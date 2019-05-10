@@ -61,7 +61,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             // if the vast campaign is accidentally a vpaid campaign parse it as such
             if (vast.isVPAIDCampaign()) {
                 // throw appropriate campaign error to be caught and handled in campaign manager
-                throw new CampaignError(ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, undefined, ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD);
+                throw new CampaignError(ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
             }
             return this._deviceInfo.getConnectionType().then((connectionType) => {
                 return this.parseVastToCampaign(vast, session, response, connectionType);
@@ -92,11 +92,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             backupCampaign: false
         };
 
-        let errorTrackingUrl;
-        if (vast.getErrorURLTemplate()) {
-            errorTrackingUrl = vast.getErrorURLTemplate()!;
-        }
-
         const vastImpressionUrls: string[] = [];
         for (const impUrl of vast.getImpressionUrls()) {
             if (Url.isValid(impUrl)) {
@@ -108,7 +103,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         let portraitAsset;
         if(portraitUrl) {
             if (!Url.isValid(portraitUrl)) {
-                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, portraitUrl);
+                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_UNSUPPORTED, vast.getErrorURLTemplates(), portraitUrl, response.getSeatId(), response.getCreativeId());
             }
             portraitAsset = new Image(Url.encode(portraitUrl), session);
         }
@@ -117,27 +112,27 @@ export class ProgrammaticVastParser extends CampaignParser {
         let landscapeAsset;
         if(landscapeUrl) {
             if (!Url.isValid(landscapeUrl)) {
-                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, landscapeUrl);
+                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_UNSUPPORTED, vast.getErrorURLTemplates(), landscapeUrl, response.getSeatId(), response.getCreativeId());
             }
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
         const mediaVideo = VastMediaSelector.getOptimizedVastMediaFile(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideo) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
         }
 
         let mediaVideoUrl = mediaVideo.getFileURL();
         if (!mediaVideoUrl) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
         }
 
         if (this._platform === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, mediaVideoUrl);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
         }
 
         if (!Url.isValid(mediaVideoUrl)) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, mediaVideoUrl);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_UNSUPPORTED, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
         }
 
         mediaVideoUrl = Url.encode(mediaVideoUrl);

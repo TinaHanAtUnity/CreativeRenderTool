@@ -3,6 +3,7 @@ import { CampaignError } from 'Ads/Errors/CampaignError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
@@ -31,7 +32,7 @@ export enum VastErrorCode {
     COMPANION_RESOURCE_NOT_FOUND = 604,
     UNDEFINED_ERROR = 900,
     GENERAL_VPAID_ERROR = 901,
-    UNKNOWN_ERROR = 9999
+    UNKNOWN_ERROR = 999
 }
 export class VastErrorInfo {
     public static errorMap: { [key: number]: string } = {
@@ -73,22 +74,26 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
-        if (campaignError.errorTrackingUrl) {
+        const errorTrackingUrls = campaignError.errorTrackingUrls;
+        for (const errorTrackingUrl of errorTrackingUrls) {
             const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
-            const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._core.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
-
-            this._request.get(errorUrl, []).then(() => {
-                return Promise.resolve();
+            const errorUrl = this.formatVASTErrorURL(errorTrackingUrl, errorCode, campaignError.assetUrl);
+            this._request.get(errorUrl, []);
+            Diagnostics.trigger('vast_error_tracking_sent', {
+                errorUrl: errorUrl,
+                errorCode: errorCode,
+                errorMessage: VastErrorInfo.errorMap[errorCode] || 'not found',
+                seatId: campaignError.seatId || -1,
+                creativeId: campaignError.creativeId || 'not found'
             });
         }
-        return Promise.reject(new Error('VastCampaignErrorHandler errorTrackingUrl was undefined'));
+        return Promise.resolve();
     }
 
     private formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
-        let formattedUrl = errorUrl.replace('[ERRORCODE]', errorCode.toString());
+        let formattedUrl = errorUrl.replace(/\[ERRORCODE\]|%5BERRORCODE%5D/ig, errorCode.toString());
         if (assetUrl) {
-            formattedUrl = formattedUrl.replace('[ASSETURI]', Url.encodeParam(assetUrl));
+            formattedUrl = formattedUrl.replace(/\[ASSETURI\]|%5BASSETURI%5D/ig, Url.encodeParam(assetUrl));
         }
         return formattedUrl;
     }
