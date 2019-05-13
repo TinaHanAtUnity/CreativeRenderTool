@@ -60,7 +60,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         const endScreen = this._vastAdUnit.getEndScreen();
-        if(endScreen) {
+        if(endScreen && this._vastAdUnit.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this._vastAdUnit.hide();
