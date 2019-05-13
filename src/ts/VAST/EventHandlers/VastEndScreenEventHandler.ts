@@ -38,10 +38,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
 
-        if (!this._vastAdUnit.hasImpressionOccurred()) {
-            this._pts.reportError(ProgrammaticTrackingErrorName.VastClickWithoutImpressionError, this._vastAdUnit.description());
-        }
-
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
