@@ -396,6 +396,13 @@ describe('CampaignManager', () => {
             mockRequest.expects('get').returns(Promise.resolve({
                 response: nonWrappedVAST
             }));
+            // mocks error urls from each Wrapped vast
+            const errorURLs = ['http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error'];
+            if (errorURLs) {
+                for (const errorURL of errorURLs) {
+                    mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
+                }
+            }
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
@@ -430,13 +437,15 @@ describe('CampaignManager', () => {
             });
         };
 
-        const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, errorURL?: string, done?: () => void): void => {
+        const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, errorURLs?: string[], done?: () => void): void => {
             // given a VAST placement that wraps another VAST
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
-            if(errorURL) {
-                mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
+            if(errorURLs) {
+                for (const errorURL of errorURLs) {
+                    mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
+                }
             }
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
@@ -482,11 +491,11 @@ describe('CampaignManager', () => {
                     response: OnProgrammaticVastPlcCampaignNoVideoWrapped
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
-                const wrapperErrorUrl = 'http://myErrorURL/error';
+                const wrapperErrorUrls = ['http://myErrorURL/error', 'http://myErrorURL/wrapper/error'];
                 const wrappedResponse = Promise.resolve({
                     response: NoVideoWrappedVast
                 });
-                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], wrapperErrorUrl, done);
+                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], wrapperErrorUrls, done);
             });
 
             it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
