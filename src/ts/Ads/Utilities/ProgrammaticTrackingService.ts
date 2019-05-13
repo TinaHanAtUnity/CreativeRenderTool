@@ -30,11 +30,15 @@ export enum ChinaMetric {
     ChineseUserIdentifiedIncorrectlyByLocale = 'chinese_user_identified_incorrectly_by_locale'
 }
 
+export enum VastMetric {
+    VastVideoImpressionFailed = 'vast_video_impression_failed'
+}
+
 export enum MiscellaneousMetric {
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | MiscellaneousMetric;
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
