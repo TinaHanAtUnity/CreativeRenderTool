@@ -20,7 +20,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const dynamicMarkup = decodeURIComponent(response.getContent());
         if (!StringUtils.startWithHTMLTag(dynamicMarkup)) {
-            throw new CampaignError(ProgrammaticStaticInterstitialParser.ErrorMessage, ProgrammaticStaticInterstitialParser.ContentTypeHtml, undefined, undefined, undefined, response.getSeatId());
+            throw new CampaignError(ProgrammaticStaticInterstitialParser.ErrorMessage, ProgrammaticStaticInterstitialParser.ContentTypeHtml, undefined, undefined, undefined, response.getSeatId(), response.getCreativeId());
         }
 
         const cacheTTL = response.getCacheTTL();
