@@ -10,7 +10,7 @@ import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -37,6 +37,10 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
 
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
+
+        if (!this._vastAdUnit.hasImpressionOccurred()) {
+            this._pts.reportError(ProgrammaticTrackingError.VastClickWithoutImpressionError, this._vastAdUnit.description());
+        }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
