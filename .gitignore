@@ -18,7 +18,7 @@ test/**/*.js
 test/**/*.js.map
 
 # VS Code
-.vscode
+# .vscode
 
 # MacOS
 .DS_Store

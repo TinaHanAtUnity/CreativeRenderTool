@@ -41,6 +41,12 @@
     "tslib": "1.9.3",
     "tslint": "5.12.1",
     "tslint-microsoft-contrib": "6.0.0",
-    "typescript": "3.3.3"
+    "typescript": "3.3.3",
+    "eslint": "5.16.0",
+    "@typescript-eslint/parser": "1.7.0",
+    "@typescript-eslint/eslint-plugin": "1.7.0",
+    "prettier": "1.17.0",
+    "eslint-config-prettier": "4.2.0",
+    "eslint-plugin-prettier": "3.0.1"
   }
 }

@@ -8,6 +8,7 @@ BIN := node_modules/.bin
 TYPESCRIPT := $(BIN)/tsc
 REMAP_ISTANBUL := $(BIN)/remap-istanbul
 TSLINT := $(BIN)/tslint
+ESLINT := $(BIN)/eslint
 STYLUS := $(BIN)/stylus
 ROLLUP := $(BIN)/rollup
 STYLINT := $(BIN)/stylint
@@ -242,11 +243,26 @@ $(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(H
 clean:
 	rm -rf $(BUILD_DIR)/*
 
+lint-ts: 
+	$(TSLINT) --project tsconfig.json $(TS_SOURCES)
+
+lint-es:
+	$(ESLINT) $(TS_SOURCES)
+
+lint-es-test:
+	$(ESLINT) $(TESTS)
+
+lint-es-fix:
+	$(ESLINT) --fix $(TS_SOURCES)
+
+lint-es-test-fix:
+	$(ESLINT) --fix $(TESTS)
+
 lint:
 	parallel --ungroup ::: \
 		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
-		"$(TSLINT) --project tsconfig.json $(TS_SOURCES)" \
-		"$(TSLINT) --project tsconfig.json --config test/tslint.json $(TESTS)"
+		"$(ESLINT) $(TS_SOURCES)" \
+		"$(ESLINT) $(TESTS)"
 
 lint-fix:
 	parallel --ungroup ::: \
