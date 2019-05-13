@@ -12,7 +12,7 @@ trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 deploy_branch () {
     ( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/$1 )
-    ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/china/webview/$1 )
+    ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/$1 )
     aws s3 sync deploy s3://unityads-cdn-origin/webview/$1/ --acl public-read
 }
 
