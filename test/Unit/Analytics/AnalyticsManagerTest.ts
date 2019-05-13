@@ -62,7 +62,7 @@ class TestHelper {
 
             return analyticsManager.init().then(() => {
                 sinon.assert.called(requestSpy);
-                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appStart.v1');
+                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'ads.analytics.appStart.v1');
             });
         });
 
@@ -74,7 +74,7 @@ class TestHelper {
                 focusManager.onActivityPaused.trigger('com.test.activity');
 
                 sinon.assert.called(requestSpy);
-                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appRunning.v1');
+                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'ads.analytics.appRunning.v1');
             });
         });
 

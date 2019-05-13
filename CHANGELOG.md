@@ -1,4 +1,23 @@
-# Pending
+# Mon May 13 21:50:59 UTC 2019
+
+* Fix Banner not ready after first banner is shown [#9561](https://github.com/Applifier/unity-ads-webview/pull/9561)
+* Fix Banners not trying to get fill after no fill [#9560](https://github.com/Applifier/unity-ads-webview/pull/9560)
+* VAST Error Tracking - part 1 [#9562](https://github.com/Applifier/unity-ads-webview/pull/9562)
+* GCP: use unity-ads-sdk-prd bucket [#9607](https://github.com/Applifier/unity-ads-webview/pull/9607)
+
+# Fri May 10 16:38:03 UTC 2019
+
+* Fix MRAID Webplayer AB group [#9559](https://github.com/Applifier/unity-ads-webview/pull/9559)
+
+# Thu May  9 16:48:28 UTC 2019
+
+* Slideshow endcard experiment [#8858](https://github.com/Applifier/unity-ads-webview/pull/8858)
+* Add `ads.` prefix to Ads SDK analytics topics [#9487](https://github.com/Applifier/unity-ads-webview/pull/9487)
+* VastCompanionAdStaticResource validator update [#9532](https://github.com/Applifier/unity-ads-webview/pull/9532)
+* Update user summary privacy endpoint [#9509](https://github.com/Applifier/unity-ads-webview/pull/9509)
+* Reduce to one abgroup for MRAID WebPlayer test [#9556](https://github.com/Applifier/unity-ads-webview/pull/9556)
+
+# Wed May  8 17:45:57 UTC 2019
 
 * Calculate additional Open Measurement Obstructions [#9223](https://github.com/Applifier/unity-ads-webview/pull/9223)
 * Add Lion Studios games to fire ad dismiss delegate callback after animation is finished [#9510](https://github.com/Applifier/unity-ads-webview/pull/9510)

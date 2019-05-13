@@ -182,7 +182,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_IMPRESSION, impressionValues);
     }
 
-    /*
+    /**
      * Video-only event. The player has loaded and buffered the creative’s
      * media and assets either fully or to the extent that it is ready
      * to play the media. Corresponds to the VAST  loaded  event.
@@ -257,31 +257,31 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
-    /*
-    * The user has interacted with the ad outside of any standard playback controls
-    * (e.g. clicked the ad to load an ad landing page).
-    */
+    /**
+     * The user has interacted with the ad outside of any standard playback controls
+     * (e.g. clicked the ad to load an ad landing page).
+     */
     public adUserInteraction(interactionType: InteractionType) {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, interactionType);
     }
 
-    // Not used at the moment because vast is not streamed
+    // TODO: Not used at the moment
     public bufferStart() {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_BUFFER_START);
     }
 
-    // Not used at the moment because vast is not streamed
+    // TODO: Not used at the moment
     public bufferFinish() {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_BUFFER_FINISH);
     }
 
-    /*
-    * Must ensure this is only called once per background and foreground
-    * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
-    * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
-    * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
-    * TODO: Calculate Geometry change for Privacy coverage
-    */
+    /**
+     * Must ensure this is only called once per background and foreground
+     * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
+     * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
+     * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
+     * TODO: Calculate Geometry change for Privacy coverage
+     */
     public geometryChange(viewPort: IViewPort, adView: IAdView) {
         if(this.getState() !== OMState.STOPPED && (this.getState() === OMState.PAUSED || this.getState() === OMState.PLAYING)) {
             this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewPort, adView});
@@ -375,10 +375,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
     }
 
-    /*
-    * All AdViews will assume fullscreen interstitial video
-    * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
-    */
+    /**
+     * All AdViews will assume fullscreen interstitial video
+     * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
+     */
     public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[]): IAdView {
         const videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
         const videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
@@ -426,10 +426,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return adView;
     }
 
-    /*
-    * Used to ensure OMID#SessionStart is fired prior to video playback events
-    * Used to ensure DOM is removed prior to OMID#SessionFinish
-    */
+    /**
+     * Used to ensure OMID#SessionStart is fired prior to video playback events
+     * Used to ensure DOM is removed prior to OMID#SessionFinish
+     */
     public onEventProcessed(eventType: string) {
         if (eventType === SESSIONEvents.SESSION_START) {
 

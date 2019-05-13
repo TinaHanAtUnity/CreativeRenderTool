@@ -3,7 +3,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -406,7 +406,7 @@ export class AssetManager {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            this._pts.reportError(ProgrammaticTrackingErrorName.TooLargeFile, adType, seatId);
+            this._pts.reportError(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
         }
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {
