@@ -3,8 +3,6 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: [
     'plugin:@typescript-eslint/recommended',
-    // 'prettier/@typescript-eslint', // TODO Re-Enable prettier
-    // 'plugin:prettier/recommended' // TODO Re-Enable prettier
   ],
   parserOptions: {
     ecmaVersion: 2018,
