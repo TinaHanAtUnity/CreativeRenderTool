@@ -1,6 +1,5 @@
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
-import { Placement } from 'Ads/Models/Placement';
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Template } from 'Core/Utilities/Template';
@@ -9,7 +8,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
-import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IBannersApi } from 'Banners/IBanners';
 
 export interface IBannerAdUnitParameters {
@@ -76,7 +75,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
 
     public onShow(): Promise<void> {
         if (!this._impressionEventsSent) {
-            this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.BannerAdImpression);
+            this._programmaticTrackingService.reportMetric(BannerMetric.BannerAdImpression);
             this._impressionEventsSent = true;
             this.sendImpressionEvent();
         }
