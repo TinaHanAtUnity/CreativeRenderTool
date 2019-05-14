@@ -1,5 +1,6 @@
 # Pending
 
+* Remove slider endcard experiment [#9635](https://github.com/Applifier/unity-ads-webview/pull/9635)
 * Remove unused code related to the old consent design [#9533](https://github.com/Applifier/unity-ads-webview/pull/9533)
 * Fix OM Javadoc Comments and Add TODOs [#9608](https://github.com/Applifier/unity-ads-webview/pull/9608)
 * Move PTS Metrics to Separate Enums [#9611](https://github.com/Applifier/unity-ads-webview/pull/9611)
