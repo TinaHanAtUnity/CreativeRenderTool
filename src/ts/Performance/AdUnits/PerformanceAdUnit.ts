@@ -7,7 +7,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
