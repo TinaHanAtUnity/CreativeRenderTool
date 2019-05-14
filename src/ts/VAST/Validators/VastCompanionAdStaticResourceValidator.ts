@@ -2,6 +2,11 @@ import { IValidator } from 'VAST/Validators/IValidator';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { Url } from 'Core/Utilities/Url';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { Campaign } from 'Ads/Models/Campaign';
+import { stat } from 'fs';
 
 export class VastCompanionAdStaticResourceValidator implements IValidator {
 
@@ -11,13 +16,13 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
     private static readonly _minLandscapeHeight = 320;
     private static readonly _minLandscapeWidth = 480;
 
-    private _errors: Error[] = [];
+    private _errors: CampaignError[] = [];
 
     constructor(companionAd: VastCompanionAdStaticResource) {
         this.validate(companionAd);
     }
 
-    public getErrors(): Error[] {
+    public getErrors(): CampaignError[] {
         return this._errors;
     }
 
@@ -34,19 +39,20 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const adId = companionAd.getId();
         const staticResourceURL = companionAd.getStaticResourceURL();
         if (staticResourceURL === null) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required StaticResource Element`));
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) is missing required StaticResource Element`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, undefined));
         } else if (!Url.isValidProtocol(staticResourceURL)) {
-            this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) staticResourceUrl`, staticResourceURL));
+            this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) staticResourceUrl`, staticResourceURL).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
         }
     }
 
     private validateCreativeType(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const creativeType = companionAd.getCreativeType();
+        const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
         if (creativeType === null) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`));
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
         } else if (VastCompanionAdStaticResourceValidator._supportedCreativeTypes.indexOf(creativeType.toLowerCase()) === -1) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`));
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
         }
     }
 
@@ -54,13 +60,14 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const adId = companionAd.getId();
         const height = companionAd.getHeight();
         const width = companionAd.getWidth();
+        const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
         if (height > width) {   // Portrait
             if (height < VastCompanionAdStaticResourceValidator._minPortraitHeight || width < VastCompanionAdStaticResourceValidator._minPortraitWidth) {
-                this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`));
+                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
         } else {
             if (height < VastCompanionAdStaticResourceValidator._minLandscapeHeight || width < VastCompanionAdStaticResourceValidator._minLandscapeWidth) {
-                this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`));
+                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
         }
     }
@@ -68,10 +75,12 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
     private validateCompanionClickThroughURLTemplate(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const companionClickThroughURLTemplate = companionAd.getCompanionClickThroughURLTemplate();
+        const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
         if (companionClickThroughURLTemplate === null) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required CompanionClickThrough Element`));
+            // Error level LOW: will reuse Video Click Through
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) is missing required CompanionClickThrough Element`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.COMPANION_NO_CLICKTHROUGH, undefined, staticResourceURL));
         } else if (!Url.isValidProtocol(companionClickThroughURLTemplate)) {
-            this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickThroughURLTemplate`, companionClickThroughURLTemplate));
+            this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickThroughURLTemplate`, companionClickThroughURLTemplate).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.COMPANION_NO_CLICKTHROUGH, undefined, staticResourceURL));
         }
     }
 
@@ -80,7 +89,8 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const companionClickTrackingURLTemplates = companionAd.getCompanionClickTrackingURLTemplates();
         for (const companionClickTrackingURLTemplate of companionClickTrackingURLTemplates) {
             if (!Url.isValidProtocol(companionClickTrackingURLTemplate)) {
-                this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickTrackingURLTemplates`, companionClickTrackingURLTemplate));
+                // Error level LOW
+                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickTrackingURLTemplates`, companionClickTrackingURLTemplate).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, companionClickTrackingURLTemplate));
             }
         }
     }
@@ -91,7 +101,8 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
             const urls = trackingEvents[key];
             urls.map((url) => {
                 if (!Url.isValidProtocol(url)) {
-                    this._errors.push(VastValidationUtilities.invalidUrlError('companion ad trackingEvents', url));
+                    // Error level LOW
+                    this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('companion ad trackingEvents', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
                 }
             });
         });

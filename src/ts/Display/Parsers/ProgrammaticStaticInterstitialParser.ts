@@ -4,7 +4,7 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
-import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { StringUtils } from 'Ads/Utilities/StringUtils';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
@@ -20,7 +20,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const dynamicMarkup = decodeURIComponent(response.getContent());
         if (!StringUtils.startWithHTMLTag(dynamicMarkup)) {
-            throw new CampaignError(ProgrammaticStaticInterstitialParser.ErrorMessage, ProgrammaticStaticInterstitialParser.ContentTypeHtml, undefined, undefined, undefined, response.getSeatId(), response.getCreativeId());
+            throw new CampaignError(ProgrammaticStaticInterstitialParser.ErrorMessage, ProgrammaticStaticInterstitialParser.ContentTypeHtml, CampaignErrorLevel.MID, undefined, undefined, undefined, response.getSeatId(), response.getCreativeId());
         }
 
         const cacheTTL = response.getCacheTTL();

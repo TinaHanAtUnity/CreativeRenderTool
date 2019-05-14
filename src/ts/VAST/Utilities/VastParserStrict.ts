@@ -14,7 +14,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
-import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 enum VastNodeName {
@@ -179,7 +179,7 @@ export class VastParserStrict {
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         } else if (depth >= this._maxWrapperDepth) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
         }
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
