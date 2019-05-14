@@ -9,6 +9,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -16,12 +17,14 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private _vastCampaign: VastCampaign;
     private _om?: OpenMeasurement;
     private _omStartCalled = false;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
         this._om = this._vastAdUnit.getOpenMeasurement();
+        this._pts = params.programmaticTrackingService;
     }
 
     public onProgress(progress: number): void {
@@ -44,6 +47,10 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
     public onCompleted(url: string): void {
         super.onCompleted(url);
+
+        if (!this._vastAdUnit.hasImpressionOccurred()) {
+            this._pts.reportMetric(VastMetric.VastVideoImpressionFailed);
+        }
 
         const session = this._vastCampaign.getSession();
 
@@ -70,7 +77,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._om.completed();
             this._om.sessionFinish({
                 adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
             });
@@ -98,7 +105,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om && !this._omStartCalled) {
             this._om.sessionStart({
                 adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                timestamp: Date.now(),
                 type: 'sessionStart',
                 data: {}
             });
@@ -167,6 +174,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         if(this._om) {
+            this._vastAdUnit.setVolume(volume / maxVolume);
             this._om.volumeChange(this._vastAdUnit.getVolume());
         }
     }

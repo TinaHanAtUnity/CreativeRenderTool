@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ChinaMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -641,7 +641,7 @@ export class Ads implements IAds {
     private logChinaMetrics() {
         const isChineseUser = this._core.Config.getCountry() === 'CN';
         if (isChineseUser) {
-            this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseUserInitialized);
+            this._core.Ads.ProgrammaticTrackingService.reportMetric(ChinaMetric.ChineseUserInitialized);
         }
         this.identifyUser(isChineseUser);
     }
@@ -649,10 +649,10 @@ export class Ads implements IAds {
     private identifyUser(isChineseUser: boolean) {
         this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
             if (isAChineseNetwork) {
-                const networkMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByNetworkOperator : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
+                const networkMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByNetworkOperator : ChinaMetric.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
                 this._core.Ads.ProgrammaticTrackingService.reportMetric(networkMetric);
             } else {
-                const localeMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByLocale : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByLocale;
+                const localeMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByLocale : ChinaMetric.ChineseUserIdentifiedIncorrectlyByLocale;
                 this.logChinaLocalizationOptimizations(localeMetric);
             }
         });
@@ -664,7 +664,7 @@ export class Ads implements IAds {
         });
     }
 
-    private logChinaLocalizationOptimizations(metric: ProgrammaticTrackingMetricName) {
+    private logChinaLocalizationOptimizations(metric: ChinaMetric) {
         const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
         const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));
         const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
