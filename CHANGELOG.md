@@ -1,3 +1,16 @@
+# Pending
+
+ * Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
+
+# Tue May 14 16:48:35 UTC 2019
+
+* Add missing deployment files in China bucket [#9636](https://github.com/Applifier/unity-ads-webview/pull/9636)
+* Remove slider endcard experiment [#9635](https://github.com/Applifier/unity-ads-webview/pull/9635)
+* Remove unused code related to the old consent design [#9533](https://github.com/Applifier/unity-ads-webview/pull/9533)
+* Fix OM Javadoc Comments and Add TODOs [#9608](https://github.com/Applifier/unity-ads-webview/pull/9608)
+* Move PTS Metrics to Separate Enums [#9611](https://github.com/Applifier/unity-ads-webview/pull/9611)
+* Investigate Magnitude of VAST Videos which Fail to Send Impressions [#9612](https://github.com/Applifier/unity-ads-webview/pull/9612)
+
 # Mon May 13 21:50:59 UTC 2019
 
 * Fix Banner not ready after first banner is shown [#9561](https://github.com/Applifier/unity-ads-webview/pull/9561)
