@@ -1,3 +1,7 @@
+# Pending
+
+ * Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
+
 # Tue May 14 16:48:35 UTC 2019
 
 * Add missing deployment files in China bucket [#9636](https://github.com/Applifier/unity-ads-webview/pull/9636)
