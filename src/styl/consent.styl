@@ -17,30 +17,11 @@
     pointer-events: none;
   }
 
-  &:not(.intro), &:not(.homepage) {
+  &:not(.homepage) {
     #consent-my-choices {
       display: flex;
     }
-    #consent-introduction {
-      display: none;
-    }
 
-    #consent-homepage {
-      display: none;
-    }
-
-    #consent-homescreen {
-      display: none;
-    }
-  }
-
-  &.intro {
-    #consent-my-choices {
-      display: none;
-    }
-    #consent-introduction {
-      display: block;
-    }
     #consent-homepage {
       display: none;
     }
@@ -52,9 +33,6 @@
 
   &.homescreen {
     #consent-my-choices {
-      display: none;
-    }
-    #consent-introduction {
       display: none;
     }
 
@@ -69,9 +47,6 @@
 
   &.homepage {
     #consent-my-choices {
-      display: none;
-    }
-    #consent-introduction {
       display: none;
     }
 
@@ -208,7 +183,7 @@
 
   .disagree {
     display: block;
-    margin-left: $default-size;
+    margin-left: .75 * $default-size;
     border: 1px solid $consent-border-gray;
     color: $black;
   }
@@ -297,46 +272,6 @@
   }
 }
 
-#consent-introduction {
-  position: relative;
-  border-radius: .5 * $default-size;
-  background: $white;
-  text-align: center;
-
-  .privacy-logo {
-    margin-top: 3 * $default-size;
-    margin-bottom: .25 * $default-size;
-    font-size: 2 * $consent-main-title-font-size;
-  }
-
-  .intro-title {
-    padding: 0 1.25 * $default-size;
-    font-weight: $privacy-main-title-font-weight;
-    font-size: $consent-main-title-font-size;
-  }
-
-  .intro-text {
-    padding: 0 1.75 * $default-size;
-  }
-
-  .bold {
-    font-weight: $privacy-main-title-font-weight;
-  }
-
-  .continue-button {
-    // padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
-    padding: .5 * $default-size 2 * $default-size 2 * $default-size 2 * $default-size;
-    color: $consent-blue;
-    font-size: $consent-title-font-size;
-  }
-
-  .unity-logo {
-    margin-bottom: $default-size;
-    font-size: $default-font-size * .65;
-    opacity: .18;
-  }
-}
-
 #consent-homepage {
   position: relative;
   border-radius: .5 * $default-size;
@@ -410,7 +345,7 @@
 
   .show-choices {
     display: block;
-    margin-left: $default-size;
+    margin-left: .75 * $default-size;
     border: 1px solid $consent-border-gray;
     color: $black;
   }
@@ -513,7 +448,6 @@
 
 &.landscape {
   #consent {
-    #consent-introduction,
     #consent-my-choices,
     #consent-homepage {
       left: 15%;
@@ -522,16 +456,6 @@
 
     #consent-my-choices {
       height: 100%;
-    }
-
-    #consent-introduction {
-      .continue-button {
-        padding: .5 * $default-size 2 * $default-size $default-size 2 * $default-size;
-      }
-
-      .privacy-logo {
-        margin-top: 2rem;
-      }
     }
 
     .back-button {

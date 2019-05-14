@@ -31,7 +31,6 @@ export interface IConsentViewParameters {
 
 export enum ConsentPage {
     HOMESCREEN = 'homescreen',
-    INTRO = 'intro',
     MY_CHOICES = 'mychoices',
     HOMEPAGE = 'homepage'
 }
@@ -69,11 +68,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         };
 
         this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onContinueEvent(event),
-                selector: '.continue-button'
-            },
             {
                 event: 'click',
                 listener: (event: Event) => this.onAgreeEvent(event),
@@ -220,7 +214,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        const states = [ConsentPage.HOMESCREEN, ConsentPage.INTRO, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE];
+        const states = [ConsentPage.HOMESCREEN, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE];
         states.forEach(state => {
             if (state === page) {
                 this.container().classList.add(page);
@@ -228,12 +222,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 this.container().classList.remove(state);
             }
         });
-    }
-
-    private onContinueEvent(event: Event) {
-        event.preventDefault();
-
-        this.container().classList.remove('intro');
     }
 
     private onAcceptAllEvent(event: Event) {
