@@ -299,7 +299,14 @@ export class VastParserStrict {
             if (staticResourceElement) {
                 const companionAd = this.parseCompanionAdStaticResourceElement(element, urlProtocol);
                 const companionAdErrors = new VastCompanionAdStaticResourceValidator(companionAd).getErrors();
-                if (companionAdErrors.length === 0) {
+                let isWarningLevel = true;
+                for (const adError of companionAdErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        isWarningLevel = false;
+                        break;
+                    }
+                }
+                if (isWarningLevel) {
                     vastAd.addCompanionAd(companionAd);
                 } else {
                     vastAd.addUnsupportedCompanionAd(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));

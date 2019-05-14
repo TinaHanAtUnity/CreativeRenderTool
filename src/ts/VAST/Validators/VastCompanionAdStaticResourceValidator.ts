@@ -5,8 +5,6 @@ import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { Campaign } from 'Ads/Models/Campaign';
-import { stat } from 'fs';
 
 export class VastCompanionAdStaticResourceValidator implements IValidator {
 
