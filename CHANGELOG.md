@@ -1,5 +1,6 @@
 # Pending
 
+* Add missing deployment files in China bucket [#9636](https://github.com/Applifier/unity-ads-webview/pull/9636)
 * Remove slider endcard experiment [#9635](https://github.com/Applifier/unity-ads-webview/pull/9635)
 * Remove unused code related to the old consent design [#9533](https://github.com/Applifier/unity-ads-webview/pull/9533)
 * Fix OM Javadoc Comments and Add TODOs [#9608](https://github.com/Applifier/unity-ads-webview/pull/9608)
