@@ -77,7 +77,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._om.completed();
             this._om.sessionFinish({
                 adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
             });
@@ -105,7 +105,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om && !this._omStartCalled) {
             this._om.sessionStart({
                 adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                timestamp: Date.now(),
                 type: 'sessionStart',
                 data: {}
             });
@@ -174,6 +174,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         if(this._om) {
+            this._vastAdUnit.setVolume(volume / maxVolume);
             this._om.volumeChange(this._vastAdUnit.getVolume());
         }
     }
