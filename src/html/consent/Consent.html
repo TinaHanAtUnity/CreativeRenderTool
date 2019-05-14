@@ -51,6 +51,27 @@
         </div>
     </div>
 
+    <div id="consent-homepage">
+        <div class="text-container">
+            <div class="privacy-logo">
+                <span class="icon-gdpr"></span>
+            </div>
+            <span class="title"><%= data.t("homepage-title") %></span>
+            <div class="main-text">
+                <p>
+                    <%= data.t("homepage-main-text") %>
+                </p>
+            </div>
+            <div class="empty-block">
+            </div>
+        </div>
+
+        <div class="consent-button-container">
+            <div class="accept-all consent-button"><span><%= data.t("homepage-accept-all") %></span></div>
+            <div class="show-choices consent-button"><%= data.t("homepage-show-my-choices") %></span></div>
+        </div>
+    </div>
+
     <div id="consent-my-choices" class="consent-container">
         <div class="back-button">
             <span><%= data.t("my-choices-back") %></span>

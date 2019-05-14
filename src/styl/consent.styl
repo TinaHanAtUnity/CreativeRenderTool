@@ -17,11 +17,15 @@
     pointer-events: none;
   }
 
-  &:not(.intro) {
+  &:not(.intro), &:not(.homepage) {
     #consent-my-choices {
       display: flex;
     }
     #consent-introduction {
+      display: none;
+    }
+
+    #consent-homepage {
       display: none;
     }
 
@@ -37,6 +41,9 @@
     #consent-introduction {
       display: block;
     }
+    #consent-homepage {
+      display: none;
+    }
 
     #consent-homescreen {
       display: none;
@@ -51,15 +58,36 @@
       display: none;
     }
 
+    #consent-homepage {
+      display: none;
+    }
+
     #consent-homescreen {
       display: flex;
+    }
+  }
+
+  &.homepage {
+    #consent-my-choices {
+      display: none;
+    }
+    #consent-introduction {
+      display: none;
+    }
+
+    #consent-homepage {
+      display: flex;
+    }
+
+    #consent-homescreen {
+      display: none;
     }
   }
 
 
   &.android4-ios7-ios8 {
     .consent-button-container {
-      padding: $default-size 0;
+      padding: .75 * $default-size 0;
       width: 100%;
       justify-content: center;
       background: $white;
@@ -146,7 +174,7 @@
     left:0;
     display: flex;
     justify-content: space-between;
-    padding: $default-size $default-size;
+    padding: .75 * $default-size $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -309,6 +337,86 @@
   }
 }
 
+#consent-homepage {
+  position: relative;
+  border-radius: .5 * $default-size;
+  background: $white;
+  text-align: center;
+
+  .text-container {
+    position: relative;
+    flex: 1 1 auto;
+    overflow: scroll;
+    border-radius: .5 * $default-size;
+    background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
+    padding: 1.5 * $default-size;
+  }
+
+  .privacy-logo {
+    margin-bottom: .25 * $default-size;
+    font-size: 1.5 * $consent-main-title-font-size;
+  }
+
+  .title {
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $consent-main-title-font-size;
+  }
+
+  .empty-block {
+    height: 4.5 * $default-size;
+  }
+
+  .consent-button-container {
+    // use absolute position to ensure that buttons are always visible
+    position: absolute;
+    right:0;
+    bottom: 0;
+    left:0;
+    display: flex;
+    justify-content: space-between;
+    padding: .75 * $default-size $default-size;
+    border-bottom-right-radius: .5 * $default-size;
+    border-bottom-left-radius: .5 * $default-size;
+    background: $white;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, .19);
+  }
+
+  .consent-button {
+    position: relative;
+    align-self: center;
+    padding: .75 * $default-size .75 * $default-size;
+    border-radius: 2 * $default-size;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
+    text-align: center;
+    font-weight: $privacy-title-font-weight;
+    font-size: $consent-button-font-size;
+
+  }
+
+  .consent-button {
+    &.click-animation {
+      $click-animation();
+    }
+  }
+
+  .accept-all {
+    display: block;
+    flex-grow: 1;
+    background: $consent-blue;
+    color: $white;
+  }
+
+  .show-choices {
+    display: block;
+    margin-left: $default-size;
+    border: 1px solid $consent-border-gray;
+    color: $black;
+  }
+}
+
+
 #consent-homescreen {
   position: relative;
   display: flex;
@@ -406,7 +514,8 @@
 &.landscape {
   #consent {
     #consent-introduction,
-    #consent-my-choices {
+    #consent-my-choices,
+    #consent-homepage {
       left: 15%;
       width: 70%;
     }
@@ -428,7 +537,6 @@
     .back-button {
       margin-left: -.5 * $default-size;
       transform: translateX(-100%);
-
     }
   }
 }

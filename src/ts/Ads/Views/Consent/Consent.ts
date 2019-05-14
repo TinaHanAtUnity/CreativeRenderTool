@@ -32,7 +32,8 @@ export interface IConsentViewParameters {
 export enum ConsentPage {
     HOMESCREEN = 'homescreen',
     INTRO = 'intro',
-    MY_CHOICES = 'mychoices'
+    MY_CHOICES = 'mychoices',
+    HOMEPAGE = 'homepage'
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -170,7 +171,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             }
         }
 
-        if (this._landingPage === ConsentPage.HOMESCREEN) {
+        if (this._landingPage === ConsentPage.HOMESCREEN || this._landingPage === ConsentPage.HOMEPAGE) {
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
         }
@@ -219,7 +220,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        const states = [ConsentPage.HOMESCREEN, ConsentPage.INTRO, ConsentPage.MY_CHOICES];
+        const states = [ConsentPage.HOMESCREEN, ConsentPage.INTRO, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE];
         states.forEach(state => {
             if (state === page) {
                 this.container().classList.add(page);
@@ -326,7 +327,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
-        this.showPage(ConsentPage.HOMESCREEN);
+        this.showPage(this._landingPage);
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
