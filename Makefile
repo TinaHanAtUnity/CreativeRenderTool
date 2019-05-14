@@ -284,17 +284,25 @@ start-server:
 deploy:
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/release
-	mkdir -p deploy-china/release
 	mkdir -p deploy/test
 	mkdir -p deploy/$(COMMIT_ID)
 	cp build/release/index.html deploy/release/index.html
 	cp build/release/config.json deploy/release/config.json
-	cp build/release/index.html deploy-china/release/index.html
-	cp build/release/config.json.cn deploy-china/release/config.json
 	cp build/test/index.html deploy/test/index.html
 	cp build/test/config.json deploy/test/config.json
 	rsync -r deploy/release deploy/$(COMMIT_ID)
 	rsync -r deploy/test deploy/$(COMMIT_ID)
+
+	mkdir -p deploy-china/release
+	mkdir -p deploy-china/test
+	mkdir -p deploy-china/$(COMMIT_ID)
+	cp build/release/index.html deploy-china/release/index.html
+	cp build/release/config.json.cn deploy-china/release/config.json
+	cp build/test/index.html deploy-china/test/index.html
+	cp build/test/config.json.cn deploy-china/test/config.json
+	rsync -r deploy-china/release deploy-china/$(COMMIT_ID)
+	rsync -r deploy-china/test deploy-china/$(COMMIT_ID)
+
 	tools/deploy.sh $(BRANCH) && node tools/purge.js
 else
 	echo 'Skipping deployment for pull requests'

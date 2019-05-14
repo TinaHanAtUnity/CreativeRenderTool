@@ -3,30 +3,42 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
-export enum ProgrammaticTrackingErrorName {
+export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
     AdmobTestHttpError = 'admob_video_http_error',
     VastClickWithoutImpressionError = 'vast_click_without_impression'
 }
 
-export enum ProgrammaticTrackingMetricName {
+export enum AdmobMetric {
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
-    AdmobUserVideoSeeked = 'admob_user_video_seeked',
+    AdmobUserVideoSeeked = 'admob_user_video_seeked'
+}
 
+export enum BannerMetric {
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
-    BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking',
+    BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
+}
 
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-
+export enum ChinaMetric {
     ChineseUserInitialized = 'chinese_user_intialized',
     ChineseUserIdentifiedCorrectlyByNetworkOperator = 'chinese_user_identified_correctly_by_network_operator',
     ChineseUserIdentifiedIncorrectlyByNetworkOperator = 'chinese_user_identified_incorrectly_by_network_operator',
     ChineseUserIdentifiedCorrectlyByLocale = 'chinese_user_identified_correctly_by_locale',
     ChineseUserIdentifiedIncorrectlyByLocale = 'chinese_user_identified_incorrectly_by_locale'
 }
+
+export enum VastMetric {
+    VastVideoImpressionFailed = 'vast_video_impression_failed'
+}
+
+export enum MiscellaneousMetric {
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
@@ -63,7 +75,7 @@ export class ProgrammaticTrackingService {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
-    public reportError(error: ProgrammaticTrackingErrorName, adType: string, seatId?: number | undefined): Promise<INativeResponse> {
+    public reportError(error: ProgrammaticTrackingError, adType: string, seatId?: number | undefined): Promise<INativeResponse> {
         const platform: Platform = this._platform;
         const osVersion: string = this._deviceInfo.getOsVersion();
         const sdkVersion: string = this._clientInfo.getSdkVersionName();
@@ -90,7 +102,7 @@ export class ProgrammaticTrackingService {
         return this._request.post(url, data, headers);
     }
 
-    public reportMetric(event: ProgrammaticTrackingMetricName): Promise<INativeResponse> {
+    public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
