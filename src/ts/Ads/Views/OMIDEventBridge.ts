@@ -174,7 +174,7 @@ export interface IOMIDMessage {
 }
 export interface ISessionEvent {
     adSessionId: string;
-    timestamp: Date;
+    timestamp: number;
     type: string;
     data: {[key: string]: unknown};
 }

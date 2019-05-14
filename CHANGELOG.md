@@ -1,3 +1,9 @@
+# Pending
+
+* Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
+* Disable Vast Endscreens Lacking Impressions [#9609](https://github.com/Applifier/unity-ads-webview/pull/9609)
+* Introduce isBannerPlacement to SDK Versions <3.0 and Remove Banner Placements from being Requested (Manual Patch)
+
 # Tue May 14 16:48:35 UTC 2019
 
 * Add missing deployment files in China bucket [#9636](https://github.com/Applifier/unity-ads-webview/pull/9636)
