@@ -170,8 +170,7 @@ export class UserPrivacyManager {
             method: PrivacyMethod.UNITY_CONSENT,
             version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
-            permissions: permissions,
-            bundleId: this._clientInfo.getApplicationName()
+            permissions: permissions
         };
 
         if (CustomFeatures.shouldSampleAtOnePercent()) {
