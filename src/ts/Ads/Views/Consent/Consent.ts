@@ -49,6 +49,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
 
+    private _isABTest: boolean = false;
+
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
 
@@ -57,6 +59,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._osVersion = parameters.osVersion;
         this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
+
+        this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
         this._templateData = {};
@@ -162,6 +166,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         if (this._landingPage === ConsentPage.HOMESCREEN || this._landingPage === ConsentPage.HOMEPAGE) {
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
+        }
+
+        if (this._isABTest) {
+            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
+            myChoicesElement.classList.add('consent-ab-test');
         }
 
         this.showPage(this._landingPage);

@@ -197,6 +197,17 @@
     color: $white;
   }
 
+  &.consent-ab-test {
+    .consent-button {
+      font-weight: 600;
+    }
+    .disagree {
+      border: 0;
+      box-shadow: 0 0 0 0;
+      color: $consent-disagree-button-color;
+    }
+  }
+
   .consent-button-container:not(.show-save-my-choices-button) {
     .agree {
       display: block;
@@ -327,7 +338,7 @@
     border-radius: 2 * $default-size;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
     text-align: center;
-    font-weight: $privacy-title-font-weight;
+    font-weight: $privacy-main-title-font-weight;
     font-size: $consent-button-font-size;
 
   }
@@ -348,8 +359,9 @@
   .show-choices {
     display: block;
     margin-left: .75 * $default-size;
-    border: 1px solid $consent-border-gray;
-    color: $black;
+    border: 0;
+    box-shadow: 0 0 0 0;
+    color: $consent-disagree-button-color;
   }
 }
 
