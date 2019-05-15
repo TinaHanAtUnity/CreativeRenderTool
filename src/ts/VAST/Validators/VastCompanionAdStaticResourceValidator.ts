@@ -37,9 +37,9 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const adId = companionAd.getId();
         const staticResourceURL = companionAd.getStaticResourceURL();
         if (staticResourceURL === null) {
-            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) is missing required StaticResource Element`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, undefined));
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) is missing required StaticResource Element`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, undefined));
         } else if (!Url.isValidProtocol(staticResourceURL)) {
-            this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) staticResourceUrl`, staticResourceURL).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
+            this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) staticResourceUrl`, staticResourceURL).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
         }
     }
 
@@ -48,9 +48,9 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const creativeType = companionAd.getCreativeType();
         const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
         if (creativeType === null) {
-            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
         } else if (VastCompanionAdStaticResourceValidator._supportedCreativeTypes.indexOf(creativeType.toLowerCase()) === -1) {
-            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
+            this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_RESOURCE_NOT_FOUND, undefined, staticResourceURL));
         }
     }
 
@@ -61,11 +61,11 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
         if (height > width) {   // Portrait
             if (height < VastCompanionAdStaticResourceValidator._minPortraitHeight || width < VastCompanionAdStaticResourceValidator._minPortraitWidth) {
-                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
+                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
         } else {
             if (height < VastCompanionAdStaticResourceValidator._minLandscapeHeight || width < VastCompanionAdStaticResourceValidator._minLandscapeWidth) {
-                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MID, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
+                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
         }
     }

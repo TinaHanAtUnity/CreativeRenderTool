@@ -4,7 +4,7 @@
  */
 export enum CampaignErrorLevel {
     LOW = 'low priority',       // Warning level error, not a blocker
-    MID = 'medium priority',    // Default level, severity depends per error occasion
+    MEDIUM = 'medium priority',    // Default level, severity depends per error occasion
     HIGH = 'high priority'      // Severe level error that stops proceeding
 }
 export class CampaignError extends Error {
@@ -19,7 +19,7 @@ export class CampaignError extends Error {
 
     constructor(message: string, contentType: string, errorLevel?: CampaignErrorLevel, errorCode?: number, errorTrackingUrls?: string[], assetUrl?: string, seatId?: number, creativeId?: string) {
         super(message);
-        this.errorLevel = errorLevel || CampaignErrorLevel.MID;
+        this.errorLevel = errorLevel || CampaignErrorLevel.MEDIUM;
         this.contentType = contentType;
         this.errorTrackingUrls = errorTrackingUrls || [];
         this.errorCode = errorCode || 999;   // 999 Undefined general error
