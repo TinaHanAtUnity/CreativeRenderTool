@@ -1,4 +1,4 @@
-# Pending
+# Wed May 15 18:04:53 UTC 2019
 
 * Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
 * Disable Vast Endscreens Lacking Impressions [#9609](https://github.com/Applifier/unity-ads-webview/pull/9609)
