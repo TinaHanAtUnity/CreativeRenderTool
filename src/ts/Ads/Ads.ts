@@ -566,8 +566,7 @@ export class Ads implements IAds {
         return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
             if(mediation) {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
-
-                if(loadEnabled && loadEnabled === 'true') {
+                if(loadEnabled) {
                     this._loadApiEnabled = true;
                 }
             }
