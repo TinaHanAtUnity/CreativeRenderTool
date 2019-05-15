@@ -201,7 +201,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._startVolume = videoPlayerVolume;
         if (this.getState() === OMState.STOPPED && this._sessionStartCalled) {
             this.setState(OMState.PLAYING);
-            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_START, {duration, videoPlayerVolume});
+
+            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_START, {
+                duration: duration,
+                videoPlayerVolume: videoPlayerVolume,
+                deviceVolume: videoPlayerVolume
+            });
         }
     }
 
@@ -253,7 +258,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public volumeChange(videoPlayerVolume: number) {
         if(this.getState() !== OMState.COMPLETED) {
-            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {videoPlayerVolume});
+            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {
+                videoPlayerVolume: videoPlayerVolume,
+                deviceVolume: videoPlayerVolume
+            });
         }
     }
 
