@@ -42,7 +42,11 @@ export class CustomFeatures {
                 creativeId === '151338976' ||
                 creativeId === '151337994' ||
                 creativeId === '152919353' ||
-                creativeId === '153119177';
+                creativeId === '153119177' ||
+                creativeId === '2044203'   || // Hulu
+                creativeId === '2044209'   || // Hulu
+                creativeId === '2044202'   || // Hulu
+                creativeId === '2044208';     // Hulu
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
