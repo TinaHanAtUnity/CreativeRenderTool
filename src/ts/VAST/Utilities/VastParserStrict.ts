@@ -120,30 +120,42 @@ export class VastParserStrict {
         this.getChildrenNodesWithName(documentElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
             parseErrorURLTemplates.push(this.parseNodeText(element));
         });
-        let errors: Error[] = [];
+        let errors: CampaignError[] = [];
+        let isWarningLevel = true;
         // parse each Ad element
         this.getNodesWithName(documentElement, VastNodeName.AD).forEach((element: HTMLElement) => {
             if (ads.length <= 0) {
                 const ad = this.parseAdElement(element, urlProtocol);
                 const adErrors = new VastAdValidator(ad).getErrors();
-                if (adErrors.length > 0) {
-                    errors = errors.concat(adErrors);
-                } else {
+                for (const adError of adErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        isWarningLevel = false;
+                    }
+
+                    if (adError.errorTrackingUrls.length === 0) {
+                        adError.errorTrackingUrls = parseErrorURLTemplates.concat(ad.getErrorURLTemplates());
+                    }
+                }
+
+                if (isWarningLevel) {
                     ads.push(ad);
                 }
+
+                errors = errors.concat(adErrors);
             }
         });
 
-        if (errors.length > 0) {
-            // Format all errors into a single error message
-            throw this.formatErrorMessage(errors);
+        // if (errors.length > 0) {
+        //     // Format all errors into a single error message
+        //     throw this.formatErrorMessage(errors);
+        // }
+
+        if (ads.length === 0) { //
+            throw this.formatErrorMessage('Failed to parse VAST xml', errors);
+            //throw new CampaignError('VAST Ad tag is missing', CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR, parseErrorURLTemplates);
         }
 
-        if (ads.length === 0) {
-            throw new CampaignError('VAST Ad tag is missing', CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR, parseErrorURLTemplates);
-        }
-
-        return new Vast(ads, parseErrorURLTemplates);
+        return new Vast(ads, parseErrorURLTemplates, errors);
     }
 
     // default to https: for relative urls
@@ -194,10 +206,11 @@ export class VastParserStrict {
         return (duration * kbitrate * 1000) / 8;
     }
 
-    private formatErrorMessage(errors: Error[]): Error {
-        return new Error(`VAST parse encountered these errors while parsing:
-            ${VastValidationUtilities.formatErrors(errors)}
-        `);
+    private formatErrorMessage(msg: string, errors: CampaignError[]): CampaignError {
+        // return new Error(`VAST parse encountered these errors while parsing:
+        //     ${VastValidationUtilities.formatErrors(errors)}
+        // `);
+        const cosolidatedCampaignError = new CampaignError(msg, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW)
     }
 
     // only searches direct children for nodes with matching name
