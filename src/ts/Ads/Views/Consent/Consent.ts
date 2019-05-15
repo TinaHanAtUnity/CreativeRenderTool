@@ -126,6 +126,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onBackButtonEvent(event),
                 selector: '.back-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onHomepageAcceptAllEvent(event),
+                selector: '.homepage-accept-all'
             }
         ];
 
@@ -237,6 +242,17 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
         const element = (<HTMLElement>this._container.querySelector('.accept-all'));
+        this.closeWithAnimation(element);
+    }
+
+    private onHomepageAcceptAllEvent(event: Event) {
+        event.preventDefault();
+
+        const permissions: IPermissions = {
+            all: true
+        };
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        const element = (<HTMLElement>this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }
 
