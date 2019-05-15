@@ -817,7 +817,8 @@ export class CampaignManager {
 
         let url: string = this.getBaseUrl();
 
-        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+        url = Url.addParameters(url, trackingIDs);
 
         if (nofillRetry && this._lastAuctionId) {
             url = Url.addParameters(url, {
