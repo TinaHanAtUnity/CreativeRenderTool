@@ -90,7 +90,7 @@ export class VastParserStrict {
 
     public parseVast(vast: string | null, urlProtocol: string = 'https:'): Vast {
         if (!vast) {
-            throw new Error('VAST data is missing');
+            throw new CampaignError('VAST data is missing', CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR);
         }
 
         const xml = this._domParser.parseFromString(vast, 'text/xml');
@@ -98,7 +98,7 @@ export class VastParserStrict {
         const parseErrorURLTemplates: string[] = [];
 
         // use the parsererror tag from DomParser to give accurate error messages
-        const parseErrors = xml.getElementsByTagName(VastNodeName.PARSE_ERROR); // TODO move to enum
+        const parseErrors = xml.getElementsByTagName(VastNodeName.PARSE_ERROR);
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
@@ -107,11 +107,11 @@ export class VastParserStrict {
                     parseMessages.push(element.textContent);
                 }
             }
-            throw new Error(`VAST xml was not parseable:\n   ${parseMessages.join('\n    ')}`);
+            throw new CampaignError(`VAST xml was not parseable:\n   ${parseMessages.join('\n    ')}`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR);
         }
 
-        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== VastNodeName.VAST) { // TODO move vast to enum
-            throw new Error('VAST xml data is missing');
+        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== VastNodeName.VAST) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR);
         }
 
         const documentElement = xml.documentElement;
@@ -140,7 +140,7 @@ export class VastParserStrict {
         }
 
         if (ads.length === 0) {
-            throw new Error('VAST Ad tag is missing');
+            throw new CampaignError('VAST Ad tag is missing', CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR, parseErrorURLTemplates);
         }
 
         return new Vast(ads, parseErrorURLTemplates);
