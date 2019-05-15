@@ -1,3 +1,7 @@
+# PENDING
+
+* IMEI support for main SDK [#9199](https://github.com/Applifier/unity-ads-webview/pull/9199)
+
 # Wed May 15 18:04:53 UTC 2019
 
 * Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
