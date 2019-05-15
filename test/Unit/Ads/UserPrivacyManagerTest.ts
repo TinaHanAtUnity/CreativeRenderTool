@@ -24,7 +24,6 @@ describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
     const testAdvertisingId = '128970986778678';
     const testUnityProjectId = 'game-1';
-    const testBundleId = 'com.unity.ads.test';
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
@@ -77,7 +76,6 @@ describe('UserPrivacyManagerTest', () => {
         writeStub = sinon.stub(core.Storage, 'write').resolves();
 
         (<sinon.SinonStub>clientInfo.getGameId).returns(testGameId);
-        (<sinon.SinonStub>clientInfo.getApplicationName).returns(testBundleId);
         (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
         (<sinon.SinonStub>coreConfig.getUnityProjectId).returns(testUnityProjectId);
         (<sinon.SinonStub>adsConfig.isGDPREnabled).callsFake(() => {
@@ -480,8 +478,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
-                'gameId': testGameId,
-                'bundleId': testBundleId
+                'gameId': testGameId
             }
         }, {
             action: GDPREventAction.CONSENT,
@@ -492,8 +489,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
-                'gameId': testGameId,
-                'bundleId': testBundleId
+                'gameId': testGameId
             }
         }, {
             action: GDPREventAction.OPTOUT,
@@ -504,8 +500,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
-                'gameId': testGameId,
-                'bundleId': testBundleId
+                'gameId': testGameId
             }
         }, {
             action: GDPREventAction.OPTOUT,
@@ -517,8 +512,7 @@ describe('UserPrivacyManagerTest', () => {
                 'platform': 'android',
                 'gameId': testGameId,
                 'country': 'FF',
-                'source': 'metadata',
-                'bundleId': testBundleId
+                'source': 'metadata'
             }
         }, {
             action: GDPREventAction.OPTOUT,
@@ -530,8 +524,7 @@ describe('UserPrivacyManagerTest', () => {
                 'platform': 'android',
                 'gameId': testGameId,
                 'country': 'FF',
-                'source': 'user',
-                'bundleId': testBundleId
+                'source': 'user'
             }
         }, {
             action: GDPREventAction.OPTIN,
@@ -542,8 +535,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
-                'gameId': testGameId,
-                'bundleId': testBundleId
+                'gameId': testGameId
             }
         }];
 
@@ -572,16 +564,11 @@ describe('UserPrivacyManagerTest', () => {
                     if (value.source !== t.infoJson.source) {
                         return false;
                     }
-                    if (value.bundleId !== t.infoJson.bundleId) {
-                        return false;
-                    }
                     return true;
                 };
-                return privacyManager.sendGDPREvent(t.action, t.source).then(() => {
-                    assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
-                    httpKafkaStub.calledWithExactly('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, t.infoJson);
-                });
-
+                privacyManager.sendGDPREvent(t.action, t.source);
+                assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
+                httpKafkaStub.calledWithExactly('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, t.infoJson);
             });
         });
     });

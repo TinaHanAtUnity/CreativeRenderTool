@@ -80,8 +80,7 @@ export class UserPrivacyManager {
             'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._platform].toLowerCase(),
             'country': this._coreConfig.getCountry(),
-            'gameId': this._clientInfo.getGameId(),
-            'bundleId': this._clientInfo.getApplicationName()
+            'gameId': this._clientInfo.getGameId()
         };
         if (source) {
             infoJson = {
@@ -170,6 +169,7 @@ export class UserPrivacyManager {
             method: PrivacyMethod.UNITY_CONSENT,
             version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
+            bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions
         };
 
