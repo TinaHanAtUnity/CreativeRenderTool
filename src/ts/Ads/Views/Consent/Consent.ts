@@ -26,7 +26,7 @@ export interface IConsentViewParameters {
     apiLevel?: number;
     osVersion?: string;
     pts: ProgrammaticTrackingService;
-    ctaABTest: boolean;
+    consentABTest: boolean;
 }
 
 export enum ConsentPage {
@@ -49,8 +49,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
 
-    private _isCtaAbTest: boolean;
-
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
 
@@ -60,12 +58,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
 
-        this._isCtaAbTest = parameters.ctaABTest;
-
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
-        this._templateData = {
-            myChoicesDisagreeCtaTest: parameters.ctaABTest
-        };
+        this._templateData = {};
 
         this._bindings = [
             {
