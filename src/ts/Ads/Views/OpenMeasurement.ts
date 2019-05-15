@@ -456,7 +456,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === SESSIONEvents.SESSION_FINISH) {
-            this.removeFromViewHieararchy();
+            // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
+            // to reach server before removing the Verification Client from the DOM
+            window.setTimeout(() => this.removeFromViewHieararchy(), 1000);
         }
 
         if (eventType === 'loadError') {
