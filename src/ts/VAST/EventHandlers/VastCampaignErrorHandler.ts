@@ -5,9 +5,11 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
-// VAST Error code defined in 3.0
-// https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
-// https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
+/**
+ * VAST Error code defined in 3.0
+ * https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
+ * https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
+ */
 export enum VastErrorCode {
     XML_PARSER_ERROR = 100,
     SCHEMA_VAL_ERROR = 101,

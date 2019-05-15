@@ -1,8 +1,11 @@
 
+/**
+ * Levels of errors that can occur in a campaign: parsing, validating, rendering, tracking
+ */
 export enum CampaignErrorLevel {
-    LOW = 'low priority',
-    MID = 'medium priority',
-    HIGH = 'high priority'
+    LOW = 'low priority',       // Warning level error, not a blocker
+    MID = 'medium priority',    // Default level, severity depends per error occasion
+    HIGH = 'high priority'      // Severe level error that stops proceeding
 }
 export class CampaignError extends Error {
     public errorLevel: CampaignErrorLevel;
