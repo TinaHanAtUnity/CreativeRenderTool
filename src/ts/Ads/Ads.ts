@@ -252,8 +252,10 @@ export class Ads implements IAds {
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
 
             if(this._loadApiEnabled) {
+                this._core.Api.Sdk.logInfo(`LOAD API ENABLED LOAD MANAGER LOADING`);
                 this.RefreshManager = new LoadManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
             } else {
+                this._core.Api.Sdk.logInfo(`LOAD API NOT ENABLED CAMPAIGN MANAGER LOADING`);
                 this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
             }
 
@@ -566,6 +568,7 @@ export class Ads implements IAds {
         return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
             if(mediation) {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
+                this._core.Api.Sdk.logInfo(`LOAD ENABLED = ${loadEnabled}`);
                 if(loadEnabled) {
                     this._loadApiEnabled = true;
                 }
