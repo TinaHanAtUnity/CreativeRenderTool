@@ -36,6 +36,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 import { IStore } from 'Store/IStore';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -76,6 +77,7 @@ export interface ICore extends IApiModule {
     RequestManager: RequestManager;
     CacheManager: CacheManager;
     JaegerManager: JaegerManager;
+    DeviceIdManager: DeviceIdManager;
     ClientInfo: ClientInfo;
     DeviceInfo: DeviceInfo;
     Config: CoreConfiguration;

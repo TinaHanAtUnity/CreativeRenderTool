@@ -51,6 +51,7 @@ import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 
 export class Core implements ICore {
 
@@ -69,6 +70,7 @@ export class Core implements ICore {
     public RequestManager: RequestManager;
     public CacheManager: CacheManager;
     public JaegerManager: JaegerManager;
+    public DeviceIdManager: DeviceIdManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
     public UnityInfo: UnityInfo;
@@ -135,6 +137,7 @@ export class Core implements ICore {
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
+                this.DeviceIdManager = new DeviceIdManager(this.Api, <AndroidDeviceInfo>this.DeviceInfo);
             } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
