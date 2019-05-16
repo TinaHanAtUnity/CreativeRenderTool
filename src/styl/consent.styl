@@ -197,23 +197,6 @@
     color: $white;
   }
 
-  &.consent-ab-test {
-    .consent-button {
-      font-weight: 600;
-    }
-
-    .agree {
-      margin-left: .75 * $default-size;
-    }
-
-    .disagree {
-      margin-left: 0;
-      border: 0;
-      box-shadow: 0 0 0 0;
-      color: $consent-disagree-button-color;
-    }
-  }
-
   .consent-button-container:not(.show-save-my-choices-button) {
     .agree {
       display: block;
@@ -319,7 +302,7 @@
   }
 
   .empty-block {
-    height: 3 * $default-size;
+    height: 6 * $default-size;
   }
 
   .consent-button-container {
@@ -329,8 +312,9 @@
     bottom: 0;
     left:0;
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    padding: .75 * $default-size $default-size;
+    padding: .75 * $default-size 2 * $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -341,12 +325,12 @@
     position: relative;
     align-self: center;
     padding: .75 * $default-size .75 * $default-size;
+    width: 100%;
     border-radius: 2 * $default-size;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
     text-align: center;
-    font-weight: $privacy-main-title-font-weight;
+    font-weight: $privacy-title-font-weight;
     font-size: $consent-button-font-size;
-
   }
 
   .consent-button {
@@ -358,16 +342,20 @@
   .homepage-accept-all {
     display: block;
     flex-grow: 1;
-    margin-left: .75 * $default-size;
     background: $consent-blue;
     color: $white;
   }
 
   .show-choices {
     display: block;
-    border: 0;
-    box-shadow: 0 0 0 0;
-    color: $consent-disagree-button-color;
+    margin-top: .5 * $default-size;
+    border: 1px solid $privacy-light-gray;
+    color: $consent-text-font-color;
+  }
+
+  .page-link {
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 
