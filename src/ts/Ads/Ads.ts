@@ -83,6 +83,7 @@ import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFac
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { LoadManager } from 'Ads/Managers/LoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class Ads implements IAds {
 
@@ -566,7 +567,7 @@ export class Ads implements IAds {
         return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
             if(mediation) {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
-                if(loadEnabled) {
+                if(loadEnabled && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
                     this._loadApiEnabled = true;
                 }
             }
