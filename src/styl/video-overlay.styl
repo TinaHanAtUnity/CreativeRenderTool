@@ -203,6 +203,11 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
     transition: transform .3s ease-in;
   }
 
+  .call-button-ctav2 {
+    transform: translateX(160%);
+    transition: transform .3s ease-in;
+  }
+
   .show-call-button {
     transform: translateX(0%);
   }
@@ -281,6 +286,76 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
       .download-text {
         text-shadow: none;
         font-size: $video-overlay-styles.base-size * .65;
+      }
+    }
+  }
+
+  .install-button-ctav2 {
+    width: 10 * $video-overlay-styles.base-size;
+
+    .tab {
+      width: 10 * $video-overlay-styles.base-size;
+    }
+
+    .download-wrapper {
+      $video-overlay-styles-download-element-height = $video-overlay-styles.base-size * 1.7;
+      $video-overlay-styles-download-element-margin = $video-overlay-styles.base-size * .3;
+      $endscreen-default-size = unit($default-px-size / 24, "em");
+      $scale-size = $default-scale-size;
+
+      .download-container {
+        left: $video-overlay-styles-download-element-height + 18 * $video-overlay-styles-download-element-margin;
+        text-transform: uppercase;
+        font-weight: 2
+        width: $video-overlay-styles.base-size * 2.5;
+        border-radius: $video-overlay-styles-download-element-height
+      }
+
+      .game-title-text {
+        text-shadow: none;
+        position: absolute;
+        display: inline;
+        font-size: 50%;
+        width: 9 * $video-overlay-styles.base-size;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .game-title {
+        position: absolute;
+        top: 5px;
+        display: inline-block;
+        line-height: 1;
+        width: 4.5 * $video-overlay-styles.base-size;
+        left: $video-overlay-styles-download-element-height + 2 * $video-overlay-styles-download-element-margin;
+        
+        .game-rating {
+          position: relative;
+          display: inline-block;
+          top: $video-overlay-styles-download-element-margin * 0.9;
+          left: 0;
+          $game-rating-default($scale-size);
+          margin-top: 2 * $endscreen-default-size;
+          letter-spacing: 0;
+          font-size: .8 * $endscreen-default-size;
+        }
+
+        .game-rating-stars-top {
+          $game-rating-mask-default($scale-size);
+          position: absolute;
+          left: 0;
+          z-index: 1;
+        }
+
+        .game-rating-stars-bottom {
+          z-index: 0;
+        }
+
+        .game-rating-count {
+          $game-rating-count-default($scale-size);
+          font-size: .5 * $endscreen-default-size;
+        }
       }
     }
   }
