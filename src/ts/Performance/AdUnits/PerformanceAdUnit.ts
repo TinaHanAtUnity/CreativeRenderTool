@@ -6,7 +6,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { DownloadManager } from 'China/Managers/DownloadManager';
-import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;

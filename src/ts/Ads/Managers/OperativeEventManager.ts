@@ -26,6 +26,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -380,8 +381,6 @@ export class OperativeEventManager {
                 'correlationId': this._campaign.getCorrelationId(),
                 'seatId': this._campaign.getSeatId(),
                 'placementId': params.placement.getId(),
-                'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
-                'limitAdTracking': this._deviceInfo.getLimitAdTracking(),
                 'osVersion': this._deviceInfo.getOsVersion(),
                 'sid': this._playerMetadataServerId,
                 'deviceModel': this._deviceInfo.getModel(),
@@ -415,31 +414,10 @@ export class OperativeEventManager {
                     'screenDensity': this._deviceInfo.getScreenDensity(),
                     'screenSize': this._deviceInfo.getScreenLayout()
                 };
-
-                // for china SDK prioritize both android id and imei over GAID
-                if (CustomFeatures.isChinaSDK(this._platform, this._clientInfo.getSdkVersionName())) {
-                    if (this._deviceInfo.getAndroidId() || this._deviceInfo.getDeviceId1()) {
-                        infoJson = {
-                            ... infoJson,
-                            'advertisingTrackingId': undefined,
-                            'androidId': this._deviceInfo.getAndroidId()
-                        };
-
-                        if(this._deviceInfo.getDeviceId1()) {
-                            infoJson = {
-                                ... infoJson,
-                                'imei': this._deviceInfo.getDeviceId1()
-                            };
-                        }
-                    }
-
-                } else if (!this._deviceInfo.getAdvertisingIdentifier()) {
-                    infoJson = {
-                        ... infoJson,
-                        'androidId': this._deviceInfo.getAndroidId()
-                    };
-                }
             }
+
+            const trackingIDs : Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+            Object.assign(infoJson, trackingIDs);
 
             infoJson.videoOrientation = params.videoOrientation;
 
