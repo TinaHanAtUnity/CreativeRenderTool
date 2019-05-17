@@ -1,23 +1,23 @@
-@import 'vars.styl';
-@import 'gdpr-pop-up.styl';
-@import 'iphone-x-series.styl';
+@import "vars.styl";
+@import "gdpr-pop-up.styl";
+@import "iphone-x-series.styl";
 
 $video-overlay-styles = {
-  base-size: unit((16px / 16), 'em') * $default-size,
-  tab-font-color: '#f1f1f1'
+  base-size: unit((16px / 16), "em") * $default-size,
+  tab-font-color: "#f1f1f1"
 };
 $video-overlay-styles.touchable-area-height = $video-overlay-styles.base-size * 2;
 $video-overlay-styles.touchable-area-width = $video-overlay-styles.base-size * 2.2;
 $video-overlay-styles.call-button-width = $video-overlay-styles.base-size * 6;
 // @stylint off
-$video-overlay-styles.tab-border-radius = $video-overlay-styles.base-size * 0.2;
-$video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.3;
+$video-overlay-styles.tab-border-radius = $video-overlay-styles.base-size * .2;
+$video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * .3;
 
 // @stylint on
 #video-overlay {
   .call-button-ctav2 {
     transform: translateX(160%);
-    transition: transform 0.3s ease-in;
+    transition: transform .3s ease-in;
   }
 
   .show-call-button {
@@ -33,8 +33,8 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
 
     .download-wrapper {
       $video-overlay-styles-download-element-height = $video-overlay-styles.base-size * 1.7;
-      $video-overlay-styles-download-element-margin = $video-overlay-styles.base-size * 0.3;
-      $endscreen-default-size = unit(($default-px-size / 24), 'em');
+      $video-overlay-styles-download-element-margin = $video-overlay-styles.base-size * .3;
+      $endscreen-default-size = unit(($default-px-size / 24), "em");
       $scale-size = $default-scale-size;
 
       .download-container {
@@ -66,13 +66,13 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
 
         .game-rating {
           position: relative;
-          top: $video-overlay-styles-download-element-margin * 0.9;
+          top: $video-overlay-styles-download-element-margin * .9;
           left: 0;
           display: inline-block;
           $game-rating-default($scale-size);
           margin-top: 2 * $endscreen-default-size;
           letter-spacing: 0;
-          font-size: 0.8 * $endscreen-default-size;
+          font-size: .8 * $endscreen-default-size;
         }
 
         .game-rating-stars-top {
@@ -88,7 +88,7 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
 
         .game-rating-count {
           $game-rating-count-default($scale-size);
-          font-size: 0.5 * $endscreen-default-size;
+          font-size: .5 * $endscreen-default-size;
         }
       }
     }
