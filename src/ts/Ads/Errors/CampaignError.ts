@@ -16,6 +16,7 @@ export class CampaignError extends Error {
     public assetUrl: string | undefined;
     public seatId: number | undefined;
     public creativeId: string | undefined;
+    public errorData: { [id: string]: unknown };
 
     private _subCampaignErrors: CampaignError[];
 
@@ -29,6 +30,7 @@ export class CampaignError extends Error {
         this.assetUrl = assetUrl;
         this.seatId = seatId;
         this.creativeId = creativeId;
+        this.errorData = {};
 
         this._subCampaignErrors = [];
     }

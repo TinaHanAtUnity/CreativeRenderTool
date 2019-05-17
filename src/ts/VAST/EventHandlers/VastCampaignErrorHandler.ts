@@ -41,7 +41,7 @@ export enum VastErrorCode {
 }
 export class VastErrorInfo {
     public static errorMap: { [key: number]: string } = {
-        [VastErrorCode.XML_PARSER_ERROR] : 'VAST xml data is missing',
+        [VastErrorCode.XML_PARSER_ERROR] : 'VAST xml parsing error',
         [VastErrorCode.SCHEMA_VAL_ERROR]: 'VAST schema validation error',
         [VastErrorCode.VERSION_UNSUPPORTED]: 'VAST version Unsupported',
         [VastErrorCode.FORMAT_UNSUPPORTED]: 'VAST format unsupported',

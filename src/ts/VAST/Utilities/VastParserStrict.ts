@@ -77,7 +77,6 @@ export class VastParserStrict {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
-    private _rootWrapperVast: unknown;
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || new DOMParser();
@@ -158,27 +157,17 @@ export class VastParserStrict {
     public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
-        if (depth === 0) {
-            this._rootWrapperVast = vast;
-        }
-
         try {
             parsedVast = this.parseVast(vast, urlProtocol);
-        } catch (e) {
-            let errorData: object;
-            if (depth > 0) {
-                errorData = {
-                    vast: vast,
-                    wrapperDepth: depth,
-                    rootWrapperVast: this._rootWrapperVast
-                };
-            } else {
-                errorData = {
-                    vast: vast,
-                    wrapperDepth: depth
-                };
-            }
-            throw new DiagnosticError(e, errorData);
+        } catch (campaignError) {
+            const errorData: {} = {
+                vast: vast,
+                wrapperDepth: depth,
+                rootWrapperVast: depth === 0 ? vast : ''
+            };
+            campaignError.errorData = errorData;
+
+            throw campaignError;
         }
 
         this.applyParentURLs(parsedVast, parent);
@@ -194,7 +183,7 @@ export class VastParserStrict {
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
         const wrapperUrlProtocol = Url.getProtocol(wrapperURL);
-        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+        return request.get(wrapperURL, [], {retries: 2, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
