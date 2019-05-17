@@ -1,6 +1,7 @@
 # Pending
 
 * VAST Error Tracking - part 2: campaign error level [#9660](https://github.com/Applifier/unity-ads-webview/pull/9660)
+* Fall back to non-transparent activity if opening transparent activity fails [#9687](https://github.com/Applifier/unity-ads-webview/pull/9687)
 
 # Thu May 16 16:26:48 UTC 2019
 

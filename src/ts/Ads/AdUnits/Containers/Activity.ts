@@ -84,7 +84,15 @@ export class Activity extends AdUnitContainer {
         this._onFocusGainedObserver = this._ads.Android!.AdUnit.onFocusGained.subscribe(() => this.onFocusGained());
         this._onFocusLostObserver = this._ads.Android!.AdUnit.onFocusLost.subscribe(() => this.onFocusLost());
 
-        return this._ads.Android!.AdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
+        return this._ads.Android!.AdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent).catch(error => {
+            // if opening transparent activity fails, cleanly fall back to non-transparent activity
+            // this may happen if developer is missing transparent activity in app Android manifest
+            if(isTransparent) {
+                return this._ads.Android!.AdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, false);
+            }
+
+            throw error;
+        });
     }
 
     public close(): Promise<void> {
