@@ -145,16 +145,12 @@ export class VastParserStrict {
             }
         });
 
-        // if (errors.length > 0) {
-        //     // Format all errors into a single error message
-        //     throw this.formatErrorMessage(errors);
-        // }
-
-        if (ads.length === 0) { //
-            throw this.formatErrorMessage('Failed to parse VAST xml', errors);
-            //throw new CampaignError('VAST Ad tag is missing', CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR, parseErrorURLTemplates);
+        // throw campaign error when it fails to get any vast ad
+        if (ads.length === 0) {
+            throw this.formatErrorMessage('Failed to parse VAST XML', errors);
         }
 
+        // return vast ads with generated non-severe errors
         return new Vast(ads, parseErrorURLTemplates, errors);
     }
 
@@ -207,8 +203,11 @@ export class VastParserStrict {
     }
 
     private formatErrorMessage(msg: string, errors: CampaignError[]): CampaignError {
-        return new CampaignError(`VAST parse encountered these errors while parsing: ${VastValidationUtilities.formatErrors(errors)}`, CampaignContentTypes.ProgrammaticVast);
-        //const cosolidatedCampaignError = new CampaignError(msg, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW)
+        const consolidatedCampaignError = new CampaignError(msg, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.XML_PARSER_ERROR);
+        for (const e of errors) {
+            consolidatedCampaignError.addSubCampaignError(e);
+        }
+        return consolidatedCampaignError;
     }
 
     // only searches direct children for nodes with matching name
