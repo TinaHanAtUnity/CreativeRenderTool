@@ -49,6 +49,7 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class CampaignManager {
 
@@ -621,6 +622,14 @@ export class CampaignManager {
 
             for(const placement of placements) {
                 this.onCampaign.trigger(placement.getPlacementId(), campaign, placement.getTrackingUrls());
+            }
+
+            if (campaign instanceof VastCampaign) {
+                const campaignWarnings = campaign.getVast().getCampaignErrors();
+                const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
+                for (const warning of campaignWarnings) {
+                    campaignErrorHandler.handleCampaignError(warning);
+                }
             }
         });
     }

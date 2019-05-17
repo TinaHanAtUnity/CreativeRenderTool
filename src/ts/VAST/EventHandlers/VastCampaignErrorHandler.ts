@@ -82,13 +82,13 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
-        const campaignErrors: CampaignError[] = [];
-        campaignErrors.push(campaignError);
-        while (campaignErrors.length > 0) {
-            const oneError = campaignErrors.shift();
+        const errorList: CampaignError[] = [];
+        errorList.push(campaignError);
+        while (errorList.length > 0) {
+            const oneError = errorList.shift();
             if (oneError) {
                 for (const subError of oneError.getSubCampaignErrors()) {
-                    campaignErrors.push(subError);
+                    errorList.push(subError);
                 }
 
                 const errorTrackingUrls = oneError.errorTrackingUrls;
@@ -100,6 +100,7 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
                         errorUrl: errorUrl,
                         errorCode: errorCode,
                         errorMessage: VastErrorInfo.errorMap[errorCode] || 'not found',
+                        erroLevel: oneError.errorLevel,
                         seatId: oneError.seatId || -1,
                         creativeId: oneError.creativeId || 'not found'
                     });
