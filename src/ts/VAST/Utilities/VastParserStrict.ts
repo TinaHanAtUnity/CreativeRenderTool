@@ -207,10 +207,8 @@ export class VastParserStrict {
     }
 
     private formatErrorMessage(msg: string, errors: CampaignError[]): CampaignError {
-        // return new Error(`VAST parse encountered these errors while parsing:
-        //     ${VastValidationUtilities.formatErrors(errors)}
-        // `);
-        const cosolidatedCampaignError = new CampaignError(msg, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW)
+        return new CampaignError(`VAST parse encountered these errors while parsing: ${VastValidationUtilities.formatErrors(errors)}`, CampaignContentTypes.ProgrammaticVast);
+        //const cosolidatedCampaignError = new CampaignError(msg, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW)
     }
 
     // only searches direct children for nodes with matching name
