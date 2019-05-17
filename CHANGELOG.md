@@ -1,5 +1,13 @@
 # Pending
 
+* VAST Error Tracking - part 2: campaign error level [#9660](https://github.com/Applifier/unity-ads-webview/pull/9660)
+
+# Thu May 16 16:26:48 UTC 2019
+
+* IMEI support for main SDK [#9199](https://github.com/Applifier/unity-ads-webview/pull/9199)
+
+# Wed May 15 18:04:53 UTC 2019
+
 * Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
 * Disable Vast Endscreens Lacking Impressions [#9609](https://github.com/Applifier/unity-ads-webview/pull/9609)
 * Introduce isBannerPlacement to SDK Versions <3.0 and Remove Banner Placements from being Requested (Manual Patch)
