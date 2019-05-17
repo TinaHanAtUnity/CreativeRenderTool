@@ -57,8 +57,8 @@ describe('VastParserStrict', () => {
                 });
             } catch (e) {
                 // tslint:disable:no-string-literal
-                assert.deepEqual(e.diagnostic['vast'], vastNoAdRaw);
-                assert.equal(e.diagnostic['wrapperDepth'], 0);
+                assert.deepEqual(e.errorData['vast'], vastNoAdRaw);
+                assert.equal(e.errorData['wrapperDepth'], 0);
                 // tslint:enable:no-string-literal
             }
         });

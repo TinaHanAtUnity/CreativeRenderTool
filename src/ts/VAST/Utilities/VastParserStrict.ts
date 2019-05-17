@@ -9,7 +9,6 @@ import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
-import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
@@ -183,7 +182,7 @@ export class VastParserStrict {
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
         const wrapperUrlProtocol = Url.getProtocol(wrapperURL);
-        return request.get(wrapperURL, [], {retries: 2, retryDelay: 5000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
