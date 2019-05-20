@@ -34,6 +34,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IStoreApi } from 'Store/IStore';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 describe('VastAdUnitTest', () => {
 
@@ -54,6 +55,7 @@ describe('VastAdUnitTest', () => {
     let vastCampaign: VastCampaign;
     let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
     let coreConfig: CoreConfiguration;
+    let openMeasurement: OpenMeasurement;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -141,6 +143,7 @@ describe('VastAdUnitTest', () => {
         const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        openMeasurement = sinon.createStubInstance(OpenMeasurement);
 
         vastAdUnitParameters = {
             platform,
@@ -165,7 +168,8 @@ describe('VastAdUnitTest', () => {
             overlay: overlay,
             video: video,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            om: openMeasurement
         };
 
         vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -327,6 +331,26 @@ describe('VastAdUnitTest', () => {
             }).then(() => {
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
+        });
+    });
+
+    // TODO: Better stubs for viewport and adview
+    describe('viewability', () => {
+        describe('onContainerBackground', () => {
+            it('should fire open measurement pause', () => {
+                vastAdUnit.setShowing(true);
+                sinon.stub(vastAdUnit, 'canShowVideo').returns(true);
+                vastAdUnit.onContainerBackground();
+                sinon.assert.called(<sinon.SinonSpy>openMeasurement.pause);
+            });
+        });
+        describe('onContainerForeground', () => {
+            it('should fire open measurement resume', () => {
+                vastAdUnit.setShowing(true);
+                sinon.stub(vastAdUnit, 'canShowVideo').returns(true);
+                vastAdUnit.onContainerForeground();
+                sinon.assert.called(<sinon.SinonSpy>openMeasurement.resume);
             });
         });
     });

@@ -46,7 +46,7 @@ import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManage
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
+import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
@@ -487,7 +487,7 @@ export class CampaignManager {
             }
         }
 
-        this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+        this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
         for(const mediaId in campaigns) {
@@ -563,7 +563,7 @@ export class CampaignManager {
 
         const parseTimestamp = Date.now();
         return parser.parse(response, session).catch((error) => {
-            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
                 return parser.parse(response, session);
             } else {
@@ -579,7 +579,7 @@ export class CampaignManager {
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
         }).catch((error) => {
-            CreativeBlocking.report(parser.creativeID, parser.seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
+            CreativeBlocking.report(parser.creativeID, parser.seatID, parser.campaignID, BlockingReason.VIDEO_PARSE_FAILURE, {
                 errorCode: error.errorCode || undefined,
                 message: error.message || undefined
             });
@@ -704,7 +704,8 @@ export class CampaignManager {
 
         let url: string = this.getBaseUrl();
 
-        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+        url = Url.addParameters(url, trackingIDs);
 
         if (nofillRetry && this._lastAuctionId) {
             url = Url.addParameters(url, {

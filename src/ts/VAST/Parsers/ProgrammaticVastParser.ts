@@ -9,7 +9,7 @@ import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { Url } from 'Core/Utilities/Url';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
-import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ICore, ICoreApi } from 'Core/ICore';
@@ -22,6 +22,9 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     public static ContentType = CampaignContentTypes.ProgrammaticVast;
 
+    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE: string = 'VAST ad contains media files meant for VPAID';
+    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD: number = 499;
+
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
@@ -31,7 +34,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _requestManager: RequestManager;
     protected _deviceInfo: DeviceInfo;
 
-    protected _vastParser: VastParserStrict = new VastParserStrict();
+    protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -42,11 +45,24 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
-            this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        if (ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+            this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
 
         return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            const warnings = this.getWarnings(vast);
+            if (warnings.length > 0) {
+                // report warnings with diagnostic
+                SessionDiagnostics.trigger('programmatic_vast_parser_strict_warning', {
+                    warnings: warnings
+                }, session);
+            }
+
+            // if the vast campaign is accidentally a vpaid campaign parse it as such
+            if (vast.isVPAIDCampaign()) {
+                // throw appropriate campaign error as LOW level(warning level) to be caught and handled in campaign manager
+                throw new CampaignError(ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
+            }
             return this._deviceInfo.getConnectionType().then((connectionType) => {
                 return this.parseVastToCampaign(vast, session, response, connectionType);
             });
@@ -55,7 +71,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-        return this._vastParser.retrieveVast(decodedVast, this._coreApi, this._requestManager);
+        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager);
     }
 
     protected parseVastToCampaign(vast: Vast, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
@@ -76,11 +92,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             backupCampaign: false
         };
 
-        let errorTrackingUrl;
-        if (vast.getErrorURLTemplate()) {
-            errorTrackingUrl = vast.getErrorURLTemplate()!;
-        }
-
         const vastImpressionUrls: string[] = [];
         for (const impUrl of vast.getImpressionUrls()) {
             if (Url.isValid(impUrl)) {
@@ -91,32 +102,31 @@ export class ProgrammaticVastParser extends CampaignParser {
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            if (!Url.isValid(portraitUrl)) {
-                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, portraitUrl);
-            }
             portraitAsset = new Image(Url.encode(portraitUrl), session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            if (!Url.isValid(landscapeUrl)) {
-                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, landscapeUrl);
-            }
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
-        let mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
+        const mediaVideo = VastMediaSelector.getOptimizedVastMediaFile(vast.getVideoMediaFiles(), connectionType);
+        if (!mediaVideo) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
+        }
+
+        let mediaVideoUrl = mediaVideo.getFileURL();
         if (!mediaVideoUrl) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH,  VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
         }
 
         if (this._platform === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, mediaVideoUrl);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
         }
 
         if (!Url.isValid(mediaVideoUrl)) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, mediaVideoUrl);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_UNSUPPORTED, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
         }
 
         mediaVideoUrl = Url.encode(mediaVideoUrl);
@@ -124,7 +134,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(mediaVideoUrl, session),
+            video: new Video(mediaVideoUrl, session, undefined, response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
             hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
@@ -143,53 +153,14 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return Promise.resolve(campaign);
     }
-}
-
-export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
-
-    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE: string = 'VAST ad contains media files meant for VPAID';
-    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD: number = 499;
-
-    protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
     private getWarnings(vast: Vast): string[] {
         let warnings: string[] = [];
         for (const vastAd of vast.getAds()) {
-            warnings = warnings.concat(vastAd.getUnparseableCompanionAds());
+            warnings = warnings.concat(vastAd.getUnsupportedCompanionAds());
         }
         return warnings.map((warning) => {
             return `Unsupported companionAd : ${warning}`;
         });
-    }
-
-    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
-
-        if (ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
-            this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
-        }
-
-        return this.retrieveVast(response).then((vast): Promise<Campaign> => {
-            const warnings = this.getWarnings(vast);
-            if (warnings.length > 0) {
-                // report warnings with diagnostic
-                SessionDiagnostics.trigger('programmatic_vast_parser_strict_warning', {
-                    warnings: warnings
-                }, session);
-            }
-
-            // if the vast campaign is accidentally a vpaid campaign parse it as such
-            if (vast.isVPAIDCampaign()) {
-                // throw appropriate campaign error to be caught and handled in campaign manager
-                throw new CampaignError(ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, undefined, ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD);
-            }
-            return this._deviceInfo.getConnectionType().then((connectionType) => {
-                return this.parseVastToCampaign(vast, session, response, connectionType);
-            });
-        });
-    }
-
-    protected retrieveVast(response: AuctionResponse): Promise<Vast> {
-        const decodedVast = decodeURIComponent(response.getContent()).trim();
-        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager);
     }
 }

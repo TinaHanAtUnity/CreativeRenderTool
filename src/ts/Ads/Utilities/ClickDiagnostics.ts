@@ -1,5 +1,6 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { WebPlayerMRAIDTest, toAbGroup } from 'Core/Models/ABGroup';
 
 export enum ClickDelayRange {
     LOW = 4000, // 4000 ms
@@ -21,7 +22,7 @@ export class ClickDiagnostics {
     }
 
     public static sendClickDiagnosticsEvent(clickDuration: number, clickUrl: string, clickLocation: string, clickedCampaign: Campaign, abGroup: number, gameSessionId: number | undefined) {
-        if (gameSessionId && gameSessionId % 10 === 1) {
+        if (clickLocation === 'programmatic_mraid_webplayer' ||  (gameSessionId && gameSessionId % 10 === 1)) {
             SessionDiagnostics.trigger('click_delay', {
                 duration: clickDuration,
                 delayRange: ClickDiagnostics.getClickDelayRange(clickDuration),

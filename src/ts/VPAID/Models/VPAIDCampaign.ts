@@ -1,8 +1,9 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VPAID } from 'VPAID/Models/VPAID';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IVPAIDCampaign extends IProgrammaticCampaign {
     vpaid: VPAID;
@@ -35,7 +36,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return this.getVPAID().hasEndScreen();
     }
 
-    public getCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
+    public getCompanionAd(): VastCompanionAdStaticResource | null {
         return this.getVPAID().getCompanion();
     }
 
@@ -66,8 +67,8 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return [];
     }
 
-    public getTrackingUrlsForEvent(eventName: string): string[] {
-        return this.getVPAID().getTrackingEventUrls(eventName);
+    public getTrackingUrlsForEvent(event: TrackingEvent): string[] {
+        return this.getVPAID().getTrackingEventUrls(event);
     }
 
     public getVideoClickTrackingURLs(): string[] {

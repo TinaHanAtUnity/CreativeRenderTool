@@ -80,7 +80,8 @@ export class UserPrivacyManager {
             'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._platform].toLowerCase(),
             'country': this._coreConfig.getCountry(),
-            'gameId': this._clientInfo.getGameId()
+            'gameId': this._clientInfo.getGameId(),
+            'bundleId': this._clientInfo.getApplicationName()
         };
         if (source) {
             infoJson = {
@@ -169,6 +170,7 @@ export class UserPrivacyManager {
             method: PrivacyMethod.UNITY_CONSENT,
             version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
+            bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions
         };
 
@@ -199,10 +201,12 @@ export class UserPrivacyManager {
     }
 
     public retrieveUserSummary(): Promise<IUserSummary> {
-        const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+        let url = `https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
-        // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
-        // const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
+        if (this._coreConfig.getTestMode()) {
+            url = `https://ads-privacy-api.stg.mz.internal.unity3d.com/api/v1/summary?adid=f2c5a456-229f-49c8-abed-c4047c86f8e7&projectId=24295855-8602-4efc-a30d-a9d84b275eda&storeId=google&gameId=1490325`;
+        }
+
         const personalPayload = {
             deviceModel: this._deviceInfo.getModel(),
             country: this._coreConfig.getCountry()

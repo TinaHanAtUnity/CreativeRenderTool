@@ -3,7 +3,7 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
@@ -12,6 +12,10 @@ import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -175,7 +179,7 @@ export class VastParserStrict {
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         } else if (depth >= this._maxWrapperDepth) {
-            throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
         }
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
@@ -231,7 +235,7 @@ export class VastParserStrict {
                 for (const clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
                     parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
                 }
-                for (const eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                for (const eventName of Object.keys(TrackingEvent).map((event) => TrackingEvent[<keyof typeof TrackingEvent>event])) {
                     for (const url of parent.getTrackingEventUrls(eventName)) {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
@@ -293,11 +297,23 @@ export class VastParserStrict {
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
             const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
             if (staticResourceElement) {
-                const companionAd = this.parseCreativeStaticResourceCompanionAdElement(element, urlProtocol);
-                vastAd.addCompanionAd(companionAd);
+                const companionAd = this.parseCompanionAdStaticResourceElement(element, urlProtocol);
+                const companionAdErrors = new VastCompanionAdStaticResourceValidator(companionAd).getErrors();
+                let isWarningLevel = true;
+                for (const adError of companionAdErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        isWarningLevel = false;
+                        break;
+                    }
+                }
+                if (isWarningLevel) {
+                    vastAd.addCompanionAd(companionAd);
+                } else {
+                    vastAd.addUnsupportedCompanionAd(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
+                }
             } else {
                 // ignore element as it is not of a type we support
-                vastAd.addUnparseableCompanionAd(element.outerHTML);
+                vastAd.addUnsupportedCompanionAd(element.outerHTML);
             }
         });
 
@@ -348,7 +364,10 @@ export class VastParserStrict {
                     vastAdVerification.setVerificationTrackingEvent(url);
                 }
             });
-            vastAdVerifications.push(vastAdVerification);
+
+            if (vastAdVerification.getVerficationResources() && vastAdVerification.getVerificationVendor()) {
+                vastAdVerifications.push(vastAdVerification);
+            }
         });
 
         return vastAdVerifications;
@@ -434,11 +453,11 @@ export class VastParserStrict {
         return creative;
     }
 
-    private parseCreativeStaticResourceCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeStaticResourceCompanionAd {
+    private parseCompanionAdStaticResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdStaticResource {
         const id = companionAdElement.getAttribute(VastAttributeNames.ID);
         const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
         const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCreativeStaticResourceCompanionAd(id, height, width);
+        const companionAd = new VastCompanionAdStaticResource(id, height, width);
 
         // Get tracking urls for companion ad
         this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {

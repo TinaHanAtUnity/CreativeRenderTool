@@ -5,7 +5,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MOAT } from 'Ads/Views/MOAT';
@@ -34,6 +34,8 @@ import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHand
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -61,6 +63,7 @@ import { IStoreApi } from 'Store/IStore';
         let sandbox: sinon.SinonSandbox;
         let privacy: Privacy;
         let programmaticTrackingService: ProgrammaticTrackingService;
+        let om: OpenMeasurement | undefined;
 
         before(() => {
             sandbox = sinon.createSandbox();
@@ -155,7 +158,8 @@ import { IStoreApi } from 'Store/IStore';
                 video: campaign.getVideo(),
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                privacy
+                privacy,
+                om: sinon.createStubInstance(OpenMeasurement)
             };
 
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -163,6 +167,8 @@ import { IStoreApi } from 'Store/IStore';
 
             moat = sinon.createStubInstance(MOAT);
             sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
+            sandbox.stub(vastAdUnit, 'getOpenMeasurement').returns(vastAdUnitParameters.om);
+            om = vastAdUnitParameters.om;
         });
 
         afterEach(() => {
@@ -179,6 +185,17 @@ import { IStoreApi } from 'Store/IStore';
             it('should hide ad unit', () => {
                 vastOverlayEventHandler.onOverlaySkip(1);
                 sinon.assert.called(<sinon.SinonSpy>vastAdUnit.hide);
+            });
+
+            it('should fire viewability skip event along with session finish', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.called(<sinon.SinonStub>om!.skipped);
+                    sinon.assert.called(<sinon.SinonStub>om!.sessionFinish);
+                });
             });
 
             describe('When ad unit has an endscreen', () => {
@@ -214,9 +231,9 @@ import { IStoreApi } from 'Store/IStore';
             });
 
             const testMuteEvent = (muted: boolean) => {
-                const eventName = muted ? 'mute' : 'unmute';
+                const eventName = muted ? TrackingEvent.MUTE : TrackingEvent.UNMUTE;
                 const mockEventManager = sinon.mock(thirdPartyEventManager);
-                mockEventManager.expects('sendWithGet').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1`);
+                mockEventManager.expects('sendTrackingEvents').withArgs(campaign, eventName, 'vast');
 
                 vastOverlayEventHandler.onOverlayMute(muted);
                 mockEventManager.verify();
@@ -236,14 +253,16 @@ import { IStoreApi } from 'Store/IStore';
                 testMuteEvent(false);
             });
 
-            it('should call volumeChange when mute is true', () => {
+            it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
                 sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
-            it('should call play when mute is false', () => {
+            it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
                 sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.called(<sinon.SinonStub>om!.volumeChange);
             });
         });
 
@@ -252,6 +271,12 @@ import { IStoreApi } from 'Store/IStore';
                 sinon.spy(ads.VideoPlayer, 'pause');
                 sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
                 sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
+            });
+
+            it('should track clicks for viewability', () => {
+                vastOverlayEventHandler.onOverlayCallButton().then(() => {
+                    sinon.assert.called(<sinon.SinonStub>om!.adUserInteraction);
+                });
             });
 
             if(platform === Platform.IOS) {
@@ -284,6 +309,41 @@ import { IStoreApi } from 'Store/IStore';
                     });
                 });
             }
+        });
+
+        describe('When calling onShowPrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+
+                return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
+            });
+
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 11.82291666666666, [ObstructionReasons.OBSTRUCTED], 1280, 768, true, [{
+                    x: 20,
+                    y: 20,
+                    width: 517,
+                    height: 367
+                }]);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
+        });
+
+        describe('When calling onClosePrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+
+                return vastOverlayEventHandler.onClosePrivacyPopUp();
+            });
+
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 100, [], 1280, 768, true, []);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
         });
     });
 });

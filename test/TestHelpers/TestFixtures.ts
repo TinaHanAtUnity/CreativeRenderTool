@@ -100,6 +100,7 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
+import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { IARApi } from 'AR/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
@@ -154,7 +155,6 @@ import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { AndroidDownloadApi } from 'China/Native/Android/Download';
 import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
 import { IChinaApi } from 'China/IChina';
-import { ChinaAndroidDeviceInfoApi } from 'China/Native/Android/DeviceInfo';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -610,6 +610,13 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
+    public static getAdVerificationsVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParserStrict();
+        const vastXml = VastAdVerificationAsExtension;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
     public static getCompanionVastCampaignWithoutImages(): VastCampaign {
         const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = VastCompanionAdWithoutImagesXml;
@@ -921,7 +928,7 @@ export class TestFixtures {
             InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
             MissedImpressionManager: new MissedImpressionManager(core.Api),
-            BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo),
+            BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo, core.ClientInfo),
             ProgrammaticTrackingService: new ProgrammaticTrackingService(platform, core.RequestManager, core.ClientInfo, core.DeviceInfo),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
@@ -952,7 +959,7 @@ export class TestFixtures {
         const banners: Partial<IBanners> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
             WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
             AdUnitFactory: new BannerAdUnitFactory()
         };
@@ -1076,8 +1083,7 @@ export class TestFixtures {
         return {
             Android: {
                 Download: new AndroidDownloadApi(nativeBridge),
-                InstallListener: new AndroidInstallListenerApi(nativeBridge),
-                DeviceInfo: new ChinaAndroidDeviceInfoApi(nativeBridge)
+                InstallListener: new AndroidInstallListenerApi(nativeBridge)
             }
         };
     }

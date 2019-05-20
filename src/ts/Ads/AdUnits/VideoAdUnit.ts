@@ -96,11 +96,18 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.hideChildren();
         this.unsetReferences();
 
-        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        const gameId = this._clientInfo.getGameId();
+        if (!CustomFeatures.gameSpawnsNewViewControllerOnFinish(gameId)) {
+            this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        }
+
         this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
             this.onClose.trigger();
+            if (CustomFeatures.gameSpawnsNewViewControllerOnFinish(gameId)) {
+                this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+            }
         });
     }
 
@@ -325,7 +332,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                         if(remoteVideoSize && remoteVideoSize !== result.size) {
                             SessionDiagnostics.trigger('video_size_mismatch', {
                                 remoteVideoSize: remoteVideoSize,
-                                localVideoSize: result.size
+                                localVideoSize: result.size,
+                                creativeId: this.getVideo().getCreativeId()
                             }, this._campaign.getSession());
 
                             // this condition is most commonly triggered on Android that probably has some unknown issue with resuming downloads

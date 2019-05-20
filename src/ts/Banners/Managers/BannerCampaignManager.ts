@@ -1,5 +1,4 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AssetManager } from 'Ads/Managers/AssetManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse, IAuctionResponse } from 'Ads/Models/AuctionResponse';
@@ -22,6 +21,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class NoFillError extends Error {
     public response: INativeResponse;
@@ -46,7 +46,6 @@ export interface IRawBannerV5Response {
 export class BannerCampaignManager {
     private _platform: Platform;
     private _core: ICoreApi;
-    private _assetManager: AssetManager;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _clientInfo: ClientInfo;
@@ -57,15 +56,15 @@ export class BannerCampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _jaegerManager: JaegerManager;
+    private _pts: ProgrammaticTrackingService;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
-        this._assetManager = assetManager;
         this._sessionManager = sessionManager;
         this._request = request;
         this._clientInfo = clientInfo;
@@ -73,6 +72,7 @@ export class BannerCampaignManager {
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
         this._jaegerManager = jaegerManager;
+        this._pts = pts;
     }
 
     public request(placement: Placement, nofillRetry?: boolean): Promise<Campaign> {
@@ -96,7 +96,8 @@ export class BannerCampaignManager {
             deviceInfo: this._deviceInfo,
             metaDataManager: this._metaDataManager,
             request: this._request,
-            sessionManager: this._sessionManager
+            sessionManager: this._sessionManager,
+            programmaticTrackingService: this._pts
         });
         request.addPlacement(placement);
         request.setTimeout(3000);
@@ -151,10 +152,10 @@ export class BannerCampaignManager {
         const json = JsonParser.parse<IRawBannerResponse>(response.response);
         const session = new Session(json.auctionId);
 
-        if('placements' in json) {
+        if ('placements' in json) {
             const mediaId: string = json.placements[placement.getId()];
 
-            if(mediaId) {
+            if (mediaId) {
                 const auctionPlacement = new AuctionPlacement(placement.getId(), mediaId);
                 const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                 return this.handleBannerCampaign(auctionResponse, session);
@@ -177,7 +178,6 @@ export class BannerCampaignManager {
         if ('placements' in json) {
             const placementId = placement.getId();
             if (placement.isBannerPlacement()) {
-
                 let mediaId: string | undefined;
                 if (json.placements.hasOwnProperty(placementId)) {
                     if (json.placements[placementId].hasOwnProperty('mediaId')) {
@@ -216,13 +216,21 @@ export class BannerCampaignManager {
                     const auctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
                     const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                     return this.handleV5BannerCampaign(auctionResponse, session, trackingUrls);
+                } else {
+                    const e = new NoFillError(`No fill for placement ${placementId}`);
+                    this._core.Sdk.logError(e.message);
+                    return Promise.reject(e);
                 }
+            } else {
+                const e = new Error(`Placement ${placementId} is not a banner placement`);
+                this._core.Sdk.logError(e.message);
+                return Promise.reject(e);
             }
+        } else {
+            const e = new Error('No placements found in realtime V5 campaign json.');
+            this._core.Sdk.logError(e.message);
+            return Promise.reject(e);
         }
-
-        const e = new Error('No placements found in realtime V5 campaign json.');
-        this._core.Sdk.logError(e.message);
-        return Promise.reject(e);
     }
 
     private handleV5BannerCampaign(response: AuctionResponse, session: Session, trackingUrls: ICampaignTrackingUrls): Promise<Campaign> {

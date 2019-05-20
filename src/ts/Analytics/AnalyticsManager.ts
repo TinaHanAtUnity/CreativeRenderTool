@@ -30,6 +30,18 @@ interface IAnalyticsEventWrapper {
     posting: boolean;
 }
 
+// Topics sent to kafka and cdp
+enum AnalyticsTopic {
+    Custom = 'ads.analytics.custom.v1',
+    Transaction = 'ads.analytics.transaction.v1'
+}
+
+// Topics coming from native sdk
+enum NativeAnalyticsTopic {
+    Custom = 'analytics.custom.v1',
+    Transaction = 'analytics.transaction.v1'
+}
+
 export class AnalyticsManager {
 
     private static storageAnalyticsQueueKey: string = 'analytics.event.queue';
@@ -182,7 +194,7 @@ export class AnalyticsManager {
     private createIapTransactionEvent(productId: string, receipt: string, currency: string, price: number): AnalyticsIapTransactionEvent | undefined {
         if (productId && receipt && currency && price) {
             return <AnalyticsIapTransactionEvent>{
-                type: 'analytics.transaction.v1',
+                type: AnalyticsTopic.Transaction,
                 msg: {
                     ts: new Date().getTime(),
                     productid: productId,
@@ -203,7 +215,7 @@ export class AnalyticsManager {
     private createIapPurchaseFailedEvent(productId: string, reason: PurchasingFailureReason, price: number | undefined, currency: string | undefined): AnalyticsIapPurchaseFailedEvent | undefined {
         if (productId && reason && price && currency) {
             return <AnalyticsIapPurchaseFailedEvent>{
-                type: 'analytics.custom.v1',
+                type: AnalyticsTopic.Custom,
                 msg: {
                     ts: new Date().getTime(),
                     name: 'unity.PurchaseFailed',
@@ -391,6 +403,7 @@ export class AnalyticsManager {
     }
 
     private buildIapTransaction(event: AnalyticsIapTransactionEvent): Promise<AnalyticsIapTransactionEvent> {
+        event.type = AnalyticsTopic.Transaction; // use kafka topic
         event.msg.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         event.msg.transactionid = 0; // this field has been deprecated so just filling with 0
         // this field is to denote if analytics events are being sent from IAP
@@ -399,7 +412,7 @@ export class AnalyticsManager {
     }
 
     private isIapTransaction(event: AnalyticsIapTransactionEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.transaction.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Transaction) {
             const msg = event.msg;
             if (!msg.ts) {
                 throw new Error('AnalyticsIapTransactionEvent is missing field : "ts"');
@@ -426,13 +439,14 @@ export class AnalyticsManager {
 
     private buildAdComplete(event: AnalyticsAdCompleteEvent): Promise<AnalyticsAdCompleteEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isAdComplete(event: AnalyticsAdCompleteEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'ad_complete') {
                 const customParams = msg.custom_params;
@@ -453,13 +467,14 @@ export class AnalyticsManager {
 
     private buildLevelFailed(event: AnalyticsLevelFailedEvent): Promise<AnalyticsLevelFailedEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isLevelFailed(event: AnalyticsLevelFailedEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'level_fail') {
                 const customParams = msg.custom_params;
@@ -474,13 +489,14 @@ export class AnalyticsManager {
 
     private buildLevelUp(event: AnalyticsLevelUpEvent): Promise<AnalyticsLevelUpEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isLevelUp(event: AnalyticsLevelUpEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'level_up') {
                 const customParams = msg.custom_params;
@@ -495,13 +511,14 @@ export class AnalyticsManager {
 
     private buildItemSpent(event: AnalyticsItemSpentEvent): Promise<AnalyticsItemSpentEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isItemSpent(event: AnalyticsItemSpentEvent): boolean {
-        if (event && event.msg && event.type && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'item_spent') {
                 const customParams = msg.custom_params;
@@ -537,13 +554,14 @@ export class AnalyticsManager {
 
     private buildItemAcquired(event: AnalyticsItemAcquiredEvent): Promise<AnalyticsItemAcquiredEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isItemAcquired(event: AnalyticsItemAcquiredEvent): boolean {
-        if (event && event.msg && event.type && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'item_acquired') {
                 const customParams = msg.custom_params;

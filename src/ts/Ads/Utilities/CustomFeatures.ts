@@ -1,18 +1,13 @@
 import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
-import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
-import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
-import { Placement } from 'Ads/Models/Placement';
+import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
-const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
+const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -33,7 +28,7 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
-    public static isSonicPlayable(creativeId: string | undefined) {
+    public static isNestedIframePlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
                 creativeId === '109091853' ||
@@ -47,12 +42,18 @@ export class CustomFeatures {
                 creativeId === '151338976' ||
                 creativeId === '151337994' ||
                 creativeId === '152919353' ||
-                creativeId === '153119177';
+                creativeId === '153119177' ||
+                creativeId === '2044203'   || // Hulu
+                creativeId === '2044209'   || // Hulu
+                creativeId === '2044202'   || // Hulu
+                creativeId === '2044208';     // Hulu
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
         return seatId === 9119 ||
-               seatId === 9121;
+               seatId === 9121 ||
+               seatId === 9122 ||
+               seatId === 9198;
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
@@ -85,18 +86,6 @@ export class CustomFeatures {
         return gameId === '1453434';
     }
 
-    public static isZyngaGame(gameId: string): boolean {
-        return this.existsInList(ZyngaGameIds, gameId);
-    }
-
-    public static isAuctionV4Game(gameId: string): boolean {
-        return this.existsInList(AuctionV4GameIds, gameId);
-    }
-
-    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
-        return SkipUnderTimerExperiment.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
-    }
-
     private static existsInList(gameIdList: string[], gameId: string): boolean {
         return gameIdList.indexOf(gameId) !== -1;
     }
@@ -117,5 +106,13 @@ export class CustomFeatures {
         } else {
             return false;
         }
+    }
+
+    public static isUnsupportedOMVendor(resourceUrl: string) {
+        return false;
+    }
+
+    public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
+        return this.existsInList(LionStudiosGameIds, gameId);
     }
 }

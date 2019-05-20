@@ -1,14 +1,17 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
+    om?: OpenMeasurement;
 }
 
 export class VastAdUnit extends VideoAdUnit<VastCampaign> {
@@ -19,6 +22,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _muted: boolean = false;
     private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
+    private _impressionSent = false;
+    private _om?: OpenMeasurement;
 
     constructor(parameters: IVastAdUnitParameters) {
         super(parameters);
@@ -29,6 +34,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._moat = MoatViewabilityService.getMoat();
+        this._om = parameters.om;
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -115,13 +121,12 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._endScreen;
     }
 
-    public sendTrackingEvent(eventName: string, sessionId: string): void {
-        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
-        if (trackingEventUrls) {
-            for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-            }
-        }
+    public sendTrackingEvent(eventName: TrackingEvent): void {
+        this._thirdPartyEventManager.sendTrackingEvents(this._vastCampaign, eventName, 'vast', this._vastCampaign.getUseWebViewUserAgentForTracking());
+    }
+
+    public getOpenMeasurement(): OpenMeasurement | undefined {
+        return this._om;
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -157,10 +162,9 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendVideoClickTrackingEvent(sessionId: string): void {
-        this.sendTrackingEvent('click', sessionId);
+        this.sendTrackingEvent(TrackingEvent.CLICK);
 
         const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
-
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
                 this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
@@ -173,12 +177,37 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.pause(this.getVolume());
         }
+
+        if (this.isShowing() && this.canShowVideo() && this._om) {
+            this._om.pause();
+
+            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+                if (this._om) {
+                    const viewPort = this._om.calculateViewPort(width, height);
+                    const obstructionRectangle = this._om.calculateObstruction(0, 0, width, height);
+                    const adView = this._om.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
+                    this._om.geometryChange(viewPort, adView);
+                }
+            });
+        }
     }
 
     public onContainerForeground(): void {
         super.onContainerForeground();
         if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.play(this.getVolume());
+        }
+
+        if (this.isShowing() && this.canShowVideo() && this._om) {
+            this._om.resume();
+
+            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+                if (this._om) {
+                    const viewPort = this._om.calculateViewPort(width, height);
+                    const adView = this._om.calculateVastAdView(100, [], width, height, true, []);
+                    this._om.geometryChange(viewPort, adView);
+                }
+            });
         }
     }
 
@@ -189,6 +218,14 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         } else {
             this.hide();
         }
+    }
+
+    public setImpressionOccurred(): void {
+        this._impressionSent = true;
+    }
+
+    public hasImpressionOccurred(): boolean {
+        return this._impressionSent;
     }
 
     private isValidURL(url: string | null): boolean {

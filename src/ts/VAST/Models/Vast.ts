@@ -1,10 +1,11 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVast {
     ads: VastAd[];
@@ -73,25 +74,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast);
-    }
-
-    public getMediaVideoUrl(): string | null {
-        const ad = this.getAd();
-        if (ad) {
-            for (const creative of ad.getCreatives()) {
-                for (const mediaFile of creative.getMediaFiles()) {
-                    const mimeType = mediaFile.getMIMEType();
-                    const playable = mimeType && this.isSupportedMIMEType(mimeType);
-                    const fileUrl = mediaFile.getFileURL();
-                    if (fileUrl && playable) {
-                        return fileUrl;
-                    }
-                }
-            }
-        }
-
-        return null;
+        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
     }
 
     public getImpressionUrls(): string[] {
@@ -102,7 +85,7 @@ export class Vast extends Model<IVast> {
         return [];
     }
 
-    public getTrackingEventUrls(eventName: string): string[] {
+    public getTrackingEventUrls(eventName: TrackingEvent): string[] {
         const ad = this.getAd();
         if (ad) {
             const adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
@@ -161,7 +144,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getLandscapeOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
+    public getLandscapeOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -186,7 +169,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getPortraitOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
+    public getPortraitOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();

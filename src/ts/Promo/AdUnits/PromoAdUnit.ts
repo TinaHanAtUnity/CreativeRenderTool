@@ -4,7 +4,7 @@ import {
     IAdUnitContainerListener,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
@@ -55,7 +55,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
-        this.sendTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
 
         if (this._platform === Platform.ANDROID) {
             this._ads.Android!.AdUnit.onKeyDown.subscribe(this._keyDownListener);
@@ -85,7 +85,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
-        this.sendTrackingEvent('complete');
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
         this._promoView.hide();
         this._promoView.container().parentElement!.removeChild(this._promoView.container());
         this.unsetReferences();
@@ -99,7 +99,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClick(): void {
         this._ads.Listener.sendClickEvent(this._placement.getId());
-        this.sendTrackingEvent('click');
+        this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 
     public description(): string {
@@ -130,16 +130,16 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private onKeyDown(key: number) {
-        if (key === KeyCode.BACK) {
+        if (KeyCode.BACK && this._promoView.isCloseButtonVisible()) {
             this._promoView.onClose.trigger();
         }
     }
 
-    private sendTrackingEvent(eventName: string): void {
+    private sendTrackingEvent(event: TrackingEvent): void {
         this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             const sessionId = this._campaign.getSession().getId();
             if(this._additionalTrackingEvents) {
-                const trackingEventUrls = this._additionalTrackingEvents[eventName].map((value: string): string => {
+                const trackingEventUrls = this._additionalTrackingEvents[event].map((value: string): string => {
                     // add native flag false to designate promo
                     if (PromoEvents.purchaseHostnameRegex.test(value)) {
                         return Url.addParameters(value, {'native': false, 'iap_service': !isAvailable});
@@ -147,11 +147,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                     return value;
                 });
 
-                if(trackingEventUrls) {
-                    for (const url of trackingEventUrls) {
-                        this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
-                    }
-                }
+                this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'promo');
             }
         });
     }

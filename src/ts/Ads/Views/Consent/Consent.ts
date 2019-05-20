@@ -15,20 +15,24 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { ProgrammaticTrackingService, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
     landingPage: ConsentPage;
+    language: string;
     apiLevel?: number;
     osVersion?: string;
-    useAltMyChoicesButtonText: boolean;
+    pts: ProgrammaticTrackingService;
+    consentABTest: boolean;
 }
 
 export enum ConsentPage {
     HOMESCREEN = 'homescreen',
-    INTRO = 'intro',
-    MY_CHOICES = 'mychoices'
+    MY_CHOICES = 'mychoices',
+    HOMEPAGE = 'homepage'
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -40,9 +44,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
+    private _pts: ProgrammaticTrackingService;
 
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
+
+    private _isABTest: boolean = false;
 
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
@@ -50,20 +57,15 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
         this._osVersion = parameters.osVersion;
-
+        this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
 
-        this._template = new Template(ConsentTemplate);
-        this._templateData = {
-            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText
-        };
+        this._isABTest = parameters.consentABTest;
+
+        this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
+        this._templateData = {};
 
         this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onContinueEvent(event),
-                selector: '.continue-button'
-            },
             {
                 event: 'click',
                 listener: (event: Event) => this.onAgreeEvent(event),
@@ -122,12 +124,17 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onBackButtonEvent(event),
                 selector: '.back-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onHomepageAcceptAllEvent(event),
+                selector: '.homepage-accept-all'
             }
         ];
 
-        this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager);
+        this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager, parameters.language);
         this._switchGroup.addEventHandler(this);
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager, true);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager, parameters.language, true);
         this._privacyRowItemContainer.addEventHandler(this);
     }
 
@@ -161,10 +168,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             }
         }
 
-        if (this._landingPage === ConsentPage.HOMESCREEN) {
+        if (this._landingPage === ConsentPage.HOMESCREEN || this._landingPage === ConsentPage.HOMEPAGE) {
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
         }
+
         this.showPage(this._landingPage);
     }
 
@@ -209,7 +217,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        const states = [ConsentPage.HOMESCREEN, ConsentPage.INTRO, ConsentPage.MY_CHOICES];
+        const states = [ConsentPage.HOMESCREEN, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE];
         states.forEach(state => {
             if (state === page) {
                 this.container().classList.add(page);
@@ -217,12 +225,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 this.container().classList.remove(state);
             }
         });
-    }
-
-    private onContinueEvent(event: Event) {
-        event.preventDefault();
-
-        this.container().classList.remove('intro');
     }
 
     private onAcceptAllEvent(event: Event) {
@@ -233,6 +235,17 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
         const element = (<HTMLElement>this._container.querySelector('.accept-all'));
+        this.closeWithAnimation(element);
+    }
+
+    private onHomepageAcceptAllEvent(event: Event) {
+        event.preventDefault();
+
+        const permissions: IPermissions = {
+            all: true
+        };
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        const element = (<HTMLElement>this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }
 
@@ -316,12 +329,13 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
-        this.showPage(ConsentPage.HOMESCREEN);
+        this.showPage(this._landingPage);
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
+        // To get a rough estimate how often users click links on the homescreen
+        this._pts.reportMetric(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
-
     }
 }

@@ -1,6 +1,6 @@
 <div class="switch-container">
     <div class="switch-label">
-        <span>I agree to personalized game experience</span>
+        <span><%= data.t("my-choices-switch-game-experience") %></span>
     </div>
     <div class="switch">
         <input id="personalized-experience-switch" type="checkbox"  />
@@ -9,7 +9,7 @@
 </div>
 <div class="switch-container">
     <div class="switch-label">
-        <span>I agree to personalized ads and in-app content from Unity</span>
+        <span><%= data.t("my-choices-switch-personalized-ads") %></span>
     </div>
     <div class="switch">
         <input id="personalized-ads-switch" type="checkbox" />
@@ -18,8 +18,7 @@
 </div>
 <div id="third-party-switch" class="switch-container">
     <div class="switch-label">
-        <span>I also agree to personalized ads and measurement, including those using
-            demographic and other data from third-party partners</span>
+        <span><%= data.t("my-choices-switch-personalized-third-party") %></span>
     </div>
     <div class="switch">
         <input id="personalized-ads-3rd-party-switch" type="checkbox" />

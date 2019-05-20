@@ -97,6 +97,7 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -156,7 +157,7 @@ describe('CampaignManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo);
+        backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
         contentTypeHandlerManager = new ContentTypeHandlerManager();
         adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
     });
@@ -227,34 +228,34 @@ describe('CampaignManager', () => {
                         'http://myTrackingURL/impression',
                         'http://myTrackingURL/wrapper/impression'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('creativeView'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.CREATIVE_VIEW), [
                         'http://myTrackingURL/creativeView',
                         'http://myTrackingURL/wrapper/creativeView'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.START), [
                         'http://myTrackingURL/start',
                         'http://myTrackingURL/wrapper/start'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.FIRST_QUARTILE), [
                         'http://myTrackingURL/firstQuartile',
                         'http://myTrackingURL/wrapper/firstQuartile'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.MIDPOINT), [
                         'http://myTrackingURL/midpoint',
                         'http://myTrackingURL/wrapper/midpoint'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.THIRD_QUARTILE), [
                         'http://myTrackingURL/thirdQuartile',
                         'http://myTrackingURL/wrapper/thirdQuartile'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.COMPLETE), [
                         'http://myTrackingURL/complete',
                         'http://myTrackingURL/wrapper/complete'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('mute'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.MUTE), [
                         'http://myTrackingURL/wrapper/mute'
                     ]);
-                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('unmute'), [
+                    assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.UNMUTE), [
                         'http://myTrackingURL/wrapper/unmute'
                     ]);
                     assert.deepEqual(triggeredCampaign.getVast().getVideoClickTrackingURLs(), [
@@ -317,44 +318,44 @@ describe('CampaignManager', () => {
                     'http://b.scorecardresearch.com/b?C1=1&C2=6000001&C3=&C4=&C5=010000&rnd=8202933074266195079',
                     'http://adserver.unityads.unity3d.com/brands/1059849/%ZONE%/start?value=715&gm=1022&nm=715&cc=USD&seat=60673&pubId=1585&brandId=3418&supplyId=9755&unit=13457&code=rwd19-1059849-video&source=5097&demand=60004&nt=3&domain=nissanusa.com&cId=17282869&deal='
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('creativeView'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.CREATIVE_VIEW), [
                     'https://x.vindicosuite.com/event/?e=11;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=95458;cr=2686135030;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href='
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.START), [
                     'https://x.vindicosuite.com/event/?e=12;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=91256;cr=2539347201;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=11;',
                     'http://events.tremorhub.com/evt?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&evt=start&vastcrtype=linear&crid=67817785'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.FIRST_QUARTILE), [
                     'https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-201&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479',
                     'https://x.vindicosuite.com/event/?e=13;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=52835;cr=3022585079;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=960584;',
                     'http://events.tremorhub.com/evt?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&evt=firstQuartile&vastcrtype=linear&crid=67817785'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.MIDPOINT), [
                     'https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-202&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479',
                     'https://x.vindicosuite.com/event/?e=14;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=23819;cr=99195890;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=18;',
                     'http://events.tremorhub.com/evt?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&evt=midpoint&vastcrtype=linear&crid=67817785'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.THIRD_QUARTILE), [
                     'https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-203&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479',
                     'https://x.vindicosuite.com/event/?e=15;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=9092;cr=1110035921;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=960585;',
                     'http://events.tremorhub.com/evt?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&evt=thirdQuartile&vastcrtype=linear&crid=67817785'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.COMPLETE), [
                     'https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=-204&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479',
                     'https://x.vindicosuite.com/event/?e=16;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=93062;cr=3378288114;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=13;',
                     'http://events.tremorhub.com/evt?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&evt=complete&vastcrtype=linear&crid=67817785'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('mute'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.MUTE), [
                     'https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1004&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479',
                     'https://x.vindicosuite.com/event/?e=17;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=45513;cr=483982038;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=16;'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('unmute'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.UNMUTE), [
                     'https://t.pointroll.com/PointRoll/Track/?q=ba&o=1&c=1005&i=C0350500-4E6E-9A6D-0314-A20018D20101&r=1466475479',
                     'https://x.vindicosuite.com/event/?e=18;l=454826;b=3968433;c=918974;smuid=;msd=;a=82365;ta=1466475479;tk=5138;cr=1883451934;ad=CKrhGxDmgQwYjgwgASgEMId3ONiZAUDdhxJIvrwSUL6LOFixm%2FIBYL2DBWjDlyFwAngBiAEAkAEAmAEBogETMjU5NDc1MTUzODc3MTAwMjAxNbIBBVZJREVPuAEBwAEAyAEA0AEA2AEA;xid=2594751538771002015;href=',
                     'https://ad.doubleclick.net/ddm/activity/dc_oe=ChMIgM6PxqOwzQIVDg-BCh1U9QzEEAAYACC5oqsg;met=1;ecn1=1;etm1=0;eid1=149645;'
@@ -395,6 +396,13 @@ describe('CampaignManager', () => {
             mockRequest.expects('get').returns(Promise.resolve({
                 response: nonWrappedVAST
             }));
+            // mocks error urls from each Wrapped vast
+            const errorURLs = ['http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error', 'http://myErrorURL/wrapper/error'];
+            if (errorURLs) {
+                for (const errorURL of errorURLs) {
+                    mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
+                }
+            }
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
@@ -429,13 +437,15 @@ describe('CampaignManager', () => {
             });
         };
 
-        const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, errorURL?: string, done?: () => void): void => {
+        const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, errorURLs?: string[], done?: () => void): void => {
             // given a VAST placement that wraps another VAST
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
-            if(errorURL) {
-                mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
+            if(errorURLs) {
+                for (const errorURL of errorURLs) {
+                    mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
+                }
             }
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
@@ -481,11 +491,11 @@ describe('CampaignManager', () => {
                     response: OnProgrammaticVastPlcCampaignNoVideoWrapped
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
-                const wrapperErrorUrl = 'http://myErrorURL/error';
+                const wrapperErrorUrls = ['http://myErrorURL/error', 'http://myErrorURL/wrapper/error'];
                 const wrappedResponse = Promise.resolve({
                     response: NoVideoWrappedVast
                 });
-                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], wrapperErrorUrl, done);
+                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], wrapperErrorUrls, done);
             });
 
             it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
@@ -623,25 +633,23 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.START), [
                     'http://customTrackingUrl/start',
                     'http://customTrackingUrl/start2',
-                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%',
-                    'www.testyboy.com',
-                    'www.scottwise.com'
+                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%'
+
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.FIRST_QUARTILE), [
                     'http://customTrackingUrl/firstQuartile'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('midpoint'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.MIDPOINT), [
                     'http://customTrackingUrl/midpoint'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('thirdQuartile'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.THIRD_QUARTILE), [
                     'http://customTrackingUrl/thirdQuartile'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('complete'), [
+                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.COMPLETE), [
                     'http://customTrackingUrl/complete'
                 ]);
             });
@@ -968,7 +976,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getCreativeId(), 'vpaid-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 900);
                     assert.equal(triggeredCampaign.getCorrelationId(), '885a17ef11f05deb34b72b');
-                    assert.deepEqual((<VPAIDCampaign>triggeredCampaign).getVPAID().getTrackingEventUrls('start'), [
+                    assert.deepEqual((<VPAIDCampaign>triggeredCampaign).getVPAID().getTrackingEventUrls(TrackingEvent.START), [
                         'https://fake-ads-backend.unityads.unity3d.com/ack/333?event=vast-tracking-url',
                         'www.testyboy.com',
                         'www.scottwise.com'
@@ -997,7 +1005,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getSeatId(), 900);
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zzzz');
                     assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-                    assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls('start'), [
+                    assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls(TrackingEvent.START), [
                         'https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D',
                         'https://www.dummy-url.com',
                         'www.testyboy.com',

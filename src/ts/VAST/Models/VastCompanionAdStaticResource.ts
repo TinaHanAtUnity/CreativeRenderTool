@@ -1,7 +1,7 @@
 import { Model } from 'Core/Models/Model';
 import { IVastCreativeCompanionAd } from 'VAST/Models/IVastCreativeCompanionAd';
 
-interface IVastCreativeStaticResourceCompanionAd extends IVastCreativeCompanionAd {
+interface IVastCompanionAdStaticResource extends IVastCreativeCompanionAd {
     width: number;
     height: number;
     type: string;
@@ -12,7 +12,7 @@ interface IVastCreativeStaticResourceCompanionAd extends IVastCreativeCompanionA
     trackingEvents: { [eventName: string]: string[] };
 }
 
-export class VastCreativeStaticResourceCompanionAd extends Model<IVastCreativeStaticResourceCompanionAd> {
+export class VastCompanionAdStaticResource extends Model<IVastCompanionAdStaticResource> {
 
     constructor(id: string | null, height: number | null, width: number | null, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, companionClickTrackingURLTemplates?: string[], trackingEvents?: { [eventName: string]: string[] }) {
         super('VastCreativeCompanionAd', {

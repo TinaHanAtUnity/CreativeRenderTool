@@ -3,23 +3,28 @@ import DanishOverlay from 'json/locale/da_DK/overlay.json';
 import GermanEndscreen from 'json/locale/de/endscreen.json';
 import GermanLoadingScreen from 'json/locale/de/loadingscreen.json';
 import GermanOverlay from 'json/locale/de/overlay.json';
+import GermanConsent from 'json/locale/de/consent.json';
 import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
+import EnglishConsent from 'json/locale/en/consent.json';
 import SpanishEndscreen from 'json/locale/es/endscreen.json';
 import SpanishLoadingScreen from 'json/locale/es/loadingscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
+import SpanishConsent from 'json/locale/es/consent.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
 import FinnishLoadingScreen from 'json/locale/fi/loadingscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
 import FrenchEndscreen from 'json/locale/fr/endscreen.json';
 import FrenchLoadingScreen from 'json/locale/fr/loadingscreen.json';
 import FrenchOverlay from 'json/locale/fr/overlay.json';
+import FrenchConsent from 'json/locale/fr/consent.json';
 import IcelandicEndscreen from 'json/locale/is/endscreen.json';
 import IcelandicOverlay from 'json/locale/is/overlay.json';
 import ItalianEndscreen from 'json/locale/it/endscreen.json';
 import ItalianLoadingScreen from 'json/locale/it/loadingscreen.json';
 import ItalianOverlay from 'json/locale/it/overlay.json';
+import ItalianConsent from 'json/locale/it/consent.json';
 import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
 import JapaneseOverlay from 'json/locale/ja/overlay.json';
 import KoreanEndscreen from 'json/locale/ko/endscreen.json';
@@ -31,11 +36,13 @@ import NorwegianOverlay from 'json/locale/nb/overlay.json';
 import PortugueseEndscreen from 'json/locale/pt/endscreen.json';
 import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 import PortugueseOverlay from 'json/locale/pt/overlay.json';
+import PortugueseConsent from 'json/locale/pt/consent.json';
 import RomanianEndscreen from 'json/locale/ro/endscreen.json';
 import RomanianOverlay from 'json/locale/ro/overlay.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
 import RussianLoadingScreen from 'json/locale/ru/loadingscreen.json';
 import RussianOverlay from 'json/locale/ru/overlay.json';
+import RussianConsent from 'json/locale/ru/consent.json';
 import TurkishEndscreen from 'json/locale/tr/endscreen.json';
 import TurkishOverlay from 'json/locale/tr/overlay.json';
 import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
@@ -106,12 +113,14 @@ export class Localization {
         'en.*': {
             'endscreen': JSON.parse(EnglishEndscreen),
             'overlay': JSON.parse(EnglishOverlay),
-            'loadingscreen': JSON.parse(EnglishLoadingScreen)
+            'loadingscreen': JSON.parse(EnglishLoadingScreen),
+            'consent': JSON.parse(EnglishConsent)
         },
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
             'overlay': JSON.parse(RussianOverlay),
-            'loadingscreen': JSON.parse(RussianLoadingScreen)
+            'loadingscreen': JSON.parse(RussianLoadingScreen),
+            'consent': JSON.parse(RussianConsent)
         },
         'ja.*': {
             'endscreen': JSON.parse(JapaneseEndscreen),
@@ -124,12 +133,14 @@ export class Localization {
         'it.*': {
             'endscreen': JSON.parse(ItalianEndscreen),
             'overlay': JSON.parse(ItalianOverlay),
-            'loadingscreen': JSON.parse(ItalianLoadingScreen)
+            'loadingscreen': JSON.parse(ItalianLoadingScreen),
+            'consent': JSON.parse(ItalianConsent)
         },
         'de.*': {
             'endscreen': JSON.parse(GermanEndscreen),
             'overlay': JSON.parse(GermanOverlay),
-            'loadingscreen': JSON.parse(GermanLoadingScreen)
+            'loadingscreen': JSON.parse(GermanLoadingScreen),
+            'consent': JSON.parse(GermanConsent)
         },
         'zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$': {
             'endscreen': JSON.parse(ChineseTraditionalEndscreen),
@@ -149,12 +160,15 @@ export class Localization {
         'es.*': {
             'endscreen': JSON.parse(SpanishEndscreen),
             'overlay': JSON.parse(SpanishOverlay),
-            'loadingscreen': JSON.parse(SpanishLoadingScreen)
+            'loadingscreen': JSON.parse(SpanishLoadingScreen),
+            'consent': JSON.parse(SpanishConsent)
+
         },
         'fr.*': {
             'endscreen': JSON.parse(FrenchEndscreen),
             'overlay': JSON.parse(FrenchOverlay),
-            'loadingscreen': JSON.parse(FrenchLoadingScreen)
+            'loadingscreen': JSON.parse(FrenchLoadingScreen),
+            'consent': JSON.parse(FrenchConsent)
         },
         'tr.*': {
             'endscreen': JSON.parse(TurkishEndscreen),
@@ -183,7 +197,8 @@ export class Localization {
         'pt.*': {
             'endscreen': JSON.parse(PortugueseEndscreen),
             'overlay': JSON.parse(PortugueseOverlay),
-            'loadingscreen': JSON.parse(PortugueseLoadingScreen)
+            'loadingscreen': JSON.parse(PortugueseLoadingScreen),
+            'consent': JSON.parse(PortugueseConsent)
         }
     };
 
@@ -202,6 +217,10 @@ export class Localization {
     private _namespace: string;
 
     constructor(language: string, namespace: string) {
+        if (namespace === 'consent' && !this.isConsentTranslationAvailable(language)) {
+            language = 'en.*';
+        }
+
         this._language = language;
         this._namespace = namespace;
     }
@@ -226,6 +245,19 @@ export class Localization {
             return (Math.floor(number / 1000)).toString() + ' ' + localizedAbbreviations.thousand;
         }
         return number.toString();
+    }
+
+    private isConsentTranslationAvailable(language: string) {
+        if (language.match('fr.*')
+            || language.match('de.*')
+            || language.match('es.*')
+            || language.match('ru.*')
+            || language.match('pt.*')
+            || language.match('it.*')) {
+            return true;
+        }
+
+        return false;
     }
 
 }
