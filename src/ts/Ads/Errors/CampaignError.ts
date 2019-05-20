@@ -42,4 +42,21 @@ export class CampaignError extends Error {
     public getSubCampaignErrors(): CampaignError[] {
         return this._subCampaignErrors;
     }
+
+    public getAllCampaignErrors(): CampaignError[] {
+        const errorList: CampaignError[] = [];
+        const errorQueue: CampaignError[] = [];
+        errorList.push(this);
+        errorQueue.push(this);
+        while (errorQueue.length > 0) {
+            const oneError = errorQueue.shift();
+            if (oneError) {
+                for (const subError of oneError.getSubCampaignErrors()) {
+                    errorList.push(subError);
+                    errorQueue.push(subError);
+                }
+            }
+        }
+        return errorList;
+    }
 }
