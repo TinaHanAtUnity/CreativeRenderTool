@@ -76,10 +76,12 @@ export class VastParserStrict {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
+    private _compiledCampaignErrors: CampaignError[];
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
+        this._compiledCampaignErrors = [];
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -94,6 +96,8 @@ export class VastParserStrict {
         const xml = this._domParser.parseFromString(vast, 'text/xml');
         const ads: VastAd[] = [];
         const parseErrorURLTemplates: string[] = [];
+
+        this._compiledCampaignErrors = [];
 
         // use the parsererror tag from DomParser to give accurate error messages
         const parseErrors = xml.getElementsByTagName(VastNodeName.PARSE_ERROR);
@@ -118,7 +122,6 @@ export class VastParserStrict {
         this.getChildrenNodesWithName(documentElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
             parseErrorURLTemplates.push(this.parseNodeText(element));
         });
-        let errors: CampaignError[] = [];
         let isWarningLevel = true;
         // parse each Ad element
         this.getNodesWithName(documentElement, VastNodeName.AD).forEach((element: HTMLElement) => {
@@ -139,17 +142,17 @@ export class VastParserStrict {
                     ads.push(ad);
                 }
 
-                errors = errors.concat(adErrors);
+                this._compiledCampaignErrors = this._compiledCampaignErrors.concat(adErrors);
             }
         });
 
         // throw campaign error when it fails to get any vast ad
         if (ads.length === 0) {
-            throw this.formatErrorMessage('Failed to parse VAST XML', errors);
+            throw this.formatErrorMessage('Failed to parse VAST XML', this._compiledCampaignErrors);
         }
 
         // return vast ads with generated non-severe errors
-        return new Vast(ads, parseErrorURLTemplates, errors);
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
     }
 
     // default to https: for relative urls
@@ -302,6 +305,10 @@ export class VastParserStrict {
                 let isWarningLevel = true;
                 for (const adError of companionAdErrors) {
                     if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        if (adError.errorTrackingUrls.length === 0) {
+                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                        }
+                        this._compiledCampaignErrors.push(adError);
                         isWarningLevel = false;
                         break;
                     }
