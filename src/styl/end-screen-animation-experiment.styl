@@ -1,0 +1,53 @@
+body.animation-ready #end-screen .campaign-container {
+    background: none;
+}
+
+#end-screen.on-show {
+    overflow: hidden;
+}
+
+transitionMixin(position) {
+    transition: position .8s cubic-bezier(0.455, 0.03, 0.515, 0.955) 0s; // easeInOutQuad
+}
+  
+
+
+.portrait.animation-ready {
+    #end-screen .game-background-container {
+        top: -50%;
+        transitionMixin(top);
+    }
+
+    #end-screen.on-show .game-background-container {
+        top: 0;
+    }
+
+    #end-screen .end-screen-info-background {
+        bottom: -50%;
+        transitionMixin(bottom);
+    }
+
+    #end-screen.on-show .end-screen-info-background {
+        bottom: 0;
+    }
+}
+
+.landscape.animation-ready {
+    #end-screen .game-background-container {
+        left: -50%;
+        transitionMixin(left);
+    }
+
+    #end-screen.on-show .game-background-container {
+        left: 0;
+    }
+
+    #end-screen .end-screen-info-background {
+        right: -50%;
+        transitionMixin(right);
+    }
+
+    #end-screen.on-show .end-screen-info-background {
+        right: 0;
+    }
+}

@@ -28,11 +28,11 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { ProgressBarVideoOverlay } from 'Ads/Views/ProgressBarVideoOverlay';
+import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
-import { ABGroup, ProgressBarVideoTest } from 'Core/Models/ABGroup';
+import { AnimationEndCardTest } from 'Core/Models/ABGroup';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -217,8 +217,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
         let overlay: AbstractVideoOverlay;
         const abGroup = parameters.coreConfig.getAbGroup();
-        if (ProgressBarVideoTest.isValid(abGroup)) {
-            overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        if (AnimationEndCardTest.isValid(abGroup)) {
+            overlay = new AnimatedVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
