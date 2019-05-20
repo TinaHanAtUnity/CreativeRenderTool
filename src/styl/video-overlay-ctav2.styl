@@ -1,3 +1,5 @@
+@import "video-overlay.styl";
+
 #video-overlay {
   .call-button-ctav2 {
     transform: translateX(160%);
@@ -74,6 +76,16 @@
           $game-rating-count-default($scale-size);
           font-size: .5 * $endscreen-default-size;
         }
+      }
+    }
+  }
+
+  &.show-gdpr-banner {
+    .bottom-container-ctav2 {
+      height: $video-overlay-styles.touchable-area-height * 3;
+
+      .left-corner, .right-corner {
+        bottom: 1.8em;
       }
     }
   }
