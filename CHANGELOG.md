@@ -1,3 +1,8 @@
+# Mon May 20 15:48:35 UTC 2019
+
+* Consent A/B test: design update [#9684](https://github.com/Applifier/unity-ads-webview/pull/9684)
+* Add bundleId to optout messages [#9661](https://github.com/Applifier/unity-ads-webview/pull/9661)
+
 # Fri May 17 22:55:29 UTC 2019
 
 * VAST Error Tracking - part 2: campaign error level [#9660](https://github.com/Applifier/unity-ads-webview/pull/9660)
