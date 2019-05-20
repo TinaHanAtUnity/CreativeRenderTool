@@ -73,7 +73,8 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
         if (this._placement.skipEndCardOnClose()) {
             super.onOverlayClose();
         } else {
-            if (AnimationEndCardTest.isValid(5)) {
+            const abGroup = this._coreConfig.getAbGroup();
+            if (AnimationEndCardTest.isValid(abGroup)) {
                 this.onOverlayAnimation(position);
             } else {
                 const endScreen = this._performanceAdUnit.getEndScreen();
