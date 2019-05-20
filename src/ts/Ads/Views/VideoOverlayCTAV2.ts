@@ -13,24 +13,24 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
-    platform: Platform;
-    ads: IAdsApi;
-    deviceInfo: DeviceInfo;
-    clientInfo: ClientInfo;
-    campaign: T;
-    coreConfig: CoreConfiguration;
-    placement: Placement;
+  platform: Platform;
+  ads: IAdsApi;
+  deviceInfo: DeviceInfo;
+  clientInfo: ClientInfo;
+  campaign: T;
+  coreConfig: CoreConfiguration;
+  placement: Placement;
 }
 
 export class VideoOverlayCTAV2 extends VideoOverlay implements IPrivacyHandlerView {
-    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
-        super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+  constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
+    super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
-        this._template = new Template(VideoOverlayTemplateCTAV2, this._localization);
+    this._template = new Template(VideoOverlayTemplateCTAV2, this._localization);
 
-        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-            this._templateData.gameName = this._campaign.getGameName();
-            this._templateData.rating = this._campaign.getRating() * 20;
-        }
+    if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+      this._templateData.gameName = this._campaign.getGameName();
+      this._templateData.rating = this._campaign.getRating() * 20;
     }
+  }
 }
