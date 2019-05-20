@@ -7,8 +7,6 @@ import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { AnimationEndCardTest } from 'Core/Models/ABGroup';
-// import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-// import { Campaign } from 'Ads/Models/Campaign';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<PerformanceCampaign> {
 
