@@ -1,6 +1,6 @@
 # Pending
 
-* Add NativeInfo to Open Measurement SessionStart context https://github.com/Applifier/unity-ads-webview/pull/9738
+* Add NativeInfo to Open Measurement SessionStart context [#9738](https://github.com/Applifier/unity-ads-webview/pull/9738)
 
 # Mon May 20 15:48:35 UTC 2019
 
