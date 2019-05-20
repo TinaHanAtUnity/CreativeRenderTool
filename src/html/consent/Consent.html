@@ -31,23 +31,24 @@
         </div>
     </div>
 
-    <div id="consent-introduction" class="consent-introduction">
-        <div class="privacy-logo">
-            <span class="icon-gdpr"></span>
+    <div id="consent-homepage">
+        <div class="text-container">
+            <div class="privacy-logo">
+                <span class="icon-gdpr"></span>
+            </div>
+            <span class="title"><%= data.t("homepage-title") %></span>
+            <div class="main-text">
+                <p>
+                    <%= data.t("homepage-main-text") %>
+                </p>
+            </div>
+            <div class="empty-block">
+            </div>
         </div>
-        <span class="intro-title">Gameplay & Ad Personalization</span>
-        <div class="intro-text">
-            <p>
-                Personalization gives you a better in-game experience by tailoring to your preferences. By
-                continuing, you may choose the extent in which your data is used to personalize gameplay
-                and ads in this game.
-            </p>
-        </div>
-        <div class="continue-button bold">
-            <span>Continue</span>
-        </div>
-        <div class="unity-logo">
-            <span>Powered by Unity</span>
+
+        <div class="homepage-button-container">
+            <div class="homepage-accept-all consent-button"><span><%= data.t("homepage-accept-all") %></span></div>
+            <div class="show-choices consent-button"><span><%= data.t("homepage-show-my-choices") %></span></div>
         </div>
     </div>
 
@@ -75,12 +76,7 @@
         <div class="consent-button-container">
             <div class="save-my-choices consent-button"><span><%= data.t("save-my-choices") %></span></div>
             <div class="agree consent-button"><span><%= data.t("agree-to-all") %></span></div>
-            <% if(data.myChoicesDisagreeCtaTest) { %>
-            <div class="disagree consent-button"><span><%= data.t("disagree") %></span></div>
-            <% } else { %>
             <div class="disagree consent-button"><span><%= data.t("no-thanks") %></span></div>
-            <% } %>
-
         </div>
     </div>
 </div>
