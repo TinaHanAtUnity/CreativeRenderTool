@@ -28,6 +28,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
         let placement: Placement;
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
+        let clock: sinon.SinonFakeTimers;
 
         describe('For VAST creatives', () => {
 
@@ -164,9 +165,13 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     context('sessionFinish', () => {
                         beforeEach(() => {
                             sinon.stub(om, 'removeFromViewHieararchy');
+                            clock = sinon.useFakeTimers();
                         });
                         it('should remove OM from dom on sessionFinish', () => {
+
                             om.onEventProcessed('sessionFinish');
+                            clock.tick(1000);
+                            clock.restore();
                             sinon.assert.called(<sinon.SinonSpy>om.removeFromViewHieararchy);
                         });
                     });

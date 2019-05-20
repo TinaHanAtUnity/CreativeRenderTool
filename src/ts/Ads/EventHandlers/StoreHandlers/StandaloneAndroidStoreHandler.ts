@@ -3,7 +3,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DownloadStatus } from 'China/Native/Android/Download';
 import { Localization } from 'Core/Utilities/Localization';
 import { DownloadManager, DownloadMessage, DownloadState } from 'China/Managers/DownloadManager';
-import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IObserver0, IObserver3 } from 'Core/Utilities/IObserver';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';

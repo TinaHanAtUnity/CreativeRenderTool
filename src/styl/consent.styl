@@ -17,25 +17,13 @@
     pointer-events: none;
   }
 
-  &:not(.intro) {
+  &:not(.homepage) {
     #consent-my-choices {
       display: flex;
     }
-    #consent-introduction {
-      display: none;
-    }
 
-    #consent-homescreen {
+    #consent-homepage {
       display: none;
-    }
-  }
-
-  &.intro {
-    #consent-my-choices {
-      display: none;
-    }
-    #consent-introduction {
-      display: block;
     }
 
     #consent-homescreen {
@@ -47,7 +35,8 @@
     #consent-my-choices {
       display: none;
     }
-    #consent-introduction {
+
+    #consent-homepage {
       display: none;
     }
 
@@ -56,10 +45,24 @@
     }
   }
 
+  &.homepage {
+    #consent-my-choices {
+      display: none;
+    }
+
+    #consent-homepage {
+      display: flex;
+    }
+
+    #consent-homescreen {
+      display: none;
+    }
+  }
+
 
   &.android4-ios7-ios8 {
     .consent-button-container {
-      padding: $default-size 0;
+      padding: .75 * $default-size 0;
       width: 100%;
       justify-content: center;
       background: $white;
@@ -81,8 +84,10 @@
       padding: 0;
     }
 
-    .empty-block {
-      height: 6 * $default-size;
+    #consent-my-choices {
+      .empty-block {
+        height: 6 * $default-size;
+      }
     }
   }
 
@@ -146,7 +151,7 @@
     left:0;
     display: flex;
     justify-content: space-between;
-    padding: $default-size $default-size;
+    padding: .75 * $default-size $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -180,7 +185,7 @@
 
   .disagree {
     display: block;
-    margin-left: $default-size;
+    margin-left: .75 * $default-size;
     border: 1px solid $consent-border-gray;
     color: $black;
   }
@@ -269,45 +274,89 @@
   }
 }
 
-#consent-introduction {
+#consent-homepage {
   position: relative;
+  max-height: 100%;
   border-radius: .5 * $default-size;
   background: $white;
   text-align: center;
 
-  .privacy-logo {
-    margin-top: 3 * $default-size;
-    margin-bottom: .25 * $default-size;
-    font-size: 2 * $consent-main-title-font-size;
+  .text-container {
+    position: relative;
+    flex: 1 1 auto;
+    overflow: scroll;
+    border-radius: .5 * $default-size;
+    background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
+    padding: 1.5 * $default-size;
   }
 
-  .intro-title {
-    padding: 0 1.25 * $default-size;
+  .privacy-logo {
+    margin-bottom: .25 * $default-size;
+    font-size: 1.5 * $consent-main-title-font-size;
+  }
+
+  .title {
     font-weight: $privacy-main-title-font-weight;
     font-size: $consent-main-title-font-size;
   }
 
-  .intro-text {
-    padding: 0 1.75 * $default-size;
+  .empty-block {
+    height: 6 * $default-size;
   }
 
-  .bold {
-    font-weight: $privacy-main-title-font-weight;
+  .homepage-button-container {
+    // use absolute position to ensure that buttons are always visible
+    position: absolute;
+    right:0;
+    bottom: 0;
+    left:0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: .75 * $default-size $default-size;
+    border-bottom-right-radius: .5 * $default-size;
+    border-bottom-left-radius: .5 * $default-size;
+    background: $white;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, .19);
   }
 
-  .continue-button {
-    // padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
-    padding: .5 * $default-size 2 * $default-size 2 * $default-size 2 * $default-size;
-    color: $consent-blue;
-    font-size: $consent-title-font-size;
+  .consent-button {
+    position: relative;
+    padding: .75 * $default-size .75 * $default-size;
+    border-radius: 2 * $default-size;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
+    text-align: center;
+    font-weight: $privacy-title-font-weight;
+    font-size: $consent-button-font-size;
   }
 
-  .unity-logo {
-    margin-bottom: $default-size;
-    font-size: $default-font-size * .65;
-    opacity: .18;
+  .consent-button {
+    &.click-animation {
+      $click-animation();
+    }
+  }
+
+  .homepage-accept-all {
+    display: block;
+    background: $consent-blue;
+    color: $white;
+  }
+
+  .show-choices {
+    display: block;
+    margin-top: .5 * $default-size;
+    border: 1px solid $privacy-light-gray;
+    color: $consent-text-font-color;
+  }
+
+  .page-link {
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
+
 
 #consent-homescreen {
   position: relative;
@@ -405,8 +454,8 @@
 
 &.landscape {
   #consent {
-    #consent-introduction,
-    #consent-my-choices {
+    #consent-my-choices,
+    #consent-homepage {
       left: 15%;
       width: 70%;
     }
@@ -415,20 +464,9 @@
       height: 100%;
     }
 
-    #consent-introduction {
-      .continue-button {
-        padding: .5 * $default-size 2 * $default-size $default-size 2 * $default-size;
-      }
-
-      .privacy-logo {
-        margin-top: 2rem;
-      }
-    }
-
     .back-button {
       margin-left: -.5 * $default-size;
       transform: translateX(-100%);
-
     }
   }
 }

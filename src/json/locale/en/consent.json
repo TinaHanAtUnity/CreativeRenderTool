@@ -13,7 +13,7 @@
 
   "save-my-choices": "Save my choices",
   "agree-to-all": "Agree to all",
-  "no-thanks": "No thanks",
+  "no-thanks": "Disagree",
 
   "privacy-what-we-collect-title": "What information we collect and how we use it",
   "privacy-what-we-collect-desc-p1": "Most of the information we use for this personalization is based on your device’s advertising ID (Apple’s Advertising Identifier or Google Advertising Identifier) and your IP address.",

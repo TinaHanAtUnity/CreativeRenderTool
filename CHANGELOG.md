@@ -1,3 +1,39 @@
+# Pending
+
+* Add NativeInfo to Open Measurement SessionStart context [#9738](https://github.com/Applifier/unity-ads-webview/pull/9738)
+
+# Mon May 20 15:48:35 UTC 2019
+
+* Consent A/B test: design update [#9684](https://github.com/Applifier/unity-ads-webview/pull/9684)
+* Add bundleId to optout messages [#9661](https://github.com/Applifier/unity-ads-webview/pull/9661)
+
+# Fri May 17 22:55:29 UTC 2019
+
+* VAST Error Tracking - part 2: campaign error level [#9660](https://github.com/Applifier/unity-ads-webview/pull/9660)
+* Fall back to non-transparent activity if opening transparent activity fails [#9687](https://github.com/Applifier/unity-ads-webview/pull/9687)
+* Add LoopMe SeatIDs to whitelist [#9688](https://github.com/Applifier/unity-ads-webview/pull/9688)
+
+# Thu May 16 16:26:48 UTC 2019
+
+* IMEI support for main SDK [#9199](https://github.com/Applifier/unity-ads-webview/pull/9199)
+
+# Wed May 15 18:04:53 UTC 2019
+
+* Fix open measurement timestamp and device volume [#9634](https://github.com/Applifier/unity-ads-webview/pull/9634)
+* Disable Vast Endscreens Lacking Impressions [#9609](https://github.com/Applifier/unity-ads-webview/pull/9609)
+* Introduce isBannerPlacement to SDK Versions <3.0 and Remove Banner Placements from being Requested (Manual Patch)
+* Add hulu ads to allow doubleverify viewability tracker [#9659](https://github.com/Applifier/unity-ads-webview/pull/9659)
+* Set timeout to remove OM from view after Verification Script requests made [#9637](https://github.com/Applifier/unity-ads-webview/pull/9637)
+
+# Tue May 14 16:48:35 UTC 2019
+
+* Add missing deployment files in China bucket [#9636](https://github.com/Applifier/unity-ads-webview/pull/9636)
+* Remove slider endcard experiment [#9635](https://github.com/Applifier/unity-ads-webview/pull/9635)
+* Remove unused code related to the old consent design [#9533](https://github.com/Applifier/unity-ads-webview/pull/9533)
+* Fix OM Javadoc Comments and Add TODOs [#9608](https://github.com/Applifier/unity-ads-webview/pull/9608)
+* Move PTS Metrics to Separate Enums [#9611](https://github.com/Applifier/unity-ads-webview/pull/9611)
+* Investigate Magnitude of VAST Videos which Fail to Send Impressions [#9612](https://github.com/Applifier/unity-ads-webview/pull/9612)
+
 # Mon May 13 21:50:59 UTC 2019
 
 * Fix Banner not ready after first banner is shown [#9561](https://github.com/Applifier/unity-ads-webview/pull/9561)
