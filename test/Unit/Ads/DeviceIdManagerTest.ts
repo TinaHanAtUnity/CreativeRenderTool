@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { AndroidPermission, AndroidPermissionsResult } from 'Core/Native/Android/Permissions';
-import { DeviceIdStorageKeys, DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdStorageKeys, DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageType } from 'Core/Native/Storage';
@@ -13,14 +13,12 @@ import { ICoreApi} from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
 import { BuildVerionCode } from 'Core/Constants/Android/BuildVerionCode';
-import { IChinaApi } from 'China/IChina';
 
 describe('DeviceIdManagerTest', () => {
     const sandbox = sinon.createSandbox();
     let nativeBridge: NativeBridge;
     let deviceInfo: AndroidDeviceInfo;
     let core: ICoreApi;
-    let china: IChinaApi;
     let deviceIdManager: DeviceIdManager;
 
     beforeEach(() => {
@@ -28,9 +26,8 @@ describe('DeviceIdManagerTest', () => {
         const backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        china = TestFixtures.getChinaApi(nativeBridge);
         deviceInfo = new AndroidDeviceInfo(core);
-        deviceIdManager = new DeviceIdManager(core, china, deviceInfo);
+        deviceIdManager = new DeviceIdManager(core, deviceInfo);
 
         sandbox.stub(Diagnostics, 'trigger');
     });
@@ -94,6 +91,62 @@ describe('DeviceIdManagerTest', () => {
         });
     });
 
+    describe('when checking compliant', () => {
+        it ('should return true if all conditions are satisfied', () => {
+            const country = 'CN';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isTrue(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if country is not China', () => {
+            const country = 'FI';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if opt out of unity ads', () => {
+            const country = 'CN';
+            const optOutEnabled = true;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if advertising ID is present', () => {
+            const country = 'CN';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns('advertisingIdentifier');
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if limit ad tracking is on', () => {
+            const country = 'CN';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(true);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if all conditions are not met', () => {
+            const country = 'FI';
+            const optOutEnabled = true;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns('advertisingIdentifier');
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+    });
+
     describe('when reading device id', () => {
         beforeEach(() => {
             sandbox.stub(core.Storage, 'get').resolves();
@@ -119,26 +172,26 @@ describe('DeviceIdManagerTest', () => {
                 });
 
                 it('should call get device with slot twice', () => {
-                    sandbox.stub(china.Android.DeviceInfo, 'getDeviceIdWithSlot').resolves();
+                    sandbox.stub(core.DeviceInfo.Android!, 'getDeviceIdWithSlot').resolves();
 
                     return deviceIdManager.getDeviceIdsWithPermissionRequest().then(() => {
-                        sinon.assert.calledTwice(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceIdWithSlot);
+                        sinon.assert.calledTwice(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceIdWithSlot);
                     });
                 });
 
                 it('should call get device with slot with slots 0 and 1', () => {
-                    sandbox.stub(china.Android.DeviceInfo, 'getDeviceIdWithSlot').resolves();
+                    sandbox.stub(core.DeviceInfo.Android!, 'getDeviceIdWithSlot').resolves();
 
                     return deviceIdManager.getDeviceIdsWithPermissionRequest().then(() => {
-                        sinon.assert.calledWithExactly(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceIdWithSlot, 0);
-                        sinon.assert.calledWithExactly(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceIdWithSlot, 1);
+                        sinon.assert.calledWithExactly(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceIdWithSlot, 0);
+                        sinon.assert.calledWithExactly(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceIdWithSlot, 1);
                     });
                 });
 
                 it('should update imei and meids in device info', () => {
                     const deviceId1 = '11111';
                     const deviceId2 = '11112';
-                    sandbox.stub(china.Android.DeviceInfo, 'getDeviceIdWithSlot')
+                    sandbox.stub(core.DeviceInfo.Android!, 'getDeviceIdWithSlot')
                         .withArgs(0).returns(deviceId1)
                         .withArgs(1).returns(deviceId2);
 
@@ -158,16 +211,16 @@ describe('DeviceIdManagerTest', () => {
                 });
 
                 it('should call get device id once', () => {
-                    sandbox.stub(china.Android.DeviceInfo, 'getDeviceId').resolves();
+                    sandbox.stub(core.DeviceInfo.Android!, 'getDeviceId').resolves();
 
                     return deviceIdManager.getDeviceIdsWithPermissionRequest().then(() => {
-                        sinon.assert.calledOnce(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceId);
+                        sinon.assert.calledOnce(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceId);
                     });
                 });
 
                 it('should update imei and meids in device info', () => {
                     const deviceId = '11111';
-                    sandbox.stub(china.Android.DeviceInfo, 'getDeviceId').resolves(deviceId);
+                    sandbox.stub(core.DeviceInfo.Android!, 'getDeviceId').resolves(deviceId);
 
                     return deviceIdManager.getDeviceIdsWithPermissionRequest().then(() => {
                         assert.equal(deviceInfo.getDeviceId1(), deviceId);
@@ -210,18 +263,18 @@ describe('DeviceIdManagerTest', () => {
                     });
 
                     it('should call get device with slot with slots 0 and 1', () => {
-                        sandbox.stub(china.Android.DeviceInfo, 'getDeviceIdWithSlot').resolves();
+                        sandbox.stub(core.DeviceInfo.Android!, 'getDeviceIdWithSlot').resolves();
 
                         return deviceIdManager.getDeviceIdsWithPermissionRequest().then(() => {
-                            sinon.assert.calledWithExactly(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceIdWithSlot, 0);
-                            sinon.assert.calledWithExactly(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceIdWithSlot, 1);
+                            sinon.assert.calledWithExactly(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceIdWithSlot, 0);
+                            sinon.assert.calledWithExactly(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceIdWithSlot, 1);
                         });
                     });
 
                     it('should update imeis in device info', () => {
                         const deviceId1 = '11111';
                         const deviceId2 = '11112';
-                        sandbox.stub(china.Android.DeviceInfo, 'getDeviceIdWithSlot')
+                        sandbox.stub(core.DeviceInfo.Android!, 'getDeviceIdWithSlot')
                             .withArgs(0).returns(deviceId1)
                             .withArgs(1).returns(deviceId2);
 
@@ -241,9 +294,9 @@ describe('DeviceIdManagerTest', () => {
                     });
 
                     it ('should not call get device id with slot', () => {
-                        sandbox.stub(china.Android.DeviceInfo, 'getDeviceIdWithSlot').resolves();
+                        sandbox.stub(core.DeviceInfo.Android!, 'getDeviceIdWithSlot').resolves();
                         return deviceIdManager.getDeviceIdsWithPermissionRequest().catch(() => {
-                            sinon.assert.notCalled(<sinon.SinonSpy>china.Android.DeviceInfo.getDeviceIdWithSlot);
+                            sinon.assert.notCalled(<sinon.SinonSpy>core.DeviceInfo.Android!.getDeviceIdWithSlot);
                         });
                     });
                 });

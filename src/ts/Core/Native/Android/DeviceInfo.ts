@@ -177,6 +177,14 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getNetworkMetered');
     }
 
+    public getDeviceId(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getDeviceId');
+    }
+
+    public getDeviceIdWithSlot(slotIndex: number): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getDeviceIdWithSlot', [slotIndex]);
+    }
+
     public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
