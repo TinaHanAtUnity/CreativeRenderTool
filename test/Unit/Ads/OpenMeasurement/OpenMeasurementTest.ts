@@ -11,7 +11,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IVerificationScriptResource } from 'Ads/Views/OMIDEventBridge';
+import { IVerificationScriptResource, IAdView, ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 import OMID3p from 'html/omid/omid3p.html';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
@@ -28,6 +28,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
         let placement: Placement;
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
+        let clock: sinon.SinonFakeTimers;
 
         describe('For VAST creatives', () => {
 
@@ -164,12 +165,132 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     context('sessionFinish', () => {
                         beforeEach(() => {
                             sinon.stub(om, 'removeFromViewHieararchy');
+                            clock = sinon.useFakeTimers();
                         });
                         it('should remove OM from dom on sessionFinish', () => {
+
                             om.onEventProcessed('sessionFinish');
+                            clock.tick(1000);
+                            clock.restore();
                             sinon.assert.called(<sinon.SinonSpy>om.removeFromViewHieararchy);
                         });
                     });
+                });
+            });
+
+            describe('Calculating Vast AdView', () => {
+                it('should return the adview in landscape', () => {
+                    const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 200, 100, false, []);
+                    const testAdView: IAdView = {
+                        percentageInView: 100,
+                        geometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100,
+                            obstructions: []
+                        },
+                        measuringElement: false,
+                        reasons: []
+                    };
+
+                    assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
+                });
+
+                it('should return the adview in portrait', () => {
+                    const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 100, 200, false, []);
+                    const testAdView: IAdView = {
+                        percentageInView: 100,
+                        geometry: {
+                            x: 0,
+                            y: 0,
+                            width: 100,
+                            height: 200
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 100,
+                            height: 200,
+                            obstructions: []
+                        },
+                        measuringElement: false,
+                        reasons: []
+                    };
+
+                    assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
+                });
+
+                it('should return new adview with an obstruction', () => {
+                    const obstructionRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 50,
+                        height: 50
+                    };
+
+                    const calculatedAdView: IAdView = om.calculateVastAdView(50, [ObstructionReasons.OBSTRUCTED], 200, 100, false, [obstructionRectangle]);
+                    const testAdView: IAdView = {
+                        percentageInView: 50,
+                        geometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100,
+                            obstructions: [obstructionRectangle]
+                        },
+                        measuringElement: false,
+                        reasons: [ObstructionReasons.OBSTRUCTED]
+                    };
+                    assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
+                });
+
+                it('should return the adview with measuringElementAvailable', () => {
+                    const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 200, 100, true, []);
+                    const testAdView: IAdView = {
+                        percentageInView: 100,
+                        geometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100,
+                            obstructions: []
+                        },
+                        measuringElement: true,
+                        reasons: [],
+                        containerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100
+                        },
+                        onScreenContainerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 200,
+                            height: 100,
+                            obstructions: []
+                        }
+                    };
+                    assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
                 });
             });
         });

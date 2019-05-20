@@ -273,19 +273,12 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     protected onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-        this._isPrivacyShowing = true;
         this._showGDPRBanner = false;
         this.choosePrivacyShown();
-
-        this._ads.VideoPlayer.pause();
-        if (this._privacy) {
-            this._privacy.show();
-        }
+        this.onPrivacyEvent(event);
     }
 
-    private onPrivacyEvent(event: Event) {
+    protected onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
         event.stopPropagation();

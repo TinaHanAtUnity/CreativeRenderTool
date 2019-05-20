@@ -29,10 +29,10 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
+import { AnimationEndCardTest } from 'Core/Models/ABGroup';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
-import { AnimationEndCardTest } from 'Core/Models/ABGroup';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -222,7 +222,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
-
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);
         }

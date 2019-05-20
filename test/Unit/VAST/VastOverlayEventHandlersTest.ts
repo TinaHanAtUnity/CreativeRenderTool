@@ -35,6 +35,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -308,6 +309,41 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
                     });
                 });
             }
+        });
+
+        describe('When calling onShowPrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+
+                return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
+            });
+
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 11.82291666666666, [ObstructionReasons.OBSTRUCTED], 1280, 768, true, [{
+                    x: 20,
+                    y: 20,
+                    width: 517,
+                    height: 367
+                }]);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
+        });
+
+        describe('When calling onClosePrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+
+                return vastOverlayEventHandler.onClosePrivacyPopUp();
+            });
+
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 100, [], 1280, 768, true, []);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
         });
     });
 });

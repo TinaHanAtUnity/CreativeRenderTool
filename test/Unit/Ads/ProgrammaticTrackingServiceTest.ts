@@ -1,8 +1,8 @@
 import {
-    ProgrammaticTrackingErrorName,
-    ProgrammaticTrackingMetricName,
+    ProgrammaticTrackingError,
     ProgrammaticTrackingService,
-    IProgrammaticTrackingData
+    IProgrammaticTrackingData,
+    AdmobMetric
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -58,10 +58,10 @@ describe('Ads/Utilities', () => {
         ];
 
         const tests: {
-            input: ProgrammaticTrackingErrorName;
+            input: ProgrammaticTrackingError;
             expected: IProgrammaticTrackingData;
         }[] = [{
-            input: ProgrammaticTrackingErrorName.TooLargeFile,
+            input: ProgrammaticTrackingError.TooLargeFile,
             expected: {
                 metrics: [
                     {
@@ -74,7 +74,7 @@ describe('Ads/Utilities', () => {
             }
         },
         {
-            input: ProgrammaticTrackingErrorName.BannerRequestError,
+            input: ProgrammaticTrackingError.BannerRequestError,
             expected: {
                 metrics: [
                     {
@@ -101,10 +101,10 @@ describe('Ads/Utilities', () => {
 
     describe('reportMetric', () => {
         const tests: {
-            input: ProgrammaticTrackingMetricName;
+            input: AdmobMetric;
             expected: IProgrammaticTrackingData;
         }[] = [{
-            input: ProgrammaticTrackingMetricName.AdmobUsedCachedVideo,
+            input: AdmobMetric.AdmobUsedCachedVideo,
             expected: {
                 metrics: [
                     {
@@ -115,7 +115,7 @@ describe('Ads/Utilities', () => {
                 ]
             }
         }, {
-            input: ProgrammaticTrackingMetricName.AdmobUsedStreamedVideo,
+            input: AdmobMetric.AdmobUsedStreamedVideo,
             expected: {
                 metrics: [
                     {

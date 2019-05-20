@@ -90,7 +90,7 @@ export interface IViewPort {
 
 /**
  * https://s3-us-west-2.amazonaws.com/omsdk-files/docs/OMID_API_GA_v1.pdf pg 59-61
- * onScreenGeometry - Provides geometry data of the ad view for the current ad session id
+ * geometry - Provides geometry data of the ad view for the current ad session id
  * onScreenGeometry - Provides geometry data of the ad view after processing all parent views
  * containerGeometry - Provides geometry data of the ad container(webview) for the current ad session id
  * onScreenContainerGeometry - Provides geometry data of the ad container (webview) for the current ad session id that is currently visible/on screen
@@ -174,7 +174,7 @@ export interface IOMIDMessage {
 }
 export interface ISessionEvent {
     adSessionId: string;
-    timestamp: Date;
+    timestamp: number;
     type: string;
     data: {[key: string]: unknown};
 }
