@@ -190,14 +190,11 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const contentTypes: string[] = [];
-
             const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
             const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
             for(const contentType in promoContentTypeHandlerMap) {
                 if(promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
                     this.ContentTypeHandlerManager.addHandler(contentType, promoContentTypeHandlerMap[contentType]);
-                    contentTypes.push(contentType);
                 }
             }
 
@@ -249,12 +246,11 @@ export class Ads implements IAds {
                 for(const contentType in contentTypeHandlerMap) {
                     if(contentTypeHandlerMap.hasOwnProperty(contentType)) {
                         this.ContentTypeHandlerManager.addHandler(contentType, contentTypeHandlerMap[contentType]);
-                        contentTypes.push(contentType);
                     }
                 }
             });
 
-            ContentType.initializeContentMapping(contentTypes);
+            ContentType.initializeContentMapping(this.ContentTypeHandlerManager.getContentTypes());
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 

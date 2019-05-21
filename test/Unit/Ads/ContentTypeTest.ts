@@ -7,24 +7,33 @@ import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 describe('ContentTypeTest', () => {
 
+    const contentTypes: string[] = [ProgrammaticVastParser.ContentType, CometCampaignParser.ContentType];
+
     before(() => {
-        ContentType.initializeContentMapping([ProgrammaticVastParser.ContentType, CometCampaignParser.ContentType]);
+        ContentType.initializeContentMapping(contentTypes);
+    });
+
+    after(() => {
+        ContentType.initializeContentMapping([]);
     });
 
     describe('getCampaignParseError', () => {
-        it('should return return the correct value for programmatic vast campaigns', () => {
-            const value = ContentType.getCampaignParseError(ProgrammaticVastParser.ContentType);
-            assert.equal(value, CampaignParseError.ProgrammaticVASTParseError);
-        });
-
-        it('should return return the correct value for comet campaigns', () => {
-            const value = ContentType.getCampaignParseError(CometCampaignParser.ContentType);
-            assert.equal(value, CampaignParseError.CometVideoParseError);
-        });
-
-        it('should return return the unknown value for nonsense', () => {
-            const value = ContentType.getCampaignParseError('country music');
-            assert.equal(value, CampaignParseError.UnknownParseError);
+        [{
+            contentType: ProgrammaticVastParser.ContentType,
+            campaignError: CampaignParseError.ProgrammaticVASTParseError
+        },
+        {
+            contentType: CometCampaignParser.ContentType,
+            campaignError: CampaignParseError.CometVideoParseError
+        },
+        {
+            contentType: '-/-/-/countrymusic',
+            campaignError: CampaignParseError.UnknownParseError
+        }].forEach((test) => {
+            it('should return return the correct value for programmatic vast campaigns', () => {
+                const value = ContentType.getCampaignParseError(test.contentType);
+                assert.equal(value, test.campaignError);
+            });
         });
     });
 });
