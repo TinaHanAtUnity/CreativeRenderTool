@@ -21,7 +21,7 @@ export class AnimatedVideoOverlay extends VideoOverlay implements IPrivacyHandle
 
   public render(): void {
     super.render();
-    super.show();
+    // super.show();
     document.body.classList.add('animated-video-overlay-experiment');
   }
 }
