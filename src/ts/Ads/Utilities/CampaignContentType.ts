@@ -1,3 +1,4 @@
+import { CampaignParseError } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export enum CampaignContentType {
     ProgrammaticVAST = 'programmatic/vast',
@@ -13,4 +14,17 @@ export enum CampaignContentType {
     CometMRAIDUrl = 'comet/mraid-url',
     IAPPromotion = 'purchasing/iap',
     XPromoVideo = 'xpromo/video'
+}
+
+export class ContentType {
+    public static getCampaignParseError(contentType: string): CampaignParseError {
+        let errorType = CampaignParseError.UnknownParseError;
+        const parseError = `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`;
+        Object.values(CampaignContentType).forEach((value: string) => {
+            if (value.valueOf() === contentType && parseError in Object.values(CampaignParseError)) {
+                errorType = <CampaignParseError>parseError;
+            }
+        });
+        return errorType;
+    }
 }

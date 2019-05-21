@@ -15,11 +15,10 @@ import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
     public static ContentType = CampaignContentType.CometVideo;
-    public static ContentTypeVideo = 'comet/video'; // TODO: Find out if this is actually used
     public static ContentTypeMRAID = CampaignContentType.CometMRAIDUrl;
 
     public canCreateAdUnit(contentType: string) {
-        return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeVideo || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;
+        return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;
     }
 
     public createAdUnit(parameters: IPerformanceAdUnitParameters): PerformanceAdUnit {
