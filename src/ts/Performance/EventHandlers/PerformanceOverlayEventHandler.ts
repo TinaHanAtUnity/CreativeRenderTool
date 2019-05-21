@@ -33,7 +33,7 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
                 endScreen.show();
             }
             this._performanceAdUnit.onFinish.trigger();
-    }
+        }
         this._performanceAdUnit.sendTrackingEvent(TrackingEvent.SKIP);
     }
 }
