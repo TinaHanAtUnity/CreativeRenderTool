@@ -55,7 +55,10 @@ interface IContext {
     transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
     podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
     adCount?: number;                       // VAST optional field - number of <InLine> elements
-    omidNativeInfo?: {};
+    omidNativeInfo?: {
+        partnerName: string;
+        partnerVersion: string;
+    };
     omidJsInfo: IOmidJsInfo;
     app?: IApp;
     deviceInfo: IDeviceInfo;
@@ -321,6 +324,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
             adSessionType: AdSessionType.HTML,
+            omidNativeInfo: {
+                partnerName: 'Unity',
+                partnerVersion: this._clientInfo.getSdkVersionName()
+            },
             omidJsInfo: {
                 omidImplementor: 'Unity',
                 serviceVersion: this._clientInfo.getSdkVersionName(),
