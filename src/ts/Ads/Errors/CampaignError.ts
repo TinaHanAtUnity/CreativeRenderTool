@@ -39,24 +39,15 @@ export class CampaignError extends Error {
         this._subCampaignErrors.push(campaignError);
     }
 
-    public getSubCampaignErrors(): CampaignError[] {
-        return this._subCampaignErrors;
-    }
-
     public getAllCampaignErrors(): CampaignError[] {
-        const errorList: CampaignError[] = [];
-        const errorQueue: CampaignError[] = [];
-        errorList.push(this);
-        errorQueue.push(this);
-        while (errorQueue.length > 0) {
-            const oneError = errorQueue.shift();
-            if (oneError) {
-                for (const subError of oneError.getSubCampaignErrors()) {
-                    errorList.push(subError);
-                    errorQueue.push(subError);
-                }
-            }
+        let errorList: CampaignError[] = [this];
+        for (const subError of this.getSubCampaignErrors()) {
+            errorList = errorList.concat(subError.getAllCampaignErrors());
         }
         return errorList;
+    }
+
+    private getSubCampaignErrors(): CampaignError[] {
+        return this._subCampaignErrors;
     }
 }
