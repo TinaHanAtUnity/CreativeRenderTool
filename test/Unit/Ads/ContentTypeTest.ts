@@ -14,11 +14,16 @@ describe('ContentTypeTest', () => {
     });
 
     after(() => {
+        // Cleanup after tests
         ContentType.initializeContentMapping([]);
     });
 
     describe('getCampaignParseError', () => {
-        [{
+
+        const tests: {
+            contentType: string;
+            campaignError: CampaignParseError;
+        }[] = [{
             contentType: ProgrammaticVastParser.ContentType,
             campaignError: CampaignParseError.ProgrammaticVASTParseError
         },
@@ -27,12 +32,14 @@ describe('ContentTypeTest', () => {
             campaignError: CampaignParseError.CometVideoParseError
         },
         {
-            contentType: '-/-/-/countrymusic',
+            contentType: '-/scooter-/-/-mcdooter',
             campaignError: CampaignParseError.UnknownParseError
-        }].forEach((test) => {
-            it('should return return the correct value for programmatic vast campaigns', () => {
-                const value = ContentType.getCampaignParseError(test.contentType);
-                assert.equal(value, test.campaignError);
+        }];
+
+        tests.forEach((t) => {
+            it('should return return the correct value for each content type', () => {
+                const value = ContentType.getCampaignParseError(t.contentType);
+                assert.equal(value, t.campaignError);
             });
         });
     });
