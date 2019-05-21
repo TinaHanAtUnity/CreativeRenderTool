@@ -1,3 +1,7 @@
+# Pending
+
+* 3.1.0 Merge changes to master [#9712](https://github.com/Applifier/unity-ads-webview/pull/9712)
+
 # Tue May 21 17:16:32 UTC 2019
 
 * Add NativeInfo to Open Measurement SessionStart context [#9738](https://github.com/Applifier/unity-ads-webview/pull/9738)
