@@ -15,10 +15,11 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Font } from 'Ads/Models/Assets/Font';
 import { PromoCoordinates } from 'Promo/Models/PromoCoordinatesAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class PromoCampaignParser extends CampaignParser {
 
-    public static ContentType = 'purchasing/iap';
+    public static ContentType = CampaignContentType.IAPPromotion;
 
     private _core: ICoreApi;
 

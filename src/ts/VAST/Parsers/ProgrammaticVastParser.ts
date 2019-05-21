@@ -11,7 +11,7 @@ import { Url } from 'Core/Utilities/Url';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 import { ICore, ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
@@ -20,7 +20,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ProgrammaticVastParser extends CampaignParser {
 
-    public static ContentType = CampaignContentTypes.ProgrammaticVast;
+    public static ContentType = CampaignContentType.ProgrammaticVAST;
 
     public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE: string = 'VAST ad contains media files meant for VPAID';
     public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD: number = 499;
@@ -61,7 +61,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             // if the vast campaign is accidentally a vpaid campaign parse it as such
             if (vast.isVPAIDCampaign()) {
                 // throw appropriate campaign error as LOW level(warning level) to be caught and handled in campaign manager
-                throw new CampaignError(ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
+                throw new CampaignError(ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.MEDIUM, ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
             }
             return this._deviceInfo.getConnectionType().then((connectionType) => {
                 return this.parseVastToCampaign(vast, session, response, connectionType);
@@ -113,20 +113,20 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         const mediaVideo = VastMediaSelector.getOptimizedVastMediaFile(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideo) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
         }
 
         let mediaVideoUrl = mediaVideo.getFileURL();
         if (!mediaVideoUrl) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH,  VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH,  VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
         }
 
         if (this._platform === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
         }
 
         if (!Url.isValid(mediaVideoUrl)) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_UNSUPPORTED, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_UNSUPPORTED, vast.getErrorURLTemplates(), mediaVideoUrl, response.getSeatId(), response.getCreativeId());
         }
 
         mediaVideoUrl = Url.encode(mediaVideoUrl);

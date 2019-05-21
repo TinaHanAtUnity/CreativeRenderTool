@@ -18,11 +18,11 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class CometCampaignParser extends CampaignParser {
-    public static ContentType = 'comet/campaign';
-    public static ContentTypeVideo = 'comet/video';
-    public static ContentTypeMRAID = 'comet/mraid-url';
+    public static ContentType = CampaignContentType.CometVideo;
+    public static ContentTypeMRAID = CampaignContentType.CometMRAIDUrl;
 
     private _requestManager: RequestManager;
 

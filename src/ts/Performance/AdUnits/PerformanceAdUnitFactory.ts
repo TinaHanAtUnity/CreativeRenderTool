@@ -10,12 +10,13 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
-    public static ContentType = 'comet/campaign';
-    public static ContentTypeVideo = 'comet/video';
-    public static ContentTypeMRAID = 'comet/mraid-url';
+    public static ContentType = CampaignContentType.CometVideo;
+    public static ContentTypeVideo = 'comet/video'; // TODO: Find out if this is actually used
+    public static ContentTypeMRAID = CampaignContentType.CometMRAIDUrl;
 
     public canCreateAdUnit(contentType: string) {
         return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeVideo || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;

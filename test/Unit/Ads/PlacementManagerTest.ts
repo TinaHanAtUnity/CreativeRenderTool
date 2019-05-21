@@ -19,6 +19,7 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 describe('PlacementManagerTest', () => {
     let platform: Platform;
@@ -41,7 +42,7 @@ describe('PlacementManagerTest', () => {
         it('should add passed placementid and campaign to the placementCampaignMap', () => {
             const placementManager = new PlacementManager(ads, adsConfig);
             const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
-            sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
+            sinon.stub(campaign, 'getAdType').returns(CampaignContentType.IAPPromotion);
             placementManager.addCampaignPlacementIds('testid', campaign);
             assert.deepEqual(placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType), {'testid': campaign});
         });
@@ -53,8 +54,8 @@ describe('PlacementManagerTest', () => {
 
             const campaign1 = TestFixtures.getPromoCampaign();
             const campaign2 = TestFixtures.getXPromoCampaign();
-            sinon.stub(campaign1, 'getAdType').returns('purchasing/iap');
-            sinon.stub(campaign2, 'getAdType').returns('xpromo/video');
+            sinon.stub(campaign1, 'getAdType').returns(CampaignContentType.IAPPromotion);
+            sinon.stub(campaign2, 'getAdType').returns(CampaignContentType.XPromoVideo);
 
             let map = placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
             expect(Object.keys(map)).to.have.length(0);
@@ -73,7 +74,7 @@ describe('PlacementManagerTest', () => {
         it('should empty all placement IDs', () => {
             const placementManager = new PlacementManager(ads, adsConfig);
             const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
-            sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
+            sinon.stub(campaign, 'getAdType').returns(CampaignContentType.IAPPromotion);
 
             placementManager.addCampaignPlacementIds('testid', campaign);
             assert.equal(Object.keys(placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType)).length, 1);

@@ -19,7 +19,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('ProgrammaticVastParser', () => {
@@ -91,7 +91,7 @@ describe('ProgrammaticVastParser', () => {
                 return parser.parse(response, session).then(() => {
                     assert.fail('An error should have been thrown');
                 }).catch((error) => {
-                    if (error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+                    if (error.contentType === CampaignContentType.ProgrammaticVAST && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                         // then the test has passed
                     } else {
                         assert.fail(`Expected MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error but got ${error.message}`);

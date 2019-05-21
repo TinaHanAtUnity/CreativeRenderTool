@@ -6,11 +6,12 @@ import { Platform } from 'Core/Constants/Platform';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { StringUtils } from 'Ads/Utilities/StringUtils';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
-    public static ContentTypeHtml = 'programmatic/static-interstitial-html';
-    public static ContentTypeJs = 'programmatic/static-interstitial-js';
+    public static ContentTypeHtml = CampaignContentType.ProgrammaticHTMLStaticInterstitial;
+    public static ContentTypeJs = CampaignContentType.ProgrammaticJSStaticInterstitial;
     public static ErrorMessage = 'Display ad content is not in HTML format';
 
     constructor(platform: Platform) {

@@ -58,6 +58,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IStoreApi } from 'Store/IStore';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -632,7 +633,7 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as ready', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign(CampaignContentType.IAPPromotion), undefined);
                 return Promise.resolve();
             });
 
@@ -644,7 +645,7 @@ describe('CampaignRefreshManager', () => {
                 assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '000000000000000000000123');
-                    assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
+                    assert.equal(tmpCampaign.getAdType(), CampaignContentType.IAPPromotion);
                 }
 
                 assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.READY);
@@ -654,7 +655,7 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as nofill if product is not available', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign(CampaignContentType.IAPPromotion), undefined);
                 return Promise.resolve();
             });
 

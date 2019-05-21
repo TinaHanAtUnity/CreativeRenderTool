@@ -4,7 +4,7 @@ import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStatic
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVast {
@@ -74,7 +74,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
+        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
     }
 
     public getImpressionUrls(): string[] {

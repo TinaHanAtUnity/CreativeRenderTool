@@ -7,11 +7,11 @@ import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
-    public static ContentType = CampaignContentTypes.ProgrammaticVpaid;
+    public static ContentType = CampaignContentType.ProgrammaticVPAID;
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 

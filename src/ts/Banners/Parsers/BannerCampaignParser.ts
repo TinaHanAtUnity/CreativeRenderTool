@@ -4,10 +4,11 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import { Platform } from 'Core/Constants/Platform';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class BannerCampaignParser extends CampaignParser {
-    public static ContentTypeJS = 'programmatic/banner-js';
-    public static ContentTypeHTML = 'programmatic/banner-html';
+    public static ContentTypeJS = CampaignContentType.ProgrammaticJSBanner;
+    public static ContentTypeHTML = CampaignContentType.ProgrammaticHTMLBanner;
 
     private _wrapJS = false;
 
