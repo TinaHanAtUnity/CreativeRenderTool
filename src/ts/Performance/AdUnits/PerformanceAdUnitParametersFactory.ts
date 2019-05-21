@@ -10,6 +10,8 @@ import { IAds } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { IChina } from 'China/IChina';
+import { PerformanceColorTintingEndScreen } from 'Performance/Views/PerformanceColorTintingEndScreen';
+import { ABGroup, ColorTintingTest } from 'Core/Models/ABGroup';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -37,7 +39,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+
+        let endScreen;
+        const abGroup = baseParams.coreConfig.getAbGroup();
+        if (ColorTintingTest.isValid(abGroup)) {
+            endScreen = new PerformanceColorTintingEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
