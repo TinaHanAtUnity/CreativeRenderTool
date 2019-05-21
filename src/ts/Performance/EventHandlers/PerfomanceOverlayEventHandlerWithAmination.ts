@@ -4,7 +4,6 @@ import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEv
 
 export class PerfomanceOverlayEventHandlerWithAmination extends PerformanceOverlayEventHandler {
     protected _performanceAdUnit: PerformanceAdUnit;
-    private _gameBackgroundContainer: HTMLElement;
 
     private whichTransitionEvent(): string {
         const transitions: {[index: string]: string} = {
@@ -23,8 +22,7 @@ export class PerfomanceOverlayEventHandlerWithAmination extends PerformanceOverl
     }
 
     public onOverlayAnimation (position: number): void {
-        this._gameBackgroundContainer = <HTMLElement>document.getElementsByClassName('game-background-container')[0];
-        const gameBackgroundContainer = this._gameBackgroundContainer;
+        const gameBackgroundContainer = <HTMLElement>document.getElementsByClassName('game-background-container')[0];
         const endScreen = this._performanceAdUnit.getEndScreen();
         const endScreenElement = document.getElementById('end-screen');
         const transitionEvent = this.whichTransitionEvent();
