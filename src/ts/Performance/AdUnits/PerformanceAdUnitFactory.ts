@@ -10,15 +10,12 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
-    public static ContentType = CampaignContentType.CometVideo;
-    public static ContentTypeMRAID = CampaignContentType.CometMRAIDUrl;
-
     public canCreateAdUnit(contentType: string) {
-        return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;
+        return contentType === CometCampaignParser.ContentType || contentType === CometCampaignParser.ContentTypeMRAID;
     }
 
     public createAdUnit(parameters: IPerformanceAdUnitParameters): PerformanceAdUnit {

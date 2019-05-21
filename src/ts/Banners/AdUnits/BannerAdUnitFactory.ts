@@ -2,15 +2,12 @@ import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit';
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 
 export class BannerAdUnitFactory {
 
-    public static ContentTypeJS = CampaignContentType.ProgrammaticJSBanner;
-    public static ContentTypeHTML = CampaignContentType.ProgrammaticHTMLBanner;
-
     public canCreateAdUnit(contentType: string): boolean {
-        return contentType === BannerAdUnitFactory.ContentTypeJS || contentType === BannerAdUnitFactory.ContentTypeHTML;
+        return contentType === BannerCampaignParser.ContentTypeJS || contentType === BannerCampaignParser.ContentTypeHTML;
     }
 
     public createAdUnit(parameters: IBannerAdUnitParameters): IBannerAdUnit {

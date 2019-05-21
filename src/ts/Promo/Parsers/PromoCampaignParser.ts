@@ -1,4 +1,3 @@
-import { HTML } from 'Ads/Models/Assets/HTML';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
@@ -15,11 +14,10 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Font } from 'Ads/Models/Assets/Font';
 import { PromoCoordinates } from 'Promo/Models/PromoCoordinatesAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class PromoCampaignParser extends CampaignParser {
 
-    public static ContentType = CampaignContentType.IAPPromotion;
+    public static ContentType = 'iap/purchasing';
 
     private _core: ICoreApi;
 

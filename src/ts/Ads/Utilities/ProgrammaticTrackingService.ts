@@ -50,7 +50,7 @@ export enum CampaignParseError {
     ProgrammaticHTMLBannerParseError = 'parse_campaign_programmatic_banner_html_error',
     ProgrammaticJSStaticInterstitialParseError = 'parse_campaign_programmatic_static_interstitial_js_error',
     ProgrammaticHTMLStaticInterstitialParseError = 'parse_campaign_programmatic_static_interstitial_html_error',
-    CometVideoParseError = 'parse_campaign_comet_campaign_error_error',
+    CometVideoParseError = 'parse_campaign_comet_campaign_error',
     CometMRAIDUrlParseError = 'parse_campaign_comet_mraid_url_error',
     IAPPromotionParseError = 'parse_campaign_purchasing_iap_error',
     XPromoVideoParseError = 'parse_campaign_xpromo_video_error',
@@ -137,5 +137,4 @@ export class ProgrammaticTrackingService {
 
         return this._request.post(url, data, headers);
     }
-
 }

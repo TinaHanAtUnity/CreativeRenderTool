@@ -6,11 +6,10 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { IRawPerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class XPromoCampaignParser extends CampaignParser {
 
-    public static ContentType = CampaignContentType.XPromoVideo;
+    public static ContentType = 'xpromo/video';
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = <IRawPerformanceCampaign>response.getJsonContent();

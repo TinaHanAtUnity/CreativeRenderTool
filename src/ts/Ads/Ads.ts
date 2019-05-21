@@ -70,7 +70,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
-import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -80,6 +80,7 @@ import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { ContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class Ads implements IAds {
 
@@ -189,11 +190,14 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
+            const contentTypes: string[] = [];
+
             const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
             const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
             for(const contentType in promoContentTypeHandlerMap) {
                 if(promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
                     this.ContentTypeHandlerManager.addHandler(contentType, promoContentTypeHandlerMap[contentType]);
+                    contentTypes.push(contentType);
                 }
             }
 
@@ -245,9 +249,12 @@ export class Ads implements IAds {
                 for(const contentType in contentTypeHandlerMap) {
                     if(contentTypeHandlerMap.hasOwnProperty(contentType)) {
                         this.ContentTypeHandlerManager.addHandler(contentType, contentTypeHandlerMap[contentType]);
+                        contentTypes.push(contentType);
                     }
                 }
             });
+
+            ContentType.initializeContentMapping(contentTypes);
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 

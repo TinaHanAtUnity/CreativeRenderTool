@@ -16,7 +16,6 @@ import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'Ads/Util
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export enum AdmobUrlQueryParameters {
     TIMESTAMP = 'ts',
@@ -25,7 +24,7 @@ export enum AdmobUrlQueryParameters {
 
 export class ProgrammaticAdMobParser extends CampaignParser {
 
-    public static ContentType = CampaignContentType.ProgrammaticAdmobVideo;
+    public static ContentType = 'programmatic/admob-video';
 
     private _core: ICoreApi;
     private _requestManager: RequestManager;
