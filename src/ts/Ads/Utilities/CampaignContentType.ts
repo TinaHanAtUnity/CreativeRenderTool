@@ -20,7 +20,9 @@ export class ContentType {
     public static getCampaignParseError(contentType: string): CampaignParseError {
         let errorType = CampaignParseError.UnknownParseError;
         const parseError = `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`;
-        if (Object.values(CampaignContentType).includes(contentType) && Object.values(CampaignParseError).includes(parseError)) {
+        const isValidContentType = Object.values(CampaignContentType).includes(contentType);
+        const hasValidCampaignParseError = Object.values(CampaignParseError).includes(parseError);
+        if (isValidContentType && hasValidCampaignParseError) {
             errorType = <CampaignParseError>parseError;
         }
         return errorType;
