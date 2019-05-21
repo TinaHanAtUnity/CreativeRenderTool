@@ -9,8 +9,8 @@ import { StringUtils } from 'Ads/Utilities/StringUtils';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
-    public static ContentTypeJs = 'programmatic/static-interstitial-js';
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
+    public static ContentTypeJs = 'programmatic/static-interstitial-js';
 
     public static ErrorMessage = 'Display ad content is not in HTML format';
 

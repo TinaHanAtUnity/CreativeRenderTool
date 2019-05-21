@@ -17,7 +17,7 @@ import { PromoSize } from 'Promo/Models/PromoSize';
 
 export class PromoCampaignParser extends CampaignParser {
 
-    public static ContentType = 'iap/purchasing';
+    public static ContentType = 'purchasing/iap';
 
     private _core: ICoreApi;
 
