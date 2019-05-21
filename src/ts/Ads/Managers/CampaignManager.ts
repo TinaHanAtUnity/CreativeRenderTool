@@ -714,6 +714,16 @@ export class CampaignManager {
         let url: string = this.getBaseUrl();
 
         const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+
+        if (this._coreConfig.getCountry() === 'CN' && this._platform === Platform.ANDROID && this._sessionManager.getGameSessionId() % 10 === 0) {
+            Diagnostics.trigger('china_ifa_request', {
+                advertisingTrackingId: trackingIDs.advertisingTrackingId ? trackingIDs.advertisingTrackingId : 'no-info',
+                limitAdTracking: trackingIDs.limitAdTracking ? trackingIDs.limitAdTracking : 'no-info',
+                androidId: trackingIDs.androidId ? trackingIDs.androidId : 'no-info',
+                imei: trackingIDs.imei ? trackingIDs.imei : 'no-info'
+            });
+        }
+
         url = Url.addParameters(url, trackingIDs);
 
         if (nofillRetry && this._lastAuctionId) {
