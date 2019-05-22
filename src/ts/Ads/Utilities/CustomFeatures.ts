@@ -47,9 +47,7 @@ export class CustomFeatures {
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
         return seatId === 9119 ||
-               seatId === 9121 ||
-               seatId === 9122 ||
-               seatId === 9198;
+               seatId === 9121;
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
