@@ -220,11 +220,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         const abGroup = parameters.coreConfig.getAbGroup();
         if (AnimationEndCardTest.isValid(abGroup)) {
             overlay = new AnimatedVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else {
-            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        }
-
-        if (CTAV2Test.isValid(abGroup)) {
+        } else if (CTAV2Test.isValid(abGroup)) {
             overlay = new VideoOverlayCTAV2(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
