@@ -1,3 +1,7 @@
+# Merged
+
+* VAST Error Tracking - part 3: alerting DSP more errors [#9714](https://github.com/Applifier/unity-ads-webview/pull/9714)
+
 # Wed May 22 17:00:16 UTC 2019
 
 * Early CTA v2 experiment [#9683](https://github.com/Applifier/unity-ads-webview/pull/9683)
