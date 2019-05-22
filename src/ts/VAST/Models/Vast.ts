@@ -15,7 +15,9 @@ interface IVast {
 
 export class Vast extends Model<IVast> {
 
-    constructor(ads: VastAd[], parseErrorURLTemplates: unknown[]) {
+    private _campaignErrors: CampaignError[];
+
+    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
         super('Vast', {
             ads: ['array'],
             parseErrorURLTemplates: ['array'],
@@ -23,8 +25,10 @@ export class Vast extends Model<IVast> {
         });
 
         this.set('ads', ads);
-        this.set('parseErrorURLTemplates', <string[]>parseErrorURLTemplates);
+        this.set('parseErrorURLTemplates', parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
+
+        this._campaignErrors = campaignErrors || [];
     }
 
     public getAds(): VastAd[] {
@@ -57,6 +61,10 @@ export class Vast extends Model<IVast> {
         }
 
         return null;
+    }
+
+    public getCampaignErrors(): CampaignError[] {
+        return this._campaignErrors;
     }
 
     public getVideoUrl(): string {

@@ -50,6 +50,7 @@ import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class CampaignManager {
 
@@ -591,6 +592,10 @@ export class CampaignManager {
     private setupCampaignAssets(placements: AuctionPlacement[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
+            for (const placement of placements) {
+                this.onCampaign.trigger(placement.getPlacementId(), campaign, placement.getTrackingUrls());
+            }
+
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType,
@@ -620,8 +625,12 @@ export class CampaignManager {
                 HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             }
 
-            for(const placement of placements) {
-                this.onCampaign.trigger(placement.getPlacementId(), campaign, placement.getTrackingUrls());
+            if (campaign instanceof VastCampaign) {
+                const campaignWarnings = campaign.getVast().getCampaignErrors();
+                const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
+                for (const warning of campaignWarnings) {
+                    campaignErrorHandler.handleCampaignError(warning);
+                }
             }
         });
     }
