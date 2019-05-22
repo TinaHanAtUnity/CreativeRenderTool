@@ -5,7 +5,9 @@ import { CampaignParseError } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('ContentTypeTest', () => {
 
-    const contentTypes: string[] = [CampaignContentType.ProgrammaticVAST, CampaignContentType.CometVideo];
+    const contentTypes: string[] = [CampaignContentType.ProgrammaticVAST,
+                                    CampaignContentType.CometVideo,
+                                    CampaignContentType.ProgrammaticAdmobVideo];
 
     before(() => {
         ContentType.initializeContentMapping(contentTypes);
@@ -28,6 +30,10 @@ describe('ContentTypeTest', () => {
         {
             contentType: CampaignContentType.CometVideo,
             campaignError: CampaignParseError.CometVideoParseError
+        },
+        {
+            contentType: CampaignContentType.ProgrammaticAdmobVideo,
+            campaignError: CampaignParseError.ProgrammaticAdmobVideoParseError
         },
         {
             contentType: '-/scooter-/-/-mcdooter',
