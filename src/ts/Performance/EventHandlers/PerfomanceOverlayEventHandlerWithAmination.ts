@@ -23,12 +23,10 @@ export class PerfomanceOverlayEventHandlerWithAmination extends PerformanceOverl
     }
 
     public onOverlaySkip(position: number): void {
-        if (this._placement.skipEndCardOnClose()) {
-            super.onOverlayClose();
-        } else {
+        if (!this._placement.skipEndCardOnClose()) {
             this.showEndScreenWithAnimation(position);
+        } else {
+            super.onOverlaySkip(position);
         }
-        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.SKIP);
     }
-
 }
