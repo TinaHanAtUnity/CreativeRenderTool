@@ -29,7 +29,8 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
-import { AnimationEndCardTest } from 'Core/Models/ABGroup';
+import { VideoOverlayCTAV2 } from 'Ads/Views/VideoOverlayCTAV2';
+import { CTAV2Test, AnimationEndCardTest, ABGroup } from 'Core/Models/ABGroup';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
@@ -215,13 +216,20 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     }
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
-        let overlay: AbstractVideoOverlay;
+        let overlay: AbstractVideoOverlay | VideoOverlay;
         const abGroup = parameters.coreConfig.getAbGroup();
         if (AnimationEndCardTest.isValid(abGroup)) {
             overlay = new AnimatedVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
+
+        if (CTAV2Test.isValid(abGroup)) {
+            overlay = new VideoOverlayCTAV2(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        } else {
+            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        }
+
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);
         }
