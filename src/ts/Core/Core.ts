@@ -50,6 +50,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
+import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 
 export class Core implements ICore {
@@ -98,6 +99,7 @@ export class Core implements ICore {
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
+            NativeError: new NativeErrorApi(nativeBridge),
             Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),
                 Intent: new IntentApi(nativeBridge),
