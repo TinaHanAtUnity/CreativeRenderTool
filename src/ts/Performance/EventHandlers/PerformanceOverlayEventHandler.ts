@@ -27,8 +27,9 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
         if (this._placement.skipEndCardOnClose()) {
             super.onOverlayClose();
         } else {
-            const endScreen = this._performanceAdUnit.getEndScreen();
             super.onOverlaySkip(position);
+
+            const endScreen = this._performanceAdUnit.getEndScreen();
             if (endScreen) {
                 endScreen.show();
             }
