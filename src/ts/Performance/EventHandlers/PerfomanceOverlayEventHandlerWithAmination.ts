@@ -7,25 +7,18 @@ export class PerfomanceOverlayEventHandlerWithAmination extends PerformanceOverl
 
     public showEndScreenWithAnimation (position: number): void {
         const gameBackgroundContainer = <HTMLElement>document.getElementsByClassName('game-background-container')[0];
-        const endScreen = this._performanceAdUnit.getEndScreen();
         const endScreenElement = document.getElementById('end-screen');
         this._ads.VideoPlayer.pause();
         if (endScreenElement && gameBackgroundContainer) {
             endScreenElement.style.visibility = 'visible';
-            gameBackgroundContainer.addEventListener('transitionend', () => {
-                super.onOverlaySkip(position);
-                if (endScreen) {
-                    endScreen.show();
-                }
-                this._performanceAdUnit.onFinish.trigger();
+            ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+                gameBackgroundContainer.addEventListener(e, () => {
+                    super.onOverlaySkip(position);
+                });
             });
             endScreenElement.classList.add('on-show');
         } else {
             super.onOverlaySkip(position);
-            if (endScreen) {
-                endScreen.show();
-            }
-            this._performanceAdUnit.onFinish.trigger();
         }
     }
 
