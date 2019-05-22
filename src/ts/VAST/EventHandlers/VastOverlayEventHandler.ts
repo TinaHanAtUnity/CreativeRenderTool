@@ -108,7 +108,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             super.onOverlaySkip(position);
 
             const endScreen = this._vastAdUnit.getEndScreen();
-            if (endScreen) {
+            if (endScreen && this._vastAdUnit.hasImpressionOccurred()) {
                 endScreen.show();
                 this._vastAdUnit.onFinish.trigger();
             } else {

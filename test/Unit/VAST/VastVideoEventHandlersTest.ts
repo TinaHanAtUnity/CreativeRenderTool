@@ -427,7 +427,7 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it('should show end screen when onVideoCompleted', () => {
+        it('should not show end screen when onVideoCompleted', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
 
             // Endscreen is not shown if the impression never occurs
@@ -436,11 +436,22 @@ describe('VastVideoEventHandler tests', () => {
         });
 
         it('should show end screen when onVideoError', () => {
+            vastAdUnit.setImpressionOccurred();
+
             // Cause an error by giving too large duration
             vastAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+            sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
+        });
+
+        it('should not show end screen when onVideoError', () => {
+            // Cause an error by giving too large duration
+            vastAdUnit.setVideoState(VideoState.PREPARING);
+            vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
     });
