@@ -1,13 +1,11 @@
 import { assert } from 'chai';
 import 'mocha';
-import { ContentType } from 'Ads/Utilities/CampaignContentType';
+import { ContentType, CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 import { CampaignParseError } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 describe('ContentTypeTest', () => {
 
-    const contentTypes: string[] = [ProgrammaticVastParser.ContentType, CometCampaignParser.ContentType];
+    const contentTypes: string[] = [CampaignContentType.ProgrammaticVAST, CampaignContentType.CometVideo];
 
     before(() => {
         ContentType.initializeContentMapping(contentTypes);
@@ -24,11 +22,11 @@ describe('ContentTypeTest', () => {
             contentType: string;
             campaignError: CampaignParseError;
         }[] = [{
-            contentType: ProgrammaticVastParser.ContentType,
+            contentType: CampaignContentType.ProgrammaticVAST,
             campaignError: CampaignParseError.ProgrammaticVASTParseError
         },
         {
-            contentType: CometCampaignParser.ContentType,
+            contentType: CampaignContentType.CometVideo,
             campaignError: CampaignParseError.CometVideoParseError
         },
         {

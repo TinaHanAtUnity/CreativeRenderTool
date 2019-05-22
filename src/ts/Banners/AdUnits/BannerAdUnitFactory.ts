@@ -3,11 +3,12 @@ import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class BannerAdUnitFactory {
 
     public canCreateAdUnit(contentType: string): boolean {
-        return contentType === BannerCampaignParser.ContentTypeJS || contentType === BannerCampaignParser.ContentTypeHTML;
+        return contentType === CampaignContentType.ProgrammaticJSBanner || contentType === CampaignContentType.ProgrammaticHTMLBanner;
     }
 
     public createAdUnit(parameters: IBannerAdUnitParameters): IBannerAdUnit {

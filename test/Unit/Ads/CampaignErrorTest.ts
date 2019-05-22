@@ -1,16 +1,16 @@
 import { assert } from 'chai';
 import 'mocha';
 import { CampaignError } from 'Ads/Errors/CampaignError';
-import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 describe('CampaignErrorTest', () => {
     it('Should return all chained sub campaigns for getAllCampaignErros', () => {
         // main > sub1 > sub2, (sub3 > sub4)
-        const mainCampaignError = new CampaignError('main campaign error', ProgrammaticVastParser.ContentType);
-        const subCampaignError1 = new CampaignError('sub campaign error 1', ProgrammaticVastParser.ContentType);
-        const subCampaignError2 = new CampaignError('sub campagin error 2', ProgrammaticVastParser.ContentType);
-        const subCampaignError3 = new CampaignError('sub campagin error 3', ProgrammaticVastParser.ContentType);
-        const subCampaignError4 = new CampaignError('sub campaign error 4', ProgrammaticVastParser.ContentType);
+        const mainCampaignError = new CampaignError('main campaign error', CampaignContentType.ProgrammaticVAST);
+        const subCampaignError1 = new CampaignError('sub campaign error 1', CampaignContentType.ProgrammaticVAST);
+        const subCampaignError2 = new CampaignError('sub campagin error 2', CampaignContentType.ProgrammaticVAST);
+        const subCampaignError3 = new CampaignError('sub campagin error 3', CampaignContentType.ProgrammaticVAST);
+        const subCampaignError4 = new CampaignError('sub campaign error 4', CampaignContentType.ProgrammaticVAST);
 
         mainCampaignError.addSubCampaignError(subCampaignError1);
         subCampaignError1.addSubCampaignError(subCampaignError2);
