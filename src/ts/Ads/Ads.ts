@@ -345,6 +345,16 @@ export class Ads implements IAds {
             return;
         }
 
+        if (this._core.DeviceIdManager &&
+            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
+            this._core.DeviceInfo instanceof AndroidDeviceInfo &&
+            !this._core.DeviceInfo.getDeviceId1()) {
+
+            this._core.DeviceIdManager.getDeviceIds().catch((error) => {
+                Diagnostics.trigger('get_deviceid_failed', error);
+            });
+        }
+
         const placement: Placement = this.Config.getPlacement(placementId);
         if(!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
