@@ -1,7 +1,5 @@
-import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { GoogleStore } from 'Store/Utilities/GoogleStore';
+import { IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 
 export class AnimatedVideoOverlay extends VideoOverlay implements IPrivacyHandlerView {
   protected _isEndScreenVisible: boolean;
