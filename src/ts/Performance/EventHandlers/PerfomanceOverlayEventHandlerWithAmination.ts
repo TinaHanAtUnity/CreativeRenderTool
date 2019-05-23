@@ -1,6 +1,5 @@
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export class PerfomanceOverlayEventHandlerWithAmination extends PerformanceOverlayEventHandler {
     protected _performanceAdUnit: PerformanceAdUnit;
