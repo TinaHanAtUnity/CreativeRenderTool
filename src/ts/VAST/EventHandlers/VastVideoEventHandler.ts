@@ -8,7 +8,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
-import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -16,23 +16,25 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private _vastCampaign: VastCampaign;
     private _om?: OpenMeasurement;
     private _omStartCalled = false;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
         this._om = this._vastAdUnit.getOpenMeasurement();
+        this._pts = params.programmaticTrackingService;
     }
 
     public onProgress(progress: number): void {
         super.onProgress(progress);
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             const events = this._vastAdUnit.getEvents();
             const event = events.shift();
-            if(event) {
-                if(progress / this._vastCampaign.getVideo().getDuration() >= event[0]) {
+            if (event) {
+                if (progress / this._vastCampaign.getVideo().getDuration() >= event[0]) {
                     moat.triggerVideoEvent(event[1], this._vastAdUnit.getVolume());
                 } else {
                     events.unshift(event);
@@ -45,22 +47,26 @@ export class VastVideoEventHandler extends VideoEventHandler {
     public onCompleted(url: string): void {
         super.onCompleted(url);
 
+        if (!this._vastAdUnit.hasImpressionOccurred()) {
+            this._pts.reportMetric(VastMetric.VastVideoImpressionFailed);
+        }
+
         const session = this._vastCampaign.getSession();
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.completed(this._vastAdUnit.getVolume());
         }
 
-        if(session) {
-            if(session.getEventSent(EventType.VAST_COMPLETE)) {
+        if (session) {
+            if (session.getEventSent(EventType.VAST_COMPLETE)) {
                 return;
             }
             session.setEventSent(EventType.VAST_COMPLETE);
         }
 
         const endScreen = this._vastAdUnit.getEndScreen();
-        if(endScreen) {
+        if (endScreen && this._vastAdUnit.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this._vastAdUnit.hide();
@@ -70,7 +76,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._om.completed();
             this._om.sessionFinish({
                 adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
             });
@@ -81,24 +87,24 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-        if(overlay && this._vastAdUnit.getVideoClickThroughURL()) {
+        if (overlay && this._vastAdUnit.getVideoClickThroughURL()) {
             overlay.setCallButtonVisible(true);
             overlay.setFadeEnabled(false);
 
-            if(TestEnvironment.get('debugOverlayEnabled')) {
+            if (TestEnvironment.get('debugOverlayEnabled')) {
                 overlay.setDebugMessage('Programmatic Ad');
             }
         }
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.init(MoatViewabilityService.getMoatIds(), duration / 1000, url, MoatViewabilityService.getMoatData(), this._vastAdUnit.getVolume());
         }
 
         if (this._om && !this._omStartCalled) {
             this._om.sessionStart({
                 adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                timestamp: Date.now(),
                 type: 'sessionStart',
                 data: {}
             });
@@ -120,12 +126,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.play(this._vastAdUnit.getVolume());
         }
 
-        if(session) {
-            if(session.getEventSent(EventType.IMPRESSION)) {
+        if (session) {
+            if (session.getEventSent(EventType.IMPRESSION)) {
                 return;
             }
             session.setEventSent(EventType.IMPRESSION);
@@ -141,7 +147,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onPause(url);
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.pause(this._vastAdUnit.getVolume());
         }
 
@@ -154,19 +160,20 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onStop(url);
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.stop(this._vastAdUnit.getVolume());
         }
     }
 
     public onVolumeChange(volume: number, maxVolume: number) {
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             this._vastAdUnit.setVolume(volume / maxVolume);
             moat.volumeChange(this._vastAdUnit.getVolume());
         }
 
-        if(this._om) {
+        if (this._om) {
+            this._vastAdUnit.setVolume(volume / maxVolume);
             this._om.volumeChange(this._vastAdUnit.getVolume());
         }
     }

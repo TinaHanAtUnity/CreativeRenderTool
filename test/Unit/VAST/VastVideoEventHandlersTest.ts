@@ -420,9 +420,18 @@ describe('VastVideoEventHandler tests', () => {
         });
 
         it('should show end screen when onVideoCompleted', () => {
+            vastAdUnit.setImpressionOccurred();
             vastVideoEventHandler.onCompleted('https://test.com');
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+            sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
+        });
+
+        it('should show end screen when onVideoCompleted', () => {
+            vastVideoEventHandler.onCompleted('https://test.com');
+
+            // Endscreen is not shown if the impression never occurs
+            sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
 

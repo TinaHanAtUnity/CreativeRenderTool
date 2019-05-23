@@ -4,17 +4,10 @@ import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 
-import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
-import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
-import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
-import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
-
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
-
-const SliderEndScreenImages = JSON.parse(SliderEndScreenImagesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -49,12 +42,18 @@ export class CustomFeatures {
                 creativeId === '151338976' ||
                 creativeId === '151337994' ||
                 creativeId === '152919353' ||
-                creativeId === '153119177';
+                creativeId === '153119177' ||
+                creativeId === '2044203'   || // Hulu
+                creativeId === '2044209'   || // Hulu
+                creativeId === '2044202'   || // Hulu
+                creativeId === '2044208';     // Hulu
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
         return seatId === 9119 ||
-               seatId === 9121;
+               seatId === 9121 ||
+               seatId === 9122 ||
+               seatId === 9198;
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
@@ -111,22 +110,6 @@ export class CustomFeatures {
 
     public static isUnsupportedOMVendor(resourceUrl: string) {
         return false;
-    }
-
-    public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string, osVersion: string, platform: Platform): boolean {
-        const isAndroid4 = platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, osVersion);
-        const isIOS7 = platform === Platform.IOS && VersionMatchers.matchesMajorOSVersion(7, osVersion);
-
-        // Exclude Android 4 and iOS 7 devices from the test because of layout issues
-        if (isAndroid4 || isIOS7) {
-            return false;
-        }
-
-        return SliderEndCardExperiment.isValid(abGroup) && SliderEndScreenImages[targetGameAppStoreId] !== undefined;
-    }
-
-    public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
-        return SliderEndScreenImages[targetGameAppStoreId];
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {

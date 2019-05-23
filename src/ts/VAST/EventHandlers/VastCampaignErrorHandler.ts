@@ -5,9 +5,11 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
-// VAST Error code defined in 3.0
-// https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
-// https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
+/**
+ * VAST Error code defined in 3.0
+ * https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
+ * https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
+ */
 export enum VastErrorCode {
     XML_PARSER_ERROR = 100,
     SCHEMA_VAL_ERROR = 101,
@@ -25,13 +27,16 @@ export enum VastErrorCode {
     MEDIA_FILE_UNSUPPORTED = 403,
     MEDIA_FILE_UNSUPPORTED_IOS = 404,
     MEDIA_FILE_PLAY_ERROR = 405,
+    MEDIA_FILE_NO_CLICKTHROUGH_URL = 499,
     COMPANION_GENERAL_ERROR = 600,   // code 5xx for Non-Linear ads
     COMPANION_SIZE_UNSUPPORTED = 601,
     COMPANION_UNABLE_TO_DISPLAY = 602,
     COMPANION_UNABLE_TO_FETCH = 603,
     COMPANION_RESOURCE_NOT_FOUND = 604,
+    COMPANION_NO_CLICKTHROUGH = 699,
     UNDEFINED_ERROR = 900,
     GENERAL_VPAID_ERROR = 901,
+    INVALID_URL_ERROR = 998,
     UNKNOWN_ERROR = 999
 }
 export class VastErrorInfo {
@@ -40,7 +45,7 @@ export class VastErrorInfo {
         [VastErrorCode.SCHEMA_VAL_ERROR]: 'VAST schema validation error',
         [VastErrorCode.VERSION_UNSUPPORTED]: 'VAST version Unsupported',
         [VastErrorCode.FORMAT_UNSUPPORTED]: 'VAST format unsupported',
-        [VastErrorCode.DURATION_UNSUPPORTED]: 'VAST duration unsupported',
+        [VastErrorCode.DURATION_UNSUPPORTED]: 'VAST linear creative is missing valid duration',
         [VastErrorCode.SIZE_UNSUPPORTED]: 'VAST size unsupported',
         [VastErrorCode.WRAPPER_GENERAL_ERROR]: 'Wrapper ad request failed',
         [VastErrorCode.WRAPPER_URI_TIMEOUT]: 'Wrapper ad request timed out',
@@ -52,14 +57,17 @@ export class VastErrorInfo {
         [VastErrorCode.MEDIA_FILE_UNSUPPORTED]: 'No Media file found supported in Video Player',
         [VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS]: 'Campaign video url needs to be https for iOS',
         [VastErrorCode.MEDIA_FILE_PLAY_ERROR]: 'Problem displaying Media file',
+        [VastErrorCode.MEDIA_FILE_NO_CLICKTHROUGH_URL]: 'Media file is missing valid ClickThrough URL',
         // code 5xx for Non-Linear ads
         [VastErrorCode.COMPANION_GENERAL_ERROR]: 'General error from Companion Ad',
         [VastErrorCode.COMPANION_SIZE_UNSUPPORTED]: 'Companion creative size unsupported',
         [VastErrorCode.COMPANION_UNABLE_TO_DISPLAY]: 'Companion unable to display',
         [VastErrorCode.COMPANION_UNABLE_TO_FETCH]: 'Unable to fetch Companion resource',
         [VastErrorCode.COMPANION_RESOURCE_NOT_FOUND]: 'Supported Companion resource not found',
+        [VastErrorCode.COMPANION_NO_CLICKTHROUGH]: 'Companion is missing valid ClickThrough URL',
         [VastErrorCode.UNDEFINED_ERROR]: 'Undefined Error',
         [VastErrorCode.GENERAL_VPAID_ERROR]: 'General VPAID error',
+        [VastErrorCode.INVALID_URL_ERROR]: 'Provided URL is invalid',
         [VastErrorCode.UNKNOWN_ERROR]: 'Unknown Error'
     };
 }

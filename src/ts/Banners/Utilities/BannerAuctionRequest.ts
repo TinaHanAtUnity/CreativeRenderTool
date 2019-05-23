@@ -1,7 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
 import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
-import { ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class BannerAuctionRequest extends AuctionRequest {
 
@@ -17,7 +17,7 @@ export class BannerAuctionRequest extends AuctionRequest {
 
     public request(): Promise<IAuctionResponse> {
         if (this._deviceInfo.getLimitAdTracking()) {
-            this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
+            this._pts.reportMetric(BannerMetric.BannerAdRequestWithLimitedAdTracking);
         }
         return super.request();
     }
