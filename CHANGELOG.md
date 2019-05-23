@@ -1,4 +1,4 @@
-# Pending
+# Thu May 23 22:27:28 UTC 2019
 
 * VAST Error Tracking - part 3: alerting DSP more errors [#9714](https://github.com/Applifier/unity-ads-webview/pull/9714)
 * Revert "Add more LoopMe seatId" [#9737](https://github.com/Applifier/unity-ads-webview/pull/9737)
