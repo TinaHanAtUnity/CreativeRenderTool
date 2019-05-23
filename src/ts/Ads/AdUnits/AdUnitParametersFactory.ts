@@ -30,7 +30,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { VideoOverlayCTAV2 } from 'Ads/Views/VideoOverlayCTAV2';
 import { CTAV2Test, ProgressBarAndSkipTest, ABGroup } from 'Core/Models/ABGroup';
-import { ProgressBarVideoOverlay } from 'Ads/Views/ProgressBarVideoOverlay';
+import { ProgressBarAndSkipVideoOverlay } from 'Ads/Views/ProgressBarAndSkipVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
@@ -220,7 +220,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (CTAV2Test.isValid(abGroup)) {
             overlay = new VideoOverlayCTAV2(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else if (ProgressBarAndSkipTest.isValid(abGroup)) {
-            overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            overlay = new ProgressBarAndSkipVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }

@@ -5,7 +5,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Template } from 'Core/Utilities/Template';
 import VideoOverlaySkipTimer from 'html/VideoOverlaySkipTimer.html';
 
-export class ProgressBarVideoOverlay extends VideoOverlay {
+export class ProgressBarAndSkipVideoOverlay extends VideoOverlay {
 
   private _progressBar: HTMLElement;
   private _progressBarWrapper: HTMLElement;
