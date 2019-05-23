@@ -3,8 +3,7 @@
 * VAST Error Tracking - part 3: alerting DSP more errors [#9714](https://github.com/Applifier/unity-ads-webview/pull/9714)
 * Revert "Add more LoopMe seatId" [#9737](https://github.com/Applifier/unity-ads-webview/pull/9737)
 * Revert "Add hulu ads to allow doubleverify viewability tracker" [#9740](https://github.com/Applifier/unity-ads-webview/pull/9740)
-
-
+* Move All ContentTypes and CampaignParseErrors to Enums [#9765](https://github.com/Applifier/unity-ads-webview/pull/9765)
 
 # Wed May 22 17:00:16 UTC 2019
 
