@@ -70,7 +70,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
-import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -80,6 +80,7 @@ import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { ContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class Ads implements IAds {
 
@@ -218,6 +219,16 @@ export class Ads implements IAds {
                 });
             }
 
+            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 10 === 0) {
+                const deviceInfo = this._core.DeviceInfo;
+                Diagnostics.trigger('china_ifa_config', {
+                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier() ? deviceInfo.getAdvertisingIdentifier() : 'no-info',
+                    limitAdTracking: deviceInfo.getLimitAdTracking() ? deviceInfo.getLimitAdTracking() : 'no-info',
+                    androidId: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getAndroidId() : 'no-info',
+                    imei: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getDeviceId1() : 'no-info'
+                });
+            }
+
             this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
@@ -238,6 +249,8 @@ export class Ads implements IAds {
                     }
                 }
             });
+
+            ContentType.initializeContentMapping(this.ContentTypeHandlerManager.getContentTypes());
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 

@@ -1,4 +1,3 @@
-import { HTML } from 'Ads/Models/Assets/HTML';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
@@ -15,16 +14,16 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Font } from 'Ads/Models/Assets/Font';
 import { PromoCoordinates } from 'Promo/Models/PromoCoordinatesAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class PromoCampaignParser extends CampaignParser {
-
-    public static ContentType = 'purchasing/iap';
 
     private _core: ICoreApi;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._core = core.Api;
+        this._contentType = CampaignContentType.IAPPromotion;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -41,7 +40,7 @@ export class PromoCampaignParser extends CampaignParser {
 
         if (premiumProduct) {
             const baseCampaignParams: ICampaign = {
-                contentType: PromoCampaignParser.ContentType,
+                contentType: this._contentType,
                 id: premiumProduct.getId(),
                 willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
                 adType: response.getContentType(),

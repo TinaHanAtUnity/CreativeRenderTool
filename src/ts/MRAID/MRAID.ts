@@ -6,6 +6,7 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class MRAID extends AbstractParserModule {
 
@@ -13,11 +14,11 @@ export class MRAID extends AbstractParserModule {
         const paramsFactory = new MRAIDAdUnitParametersFactory(ar, core, ads);
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const factory = new MRAIDAdUnitFactory(paramsFactory);
-        contentTypeHandlerMap[ProgrammaticMraidParser.ContentType] = {
+        contentTypeHandlerMap[CampaignContentType.ProgrammaticMRAID] = {
             parser: new ProgrammaticMraidParser(core.NativeBridge.getPlatform()),
             factory
         };
-        contentTypeHandlerMap[ProgrammaticMraidUrlParser.ContentType] = {
+        contentTypeHandlerMap[CampaignContentType.ProgrammaticMRAIDUrl] = {
             parser: new ProgrammaticMraidUrlParser(core.NativeBridge.getPlatform()),
             factory
         };

@@ -41,7 +41,7 @@ export enum VastErrorCode {
 }
 export class VastErrorInfo {
     public static errorMap: { [key: number]: string } = {
-        [VastErrorCode.XML_PARSER_ERROR] : 'VAST xml data is missing',
+        [VastErrorCode.XML_PARSER_ERROR] : 'VAST xml parsing error',
         [VastErrorCode.SCHEMA_VAL_ERROR]: 'VAST schema validation error',
         [VastErrorCode.VERSION_UNSUPPORTED]: 'VAST version Unsupported',
         [VastErrorCode.FORMAT_UNSUPPORTED]: 'VAST format unsupported',
@@ -82,18 +82,22 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
-        const errorTrackingUrls = campaignError.errorTrackingUrls;
-        for (const errorTrackingUrl of errorTrackingUrls) {
-            const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
-            const errorUrl = this.formatVASTErrorURL(errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._request.get(errorUrl, []);
-            Diagnostics.trigger('vast_error_tracking_sent', {
-                errorUrl: errorUrl,
-                errorCode: errorCode,
-                errorMessage: VastErrorInfo.errorMap[errorCode] || 'not found',
-                seatId: campaignError.seatId || -1,
-                creativeId: campaignError.creativeId || 'not found'
-            });
+        const errorList: CampaignError[] = campaignError.getAllCampaignErrors();
+        for (const oneError of errorList) {
+            const errorTrackingUrls = oneError.errorTrackingUrls;
+            for (const errorTrackingUrl of errorTrackingUrls) {
+                const errorCode = oneError.errorCode ? oneError.errorCode : VastErrorCode.UNDEFINED_ERROR;
+                const errorUrl = this.formatVASTErrorURL(errorTrackingUrl, errorCode, oneError.assetUrl);
+                this._request.get(errorUrl, []);
+                Diagnostics.trigger('vast_error_tracking_sent', {
+                    errorUrl: errorUrl,
+                    errorCode: errorCode,
+                    errorMessage: VastErrorInfo.errorMap[errorCode] || 'not found',
+                    erroLevel: oneError.errorLevel,
+                    seatId: oneError.seatId || -1,
+                    creativeId: oneError.creativeId || 'not found'
+                });
+            }
         }
         return Promise.resolve();
     }

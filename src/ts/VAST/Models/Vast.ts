@@ -4,8 +4,8 @@ import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStatic
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 interface IVast {
     ads: VastAd[];
@@ -15,7 +15,9 @@ interface IVast {
 
 export class Vast extends Model<IVast> {
 
-    constructor(ads: VastAd[], parseErrorURLTemplates: unknown[]) {
+    private _campaignErrors: CampaignError[];
+
+    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
         super('Vast', {
             ads: ['array'],
             parseErrorURLTemplates: ['array'],
@@ -23,8 +25,10 @@ export class Vast extends Model<IVast> {
         });
 
         this.set('ads', ads);
-        this.set('parseErrorURLTemplates', <string[]>parseErrorURLTemplates);
+        this.set('parseErrorURLTemplates', parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
+
+        this._campaignErrors = campaignErrors || [];
     }
 
     public getAds(): VastAd[] {
@@ -59,6 +63,10 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
+    public getCampaignErrors(): CampaignError[] {
+        return this._campaignErrors;
+    }
+
     public getVideoUrl(): string {
         const ad = this.getAd();
         if (ad) {
@@ -74,7 +82,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
+        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
     }
 
     public getImpressionUrls(): string[] {

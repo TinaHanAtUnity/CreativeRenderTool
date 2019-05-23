@@ -2,6 +2,7 @@ import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlockin
 import 'mocha';
 import * as sinon from 'sinon';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 describe('Creative Blocking', () => {
     let httpKafkaStub: sinon.SinonSpy;
@@ -23,7 +24,7 @@ describe('Creative Blocking', () => {
         blockingReason: BlockingReason.VIDEO_PARSE_FAILURE,
         extraFields: {
             'errorCode': 100,
-            'message': 'VAST xml data is missing'
+            'message': VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR]
         }
     }, {
         blockingReason: BlockingReason.USER_REPORT,

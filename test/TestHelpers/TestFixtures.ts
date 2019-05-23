@@ -161,6 +161,8 @@ import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
+import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -186,7 +188,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CometCampaignParser.ContentType,
+            contentType: CampaignContentType.CometVideo,
             adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
@@ -318,7 +320,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: ProgrammaticMraidParser.ContentType,
+            contentType: CampaignContentType.ProgrammaticMRAID,
             adType: mraidJson.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: mraidJson.creativeId || undefined,
@@ -366,7 +368,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: ProgrammaticVastParser.ContentType,
+            contentType: CampaignContentType.ProgrammaticVAST,
             adType: 'adType',
             correlationId: 'correlationId',
             creativeId: 'creativeId',
@@ -423,7 +425,7 @@ export class TestFixtures {
         const baseCampaignParams: ICampaign = {
             id: campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
-            contentType: ProgrammaticStaticInterstitialParser.ContentTypeHtml,
+            contentType: CampaignContentType.ProgrammaticHTMLStaticInterstitial,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
@@ -450,7 +452,7 @@ export class TestFixtures {
         return {
             id: json.campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
-            contentType: ProgrammaticVPAIDParser.ContentType,
+            contentType: CampaignContentType.ProgrammaticVPAID,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
@@ -984,6 +986,7 @@ export class TestFixtures {
             Resolve: new ResolveApi(nativeBridge),
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
+            NativeError: new NativeErrorApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
             Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),

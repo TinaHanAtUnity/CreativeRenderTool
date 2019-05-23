@@ -11,6 +11,7 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 import { PromoAdUnitParametersFactory } from 'Promo/AdUnits/PromoAdUnitParametersFactory';
 import { OrganicPurchaseManager } from 'Purchasing/OrganicPurchaseManager';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class Promo extends AbstractParserModule implements IPromo {
 
@@ -26,7 +27,7 @@ export class Promo extends AbstractParserModule implements IPromo {
 
     constructor(core: ICore, ads: IAds, purchasing: IPurchasing, analytics: IAnalytics) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
-        contentTypeHandlerMap[PromoCampaignParser.ContentType] = {
+        contentTypeHandlerMap[CampaignContentType.IAPPromotion] = {
             parser: new PromoCampaignParser(core),
             factory: new PromoAdUnitFactory(new PromoAdUnitParametersFactory(purchasing.Api, core, ads))
         };
