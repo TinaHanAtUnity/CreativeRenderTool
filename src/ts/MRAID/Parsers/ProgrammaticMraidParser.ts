@@ -2,12 +2,11 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Platform } from 'Core/Constants/Platform';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export interface IRawMRAIDCampaign extends IRawPerformanceCampaign {
     markup?: string;
@@ -15,7 +14,10 @@ export interface IRawMRAIDCampaign extends IRawPerformanceCampaign {
 
 export class ProgrammaticMraidParser extends CampaignParser {
 
-    public static ContentType = 'programmatic/mraid';
+    constructor(platform: Platform) {
+        super(platform);
+        this._contentType = CampaignContentType.ProgrammaticMRAID;
+    }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = <IRawMRAIDCampaign>response.getJsonContent();
@@ -37,7 +39,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-            contentType: ProgrammaticMraidParser.ContentType,
+            contentType: this._contentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
