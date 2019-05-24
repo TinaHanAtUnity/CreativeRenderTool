@@ -4,8 +4,8 @@
 @import "square-end-screen.styl";
 
 // We have new media queries with custom font sizes for the endscreen so we need to use 'em' unit
+// TODO: This should be already defined, also don't override the original
 $endscreen-default-size = unit($default-px-size/ 16, "em");
-
 $end-screen-mixin($scale-size = $default-scale-size) {
 
   #redesigned-end-screen {
@@ -14,6 +14,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     .btn-close-region {
       $close-button-default($scale-size);
       padding: $scale-size * $default-size * .25;
+      top: -0.5em;
+      right: 0;
     }
 
     .china-advertisement {
@@ -29,10 +31,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .pop-up-container {
-        width: calc(100% - 1.5em);
+        width: calc(100% - 2em);
         height: calc(100% - 1.5em);
-        margin: .75em auto;
-      }
+        margin: .75em 1em;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+        border-radius: .75em;
+    }
 
     .download-container {
       margin: .75 * $default-scale-size * $scale-size auto 0 auto;
@@ -121,7 +125,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 1.6 * $endscreen-default-size;
+      height: 1.35 * $endscreen-default-size;
       margin-bottom: .15 * $endscreen-default-size;
     }
 
@@ -202,11 +206,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
         top: -1.5em;
       }
 
-      .btn-close-region {
-        top: -1.55em;
-        right: -1.55em;
-      }
-
       .end-screen-info-background {
         border-radius: 0 0 .75 * $endscreen-default-size .75 * $endscreen-default-size;
       }
@@ -218,13 +217,33 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       .column-container {
         margin-bottom: 0;  
       }
+
+
+      @media (orientation: portrait) {
+          @media (max-height: 460px) {
+              .pop-up-container {
+                height: calc(100% - 3.55em);
+
+                .icon-close {
+                  font-size: 1.5em;
+                }
+
+                .btn-close-region {
+                  top: -0.5em;
+                  right: -0.3em;
+                }
+              }
+
+              .bottom {
+                height: 2.05 * $endscreen-default-size;
+              }
+            }
+        }
     }
 
     &.landscape #redesigned-end-screen {
       .btn-close-region {
         color: $gray;
-        top: -2em;
-        right: -2em;
       }
 
       .end-screen-info {
@@ -288,6 +307,7 @@ body {
     .end-screen-info-background {
       width: 100%;
       height: 31%;
+      border-radius: 0 0 .75em .75em;
     }
 
     .game-icon {
@@ -296,6 +316,11 @@ body {
     
     .game-background {
       background-color: $end-screen-gray-border;
+    }
+
+    .btn-close-region {
+      right: 0.3em;
+      top: -0.3em;
     }
   }
 
@@ -333,13 +358,14 @@ body {
 
     .campaign-container {
       display: flex;
-      border-radius: 1em;
+      border-radius: .75em;
     }
 
     .end-screen-info-background {
       width: 50%;
       height: 100%;
       text-align: center;
+      border-radius: 0 .75em .75em 0;
     }
 
     .gdpr-pop-up {
@@ -367,6 +393,7 @@ body {
     width: 100%;
     height: 100%;
     background: $white;
+    border-radius: .75em;
   }
 
   .game-background {
@@ -391,19 +418,29 @@ body {
     align-content: center;
     height: 100%;
     justify-content: center;
-    background-color: #000;
-    border-radius: 0 1rem 1rem 0;
+    background-color: $end-screen-background-color;
   }
 
+  .bottom-container,
   .pop-up-container {
     @media (orientation: portrait) {
       @media (max-height: 380px) {
         .icon-gdpr {
-          font-size: 15px;
+          font-size: 11px;
         }
 
         .unityads-logo {
-          height: 15px;
+          height: 11px;
+        }
+      }
+
+      @media (max-height: 600px) {
+        .icon-gdpr {
+          font-size: 13px;
+        }
+
+        .unityads-logo {
+          height: 13px;
         }
       }
 
@@ -495,6 +532,16 @@ body {
     }
 
     @media (orientation: landscape) {
+      @media (max-width: 510px) {
+        .icon-gdpr {
+          font-size: 14px;
+        }
+
+        .unityads-logo {
+          height: 14px;
+        }
+      }
+
       @media (min-width: 200px) {
         font-size: $default-px-size * .7;
       }
@@ -504,7 +551,7 @@ body {
       }
 
       @media (min-width: 460px) {
-        font-size: $default-px-size * 1;
+        font-size: $default-px-size * .95;
       }
 
       @media (min-width: 580px) {

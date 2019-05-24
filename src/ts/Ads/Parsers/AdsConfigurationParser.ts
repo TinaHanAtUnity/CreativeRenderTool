@@ -162,7 +162,8 @@ export class AdsConfigurationParser {
     }
 
     private static parseCacheMode(configJson: IRawAdsConfiguration): CacheMode {
-        switch(configJson.assetCaching) {
+        return CacheMode.DISABLED;
+        switch (configJson.assetCaching) {
             case 'forced':
                 return CacheMode.FORCED;
             case 'allowed':
