@@ -1,6 +1,8 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
+import { toAbGroup } from 'Core/Models/ABGroup';
+import { Platform } from 'Core/Constants/Platform';
 
 describe('CustomFeatures', () => {
 
@@ -60,52 +62,45 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isWhiteListedForLoadApi', () => {
-        const tests: {
-            gameId: string;
-            expected: boolean;
-        }[] = [{
-            gameId: '2988495',
-            expected: true
-        }, {
-            gameId: '2988494',
-            expected: true
-        }, {
-            gameId: '2988443',
-            expected: true
-        }, {
-            gameId: 'scott',
-            expected: false
-        }];
-
-        tests.forEach(t => {
-            it('should match the expected value', () => {
-                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
-                assert.equal(value, t.expected);
-            });
+    describe('isSliderEndScreenEnabled', () => {
+        it('should return true for iOS 9.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '9.0', Platform.IOS);
+            assert.isTrue(isEnabled);
         });
-    });
 
-    describe('isTrackedGameUsingLoadApi', () => {
-        const tests: {
-            gameId: string;
-            expected: boolean;
-        }[] = [{
-            gameId: '2988443',
-            expected: true
-        }, {
-            gameId: '2988494',
-            expected: false
-        }, {
-            gameId: '1234556',
-            expected: false
-        }];
+        it('should return true for Android 7.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.0', Platform.ANDROID);
+            assert.isTrue(isEnabled);
+        });
 
-        tests.forEach(t => {
-            it('should match the expected value', () => {
-                const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId);
-                assert.equal(value, t.expected);
-            });
+        it('should return false if ab group is 7 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '-1', '9.0', Platform.IOS);
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if ab group is 1 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '547145938', '9.0', Platform.ANDROID);
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if ab group is 1 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '-1', '9.0', Platform.IOS);
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if on Android and os version is 4.x', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '4.8', Platform.ANDROID);
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if on iOS and os version is 7.x', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.11', Platform.IOS);
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if all conditions do not match', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '-1', '7.9', Platform.IOS);
+            assert.isFalse(isEnabled);
         });
     });
 });

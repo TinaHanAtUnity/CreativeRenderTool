@@ -7,9 +7,10 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
-    endScreen: PerformanceEndScreen;
+    endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
     downloadManager?: DownloadManager;
     deviceIdManager?: DeviceIdManager;
@@ -17,7 +18,7 @@ export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<Per
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    private _endScreen: PerformanceEndScreen;
+    private _endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
     private _privacy: AbstractPrivacy;
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -60,7 +61,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         return 'performance';
     }
 
-    public getEndScreen(): PerformanceEndScreen | undefined {
+    public getEndScreen(): PerformanceEndScreen | SliderPerformanceEndScreen | undefined {
         return this._endScreen;
     }
 

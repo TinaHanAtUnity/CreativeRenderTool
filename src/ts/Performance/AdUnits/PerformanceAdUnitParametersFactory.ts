@@ -16,6 +16,12 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { DoubleShadowCloseButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
+import { RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
+import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import { Platform } from 'Core/Constants/Platform';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -48,6 +54,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const abGroup = baseParams.coreConfig.getAbGroup();
         if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
             endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (baseParams.campaign instanceof SliderPerformanceCampaign) {
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign);
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
@@ -55,7 +63,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
-            ... baseParams,
+            ...baseParams,
             video: video,
             overlay: overlay,
             endScreen: endScreen,

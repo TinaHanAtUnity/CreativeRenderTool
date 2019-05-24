@@ -18,6 +18,11 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+import { ABGroup } from 'Core/Models/ABGroup';
+
+const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
@@ -25,10 +30,15 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     private _requestManager: RequestManager;
+    private _abGroup: ABGroup;
+    private _core: ICore;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._requestManager = core.RequestManager;
+        this._contentType = CampaignContentType.CometVideo;
+        this._abGroup = core.Config.getAbGroup();
+        this._core = core;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -145,7 +155,22 @@ export class CometCampaignParser extends CampaignParser {
             if(json.appDownloadUrl) {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
-            return Promise.resolve(new PerformanceCampaign(parameters));
+
+            let promise;
+            const osVersion = this._core.DeviceInfo.getOsVersion();
+            const platform = this._core.NativeBridge.getPlatform();
+            if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
+                const orientation = CustomFeatures.getSliderEndScreenImageOrientation(parameters.appStoreId);
+                parameters.screenshotsOrientation = orientation;
+                parameters.screenshots = Array.from([1, 2, 3], i => {
+                    const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
+                    return new Image(url, session);
+                });
+                promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
+            } else {
+                promise = Promise.resolve(new PerformanceCampaign(parameters));
+            }
+            return promise;
         }
     }
 
