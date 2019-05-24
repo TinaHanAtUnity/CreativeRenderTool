@@ -12,7 +12,7 @@ export class AnimatedVideoOverlay extends VideoOverlay implements IPrivacyHandle
       this._isEndScreenVisible = true;
       if (endScreen) {
         endScreen.style.visibility = 'visible';
-        endScreen.classList.add('on-show');
+        endScreen.classList.add('on-show-animation');
       }
     }
   }

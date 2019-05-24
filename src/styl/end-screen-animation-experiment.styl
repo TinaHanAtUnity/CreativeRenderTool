@@ -22,47 +22,47 @@ $dark-cover-animation-experiment = #0c292f;
             transitionMixinAnimationExperiment(opacity);
         }
     }
-    #end-screen.on-show .campaign-container:before {
+    #end-screen.on-show-animation  .campaign-container:before {
         content: "";
         opacity: 1;
     }
 
-    &.portrait {
-        #end-screen .game-background-container {
+    &.portrait :not(.on-show)#end-screen {
+        .game-background-container {
             top: -50%;
             transitionMixinAnimationExperiment(top);
         }
 
-        #end-screen.on-show .game-background-container {
+        &.on-show-animation .game-background-container {
             top: 0;
         }
 
-        #end-screen .end-screen-info-background {
+        .end-screen-info-background {
             bottom: -50%;
             transitionMixinAnimationExperiment(bottom);
         }
 
-        #end-screen.on-show .end-screen-info-background {
+        &.on-show-animation .end-screen-info-background {
             bottom: 0;
         }
     }
 
-    $.landscape {
-        #end-screen .game-background-container {
+    $.landscape :not(.on-show)#end-screen {
+        .game-background-container {
             left: -50%;
             transitionMixinAnimationExperiment(left);
         }
 
-        #end-screen.on-show .game-background-container {
+        &.on-show-animation .game-background-container {
             left: 0;
         }
 
-        #end-screen .end-screen-info-background {
+        .end-screen-info-background {
             right: -50%;
             transitionMixinAnimationExperiment(right);
         }
 
-        #end-screen.on-show .end-screen-info-background {
+        &.on-show-animation .end-screen-info-background {
             right: 0;
         }
     }
