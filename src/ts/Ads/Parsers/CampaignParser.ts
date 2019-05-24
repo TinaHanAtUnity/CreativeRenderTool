@@ -4,6 +4,7 @@ import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
 import { Url } from 'Core/Utilities/Url';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export abstract class CampaignParser {
 
@@ -12,6 +13,7 @@ export abstract class CampaignParser {
     public campaignID: string;
 
     protected _platform: Platform;
+    protected _contentType: CampaignContentType;
     private _programmaticCampaignId: string;
 
     constructor(platform: Platform) {

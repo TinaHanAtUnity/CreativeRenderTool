@@ -13,6 +13,7 @@ import { IRawProductInfo, ProductInfo } from 'Promo/Models/ProductInfo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IProductData } from 'Promo/Models/Product';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export interface IPlacementContent {
     state: PlacementContentState;
@@ -198,7 +199,7 @@ export class PlacementContentManager {
     }
 
     private setAllPlacementContentStates(): Promise<void> {
-        const placementCampaignMap = this._placementManager.getPlacementCampaignMap('purchasing/iap');
+        const placementCampaignMap = this._placementManager.getPlacementCampaignMap(CampaignContentType.IAPPromotion);
         for (const placementId of Object.keys(placementCampaignMap)) {
             const campaign = placementCampaignMap[placementId];
 

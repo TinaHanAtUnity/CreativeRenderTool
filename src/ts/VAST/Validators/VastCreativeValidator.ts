@@ -3,9 +3,8 @@ import { Url } from 'Core/Utilities/Url';
 import { IValidator } from 'VAST/Validators/IValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
-import { Campaign } from 'Ads/Models/Campaign';
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class VastCreativeValidator implements IValidator {
 
@@ -25,7 +24,7 @@ export class VastCreativeValidator implements IValidator {
             trackingEvents[key].map((url) => {
                 if (!Url.isValidProtocol(url)) {
                     // Error level LOW
-                    this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('creative trackingEvents', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
+                    this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('creative trackingEvents', url).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
                 }
             });
         });
