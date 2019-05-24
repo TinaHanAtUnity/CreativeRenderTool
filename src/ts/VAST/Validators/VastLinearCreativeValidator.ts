@@ -6,7 +6,7 @@ import { Url } from 'Core/Utilities/Url';
 import { IValidator } from 'VAST/Validators/IValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class VastLinearCreativeValidator implements IValidator {
 
@@ -32,7 +32,7 @@ export class VastLinearCreativeValidator implements IValidator {
     private validateDuration(linearCreative: VastCreativeLinear) {
         if (linearCreative.getDuration() === -1) {
             // Error level HIGH
-            this._errors.push(new CampaignError(VastErrorInfo.errorMap[VastErrorCode.DURATION_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.DURATION_UNSUPPORTED));
+            this._errors.push(new CampaignError(VastErrorInfo.errorMap[VastErrorCode.DURATION_UNSUPPORTED], CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.DURATION_UNSUPPORTED));
         }
     }
 
@@ -40,7 +40,7 @@ export class VastLinearCreativeValidator implements IValidator {
         const videoClickThroughURLTemplate = linearCreative.getVideoClickThroughURLTemplate();
         if (videoClickThroughURLTemplate && !Url.isValidProtocol(videoClickThroughURLTemplate)) {
             // Error level HIGH
-            this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('linear creative videoClickThroughURLTemplate', videoClickThroughURLTemplate).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_NO_CLICKTHROUGH_URL, undefined, videoClickThroughURLTemplate));
+            this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('linear creative videoClickThroughURLTemplate', videoClickThroughURLTemplate).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_NO_CLICKTHROUGH_URL, undefined, videoClickThroughURLTemplate));
         }
     }
 
@@ -49,7 +49,7 @@ export class VastLinearCreativeValidator implements IValidator {
         videoClickTrackingURLTemplates.map((url) => {
             if (!Url.isValidProtocol(url)) {
                 // Error level LOW
-                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('linear creative videoClickTrackingURLTemplates', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
+                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('linear creative videoClickTrackingURLTemplates', url).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
             }
         });
     }
@@ -59,7 +59,7 @@ export class VastLinearCreativeValidator implements IValidator {
         videoCustomClickURLTemplates.map((url) => {
             if (!Url.isValidProtocol(url)) {
                 // Error level LOW
-                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('linear creative videoCustomClickURLTemplates', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
+                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('linear creative videoCustomClickURLTemplates', url).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, undefined, url));
             }
         });
     }

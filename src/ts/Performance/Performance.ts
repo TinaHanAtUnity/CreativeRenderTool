@@ -8,16 +8,17 @@ import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/Performa
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { IARApi } from 'AR/AR';
 import { IChina } from 'China/IChina';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class Performance extends AbstractParserModule {
     constructor(ar: IARApi, core: ICore, ads: IAds, china?: IChina) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const parser = new CometCampaignParser(core);
-        contentTypeHandlerMap[CometCampaignParser.ContentType] = {
+        contentTypeHandlerMap[CampaignContentType.CometVideo] = {
             parser,
             factory: new PerformanceAdUnitFactory(new PerformanceAdUnitParametersFactory(core, ads, china))
         };
-        contentTypeHandlerMap[CometCampaignParser.ContentTypeMRAID] = {
+        contentTypeHandlerMap[CampaignContentType.CometMRAIDUrl] = {
             parser,
             factory: new MRAIDAdUnitFactory(new MRAIDAdUnitParametersFactory(ar, core, ads))
         };

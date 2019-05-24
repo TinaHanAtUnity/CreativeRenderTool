@@ -12,15 +12,12 @@ import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHa
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
 import { AnimationEndCardTest } from 'Core/Models/ABGroup';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
-    public static ContentType = 'comet/campaign';
-    public static ContentTypeVideo = 'comet/video';
-    public static ContentTypeMRAID = 'comet/mraid-url';
-
     public canCreateAdUnit(contentType: string) {
-        return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeVideo || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;
+        return contentType === CampaignContentType.CometVideo || contentType === CampaignContentType.CometMRAIDUrl;
     }
 
     public createAdUnit(parameters: IPerformanceAdUnitParameters): PerformanceAdUnit {
