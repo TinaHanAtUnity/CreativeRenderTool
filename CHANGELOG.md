@@ -1,3 +1,7 @@
+# Staged
+
+* Consent AB test: Decrease font sizes to see the effect of the smaller font size [#9818](https://github.com/Applifier/unity-ads-webview/pull/9818)
+
 # Thu May 23 22:27:28 UTC 2019
 
 * VAST Error Tracking - part 3: alerting DSP more errors [#9714](https://github.com/Applifier/unity-ads-webview/pull/9714)
