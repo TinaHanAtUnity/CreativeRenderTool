@@ -216,7 +216,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     }
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
-        let overlay: AbstractVideoOverlay | VideoOverlay;
+        let overlay: VideoOverlay;
         const abGroup = parameters.coreConfig.getAbGroup();
         if (AnimationEndCardTest.isValid(abGroup)) {
             overlay = new AnimatedVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
