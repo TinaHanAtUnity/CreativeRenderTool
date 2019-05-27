@@ -21,14 +21,6 @@ export class ProgressBarAndSkipVideoOverlay extends VideoOverlay {
       this._templateData._skipUnderTimerExperimentEnabled = true;
       this._skipUnderTimerExperimentEnabled = true;
     }
-
-    let timerCount: number;
-
-    if (this._skipUnderTimerExperimentEnabled) {
-      timerCount = Math.ceil((this._skipRemaining) / 1000);
-    } else {
-      timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
-    }
   }
 
   public setVideoProgress(value: number): void {
@@ -77,13 +69,9 @@ export class ProgressBarAndSkipVideoOverlay extends VideoOverlay {
     parentElement.insertBefore(this._progressBarWrapper, parentElement.childNodes[0] || null);
   }
 
-  private mountSkipTimer(): void {
-    this._timerButton = <HTMLElement>this._container.querySelector('.timer-button');
-  }
-
   public render(): void {
     super.render();
     this.mountProgressBar(<HTMLElement>this._container.querySelector('.top-container'));
-    this.mountSkipTimer();
+    this._timerButton = <HTMLElement>this._container.querySelector('.timer-button');
   }
 }
