@@ -28,6 +28,9 @@ export class SliderPerformanceEndScreen extends EndScreen {
         const adjustedRating: number = campaign.getRating() * 20;
 
         const screenshots = campaign.getScreenshots().map(s => s.getUrl());
+        const portraitImage = campaign.getPortrait();
+        const landscapeImage = campaign.getLandscape();
+        const squareImage = campaign.getSquare();
 
         this._templateData = {
             'gameName': campaign.getGameName(),
@@ -35,7 +38,10 @@ export class SliderPerformanceEndScreen extends EndScreen {
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt(),
-            'screenshots': screenshots
+            'screenshots': screenshots,
+            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
+            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
+            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined
         };
 
         this._sliderEventParameters = {
@@ -47,7 +53,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
         this._sliderUsageDataEventSent = false;
 
-        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback, this.onDownloadCallback);
+        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback, this.onDownloadCallback, portraitImage ? portraitImage.getUrl() : undefined, landscapeImage ? landscapeImage.getUrl() : undefined, squareImage ? squareImage.getUrl() : undefined);
     }
 
     public show(): void {
