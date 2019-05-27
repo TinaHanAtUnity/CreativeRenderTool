@@ -59,7 +59,7 @@ export class Slider {
     private _onSlideCallback: OnSlideCallback;
     private _onDownloadCallback: OnDownloadCallback;
 
-    constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
+    constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback, portraitImage?: string, landscapeImage?: string, squareImage?: string) {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
 
@@ -83,7 +83,17 @@ export class Slider {
 
         // TODO: Make sure we always have 3 images
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
-        this._imageUrls = [urls[1], urls[2], urls[0]];
+        this._imageUrls = [];
+        if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
+          this._imageUrls.push(urls[0], portraitImage, urls[2]);
+          console.error('Portrait');
+        } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
+          this._imageUrls.push(urls[0], landscapeImage, urls[2]);
+          console.error('Landscape');
+        } else {
+          this._imageUrls.push(urls[1], urls[2], urls[0]);
+          console.error('old');
+        }
         this._currentSlide = this._config.startIndex % this._imageUrls.length;
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
         this._transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';

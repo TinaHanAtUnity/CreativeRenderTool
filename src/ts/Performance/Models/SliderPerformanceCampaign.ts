@@ -9,8 +9,7 @@ export enum SliderEndScreenImageOrientation {
 export class SliderPerformanceCampaign extends PerformanceCampaign {
 
     public getOptionalAssets() {
-        const assets: Asset[] = [];
-        assets.push(this.getGameIcon());
+        const assets: Asset[] = super.getOptionalAssets();
         assets.push(...this.getScreenshots());
 
         return assets;
