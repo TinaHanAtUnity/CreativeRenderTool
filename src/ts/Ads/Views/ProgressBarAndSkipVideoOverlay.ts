@@ -35,6 +35,15 @@ export class ProgressBarAndSkipVideoOverlay extends VideoOverlay {
       this._progressBarWrapper.remove();
     }
 
+    let timerCount: number;
+
+    if (this._skipUnderTimerExperimentEnabled) {
+      timerCount = Math.ceil((this._skipRemaining) / 1000);
+      if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
+        this._timerElement.innerText = timerCount.toString();
+      }
+    }
+
     if (this._skipRemaining <= 0) {
       if (this._skipUnderTimerExperimentEnabled) {
         this.hideTimerButton();
