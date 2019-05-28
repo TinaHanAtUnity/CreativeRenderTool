@@ -427,7 +427,7 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it('should not show end screen when onVideoCompleted', () => {
+        it('should not show end screen when onVideoCompleted without an impression event sent', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
 
             // Endscreen is not shown if the impression never occurs
