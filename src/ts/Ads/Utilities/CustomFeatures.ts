@@ -114,7 +114,7 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
-    public static isWhiteListedForLoadApi(gameId: string){
+    public static isWhiteListedForLoadApi(gameId: string) {
         return gameId === '3097696' ||  //Unity Ads test ID
                gameId === '1409248';    //Unity Ads test ID
     }
