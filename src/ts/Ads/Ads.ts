@@ -206,6 +206,18 @@ export class Ads implements IAds {
                 this.China.initialize();
             }
 
+            if (this.SessionManager.getGameSessionId() % 1000 === 0) {
+                Promise.all([
+                    ARUtil.isARSupported(this.AR.Api),
+                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA),
+                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA)
+                ]).then(([arSupported, permissionInManifest, permissionResult]) => {
+                    Diagnostics.trigger('ar_device_support', { arSupported, permissionInManifest, permissionResult });
+                }).catch((error) => {
+                    Diagnostics.trigger('ar_device_support_check_error', error);
+                });
+            }
+
             this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
