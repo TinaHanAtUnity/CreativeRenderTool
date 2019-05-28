@@ -1,6 +1,39 @@
-# Pending
+# Tue May 28 15:00:00 UTC 2019
+
+* Revert "Merge pull request #9765 from Applifier/add/all-content-types (incident-20190528)
+
+# Mon May 27 10:00:42 UTC 2019
+
+* Add temporary custom Kafka event to performance video overlay download [#9841](https://github.com/Applifier/unity-ads-webview/pull/9841)
+* Consent AB test: Decrease font sizes to see the effect of the smaller font size [#9818](https://github.com/Applifier/unity-ads-webview/pull/9818)
+
+# Thu May 23 22:27:28 UTC 2019
+
+* VAST Error Tracking - part 3: alerting DSP more errors [#9714](https://github.com/Applifier/unity-ads-webview/pull/9714)
+* Revert "Add more LoopMe seatId" [#9737](https://github.com/Applifier/unity-ads-webview/pull/9737)
+* Revert "Add hulu ads to allow doubleverify viewability tracker" [#9740](https://github.com/Applifier/unity-ads-webview/pull/9740)
+* Move All ContentTypes and CampaignParseErrors to Enums [#9765](https://github.com/Applifier/unity-ads-webview/pull/9765)
+
+# Wed May 22 17:00:16 UTC 2019
+
+* Early CTA v2 experiment [#9683](https://github.com/Applifier/unity-ads-webview/pull/9683)
+* 3.1.0 Merge changes to master [#9712](https://github.com/Applifier/unity-ads-webview/pull/9712)
+
+# Tue May 21 17:16:32 UTC 2019
+
+* Add NativeInfo to Open Measurement SessionStart context [#9738](https://github.com/Applifier/unity-ads-webview/pull/9738)
+* China ifa logging [#9763](https://github.com/Applifier/unity-ads-webview/pull/9763)
+
+# Mon May 20 15:48:35 UTC 2019
+
+* Consent A/B test: design update [#9684](https://github.com/Applifier/unity-ads-webview/pull/9684)
+* Add bundleId to optout messages [#9661](https://github.com/Applifier/unity-ads-webview/pull/9661)
+
+# Fri May 17 22:55:29 UTC 2019
 
 * VAST Error Tracking - part 2: campaign error level [#9660](https://github.com/Applifier/unity-ads-webview/pull/9660)
+* Fall back to non-transparent activity if opening transparent activity fails [#9687](https://github.com/Applifier/unity-ads-webview/pull/9687)
+* Add LoopMe SeatIDs to whitelist [#9688](https://github.com/Applifier/unity-ads-webview/pull/9688)
 
 # Thu May 16 16:26:48 UTC 2019
 

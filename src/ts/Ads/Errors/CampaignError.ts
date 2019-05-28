@@ -16,6 +16,9 @@ export class CampaignError extends Error {
     public assetUrl: string | undefined;
     public seatId: number | undefined;
     public creativeId: string | undefined;
+    public errorData: { [id: string]: unknown };
+
+    private _subCampaignErrors: CampaignError[];
 
     constructor(message: string, contentType: string, errorLevel?: CampaignErrorLevel, errorCode?: number, errorTrackingUrls?: string[], assetUrl?: string, seatId?: number, creativeId?: string) {
         super(message);
@@ -27,5 +30,24 @@ export class CampaignError extends Error {
         this.assetUrl = assetUrl;
         this.seatId = seatId;
         this.creativeId = creativeId;
+        this.errorData = {};
+
+        this._subCampaignErrors = [];
+    }
+
+    public addSubCampaignError(campaignError: CampaignError) {
+        this._subCampaignErrors.push(campaignError);
+    }
+
+    public getAllCampaignErrors(): CampaignError[] {
+        let errorList: CampaignError[] = [this];
+        for (const subError of this.getSubCampaignErrors()) {
+            errorList = errorList.concat(subError.getAllCampaignErrors());
+        }
+        return errorList;
+    }
+
+    private getSubCampaignErrors(): CampaignError[] {
+        return this._subCampaignErrors;
     }
 }

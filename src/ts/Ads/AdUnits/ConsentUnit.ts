@@ -15,7 +15,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ABGroup, ConsentCTATest } from 'Core/Models/ABGroup';
+import { ABGroup, ConsentTest } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -45,7 +45,12 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
-        this._landingPage = ConsentPage.HOMESCREEN;
+
+        if (ConsentTest.isValid(parameters.abGroup)) {
+            this._landingPage = ConsentPage.HOMEPAGE;
+        } else {
+            this._landingPage = ConsentPage.HOMESCREEN;
+        }
 
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
@@ -53,7 +58,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             landingPage: this._landingPage,
             pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
-            ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
+            consentABTest: ConsentTest.isValid(parameters.abGroup)
         };
 
         if (this._platform === Platform.ANDROID) {

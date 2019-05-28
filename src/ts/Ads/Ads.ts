@@ -227,6 +227,16 @@ export class Ads implements IAds {
                 });
             }
 
+            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 10 === 0) {
+                const deviceInfo = this._core.DeviceInfo;
+                Diagnostics.trigger('china_ifa_config', {
+                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier() ? deviceInfo.getAdvertisingIdentifier() : 'no-info',
+                    limitAdTracking: deviceInfo.getLimitAdTracking() ? deviceInfo.getLimitAdTracking() : 'no-info',
+                    androidId: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getAndroidId() : 'no-info',
+                    imei: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getDeviceId1() : 'no-info'
+                });
+            }
+
             this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
