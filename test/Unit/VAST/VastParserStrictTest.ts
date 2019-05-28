@@ -27,6 +27,7 @@ import VastAdVerificationAsStandAlone from 'xml/VastWithAdVerification4_1.xml';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 describe('VastParserStrict', () => {
 
@@ -56,8 +57,8 @@ describe('VastParserStrict', () => {
                 });
             } catch (e) {
                 // tslint:disable:no-string-literal
-                assert.deepEqual(e.diagnostic['vast'], vastNoAdRaw);
-                assert.equal(e.diagnostic['wrapperDepth'], 0);
+                assert.deepEqual(e.errorData['vast'], vastNoAdRaw);
+                assert.equal(e.errorData['wrapperDepth'], 0);
                 // tslint:enable:no-string-literal
             }
         });
@@ -595,7 +596,7 @@ describe('VastParserStrict', () => {
                     assert.isNull(TestFixtures.getVastParserStrict().parseVast(
                         '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo></foo>'
                     ));
-                }, 'VAST xml data is missing');
+                }, VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR]);
             });
         });
     });
