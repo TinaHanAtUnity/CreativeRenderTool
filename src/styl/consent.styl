@@ -299,7 +299,14 @@
 
   .title {
     font-weight: $privacy-main-title-font-weight;
-    font-size: $consent-main-title-font-size;
+    font-size: $consent-text-font-size;
+  }
+
+  .main-text {
+    color: $consent-text-font-color;
+    font-weight: $privacy-text-font-weight;
+    font-size: $privacy-text-font-size;
+    line-height: $default-size;
   }
 
   .empty-block {
@@ -326,10 +333,9 @@
     position: relative;
     padding: .75 * $default-size .75 * $default-size;
     border-radius: 2 * $default-size;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
     text-align: center;
     font-weight: $privacy-title-font-weight;
-    font-size: $consent-button-font-size;
+    font-size: $privacy-heading-font-size;
   }
 
   .consent-button {
@@ -340,13 +346,14 @@
 
   .homepage-accept-all {
     display: block;
+    border: 1px solid $consent-blue;
     background: $consent-blue;
     color: $white;
   }
 
   .show-choices {
     display: block;
-    margin-top: .5 * $default-size;
+    margin-top: .75 * $default-size;
     border: 1px solid $privacy-light-gray;
     color: $consent-text-font-color;
   }

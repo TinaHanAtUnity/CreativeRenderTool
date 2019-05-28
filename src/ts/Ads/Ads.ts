@@ -212,19 +212,9 @@ export class Ads implements IAds {
                     PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA),
                     PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA)
                 ]).then(([arSupported, permissionInManifest, permissionResult]) => {
-                    Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
+                    Diagnostics.trigger('ar_device_support', { arSupported, permissionInManifest, permissionResult });
                 }).catch((error) => {
                     Diagnostics.trigger('ar_device_support_check_error', error);
-                });
-            }
-
-            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 10 === 0) {
-                const deviceInfo = this._core.DeviceInfo;
-                Diagnostics.trigger('china_ifa_config', {
-                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier() ? deviceInfo.getAdvertisingIdentifier() : 'no-info',
-                    limitAdTracking: deviceInfo.getLimitAdTracking() ? deviceInfo.getLimitAdTracking() : 'no-info',
-                    androidId: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getAndroidId() : 'no-info',
-                    imei: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getDeviceId1() : 'no-info'
                 });
             }
 
@@ -343,6 +333,16 @@ export class Ads implements IAds {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
             return;
+        }
+
+        if (this._core.DeviceIdManager &&
+            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
+            this._core.DeviceInfo instanceof AndroidDeviceInfo &&
+            !this._core.DeviceInfo.getDeviceId1()) {
+
+            this._core.DeviceIdManager.getDeviceIds().catch((error) => {
+                Diagnostics.trigger('get_deviceid_failed', error);
+            });
         }
 
         const placement: Placement = this.Config.getPlacement(placementId);
