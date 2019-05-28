@@ -7,15 +7,16 @@ import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
+
+    public static ContentType = CampaignContentTypes.ProgrammaticVpaid;
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
     constructor(core: ICore) {
         super(core);
-        this._contentType = CampaignContentType.ProgrammaticVPAID;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -29,7 +30,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                 const baseCampaignParams: ICampaign = {
                     id: this.getProgrammaticCampaignId(),
                     willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-                    contentType: this._contentType,
+                    contentType: ProgrammaticVPAIDParser.ContentType,
                     adType: response.getAdType() || undefined,
                     correlationId: response.getCorrelationId() || undefined,
                     creativeId: response.getCreativeId() || undefined,

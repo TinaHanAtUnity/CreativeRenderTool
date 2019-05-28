@@ -1,3 +1,12 @@
+# Tue May 28 15:00:00 UTC 2019
+
+* Revert "Merge pull request #9765 from Applifier/add/all-content-types (incident-20190528)
+
+# Mon May 27 10:00:42 UTC 2019
+
+* Add temporary custom Kafka event to performance video overlay download [#9841](https://github.com/Applifier/unity-ads-webview/pull/9841)
+* Consent AB test: Decrease font sizes to see the effect of the smaller font size [#9818](https://github.com/Applifier/unity-ads-webview/pull/9818)
+
 # Thu May 23 22:27:28 UTC 2019
 
 * VAST Error Tracking - part 3: alerting DSP more errors [#9714](https://github.com/Applifier/unity-ads-webview/pull/9714)
