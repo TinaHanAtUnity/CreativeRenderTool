@@ -1,6 +1,6 @@
 # Staged
 
-* Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
+* Revert "Merge pull request #9765 from Applifier/add/all-content-types (incident-20190528)
 
 # Mon May 27 10:00:42 UTC 2019
 
