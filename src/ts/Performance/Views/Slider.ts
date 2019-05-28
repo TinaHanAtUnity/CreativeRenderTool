@@ -85,15 +85,15 @@ export class Slider {
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
         this._imageUrls = [];
         if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
-          this._imageUrls.push(urls[0], portraitImage, urls[2]);
+          this._imageUrls.push(portraitImage, urls[0], urls[2]);
           console.error('Portrait');
         } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
-          this._imageUrls.push(urls[0], landscapeImage, urls[2]);
+          this._imageUrls.push(landscapeImage, urls[0], urls[2]);
           console.error('Landscape');
         } else {
           this._imageUrls.push(urls[1], urls[2], urls[0]);
           console.error('old');
-        }
+        } 
         this._currentSlide = this._config.startIndex % this._imageUrls.length;
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
         this._transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
