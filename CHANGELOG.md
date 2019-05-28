@@ -1,3 +1,7 @@
+# Staged
+
+* Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
+
 # Mon May 27 10:00:42 UTC 2019
 
 * Add temporary custom Kafka event to performance video overlay download [#9841](https://github.com/Applifier/unity-ads-webview/pull/9841)
