@@ -213,7 +213,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public onVideoError(): void {
         const endScreen = this.getEndScreen();
-        if(endScreen && this.hasImpressionOccurred()) {
+        if (endScreen && this.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this.hide();
