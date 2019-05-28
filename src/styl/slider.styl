@@ -39,6 +39,8 @@ $slider-experiment-dot-margin = 5px;
         z-index: 2;
         float: left;
         height: 100%;
+        overflow: hidden;
+        object-fit: cover;
         -moz-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
@@ -51,7 +53,8 @@ $slider-experiment-dot-margin = 5px;
             max-width: 100%;
             max-height: 100%;
             transform: translate(-50%, -50%) scale(.9);
-            object-fit: contain;
+            height: 100%;
+            object-fit: cover;
             pointer-events: all;
         }
     }
@@ -86,5 +89,6 @@ $slider-experiment-dot-margin = 5px;
     .slider-item img {
         left: 95%;
         transform: translate(-50%, -50%) scale(.95);
+        object-fit: cover;
     }
 }
