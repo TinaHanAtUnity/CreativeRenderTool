@@ -85,10 +85,11 @@ export class DeviceIdManager {
      * @param isOptOutEnabled The consent response from user.
      * @returns True if collecting device ID is okay, else false.
      */
-    public isCompliant(country: string, isOptOutEnabled: boolean): boolean {
+    public isCompliant(country: string, isOptOutRecorded: boolean, isOptOutEnabled: boolean): boolean {
         return country === 'CN'
             && !this._deviceInfo.getAdvertisingIdentifier()
             && !this._deviceInfo.getLimitAdTracking()
+            && isOptOutRecorded
             && !isOptOutEnabled;
     }
 
