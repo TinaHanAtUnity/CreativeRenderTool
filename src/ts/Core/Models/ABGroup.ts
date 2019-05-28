@@ -69,4 +69,3 @@ export const ConsentTest = new ABTest(9, 10);
 export const WebPlayerMRAIDTest = new ABTest(15);
 export const OpenMeasurementTest = new DisabledABTest();
 export const CTAV2Test = new ZyngaFilteredABTest(7, 8);
-export const ProgressBarAndSkipTest = new ZyngaFilteredABTest(5, 6);
