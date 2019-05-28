@@ -1,53 +1,26 @@
-import { Platform } from 'Core/Constants/Platform';
-import { IFileInfo } from 'Core/Native/Cache';
-import { XHRequest } from 'Core/Utilities/XHRequest';
 import { Asset } from 'Ads/Models/Assets/Asset';
-
-import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICoreApi } from 'Core/ICore';
-import { Template } from 'Core/Utilities/Template';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
-
-const SQUARE_END_SCREEN = 'square-end-screen';
 
 const PALETTE_COLOR_COUNT = 16;
 const BACKGROUND_MIN_BRIGHTNESS = 0.85;
 const BUTTON_BRIGHTNESS = 0.4;
 const GAME_NAME_BRIGHTNESS = 0.25;
 
-export class PerformanceColorTintingEndScreen extends EndScreen {
-    private _core: ICoreApi;
-    private _campaign: PerformanceCampaign;
-    private _country: string | undefined;
+export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
+    private _coreApi: ICoreApi;
+    private _performanceCampaign: PerformanceCampaign;
     private _image: Asset | undefined;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
-        super(parameters);
+        super(parameters, campaign, country);
 
-        this._campaign = campaign;
-        this._country = country;
-
-        this._template = new Template(this.getTemplate(), this._localization);
-
-        const portraitImage = campaign.getPortrait();
-        const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
-        const adjustedRating: number = campaign.getRating() * 20;
-        this._templateData = {
-            'gameName': campaign.getGameName(),
-            'gameIcon': campaign.getGameIcon().getUrl(),
-            // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
-            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
-            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined,
-            'rating': adjustedRating.toString(),
-            'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt()
-        };
-        this._core = parameters.core;
-        this._campaign = campaign;
+        const landscapeImage = campaign.getLandscape();
+        const portraitImage = campaign.getPortrait();
 
         let image;
         if (squareImage) {
@@ -59,30 +32,12 @@ export class PerformanceColorTintingEndScreen extends EndScreen {
         }
 
         this._image = image;
-    }
-
-    protected onDownloadEvent(event: Event): void {
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onEndScreenDownload({
-            clickAttributionUrl: this._campaign.getClickAttributionUrl(),
-            clickAttributionUrlFollowsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
-            bypassAppSheet: this._campaign.getBypassAppSheet(),
-            appStoreId: this._campaign.getAppStoreId(),
-            store: this._campaign.getStore(),
-            appDownloadUrl: this._campaign.getAppDownloadUrl(),
-            adUnitStyle: this._adUnitStyle
-        }));
+        this._performanceCampaign = campaign;
+        this._coreApi = parameters.core;
     }
 
     public render(): void {
         super.render();
-
-        document.documentElement.classList.add('performance-end-screen');
-
-        const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.china-advertisement');
-        if (this._country === 'CN' && chinaAdvertisementElement) {
-            chinaAdvertisementElement.style.display = 'block';
-        }
 
         if (this._image) {
             this.getImagePixelData(this._image).then((rgbaData: Uint8ClampedArray) => {
@@ -98,21 +53,6 @@ export class PerformanceColorTintingEndScreen extends EndScreen {
                 this.sendKafkaEvent(msg);
             });
         }
-    }
-
-    protected getEndscreenAlt(): string | undefined {
-        if (this._campaign.getSquare()) {
-            return SQUARE_END_SCREEN;
-        }
-        return undefined;
-    }
-
-    protected getTemplate() {
-        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            return SquareEndScreenTemplate;
-
-        }
-        return super.getTemplate();
     }
 
     private applyColorTheme(colorTheme: { [id: string]: number[] }): void {
@@ -176,7 +116,7 @@ export class PerformanceColorTintingEndScreen extends EndScreen {
             const imageExt = originalUrl.split('.').pop();
 
             if(fileId) {
-                this._core.Cache.getFileContent(fileId, 'Base64').then((res: string) => {
+                this._coreApi.Cache.getFileContent(fileId, 'Base64').then((res: string) => {
                     resolve(`data:image/${imageExt};base64,${res}`);
                 }).catch(() => {
                     resolve(originalUrl);
@@ -190,7 +130,7 @@ export class PerformanceColorTintingEndScreen extends EndScreen {
     private sendKafkaEvent(message: string) {
         const kafkaObject: { [key: string]: unknown } = {};
         kafkaObject.type = 'color_tinting_data';
-        kafkaObject.auctionId = this._campaign.getSession().getId();
+        kafkaObject.auctionId = this._performanceCampaign.getSession().getId();
         kafkaObject.message = message;
         HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
