@@ -2,6 +2,7 @@
 
 * ESLint Investigation [#9610](https://github.com/Applifier/unity-ads-webview/pull/9610)
 * Remove unnecessary china tracking id kibana logs [#9814](https://github.com/Applifier/unity-ads-webview/pull/9814)
+* Enable IMEI collection for SDK 3.1.0+ [#9788](https://github.com/Applifier/unity-ads-webview/pull/9788)
 
 # Tue May 28 15:00:00 UTC 2019
 
