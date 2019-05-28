@@ -10,6 +10,12 @@ const BACKGROUND_MIN_BRIGHTNESS = 0.85;
 const BUTTON_BRIGHTNESS = 0.4;
 const GAME_NAME_BRIGHTNESS = 0.25;
 
+type ColorTheme = {
+    light: number[];
+    medium: number[];
+    dark: number[];
+};
+
 export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
     private _coreApi: ICoreApi;
     private _performanceCampaign: PerformanceCampaign;
@@ -55,7 +61,7 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
         }
     }
 
-    private applyColorTheme(colorTheme: { [id: string]: number[] }): void {
+    private applyColorTheme(colorTheme: ColorTheme): void {
         const { light, medium, dark } = colorTheme;
         if (!light || !medium || !dark) {
             this.sendKafkaEvent('invalid_theme');
@@ -296,7 +302,7 @@ class Swatch {
         return this._hsl;
     }
 
-    public getColorTheme(): { [id: string]: number[] } {
+    public getColorTheme(): ColorTheme {
         const hsl = this.hsl();
         const lightColor = HSLToRGB(hsl[0], hsl[1], Math.max(hsl[2], BACKGROUND_MIN_BRIGHTNESS));
         const mediumColor = HSLToRGB(hsl[0], hsl[1], BUTTON_BRIGHTNESS);
