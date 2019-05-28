@@ -34,7 +34,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Observable1, Observable3, Observable4 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2, Observable3, Observable4 } from 'Core/Utilities/Observable';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
@@ -45,13 +45,11 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
-import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class CampaignManager {
 
@@ -336,7 +334,7 @@ export class CampaignManager {
 
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if(contentType && contentType !== CampaignContentType.CometVideo && typeof cacheTTL !== 'undefined' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    if(contentType && contentType !== 'comet/campaign' && typeof cacheTTL !== 'undefined' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
                 }
@@ -566,8 +564,8 @@ export class CampaignManager {
 
         const parseTimestamp = Date.now();
         return parser.parse(response, session).catch((error) => {
-            if (error instanceof CampaignError && error.contentType === CampaignContentType.ProgrammaticVAST && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
-                parser = this.getCampaignParser(CampaignContentType.ProgrammaticVPAID);
+            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+                parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
                 return parser.parse(response, session);
             } else {
                 throw error;

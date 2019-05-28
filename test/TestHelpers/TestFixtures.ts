@@ -162,7 +162,6 @@ import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -188,7 +187,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CampaignContentType.CometVideo,
+            contentType: CometCampaignParser.ContentType,
             adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
@@ -320,7 +319,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CampaignContentType.ProgrammaticMRAID,
+            contentType: ProgrammaticMraidParser.ContentType,
             adType: mraidJson.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: mraidJson.creativeId || undefined,
@@ -368,7 +367,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CampaignContentType.ProgrammaticVAST,
+            contentType: ProgrammaticVastParser.ContentType,
             adType: 'adType',
             correlationId: 'correlationId',
             creativeId: 'creativeId',
@@ -425,7 +424,7 @@ export class TestFixtures {
         const baseCampaignParams: ICampaign = {
             id: campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
-            contentType: CampaignContentType.ProgrammaticHTMLStaticInterstitial,
+            contentType: ProgrammaticStaticInterstitialParser.ContentTypeHtml,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
@@ -452,7 +451,7 @@ export class TestFixtures {
         return {
             id: json.campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
-            contentType: CampaignContentType.ProgrammaticVPAID,
+            contentType: ProgrammaticVPAIDParser.ContentType,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,

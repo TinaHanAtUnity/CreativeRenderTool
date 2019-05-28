@@ -18,16 +18,17 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class CometCampaignParser extends CampaignParser {
+    public static ContentType = 'comet/campaign';
+    public static ContentTypeVideo = 'comet/video';
+    public static ContentTypeMRAID = 'comet/mraid-url';
 
     private _requestManager: RequestManager;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._requestManager = core.RequestManager;
-        this._contentType = CampaignContentType.CometVideo;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -55,7 +56,7 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
-            contentType: this._contentType,
+            contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: response.getCreativeId() || undefined,
@@ -89,7 +90,7 @@ export class CometCampaignParser extends CampaignParser {
                 appStoreId: json.appStoreId,
                 playableConfiguration: undefined
             };
-            parameters.contentType = this._contentType = CampaignContentType.CometMRAIDUrl;
+            parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
             const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 
