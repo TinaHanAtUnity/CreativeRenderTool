@@ -1,3 +1,14 @@
+# Pending
+
+* Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
+* ESLint Investigation [#9610](https://github.com/Applifier/unity-ads-webview/pull/9610)
+* Remove unnecessary china tracking id kibana logs [#9814](https://github.com/Applifier/unity-ads-webview/pull/9814)
+* Enable IMEI collection for SDK 3.1.0+ [#9788](https://github.com/Applifier/unity-ads-webview/pull/9788)
+
+# Tue May 28 15:00:00 UTC 2019
+
+* Revert "Merge pull request #9765 from Applifier/add/all-content-types (incident-20190528)
+
 # Mon May 27 10:00:42 UTC 2019
 
 * Add temporary custom Kafka event to performance video overlay download [#9841](https://github.com/Applifier/unity-ads-webview/pull/9841)

@@ -4,17 +4,15 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IRawPerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { Platform } from 'Core/Constants/Platform';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class XPromoCampaignParser extends CampaignParser {
 
-    constructor(platform: Platform) {
-        super(platform);
-        this._contentType = CampaignContentType.XPromoVideo;
-    }
+    public static ContentType = 'xpromo/video';
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = <IRawPerformanceCampaign>response.getJsonContent();
@@ -40,7 +38,7 @@ export class XPromoCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
-            contentType: this._contentType,
+            contentType: XPromoCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: response.getCreativeId() || undefined,
