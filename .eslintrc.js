@@ -20,7 +20,6 @@ module.exports = {
     '@typescript-eslint/no-object-literal-type-assertion': ['off'], // TODO
     '@typescript-eslint/no-unused-vars': ['off'], // TODO
     '@typescript-eslint/no-explicit-any': ['off'], // TODO
-    '@typescript-eslint/type-annotation-spacing': ['off'], // TODO
     '@typescript-eslint/indent': ['off'], // TODO
     '@typescript-eslint/prefer-interface': ['off'], // TODO
     '@typescript-eslint/no-inferrable-types': ['off'], // TODO
