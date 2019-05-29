@@ -25,6 +25,5 @@ module.exports = {
     '@typescript-eslint/prefer-interface': ['off'], // TODO
     '@typescript-eslint/no-inferrable-types': ['off'], // TODO
     '@typescript-eslint/ban-types': ['off'], // TODO
-    '@typescript-eslint/no-use-before-define': ['off'], // TODO
   }
 }

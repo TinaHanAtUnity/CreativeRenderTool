@@ -7,11 +7,6 @@ import { ProgressBarAndSkipTest } from 'Core/Models/ABGroup';
 import { Placement } from 'Ads/Models/Placement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
-const CheetahGameIds = setGameIds(CheetahGamesJson);
-const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const Game7GameIds = setGameIds(Game7GamesJson);
-const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
-
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
     try {
@@ -21,6 +16,11 @@ function setGameIds(gameIdJson: string): string[] {
     }
     return gameIds;
 }
+
+const CheetahGameIds = setGameIds(CheetahGamesJson);
+const BitmangoGameIds = setGameIds(BitmangoGamesJson);
+const Game7GameIds = setGameIds(Game7GamesJson);
+const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
