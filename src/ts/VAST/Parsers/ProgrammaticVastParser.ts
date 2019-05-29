@@ -33,11 +33,11 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _coreApi: ICoreApi;
     protected _requestManager: RequestManager;
     protected _deviceInfo: DeviceInfo;
-
-    protected _vastParserStrict: VastParserStrict = new VastParserStrict();
+    protected _vastParserStrict: VastParserStrict;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
+        this._vastParserStrict = new VastParserStrict();
         this._deviceInfo = core.DeviceInfo;
         this._coreApi = core.Api;
         this._requestManager = core.RequestManager;
