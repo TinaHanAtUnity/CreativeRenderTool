@@ -6,7 +6,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
-export type IAnalyticsMessage = {};
+export interface AnalyticsMessage {}
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;
@@ -17,7 +17,7 @@ export interface IAnalyticsCustomParams {
     unity_monetization_extras: string;
 }
 
-export interface IAnalyticsEvent<T extends IAnalyticsMessage> {
+export interface IAnalyticsEvent<T extends AnalyticsMessage> {
     type: string;
     msg: T;
 }
@@ -47,7 +47,7 @@ interface IAnalyticsAdCompleteEvent extends IAnalyticsCustomParams {
     placement_id: string;
 }
 
-interface IIapTransactionEvent extends IAnalyticsMessage {
+interface IIapTransactionEvent extends AnalyticsMessage {
     ts: number;
     productid: string;
     amount: number;
@@ -66,7 +66,7 @@ interface IIapPurchaseFailedEvent extends IAnalyticsCustomParams {
     currency: string;
 }
 
-interface IAnalyticsCustomEvent<G extends IAnalyticsCustomParams> extends IAnalyticsMessage {
+interface IAnalyticsCustomEvent<G extends IAnalyticsCustomParams> extends AnalyticsMessage {
     ts: number;
     t_since_start: number; // appended by webview
     name: string;
@@ -77,7 +77,7 @@ export type AnalyticsItemAcquiredEvent = IAnalyticsEvent<IAnalyticsCustomEvent<I
 export type AnalyticsItemSpentEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
 export type AnalyticsLevelUpEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelUpEvent>>;
 export type AnalyticsLevelFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelFailedEvent>>;
-export type AnalyticsGenericEvent = IAnalyticsEvent<IAnalyticsMessage>;
+export type AnalyticsGenericEvent = IAnalyticsEvent<AnalyticsMessage>;
 export type AnalyticsAdCompleteEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsAdCompleteEvent>>;
 export type AnalyticsIapTransactionEvent = IAnalyticsEvent<IIapTransactionEvent>;
 export type AnalyticsIapPurchaseFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IIapPurchaseFailedEvent>>;
