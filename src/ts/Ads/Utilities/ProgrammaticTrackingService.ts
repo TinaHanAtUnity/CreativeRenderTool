@@ -7,7 +7,13 @@ export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
     AdmobTestHttpError = 'admob_video_http_error',
-    VastClickWithoutImpressionError = 'vast_click_without_impression'
+    VastClickWithoutImpressionError = 'vast_click_without_impression',
+    AdUnitAlreadyShowing = 'ad_unit_already_showing',
+    PlacementWithIdDoesNotExist = 'placement_with_id_does_not_exist',
+    CampaignNotFound = 'campaign_not_found',
+    PromoWithoutCreatives = 'promo_without_creatives',
+    CampaignExpired = 'campaign_expired',
+    NoConnectionWhenNeeded = 'no_connection_when_needed'
 }
 
 export enum AdmobMetric {
