@@ -490,6 +490,7 @@ export class Ads implements IAds {
                     id: campaign.getId()
                 });
                 SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
+                // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
                 this.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.AdUnitAlreadyShowing, campaign.getContentType(), campaign.getSeatId());
                 return;
             }
