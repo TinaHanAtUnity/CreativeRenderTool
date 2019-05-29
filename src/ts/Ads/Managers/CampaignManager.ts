@@ -154,7 +154,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(requestPrivacy, countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -222,7 +222,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getPrivacy(), session.getGameSessionCounters(), false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getGameSessionCounters(), session.getPrivacy(), false, placement)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -263,7 +263,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionResponse>(response.response);
@@ -372,7 +372,7 @@ export class CampaignManager {
         }
     }
 
-    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
+    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -790,7 +790,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
+    private createRequestBody(gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         if(realtimePlacement && this._realtimeBody) {

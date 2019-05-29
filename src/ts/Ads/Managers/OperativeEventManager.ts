@@ -81,7 +81,7 @@ export interface IInfoJson {
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
-    privacy: IRequestPrivacy;
+    privacy?: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
     apiLevel?: number;
     deviceMake?: string;
