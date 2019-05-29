@@ -13,6 +13,7 @@ import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { HTMLBannerAdUnit } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { asStub } from 'TestHelpers/Functions';
 import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
+import { BannerRefreshDisabledId } from 'Ads/Utilities/CustomFeatures';
 
 [
     Platform.IOS,
@@ -94,6 +95,17 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
                     clock.tick(31 * 1000);
                     return Promise.resolve().then(() => {
                         sinon.assert.calledTwice(asStub(banners.CampaignManager.request));
+                    });
+                });
+            });
+
+            context('after being shown', () => {
+                it('should not refresh after 30 seconds if disabled through custom feature', () => {
+                    core.ClientInfo.set('gameId', BannerRefreshDisabledId);
+                    banners.Api.Banner.onBannerOpened.trigger();
+                    clock.tick(31 * 1000);
+                    return Promise.resolve().then(() => {
+                        sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
                     });
                 });
             });

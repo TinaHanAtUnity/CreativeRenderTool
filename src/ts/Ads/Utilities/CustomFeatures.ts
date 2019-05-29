@@ -11,6 +11,7 @@ const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
+export const BannerRefreshDisabledId = '2962474';
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -115,5 +116,13 @@ export class CustomFeatures {
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
         return this.existsInList(LionStudiosGameIds, gameId);
+    }
+
+    public static shouldDisableBannerRefresh(gameId: string): boolean {
+        if (gameId === BannerRefreshDisabledId) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
