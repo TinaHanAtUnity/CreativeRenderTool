@@ -1,5 +1,6 @@
 # Pending
 
+* Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
 * ESLint Investigation [#9610](https://github.com/Applifier/unity-ads-webview/pull/9610)
 * Remove unnecessary china tracking id kibana logs [#9814](https://github.com/Applifier/unity-ads-webview/pull/9814)
 * Enable IMEI collection for SDK 3.1.0+ [#9788](https://github.com/Applifier/unity-ads-webview/pull/9788)
