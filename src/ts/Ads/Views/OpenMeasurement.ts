@@ -93,6 +93,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _deviceInfo: DeviceInfo;
     private _omAdSessionId: string;
 
+    private _deviceVolume: number;
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
 
@@ -114,7 +115,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge = new OMIDEventBridge(core, {
             onImpression: (impressionValues) => this.impression(impressionValues),
             onLoaded: (vastProperties) => this.loaded(vastProperties),
-            onStart: (duration, videoPlayerVolume) => this.start(duration, videoPlayerVolume),
+            onStart: (duration, videoPlayerVolume) => this.start(duration),
             onSendFirstQuartile: () => this.sendFirstQuartile(),
             onSendMidpoint: () =>  this.sendMidpoint(),
             onSendThirdQuartile: () => this.sendThirdQuartile(),
@@ -202,14 +203,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Video-only event. The player began playback of the video ad creative.
      * Corresponds to the VAST  start event.
      */
-    public start(duration: number, videoPlayerVolume: number) {
+    public start(duration: number) {
         if (this.getState() === OMState.STOPPED && this._sessionStartCalled) {
             this.setState(OMState.PLAYING);
 
             this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_START, {
                 duration: duration,
-                videoPlayerVolume: videoPlayerVolume,
-                deviceVolume: videoPlayerVolume
+                videoPlayerVolume: this._placement.muteVideo() ? 0 : 1,
+                deviceVolume: this._deviceVolume
             });
         }
     }
@@ -260,11 +261,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_SKIPPED);
     }
 
+    public setDeviceVolume(deviceVolume: number) {
+        this._deviceVolume = deviceVolume;
+    }
+
+    public getDeviceVolume(deviceVolume: number) {
+        return this._deviceVolume;
+    }
+
     public volumeChange(videoPlayerVolume: number) {
         if(this.getState() !== OMState.COMPLETED) {
             this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {
                 videoPlayerVolume: videoPlayerVolume,
-                deviceVolume: videoPlayerVolume
+                deviceVolume: this._deviceVolume
             });
         }
     }
