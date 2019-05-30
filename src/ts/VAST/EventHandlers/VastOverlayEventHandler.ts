@@ -119,7 +119,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (this._om) {
             this._om.skipped();
             this._om.sessionFinish({
-                adSessionId: this._campaign.getSession().getId(),
+                adSessionId: this._om.getOMAdSessionId(),
                 timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}

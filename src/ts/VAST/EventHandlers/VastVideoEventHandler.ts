@@ -75,7 +75,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.completed();
             this._om.sessionFinish({
-                adSessionId: this._campaign.getSession().getId(),
+                adSessionId: this._om.getOMAdSessionId(),
                 timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
@@ -103,7 +103,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         if (this._om && !this._omStartCalled) {
             this._om.sessionStart({
-                adSessionId: this._campaign.getSession().getId(),
+                adSessionId: this._om.getOMAdSessionId(),
                 timestamp: Date.now(),
                 type: 'sessionStart',
                 data: {}
