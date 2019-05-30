@@ -9,6 +9,8 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
+    'semi': ['error', 'always'],
+
     '@typescript-eslint/interface-name-prefix': ['off', 'always'], // TODO
     '@typescript-eslint/explicit-function-return-type': ['off'], // TODO
     '@typescript-eslint/explicit-member-accessibility': ['off'], // TODO
