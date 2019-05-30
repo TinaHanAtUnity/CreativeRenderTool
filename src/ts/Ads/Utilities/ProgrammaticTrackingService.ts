@@ -10,7 +10,6 @@ export enum ProgrammaticTrackingError {
     VastClickWithoutImpressionError = 'vast_click_without_impression',
     AdUnitAlreadyShowing = 'ad_unit_already_showing',
     PlacementWithIdDoesNotExist = 'placement_with_id_does_not_exist',
-    CampaignNotFound = 'campaign_not_found',
     PromoWithoutCreatives = 'promo_without_creatives',
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed'
@@ -41,6 +40,7 @@ export enum VastMetric {
 }
 
 export enum MiscellaneousMetric {
+    CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
 }
 

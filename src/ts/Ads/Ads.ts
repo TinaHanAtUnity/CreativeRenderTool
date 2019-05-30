@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService, ChinaMetric, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -330,9 +330,15 @@ export class Ads implements IAds {
         callback(CallbackStatus.OK);
 
         const campaign = this.RefreshManager.getCampaign(placementId);
-        // Defaults for PTS Errors
-        const contentType = campaign!.getContentType() || 'none';
-        const seatId = campaign!.getSeatId();
+
+        if(!campaign) {
+            this.showError(true, placementId, 'Campaign not found');
+            this.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignNotFound);
+            return;
+        }
+
+        const contentType = campaign.getContentType();
+        const seatId = campaign.getSeatId();
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
@@ -355,12 +361,6 @@ export class Ads implements IAds {
         if(!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
             this.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.PlacementWithIdDoesNotExist, contentType, seatId);
-            return;
-        }
-
-        if(!campaign) {
-            this.showError(true, placementId, 'Campaign not found');
-            this.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.CampaignNotFound, contentType, seatId);
             return;
         }
 
