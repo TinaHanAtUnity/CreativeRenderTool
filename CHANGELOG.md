@@ -1,3 +1,7 @@
+# Pending
+
+* Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
+
 # Wed May 29 20:29:52 UTC 2019
 
 * Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
