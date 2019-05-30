@@ -72,7 +72,7 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
                 onEventProcessed: sinon.spy()
             };
 
-            omidEventBridge = new OMIDEventBridge(core, handler, iframe, campaign.getSession().getId());
+            omidEventBridge = new OMIDEventBridge(core, handler, iframe, omInstance);
             omidEventBridge.connect();
         });
 

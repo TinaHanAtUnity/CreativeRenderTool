@@ -1,4 +1,5 @@
 import { ICoreApi } from 'Core/ICore';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 export enum OMEvents {
     IMPRESSION_OCCURED = 'impressionOccured',
@@ -191,15 +192,15 @@ export class OMIDEventBridge {
     private _handler: IOMIDHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
     private _iframe: HTMLIFrameElement;
-    private _sessionId: string;
+    private _openMeasurement: OpenMeasurement;
 
-    constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, sessionId: string) {
+    constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._omidHandlers = {};
         this._handler = handler;
         this._iframe = iframe;
-        this._sessionId = sessionId;
+        this._openMeasurement = openMeasurement;
 
         this._omidHandlers = {};
         this._omidHandlers[OMEvents.IMPRESSION_OCCURED] = (msg) => this._handler.onImpression(<IImpressionValues>msg.data);
@@ -252,7 +253,7 @@ export class OMIDEventBridge {
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: type,
-                sessionId: this._sessionId,
+                adSessionId: this._openMeasurement.getOMAdSessionId(),
                 payload: payload
             }, '*');
         }
@@ -263,7 +264,7 @@ export class OMIDEventBridge {
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: type,
-                sessionId: this._sessionId,
+                adSessionId: this._openMeasurement.getOMAdSessionId(),
                 payload: payload
             }, '*');
         }
