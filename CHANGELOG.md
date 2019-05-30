@@ -1,6 +1,7 @@
 # Pending
 
 * Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
+* Separate VideoPlayerVolume from DeviceVolume Open Measurement [#9764](https://github.com/Applifier/unity-ads-webview/pull/9764)
 
 # Wed May 29 20:29:52 UTC 2019
 
