@@ -99,9 +99,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getVolume() {
-        if(this._muted) {
-            return 0;
-        }
         return this._volume;
     }
 
@@ -109,11 +106,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._volume = volume;
     }
 
-    public setMuted(muted: boolean) {
+    public setVideoPlayerMuted(muted: boolean) {
         this._muted = muted;
     }
 
-    public getMuted() {
+    public getVideoPlayerMuted() {
         return this._muted;
     }
 
@@ -213,7 +210,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public onVideoError(): void {
         const endScreen = this.getEndScreen();
-        if(endScreen) {
+        if (endScreen && this.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this.hide();
