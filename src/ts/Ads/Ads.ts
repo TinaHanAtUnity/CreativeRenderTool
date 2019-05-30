@@ -331,7 +331,7 @@ export class Ads implements IAds {
 
         const campaign = this.RefreshManager.getCampaign(placementId);
 
-        if(!campaign) {
+        if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
             this.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignNotFound);
             return;
