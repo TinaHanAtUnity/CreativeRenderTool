@@ -11,9 +11,9 @@ import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
@@ -44,7 +44,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         const showGDPRBanner = this.showGDPRBanner(baseParams);
 
         baseParams.gameSessionId = baseParams.gameSessionId || 0;
-        const isProgrammaticWebPlayerTest = WebPlayerMRAIDTest.isValid(baseParams.coreConfig.getAbGroup()) && !(baseParams.campaign instanceof PerformanceMRAIDCampaign) && !ARUtil.isARCreative(baseParams.campaign) && !MRAIDAdUnitParametersFactory._forcedExtendedMRAID && !MRAIDAdUnitParametersFactory._forcedARMRAID;
+        const isProgrammaticWebPlayerTest = CustomFeatures.isWebPlayerTestProjects(baseParams.clientInfo.getGameId(), baseParams.campaign.getCreativeId()) && !(baseParams.campaign instanceof PerformanceMRAIDCampaign) && !ARUtil.isARCreative(baseParams.campaign) && !MRAIDAdUnitParametersFactory._forcedExtendedMRAID && !MRAIDAdUnitParametersFactory._forcedARMRAID;
 
         if (isProgrammaticWebPlayerTest) {
             mraid = new WebPlayerMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
