@@ -5,6 +5,7 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import 'mocha';
 import * as sinon from 'sinon';
+import { Placement } from 'Ads/Models/Placement';
 
 describe('MOAT', () => {
     describe('onMessage', () => {
@@ -14,9 +15,10 @@ describe('MOAT', () => {
         beforeEach(() => {
             const nativeBridge = sinon.createStubInstance(NativeBridge);
             const sdk: SdkApi = sinon.createStubInstance(SdkApi);
+            const placement: Placement = sinon.createStubInstance(Placement);
             nativeBridge.Sdk = sdk;
             logWarningStub = <sinon.SinonStub> sdk.logWarning;
-            moat = new MOAT(Platform.ANDROID, nativeBridge);
+            moat = new MOAT(Platform.ANDROID, nativeBridge, placement);
             diagnosticsTriggerStub = sinon.stub(Diagnostics, 'trigger');
         });
 

@@ -31,7 +31,7 @@ export interface IMoatData {
 export class MoatViewabilityService {
 
     public static initMoat(platform: Platform, core: ICoreApi, campaign: Campaign, clientInfo: ClientInfo, placement: Placement, deviceInfo: DeviceInfo, configuration: CoreConfiguration) {
-        this._moat = new MOAT(platform, core);
+        this._moat = new MOAT(platform, core, placement);
         this._moat.render();
         this._moat.addMessageListener();
         document.body.appendChild(this._moat.container());

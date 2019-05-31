@@ -265,10 +265,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._deviceVolume = deviceVolume;
     }
 
-    public getDeviceVolume(deviceVolume: number) {
-        return this._deviceVolume;
-    }
-
     public volumeChange(videoPlayerVolume: number) {
         if(this.getState() !== OMState.COMPLETED) {
             this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {
