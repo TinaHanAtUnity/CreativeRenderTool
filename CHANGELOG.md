@@ -1,4 +1,4 @@
-# Fri May 31 16:31:24 UTC 2019
+# Fri May 31 16:55:24 UTC 2019
 
 * Disable Consent A/B test [#9926](https://github.com/Applifier/unity-ads-webview/pull/9926)
 * Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
