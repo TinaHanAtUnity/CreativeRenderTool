@@ -266,8 +266,8 @@ lint:
 
 lint-fix:
 	parallel --ungroup ::: \
-		"$(TSLINT) --project tsconfig.json --fix $(TS_SOURCES)" \
-		"$(TSLINT) --project tsconfig.json --config test/tslint.json --fix $(TESTS)"
+		"$(ESLINT) --fix $(TS_SOURCES)" \
+		"$(ESLINT) --fix $(TESTS)"
 
 setup: clean
 	rm -rf node_modules
