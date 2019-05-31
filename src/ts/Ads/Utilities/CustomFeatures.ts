@@ -118,16 +118,16 @@ export class CustomFeatures {
     }
 
     public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {
-        return this.isMRAIDWebPlayerGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
+        return this.isMRAIDWebPlayerAndroidGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
     }
 
-    private static isMRAIDWebPlayerGamesTest(gameId: string) {
-        return gameId === '1789728' ||
-               gameId === '1373395' ||
-               gameId === '2950247' ||
-               gameId === '2950185' ||
-               gameId === '2639272' ||
-               gameId === '1300960';
+    private static isMRAIDWebPlayerAndroidGamesTest(gameId: string) {
+        return gameId === '1789727' ||      // ru.iprado.spot
+               gameId === '1373394' ||      // pl.idreams.Dino
+               gameId === '2950248' ||      // com.game5mobile.lineandwater
+               gameId === '2950184' ||      // com.game5mobile.popular
+               gameId === '2639270' ||      // com.ohmgames.paperplane
+               gameId === '1300959';        // com.sadpuppy.lemmings
     }
 
     private static isMRAIDWebPlayerCreativesTest(creativeId: string | undefined) {
