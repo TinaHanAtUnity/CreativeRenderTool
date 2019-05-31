@@ -1,3 +1,7 @@
+# Pending
+
+* ESLint prefer-interface [#9896](https://github.com/Applifier/unity-ads-webview/pull/9896)
+
 # Fri May 31 16:55:24 UTC 2019
 
 * Disable Consent A/B test [#9926](https://github.com/Applifier/unity-ads-webview/pull/9926)

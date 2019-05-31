@@ -44,7 +44,9 @@ export enum TrackingEvent {
     PURCHASE = 'purchase'
 }
 
-export type TemplateValueMap = { [id: string]: string };
+export interface ITemplateValueMap { 
+    [id: string]: string;
+}
 
 export class ThirdPartyEventManager {
 
@@ -52,7 +54,7 @@ export class ThirdPartyEventManager {
     private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: TemplateValueMap) {
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
         this._core = core;
         this._request = request;
 
@@ -152,7 +154,7 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public setTemplateValues(templateValues: TemplateValueMap): void {
+    public setTemplateValues(templateValues: ITemplateValueMap): void {
         this._templateValues = templateValues;
     }
 
@@ -174,7 +176,7 @@ export class ThirdPartyEventManager {
 }
 
 export interface IThirdPartyEventManagerFactory {
-    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
+    create(templateValues: ITemplateValueMap): ThirdPartyEventManager;
 }
 
 export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
@@ -187,7 +189,7 @@ export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFac
         this._requestManager = requestManager;
     }
 
-    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
+    public create(templateValues: ITemplateValueMap): ThirdPartyEventManager {
         return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
     }
 }
