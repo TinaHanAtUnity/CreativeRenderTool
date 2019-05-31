@@ -28,12 +28,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-<<<<<<< HEAD
-import { VideoOverlayCTAV2 } from 'Ads/Views/VideoOverlayCTAV2';
-import { CTAV2Test, ProgressBarAndSkipTest, ABGroup } from 'Core/Models/ABGroup';
-import { ProgressBarAndSkipVideoOverlay } from 'Ads/Views/ProgressBarAndSkipVideoOverlay';
-=======
->>>>>>> parent of 48197bf7d... Merge pull request #9683 from Applifier/feature/early-cta-v2
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
@@ -218,20 +212,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         };
     }
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
-<<<<<<< HEAD
-        let overlay: VideoOverlay;
-        const abGroup = parameters.coreConfig.getAbGroup();
-        if (CTAV2Test.isValid(abGroup)) {
-            overlay = new VideoOverlayCTAV2(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else if (ProgressBarAndSkipTest.isValid(abGroup)) {
-            overlay = new ProgressBarAndSkipVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else {
-            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        }
-=======
 
         const overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
->>>>>>> parent of 48197bf7d... Merge pull request #9683 from Applifier/feature/early-cta-v2
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);
