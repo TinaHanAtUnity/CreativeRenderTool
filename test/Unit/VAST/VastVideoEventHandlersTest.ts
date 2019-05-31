@@ -372,13 +372,22 @@ describe('VastVideoEventHandler tests', () => {
     });
 
     describe('onVolumeChange', () => {
-        beforeEach(() => {
+        it ('should call moat volumeChange event', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
         });
 
-        it ('should call viewability volumeChange events', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
-            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0.1);
+        it('should call om volumeChange event with arguments if videoPlayer unmuted', () => {
+            vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setDeviceVolume, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 1);
+        });
+
+        it('should call om volumeChange event with arguments if videoPlayer muted', () => {
+            testAdUnit.setVideoPlayerMuted(true);
+            vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setDeviceVolume, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0);
         });
     });
 
