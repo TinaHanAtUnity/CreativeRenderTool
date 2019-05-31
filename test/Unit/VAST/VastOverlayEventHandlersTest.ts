@@ -244,6 +244,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setVolume(1);
                     vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
                 });
             });
@@ -274,13 +275,15 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
             it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
                 sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
             it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
                 sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
-                sinon.assert.called(<sinon.SinonStub>om!.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 1);
             });
         });
 
