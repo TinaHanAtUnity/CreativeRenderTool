@@ -1,5 +1,6 @@
 # Pending
 
+* Disable Consent A/B test [#9926](https://github.com/Applifier/unity-ads-webview/pull/9926)
 * Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
 * Separate VideoPlayerVolume from DeviceVolume Open Measurement [#9764](https://github.com/Applifier/unity-ads-webview/pull/9764)
 * Add XInstall test creativeids and gameids for testing MRAID Webplayer [#9922](https://github.com/Applifier/unity-ads-webview/pull/9922)
