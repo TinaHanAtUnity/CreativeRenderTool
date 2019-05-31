@@ -199,7 +199,11 @@ export class BannerAdContext {
 
     private onAppForeground() {
         if (this.isState(BannerLoadState.Loaded)) {
-            this.setUpBannerRefresh();
+            if (CustomFeatures.shouldDisableBannerRefresh(this._clientInfo.getGameId())) {
+                // Do not refresh
+            } else {
+                this.setUpBannerRefresh();
+            }
         }
     }
 

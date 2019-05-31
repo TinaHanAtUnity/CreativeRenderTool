@@ -125,7 +125,7 @@ export class CustomFeatures {
             return false;
         }
     }
-    
+
     public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {
         return this.isMRAIDWebPlayerGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
     }
