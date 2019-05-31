@@ -26,8 +26,6 @@ export class MOAT extends View<VastCampaign> {
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
-
-    private _deviceVolume: number;
     private _playerVolume: number;
 
     constructor(platform: Platform, core: ICoreApi, placement: Placement) {
