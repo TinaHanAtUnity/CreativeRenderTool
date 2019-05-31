@@ -6,7 +6,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
-export type IAnalyticsMessage = {};
+export interface IAnalyticsMessage {}
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;

@@ -125,4 +125,24 @@ export class CustomFeatures {
             return false;
         }
     }
+    
+    public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {
+        return this.isMRAIDWebPlayerGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
+    }
+
+    private static isMRAIDWebPlayerGamesTest(gameId: string) {
+        return gameId === '1789728' ||
+               gameId === '1373395' ||
+               gameId === '2950247' ||
+               gameId === '2950185' ||
+               gameId === '2639272' ||
+               gameId === '1300960';
+    }
+
+    private static isMRAIDWebPlayerCreativesTest(creativeId: string | undefined) {
+        return creativeId === 'futur_idlec_p1.1' ||
+               creativeId === 'lions_hooke_p1'   ||
+               creativeId === 'gg_bounzy'        ||
+               creativeId === 'social_dc';
+    }
 }

@@ -1,6 +1,5 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { WebPlayerMRAIDTest, toAbGroup } from 'Core/Models/ABGroup';
 
 export enum ClickDelayRange {
     LOW = 4000, // 4000 ms

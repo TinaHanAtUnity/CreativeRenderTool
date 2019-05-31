@@ -90,7 +90,6 @@ export class BannerAdContext {
                 return this.sendBannerError(new Error(`Placement ${placementId} is not a banner placement`));
             }
             this._placement = placement;
-            this._placementManager.sendBannersWaiting();
             this.setState(BannerLoadState.Loading);
             return this.loadBannerAdUnit().catch((e) => {
                 if (e instanceof NoFillError) {

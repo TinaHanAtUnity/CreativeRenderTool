@@ -1,3 +1,17 @@
+# Pending
+
+* ESLint prefer-interface [#9896](https://github.com/Applifier/unity-ads-webview/pull/9896)
+
+# Fri May 31 16:55:24 UTC 2019
+
+* Disable Consent A/B test [#9926](https://github.com/Applifier/unity-ads-webview/pull/9926)
+* Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
+* Separate VideoPlayerVolume from DeviceVolume Open Measurement [#9764](https://github.com/Applifier/unity-ads-webview/pull/9764)
+* Add XInstall test creativeids and gameids for testing MRAID Webplayer [#9922](https://github.com/Applifier/unity-ads-webview/pull/9922)
+* Remove Banner Placement WAITING State [#9924](https://github.com/Applifier/unity-ads-webview/pull/9924)
+* Remove Unnecessary Banner Method [#9923](https://github.com/Applifier/unity-ads-webview/pull/9923)
+* Add Metrics for Failure Cases Before Ad Playback [#9893](https://github.com/Applifier/unity-ads-webview/pull/9893)
+
 # Wed May 29 20:29:52 UTC 2019
 
 * Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
