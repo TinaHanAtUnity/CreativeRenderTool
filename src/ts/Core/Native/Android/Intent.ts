@@ -6,12 +6,12 @@ export enum IntentFlag {
     FLAG_ACTIVITY_NEW_TASK = 268435456
 }
 
-export interface IntentExtra {
+export interface IIntentExtra {
     key: string;
     value: unknown;
 }
 
-export interface IntentData {
+export interface IIntentData {
     className?: string;
     packageName?: string;
     action?: string;
@@ -19,7 +19,7 @@ export interface IntentData {
     mimeType?: string;
     categories?: string[];
     flags?: number;
-    extras?: IntentExtra[];
+    extras?: IIntentExtra[];
     id?: string;
 }
 
@@ -29,15 +29,15 @@ export class IntentApi extends NativeApi {
         super(nativeBridge, 'Intent', ApiPackage.CORE);
     }
 
-    public launch(intentData: IntentData): Promise<void> {
+    public launch(intentData: IIntentData): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'launch', [intentData]);
     }
 
-    public canOpenIntent(intentData: IntentData): Promise<boolean> {
+    public canOpenIntent(intentData: IIntentData): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'canOpenIntent', [intentData]);
     }
 
-    public canOpenIntents(intents: IntentData[]): Promise<{ [id: string]: boolean }> {
+    public canOpenIntents(intents: IIntentData[]): Promise<{ [id: string]: boolean }> {
         return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._fullApiClassName, 'canOpenIntents', [intents]);
     }
 }
