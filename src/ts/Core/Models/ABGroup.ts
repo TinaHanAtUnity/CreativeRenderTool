@@ -67,5 +67,8 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 // Add actual A/B tests below
 export const ConsentTest = new ABTest(9, 10);
 export const OpenMeasurementTest = new DisabledABTest();
+<<<<<<< HEAD
 export const CTAV2Test = new ZyngaFilteredABTest(7, 8);
 export const ProgressBarAndSkipTest = new ZyngaFilteredABTest(5, 6);
+=======
+>>>>>>> parent of 48197bf7d... Merge pull request #9683 from Applifier/feature/early-cta-v2
