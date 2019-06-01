@@ -17,7 +17,7 @@ export enum DeviceIdStorageKeys {
 }
 
 export class DeviceIdManager {
-    private _core : ICoreApi;
+    private _core: ICoreApi;
     private _deviceInfo: AndroidDeviceInfo;
 
     constructor(core: ICoreApi, deviceInfo: AndroidDeviceInfo) {
