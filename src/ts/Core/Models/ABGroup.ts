@@ -68,4 +68,3 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 export const ConsentTest = new DisabledABTest();
 export const OpenMeasurementTest = new DisabledABTest();
 export const AnimationEndCardTest = new ZyngaFilteredABTest(7, 8);
-export const ProgressBarAndSkipTest = new ZyngaFilteredABTest(5, 6);
