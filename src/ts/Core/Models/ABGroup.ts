@@ -2,7 +2,7 @@ type ReferenceGroups = 0 | 1 | 2 | 3 | 4;
 type TreatmentGroups = 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19;
 export type ABGroup = ReferenceGroups | TreatmentGroups | -1 | 99;
 
-export function toAbGroup(group: number) : ABGroup {
+export function toAbGroup(group: number): ABGroup {
     if (group === 99) {
         return 99;
     }
