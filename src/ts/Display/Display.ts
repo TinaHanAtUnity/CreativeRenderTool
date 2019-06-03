@@ -4,14 +4,17 @@ import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/Programmat
 import { DisplayInterstitialAdUnitParametersFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitParametersFactory';
 import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class Display extends AbstractParserModule {
 
     constructor(core: ICore, ads: IAds) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const factory = new DisplayInterstitialAdUnitFactory(new DisplayInterstitialAdUnitParametersFactory(core, ads));
-        contentTypeHandlerMap[CampaignContentType.ProgrammaticHTMLStaticInterstitial] = {
+        contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeHtml] = {
+            parser: new ProgrammaticStaticInterstitialParser(core.NativeBridge.getPlatform()),
+            factory
+        };
+        contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeJs] = {
             parser: new ProgrammaticStaticInterstitialParser(core.NativeBridge.getPlatform()),
             factory
         };

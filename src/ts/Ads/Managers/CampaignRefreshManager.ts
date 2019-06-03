@@ -108,7 +108,7 @@ export class CampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
-    public subscribeNativePromoEvents(eventHandler : NativePromoEventHandler): void {
+    public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
         eventHandler.onClose.subscribe(() => {
             this._needsRefill = true;
             this.refresh();

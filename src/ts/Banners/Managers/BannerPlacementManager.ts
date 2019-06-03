@@ -23,12 +23,6 @@ export class BannerPlacementManager {
         });
     }
 
-    public sendBannersWaiting() {
-        Object.keys(this._placements).forEach((placementId) => {
-            this.setPlacementState(placementId, PlacementState.WAITING);
-        });
-    }
-
     public getPlacement(placementId: string): Placement | undefined {
         return this._placements[placementId];
     }

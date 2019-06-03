@@ -111,7 +111,7 @@
                 */
                 payload = event.data.payload;
                 const eventData = {
-                        adSessionId: event.data.sessionId,
+                        adSessionId: event.data.adSessionId,
                         timestamp: Date.now(),
                         type: stripEventString(event.data.type),
                         data: payload

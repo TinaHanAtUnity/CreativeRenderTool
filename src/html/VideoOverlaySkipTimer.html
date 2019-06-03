@@ -1,7 +1,23 @@
 <div class="content">
     <div class="top-container">
         <div class="left-corner">
-            <div class="skip-button button button-left">
+            <% if (!data._skipUnderTimerExperimentEnabled) { %>
+                <div class="skip-button button button-left">
+                    <div class="tab">
+                        <div class="icon-container">
+                            <span class="icon icon-skip"></span>
+                        </div>
+                        <div class="icon-container">
+                            <span class="icon icon-close"></span>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            <div class="china-advertisement">广告</div>
+        </div>
+        <div class="right-corner">
+            <% if (data._skipUnderTimerExperimentEnabled) { %>
+            <div class="skip-button button button-right">
                 <div class="tab">
                     <div class="icon-container">
                         <span class="icon icon-skip"></span>
@@ -11,9 +27,7 @@
                     </div>
                 </div>
             </div>
-            <div class="china-advertisement">广告</div>
-        </div>
-        <div class="right-corner">
+            <% } %>
             <div class="timer-button button button-right">
                 <div class="tab">
                     <div class="timer-container">
@@ -29,7 +43,7 @@
             <%= data.t("Buffering") %>
         </div>
     </div>
-    <div class="bottom-container bottom-container-ctav2">
+    <div class="bottom-container">
         <div class="left-corner">
             <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
                 <div class="tab">
@@ -60,31 +74,12 @@
         </div>
         <div class="right-corner">
             <% if (data.showInstallButton) { %>
-                <div class="install-button install-button-ctav2 call-button call-button-ctav2 button button-bottom button-right">
+                <div class="install-button call-button button button-bottom button-right">
                     <div class="tab">
                         <div class="download-wrapper">
                             <div class="game-icon" style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "" ) %>')"></div>
-                            <div class="game-title">
-                                <span class="game-title-text"><%= data.gameName %></span>
-                                <span class="game-rating">
-                                    <span class="game-rating-stars-top" style="width: <%= data.rating %>%">
-                                        <span class="icon-star first-icon-star"></span>
-                                        <span class="icon-star"></span>
-                                        <span class="icon-star"></span> 
-                                        <span class="icon-star"></span>
-                                        <span class="icon-star"></span>
-                                    </span>
-                                    <span class="game-rating-stars-bottom">
-                                        <span class="icon-star first-icon-star"></span>
-                                        <span class="icon-star"></span>
-                                        <span class="icon-star"></span>
-                                        <span class="icon-star"></span>
-                                        <span class="icon-star"></span>
-                                    </span>
-                                </span>
-                            </div>
                             <div class="download-container">
-                                <span class="download-text"><%= data.t("Get") %></span>
+                                <span class="download-text"><%= data.t("Install Now") %></span>
                             </div>
                         </div>
                     </div>

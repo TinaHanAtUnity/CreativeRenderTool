@@ -1,5 +1,37 @@
-# Staged
+# Pending
 
+* Remove Early CTA V2 experiment [#9925](https://github.com/Applifier/unity-ads-webview/pull/9925)
+* ESLint prefer-interface [#9896](https://github.com/Applifier/unity-ads-webview/pull/9896)
+* ESLint interface-name-prefix [#9898](https://github.com/Applifier/unity-ads-webview/pull/9898)
+* ESLint type-annotation-spacing [#9895](https://github.com/Applifier/unity-ads-webview/pull/9895)
+* Fix game ids to be Android version for MRAIDWebPlayerTest [#9956](https://github.com/Applifier/unity-ads-webview/pull/9956)
+
+# Fri May 31 16:55:24 UTC 2019
+
+* Disable Consent A/B test [#9926](https://github.com/Applifier/unity-ads-webview/pull/9926)
+* Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
+* Separate VideoPlayerVolume from DeviceVolume Open Measurement [#9764](https://github.com/Applifier/unity-ads-webview/pull/9764)
+* Add XInstall test creativeids and gameids for testing MRAID Webplayer [#9922](https://github.com/Applifier/unity-ads-webview/pull/9922)
+* Remove Banner Placement WAITING State [#9924](https://github.com/Applifier/unity-ads-webview/pull/9924)
+* Remove Unnecessary Banner Method [#9923](https://github.com/Applifier/unity-ads-webview/pull/9923)
+* Add Metrics for Failure Cases Before Ad Playback [#9893](https://github.com/Applifier/unity-ads-webview/pull/9893)
+
+# Wed May 29 20:29:52 UTC 2019
+
+* Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
+* ESLint Investigation [#9610](https://github.com/Applifier/unity-ads-webview/pull/9610)
+* Remove unnecessary china tracking id kibana logs [#9814](https://github.com/Applifier/unity-ads-webview/pull/9814)
+* Enable IMEI collection for SDK 3.1.0+ [#9788](https://github.com/Applifier/unity-ads-webview/pull/9788)
+* Move Creation of VastParserStricts to Constructors [#9812](https://github.com/Applifier/unity-ads-webview/pull/9812)
+* Disable Vast Endcards Lacking Impressions Part 2 [#9813](https://github.com/Applifier/unity-ads-webview/pull/9813)
+
+# Tue May 28 15:00:00 UTC 2019
+
+* Revert "Merge pull request #9765 from Applifier/add/all-content-types (incident-20190528)
+
+# Mon May 27 10:00:42 UTC 2019
+
+* Add temporary custom Kafka event to performance video overlay download [#9841](https://github.com/Applifier/unity-ads-webview/pull/9841)
 * Consent AB test: Decrease font sizes to see the effect of the smaller font size [#9818](https://github.com/Applifier/unity-ads-webview/pull/9818)
 
 # Thu May 23 22:27:28 UTC 2019

@@ -29,11 +29,11 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
-import { VideoOverlayCTAV2 } from 'Ads/Views/VideoOverlayCTAV2';
-import { CTAV2Test, AnimationEndCardTest, ABGroup } from 'Core/Models/ABGroup';
+import { AnimationEndCardTest, ProgressBarAndSkipTest, ABGroup } from 'Core/Models/ABGroup';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
+import { ProgressBarAndSkipVideoOverlay } from 'Ads/Views/ProgressBarAndSkipVideoOverlay';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -220,8 +220,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         const abGroup = parameters.coreConfig.getAbGroup();
         if (AnimationEndCardTest.isValid(abGroup)) {
             overlay = new AnimatedVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else if (CTAV2Test.isValid(abGroup)) {
-            overlay = new VideoOverlayCTAV2(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        } else if (ProgressBarAndSkipTest.isValid(abGroup)) {
+            overlay = new ProgressBarAndSkipVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
