@@ -3,9 +3,6 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { ProgressBarAndSkipTest } from 'Core/Models/ABGroup';
-import { Placement } from 'Ads/Models/Placement';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -95,10 +92,6 @@ export class CustomFeatures {
         } else {
             return false;
         }
-    }
-
-    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
-        return ProgressBarAndSkipTest.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
     }
 
     public static shouldSampleAtTenPercent(): boolean {
