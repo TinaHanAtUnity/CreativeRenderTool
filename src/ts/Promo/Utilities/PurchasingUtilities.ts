@@ -200,7 +200,7 @@ export class PurchasingUtilities {
         }
     }
 
-    private static getPurchasingAdapter() : Promise<IPurchasingAdapter> {
+    private static getPurchasingAdapter(): Promise<IPurchasingAdapter> {
         if (this._coreConfig.getTestMode()) {
             return Promise.resolve().then(() => {
                 this._core.Sdk.logInfo('TestMode delegate is set');

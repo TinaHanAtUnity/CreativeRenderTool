@@ -11,8 +11,8 @@ module.exports = {
   rules: {
     'no-multiple-empty-lines': ['error', {'max': 1, 'maxEOF': 1}],
     'eol-last': ['error', 'always'],
-
-    '@typescript-eslint/interface-name-prefix': ['off', 'always'], // TODO
+    '@typescript-eslint/interface-name-prefix': ['error', 'always'],
+    
     '@typescript-eslint/explicit-function-return-type': ['off'], // TODO
     '@typescript-eslint/explicit-member-accessibility': ['off'], // TODO
     '@typescript-eslint/no-non-null-assertion': ['off'], // TODO
@@ -23,7 +23,6 @@ module.exports = {
     '@typescript-eslint/no-object-literal-type-assertion': ['off'], // TODO
     '@typescript-eslint/no-unused-vars': ['off'], // TODO
     '@typescript-eslint/no-explicit-any': ['off'], // TODO
-    '@typescript-eslint/type-annotation-spacing': ['off'], // TODO
     '@typescript-eslint/indent': ['off'], // TODO
     '@typescript-eslint/no-inferrable-types': ['off'], // TODO
     '@typescript-eslint/ban-types': ['off'], // TODO
