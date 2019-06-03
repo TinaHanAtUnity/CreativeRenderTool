@@ -52,7 +52,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
-    protected _timerElement: HTMLElement;
+    private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
