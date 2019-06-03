@@ -161,7 +161,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
         return urls ? urls[eventType] : undefined;
     }
 
-    public getTargetGameId() : number | undefined {
+    public getTargetGameId(): number | undefined {
         return this.get('targetGameId');
     }
 
