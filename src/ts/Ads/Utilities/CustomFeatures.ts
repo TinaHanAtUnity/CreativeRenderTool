@@ -17,7 +17,6 @@ const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
 const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
 const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
 const LionStudiosGameIds = JsonStringArrayParser(LionStudiosGamesJson);
-const BannerRefreshDisabledId = '2962474';
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -111,7 +110,7 @@ export class CustomFeatures {
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
-        if (gameId === BannerRefreshDisabledId) {
+        if (gameId === '2962474') {
             return true;
         } else {
             return false;

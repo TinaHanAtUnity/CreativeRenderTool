@@ -94,7 +94,11 @@ export class BannerAdContext {
             return this.loadBannerAdUnit().catch((e) => {
                 if (e instanceof NoFillError) {
                     this.sendBannerError(new Error(`Banner placement ${placementId} returned no fill`));
-                    this.setUpBannerRefresh();
+                    if (CustomFeatures.shouldDisableBannerRefresh(this._clientInfo.getGameId())) {
+                        // Do not refresh
+                    } else {
+                        this.setUpBannerRefresh();
+                    }
                 }
                 throw e;
             });
