@@ -11,7 +11,7 @@ const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
-export const BannerRefreshDisabledId = '2962474';
+const BannerRefreshDisabledId = '2962474';
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
