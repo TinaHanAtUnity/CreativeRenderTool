@@ -6,6 +6,7 @@
 * ESLint interface-name-prefix [#9898](https://github.com/Applifier/unity-ads-webview/pull/9898)
 * ESLint type-annotation-spacing [#9895](https://github.com/Applifier/unity-ads-webview/pull/9895)
 * Fix game ids to be Android version for MRAIDWebPlayerTest [#9956](https://github.com/Applifier/unity-ads-webview/pull/9956)
+* Use Correct ConnectionNeeded Metric [#9959](https://github.com/Applifier/unity-ads-webview/pull/9956)
 
 # Fri May 31 16:55:24 UTC 2019
 
