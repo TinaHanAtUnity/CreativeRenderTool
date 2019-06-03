@@ -3,9 +3,6 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { ProgressBarAndSkipTest } from 'Core/Models/ABGroup';
-import { Placement } from 'Ads/Models/Placement';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -96,10 +93,6 @@ export class CustomFeatures {
         }
     }
 
-    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
-        return ProgressBarAndSkipTest.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
-    }
-
     public static shouldSampleAtTenPercent(): boolean {
         // will only return true when Math.random returns 1
         if (Math.floor(Math.random() * 10) % 10 === 1) {
@@ -118,16 +111,16 @@ export class CustomFeatures {
     }
 
     public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {
-        return this.isMRAIDWebPlayerGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
+        return this.isMRAIDWebPlayerAndroidGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
     }
 
-    private static isMRAIDWebPlayerGamesTest(gameId: string) {
-        return gameId === '1789728' ||
-               gameId === '1373395' ||
-               gameId === '2950247' ||
-               gameId === '2950185' ||
-               gameId === '2639272' ||
-               gameId === '1300960';
+    private static isMRAIDWebPlayerAndroidGamesTest(gameId: string) {
+        return gameId === '1789727' ||      // ru.iprado.spot
+               gameId === '1373394' ||      // pl.idreams.Dino
+               gameId === '2950248' ||      // com.game5mobile.lineandwater
+               gameId === '2950184' ||      // com.game5mobile.popular
+               gameId === '2639270' ||      // com.ohmgames.paperplane
+               gameId === '1300959';        // com.sadpuppy.lemmings
     }
 
     private static isMRAIDWebPlayerCreativesTest(creativeId: string | undefined) {

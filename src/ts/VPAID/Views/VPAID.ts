@@ -10,7 +10,7 @@ import VPAIDContainerTemplate from 'html/vpaid/container.html';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
-interface InitAdOptions {
+interface IInitAdOptions {
     width: number;
     height: number;
     viewMode: string;
@@ -127,12 +127,12 @@ export class VPAID extends View<IVPAIDHandler> {
         });
     }
 
-    private getInitAdOptions(): Promise<InitAdOptions> {
+    private getInitAdOptions(): Promise<IInitAdOptions> {
         return Promise.all([
             this._core.DeviceInfo.getScreenWidth(),
             this._core.DeviceInfo.getScreenHeight()
         ]).then(([width, height]) => {
-                return <InitAdOptions>{
+                return <IInitAdOptions>{
                     width: width,
                     height: height,
                     bitrate: 500,

@@ -416,7 +416,7 @@ export class OperativeEventManager {
                 };
             }
 
-            const trackingIDs : Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+            const trackingIDs: Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
             Object.assign(infoJson, trackingIDs);
 
             infoJson.videoOrientation = params.videoOrientation;
