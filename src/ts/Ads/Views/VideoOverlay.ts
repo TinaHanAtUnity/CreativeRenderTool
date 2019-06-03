@@ -31,7 +31,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _showGDPRBanner: boolean;
 
     private _ads: IAdsApi;
-    private _localization: Localization;
+    protected _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
 
@@ -52,7 +52,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
-    private _timerElement: HTMLElement;
+    protected _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
@@ -60,7 +60,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _gameId: string;
 
     private _country: string | undefined;
-    private _campaign: Campaign;
+    protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
 

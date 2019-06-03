@@ -123,7 +123,7 @@ describe('EndScreenEventHandlerTest', () => {
             const video = new Video('', TestFixtures.getSession());
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, false, false);
-            const endScreenParams : IEndScreenParameters = {
+            const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
                 language : deviceInfo.getLanguage(),
@@ -287,7 +287,7 @@ describe('EndScreenEventHandlerTest', () => {
             describe('device is using china SDK ', () => {
                 let downloadManager: DownloadManager;
                 let deviceIdManager: DeviceIdManager;
-                let china : IChinaApi;
+                let china: IChinaApi;
 
                 beforeEach(() => {
                     china = TestFixtures.getChinaApi(nativeBridge);
@@ -993,7 +993,7 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-            const endScreenParams : IEndScreenParameters = {
+            const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
                 language : deviceInfo.getLanguage(),
