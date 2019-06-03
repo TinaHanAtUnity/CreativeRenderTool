@@ -31,8 +31,6 @@ import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
-import { ProgressBarAndSkipTest } from 'Core/Models/ABGroup';
-import { ProgressBarAndSkipVideoOverlay } from 'Ads/Views/ProgressBarAndSkipVideoOverlay';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -215,13 +213,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     }
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
-        let overlay: VideoOverlay;
-        const abGroup = parameters.coreConfig.getAbGroup();
-        if (ProgressBarAndSkipTest.isValid(abGroup)) {
-            overlay = new ProgressBarAndSkipVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else {
-            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        }
+        const overlay: VideoOverlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);
