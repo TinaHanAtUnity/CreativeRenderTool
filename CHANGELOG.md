@@ -1,5 +1,6 @@
 # Pending
 
+* Remove Combine skip under timer and progress bar experiment [#9958](https://github.com/Applifier/unity-ads-webview/pull/9958)
 * Remove Early CTA V2 experiment [#9925](https://github.com/Applifier/unity-ads-webview/pull/9925)
 * ESLint prefer-interface [#9896](https://github.com/Applifier/unity-ads-webview/pull/9896)
 * ESLint interface-name-prefix [#9898](https://github.com/Applifier/unity-ads-webview/pull/9898)
