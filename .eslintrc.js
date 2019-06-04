@@ -1,14 +1,19 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint',
+    '@typescript-eslint/tslint',
+  ],
   extends: [
     'plugin:@typescript-eslint/recommended',
   ],
   parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: 'module'
+    project: 'tsconfig.json',
   },
   rules: {
+    '@typescript-eslint/tslint/config': ['error', {
+      'lintFile': './tslint.json'
+    }],
     '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     
     '@typescript-eslint/explicit-function-return-type': ['off'], // TODO
