@@ -110,7 +110,6 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
-    private _consentWasSanitizedOnInit: boolean = false;
 
     private _core: ICore;
     private _store: IStore;
@@ -121,9 +120,7 @@ export class Ads implements IAds {
     public China: China;
 
     constructor(config: unknown, core: ICore, store: IStore) {
-        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, () => {
-            this._consentWasSanitizedOnInit = true;
-        });
+        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
         this._core = core;
         this._store = store;
 
@@ -174,7 +171,7 @@ export class Ads implements IAds {
         }).then(() => {
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
 
-            if (this._consentWasSanitizedOnInit) {
+            if (AdsConfigurationParser.isUpdateUserPrivacyForIncidentNeeded()) {
                 this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.SANITIZATION);
             }
 

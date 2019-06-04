@@ -6,7 +6,8 @@ import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class AdsConfigurationParser {
-    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, updateUserPrivacyForIncidentCB?: () => void): AdsConfiguration {
+    private static _updateUserPrivacyForIncident: boolean = false;
+    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
@@ -32,16 +33,9 @@ export class AdsConfigurationParser {
             throw Error('No default placement in configuration response');
         }
 
-        if (configJson.userPrivacy) {
-            const uPP = configJson.userPrivacy.permissions;
-            if (((uPP.hasOwnProperty('profiling') && (<IProfilingPermissions>uPP).profiling === false) ||
-                (uPP.hasOwnProperty('ads') && (<IGranularPermissions>uPP).ads === false)) &&
-                (configJson.optOutRecorded === true && configJson.optOutEnabled === false)) {
-                configJson.optOutEnabled = true;
-                if (updateUserPrivacyForIncidentCB) {
-                    updateUserPrivacyForIncidentCB();
-                }
-            }
+        if (this.isUserPrivacyAndOptOutDesynchronized(configJson)) {
+            configJson.optOutEnabled = true;
+            this._updateUserPrivacyForIncident = true;
         }
 
         const configurationParams: IAdsConfiguration = {
@@ -57,6 +51,28 @@ export class AdsConfigurationParser {
         };
 
         return new AdsConfiguration(configurationParams);
+    }
+
+    // For #incident-20190516-2
+    public static isUpdateUserPrivacyForIncidentNeeded(): boolean {
+        return this._updateUserPrivacyForIncident;
+    }
+
+    // For #incident-20190516-2
+    private static isUserPrivacyAndOptOutDesynchronized(configJson: IRawAdsConfiguration) {
+        if (!configJson.userPrivacy) {
+            return false;
+        }
+        if (!configJson.optOutRecorded) {
+            return false;
+        }
+        const uPP = configJson.userPrivacy.permissions;
+        const configProfiling = uPP.hasOwnProperty('profiling') && (<IProfilingPermissions>uPP).profiling;
+        const configAds = uPP.hasOwnProperty('ads') && (<IGranularPermissions>uPP).ads;
+        if (!configProfiling && !configAds) {
+            return false;
+        }
+        return !configJson.optOutEnabled;
     }
 
     private static parseGamePrivacy(configJson: IRawAdsConfiguration) {
@@ -87,7 +103,7 @@ export class AdsConfigurationParser {
             configJson.gamePrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
                 return new UserPrivacy({
                     method: configJson.gamePrivacy.method,
-                    version: configJson.userPrivacy ? configJson.userPrivacy.version : 0,
+                    version: 0,
                     permissions: {
                         all: false,
                         gameExp: false,
