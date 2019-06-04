@@ -46,11 +46,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
 
-        if (ConsentTest.isValid(parameters.abGroup)) {
-            this._landingPage = ConsentPage.HOMEPAGE;
-        } else {
-            this._landingPage = ConsentPage.HOMESCREEN;
-        }
+        this._landingPage = ConsentPage.HOMESCREEN;
 
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
