@@ -1,12 +1,12 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class AdsConfigurationParser {
-    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, updateUserPrivacyForIncidentCB?: () => {}): AdsConfiguration {
+    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, updateUserPrivacyForIncidentCB?: () => void): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
@@ -30,6 +30,18 @@ export class AdsConfigurationParser {
 
         if (!defaultPlacement) {
             throw Error('No default placement in configuration response');
+        }
+
+        if (configJson.userPrivacy) {
+            const uPP = configJson.userPrivacy.permissions;
+            if (((uPP.hasOwnProperty('profiling') && (<IProfilingPermissions>uPP).profiling === false) ||
+                (uPP.hasOwnProperty('ads') && (<IGranularPermissions>uPP).ads === false)) &&
+                (configJson.optOutRecorded === true && configJson.optOutEnabled === false)) {
+                configJson.optOutEnabled = true;
+                if (updateUserPrivacyForIncidentCB) {
+                    updateUserPrivacyForIncidentCB();
+                }
+            }
         }
 
         const configurationParams: IAdsConfiguration = {
@@ -62,31 +74,27 @@ export class AdsConfigurationParser {
     }
 
     private static parseUserPrivacy(configJson: IRawAdsConfiguration) {
-        if (!configJson.gamePrivacy) {
-            // This would be an unexpected case, LI is necessary not the correct option, but this makes sure we show at
-            // least contextual ads
-            return new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: {
+        if (!configJson.gamePrivacy || !configJson.userPrivacy) {
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
                     all: false,
                     gameExp: false,
-                    ads: !configJson.optOutEnabled,
+                    ads: false,
                     external: false
-                }});
+            }});
         }
-        if (!configJson.userPrivacy) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
-        }
+
         if (configJson.gamePrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST ||
             configJson.gamePrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
-            return new UserPrivacy({
-                method: configJson.gamePrivacy.method,
-                version: configJson.userPrivacy ? configJson.userPrivacy.version : 0,
-                permissions: {
-                    all: false,
-                    gameExp: false,
-                    ads: !configJson.optOutEnabled,
-                    external: false
-                }
-            });
+                return new UserPrivacy({
+                    method: configJson.gamePrivacy.method,
+                    version: configJson.userPrivacy ? configJson.userPrivacy.version : 0,
+                    permissions: {
+                        all: false,
+                        gameExp: false,
+                        ads: !configJson.optOutEnabled,
+                        external: false
+                    }
+                });
         }
         return new UserPrivacy(configJson.userPrivacy);
     }
