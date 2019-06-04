@@ -41,4 +41,4 @@ slackjson=$(cat <<EOF
 }
 EOF
 )
-curl -X POST -H 'Content-type: application/json' --data "$slackjson" https://hooks.slack.com/services/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
+curl -X POST -H 'Content-type: application/json' --data "$slackjson" https://hooks.slack.com/services/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

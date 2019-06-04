@@ -26,7 +26,7 @@ while IFS= read -r release
     sleep 1
 done <"$releases"
 
-curl -X POST -H 'Content-type: application/json' --data '{"attachments":[{"text":"Ads SDK Deployment has been reverted. :frowning:","color":"danger"}]}' https://hooks.slack.com/services/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
+curl -X POST -H 'Content-type: application/json' --data '{"attachments":[{"text":"Ads SDK Deployment has been reverted. :frowning:","color":"danger"}]}' https://hooks.slack.com/services/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
 curl -X POST -H 'Content-type: application/json' --data '{"attachments":[{"text":"Ads SDK Deployment has been reverted. :frowning:","color":"danger"}]}' https://hooks.slack.com/services/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
 
 echo "Get yourself a nice bottle of tequila. 🥃✨🥃"
