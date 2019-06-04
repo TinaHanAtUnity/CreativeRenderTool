@@ -15,7 +15,6 @@ describe('MOAT', () => {
         beforeEach(() => {
             const nativeBridge = sinon.createStubInstance(NativeBridge);
             const sdk: SdkApi = sinon.createStubInstance(SdkApi);
-            const placement: Placement = sinon.createStubInstance(Placement);
             nativeBridge.Sdk = sdk;
             logWarningStub = <sinon.SinonStub> sdk.logWarning;
 
