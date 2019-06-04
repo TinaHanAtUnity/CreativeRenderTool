@@ -109,6 +109,14 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
+    public static shouldDisableBannerRefresh(gameId: string): boolean {
+        if (gameId === '2962474') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {
         return this.isMRAIDWebPlayerAndroidGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
     }
