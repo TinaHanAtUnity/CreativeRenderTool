@@ -2,6 +2,7 @@
 
 * Change SDK Bot Webhook Endpoint [#9961](https://github.com/Applifier/unity-ads-webview/pull/9961)
 * ESLint : no-use-before-define [#9894](https://github.com/Applifier/unity-ads-webview/pull/9894)
+* Disable Banner Refresh for GameID 2962474 [#9953](https://github.com/Applifier/unity-ads-webview/pull/9953)
 
 # Mon Jun  3 21:23:43 UTC 2019
 
