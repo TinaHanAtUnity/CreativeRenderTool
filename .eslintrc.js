@@ -9,6 +9,8 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
+    'no-multiple-empty-lines': ['error', {'max': 1, 'maxEOF': 1}],
+    'eol-last': ['error', 'always'],
     '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     
     '@typescript-eslint/explicit-function-return-type': ['off'], // TODO
