@@ -254,13 +254,11 @@ export class CampaignManager {
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
         const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
-        let deviceFreeSpace: number;
 
-        return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, false, undefined, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, false, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
-            // tslint:disable-next-line
-            deviceFreeSpace = (<any>requestBody).deviceFreeSpace; // todo: figure out cleaner way to pass this data
             const body = JSON.stringify(requestBody);
+            this._deviceFreeSpace = deviceFreeSpace;
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
