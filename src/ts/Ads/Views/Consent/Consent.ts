@@ -173,6 +173,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             myChoicesElement.classList.add('show-back-button');
         }
 
+        if (this._isABTest) {
+            const homeScreenContainer = (<HTMLElement>this._container.querySelector('#consent-homescreen'));
+            homeScreenContainer.classList.add(('cta-style-abtest'));
+        }
+
         this.showPage(this._landingPage);
     }
 
