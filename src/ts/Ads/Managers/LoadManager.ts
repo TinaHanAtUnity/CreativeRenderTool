@@ -15,7 +15,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 
-interface ILoadEvent {
+export interface ILoadEvent {
     value: string;
     ts: number;
 }
