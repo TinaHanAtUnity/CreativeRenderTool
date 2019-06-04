@@ -89,7 +89,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-        const endScreenParams : IEndScreenParameters = {
+        const endScreenParams: IEndScreenParameters = {
             platform,
             core,
             language : deviceInfo.getLanguage(),

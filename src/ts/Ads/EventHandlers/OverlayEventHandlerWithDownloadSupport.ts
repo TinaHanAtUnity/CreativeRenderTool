@@ -15,7 +15,7 @@ export interface IVideoOverlayDownloadParameters extends IStoreHandlerDownloadPa
 
 export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends OverlayEventHandler<T> {
 
-    private _storeHandler: IStoreHandler;
+    protected _storeHandler: IStoreHandler;
     private _overlay: AbstractVideoOverlay | undefined;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
@@ -42,13 +42,13 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
         this.setCallButtonEnabled(true);
     }
 
-    private setCallButtonEnabled(enabled: boolean): void {
+    protected setCallButtonEnabled(enabled: boolean): void {
         if (this._overlay) {
             this._overlay.setCallButtonEnabled(enabled);
         }
     }
 
-    private getOperativeEventParams(parameters: IVideoOverlayDownloadParameters): IOperativeEventParams {
+    protected getOperativeEventParams(parameters: IVideoOverlayDownloadParameters): IOperativeEventParams {
         return {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),

@@ -8,17 +8,19 @@ export interface IContentTypeHandler {
     factory: AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>>;
 }
 
-export type ContentTypeHandlerMapType = { [key: string]: IContentTypeHandler };
+export interface IContentTypeHandlerMapType { 
+    [key: string]: IContentTypeHandler;
+};
 
 export abstract class AbstractParserModule {
 
-    protected readonly _contentTypeHandlerMap: ContentTypeHandlerMapType;
+    protected readonly _contentTypeHandlerMap: IContentTypeHandlerMapType;
 
-    protected constructor(contentTypeHandlerMap: ContentTypeHandlerMapType) {
+    protected constructor(contentTypeHandlerMap: IContentTypeHandlerMapType) {
         this._contentTypeHandlerMap = contentTypeHandlerMap;
     }
 
-    public getContentTypeHandlerMap(): ContentTypeHandlerMapType {
+    public getContentTypeHandlerMap(): IContentTypeHandlerMapType {
         return this._contentTypeHandlerMap;
     }
 
