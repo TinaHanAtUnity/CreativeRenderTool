@@ -1,11 +1,18 @@
 # Pending
 
+* Change SDK Bot Webhook Endpoint [#9961](https://github.com/Applifier/unity-ads-webview/pull/9961)
+* ESLint : no-use-before-define [#9894](https://github.com/Applifier/unity-ads-webview/pull/9894)
+* Disable Banner Refresh for GameID 2962474 [#9953](https://github.com/Applifier/unity-ads-webview/pull/9953)
+
+# Mon Jun  3 21:23:43 UTC 2019
+
 * Remove Combine skip under timer and progress bar experiment [#9958](https://github.com/Applifier/unity-ads-webview/pull/9958)
 * Remove Early CTA V2 experiment [#9925](https://github.com/Applifier/unity-ads-webview/pull/9925)
 * ESLint prefer-interface [#9896](https://github.com/Applifier/unity-ads-webview/pull/9896)
 * ESLint interface-name-prefix [#9898](https://github.com/Applifier/unity-ads-webview/pull/9898)
 * ESLint type-annotation-spacing [#9895](https://github.com/Applifier/unity-ads-webview/pull/9895)
 * Fix game ids to be Android version for MRAIDWebPlayerTest [#9956](https://github.com/Applifier/unity-ads-webview/pull/9956)
+* Use Correct ConnectionNeeded Metric [#9959](https://github.com/Applifier/unity-ads-webview/pull/9956)
 
 # Fri May 31 16:55:24 UTC 2019
 

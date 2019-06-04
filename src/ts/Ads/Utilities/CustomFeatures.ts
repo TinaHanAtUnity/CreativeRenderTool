@@ -4,12 +4,7 @@ import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 
-const CheetahGameIds = setGameIds(CheetahGamesJson);
-const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const Game7GameIds = setGameIds(Game7GamesJson);
-const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
-
-function setGameIds(gameIdJson: string): string[] {
+const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
     try {
         gameIds = JSON.parse(gameIdJson);
@@ -17,7 +12,11 @@ function setGameIds(gameIdJson: string): string[] {
         gameIds = [];
     }
     return gameIds;
-}
+};
+const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
+const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
+const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
+const LionStudiosGameIds = JsonStringArrayParser(LionStudiosGamesJson);
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -108,6 +107,14 @@ export class CustomFeatures {
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
         return this.existsInList(LionStudiosGameIds, gameId);
+    }
+
+    public static shouldDisableBannerRefresh(gameId: string): boolean {
+        if (gameId === '2962474') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {

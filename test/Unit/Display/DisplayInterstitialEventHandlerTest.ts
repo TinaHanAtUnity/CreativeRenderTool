@@ -42,10 +42,6 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
 
-    describe('on Display Interstitial Markup Campaign', () => {
-        eventHandlerTests();
-    });
-
     function eventHandlerTests() {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
@@ -123,6 +119,10 @@ describe('DisplayInterstitialEventHandler', () => {
             displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
             view.addEventHandler(displayInterstitialEventHandler);
             return displayInterstitialAdUnit.show();
+        });
+
+        describe('on Display Interstitial Markup Campaign', () => {
+            eventHandlerTests();
         });
 
         afterEach(() => {
