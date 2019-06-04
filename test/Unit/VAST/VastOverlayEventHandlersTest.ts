@@ -276,6 +276,8 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 vastOverlayEventHandler.onOverlayMute(true);
                 sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 0);
                 sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
                 sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
@@ -284,6 +286,8 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 vastOverlayEventHandler.onOverlayMute(false);
                 sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
                 sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 1);
             });
