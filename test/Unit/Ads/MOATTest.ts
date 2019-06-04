@@ -18,7 +18,9 @@ describe('MOAT', () => {
             const placement: Placement = sinon.createStubInstance(Placement);
             nativeBridge.Sdk = sdk;
             logWarningStub = <sinon.SinonStub> sdk.logWarning;
-            moat = new MOAT(Platform.ANDROID, nativeBridge, placement);
+
+            const muteVideo = true;
+            moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
             diagnosticsTriggerStub = sinon.stub(Diagnostics, 'trigger');
         });
 

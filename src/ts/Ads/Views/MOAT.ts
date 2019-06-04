@@ -7,7 +7,6 @@ import { View } from 'Core/Views/View';
 import MOATTemplate from 'html/MOAT.html';
 import MOATContainer from 'html/moat/container.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { Placement } from 'Ads/Models/Placement';
 
 export enum MoatState {
     PLAYING,
@@ -28,13 +27,13 @@ export class MOAT extends View<VastCampaign> {
     private _state: MoatState = MoatState.STOPPED;
     private _playerVolume: number;
 
-    constructor(platform: Platform, core: ICoreApi, placement: Placement) {
+    constructor(platform: Platform, core: ICoreApi, muteVideo: boolean) {
         super(platform, 'moat');
         this._template = new Template(MOATTemplate);
         this._core = core;
         this._bindings = [];
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
-        this._playerVolume = placement.muteVideo() ? 0 : 1;
+        this._playerVolume = muteVideo ? 0 : 1;
     }
 
     public setPlayerVolume(playerVolume: number) {
