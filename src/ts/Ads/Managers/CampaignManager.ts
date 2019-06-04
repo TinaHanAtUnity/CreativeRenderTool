@@ -638,15 +638,24 @@ export class CampaignManager {
                                 trackingUrls: trackingUrls
                             };
                         } else {
+                            SessionDiagnostics.trigger('load_campaign_missing_tracking_urls', {}, campaign.getSession());
                             return undefined;
                         }
                     }).catch(() => {
+                        SessionDiagnostics.trigger('load_campaign_failed_caching_setup', {}, campaign.getSession());
                         return undefined;
                     });
                 } else {
+                    Diagnostics.trigger('load_campaign_undefined_campaign', {});
                     return undefined;
                 }
             }).catch(() => {
+                Diagnostics.trigger('load_campaign_parse_failure', {
+                    creativeID: parser.creativeID,
+                    seatID: parser.seatID,
+                    campaignID: parser.campaignID
+                });
+                // TODO: Report to CreativeBlockingService after production testing
                 return undefined;
             });
         } else {
