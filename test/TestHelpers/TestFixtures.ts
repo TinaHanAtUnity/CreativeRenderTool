@@ -164,6 +164,7 @@ import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
+import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -520,7 +521,7 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
+    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean, limitedTimeOffer?: ILimitedTimeOffer): IPromoCampaign {
         const session = this.getSession();
         const costProductInfoList: ProductInfo[] = [];
         const payoutProductInfoList: ProductInfo[] = [];
@@ -544,7 +545,7 @@ export class TestFixtures {
         return {
             ... this.getCampaignBaseParams(session, json.promo.id, json.meta, adType),
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
-            limitedTimeOffer: undefined,
+            limitedTimeOffer: limitedTimeOffer ? new LimitedTimeOffer(limitedTimeOffer) : undefined,
             costs: costProductInfoList,
             payouts: payoutProductInfoList,
             premiumProduct: new ProductInfo(premiumProduct),
@@ -553,9 +554,9 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaign(adType?: string, rewardedPromo?: boolean): PromoCampaign {
+    public static getPromoCampaign(adType?: string, rewardedPromo?: boolean, timeLimitedOffer?: ILimitedTimeOffer): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
-        return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo));
+        return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo, timeLimitedOffer));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
