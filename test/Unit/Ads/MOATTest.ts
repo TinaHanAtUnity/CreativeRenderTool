@@ -4,6 +4,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import 'mocha';
+import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 describe('MOAT', () => {
@@ -60,6 +61,27 @@ describe('MOAT', () => {
                 moat.onMessage(test.event);
                 test.assertions();
             });
+        });
+    });
+
+    describe('MOAT player volume', () => {
+        let moat: any;
+        beforeEach(() => {
+            const nativeBridge = sinon.createStubInstance(NativeBridge);
+            const sdk: SdkApi = sinon.createStubInstance(SdkApi);
+            nativeBridge.Sdk = sdk;
+            const muteVideo = true;
+            moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
+        });
+
+        it('should have correct volume value from boolean pass', () => {
+            moat.render();
+            assert.equal(moat.getPlayerVolume(), 0);
+        });
+
+        it('should have correct volume value from setVolume pass', () => {
+            moat.setPlayerVolume(1);
+            assert.equal(moat.getPlayerVolume(), 1);
         });
     });
 });

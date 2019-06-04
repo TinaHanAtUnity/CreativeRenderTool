@@ -40,6 +40,10 @@ export class MOAT extends View<VastCampaign> {
         this._playerVolume = playerVolume;
     }
 
+    public getPlayerVolume() {
+        return this._playerVolume;
+    }
+
     public render(): void {
         super.render();
         const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
