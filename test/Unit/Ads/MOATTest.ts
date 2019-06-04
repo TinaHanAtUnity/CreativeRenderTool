@@ -5,7 +5,6 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import 'mocha';
 import * as sinon from 'sinon';
-import { Placement } from 'Ads/Models/Placement';
 
 describe('MOAT', () => {
     describe('onMessage', () => {
