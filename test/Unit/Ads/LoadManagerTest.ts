@@ -23,7 +23,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -162,24 +162,73 @@ describe('LoadManagerTest', () => {
                 });
             });
         });
+    });
 
-        describe('setCurrentAdUnit', () => {
-            let adUnit: AbstractAdUnit;
-            let placement: Placement;
+    describe('setCurrentAdUnit', () => {
+        it('should handle setting the current ad unit correctly', () => {
+            const adUnit = sinon.createStubInstance(AbstractAdUnit);
+            const placement = adsConfig.getPlacement('premium');
+            placement.setState(PlacementState.READY);
+            loadManager.setCurrentAdUnit(adUnit, placement);
+            assert.isUndefined(placement.getCurrentCampaign());
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE);
+        });
+    });
 
-            beforeEach(() => {
-                adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-                loadManager = new LoadManager(platform, core, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
-                adUnit = sinon.createStubInstance(AbstractAdUnit);
-                placement = adsConfig.getPlacement('premium');
-                placement.setState(PlacementState.READY);
-            });
+    describe('refresh', () => {
 
-            it('should handle setting the current ad unit correctly', () => {
-                loadManager.setCurrentAdUnit(adUnit, placement);
-                assert.isUndefined(placement.getCurrentCampaign());
-                assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE);
+        let placement: Placement;
+        let campaign: Campaign;
+
+        beforeEach(() => {
+            placement = adsConfig.getPlacement('premium');
+            campaign = TestFixtures.getCampaign();
+            placement.setState(PlacementState.READY);
+        });
+
+        it('should invalidate expired campaigns', () => {
+            campaign.set('willExpireAt', Date.now() - 1);
+            placement.setCurrentCampaign(campaign);
+
+            return loadManager.refresh().then((res) => {
+                assert.isUndefined(res, 'Promise should always resolve with undefined');
+                assert.isUndefined(placement.getCurrentCampaign(), 'Campaign for placement should be set to undefined');
+                assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'Placement State should be not available');
             });
         });
+
+        it('should not invalidate campaigns which haven\'t expired', () => {
+            campaign.set('willExpireAt', Date.now() + 100);
+            placement.setCurrentCampaign(campaign);
+
+            return loadManager.refresh().then((res) => {
+                assert.isUndefined(res, 'Promise should always resolve with undefined');
+                assert.equal(placement.getCurrentCampaign(), campaign, 'Campaign for placement should be set to undefined');
+                assert.equal(placement.getState(), PlacementState.READY, 'Placement State should be not available');
+            });
+        });
+    });
+
+    describe('refreshWithBackupCampaigns', () => {
+        // TODO
+    });
+
+    describe('shouldRefill', () => {
+        it('should always return false', () => {
+            const unusedTimestamp = 0;
+            assert.isFalse(loadManager.shouldRefill(unusedTimestamp));
+        });
+    });
+
+    describe('setPlacementState', () => {
+        // TODO
+    });
+
+    describe('sendPlacementStateChanges', () => {
+        // TODO
+    });
+
+    describe('refreshStoredLoads', () => {
+        // TODO
     });
 });
