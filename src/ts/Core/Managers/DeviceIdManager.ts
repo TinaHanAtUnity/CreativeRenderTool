@@ -86,6 +86,14 @@ export class DeviceIdManager {
      * @returns True if collecting device ID is okay, else false.
      */
     public isCompliant(country: string, isOptOutRecorded: boolean, isOptOutEnabled: boolean): boolean {
+        if (country === 'CN' && !this._deviceInfo.getAdvertisingIdentifier() && !this._deviceInfo.getLimitAdTracking() && this._deviceInfo instanceof AndroidDeviceInfo) {
+            Diagnostics.trigger('china_compliant_check', {
+                isOptOutRecorded: isOptOutRecorded,
+                isOptOutEnabled: isOptOutEnabled,
+                imei: this._deviceInfo.getDeviceId1()
+            });
+        }
+
         return country === 'CN'
             && !this._deviceInfo.getAdvertisingIdentifier()
             && !this._deviceInfo.getLimitAdTracking()
