@@ -1,3 +1,10 @@
+# Pending
+
+* ESLint : No multiple blank lines and end of file must have newline [#9952](https://github.com/Applifier/unity-ads-webview/pull/9952)
+* ESLint : semi rule enabled [#9949](https://github.com/Applifier/unity-ads-webview/pull/9949)
+* Log update for ad_ready/received and adding china imei log [#9990](https://github.com/Applifier/unity-ads-webview/pull/9990)
+ 
+
 # Tue Jun  4 16:35:13 UTC 2019
 
 * End card transition experiment [#9715](https://github.com/Applifier/unity-ads-webview/pull/9715)
