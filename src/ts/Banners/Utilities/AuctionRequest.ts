@@ -26,7 +26,6 @@ export interface IAuctionResponse {
     auctionId: string;
     placements: { [placementID: string]: string };
     media: { [mediaID: string]: IPlacementMedia };
-    realtimeData: { [placementID: string]: string };
 }
 
 export interface IPlacementMedia {
@@ -340,9 +339,6 @@ export class AuctionRequest {
             allowSkip: placement.allowSkip()
         };
 
-        if (placement.getRealtimeData()) {
-            dto.realtimeData = placement.getRealtimeData();
-        }
         return dto;
     }
 

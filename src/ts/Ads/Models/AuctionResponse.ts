@@ -13,7 +13,6 @@ export interface IRawAuctionResponse {
     correlationId: string;
     placements: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
-    realtimeData?: { [key: string]: string };
     statusCode?: number;
 }
 
@@ -21,16 +20,9 @@ export interface IRawAuctionV5Response {
     auctionId?: string;
     correlationId: string;
     placements: { [key: string]: { mediaId: string; trackingId: string } };
-    realtimeData?: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls | undefined };
     statusCode?: number;
-}
-
-export interface IRawRealtimeResponse {
-    correlationId: string;
-    placements: { [key: string]: string };
-    media: { [key: string]: IAuctionResponse };
 }
 
 export interface IAuctionResponse {
