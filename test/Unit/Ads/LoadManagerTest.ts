@@ -1,5 +1,3 @@
-import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
-import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
@@ -23,7 +21,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -64,12 +62,21 @@ describe('LoadManagerTest', () => {
     let campaignParserManager: ContentTypeHandlerManager;
 
     beforeEach(() => {
-        clientInfo = TestFixtures.getClientInfo();
         platform = Platform.ANDROID;
+        clientInfo = TestFixtures.getClientInfo();
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
+        adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
+        jaegerManager = sinon.createStubInstance(JaegerManager);
+
+        coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -77,27 +84,15 @@ describe('LoadManagerTest', () => {
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
         sessionManager = new SessionManager(core, request, storageBridge);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         backupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
-        campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-
-        adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
-        (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
-        (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-
-        jaegerManager = sinon.createStubInstance(JaegerManager);
-        coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
         loadManager = new LoadManager(platform, core, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
     });
 
-    describe('getCampaign', () => {
-
+    describe('getCampaign and refreshWithBackupCampaigns', () => {
         describe('without loading placement IDs', () => {
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig.getPlacementIds().forEach((placementId) => {
@@ -108,12 +103,12 @@ describe('LoadManagerTest', () => {
         });
 
         describe('with loading placement IDs', () => {
-
             let placementId: string;
             let loadEvent: ILoadEvent;
-            const sandbox = sinon.createSandbox();
+            let sandbox: sinon.SinonSandbox;
 
             beforeEach(() => {
+                sandbox = sinon.createSandbox();
                 placementId = 'premium';
                 loadEvent = {
                     value: placementId,
@@ -125,7 +120,6 @@ describe('LoadManagerTest', () => {
                 sandbox.stub(core.Storage, 'getKeys').callsFake(() => {
                     return Promise.resolve(adsConfig.getPlacementIds());
                 });
-                adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             });
 
             afterEach(() => {
@@ -176,7 +170,6 @@ describe('LoadManagerTest', () => {
     });
 
     describe('refresh', () => {
-
         let placement: Placement;
         let campaign: Campaign;
 
@@ -190,8 +183,8 @@ describe('LoadManagerTest', () => {
             campaign.set('willExpireAt', Date.now() - 1);
             placement.setCurrentCampaign(campaign);
 
-            return loadManager.refresh().then((res) => {
-                assert.isUndefined(res, 'Promise should always resolve with undefined');
+            return loadManager.refresh().then((resp) => {
+                assert.isUndefined(resp, 'Promise should always resolve with undefined');
                 assert.isUndefined(placement.getCurrentCampaign(), 'Campaign for placement should be set to undefined');
                 assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'Placement State should be not available');
             });
@@ -201,16 +194,12 @@ describe('LoadManagerTest', () => {
             campaign.set('willExpireAt', Date.now() + 100);
             placement.setCurrentCampaign(campaign);
 
-            return loadManager.refresh().then((res) => {
-                assert.isUndefined(res, 'Promise should always resolve with undefined');
+            return loadManager.refresh().then((resp) => {
+                assert.isUndefined(resp, 'Promise should always resolve with undefined');
                 assert.equal(placement.getCurrentCampaign(), campaign, 'Campaign for placement should be set to undefined');
                 assert.equal(placement.getState(), PlacementState.READY, 'Placement State should be not available');
             });
         });
-    });
-
-    describe('refreshWithBackupCampaigns', () => {
-        // TODO
     });
 
     describe('shouldRefill', () => {
@@ -220,15 +209,38 @@ describe('LoadManagerTest', () => {
         });
     });
 
-    describe('setPlacementState', () => {
-        // TODO
-    });
+    describe('setPlacementState and setPlacementStateChanges', () => {
+        let placement: Placement;
+        let sandbox: sinon.SinonSandbox;
+        const placementID = 'premium';
 
-    describe('sendPlacementStateChanges', () => {
-        // TODO
-    });
+        beforeEach(() => {
+            placement = adsConfig.getPlacement(placementID);
+            placement.setState(PlacementState.NOT_AVAILABLE);
+            sandbox = sinon.createSandbox();
+            sandbox.stub(ads.Listener, 'sendReadyEvent');
+            sandbox.stub(ads.Placement, 'setPlacementState');
+            sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
+        });
 
-    describe('refreshStoredLoads', () => {
-        // TODO
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should overwrite the placement state to ready', () => {
+            loadManager.setPlacementState(placementID, PlacementState.READY);
+            assert.isFalse(placement.getPlacementStateChanged(), 'placement state should not be unchanged after this point');
+            sandbox.assert.called((<sinon.SinonStub>ads.Listener.sendReadyEvent));
+            sandbox.assert.called((<sinon.SinonStub>ads.Placement.setPlacementState));
+            sandbox.assert.called((<sinon.SinonStub>ads.Listener.sendPlacementStateChangedEvent));
+        });
+
+        it('should not overwrite the placement state', () => {
+            loadManager.setPlacementState(placementID, PlacementState.NOT_AVAILABLE);
+            assert.isUndefined(placement.getPlacementStateChanged(), 'getPlacementStateChanged should not be defined at this point');
+            sandbox.assert.notCalled((<sinon.SinonStub>ads.Listener.sendReadyEvent));
+            sandbox.assert.notCalled((<sinon.SinonStub>ads.Placement.setPlacementState));
+            sandbox.assert.notCalled((<sinon.SinonStub>ads.Listener.sendPlacementStateChangedEvent));
+        });
     });
 });
