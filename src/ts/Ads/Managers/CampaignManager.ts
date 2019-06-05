@@ -108,8 +108,6 @@ export class CampaignManager {
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _realtimeUrl: string | undefined;
-    private _realtimeBody?: { [key: string]: unknown } = {};
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
@@ -152,7 +150,7 @@ export class CampaignManager {
 
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(requestPrivacy, countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(requestPrivacy, countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -627,18 +625,7 @@ export class CampaignManager {
         }
     }
 
-    private createRequestUrl(realtime: boolean, nofillRetry?: boolean, session?: Session): Promise<string> {
-
-        if (realtime && this._realtimeUrl) {
-            if (session) {
-                this._realtimeUrl = Url.addParameters(this._realtimeUrl, {
-                    auctionId: session.getId()
-                });
-            }
-            return Promise.resolve(this._realtimeUrl);
-        }
-        this._realtimeUrl = undefined;
-
+    private createRequestUrl(nofillRetry?: boolean, session?: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
         const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
@@ -712,37 +699,12 @@ export class CampaignManager {
                 connectionType: connectionType,
                 networkType: networkType
             });
-            this._realtimeUrl = url;
             return url;
         });
     }
 
-    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
+    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
-
-        if(realtimePlacement && this._realtimeBody) {
-
-            const placements = this._adsConfig.getPlacements();
-            for (const placement in placements) {
-                if (placements.hasOwnProperty(placement)) {
-                    placementRequest[placement] = {
-                        adTypes: placements[placement].getAdTypes(),
-                        allowSkip: placements[placement].allowSkip()
-                    };
-                }
-            }
-
-            return this._deviceInfo.getFreeSpace().then((freeSpace) => {
-                if(this._realtimeBody) {
-                    this._realtimeBody.deviceFreeSpace = freeSpace;
-                }
-                return this._realtimeBody;
-            }).catch((e) => {
-                // Try the request with the original request value anyways
-                return this._realtimeBody;
-            });
-        }
-        this._realtimeBody = undefined;
 
         const body: { [key: string]: unknown } = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -844,7 +806,6 @@ export class CampaignManager {
                 if(organizationId) {
                     body.organizationId = organizationId;
                 }
-                this._realtimeBody = body;
                 return body;
             });
         });
