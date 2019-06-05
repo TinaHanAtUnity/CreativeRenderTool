@@ -109,8 +109,7 @@ export class Ads implements IAds {
     private _showing: boolean = false;
     private _creativeUrl?: string;
     private _requestDelay: number;
-    private _wasRealtimePlacement: boolean = false;
-
+    
     private _core: ICore;
     private _store: IStore;
 
@@ -499,21 +498,6 @@ export class Ads implements IAds {
 
             OperativeEventManager.setPreviousPlacementId(this.CampaignManager.getPreviousPlacementId());
             this.CampaignManager.setPreviousPlacementId(placement.getId());
-
-            // Temporary for realtime testing purposes
-            if (this._wasRealtimePlacement) {
-                this._currentAdUnit.onStart.subscribe(() => {
-                    const startDelay = Date.now() - start;
-                    Diagnostics.trigger('realtime_delay', {
-                        requestDelay: this._requestDelay,
-                        startDelay: startDelay,
-                        totalDelay: this._requestDelay + startDelay,
-                        auctionId: campaign.getSession().getId(),
-                        adUnitDescription: this._currentAdUnit.description()
-                    });
-                });
-            }
-            this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
                 this.BackupCampaignManager.deleteBackupCampaigns();
