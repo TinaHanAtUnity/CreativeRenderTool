@@ -148,13 +148,6 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
     }
 }
 
-const pixelKeyToRGB = (pixelKey: number): number[] => {
-    const r = (pixelKey & 0xFF0000) >>> 16;
-    const g = (pixelKey & 0xFF00) >>> 8;
-    const b = pixelKey & 0xFF;
-    return [r, g, b];
-};
-
 class Box {
     private _minR: number;
     private _minG: number;
@@ -168,14 +161,11 @@ class Box {
     private _diffR: number;
     private _diffG: number;
     private _diffB: number;
-    private _colors: number[];
+    private _colors: number[][];
     private _volume: number;
     private _population: number;
-    private _histogram: { [id: number]: number };
 
-    constructor(colors: number[], histogram: { [id: number]: number }) {
-        this._histogram = histogram;
-
+    constructor(colors: number[][]) {
         this._minR = 256;
         this._minG = 256;
         this._minB = 256;
@@ -186,11 +176,9 @@ class Box {
         this._avgG = 0;
         this._avgB = 0;
 
-        const length = colors.length;
-
         let population = 0;
-        for (let i = 0; i < length; i ++) {
-            const [r, g, b] = pixelKeyToRGB(colors[i]);
+        for (const color of colors) {
+            const [r, g, b, colorPopulation] = color;
 
             if (r < this._minR) {
                 this._minR = r;
@@ -211,7 +199,6 @@ class Box {
                 this._maxB = b;
             }
 
-            const colorPopulation = histogram[colors[i]];
             population += colorPopulation;
 
             this._avgR += colorPopulation * r;
@@ -250,14 +237,14 @@ class Box {
             return [this];
         }
         const colorChannel = this.longestColorChannel();
-        const sortFn = (a: number, b: number) => pixelKeyToRGB(b)[colorChannel] - pixelKeyToRGB(a)[colorChannel];
+        const sortFn = (a: number[], b: number[]) => (b[colorChannel] - a[colorChannel]);
         const sortedColors = this._colors.sort(sortFn);
         const length = sortedColors.length;
         const splitPoint = Math.floor(length / 2);
 
         return [
-            new Box(sortedColors.slice(0, splitPoint), this._histogram),
-            new Box(sortedColors.slice(splitPoint, length - 1), this._histogram)
+            new Box(sortedColors.slice(0, splitPoint)),
+            new Box(sortedColors.slice(splitPoint, length - 1))
         ];
     }
 
@@ -344,8 +331,9 @@ class PQueue {
     }
 }
 
-function getHistogram(pixels: Uint8ClampedArray): { [id: number]: number } {
-    const histogram: { [id: number]: number } = {};
+function getHistogram(pixels: Uint8ClampedArray): number[][] {
+    const histogram: number[][] = [];
+    const histogramMap: { [id: number]: number[] } = {};
     const length: number = pixels.length;
 
     // Check every 5th pixel (4 channels) instead of scaling the canvas, since
@@ -353,25 +341,27 @@ function getHistogram(pixels: Uint8ClampedArray): { [id: number]: number } {
     for (let i = 0; i < length; i += 4 * 5) {
         // assuming we don't have transparent end screens, skip alpha channel
         const pixelKey: number = pixels[i] * 0x10000 + pixels[i + 1] * 0x100 + pixels[i + 2];
-        if (!histogram[pixelKey]) {
-            histogram[pixelKey] = 0;
+        let color = histogramMap[pixelKey];
+        if (!color) {
+            color = [pixels[i], pixels[i + 1], pixels[i + 2], 0];
+            histogramMap[pixelKey] = color;
+            histogram.push(color);
         }
-        histogram[pixelKey] += 1;
+        color[3] += 1;
     }
 
     return histogram;
 }
 
 function quantize(pixels: Uint8ClampedArray, maxColors: number): { swatches: Swatch[]; dominant: Swatch | undefined } {
-    const hist = getHistogram(pixels);
-    const colors = Object.keys(hist).map(Number);
+    const colors = getHistogram(pixels);
     const swatches = [];
     let dominantSwatch;
 
     if (colors.length <= maxColors) {
-        for(const pixelKey of colors) {
-            const rgb = pixelKeyToRGB(pixelKey);
-            const swatch = new Swatch(rgb, hist[pixelKey]);
+        for(const color of colors) {
+            const [r, g, b, population] = color;
+            const swatch = new Swatch([r, g, b], population);
             swatches.push(swatch);
             if (!dominantSwatch || swatch.population > dominantSwatch.population) {
                 dominantSwatch = swatch;
@@ -385,7 +375,7 @@ function quantize(pixels: Uint8ClampedArray, maxColors: number): { swatches: Swa
     }
 
     // split color space into boxes of ~equal size using median cut
-    const box = new Box(colors, hist);
+    const box = new Box(colors);
     const pq = new PQueue((a: Box, b: Box) => b.volume() - a.volume());
 
     pq.push(box);
