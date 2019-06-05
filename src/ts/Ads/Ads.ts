@@ -329,7 +329,7 @@ export class Ads implements IAds {
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
-        if (!this._core.FocusManager.isAppForeground()) {
+        if (!this._core.FocusManager.isAppForeground() && CustomFeatures.shouldSampleAtTenPercent()) {
             Diagnostics.trigger('ad_shown_in_background', {});
         }
 
