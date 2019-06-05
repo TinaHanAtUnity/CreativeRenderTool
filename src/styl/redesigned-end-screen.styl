@@ -14,7 +14,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     .btn-close-region {
       $close-button-default($scale-size);
       padding: $scale-size * $default-size * .25;
-      top: -0.5em;
+      top: -0.5 * $endscreen-default-size;
       right: 0;
     }
 
@@ -31,11 +31,11 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .pop-up-container {
-        width: calc(100% - 2em);
-        height: calc(100% - 1.5em);
-        margin: .75em 1em;
+        width: 'calc(100% - 2 * %s)' % $endscreen-default-size;
+        height: 'calc(100% - 1.5 * %s)' % $endscreen-default-size;
+        margin: .75 * $endscreen-default-size 1 * $endscreen-default-size;
         box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-        border-radius: .75em;
+        border-radius: .75 * $endscreen-default-size;
     }
 
     .download-container {
@@ -198,12 +198,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .game-image {
-        border-radius: 1em 1em 0 0;
+        border-radius: 1 * $endscreen-default-size 1 * $endscreen-default-size 0 0;
       }
 
       .game-icon {
         position: absolute;
-        top: -1.5em;
+        top: -1.5 * $endscreen-default-size;
       }
 
       .end-screen-info-background {
@@ -222,15 +222,15 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       @media (orientation: portrait) {
           @media (max-height: 460px) {
               .pop-up-container {
-                height: calc(100% - 3.55em);
+                height: 'calc(100% - 3.55 * %s)' % $endscreen-default-size;
 
                 .icon-close {
-                  font-size: 1.5em;
+                  font-size: 1.5 * $endscreen-default-size;
                 }
 
                 .btn-close-region {
-                  top: -0.5em;
-                  right: -0.3em;
+                  top: -0.5 * $endscreen-default-size;
+                  right: -0.3 * $endscreen-default-size;
                 }
               }
 
@@ -307,7 +307,7 @@ body {
     .end-screen-info-background {
       width: 100%;
       height: 31%;
-      border-radius: 0 0 .75em .75em;
+      border-radius: 0 0 .75 * $endscreen-default-size .75 * $endscreen-default-size;
     }
 
     .game-icon {
@@ -319,8 +319,8 @@ body {
     }
 
     .btn-close-region {
-      right: 0.3em;
-      top: -0.3em;
+      right: 0.3 * $endscreen-default-size;
+      top: -0.3 * $endscreen-default-size;
     }
   }
 
@@ -358,14 +358,14 @@ body {
 
     .campaign-container {
       display: flex;
-      border-radius: .75em;
+      border-radius: .75 * $endscreen-default-size;
     }
 
     .end-screen-info-background {
       width: 50%;
       height: 100%;
       text-align: center;
-      border-radius: 0 .75em .75em 0;
+      border-radius: 0 .75 * $endscreen-default-size .75 * $endscreen-default-size 0;
     }
 
     .gdpr-pop-up {
@@ -393,7 +393,7 @@ body {
     width: 100%;
     height: 100%;
     background: $white;
-    border-radius: .75em;
+    border-radius: .75 * $endscreen-default-size;
   }
 
   .game-background {
