@@ -10,142 +10,74 @@ const BACKGROUND_MIN_BRIGHTNESS = 0.85;
 const BUTTON_BRIGHTNESS = 0.4;
 const GAME_NAME_BRIGHTNESS = 0.25;
 
-type ColorTheme = {
+interface IColorTheme {
     light: number[];
     medium: number[];
     dark: number[];
 };
 
-export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
-    private _coreApi: ICoreApi;
-    private _performanceCampaign: PerformanceCampaign;
-    private _image: Asset | undefined;
+// https://en.wikipedia.org/wiki/HSL_and_HSV
+function RGBToHSL(r: number, g: number, b: number): number[] {
+    const rf = r / 255;
+    const gf = g / 255;
+    const bf = b / 255;
 
-    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
-        super(parameters, campaign, country);
+    const max = Math.max(rf, gf, bf);
+    const min = Math.min(rf, gf, bf);
+    const chroma = max - min;
 
-        this._performanceCampaign = campaign;
-        this._coreApi = parameters.core;
+    const l = (max + min) / 2;
+    let hue = 0;
+    let saturation = 0;
+
+    if (max === min) {
+        hue = 0;
+    } else if (max === rf) {
+        hue = (gf - bf) / chroma;
+    } else if (max === gf) {
+        hue = ((bf - rf) / chroma) + 2;
+    } else if (max === bf) {
+        hue = ((rf - gf) / chroma) + 4;
     }
 
-    public render(): void {
-        super.render();
+    hue = (hue * 60 + 360) % 360;
 
-        const squareImage = this._performanceCampaign.getSquare();
-        const landscapeImage = this._performanceCampaign.getLandscape();
-        const portraitImage = this._performanceCampaign.getPortrait();
-
-        const deviceInfo = this._coreApi.DeviceInfo;
-        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()])
-        .then(([screenWidth, screenHeight]) => {
-            const isLandscape = screenWidth > screenHeight;
-            let image;
-            if (squareImage) {
-                image = squareImage;
-            } else if (isLandscape && portraitImage) {
-                image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
-            } else if (landscapeImage) {
-                image = landscapeImage;
-            } else {
-                image = portraitImage;
-            }
-
-            if (image) {
-                this.getImagePixelData(image).then((rgbaData: Uint8ClampedArray) => {
-                    const swatches = quantize(rgbaData, PALETTE_COLOR_COUNT);
-                    if (!swatches || !swatches.dominant) {
-                        this.sendKafkaEvent('invalid_swatches');
-                        return;
-                    }
-
-                    const colorTheme = swatches.dominant.getColorTheme();
-                    this.applyColorTheme(colorTheme);
-                }).catch((msg: string) => {
-                    this.sendKafkaEvent(msg);
-                });
-            }
-        });
+    if (l > 0 && l < 1) {
+        saturation = chroma / (1 - Math.abs(max + min - 1));
     }
 
-    private applyColorTheme(colorTheme: ColorTheme): void {
-        const { light, medium, dark } = colorTheme;
-        if (!light || !medium || !dark) {
-            this.sendKafkaEvent('invalid_theme');
-            return;
-        }
+    return [hue, saturation, l];
+}
 
-        const backgroundElement: HTMLElement | null = this._container.querySelector('.end-screen-info-background');
-        const downloadContainer: HTMLElement | null = this._container.querySelector('.download-container');
-        const gameNameContainer: HTMLElement | null = this._container.querySelector('.name-container');
-        const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
-        const privacyIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-gdpr');
-        const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .unityads-logo');
+function HSLToRGB(h: number, s: number, l: number): number[] {
+    const chroma = (1 - Math.abs(l * 2 - 1)) * s;
+    const tmpH = (h / 60);
+    const x = chroma * (1 - Math.abs((tmpH % 2) - 1));
+    const m = l - chroma / 2;
 
-        if (backgroundElement && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer) {
-            backgroundElement.style.backgroundColor = `rgb(${light.join(',')})`;
-            downloadContainer.style.background = `rgb(${medium.join(',')})`;
-            gameNameContainer.style.color = `rgb(${dark.join(',')})`;
-            gameRatingContainer.style.color = `rgb(${dark.join(',')})`;
-            privacyIconContainer.style.color = `rgb(${dark.join(',')})`;
-            unityIconContainer.style.color = `rgb(${dark.join(',')})`;
-        }
+    let rgb = [0, 0, 0];
+
+    if (h === 0) {
+        rgb = [0, 0, 0];
+    } else if (tmpH >= 0 && tmpH <= 1) {
+        rgb = [chroma, x, 0];
+    } else if (tmpH >= 1 && tmpH <= 2) {
+        rgb = [x, chroma, 0];
+    } else if (tmpH >= 2 && tmpH <= 3) {
+        rgb = [0, chroma, x];
+    } else if (tmpH >= 3 && tmpH <= 4) {
+        rgb = [0, x, chroma];
+    } else if (tmpH >= 4 && tmpH <= 5) {
+        rgb = [x, 0, chroma];
+    } else if (tmpH >= 5 && tmpH <= 6) {
+        rgb = [chroma, 0, x];
     }
 
-    private getImagePixelData(asset: Asset): Promise<Uint8ClampedArray> {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+    rgb[0] = Math.round((rgb[0] + m) * 0xFF);
+    rgb[1] = Math.round((rgb[1] + m) * 0xFF);
+    rgb[2] = Math.round((rgb[2] + m) * 0xFF);
 
-            img.addEventListener('load', () => {
-                if (ctx) {
-                    const { width, height } = img;
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    const imgData = ctx.getImageData(0, 0, width, height);
-                    resolve(imgData.data);
-                } else {
-                    reject('context_failed');
-                }
-            });
-
-            img.addEventListener('error', () => {
-                reject('image_load_failed');
-            });
-
-            this.getImageSrc(asset).then((src: string) => {
-                img.crossOrigin = 'Anonymous';
-                img.src = src;
-            });
-        });
-    }
-
-    private getImageSrc(asset: Asset): Promise<string> {
-        return new Promise((resolve) => {
-            const fileId = asset.getFileId();
-            const originalUrl = asset.getOriginalUrl();
-            const imageExt = originalUrl.split('.').pop();
-
-            if(fileId) {
-                this._coreApi.Cache.getFileContent(fileId, 'Base64').then((res: string) => {
-                    resolve(`data:image/${imageExt};base64,${res}`);
-                }).catch(() => {
-                    resolve(originalUrl);
-                });
-            } else {
-                resolve(originalUrl);
-            }
-        });
-    }
-
-    private sendKafkaEvent(message: string) {
-        const kafkaObject: { [key: string]: unknown } = {};
-        kafkaObject.type = 'color_tinting_data';
-        kafkaObject.auctionId = this._performanceCampaign.getSession().getId();
-        kafkaObject.message = message;
-        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
-    }
+    return rgb;
 }
 
 class Box {
@@ -295,7 +227,7 @@ class Swatch {
         return this._hsl;
     }
 
-    public getColorTheme(): ColorTheme {
+    public getColorTheme(): IColorTheme {
         const hsl = this.hsl();
         const lightColor = HSLToRGB(hsl[0], hsl[1], Math.max(hsl[2], BACKGROUND_MIN_BRIGHTNESS));
         const mediumColor = HSLToRGB(hsl[0], hsl[1], BUTTON_BRIGHTNESS);
@@ -415,66 +347,134 @@ function quantize(pixels: Uint8ClampedArray, maxColors: number): { swatches: Swa
     };
 }
 
-// https://en.wikipedia.org/wiki/HSL_and_HSV
-function RGBToHSL(r: number, g: number, b: number): number[] {
-    const rf = r / 255;
-    const gf = g / 255;
-    const bf = b / 255;
+export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
+    private _coreApi: ICoreApi;
+    private _performanceCampaign: PerformanceCampaign;
+    private _image: Asset | undefined;
 
-    const max = Math.max(rf, gf, bf);
-    const min = Math.min(rf, gf, bf);
-    const chroma = max - min;
+    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+        super(parameters, campaign, country);
 
-    const l = (max + min) / 2;
-    let hue = 0;
-    let saturation = 0;
-
-    if (max === min) {
-        hue = 0;
-    } else if (max === rf) {
-        hue = (gf - bf) / chroma;
-    } else if (max === gf) {
-        hue = ((bf - rf) / chroma) + 2;
-    } else if (max === bf) {
-        hue = ((rf - gf) / chroma) + 4;
+        this._performanceCampaign = campaign;
+        this._coreApi = parameters.core;
     }
 
-    hue = (hue * 60 + 360) % 360;
+    public render(): void {
+        super.render();
 
-    if (l > 0 && l < 1) {
-        saturation = chroma / (1 - Math.abs(max + min - 1));
+        const squareImage = this._performanceCampaign.getSquare();
+        const landscapeImage = this._performanceCampaign.getLandscape();
+        const portraitImage = this._performanceCampaign.getPortrait();
+
+        const deviceInfo = this._coreApi.DeviceInfo;
+        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()])
+        .then(([screenWidth, screenHeight]) => {
+            const isLandscape = screenWidth > screenHeight;
+            let image;
+            if (squareImage) {
+                image = squareImage;
+            } else if (isLandscape && portraitImage) {
+                image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
+            } else if (landscapeImage) {
+                image = landscapeImage;
+            } else {
+                image = portraitImage;
+            }
+
+            if (image) {
+                this.getImagePixelData(image).then((rgbaData: Uint8ClampedArray) => {
+                    const swatches = quantize(rgbaData, PALETTE_COLOR_COUNT);
+                    if (!swatches || !swatches.dominant) {
+                        this.sendKafkaEvent('invalid_swatches');
+                        return;
+                    }
+
+                    const colorTheme = swatches.dominant.getColorTheme();
+                    this.applyColorTheme(colorTheme);
+                }).catch((msg: string) => {
+                    this.sendKafkaEvent(msg);
+                });
+            }
+        });
     }
 
-    return [hue, saturation, l];
-}
+    private applyColorTheme(colorTheme: IColorTheme): void {
+        const { light, medium, dark } = colorTheme;
+        if (!light || !medium || !dark) {
+            this.sendKafkaEvent('invalid_theme');
+            return;
+        }
 
-function HSLToRGB(h: number, s: number, l: number): number[] {
-    const chroma = (1 - Math.abs(l * 2 - 1)) * s;
-    const tmpH = (h / 60);
-    const x = chroma * (1 - Math.abs((tmpH % 2) - 1));
-    const m = l - chroma / 2;
+        const backgroundElement: HTMLElement | null = this._container.querySelector('.end-screen-info-background');
+        const downloadContainer: HTMLElement | null = this._container.querySelector('.download-container');
+        const gameNameContainer: HTMLElement | null = this._container.querySelector('.name-container');
+        const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
+        const privacyIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-gdpr');
+        const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .unityads-logo');
 
-    let rgb = [0, 0, 0];
-
-    if (h === 0) {
-        rgb = [0, 0, 0];
-    } else if (tmpH >= 0 && tmpH <= 1) {
-        rgb = [chroma, x, 0];
-    } else if (tmpH >= 1 && tmpH <= 2) {
-        rgb = [x, chroma, 0];
-    } else if (tmpH >= 2 && tmpH <= 3) {
-        rgb = [0, chroma, x];
-    } else if (tmpH >= 3 && tmpH <= 4) {
-        rgb = [0, x, chroma];
-    } else if (tmpH >= 4 && tmpH <= 5) {
-        rgb = [x, 0, chroma];
-    } else if (tmpH >= 5 && tmpH <= 6) {
-        rgb = [chroma, 0, x];
+        if (backgroundElement && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer) {
+            backgroundElement.style.backgroundColor = `rgb(${light.join(',')})`;
+            downloadContainer.style.background = `rgb(${medium.join(',')})`;
+            gameNameContainer.style.color = `rgb(${dark.join(',')})`;
+            gameRatingContainer.style.color = `rgb(${dark.join(',')})`;
+            privacyIconContainer.style.color = `rgb(${dark.join(',')})`;
+            unityIconContainer.style.color = `rgb(${dark.join(',')})`;
+        }
     }
 
-    rgb[0] = Math.round((rgb[0] + m) * 0xFF);
-    rgb[1] = Math.round((rgb[1] + m) * 0xFF);
-    rgb[2] = Math.round((rgb[2] + m) * 0xFF);
+    private getImagePixelData(asset: Asset): Promise<Uint8ClampedArray> {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
 
-    return rgb;
+            img.addEventListener('load', () => {
+                if (ctx) {
+                    const { width, height } = img;
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const imgData = ctx.getImageData(0, 0, width, height);
+                    resolve(imgData.data);
+                } else {
+                    reject('context_failed');
+                }
+            });
+
+            img.addEventListener('error', () => {
+                reject('image_load_failed');
+            });
+
+            this.getImageSrc(asset).then((src: string) => {
+                img.crossOrigin = 'Anonymous';
+                img.src = src;
+            });
+        });
+    }
+
+    private getImageSrc(asset: Asset): Promise<string> {
+        return new Promise((resolve) => {
+            const fileId = asset.getFileId();
+            const originalUrl = asset.getOriginalUrl();
+            const imageExt = originalUrl.split('.').pop();
+
+            if(fileId) {
+                this._coreApi.Cache.getFileContent(fileId, 'Base64').then((res: string) => {
+                    resolve(`data:image/${imageExt};base64,${res}`);
+                }).catch(() => {
+                    resolve(originalUrl);
+                });
+            } else {
+                resolve(originalUrl);
+            }
+        });
+    }
+
+    private sendKafkaEvent(message: string) {
+        const kafkaObject: { [key: string]: unknown } = {};
+        kafkaObject.type = 'color_tinting_data';
+        kafkaObject.auctionId = this._performanceCampaign.getSession().getId();
+        kafkaObject.message = message;
+        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+    }
 }
