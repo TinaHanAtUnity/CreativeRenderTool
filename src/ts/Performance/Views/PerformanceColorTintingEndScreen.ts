@@ -24,20 +24,6 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
 
-        const squareImage = campaign.getSquare();
-        const landscapeImage = campaign.getLandscape();
-        const portraitImage = campaign.getPortrait();
-
-        let image;
-        if (squareImage) {
-            image = squareImage;
-        } else if (landscapeImage) {
-            image = landscapeImage;
-        } else if (portraitImage) {
-            image = portraitImage;
-        }
-
-        this._image = image;
         this._performanceCampaign = campaign;
         this._coreApi = parameters.core;
     }
@@ -45,20 +31,40 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
     public render(): void {
         super.render();
 
-        if (this._image) {
-            this.getImagePixelData(this._image).then((rgbaData: Uint8ClampedArray) => {
-                const swatches = quantize(rgbaData, PALETTE_COLOR_COUNT);
-                if (!swatches || !swatches.dominant) {
-                    this.sendKafkaEvent('invalid_swatches');
-                    return;
-                }
+        const squareImage = this._performanceCampaign.getSquare();
+        const landscapeImage = this._performanceCampaign.getLandscape();
+        const portraitImage = this._performanceCampaign.getPortrait();
 
-                const colorTheme = swatches.dominant.getColorTheme();
-                this.applyColorTheme(colorTheme);
-            }).catch((msg: string) => {
-                this.sendKafkaEvent(msg);
-            });
-        }
+        const deviceInfo = this._coreApi.DeviceInfo;
+        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()])
+        .then(([screenWidth, screenHeight]) => {
+            const isLandscape = screenWidth > screenHeight;
+            let image;
+            if (squareImage) {
+                image = squareImage;
+            } else if (isLandscape && portraitImage) {
+                image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
+            } else if (landscapeImage) {
+                image = landscapeImage;
+            } else {
+                image = portraitImage;
+            }
+
+            if (image) {
+                this.getImagePixelData(image).then((rgbaData: Uint8ClampedArray) => {
+                    const swatches = quantize(rgbaData, PALETTE_COLOR_COUNT);
+                    if (!swatches || !swatches.dominant) {
+                        this.sendKafkaEvent('invalid_swatches');
+                        return;
+                    }
+
+                    const colorTheme = swatches.dominant.getColorTheme();
+                    this.applyColorTheme(colorTheme);
+                }).catch((msg: string) => {
+                    this.sendKafkaEvent(msg);
+                });
+            }
+        });
     }
 
     private applyColorTheme(colorTheme: ColorTheme): void {
