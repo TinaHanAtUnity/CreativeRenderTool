@@ -149,7 +149,7 @@ export class MOAT extends View<VastCampaign> {
                 type: 'videoEvent',
                 data: {
                     type: type,
-                    adVolume: this._playerVolume,
+                    adVolume: this.getPlayerVolume(),
                     volume: volume
                 }
             }, '*');

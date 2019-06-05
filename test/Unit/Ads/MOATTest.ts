@@ -64,6 +64,29 @@ describe('MOAT', () => {
         });
     });
 
+    describe('MOAT placement mute', () => {
+        let moat: any;
+        it('should have correct volume after initialization: 0', () => {
+           const nativeBridge = sinon.createStubInstance(NativeBridge);
+           const sdk: SdkApi = sinon.createStubInstance(SdkApi);
+           nativeBridge.Sdk = sdk;
+           const muteVideo = true;
+
+           moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
+           assert.equal(moat.getPlayerVolume(), 0);
+       });
+
+        it('should have correct volume after initialization: 1', () => {
+           const nativeBridge = sinon.createStubInstance(NativeBridge);
+           const sdk: SdkApi = sinon.createStubInstance(SdkApi);
+           nativeBridge.Sdk = sdk;
+           const muteVideo = false;
+
+           moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
+           assert.equal(moat.getPlayerVolume(), 1);
+       });
+   });
+
     describe('MOAT player volume', () => {
         let moat: any;
         beforeEach(() => {
@@ -71,6 +94,7 @@ describe('MOAT', () => {
             const sdk: SdkApi = sinon.createStubInstance(SdkApi);
             nativeBridge.Sdk = sdk;
             const muteVideo = true;
+
             moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
         });
 
