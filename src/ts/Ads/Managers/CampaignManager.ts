@@ -150,7 +150,6 @@ export class CampaignManager {
 
         this._requesting = true;
 
-        this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
         return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(requestPrivacy, countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
@@ -220,25 +219,6 @@ export class CampaignManager {
         });
     }
 
-    public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getPrivacy(), session.getGameSessionCounters(), false, placement)]).then(([requestUrl, requestBody]) => {
-            this._core.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
-            const body = JSON.stringify(requestBody);
-            return this._request.post(requestUrl, body, [], {
-                retries: 0,
-                retryDelay: 0,
-                followRedirects: false,
-                retryWithConnectionEvents: false,
-                timeout: 2000
-            }).then(response => {
-                if(response) {
-                    return this.parseRealtimeCampaign(response, session, placement);
-                }
-                throw new WebViewError('Empty realtime campaign response', 'CampaignRequestError');
-            });
-        });
-    }
-
     public setPreviousPlacementId(id: string | undefined) {
         this._previousPlacementId = id;
     }
@@ -252,13 +232,6 @@ export class CampaignManager {
             return campaignKeys;
         }).catch(() => {
             return [];
-        });
-    }
-
-    public resetRealtimeDataForPlacements() {
-        const placements = this._adsConfig.getPlacements();
-        Object.keys(placements).forEach((placementId) => {
-            placements[placementId].setRealtimeData(undefined);
         });
     }
 
@@ -310,10 +283,6 @@ export class CampaignManager {
                         this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId);
                     } else {
                         noFill.push(placement);
-                    }
-
-                    if(json.realtimeData && json.realtimeData[placement]) {
-                        this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
                     }
                 }
             }
@@ -458,10 +427,6 @@ export class CampaignManager {
                     } else {
                         noFill.push(placement);
                     }
-
-                    if(json.realtimeData && json.realtimeData[placement]) {
-                        this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
-                    }
                 }
             }
         }
@@ -514,32 +479,6 @@ export class CampaignManager {
         }
 
         return Promise.all(promises);
-    }
-
-    private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
-        const json = JsonParser.parse<IRawRealtimeResponse>(response.response);
-
-        if('placements' in json) {
-            const mediaId: string = json.placements[placement.getId()];
-
-            if(mediaId) {
-                const oldCampaign = placement.getCurrentCampaign();
-
-                if(oldCampaign && oldCampaign.getMediaId() === mediaId) {
-                    return Promise.resolve(oldCampaign);
-                }
-
-                const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement.getId(), mediaId);
-                const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
-
-                return this.handleRealtimeCampaign(auctionResponse, session);
-            } else {
-                return Promise.resolve(); // no fill
-            }
-        } else {
-            this._core.Sdk.logError('No placements found in realtime campaign json.');
-            return Promise.resolve();
-        }
     }
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
@@ -630,18 +569,6 @@ export class CampaignManager {
                     campaignErrorHandler.handleCampaignError(warning);
                 }
             }
-        });
-    }
-
-    private handleRealtimeCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
-        this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-
-        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
-
-        return parser.parse(response, session).then((campaign) => {
-            campaign.setMediaId(response.getMediaId());
-
-            return campaign;
         });
     }
 
@@ -801,12 +728,6 @@ export class CampaignManager {
                         allowSkip: placements[placement].allowSkip()
                     };
                 }
-            }
-
-            if(realtimePlacement.getRealtimeData()) {
-                const realtimeDataObject: { [key: string]: string | undefined } = {};
-                realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
-                this._realtimeBody.realtimeData = realtimeDataObject;
             }
 
             return this._deviceInfo.getFreeSpace().then((freeSpace) => {
