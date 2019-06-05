@@ -1,25 +1,19 @@
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { LoadManager, ILoadEvent } from 'Ads/Managers/LoadManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { RefreshManager } from 'Ads/Managers/RefreshManager';
+import { ILoadEvent, LoadManager } from 'Ads/Managers/LoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -40,11 +34,9 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
-import { IStoreApi } from 'Store/IStore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { TestContainer } from 'Unit/Ads/CampaignRefreshManagerTests';
 
-xdescribe('LoadManagerTest', () => {
+describe('LoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
@@ -56,27 +48,20 @@ xdescribe('LoadManagerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let store: IStoreApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
-    let thirdPartyEventManager: ThirdPartyEventManager;
-    let container: AdUnitContainer;
     let loadManager: LoadManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
-    let adUnitParams: IAdUnitParameters<Campaign>;
-    let operativeEventManager: OperativeEventManager;
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
     let jaegerManager: JaegerManager;
-    let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let backupCampaignManager: BackupCampaignManager;
     let campaignParserManager: ContentTypeHandlerManager;
-    let privacy: AbstractPrivacy;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -85,15 +70,12 @@ xdescribe('LoadManagerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        store = TestFixtures.getStoreApi(nativeBridge);
-        privacy = sinon.createStubInstance(AbstractPrivacy);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
         metaDataManager = new MetaDataManager(core);
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
@@ -102,52 +84,11 @@ xdescribe('LoadManagerTest', () => {
         backupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-        container = new TestContainer();
-        const campaign = TestFixtures.getCampaign();
-        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-            platform,
-            core,
-            ads,
-            request: request,
-            metaDataManager: metaDataManager,
-            sessionManager: sessionManager,
-            clientInfo: clientInfo,
-            deviceInfo: deviceInfo,
-            coreConfig: coreConfig,
-            adsConfig: adsConfig,
-            storageBridge: storageBridge,
-            campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
-        });
+
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        adUnitParams = {
-            platform,
-            core,
-            ads,
-            store,
-            forceOrientation: Orientation.NONE,
-            focusManager: focusManager,
-            container: container,
-            deviceInfo: deviceInfo,
-            clientInfo: clientInfo,
-            thirdPartyEventManager: thirdPartyEventManager,
-            operativeEventManager: operativeEventManager,
-            placement: TestFixtures.getPlacement(),
-            campaign: campaign,
-            coreConfig: coreConfig,
-            adsConfig: adsConfig,
-            request: request,
-            options: {},
-            privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
-            privacy: privacy
-        };
-
-        RefreshManager.ParsingErrorRefillDelayInSeconds = 0; // prevent tests from hanging due to long retry timeouts
         jaegerManager = sinon.createStubInstance(JaegerManager);
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
@@ -219,6 +160,25 @@ xdescribe('LoadManagerTest', () => {
                         assert.isUndefined(loadManager.getCampaign('banner'), 'Campaign with placementID \'banner\' was loaded incorrectly');
                     });
                 });
+            });
+        });
+
+        describe('setCurrentAdUnit', () => {
+            let adUnit: AbstractAdUnit;
+            let placement: Placement;
+
+            beforeEach(() => {
+                adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+                loadManager = new LoadManager(platform, core, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
+                adUnit = sinon.createStubInstance(AbstractAdUnit);
+                placement = adsConfig.getPlacement('premium');
+                placement.setState(PlacementState.READY);
+            });
+
+            it('should handle setting the current ad unit correctly', () => {
+                loadManager.setCurrentAdUnit(adUnit, placement);
+                assert.isUndefined(placement.getCurrentCampaign());
+                assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE);
             });
         });
     });
