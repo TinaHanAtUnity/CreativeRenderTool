@@ -107,7 +107,6 @@ export class CampaignManager {
     private _backupCampaignManager: BackupCampaignManager;
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
-    private _deviceConnectionType: string | undefined;
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
     private _realtimeBody?: { [key: string]: unknown } = {};
@@ -784,7 +783,6 @@ export class CampaignManager {
                 connectionType: connectionType,
                 networkType: networkType
             });
-            this._deviceConnectionType = connectionType;
             this._realtimeUrl = url;
             return url;
         });
