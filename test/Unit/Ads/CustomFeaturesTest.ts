@@ -1,6 +1,7 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -57,6 +58,30 @@ describe('CustomFeatures', () => {
         it('should return false if gameId is 99999', () => {
             const value = CustomFeatures.isCloseIconSkipEnabled('99999');
             assert.isFalse(value);
+        });
+    });
+
+    describe('isWhiteListedForLoadApi', () => {
+
+        const tests: {
+            abGroup: ABGroup;
+            gameId: string;
+        }[] = [{
+            abGroup: 14,
+            gameId: '1409248'
+        }, {
+            abGroup: 15,
+            gameId: '3097696'
+        }, {
+            abGroup: 15,
+            gameId: 'scott'
+        }];
+
+        tests.forEach(t => {
+            it('should return false since the AB Test is disabled', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId, t.abGroup);
+                assert.isFalse(value);
+            });
         });
     });
 });

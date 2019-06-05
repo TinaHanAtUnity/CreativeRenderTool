@@ -102,7 +102,7 @@ export class LoadManager extends RefreshManager {
         // todo: implement method or remove from parent class
     }
 
-    public refreshStoredLoads(): Promise<void> {
+    private refreshStoredLoads(): Promise<void> {
         return this.getStoredLoads().then(storedLoads => {
             this._adsConfig.getPlacementIds().forEach(placementId => {
                 if(!this._adsConfig.getPlacement(placementId).isBannerPlacement()) {
@@ -131,8 +131,6 @@ export class LoadManager extends RefreshManager {
     }
 
     private getStoredLoads(): Promise<string[]> {
-        const placements: string[] = [];
-
         return this._core.Storage.getKeys(StorageType.PUBLIC, 'load', false).then(keys => {
             if(keys && keys.length > 0) {
                 const promises = [];

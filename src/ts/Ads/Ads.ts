@@ -587,7 +587,7 @@ export class Ads implements IAds {
         return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
             if(mediation) {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
-                if(loadEnabled && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
+                if(loadEnabled &&  CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId(), this._core.Config.getAbGroup())) {
                     this._loadApiEnabled = true;
                 }
             }
