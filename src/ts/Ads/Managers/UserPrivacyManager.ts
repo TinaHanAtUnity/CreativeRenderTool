@@ -43,9 +43,9 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
-export interface IUserPrivacyStorageData { 
-    gdpr: { 
-        consent: { 
+export interface IUserPrivacyStorageData {
+    gdpr: {
+        consent: {
             value: unknown;
         };
     };

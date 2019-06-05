@@ -8,7 +8,7 @@ export interface IContentTypeHandler {
     factory: AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>>;
 }
 
-export interface IContentTypeHandlerMapType { 
+export interface IContentTypeHandlerMapType {
     [key: string]: IContentTypeHandler;
 };
 

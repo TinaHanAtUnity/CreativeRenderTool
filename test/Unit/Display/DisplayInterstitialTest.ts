@@ -82,5 +82,5 @@ describe('DisplayInterstitialTest', () => {
     describe('on Display Interstitial Markup Campaign', () => {
         viewUnitTests();
     });
-    
+
 });

@@ -52,9 +52,9 @@ export interface ICacheEvent {
     contentLength: number;
 }
 
-export interface ICachePauseStorageType { 
-    caching: { 
-        pause: { 
+export interface ICachePauseStorageType {
+    caching: {
+        pause: {
             value: boolean;
         };
     };
