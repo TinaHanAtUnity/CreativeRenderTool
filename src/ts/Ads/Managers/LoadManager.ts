@@ -21,7 +21,7 @@ export interface ILoadEvent {
 }
 
 export interface ILoadStorageEvent {
-    load: { [placementId: string]: ILoadEvent };
+    load?: { [placementId: string]: ILoadEvent };
 }
 
 export class LoadManager extends RefreshManager {
@@ -180,16 +180,18 @@ export class LoadManager extends RefreshManager {
     }
 
     private onStorageSet(event: ILoadStorageEvent) {
-        if(event && event.hasOwnProperty('load')) {
+        if(event && event.load && event.hasOwnProperty('load')) {
+            const loadedEvents = event.load;
             Object.keys(event.load).forEach(key => {
-                const loadEvent: ILoadEvent = event.load[key];
-                const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
+                if (loadedEvents[key]) {
+                    const loadEvent: ILoadEvent = loadedEvents[key];
+                    const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
 
-                if(placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
-                    this.loadPlacement(loadEvent.value);
-                    this.deleteStoredLoad(key);
+                    if (placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
+                        this.loadPlacement(loadEvent.value);
+                        this.deleteStoredLoad(key);
+                    }
                 }
-
             });
         }
     }
