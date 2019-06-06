@@ -85,6 +85,7 @@ import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import AuctionV5Response from 'json/AuctionV5Response.json';
+import LoadedCampaignResponse from 'json/LoadedCampaignResponse.json';
 import { IAbstractAdUnitParametersFactory, AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastAdUnitParametersFactory } from 'VAST/AdUnits/VastAdUnitParametersFactory';
@@ -98,6 +99,7 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { Placement } from 'Backend/Api/Placement';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1273,6 +1275,48 @@ describe('CampaignManager', () => {
                 assert.deepEqual(premiumTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
                 assert.deepEqual(videoTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
                 assert.deepEqual(rewardedTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
+            });
+        });
+    });
+
+    describe('loadCampaign', () => {
+        let assetManager: AssetManager;
+        let campaignManager: CampaignManager;
+        let mockRequest: sinon.SinonMock;
+        const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
+
+        beforeEach(() => {
+            contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
+            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+            campaignManager = new CampaignManager(platform, core.Api, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
+
+            mockRequest = sinon.mock(request);
+        });
+
+        it('should handle a response to a loaded campaign', () => {
+            const placement = TestFixtures.getPlacement();
+            const loadManagerTimeout = 10000;
+
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: LoadedCampaignResponse
+            }));
+
+            sinon.stub(assetManager, 'enableCaching');
+
+            return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
+                mockRequest.verify();
+                sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
+
+                if (loadedCampaign) {
+                    assert.isDefined(loadedCampaign.campaign);
+                    assert.isDefined(loadedCampaign.trackingUrls);
+                    assert.deepEqual(loadedCampaign.trackingUrls[TrackingEvent.START], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0']);
+                } else {
+                    assert.fail();
+                }
+
+            }).catch(() => {
+                assert.fail();
             });
         });
     });
