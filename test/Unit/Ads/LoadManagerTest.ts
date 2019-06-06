@@ -5,7 +5,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { ILoadEvent, LoadManager } from 'Ads/Managers/LoadManager';
+import { ILoadEvent, LoadManager, ILoadStorageEvent } from 'Ads/Managers/LoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -33,6 +33,8 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
+import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 
 describe('LoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -90,6 +92,36 @@ describe('LoadManagerTest', () => {
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
         loadManager = new LoadManager(platform, core, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
+    });
+
+    describe('onStorageSet', () => {
+        let sandbox: sinon.SinonSandbox;
+
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            sandbox.stub(core.Storage, 'delete').callsFake(() => {
+                return Promise.resolve();
+            });
+            sandbox.stub(core.Storage, 'write').callsFake(() => {
+                return Promise.resolve();
+            });
+            (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
+            (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
+        });
+
+        it('should correctly load placements and delete the load information onStorageSet', () => {
+            const loadStorageEvent: ILoadStorageEvent = {
+                load: {
+                    'key': {
+                        value: 'premium',
+                        ts: clientInfo.getInitTimestamp()
+                    }
+                }
+            };
+            core.Storage.onSet.trigger('type', loadStorageEvent);
+            sinon.assert.called((<sinon.SinonStub>core.Storage.delete));
+            sinon.assert.called((<sinon.SinonStub>core.Storage.write));
+        });
     });
 
     describe('getCampaign and refreshWithBackupCampaigns', () => {

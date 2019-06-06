@@ -20,6 +20,10 @@ export interface ILoadEvent {
     ts: number;
 }
 
+export interface ILoadStorageEvent {
+    load: { [placementId: string]: ILoadEvent };
+}
+
 export class LoadManager extends RefreshManager {
     private _platform: Platform;
     private _core: ICoreApi;
@@ -42,7 +46,7 @@ export class LoadManager extends RefreshManager {
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
 
-        this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(type, value));
+        this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(<ILoadStorageEvent>value));
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
     }
@@ -170,14 +174,12 @@ export class LoadManager extends RefreshManager {
         });
     }
 
-    private deleteStoredLoads() {
-        this._core.Storage.delete(StorageType.PUBLIC, 'load');
+    private deleteStoredLoad(key: string) {
+        this._core.Storage.delete(StorageType.PUBLIC, 'load.' + key);
         this._core.Storage.write(StorageType.PUBLIC);
     }
 
-    // todo: proper typing
-    // tslint:disable-next-line
-    private onStorageSet(type: string, event: any) {
+    private onStorageSet(event: ILoadStorageEvent) {
         if(event && event.hasOwnProperty('load')) {
             Object.keys(event.load).forEach(key => {
                 const loadEvent: ILoadEvent = event.load[key];
@@ -185,7 +187,9 @@ export class LoadManager extends RefreshManager {
 
                 if(placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
                     this.loadPlacement(loadEvent.value);
+                    this.deleteStoredLoad(key);
                 }
+
             });
         }
     }
