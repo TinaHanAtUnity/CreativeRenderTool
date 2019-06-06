@@ -29,7 +29,7 @@ describe('RequestPrivacyFactoryTests', () => {
         });
         it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
         it('should set recorded privacy method', () => assert.equal(result!.method, PrivacyMethod.UNITY_CONSENT));
-        xit('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
+        it('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
     });
 
     context('if game privacy method has changed since last privacy store', () => {
