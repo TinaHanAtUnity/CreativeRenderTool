@@ -125,18 +125,12 @@ import { StorageType } from 'Core/Native/Storage';
             });
         });
 
-        it('isMetaDataLoadEnabled', () => {
-            const key = 'enable_metadata_load';
-            beforeEach(() => {
-                sinon.stub(core.Storage, 'get').withArgs(StorageType.PUBLIC, key + '.value').callsFake(() => {
-                    return Promise.resolve(true);
-                });
-            });
-
+        describe('isMetaDataLoadEnabled', () => {
             it('should return true when the mediation metadata is found', () => {
                 backend.Api.Storage.setStorageContents(<any>{
                     mediation: {
-                        name: { value: 'test_name' }
+                        name: {value: 'test_name'},
+                        enable_metadata_load: {value: true}
                     }
                 });
 

@@ -170,11 +170,6 @@ export class LoadManager extends RefreshManager {
         });
     }
 
-    private deleteStoredLoads() {
-        this._core.Storage.delete(StorageType.PUBLIC, 'load');
-        this._core.Storage.write(StorageType.PUBLIC);
-    }
-
     // todo: proper typing
     // tslint:disable-next-line
     private onStorageSet(type: string, event: any) {
