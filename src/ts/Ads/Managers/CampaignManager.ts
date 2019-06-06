@@ -550,7 +550,8 @@ export class CampaignManager {
         if(this._sessionManager.getGameSessionId() % 1000 === 99) {
             SessionDiagnostics.trigger('ad_received', {
                 contentType: response.getContentType(),
-                auctionProtocol: this._auctionProtocol,
+                seatId: response.getSeatId(),
+                creativeId: response.getCreativeId(),
                 abGroup: this._coreConfig.getAbGroup().valueOf()
             }, session);
         }
@@ -598,7 +599,8 @@ export class CampaignManager {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType,
-                    auctionProtocol: this._auctionProtocol,
+                    seatId: campaign.getSeatId(),
+                    creativeId: campaign.getCreativeId(),
                     abGroup: this._coreConfig.getAbGroup().valueOf()
                 }, session);
             }
