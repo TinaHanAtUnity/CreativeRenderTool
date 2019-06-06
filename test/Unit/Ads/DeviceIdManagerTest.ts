@@ -92,7 +92,7 @@ describe('DeviceIdManagerTest', () => {
     });
 
     describe('when checking compliant', () => {
-        it ('should return false if user set to be optOut satisfied under GDPR is enabled', () => {
+        it ('should return false if user set to be optOut under GDPR is enabled', () => {
             const country = 'CN';
             const gdprEnabled = true;
             const optOutRecorded = true;
