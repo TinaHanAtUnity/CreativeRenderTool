@@ -4,10 +4,11 @@ import { GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class AdsConfigurationParser {
     private static _updateUserPrivacyForIncident: boolean = false;
-    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo): AdsConfiguration {
+    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
@@ -47,7 +48,7 @@ export class AdsConfigurationParser {
             optOutEnabled: configJson.optOutEnabled,
             defaultBannerPlacement: defaultBannerPlacement,
             gamePrivacy: this.parseGamePrivacy(configJson),
-            userPrivacy: this.parseUserPrivacy(configJson)
+            userPrivacy: this.parseUserPrivacy(configJson, deviceInfo)
         };
 
         return new AdsConfiguration(configurationParams);
@@ -89,7 +90,19 @@ export class AdsConfigurationParser {
         return new GamePrivacy({ method: PrivacyMethod.DEFAULT });
     }
 
-    private static parseUserPrivacy(configJson: IRawAdsConfiguration) {
+    private static parseUserPrivacy(configJson: IRawAdsConfiguration, deviceInfo?: DeviceInfo) {
+        if (deviceInfo && deviceInfo.getLimitAdTracking()) {
+            return new UserPrivacy({
+                method: configJson.gamePrivacy && configJson.gamePrivacy.method ? configJson.gamePrivacy.method : PrivacyMethod.DEFAULT,
+                version: 0,
+                permissions: {
+                    all: false,
+                    gameExp: false,
+                    ads: false,
+                    external: false
+                }
+            });
+        }
         if (!configJson.gamePrivacy || !configJson.userPrivacy) {
             return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
                     all: false,

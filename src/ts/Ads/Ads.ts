@@ -120,7 +120,7 @@ export class Ads implements IAds {
     public China: China;
 
     constructor(config: unknown, core: ICore, store: IStore) {
-        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
+        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this._core = core;
         this._store = store;
 
@@ -277,10 +277,6 @@ export class Ads implements IAds {
     private isConsentShowRequired(): boolean {
         if (Ads._forcedConsentUnit) {
             return true;
-        }
-
-        if (this._core.DeviceInfo.getLimitAdTracking()) {
-            return false;
         }
 
         const gamePrivacy = this.Config.getGamePrivacy();
