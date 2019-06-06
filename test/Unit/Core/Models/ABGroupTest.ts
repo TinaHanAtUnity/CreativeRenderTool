@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest, FilteredABTest, FakeZyngaFilteredABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest, FilteredABTest, FakeZyngaFilteredABTest, ZyngaLoadTest } from 'Core/Models/ABGroup';
 import 'mocha';
 
 describe('ABGroupTests', () => {
@@ -73,6 +73,16 @@ describe('ABGroupTests', () => {
             for (const i of invalidGroups) {
                 assert.isFalse(FakeZyngaFilteredABTest.isValid(toAbGroup(i)));
             }
+        });
+    });
+
+    describe('ZyngaLoadTest', () => {
+        it('should return false for all A/B groups', () => {
+            for (const i of validGroups) {
+                assert.isFalse(ZyngaLoadTest.isValid(toAbGroup(i)));
+            }
+            assert.isFalse(FakeDisabledABTest.isValid(99));
+            assert.isFalse(FakeDisabledABTest.isValid(-1));
         });
     });
 });
