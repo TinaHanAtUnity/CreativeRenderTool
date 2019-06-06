@@ -64,48 +64,127 @@ describe('MOAT', () => {
         });
     });
 
-    describe('MOAT placement mute', () => {
-        let moat: any;
+    const InitMoatWithPlayerVolume = (muteVideo: boolean, iframe: HTMLIFrameElement, container: HTMLElement) => {
+        const nativeBridge = sinon.createStubInstance(NativeBridge);
+        const sdk: SdkApi = sinon.createStubInstance(SdkApi);
+        nativeBridge.Sdk = sdk;
+
+        return new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
+    };
+
+    describe('MOAT player volume placement muted', () => {
+        let moat: MOAT;
+        let iframe: HTMLIFrameElement;
+        let container: HTMLElement;
+
+        beforeEach(() => {
+            const muteVideo = true;
+            moat = InitMoatWithPlayerVolume(muteVideo, iframe, container);
+
+            container = document.createElement('div');
+            iframe = document.createElement('iframe');
+
+            container.appendChild(iframe);
+            document.body.appendChild(container);
+
+            sinon.stub(iframe.contentWindow!, 'postMessage');
+            sinon.stub(container, 'querySelector').returns(iframe);
+            sinon.stub(moat, 'container').returns(container);
+        });
+
+        afterEach(() => {
+            document.body.removeChild(container);
+        });
+
         it('should have correct volume after initialization: 0', () => {
-           const nativeBridge = sinon.createStubInstance(NativeBridge);
-           const sdk: SdkApi = sinon.createStubInstance(SdkApi);
-           nativeBridge.Sdk = sdk;
-           const muteVideo = true;
+            moat.render();
+            moat.triggerVideoEvent('test', 0.3);
 
-           moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
-           assert.equal(moat.getPlayerVolume(), 0);
-       });
+            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
+                {
+                    type: 'videoEvent',
+                    data: {
+                        type: 'test',
+                        adVolume: 0,
+                        volume: 0.3
+                    }
+                }
+            );
+        });
 
-        it('should have correct volume after initialization: 1', () => {
-           const nativeBridge = sinon.createStubInstance(NativeBridge);
-           const sdk: SdkApi = sinon.createStubInstance(SdkApi);
-           nativeBridge.Sdk = sdk;
-           const muteVideo = false;
+        it('should have the correct player volume after player volume set', () => {
+            moat.render();
+            moat.setPlayerVolume(1);
+            moat.triggerVideoEvent('test', 0.3);
 
-           moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
-           assert.equal(moat.getPlayerVolume(), 1);
-       });
+            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
+                {
+                    type: 'videoEvent',
+                    data: {
+                        type: 'test',
+                        adVolume: 1,
+                        volume: 0.3
+                    }
+                }
+            );
+        });
    });
 
-    describe('MOAT player volume', () => {
-        let moat: any;
+   describe('MOAT player volume placement nonmuted', () => {
+        let moat: MOAT;
+        let iframe: HTMLIFrameElement;
+        let container: HTMLElement;
+
         beforeEach(() => {
-            const nativeBridge = sinon.createStubInstance(NativeBridge);
-            const sdk: SdkApi = sinon.createStubInstance(SdkApi);
-            nativeBridge.Sdk = sdk;
-            const muteVideo = true;
+            const muteVideo = false;
+            moat = InitMoatWithPlayerVolume(muteVideo, iframe, container);
 
-            moat = new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
+            container = document.createElement('div');
+            iframe = document.createElement('iframe');
+
+            container.appendChild(iframe);
+            document.body.appendChild(container);
+
+            sinon.stub(iframe.contentWindow!, 'postMessage');
+            sinon.stub(container, 'querySelector').returns(iframe);
+            sinon.stub(moat, 'container').returns(container);
         });
 
-        it('should have correct volume value from boolean pass', () => {
+        afterEach(() => {
+            document.body.removeChild(container);
+        });
+
+        it('should have correct volume after initialization: 1', () => {
             moat.render();
-            assert.equal(moat.getPlayerVolume(), 0);
+            moat.triggerVideoEvent('test', 0.3);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
+                {
+                    type: 'videoEvent',
+                    data: {
+                        type: 'test',
+                        adVolume: 1,
+                        volume: 0.3
+                    }
+                }
+            );
         });
 
-        it('should have correct volume value from setVolume pass', () => {
-            moat.setPlayerVolume(1);
-            assert.equal(moat.getPlayerVolume(), 1);
+        it('should have the correct player volume after player volume set', () => {
+            moat.render();
+            moat.setPlayerVolume(0);
+            moat.triggerVideoEvent('test', 0.3);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
+                {
+                    type: 'videoEvent',
+                    data: {
+                        type: 'test',
+                        adVolume: 0,
+                        volume: 0.3
+                    }
+                }
+            );
         });
     });
 });
