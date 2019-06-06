@@ -1,6 +1,6 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { CurrentUnityConsentVersion, GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -95,7 +95,7 @@ export class AdsConfigurationParser {
         if (deviceInfo && deviceInfo.getLimitAdTracking()) {
             return new UserPrivacy({
                 method: configJson.gamePrivacy && configJson.gamePrivacy.method ? configJson.gamePrivacy.method : PrivacyMethod.DEFAULT,
-                version: 0,
+                version:  CurrentUnityConsentVersion,
                 permissions: {
                     all: false,
                     gameExp: false,
