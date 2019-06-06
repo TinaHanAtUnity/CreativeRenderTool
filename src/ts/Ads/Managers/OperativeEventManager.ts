@@ -60,29 +60,35 @@ export interface IInfoJson {
     auctionId: string;
     gameSessionId: number;
     campaignId: string;
-    adType?: string;
-    correlationId?: string;
-    seatId?: number;
     placementId: string;
-    advertisingTrackingId?: string | null;
-    limitAdTracking?: boolean;
     osVersion: string;
-    sid?: string;
     deviceModel: string;
     sdkVersion: number;
-    previousPlacementId?: string;
     bundleId: string;
-    meta?: string;
     platform: string;
     language: string;
     cached: boolean;
-    cachedOrientation?: 'landscape' | 'portrait';
     token: string;
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
-    privacy?: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
+    networkType: number;
+    connectionType: string;
+    screenWidth: number;
+    screenHeight: number;
+    isBackupCampaign: boolean;
+    deviceFreeSpace: number;
+    adType?: string;
+    correlationId?: string;
+    seatId?: number;
+    advertisingTrackingId?: string | null;
+    limitAdTracking?: boolean;
+    sid?: string;
+    previousPlacementId?: string;
+    meta?: string;
+    cachedOrientation?: 'landscape' | 'portrait';
+    privacy?: IRequestPrivacy;
     apiLevel?: number;
     deviceMake?: string;
     screenDensity?: number;
@@ -91,10 +97,6 @@ export interface IInfoJson {
     videoOrientation?: string;
     webviewUa?: string;
     adUnitStyle?: { [key: string]: unknown };
-    networkType: number;
-    connectionType: string;
-    screenWidth: number;
-    screenHeight: number;
     mediationName?: string;
     mediationVersion?: string;
     mediationOrdinal?: number;
@@ -102,8 +104,6 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     imei?: string;
-    isBackupCampaign: boolean;
-    deviceFreeSpace: number;
 }
 
 export class OperativeEventManager {

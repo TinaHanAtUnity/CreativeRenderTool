@@ -80,10 +80,11 @@ export class AdsConfigurationParser {
         if (configJson.gamePrivacy && configJson.gamePrivacy.method) {
             return new GamePrivacy(configJson.gamePrivacy);
         }
-        Diagnostics.trigger('ads_configuration_game_privacy_missing', {
-            userPrivacy: JSON.stringify(configJson.userPrivacy),
-            gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
+
         if (configJson.gdprEnabled === true) {
+            Diagnostics.trigger('ads_configuration_game_privacy_missing', {
+                userPrivacy: JSON.stringify(configJson.userPrivacy),
+                gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
             // TODO: Remove when all games have a correct method in dashboard and configuration always contains correct method
             return new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
         }
