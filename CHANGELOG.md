@@ -1,3 +1,7 @@
+# Pending
+
+* Move ProgrammaticTrackingService to Core module [10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
+
 # Wed Jun  5 21:58:38 UTC 2019
 
 * ESLint : No multiple blank lines and end of file must have newline [#9952](https://github.com/Applifier/unity-ads-webview/pull/9952)
