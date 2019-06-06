@@ -67,7 +67,9 @@ export class PurchasingUtilities {
         }).then(() => {
             this._isInitialized = true;
             if (this.configurationIncludesPromoPlacement()) {
-                this._purchasingAdapter.refreshCatalog();
+                this._purchasingAdapter.refreshCatalog().catch(() => {
+                    this._core.Sdk.logDebug('Purchasing Catalog failed to refresh');
+                });
             }
         });
     }
