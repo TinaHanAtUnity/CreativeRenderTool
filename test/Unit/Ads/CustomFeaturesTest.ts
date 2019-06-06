@@ -1,6 +1,7 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -61,15 +62,17 @@ describe('CustomFeatures', () => {
     });
 
     describe('isWhiteListedForLoadApi', () => {
-
         const tests: {
             gameId: string;
             expected: boolean;
         }[] = [{
-            gameId: '1409248',
+            gameId: '2988495',
             expected: true
         }, {
-            gameId: '3097696',
+            gameId: '2988494',
+            expected: true
+        }, {
+            gameId: '2988443',
             expected: true
         }, {
             gameId: 'scott',
@@ -79,6 +82,33 @@ describe('CustomFeatures', () => {
         tests.forEach(t => {
             it('should match the expected value', () => {
                 const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
+
+    describe('isTrackedGameUsingLoadApi', () => {
+        const tests: {
+            gameId: string;
+            abGroup: ABGroup;
+            expected: boolean;
+        }[] = [{
+            gameId: '2988443',
+            abGroup: 14,
+            expected: true
+        }, {
+            gameId: '2988443',
+            abGroup: 16,
+            expected: false
+        }, {
+            gameId: '1234556',
+            abGroup: 14,
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId, t.abGroup);
                 assert.equal(value, t.expected);
             });
         });

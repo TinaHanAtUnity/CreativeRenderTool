@@ -3,7 +3,7 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { ABGroup, ZyngaLoadTest } from 'Core/Models/ABGroup';
+import { ZyngaLoadTest, ABGroup } from 'Core/Models/ABGroup';
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
@@ -110,9 +110,16 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
+    public static isTrackedGameUsingLoadApi(gameId: string, abGroup: ABGroup) {
+        const isZyngaSolitare = gameId === '2988443';
+        const isUsingLoadApi = ZyngaLoadTest.isValid(abGroup);
+        return isZyngaSolitare && isUsingLoadApi;
+    }
+
     public static isWhiteListedForLoadApi(gameId: string) {
-        return gameId === '3097696' ||  //Unity Ads test ID
-               gameId === '1409248';    //Unity Ads test ID
+        return gameId === '2988443' ||  // Solitare Zynga game
+               gameId === '2988494' ||
+               gameId === '2988495';
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

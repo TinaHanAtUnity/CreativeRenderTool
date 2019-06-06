@@ -77,12 +77,14 @@ describe('ABGroupTests', () => {
     });
 
     describe('ZyngaLoadTest', () => {
-        it('should return false for all A/B groups', () => {
+        it('should return true for ABGroups 14 and 15', () => {
             for (const i of validGroups) {
-                assert.isFalse(ZyngaLoadTest.isValid(toAbGroup(i)));
+                if (i === 14 || i === 15) {
+                    assert.isTrue(ZyngaLoadTest.isValid(i));
+                } else {
+                    assert.isFalse(ZyngaLoadTest.isValid(toAbGroup(i)));
+                }
             }
-            assert.isFalse(FakeDisabledABTest.isValid(99));
-            assert.isFalse(FakeDisabledABTest.isValid(-1));
         });
     });
 });
