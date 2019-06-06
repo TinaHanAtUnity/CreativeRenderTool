@@ -58,10 +58,6 @@ import { IStoreApi } from 'Store/IStore';
         let webPlayerContainer: WebPlayerContainer;
         let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
 
-        describe('On static-interstial campaign', () => {
-            adUnitTests();
-        });
-
         function adUnitTests(): void {
             beforeEach(() => {
                 campaign = TestFixtures.getDisplayInterstitialCampaign();
@@ -193,5 +189,9 @@ import { IStoreApi } from 'Store/IStore';
                 });
             });
         }
+
+        describe('On static-interstial campaign', () => {
+            adUnitTests();
+        });
     });
 });

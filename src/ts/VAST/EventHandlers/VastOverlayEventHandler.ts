@@ -108,7 +108,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             super.onOverlaySkip(position);
 
             const endScreen = this._vastAdUnit.getEndScreen();
-            if (endScreen) {
+            if (endScreen && this._vastAdUnit.hasImpressionOccurred()) {
                 endScreen.show();
                 this._vastAdUnit.onFinish.trigger();
             } else {
@@ -119,7 +119,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (this._om) {
             this._om.skipped();
             this._om.sessionFinish({
-                adSessionId: this._campaign.getSession().getId(),
+                adSessionId: this._om.getOMAdSessionId(),
                 timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
@@ -130,19 +130,23 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     public onOverlayMute(isMuted: boolean): void {
         super.onOverlayMute(isMuted);
         if (isMuted) {
+            this._vastAdUnit.setVideoPlayerMuted(true);
             if (this._moat) {
                 this._moat.volumeChange(0);
             }
             if (this._om) {
+                this._om.setDeviceVolume(this._vastAdUnit.getVolume());
                 this._om.volumeChange(0);
             }
             this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE);
         } else {
+            this._vastAdUnit.setVideoPlayerMuted(false);
             if (this._moat) {
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
             if (this._om) {
-                this._om.volumeChange(this._vastAdUnit.getVolume());
+                this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+                this._om.volumeChange(1);
             }
             this._vastAdUnit.sendTrackingEvent(TrackingEvent.UNMUTE);
         }

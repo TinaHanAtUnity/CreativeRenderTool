@@ -372,13 +372,22 @@ describe('VastVideoEventHandler tests', () => {
     });
 
     describe('onVolumeChange', () => {
-        beforeEach(() => {
+        it ('should call moat volumeChange event', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
         });
 
-        it ('should call viewability volumeChange events', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
-            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0.1);
+        it('should call om volumeChange event with arguments if videoPlayer unmuted', () => {
+            vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setDeviceVolume, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 1);
+        });
+
+        it('should call om volumeChange event with arguments if videoPlayer muted', () => {
+            testAdUnit.setVideoPlayerMuted(true);
+            vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setDeviceVolume, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0);
         });
     });
 
@@ -427,7 +436,7 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it('should show end screen when onVideoCompleted', () => {
+        it('should not show end screen when onVideoCompleted without an impression event sent', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
 
             // Endscreen is not shown if the impression never occurs
@@ -436,11 +445,22 @@ describe('VastVideoEventHandler tests', () => {
         });
 
         it('should show end screen when onVideoError', () => {
+            vastAdUnit.setImpressionOccurred();
+
             // Cause an error by giving too large duration
             vastAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+            sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
+        });
+
+        it('should not show end screen when onVideoError', () => {
+            // Cause an error by giving too large duration
+            vastAdUnit.setVideoState(VideoState.PREPARING);
+            vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
     });

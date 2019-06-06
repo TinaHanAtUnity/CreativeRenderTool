@@ -1,9 +1,47 @@
-# Pending
+# Wed Jun  5 21:58:38 UTC 2019
+
+* ESLint : No multiple blank lines and end of file must have newline [#9952](https://github.com/Applifier/unity-ads-webview/pull/9952)
+* ESLint : semi rule enabled [#9949](https://github.com/Applifier/unity-ads-webview/pull/9949)
+* Log update for ad_ready/received and adding china imei log [#9990](https://github.com/Applifier/unity-ads-webview/pull/9990)
+* Add back ad_shown_in_background diagnostic [#10013](https://github.com/Applifier/unity-ads-webview/pull/10013)
+ 
+
+# Tue Jun  4 16:35:13 UTC 2019
+
+* End card transition experiment [#9715](https://github.com/Applifier/unity-ads-webview/pull/9715)
+* Consent CTA ab test [#9984](https://github.com/Applifier/unity-ads-webview/pull/9984)
+* Change SDK Bot Webhook Endpoint [#9961](https://github.com/Applifier/unity-ads-webview/pull/9961)
+* ESLint : no-use-before-define [#9894](https://github.com/Applifier/unity-ads-webview/pull/9894)
+* Disable Banner Refresh for GameID 2962474 [#9953](https://github.com/Applifier/unity-ads-webview/pull/9953)
+
+# Mon Jun  3 21:23:43 UTC 2019
+
+* Remove Combine skip under timer and progress bar experiment [#9958](https://github.com/Applifier/unity-ads-webview/pull/9958)
+* Remove Early CTA V2 experiment [#9925](https://github.com/Applifier/unity-ads-webview/pull/9925)
+* ESLint prefer-interface [#9896](https://github.com/Applifier/unity-ads-webview/pull/9896)
+* ESLint interface-name-prefix [#9898](https://github.com/Applifier/unity-ads-webview/pull/9898)
+* ESLint type-annotation-spacing [#9895](https://github.com/Applifier/unity-ads-webview/pull/9895)
+* Fix game ids to be Android version for MRAIDWebPlayerTest [#9956](https://github.com/Applifier/unity-ads-webview/pull/9956)
+* Use Correct ConnectionNeeded Metric [#9959](https://github.com/Applifier/unity-ads-webview/pull/9956)
+
+# Fri May 31 16:55:24 UTC 2019
+
+* Disable Consent A/B test [#9926](https://github.com/Applifier/unity-ads-webview/pull/9926)
+* Make OM adSessionId unique for each ad playback [#9888](https://github.com/Applifier/unity-ads-webview/pull/9888)
+* Separate VideoPlayerVolume from DeviceVolume Open Measurement [#9764](https://github.com/Applifier/unity-ads-webview/pull/9764)
+* Add XInstall test creativeids and gameids for testing MRAID Webplayer [#9922](https://github.com/Applifier/unity-ads-webview/pull/9922)
+* Remove Banner Placement WAITING State [#9924](https://github.com/Applifier/unity-ads-webview/pull/9924)
+* Remove Unnecessary Banner Method [#9923](https://github.com/Applifier/unity-ads-webview/pull/9923)
+* Add Metrics for Failure Cases Before Ad Playback [#9893](https://github.com/Applifier/unity-ads-webview/pull/9893)
+
+# Wed May 29 20:29:52 UTC 2019
 
 * Combined skip and progress bar experiment [#9815](https://github.com/Applifier/unity-ads-webview/pull/9815)
 * ESLint Investigation [#9610](https://github.com/Applifier/unity-ads-webview/pull/9610)
 * Remove unnecessary china tracking id kibana logs [#9814](https://github.com/Applifier/unity-ads-webview/pull/9814)
 * Enable IMEI collection for SDK 3.1.0+ [#9788](https://github.com/Applifier/unity-ads-webview/pull/9788)
+* Move Creation of VastParserStricts to Constructors [#9812](https://github.com/Applifier/unity-ads-webview/pull/9812)
+* Disable Vast Endcards Lacking Impressions Part 2 [#9813](https://github.com/Applifier/unity-ads-webview/pull/9813)
 
 # Tue May 28 15:00:00 UTC 2019
 

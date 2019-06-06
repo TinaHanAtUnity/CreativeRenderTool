@@ -122,7 +122,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const video = new Video('', TestFixtures.getSession());
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-            const endScreenParams : IEndScreenParameters = {
+            const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
                 language : deviceInfo.getLanguage(),
@@ -292,7 +292,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const video = new Video('', TestFixtures.getSession());
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-            const endScreenParams : IEndScreenParameters = {
+            const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
                 language : deviceInfo.getLanguage(),

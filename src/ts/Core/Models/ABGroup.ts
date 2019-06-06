@@ -2,7 +2,7 @@ type ReferenceGroups = 0 | 1 | 2 | 3 | 4;
 type TreatmentGroups = 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19;
 export type ABGroup = ReferenceGroups | TreatmentGroups | -1 | 99;
 
-export function toAbGroup(group: number) : ABGroup {
+export function toAbGroup(group: number): ABGroup {
     if (group === 99) {
         return 99;
     }
@@ -66,7 +66,5 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 
 // Add actual A/B tests below
 export const ConsentTest = new ABTest(9, 10);
-export const WebPlayerMRAIDTest = new ABTest(15);
 export const OpenMeasurementTest = new DisabledABTest();
-export const CTAV2Test = new ZyngaFilteredABTest(7, 8);
-export const ProgressBarAndSkipTest = new ZyngaFilteredABTest(5, 6);
+export const AnimationEndCardTest = new ZyngaFilteredABTest(7, 8);

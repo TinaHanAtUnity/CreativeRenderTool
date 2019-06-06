@@ -44,7 +44,13 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
-export type UserPrivacyStorageData = { gdpr: { consent: { value: unknown }}};
+export interface IUserPrivacyStorageData { 
+    gdpr: { 
+        consent: { 
+            value: unknown;
+        };
+    };
+}
 
 export class UserPrivacyManager {
 
@@ -71,7 +77,7 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <UserPrivacyStorageData>data));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -296,7 +302,7 @@ export class UserPrivacyManager {
         }
     }
 
-    private onStorageSet(eventType: string, data: UserPrivacyStorageData) {
+    private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
             if(data && data.gdpr && data.gdpr.consent) {

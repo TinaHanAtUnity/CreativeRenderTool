@@ -97,6 +97,17 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
                     });
                 });
             });
+
+            context('after being shown', () => {
+                it('should not refresh after 30 seconds if disabled through custom feature', () => {
+                    core.ClientInfo.set('gameId', '2962474');
+                    banners.Api.Banner.onBannerOpened.trigger();
+                    clock.tick(31 * 1000);
+                    return Promise.resolve().then(() => {
+                        sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
+                    });
+                });
+            });
         });
 
         describe('No fill banner scenario', () => {
