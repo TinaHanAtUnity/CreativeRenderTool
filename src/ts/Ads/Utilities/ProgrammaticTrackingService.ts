@@ -44,7 +44,14 @@ export enum MiscellaneousMetric {
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
+export enum LoadMetric {
+    LoadEnabledAuctionRequest = 'load_enabled_auction_request',
+    LoadEnabledFill = 'load_enabled_fill',
+    LoadEnabledNoFill = 'load_enabled_no_fill',
+    LoadEnabledShow = 'load_enabled_show'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;

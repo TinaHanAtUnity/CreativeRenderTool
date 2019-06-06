@@ -187,6 +187,18 @@ describe('LoadManagerTest', () => {
                     });
                 });
             });
+
+            it('should set the placement state to nofill', () => {
+                sandbox.stub(campaignManager, 'loadCampaign').callsFake(() => {
+                    return Promise.resolve(undefined);
+                });
+                sandbox.stub(ads.Placement, 'setPlacementState');
+                return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
+                    const testCampaign = loadManager.getCampaign(placementId);
+                    assert.isUndefined(testCampaign, 'Loaded campaign was defined');
+                    sinon.assert.calledWith((<sinon.SinonStub>ads.Placement.setPlacementState), placementId, PlacementState.NO_FILL);
+                });
+            });
         });
     });
 

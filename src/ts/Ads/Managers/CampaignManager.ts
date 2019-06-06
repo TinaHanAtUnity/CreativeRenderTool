@@ -50,6 +50,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -267,6 +268,11 @@ export class CampaignManager {
                 timeout: timeout
             }).then(response => {
                 if(response) {
+                    /* TODO Add back
+                    if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
+                        this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnab);
+                    }
+                    */
                     return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
                 }
                 return undefined;
