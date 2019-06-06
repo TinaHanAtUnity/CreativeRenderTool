@@ -275,8 +275,13 @@ export class CampaignManager {
                     */
                     return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
                 }
+                Diagnostics.trigger('load_campaign_response_invalid', {});
                 return undefined;
-            }).catch(() => {
+            }).catch((e: Error) => {
+                Diagnostics.trigger('load_campaign_response_failure', {
+                    errorMessage: e.message,
+                    stackTrace: e.stack
+                });
                 return undefined;
             });
         });
@@ -590,14 +595,17 @@ export class CampaignManager {
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
         } catch(e) {
+            Diagnostics.trigger('load_campaign_failed_to_parse', {});
             return Promise.resolve(undefined);
         }
 
-        if(!json.auctionId) {
-            throw new Error('No auction ID found');
+        const auctionId = json.auctionId;
+        if(!auctionId) {
+            Diagnostics.trigger('load_campaign_auction_id_missing', {});
+            return Promise.resolve(undefined);
         }
 
-        const session: Session = this._sessionManager.create(json.auctionId);
+        const session: Session = this._sessionManager.create(auctionId);
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
@@ -606,6 +614,7 @@ export class CampaignManager {
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
 
         if(!('placements' in json)) {
+            SessionDiagnostics.trigger('load_campaign_placements_missing_in_json', {}, session);
             return Promise.resolve(undefined);
         }
 
@@ -652,19 +661,23 @@ export class CampaignManager {
                         return undefined;
                     });
                 } else {
-                    Diagnostics.trigger('load_campaign_undefined_campaign', {});
+                    SessionDiagnostics.trigger('load_campaign_undefined_campaign', {}, session);
                     return undefined;
                 }
             }).catch(() => {
-                Diagnostics.trigger('load_campaign_parse_failure', {
+                SessionDiagnostics.trigger('load_campaign_parse_failure', {
                     creativeID: parser.creativeID,
                     seatID: parser.seatID,
                     campaignID: parser.campaignID
-                });
+                }, session);
                 // TODO: Report to CreativeBlockingService after production testing
                 return undefined;
             });
         } else {
+            Diagnostics.trigger('load_campaign_no_fill', {
+                mediaId: mediaId,
+                trackingUrls: trackingUrls
+            });
             return Promise.resolve(undefined);
         }
     }

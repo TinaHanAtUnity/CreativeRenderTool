@@ -1289,7 +1289,6 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             campaignManager = new CampaignManager(platform, core.Api, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-
             mockRequest = sinon.mock(request);
         });
 
@@ -1314,6 +1313,50 @@ describe('CampaignManager', () => {
                 } else {
                     assert.fail();
                 }
+
+            }).catch(() => {
+                assert.fail();
+            });
+        });
+
+        it('should resolve with undefined with an empty media Id', () => {
+            const placement = TestFixtures.getPlacement();
+            const loadManagerTimeout = 10000;
+            const mediaId = '5be40c5f602f4510ec583881';
+
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: LoadedCampaignResponse.replace(mediaId, '')
+            }));
+
+            sinon.stub(assetManager, 'enableCaching');
+
+            return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
+                mockRequest.verify();
+                sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
+
+                assert.isUndefined(loadedCampaign, 'Campaign without mediaId should not exist');
+
+            }).catch(() => {
+                assert.fail();
+            });
+        });
+
+        it('should return undefined without an auction Id', () => {
+            const placement = TestFixtures.getPlacement();
+            const loadManagerTimeout = 10000;
+            const auctionId = 'd301fd4c-4a9e-48e4-82aa-ad8b07977ca5';
+
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: LoadedCampaignResponse.replace(auctionId, '')
+            }));
+
+            sinon.stub(assetManager, 'enableCaching');
+
+            return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
+                mockRequest.verify();
+                sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
+
+                assert.isUndefined(loadedCampaign, 'Response without auction Id should not return a defined value');
 
             }).catch(() => {
                 assert.fail();
