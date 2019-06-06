@@ -209,10 +209,8 @@ export class PurchasingUtilities {
         }
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             if (isAvailable) {
-                this._core.Sdk.logInfo('CustomPurchasing delegate is set');
                 return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
-                this._core.Sdk.logInfo('UnityPurchasing delegate is set');
                 return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
             }
         }).catch(() => {
