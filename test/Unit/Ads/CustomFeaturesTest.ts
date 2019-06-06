@@ -1,7 +1,6 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
-import { ABGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -64,23 +63,23 @@ describe('CustomFeatures', () => {
     describe('isWhiteListedForLoadApi', () => {
 
         const tests: {
-            abGroup: ABGroup;
             gameId: string;
+            expected: boolean;
         }[] = [{
-            abGroup: 14,
-            gameId: '1409248'
+            gameId: '1409248',
+            expected: true
         }, {
-            abGroup: 15,
-            gameId: '3097696'
+            gameId: '3097696',
+            expected: true
         }, {
-            abGroup: 15,
-            gameId: 'scott'
+            gameId: 'scott',
+            expected: false
         }];
 
         tests.forEach(t => {
-            it('should return false since the AB Test is disabled', () => {
-                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId, t.abGroup);
-                assert.isFalse(value);
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, t.expected);
             });
         });
     });

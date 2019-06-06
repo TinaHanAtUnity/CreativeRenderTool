@@ -84,6 +84,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { LoadManager } from 'Ads/Managers/LoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -179,7 +180,9 @@ export class Ads implements IAds {
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             const promises = [];
-            promises.push(this.setupLoadApi());
+            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
+                promises.push(this.setupLoadApi());
+            }
             promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
@@ -591,7 +594,7 @@ export class Ads implements IAds {
         return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
             if(mediation) {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
-                if(loadEnabled &&  CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId(), this._core.Config.getAbGroup())) {
+                if(loadEnabled) {
                     this._loadApiEnabled = true;
                 }
             }

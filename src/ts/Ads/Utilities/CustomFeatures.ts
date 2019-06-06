@@ -110,10 +110,9 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
-    public static isWhiteListedForLoadApi(gameId: string, abGroup: ABGroup) {
-        const isCorrectGameId = gameId === '3097696' ||  //Unity Ads test ID
-                                gameId === '1409248';    //Unity Ads test ID
-        return isCorrectGameId && ZyngaLoadTest.isValid(abGroup);
+    public static isWhiteListedForLoadApi(gameId: string) {
+        return gameId === '3097696' ||  //Unity Ads test ID
+               gameId === '1409248';    //Unity Ads test ID
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
