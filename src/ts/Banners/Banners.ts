@@ -33,7 +33,7 @@ export class Banners implements IBanners {
         this.PlacementManager.sendBannersReady();
 
         this.AdUnitFactory = new BannerAdUnitFactory();
-        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager);
+        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager);
         this.WebPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api);
         this.AdUnitParametersFactory = new BannerAdUnitParametersFactory(this, ads, core);
         this.BannerAdContext = new BannerAdContext(this, ads, core);
