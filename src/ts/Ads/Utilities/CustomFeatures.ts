@@ -110,6 +110,11 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
+    /**
+     *  Method used for gating PTS metrics for this specific Zynga Game using Load API
+     *  TODO: Contact Zynga if they are exclusively using mediation for this game
+     *          If not, change to check for isMetaDataLoadEnabled
+     */
     public static isTrackedGameUsingLoadApi(gameId: string, abGroup: ABGroup) {
         const isZyngaSolitare = gameId === '2988443';
         const isUsingLoadApi = ZyngaLoadTest.isValid(abGroup);

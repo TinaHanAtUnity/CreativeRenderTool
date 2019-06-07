@@ -24,7 +24,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
@@ -114,6 +114,7 @@ describe('CampaignRefreshManager', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
+    let coreModule: ICore;
     let ads: IAdsApi;
     let store: IStoreApi;
     let request: RequestManager;
@@ -144,7 +145,8 @@ describe('CampaignRefreshManager', () => {
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        core = TestFixtures.getCoreApi(nativeBridge);
+        coreModule = TestFixtures.getCoreModule(nativeBridge);
+        core = coreModule.Api;
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
         privacy = sinon.createStubInstance(AbstractPrivacy);
@@ -220,7 +222,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -621,7 +623,7 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 

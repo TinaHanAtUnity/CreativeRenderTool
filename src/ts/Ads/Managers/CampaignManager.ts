@@ -15,7 +15,7 @@ import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { ICoreApi } from 'Core/ICore';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
@@ -51,6 +51,7 @@ import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -121,10 +122,11 @@ export class CampaignManager {
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
+    private _pts: ProgrammaticTrackingService;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
-        this._core = core;
+        this._core = core.Api;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
         this._assetManager = assetManager;
@@ -140,6 +142,7 @@ export class CampaignManager {
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
         this._auctionProtocol = RequestManager.getAuctionProtocol();
+        this._pts = core.ProgrammaticTrackingService;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -260,6 +263,9 @@ export class CampaignManager {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
+            if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
+                this._pts.reportMetric(LoadMetric.LoadEnabledAuctionRequest);
+            }
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
@@ -268,20 +274,14 @@ export class CampaignManager {
                 timeout: timeout
             }).then(response => {
                 if(response) {
-                    /* TODO Add back
-                    if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
-                        this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnab);
-                    }
-                    */
                     return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
                 }
-                Diagnostics.trigger('load_campaign_response_invalid', {});
+
+                this.logLoadNoFill();
                 return undefined;
-            }).catch((e: Error) => {
-                Diagnostics.trigger('load_campaign_response_failure', {
-                    errorMessage: e.message,
-                    stackTrace: e.stack
-                });
+            }).catch(() => {
+                Diagnostics.trigger('load_campaign_response_failure', {});
+                this.logLoadNoFill();
                 return undefined;
             });
         });
@@ -308,6 +308,12 @@ export class CampaignManager {
         Object.keys(placements).forEach((placementId) => {
             placements[placementId].setRealtimeData(undefined);
         });
+    }
+
+    private logLoadNoFill(): void {
+        if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
+            this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
+        }
     }
 
     private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
@@ -648,6 +654,9 @@ export class CampaignManager {
 
                     return this._assetManager.setup(campaign).then(() => {
                         if(trackingUrls) {
+                            if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
+                                this._pts.reportMetric(LoadMetric.LoadEnabledFill);
+                            }
                             return {
                                 campaign: campaign,
                                 trackingUrls: trackingUrls

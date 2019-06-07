@@ -15,7 +15,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -46,7 +46,7 @@ describe('LoadManagerTest', () => {
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
-    let core: ICoreApi;
+    let core: ICore;
     let ads: IAdsApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
@@ -68,9 +68,9 @@ describe('LoadManagerTest', () => {
         clientInfo = TestFixtures.getClientInfo();
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        core = TestFixtures.getCoreApi(nativeBridge);
+        core = TestFixtures.getCoreModule(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
 
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
@@ -80,18 +80,18 @@ describe('LoadManagerTest', () => {
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
-        storageBridge = new StorageBridge(core);
-        focusManager = new FocusManager(platform, core);
-        metaDataManager = new MetaDataManager(core);
-        wakeUpManager = new WakeUpManager(core);
-        request = new RequestManager(platform, core, wakeUpManager);
-        sessionManager = new SessionManager(core, request, storageBridge);
-        cacheBookkeeping = new CacheBookkeepingManager(core);
-        cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        backupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
-        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        storageBridge = new StorageBridge(core.Api);
+        focusManager = new FocusManager(platform, core.Api);
+        metaDataManager = new MetaDataManager(core.Api);
+        wakeUpManager = new WakeUpManager(core.Api);
+        request = new RequestManager(platform, core.Api, wakeUpManager);
+        sessionManager = new SessionManager(core.Api, request, storageBridge);
+        cacheBookkeeping = new CacheBookkeepingManager(core.Api);
+        cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
+        backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
+        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-        loadManager = new LoadManager(platform, core, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
+        loadManager = new LoadManager(platform, core.Api, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
     });
 
     describe('getStoredLoads', () => {
@@ -99,7 +99,7 @@ describe('LoadManagerTest', () => {
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            sandbox.stub(core.Storage, 'get');
+            sandbox.stub(core.Api.Storage, 'get');
         });
 
         afterEach(() => {
@@ -107,16 +107,16 @@ describe('LoadManagerTest', () => {
         });
 
         it('should not call getStoredLoad at all', () => {
-            sandbox.stub(core.Storage, 'getKeys').returns(Promise.resolve([]));
+            sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.resolve([]));
             return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then((res) => {
-                sandbox.assert.notCalled((<sinon.SinonStub>core.Storage.get));
+                sandbox.assert.notCalled((<sinon.SinonStub>core.Api.Storage.get));
             });
         });
 
         it('should not call getStoredLoad at all', () => {
-            sandbox.stub(core.Storage, 'getKeys').returns(Promise.reject());
+            sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.reject());
             return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then((res) => {
-                sandbox.assert.notCalled((<sinon.SinonStub>core.Storage.get));
+                sandbox.assert.notCalled((<sinon.SinonStub>core.Api.Storage.get));
             });
         });
     });
@@ -126,10 +126,10 @@ describe('LoadManagerTest', () => {
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            sandbox.stub(core.Storage, 'delete').callsFake(() => {
+            sandbox.stub(core.Api.Storage, 'delete').callsFake(() => {
                 return Promise.resolve();
             });
-            sandbox.stub(core.Storage, 'write').callsFake(() => {
+            sandbox.stub(core.Api.Storage, 'write').callsFake(() => {
                 return Promise.resolve();
             });
             (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
@@ -145,9 +145,9 @@ describe('LoadManagerTest', () => {
                     }
                 }
             };
-            core.Storage.onSet.trigger('type', loadStorageEvent);
-            sinon.assert.called((<sinon.SinonStub>core.Storage.delete));
-            sinon.assert.called((<sinon.SinonStub>core.Storage.write));
+            core.Api.Storage.onSet.trigger('type', loadStorageEvent);
+            sinon.assert.called((<sinon.SinonStub>core.Api.Storage.delete));
+            sinon.assert.called((<sinon.SinonStub>core.Api.Storage.write));
         });
     });
 
@@ -173,10 +173,10 @@ describe('LoadManagerTest', () => {
                     value: placementId,
                     ts: clientInfo.getInitTimestamp() + 1
                 };
-                sandbox.stub(core.Storage, 'get').callsFake(() => {
+                sandbox.stub(core.Api.Storage, 'get').callsFake(() => {
                     return Promise.resolve(loadEvent);
                 });
-                sandbox.stub(core.Storage, 'getKeys').callsFake(() => {
+                sandbox.stub(core.Api.Storage, 'getKeys').callsFake(() => {
                     return Promise.resolve(adsConfig.getPlacementIds());
                 });
             });
