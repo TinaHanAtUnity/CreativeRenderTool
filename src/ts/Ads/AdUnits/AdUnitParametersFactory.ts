@@ -28,6 +28,8 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
+import { AnimationEndCardTest, ABGroup } from 'Core/Models/ABGroup';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
@@ -88,7 +90,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._coreConfig = core.Config;
         this._sessionManager = ads.SessionManager;
         this._privacyManager = ads.PrivacyManager;
-        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
     }
@@ -213,7 +215,13 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     }
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
-        const overlay: VideoOverlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        let overlay: VideoOverlay;
+        const abGroup = parameters.coreConfig.getAbGroup();
+        if (AnimationEndCardTest.isValid(abGroup)) {
+            overlay = new AnimatedVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        } else {
+            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        }
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);

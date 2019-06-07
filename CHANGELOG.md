@@ -1,5 +1,20 @@
 # Pending
 
+* Move ProgrammaticTrackingService to Core module [10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
+* Making Core Module available to CampaignManager [#10048](https://github.com/Applifier/unity-ads-webview/pull/10048)
+
+# Wed Jun  5 21:58:38 UTC 2019
+
+* ESLint : No multiple blank lines and end of file must have newline [#9952](https://github.com/Applifier/unity-ads-webview/pull/9952)
+* ESLint : semi rule enabled [#9949](https://github.com/Applifier/unity-ads-webview/pull/9949)
+* Log update for ad_ready/received and adding china imei log [#9990](https://github.com/Applifier/unity-ads-webview/pull/9990)
+* Add back ad_shown_in_background diagnostic [#10013](https://github.com/Applifier/unity-ads-webview/pull/10013)
+ 
+
+# Tue Jun  4 16:35:13 UTC 2019
+
+* End card transition experiment [#9715](https://github.com/Applifier/unity-ads-webview/pull/9715)
+* Consent CTA ab test [#9984](https://github.com/Applifier/unity-ads-webview/pull/9984)
 * Change SDK Bot Webhook Endpoint [#9961](https://github.com/Applifier/unity-ads-webview/pull/9961)
 * ESLint : no-use-before-define [#9894](https://github.com/Applifier/unity-ads-webview/pull/9894)
 * Disable Banner Refresh for GameID 2962474 [#9953](https://github.com/Applifier/unity-ads-webview/pull/9953)
