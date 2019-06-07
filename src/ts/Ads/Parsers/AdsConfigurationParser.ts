@@ -93,9 +93,10 @@ export class AdsConfigurationParser {
 
     private static parseUserPrivacy(configJson: IRawAdsConfiguration, deviceInfo?: DeviceInfo) {
         if (deviceInfo && deviceInfo.getLimitAdTracking()) {
+            const gPmethod = configJson.gamePrivacy && configJson.gamePrivacy.method ? configJson.gamePrivacy.method : undefined;
             return new UserPrivacy({
-                method: configJson.gamePrivacy && configJson.gamePrivacy.method ? configJson.gamePrivacy.method : PrivacyMethod.DEFAULT,
-                version:  CurrentUnityConsentVersion,
+                method: gPmethod ? gPmethod : PrivacyMethod.DEFAULT,
+                version:  gPmethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0,
                 permissions: {
                     all: false,
                     gameExp: false,
