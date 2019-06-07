@@ -350,12 +350,16 @@ export class Ads implements IAds {
         }
 
         if (this._core.DeviceIdManager &&
-            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
+            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isGDPREnabled(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
             this._core.DeviceInfo instanceof AndroidDeviceInfo &&
             !this._core.DeviceInfo.getDeviceId1()) {
 
-            this._core.DeviceIdManager.getDeviceIds().catch((error) => {
-                Diagnostics.trigger('get_deviceid_failed', error);
+            this._core.DeviceIdManager.getDeviceIds().then(() => {
+                Diagnostics.trigger('china_imei_collected', {
+                    imei: this._core.DeviceInfo instanceof AndroidDeviceInfo ? this._core.DeviceInfo.getDeviceId1(): "no-info"
+                });
+            }).catch((error) => {
+                Diagnostics.trigger('china_imei_notcollected', error);
             });
         }
 
