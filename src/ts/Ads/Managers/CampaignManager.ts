@@ -263,9 +263,7 @@ export class CampaignManager {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
-            if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
-                this._pts.reportMetric(LoadMetric.LoadEnabledAuctionRequest);
-            }
+            this._pts.reportMetric(LoadMetric.LoadEnabledAuctionRequest);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
@@ -273,15 +271,15 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: timeout
             }).then(response => {
-                if(response) {
-                    return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
+            }).then((loadedCampaign) => {
+                if (!loadedCampaign) {
+                    this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
                 }
-
-                this.logLoadNoFill();
-                return undefined;
+                return loadedCampaign;
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
-                this.logLoadNoFill();
+                this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
         });
@@ -308,12 +306,6 @@ export class CampaignManager {
         Object.keys(placements).forEach((placementId) => {
             placements[placementId].setRealtimeData(undefined);
         });
-    }
-
-    private logLoadNoFill(): void {
-        if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
-            this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
-        }
     }
 
     private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
@@ -654,9 +646,7 @@ export class CampaignManager {
 
                     return this._assetManager.setup(campaign).then(() => {
                         if(trackingUrls) {
-                            if (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId(), this._coreConfig.getAbGroup())) {
-                                this._pts.reportMetric(LoadMetric.LoadEnabledFill);
-                            }
+                            this._pts.reportMetric(LoadMetric.LoadEnabledFill);
                             return {
                                 campaign: campaign,
                                 trackingUrls: trackingUrls

@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService, ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -341,13 +341,18 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
+        if (!this._core.FocusManager.isAppForeground()) {
+            if (CustomFeatures.shouldSampleAtTenPercent()) {
+                Diagnostics.trigger('ad_shown_in_background', {});
+            }
 
-        if (!this._core.FocusManager.isAppForeground() && CustomFeatures.shouldSampleAtTenPercent()) {
-            Diagnostics.trigger('ad_shown_in_background', {});
+            if (CustomFeatures.isShowingAdInBackground(this._core.ClientInfo.getGameId())) {
+                this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedToShowInBackground);
+                return;
+            }
         }
 
         const campaign = this.RefreshManager.getCampaign(placementId);
-
         if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
             this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignNotFound);
@@ -365,12 +370,16 @@ export class Ads implements IAds {
         }
 
         if (this._core.DeviceIdManager &&
-            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
+            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isGDPREnabled(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
             this._core.DeviceInfo instanceof AndroidDeviceInfo &&
             !this._core.DeviceInfo.getDeviceId1()) {
 
-            this._core.DeviceIdManager.getDeviceIds().catch((error) => {
-                Diagnostics.trigger('get_deviceid_failed', error);
+            this._core.DeviceIdManager.getDeviceIds().then(() => {
+                Diagnostics.trigger('china_imei_collected', {
+                    imei: this._core.DeviceInfo instanceof AndroidDeviceInfo ? this._core.DeviceInfo.getDeviceId1(): "no-info"
+                });
+            }).catch((error) => {
+                Diagnostics.trigger('china_imei_notcollected', error);
             });
         }
 
@@ -562,9 +571,7 @@ export class Ads implements IAds {
             this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
-                if (CustomFeatures.isTrackedGameUsingLoadApi(this._core.ClientInfo.getGameId(), this._core.Config.getAbGroup())) {
-                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
-                }
+                this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
         });
@@ -595,6 +602,10 @@ export class Ads implements IAds {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
                 if(loadEnabled) {
                     this._loadApiEnabled = true;
+                    CustomFeatures.isLoadEnabled = true;
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationSuccess);
+                } else {
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationFailure);
                 }
             }
         });
