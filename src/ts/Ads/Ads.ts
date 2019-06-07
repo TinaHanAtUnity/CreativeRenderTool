@@ -325,6 +325,7 @@ export class Ads implements IAds {
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
+        callback(CallbackStatus.OK);
         if (!this._core.FocusManager.isAppForeground()) {
             if (CustomFeatures.shouldSampleAtTenPercent()) {
                 Diagnostics.trigger('ad_shown_in_background', {});
@@ -335,8 +336,6 @@ export class Ads implements IAds {
             }
         }
 
-        callback(CallbackStatus.OK);
-        
         const campaign = this.RefreshManager.getCampaign(placementId);
         if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
