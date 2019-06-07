@@ -21,7 +21,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
+import { RequestManager, AuctionProtocol, INativeResponse } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -100,6 +100,7 @@ import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Backend/Api/Placement';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1290,6 +1291,9 @@ describe('CampaignManager', () => {
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             mockRequest = sinon.mock(request);
+            sinon.stub(Diagnostics, 'trigger').callsFake(() => {
+                return Promise.resolve(<INativeResponse>{});
+            });
         });
 
         it('should handle a response to a loaded campaign', () => {
@@ -1333,6 +1337,7 @@ describe('CampaignManager', () => {
             return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
                 mockRequest.verify();
                 sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
+                sinon.assert.calledWith((<sinon.SinonStub>Diagnostics.trigger), 'load_campaign_response_failure', {});
 
                 assert.isUndefined(loadedCampaign, 'Campaign without mediaId should not exist');
 
@@ -1355,6 +1360,7 @@ describe('CampaignManager', () => {
             return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
                 mockRequest.verify();
                 sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
+                sinon.assert.calledWith((<sinon.SinonStub>Diagnostics.trigger), 'load_campaign_auction_id_missing', {});
 
                 assert.isUndefined(loadedCampaign, 'Response without auction Id should not return a defined value');
 

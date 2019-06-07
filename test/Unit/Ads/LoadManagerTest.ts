@@ -21,7 +21,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -35,6 +35,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 describe('LoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -178,6 +179,10 @@ describe('LoadManagerTest', () => {
                 });
                 sandbox.stub(core.Api.Storage, 'getKeys').callsFake(() => {
                     return Promise.resolve(adsConfig.getPlacementIds());
+                });
+                // To silence diagnostic messages
+                sandbox.stub(Diagnostics, 'trigger').callsFake(() => {
+                    return Promise.resolve(<INativeResponse>{});
                 });
             });
 
