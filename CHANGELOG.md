@@ -1,6 +1,7 @@
 # Pending
 
 * Move ProgrammaticTrackingService to Core module [10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
+* Making Core Module available to CampaignManager [#10048](https://github.com/Applifier/unity-ads-webview/pull/10048)
 
 # Wed Jun  5 21:58:38 UTC 2019
 
