@@ -55,7 +55,7 @@ export class BannerAdContext {
         this._adUnitParametersFactory = banner.AdUnitParametersFactory;
         this._deviceInfo = core.DeviceInfo;
         this._clientInfo = core.ClientInfo;
-        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._programmaticTrackingService = core.ProgrammaticTrackingService;
 
         this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
