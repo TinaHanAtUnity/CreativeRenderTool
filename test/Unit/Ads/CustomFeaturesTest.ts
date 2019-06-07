@@ -87,28 +87,38 @@ describe('CustomFeatures', () => {
         });
     });
 
+    describe('isLoadEnabled', () => {
+        it('should set isLoadEnabled correctly', () => {
+            CustomFeatures.isLoadEnabled = false;
+            assert.isFalse(CustomFeatures.isLoadEnabled);
+            CustomFeatures.isLoadEnabled = true;
+            assert.isTrue(CustomFeatures.isLoadEnabled);
+        });
+    });
+
     describe('isTrackedGameUsingLoadApi', () => {
         const tests: {
             gameId: string;
-            abGroup: ABGroup;
             expected: boolean;
+            loadEnabled: boolean;
         }[] = [{
             gameId: '2988443',
-            abGroup: 14,
-            expected: true
+            expected: true,
+            loadEnabled: true
         }, {
             gameId: '2988443',
-            abGroup: 16,
-            expected: false
+            expected: false,
+            loadEnabled: false
         }, {
             gameId: '1234556',
-            abGroup: 14,
-            expected: false
+            expected: false,
+            loadEnabled: true
         }];
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId, t.abGroup);
+                CustomFeatures.isLoadEnabled = t.loadEnabled;
+                const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId);
                 assert.equal(value, t.expected);
             });
         });

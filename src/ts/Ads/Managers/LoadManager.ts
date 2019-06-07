@@ -193,8 +193,8 @@ export class LoadManager extends RefreshManager {
                     if (placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
                         this.loadPlacement(loadEvent.value);
                     }
+                    this.deleteStoredLoad(key);
                 }
-                this.deleteStoredLoad(key);
             });
         }
     }

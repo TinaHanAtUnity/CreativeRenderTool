@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { CustomFeatures } from './CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -118,6 +119,10 @@ export class ProgrammaticTrackingService {
     }
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
+
+        if (event in LoadMetric && !(CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId()))) {
+            return Promise.resolve(<INativeResponse>{});
+        }
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
