@@ -90,7 +90,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._coreConfig = core.Config;
         this._sessionManager = ads.SessionManager;
         this._privacyManager = ads.PrivacyManager;
-        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
     }

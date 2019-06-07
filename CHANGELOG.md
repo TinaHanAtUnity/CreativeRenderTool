@@ -1,3 +1,9 @@
+# Pending
+
+* Consent CTA ab test (bolder fonts) [#10049](https://github.com/Applifier/unity-ads-webview/pull/10049)
+* Move ProgrammaticTrackingService to Core module [10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
+* Making Core Module available to CampaignManager [#10048](https://github.com/Applifier/unity-ads-webview/pull/10048)
+
 # Wed Jun  5 21:58:38 UTC 2019
 
 * ESLint : No multiple blank lines and end of file must have newline [#9952](https://github.com/Applifier/unity-ads-webview/pull/9952)
