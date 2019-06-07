@@ -20,7 +20,6 @@ import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
@@ -48,7 +47,6 @@ export interface IAds extends IApiModule {
     SessionManager: SessionManager;
     MissedImpressionManager: MissedImpressionManager;
     BackupCampaignManager: BackupCampaignManager;
-    ProgrammaticTrackingService: ProgrammaticTrackingService;
     ContentTypeHandlerManager: ContentTypeHandlerManager;
     Config: AdsConfiguration;
     Container: Activity | ViewController;
