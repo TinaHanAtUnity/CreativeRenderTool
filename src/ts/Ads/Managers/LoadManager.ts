@@ -148,6 +148,7 @@ export class LoadManager extends RefreshManager {
                     for(const load of storedLoads) {
                         if(load) {
                             validLoads.push(load);
+                            this.deleteStoredLoad(load);
                         }
                     }
 
@@ -174,9 +175,11 @@ export class LoadManager extends RefreshManager {
         });
     }
 
-    private deleteStoredLoad(key: string) {
-        this._core.Storage.delete(StorageType.PUBLIC, 'load.' + key);
-        this._core.Storage.write(StorageType.PUBLIC);
+    private deleteStoredLoad(key: string): Promise<void[]> {
+        const promises = [];
+        promises.push(this._core.Storage.delete(StorageType.PUBLIC, 'load.' + key));
+        promises.push(this._core.Storage.write(StorageType.PUBLIC));
+        return Promise.all(promises);
     }
 
     private onStorageSet(event: ILoadStorageEvent) {
@@ -189,9 +192,9 @@ export class LoadManager extends RefreshManager {
 
                     if (placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
                         this.loadPlacement(loadEvent.value);
-                        this.deleteStoredLoad(key);
                     }
                 }
+                this.deleteStoredLoad(key);
             });
         }
     }
