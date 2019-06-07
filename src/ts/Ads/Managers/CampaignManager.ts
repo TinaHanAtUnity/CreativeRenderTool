@@ -273,12 +273,12 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: timeout
             }).then(response => {
-                if(response) {
-                    return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
-                }
-
-                this.logLoadNoFill();
-                return undefined;
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace).then((loadedCampaign) => {
+                    if (!loadedCampaign) {
+                        this.logLoadNoFill();
+                    }
+                    return loadedCampaign;
+                });
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
                 this.logLoadNoFill();

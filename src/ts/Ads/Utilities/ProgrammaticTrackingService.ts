@@ -48,7 +48,9 @@ export enum LoadMetric {
     LoadEnabledAuctionRequest = 'load_enabled_auction_request',
     LoadEnabledFill = 'load_enabled_fill',
     LoadEnabledNoFill = 'load_enabled_no_fill',
-    LoadEnabledShow = 'load_enabled_show'
+    LoadEnabledShow = 'load_enabled_show',
+    LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure'
 }
 
 type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric;

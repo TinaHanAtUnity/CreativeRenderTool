@@ -595,6 +595,9 @@ export class Ads implements IAds {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
                 if(loadEnabled) {
                     this._loadApiEnabled = true;
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationSuccess);
+                } else {
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationFailure);
                 }
             }
         });
