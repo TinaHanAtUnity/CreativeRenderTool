@@ -1,5 +1,6 @@
 # Pending
 
+* Consent CTA ab test (bolder fonts) [#10049](https://github.com/Applifier/unity-ads-webview/pull/10049)
 * Move ProgrammaticTrackingService to Core module [10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
 * Making Core Module available to CampaignManager [#10048](https://github.com/Applifier/unity-ads-webview/pull/10048)
 
