@@ -271,12 +271,12 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: timeout
             }).then(response => {
-                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace).then((loadedCampaign) => {
-                    if (!loadedCampaign) {
-                        this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
-                    }
-                    return loadedCampaign;
-                });
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
+            }).then((loadedCampaign) => {
+                if (!loadedCampaign) {
+                    this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
+                }
+                return loadedCampaign;
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
                 this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);

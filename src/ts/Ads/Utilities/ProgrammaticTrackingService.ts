@@ -120,7 +120,9 @@ export class ProgrammaticTrackingService {
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
 
-        if (event in LoadMetric && !(CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId()))) {
+        const isLoadMetric = event in LoadMetric;
+        const isZyngaSolitareUsingLoad = (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId()));
+        if (isLoadMetric && !(isZyngaSolitareUsingLoad)) {
             return Promise.resolve(<INativeResponse>{});
         }
         const metricData: IProgrammaticTrackingData = {
