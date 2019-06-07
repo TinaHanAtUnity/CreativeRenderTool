@@ -341,13 +341,18 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
+        if (!this._core.FocusManager.isAppForeground()) {
+            if (CustomFeatures.shouldSampleAtTenPercent()) {
+                Diagnostics.trigger('ad_shown_in_background', {});
+            }
 
-        if (!this._core.FocusManager.isAppForeground() && CustomFeatures.shouldSampleAtTenPercent()) {
-            Diagnostics.trigger('ad_shown_in_background', {});
+            if (CustomFeatures.isShowingAdInBackground(this._core.ClientInfo.getGameId())) {
+                this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedToShowInBackground);
+                return;
+            }
         }
 
         const campaign = this.RefreshManager.getCampaign(placementId);
-
         if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
             this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignNotFound);
@@ -365,12 +370,16 @@ export class Ads implements IAds {
         }
 
         if (this._core.DeviceIdManager &&
-            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
+            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isGDPREnabled(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
             this._core.DeviceInfo instanceof AndroidDeviceInfo &&
             !this._core.DeviceInfo.getDeviceId1()) {
 
-            this._core.DeviceIdManager.getDeviceIds().catch((error) => {
-                Diagnostics.trigger('get_deviceid_failed', error);
+            this._core.DeviceIdManager.getDeviceIds().then(() => {
+                Diagnostics.trigger('china_imei_collected', {
+                    imei: this._core.DeviceInfo instanceof AndroidDeviceInfo ? this._core.DeviceInfo.getDeviceId1(): "no-info"
+                });
+            }).catch((error) => {
+                Diagnostics.trigger('china_imei_notcollected', error);
             });
         }
 
