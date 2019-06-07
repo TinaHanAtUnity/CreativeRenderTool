@@ -94,6 +94,33 @@ describe('LoadManagerTest', () => {
         loadManager = new LoadManager(platform, core, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
     });
 
+    describe('getStoredLoads', () => {
+        let sandbox: sinon.SinonSandbox;
+
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            sandbox.stub(core.Storage, 'get');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should not call getStoredLoad at all', () => {
+            sandbox.stub(core.Storage, 'getKeys').returns(Promise.resolve([]));
+            return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then((res) => {
+                sandbox.assert.notCalled((<sinon.SinonStub>core.Storage.get));
+            });
+        });
+
+        it('should not call getStoredLoad at all', () => {
+            sandbox.stub(core.Storage, 'getKeys').returns(Promise.reject());
+            return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then((res) => {
+                sandbox.assert.notCalled((<sinon.SinonStub>core.Storage.get));
+            });
+        });
+    });
+
     describe('onStorageSet', () => {
         let sandbox: sinon.SinonSandbox;
 

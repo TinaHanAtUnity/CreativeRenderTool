@@ -565,7 +565,7 @@ export class Ads implements IAds {
 
             this._currentAdUnit.show().then(() => {
                 if (CustomFeatures.isTrackedGameUsingLoadApi(this._core.ClientInfo.getGameId(), this._core.Config.getAbGroup())) {
-                    this.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
                 }
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
