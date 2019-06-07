@@ -1,4 +1,4 @@
-# Pending
+# Fri Jun  7 19:56:54 UTC 2019
 
 * Consent CTA ab test (bolder fonts) [#10049](https://github.com/Applifier/unity-ads-webview/pull/10049)
 * Move ProgrammaticTrackingService to Core module [#10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
