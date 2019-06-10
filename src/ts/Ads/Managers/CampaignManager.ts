@@ -646,6 +646,7 @@ export class CampaignManager {
 
                     return this._assetManager.setup(campaign).then(() => {
                         if(trackingUrls) {
+                            this._pts.reportMetric(LoadMetric.LoadEnabledFill);
                             return {
                                 campaign: campaign,
                                 trackingUrls: trackingUrls
