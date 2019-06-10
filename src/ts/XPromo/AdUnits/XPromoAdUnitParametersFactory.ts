@@ -35,7 +35,7 @@ export class XPromoAdUnitParametersFactory extends AbstractAdUnitParametersFacto
         if (AnimationEndCardTest.isValid(abGroup)) {
             overlay = new AnimatedVideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
         } else {
-            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
