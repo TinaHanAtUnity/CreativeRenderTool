@@ -141,6 +141,7 @@ export class LoadManager extends RefreshManager {
 
                 for(const key of keys) {
                     promises.push(this.getStoredLoad(key));
+                    this.deleteStoredLoad(key);
                 }
 
                 return Promise.all(promises).then(storedLoads => {
@@ -148,7 +149,6 @@ export class LoadManager extends RefreshManager {
                     for(const load of storedLoads) {
                         if(load) {
                             validLoads.push(load);
-                            this.deleteStoredLoad(load);
                         }
                     }
 
@@ -183,7 +183,7 @@ export class LoadManager extends RefreshManager {
     }
 
     private onStorageSet(event: ILoadStorageEvent) {
-        if(event && event.load && event.hasOwnProperty('load')) {
+        if(event && event.load) {
             const loadedEvents = event.load;
             Object.keys(event.load).forEach(key => {
                 if (loadedEvents[key]) {
@@ -193,8 +193,8 @@ export class LoadManager extends RefreshManager {
                     if (placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
                         this.loadPlacement(loadEvent.value);
                     }
-                    this.deleteStoredLoad(key);
                 }
+                this.deleteStoredLoad(key);
             });
         }
     }

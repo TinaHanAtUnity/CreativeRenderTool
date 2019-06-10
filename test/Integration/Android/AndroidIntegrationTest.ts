@@ -10,6 +10,7 @@ import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
 import { StorageType, StorageEvent } from 'Core/Native/Storage';
+import { ILoadEvent } from 'Ads/Managers/LoadManager';
 
 describe('AndroidIntegrationTest', () => {
     const sandbox = sinon.createSandbox();
@@ -316,9 +317,12 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
 
         return new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
-            UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1.value', 'rewardedVideo');
-            UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1.ts', new Date().getTime());
-            UnityAds.getBackend().sendEvent('STORAGE', StorageEvent[StorageEvent.SET], 'load', {load: {test: {value: 'rewardedVideo', ts: new Date().getTime()}}});
+            const loadEvent: ILoadEvent = {
+                value: 'rewardedVideo',
+                ts: new Date().getTime()
+            };
+            UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.test', loadEvent);
+            UnityAds.getBackend().sendEvent('STORAGE', StorageEvent[StorageEvent.SET], 'load', {load: {test: loadEvent}});
         }).then(() => promiseReady).then(() => {
             chai.assert.equal(readyCount, 1);
             chai.assert.equal(readyPlacement, 'rewardedVideo');
