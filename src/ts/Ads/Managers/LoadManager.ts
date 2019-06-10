@@ -17,7 +17,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 
 export interface ILoadEvent {
     value: string;
-    ts: number;
+    ts: number; // Set by metadata api on the native level
 }
 
 export interface ILoadStorageEvent {
