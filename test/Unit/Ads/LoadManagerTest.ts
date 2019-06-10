@@ -1,3 +1,5 @@
+import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
+import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
@@ -5,7 +7,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { ILoadEvent, LoadManager, ILoadStorageEvent } from 'Ads/Managers/LoadManager';
+import { ILoadEvent, ILoadStorageEvent, LoadManager } from 'Ads/Managers/LoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -15,27 +17,25 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi, ICore } from 'Core/ICore';
+import { ICore } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
-import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 describe('LoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -92,7 +92,7 @@ describe('LoadManagerTest', () => {
         backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-        loadManager = new LoadManager(platform, core.Api, coreConfig, ads, adsConfig, campaignManager, clientInfo, focusManager);
+        loadManager = new LoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager);
     });
 
     describe('getStoredLoads', () => {
@@ -118,6 +118,20 @@ describe('LoadManagerTest', () => {
             sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.reject());
             return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then((res) => {
                 sandbox.assert.notCalled((<sinon.SinonStub>core.Api.Storage.get));
+            });
+        });
+
+        it('should ignore loads set more than 60 seconds prior to SDK initialization', () => {
+            const time = Date.now();
+            const loadEvent: ILoadEvent = {
+                value: 'scott',
+                ts: time - 600001
+            };
+            sandbox.stub(clientInfo, 'getInitTimestamp').returns(time);
+            sandbox.stub(campaignManager, 'loadCampaign');
+            sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.resolve({key: loadEvent}));
+            return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then((res) => {
+                sandbox.assert.notCalled((<sinon.SinonStub> campaignManager.loadCampaign));
             });
         });
     });

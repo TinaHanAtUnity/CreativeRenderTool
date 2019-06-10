@@ -111,7 +111,7 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
-        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(new Date().getTime());
+        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -121,7 +121,7 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
         const loadEvent: ILoadEvent = {
             value: 'video',
-            ts: new Date().getTime()
+            ts: Date.now()
         };
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1', loadEvent);
 
@@ -179,7 +179,7 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
-        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(new Date().getTime());
+        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -189,11 +189,11 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
         const loadEventPremium: ILoadEvent = {
             value: 'premium',
-            ts: new Date().getTime()
+            ts: Date.now()
         };
         const loadEventVideo: ILoadEvent = {
             value: 'video',
-            ts: new Date().getTime() - 600000
+            ts: Date.now() - 600000
         };
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1', loadEventPremium);
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.2', loadEventVideo);
@@ -252,7 +252,7 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
-        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(new Date().getTime());
+        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -314,7 +314,7 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
-        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(new Date().getTime());
+        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -328,7 +328,7 @@ describe('AndroidIntegrationTest', () => {
         return new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
             const loadEvent: ILoadEvent = {
                 value: 'rewardedVideo',
-                ts: new Date().getTime()
+                ts: Date.now()
             };
             UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.test', loadEvent);
             UnityAds.getBackend().sendEvent('STORAGE', StorageEvent[StorageEvent.SET], 'load', {load: {test: loadEvent}});

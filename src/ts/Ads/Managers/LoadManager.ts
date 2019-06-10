@@ -5,41 +5,35 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 
 export interface ILoadEvent {
-    value: string;
+    value: string; // PlacementID for the loaded placement
     ts: number; // Set by metadata api on the native level
 }
 
 export interface ILoadStorageEvent {
-    load?: { [placementId: string]: ILoadEvent };
+    load?: { [key: string]: ILoadEvent };
 }
 
 export class LoadManager extends RefreshManager {
-    private _platform: Platform;
     private _core: ICoreApi;
-    private _coreConfig: CoreConfiguration;
     private _ads: IAdsApi;
     private _adsConfig: AdsConfiguration;
     private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
+    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
         super();
 
-        this._platform = platform;
         this._core = core;
-        this._coreConfig = coreConfig;
         this._ads = ads;
         this._adsConfig = adsConfig;
         this._campaignManager = campaignManager;
@@ -165,7 +159,7 @@ export class LoadManager extends RefreshManager {
 
     private getStoredLoad(key: string): Promise<string | undefined> {
         return this._core.Storage.get<ILoadEvent>(StorageType.PUBLIC, 'load.' + key).then(loadEvent => {
-            if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp() - 60000) { // ignore loads 60 seconds older than SDK init timestamp
+            if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp() - 60000) { // Ignore loads set more than 60 seconds prior to SDK initialization
                 return loadEvent.value;
             } else {
                 return undefined;
