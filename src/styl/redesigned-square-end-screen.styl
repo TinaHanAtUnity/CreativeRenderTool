@@ -189,13 +189,34 @@ html #redesigned-end-screen.square-end-screen .end-screen-info-background {
   }
 }
 
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+   &.landscape #redesigned-end-screen.square-end-screen {
+
+    .game-background-container {
+      width: 332px;
+    }
+   }
+}
+
+/* iPhone XR and iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  &.landscape #redesigned-end-screen.square-end-screen {
+    .game-background-container {
+      width: 371px;
+    }
+  }
+}
+
 /* iPhone X, XR and XS Max fixes */
 @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3),
 only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
 only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
   &.landscape #redesigned-end-screen.square-end-screen {
-    .game-image {
-      background-position: left;
+    .game-background-blurred {
+      display: none;
     }
 
     .download-container {

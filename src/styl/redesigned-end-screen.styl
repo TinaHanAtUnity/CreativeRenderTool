@@ -5,9 +5,9 @@
 
 // We have new media queries with custom font sizes for the endscreen so we need to use 'em' unit
 // TODO: This should be already defined, also don't override the original
-$endscreen-default-size = unit($default-px-size/ 16, "em");
-$end-screen-mixin($scale-size = $default-scale-size) {
+$redesigned-endscreen-default-size = unit($default-px-size/ 16, "em");
 
+$redesigned-end-screen-mixin($scale-size = $default-scale-size) {
   #redesigned-end-screen {
     background-color: $end-screen-background-color;
 
@@ -105,7 +105,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     .unityads-logo {
       $unityads-logo-default($scale-size, false);
       position: absolute;
-      z-index: 5;
+      z-index: 10;
       height: 18px;
       margin-bottom: 3px;
       opacity: .6;
@@ -135,6 +135,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       margin-left: .5 * $endscreen-default-size;
       line-height: 1 * $endscreen-default-size;
       line-height: initial;
+      z-index: 15;
     }
 
     .icon-gdpr {
@@ -181,6 +182,44 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       margin-bottom: .85 * $endscreen-default-size;
       margin-top: 1 * $endscreen-default-size;
     }
+
+    .game-background-portrait {
+      display: block;
+    }
+
+    .game-background-landscape {
+      display: none;
+    }
+
+    .row-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      bottom: $endscreen-default-size;
+    }
+
+    .store-container {
+      margin-top: 0;
+    }
+
+    .end-screen-info-background {
+      width: 100%;
+      height: 31%;
+      border-radius: 0 0 .75 * $endscreen-default-size .75 * $endscreen-default-size;
+    }
+
+    .game-icon {
+      align-self: center;
+    }
+
+    .game-background {
+      background-color: $end-screen-gray-border;
+    }
+
+    .btn-close-region {
+      right: 0.3 * $endscreen-default-size;
+      top: -0.3 * $endscreen-default-size;
+    }
   }
 
   body {
@@ -219,27 +258,27 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
 
-      @media (orientation: portrait) {
-          @media (max-height: 460px) {
-              .pop-up-container {
-                height: 'calc(100% - 3.55 * %s)' % $endscreen-default-size;
+    @media (orientation: portrait) {
+      @media (max-height: 460px) {
+        .pop-up-container {
+          height: 'calc(100% - 3.55 * %s)' % $endscreen-default-size;
 
-                .icon-close {
-                  font-size: 1.5 * $endscreen-default-size;
-                }
+          .icon-close {
+            font-size: 1.5 * $endscreen-default-size;
+          }
 
-                .btn-close-region {
-                  top: -0.5 * $endscreen-default-size;
-                  right: -0.3 * $endscreen-default-size;
-                }
-              }
-
-              .bottom {
-                height: 2.05 * $endscreen-default-size;
-              }
-            }
+          .btn-close-region {
+            top: -0.5 * $endscreen-default-size;
+            right: -0.3 * $endscreen-default-size;
+          }
         }
+
+        .bottom {
+          height: 2.05 * $endscreen-default-size;
+        }
+      }
     }
+  }
 
     &.landscape #redesigned-end-screen {
       .btn-close-region {
@@ -255,15 +294,52 @@ $end-screen-mixin($scale-size = $default-scale-size) {
           margin-bottom: .8 * $endscreen-default-size;
         }
       }
-    }
 
-    #redesigned-end-screen {
-      .store-container {
-        margin-top: 0;
+      .bottom-container {
+        bottom: .75 * $endscreen-default-size;
+        right: 0;
+        left: auto;
+        width: 50%;
       }
 
-      .row-container {
-        bottom: $endscreen-default-size;
+      .game-background-container {
+        width: 50%;
+        height: 100%;
+      }
+
+      .game-background-portrait {
+        display: none;
+      }
+      .game-background-landscape {
+        display: block;
+      }
+
+      .end-screen-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .game-icon {
+          margin: 0 auto;
+        }
+
+      }
+
+      .campaign-container {
+        display: flex;
+        border-radius: .75 * $endscreen-default-size;
+      }
+
+      .end-screen-info-background {
+        width: 50%;
+        height: 100%;
+        text-align: center;
+        border-radius: 0 .75 * $endscreen-default-size .75 * $endscreen-default-size 0;
+      }
+
+      .gdpr-pop-up {
+        left: 0;
       }
     }
 
@@ -286,95 +362,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
         }
       }
     }
-  }
-}
-
-body {
-  &.portrait #redesigned-end-screen {
-    .game-background-portrait {
-      display: block;
-    }
-    .game-background-landscape {
-      display: none;
-    }
-
-    .row-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-    }
-
-    .end-screen-info-background {
-      width: 100%;
-      height: 31%;
-      border-radius: 0 0 .75 * $endscreen-default-size .75 * $endscreen-default-size;
-    }
-
-    .game-icon {
-      align-self: center;
-    }
-    
-    .game-background {
-      background-color: $end-screen-gray-border;
-    }
-
-    .btn-close-region {
-      right: 0.3 * $endscreen-default-size;
-      top: -0.3 * $endscreen-default-size;
-    }
-  }
-
-  &.landscape #redesigned-end-screen {
-    .bottom-container {
-      bottom: .75 * $endscreen-default-size;
-      right: 0;
-      left: auto;
-      width: 50%;
-    }
-
-    .game-background-container {
-      width: 50%;
-      height: 100%;
-    }
-
-    .game-background-portrait {
-      display: none;
-    }
-    .game-background-landscape {
-      display: block;
-    }
-
-    .end-screen-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-
-      .game-icon {
-        margin: 0 auto;
-      }
-
-    }
-
-    .campaign-container {
-      display: flex;
-      border-radius: .75 * $endscreen-default-size;
-    }
-
-    .end-screen-info-background {
-      width: 50%;
-      height: 100%;
-      text-align: center;
-      border-radius: 0 .75 * $endscreen-default-size .75 * $endscreen-default-size 0;
-    }
-
-    .gdpr-pop-up {
-      left: 0;
-    }
-  }
-
-  .row-container {
-    position: relative;
   }
 }
 
@@ -585,4 +572,48 @@ body {
   }
 }
 
-$end-screen-mixin();
+$redesigned-end-screen-mixin();
+
+/* iPhone X, XR and XS Max fixes */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  body.iphone #redesigned-end-screen {
+    .pop-up-container {
+      height: calc(100% - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 1em);
+      width: calc(100% - 2em);
+      margin-top: 1em;
+    }
+
+    .btn-close-region {
+      top: env(safe-area-inset-top);
+    }
+  }
+
+  .performance-end-screen body {
+    &.ios-landscape-right #redesigned-end-screen {
+      .bottom-container {
+        right: calc(env(safe-area-inset-right) + 1em);
+        width: calc(50% - 2em);
+        margin-bottom: calc(env(safe-area-inset-bottom) - .5em);
+      }
+    }
+
+    &.ios-landscape-left #redesigned-end-screen {
+      width: calc(100% - 2em);
+
+      .pop-up-container {
+        width: calc(100% - 2em - env(safe-area-inset-right));
+      }
+
+      .bottom-container {
+        right: calc(env(safe-area-inset-right) + 1em);
+        width: calc(50% - env(safe-area-inset-right) - 1em);
+
+        .privacy-button {
+          right: 0;
+        }
+      }
+    }
+  }
+}
