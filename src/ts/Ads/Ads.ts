@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService, ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -80,6 +80,11 @@ import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { RefreshManager } from 'Ads/Managers/RefreshManager';
+import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -100,7 +105,7 @@ export class Ads implements IAds {
     public PlacementManager: PlacementManager;
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
-    public RefreshManager: CampaignRefreshManager;
+    public RefreshManager: RefreshManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -109,6 +114,7 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
+    private _loadApiEnabled: boolean = false;
 
     private _core: ICore;
     private _store: IStore;
@@ -171,10 +177,16 @@ export class Ads implements IAds {
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+            const promises = [];
+            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
+                promises.push(this.setupLoadApi());
+            }
+            promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
-            });
+            }));
+
+            return Promise.all(promises);
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
@@ -240,8 +252,11 @@ export class Ads implements IAds {
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
-            this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-
+            if(this._loadApiEnabled) {
+                this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
+            } else {
+                this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+            }
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
             promo.initialize();
@@ -509,7 +524,7 @@ export class Ads implements IAds {
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
             this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options);
-            this.RefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            this.RefreshManager.setCurrentAdUnit(this._currentAdUnit, placement);
             if (this.Monetization.isInitialized()) {
                 this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
             }
@@ -556,6 +571,7 @@ export class Ads implements IAds {
             this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
+                this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
         });
@@ -576,6 +592,23 @@ export class Ads implements IAds {
 
     private onAdUnitClose(): void {
         this._showing = false;
+    }
+
+    private setupLoadApi(): Promise<void> {
+        this._loadApiEnabled = false;
+
+        return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if(mediation) {
+                const loadEnabled = mediation.isMetaDataLoadEnabled();
+                if(loadEnabled) {
+                    this._loadApiEnabled = true;
+                    CustomFeatures.isLoadEnabled = true;
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationSuccess);
+                } else {
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationFailure);
+                }
+            }
+        });
     }
 
     private setupTestEnvironment(): void {

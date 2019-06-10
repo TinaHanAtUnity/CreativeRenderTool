@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest, FilteredABTest, FakeZyngaFilteredABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest, FilteredABTest, FakeZyngaFilteredABTest, ZyngaLoadTest } from 'Core/Models/ABGroup';
 import 'mocha';
 
 describe('ABGroupTests', () => {
@@ -72,6 +72,18 @@ describe('ABGroupTests', () => {
             const invalidGroups = validGroups.filter(v => v !== 16 && v !== 17);
             for (const i of invalidGroups) {
                 assert.isFalse(FakeZyngaFilteredABTest.isValid(toAbGroup(i)));
+            }
+        });
+    });
+
+    describe('ZyngaLoadTest', () => {
+        it('should return true for ABGroups 14 and 15', () => {
+            for (const i of validGroups) {
+                if (i === 14 || i === 15) {
+                    assert.isTrue(ZyngaLoadTest.isValid(i));
+                } else {
+                    assert.isFalse(ZyngaLoadTest.isValid(toAbGroup(i)));
+                }
             }
         });
     });

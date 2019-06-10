@@ -133,6 +133,22 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
+    public static isLoadEnabled: boolean = false;
+
+    /**
+     *  Method used for gating PTS metrics for this specific Zynga Game using Load API
+     */
+    public static isTrackedGameUsingLoadApi(gameId: string) {
+        const isZyngaSolitare = gameId === '2988443';
+        return isZyngaSolitare && this.isLoadEnabled;
+    }
+
+    public static isWhiteListedForLoadApi(gameId: string) {
+        return gameId === '2988443' ||  // Zynga Solitaire          : Android
+               gameId === '2988494' ||  // Zynga Freecell           : iOS
+               gameId === '2988495';    // Zynga Freecell Solitaire : Android
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;

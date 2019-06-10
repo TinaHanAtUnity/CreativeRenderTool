@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { CustomFeatures } from './CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -45,7 +46,16 @@ export enum MiscellaneousMetric {
     CampaignAttemptedToShowInBackground = 'ad_attempted_show_background'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
+export enum LoadMetric {
+    LoadEnabledAuctionRequest = 'load_enabled_auction_request',
+    LoadEnabledFill = 'load_enabled_fill',
+    LoadEnabledNoFill = 'load_enabled_no_fill',
+    LoadEnabledShow = 'load_enabled_show',
+    LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
@@ -110,6 +120,12 @@ export class ProgrammaticTrackingService {
     }
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
+
+        const isLoadMetric = event in LoadMetric;
+        const isZyngaSolitareUsingLoad = (CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId()));
+        if (isLoadMetric && !(isZyngaSolitareUsingLoad)) {
+            return Promise.resolve(<INativeResponse>{});
+        }
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {

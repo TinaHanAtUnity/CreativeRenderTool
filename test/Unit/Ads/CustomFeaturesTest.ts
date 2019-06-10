@@ -1,6 +1,7 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -57,6 +58,69 @@ describe('CustomFeatures', () => {
         it('should return false if gameId is 99999', () => {
             const value = CustomFeatures.isCloseIconSkipEnabled('99999');
             assert.isFalse(value);
+        });
+    });
+
+    describe('isWhiteListedForLoadApi', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '2988495',
+            expected: true
+        }, {
+            gameId: '2988494',
+            expected: true
+        }, {
+            gameId: '2988443',
+            expected: true
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
+
+    describe('isLoadEnabled', () => {
+        it('should set isLoadEnabled correctly', () => {
+            CustomFeatures.isLoadEnabled = false;
+            assert.isFalse(CustomFeatures.isLoadEnabled);
+            CustomFeatures.isLoadEnabled = true;
+            assert.isTrue(CustomFeatures.isLoadEnabled);
+        });
+    });
+
+    describe('isTrackedGameUsingLoadApi', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+            loadEnabled: boolean;
+        }[] = [{
+            gameId: '2988443',
+            expected: true,
+            loadEnabled: true
+        }, {
+            gameId: '2988443',
+            expected: false,
+            loadEnabled: false
+        }, {
+            gameId: '1234556',
+            expected: false,
+            loadEnabled: true
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                CustomFeatures.isLoadEnabled = t.loadEnabled;
+                const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId);
+                assert.equal(value, t.expected);
+            });
         });
     });
 });
