@@ -41,7 +41,8 @@ export enum VastMetric {
 
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
+    CampaignAttemptedToShowInBackground = 'ad_attempted_show_background'
 }
 
 type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
