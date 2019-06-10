@@ -119,8 +119,11 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1.value', 'video');
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1.ts', new Date().getTime());
+        const loadEvent: ILoadEvent = {
+            value: 'video',
+            ts: new Date().getTime()
+        };
+        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1', loadEvent);
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
 
@@ -184,10 +187,16 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1.value', 'premium');
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1.ts', new Date().getTime());
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.2.value', 'video');
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.2.ts', new Date().getTime() - 600000);
+        const loadEventPremium: ILoadEvent = {
+            value: 'premium',
+            ts: new Date().getTime()
+        };
+        const loadEventVideo: ILoadEvent = {
+            value: 'video',
+            ts: new Date().getTime() - 600000
+        };
+        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1', loadEventPremium);
+        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.2', loadEventVideo);
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
 
