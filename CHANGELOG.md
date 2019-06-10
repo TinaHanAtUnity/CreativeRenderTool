@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun 10 23:42:26 UTC 2019
 
 * Metadata Enabled Per Placement Load Functionality Test [#9685](https://github.com/Applifier/unity-ads-webview/pull/9685)
 
