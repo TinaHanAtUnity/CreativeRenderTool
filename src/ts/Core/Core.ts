@@ -52,6 +52,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class Core implements ICore {
 
@@ -80,6 +81,7 @@ export class Core implements ICore {
     public Ads: Ads;
     public Purchasing: Purchasing;
     public Store: Store;
+    public ProgrammaticTrackingService: ProgrammaticTrackingService;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -142,6 +144,7 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
+            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo);
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
