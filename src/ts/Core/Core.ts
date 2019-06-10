@@ -165,7 +165,6 @@ export class Core implements ICore {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this._initialized = true;
             this._initializedAt = Date.now();
-            this.Api.Sdk.initComplete();
 
             this.WakeUpManager.setListenConnectivity(true);
             if(this.NativeBridge.getPlatform() === Platform.IOS) {
@@ -239,24 +238,26 @@ export class Core implements ICore {
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
-        }).catch((error: { message: string; name: unknown }) => {
-            jaegerInitSpan.addAnnotation(error.message);
+            this.Api.Sdk.initComplete();
+        }).catch((e: Error) => {
+            jaegerInitSpan.addAnnotation(e.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, e.message);
             if (this.JaegerManager) {
                 this.JaegerManager.stop(jaegerInitSpan);
             }
 
-            if(error instanceof ConfigError) {
+            if(e instanceof ConfigError) {
                 // tslint:disable-next-line
-                error = { 'message': error.message, 'name': error.name };
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if(error instanceof Error && error.name === 'DisabledGame') {
+                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], e.message);
+            } else if(e.name === 'DisabledGame') {
                 return;
             }
 
-            this.Api.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger('initialization_error', error);
+            // TODO needs a better code.
+            this.Api.Sdk.initError(e.message, 0);
+            this.Api.Sdk.logError(`Initialization error: ${e.message}, ${e.stack}`);
+            Diagnostics.trigger('initialization_error', e);
         });
     }
 

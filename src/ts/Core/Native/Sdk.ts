@@ -16,6 +16,10 @@ export class SdkApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initComplete');
     }
 
+    public initError(message: string, code: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initError', [message, code]);
+    }
+
     public setDebugMode(debugMode: boolean): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDebugMode', [debugMode]);
     }
