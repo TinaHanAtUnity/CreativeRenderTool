@@ -1,3 +1,7 @@
+# Pending
+
+* Metadata Enabled Per Placement Load Functionality Test [#9685](https://github.com/Applifier/unity-ads-webview/pull/9685)
+
 # Fri Jun  7 19:56:54 UTC 2019
 
 * Consent CTA ab test (bolder fonts) [#10049](https://github.com/Applifier/unity-ads-webview/pull/10049)
