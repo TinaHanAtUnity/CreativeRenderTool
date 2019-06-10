@@ -22,7 +22,7 @@ export interface ILoadStorageEvent {
     load?: { [key: string]: ILoadEvent };
 }
 
-export class LoadManager extends RefreshManager {
+export class PerPlacementLoadManager extends RefreshManager {
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _adsConfig: AdsConfiguration;

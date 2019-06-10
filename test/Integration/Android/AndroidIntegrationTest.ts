@@ -10,7 +10,7 @@ import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
 import { StorageType, StorageEvent } from 'Core/Native/Storage';
-import { ILoadEvent } from 'Ads/Managers/LoadManager';
+import { ILoadEvent } from 'Ads/Managers/PerPlacementLoadManager';
 
 describe('AndroidIntegrationTest', () => {
     const sandbox = sinon.createSandbox();

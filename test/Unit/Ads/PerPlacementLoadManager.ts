@@ -7,7 +7,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { ILoadEvent, ILoadStorageEvent, LoadManager } from 'Ads/Managers/LoadManager';
+import { ILoadEvent, ILoadStorageEvent, PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -37,7 +37,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-describe('LoadManagerTest', () => {
+describe('PerPlacementLoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
@@ -53,7 +53,7 @@ describe('LoadManagerTest', () => {
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
-    let loadManager: LoadManager;
+    let loadManager: PerPlacementLoadManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
     let adMobSignalFactory: AdMobSignalFactory;
@@ -92,7 +92,7 @@ describe('LoadManagerTest', () => {
         backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-        loadManager = new LoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager);
+        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager);
     });
 
     describe('getStoredLoads', () => {
