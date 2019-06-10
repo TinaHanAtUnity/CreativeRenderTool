@@ -1,0 +1,73 @@
+@import "vars.styl";
+
+$endscreen-default-size = unit(($default-px-size / 16), "em");
+$scale-size = $default-scale-size;
+
+#end-screen {
+  .download-query {
+    padding-top: $endscreen-default-size * .3;
+
+    .download-query-text {
+      font-size: 80%;
+    }
+  }
+
+  .download-container-query {
+    display: block;
+    background-color: transparent;
+    padding-top: 0;
+
+    .download-button {
+      padding: $endscreen-default-size * .6 0;
+      border-radius: $endscreen-default-size * .6;
+    }
+
+    .download-yes {
+      float: right;
+      width: 60%;
+      background: $blue;
+    }
+
+    .download-no {
+      float: left;
+      width: 35%;
+      background: $light-gray;
+    }
+  }
+}
+
+body {
+  &.portrait #end-screen {
+    .download-container-query {
+      margin: 2.4 * $endscreen-default-size auto 0 auto;
+    }
+
+    .game-icon {
+      margin-bottom: .4em;
+    }
+  }
+
+  &.landscape #end-screen {
+    .end-screen-info {
+      .download-container-query {
+        margin: 2.4 * $endscreen-default-size auto 0 auto;
+      }
+    }
+  }
+
+  &.ios {
+    #end-screen .end-screen-info {
+      .download-container-query {
+        border-radius: 2.25 * $endscreen-default-size;
+      }
+    }
+  }
+
+  &.landscape #end-screen {
+    .end-screen-info {
+      .download-container-query {
+        margin: 2.4 * $endscreen-default-size auto 0 auto;
+      }
+    }
+  }
+}

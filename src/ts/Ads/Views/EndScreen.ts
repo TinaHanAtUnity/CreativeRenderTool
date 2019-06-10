@@ -175,7 +175,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
-    private onPrivacyEvent(event: Event): void {
+    protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
 
         if (this._showGDPRBanner) {

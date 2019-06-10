@@ -14,10 +14,11 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
-import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
-import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import { PerformanceEndScreenQueryCTA } from 'Performance/Views/PerformanceEndScreenQueryCTA';
 import { Platform } from 'Core/Constants/Platform';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import { RedesignedEndScreenDesignTest, QueryCTATest } from 'Core/Models/ABGroup';
+import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -52,14 +53,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
             endScreenParameters.id = 'redesigned-end-screen';
             endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (QueryCTATest.isValid(abGroup)) {
+            endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
-
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
-            ... baseParams,
+            ...baseParams,
             video: video,
             overlay: overlay,
             endScreen: endScreen,
