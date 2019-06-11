@@ -37,6 +37,7 @@ import { IPurchasing } from 'Purchasing/IPurchasing';
 import { IStore } from 'Store/IStore';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -85,4 +86,5 @@ export interface ICore extends IApiModule {
     Analytics: IAnalytics;
     Purchasing: IPurchasing;
     Store: IStore;
+    ProgrammaticTrackingService: ProgrammaticTrackingService;
 }

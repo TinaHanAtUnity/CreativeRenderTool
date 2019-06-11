@@ -52,7 +52,6 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 (<any>core.Api).Sdk = sinon.createStubInstance(SdkApi);
                 core.Config = sinon.createStubInstance(CoreConfiguration);
                 core.Ads = TestFixtures.getAdsModule(core);
-                core.Ads.ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
                 request = sinon.createStubInstance(RequestManager);
                 core.RequestManager = request;

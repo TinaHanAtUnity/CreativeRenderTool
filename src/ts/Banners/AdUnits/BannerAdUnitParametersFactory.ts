@@ -26,7 +26,7 @@ export class BannerAdUnitParametersFactory {
         this._clientInfo = core.ClientInfo;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._webPlayerContainer = banner.WebPlayerContainer;
-        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._bannersApi = banner.Api;
     }
 
