@@ -1,19 +1,25 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint',
+    '@typescript-eslint/tslint',
+  ],
   extends: [
     'plugin:@typescript-eslint/recommended',
   ],
   parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: 'module'
+    project: 'tsconfig.json',
   },
   rules: {
+    '@typescript-eslint/tslint/config': ['error', {
+      'lintFile': './tslint.json'
+    }],
     'semi': ['error', 'always'],
     'no-multiple-empty-lines': ['error', {'max': 1, 'maxEOF': 1}],
     'eol-last': ['error', 'always'],
     '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     'no-trailing-spaces': ['error'],
+    'no-tabs': ['error'],
     
     '@typescript-eslint/explicit-function-return-type': ['off'], // TODO
     '@typescript-eslint/explicit-member-accessibility': ['off'], // TODO

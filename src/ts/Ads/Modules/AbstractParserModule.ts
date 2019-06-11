@@ -10,7 +10,7 @@ export interface IContentTypeHandler {
 
 export interface IContentTypeHandlerMapType {
     [key: string]: IContentTypeHandler;
-};
+}
 
 export abstract class AbstractParserModule {
 
