@@ -2,9 +2,9 @@ import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { ICoreApi } from 'Core/ICore';
 
-export interface IMissedImpressionOrdinalData { 
-    mediation: { 
-        missedImpressionOrdinal: { 
+export interface IMissedImpressionOrdinalData {
+    mediation: {
+        missedImpressionOrdinal: {
             value: number;
         };
     };
