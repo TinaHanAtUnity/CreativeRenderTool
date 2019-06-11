@@ -271,7 +271,7 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: timeout
             }).then(response => {
-                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy);
             }).then((loadedCampaign) => {
                 if (!loadedCampaign) {
                     this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
@@ -588,7 +588,7 @@ export class CampaignManager {
         }
     }
 
-    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy, deviceFreeSpace: number): Promise<ILoadedCampaign | undefined> {
+    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, deviceFreeSpace: number, requestPrivacy?: IRequestPrivacy): Promise<ILoadedCampaign | undefined> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
