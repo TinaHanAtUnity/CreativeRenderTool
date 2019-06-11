@@ -121,7 +121,7 @@ export class ProgrammaticTrackingService {
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
 
-        const isLoadMetric = event in LoadMetric;
+        const isLoadMetric = Object.values(LoadMetric).includes(event);
         const isZyngaFreeCellSolitareUsingLoad = CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId());
         if (isLoadMetric && !isZyngaFreeCellSolitareUsingLoad) {
             return Promise.resolve(<INativeResponse>{});
