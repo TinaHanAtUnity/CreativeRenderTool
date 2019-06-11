@@ -50,7 +50,13 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+
+export interface ILoadedCampaign {
+    campaign: Campaign;
+    trackingUrls: ICampaignTrackingUrls;
+}
 
 export class CampaignManager {
 
@@ -116,6 +122,7 @@ export class CampaignManager {
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
@@ -135,6 +142,7 @@ export class CampaignManager {
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
         this._auctionProtocol = RequestManager.getAuctionProtocol();
+        this._pts = core.ProgrammaticTrackingService;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -237,6 +245,42 @@ export class CampaignManager {
                     return this.parseRealtimeCampaign(response, session, placement);
                 }
                 throw new WebViewError('Empty realtime campaign response', 'CampaignRequestError');
+            });
+        });
+    }
+
+    public loadCampaign(placement: Placement, timeout: number): Promise<ILoadedCampaign | undefined> {
+        // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
+        this._assetManager.enableCaching();
+
+        // todo: current logic for session counters assumes ad request cycle based on automatic loading
+        const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
+
+        // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+
+        return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, false, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
+            this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
+            const body = JSON.stringify(requestBody);
+            this._deviceFreeSpace = deviceFreeSpace;
+            this._pts.reportMetric(LoadMetric.LoadEnabledAuctionRequest);
+            return this._request.post(requestUrl, body, [], {
+                retries: 0,
+                retryDelay: 0,
+                followRedirects: false,
+                retryWithConnectionEvents: false,
+                timeout: timeout
+            }).then(response => {
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
+            }).then((loadedCampaign) => {
+                if (!loadedCampaign) {
+                    this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
+                }
+                return loadedCampaign;
+            }).catch(() => {
+                Diagnostics.trigger('load_campaign_response_failure', {});
+                this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
+                return undefined;
             });
         });
     }
@@ -544,6 +588,99 @@ export class CampaignManager {
         }
     }
 
+    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy, deviceFreeSpace: number): Promise<ILoadedCampaign | undefined> {
+        let json;
+        try {
+            json = JsonParser.parse<IRawAuctionV5Response>(response.response);
+        } catch(e) {
+            Diagnostics.trigger('load_campaign_failed_to_parse', {});
+            return Promise.resolve(undefined);
+        }
+
+        const auctionId = json.auctionId;
+        if(!auctionId) {
+            Diagnostics.trigger('load_campaign_auction_id_missing', {});
+            return Promise.resolve(undefined);
+        }
+
+        const session: Session = this._sessionManager.create(auctionId);
+        session.setAdPlan(response.response);
+        session.setGameSessionCounters(gameSessionCounters);
+        session.setPrivacy(requestPrivacy);
+        session.setDeviceFreeSpace(deviceFreeSpace);
+
+        const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
+
+        if(!('placements' in json)) {
+            SessionDiagnostics.trigger('load_campaign_placements_missing_in_json', {}, session);
+            return Promise.resolve(undefined);
+        }
+
+        const placementId = placement.getId();
+        let mediaId: string | undefined;
+        let trackingUrls: ICampaignTrackingUrls | undefined;
+
+        if(json.placements.hasOwnProperty(placementId)) {
+            if(json.placements[placementId].hasOwnProperty('mediaId')) {
+                mediaId = json.placements[placementId].mediaId;
+            }
+
+            if(json.placements[placementId].hasOwnProperty('trackingId')) {
+                const trackingId: string = json.placements[placementId].trackingId;
+
+                if(json.tracking[trackingId]) {
+                    trackingUrls = json.tracking[trackingId];
+                }
+            }
+        }
+
+        if(mediaId && trackingUrls) {
+            const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
+            const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
+
+            const parser: CampaignParser = this.getCampaignParser(auctionResponse.getContentType());
+
+            return parser.parse(auctionResponse, session).then((campaign) => {
+                if(campaign) {
+                    campaign.setMediaId(auctionResponse.getMediaId());
+
+                    return this._assetManager.setup(campaign).then(() => {
+                        if(trackingUrls) {
+                            this._pts.reportMetric(LoadMetric.LoadEnabledFill);
+                            return {
+                                campaign: campaign,
+                                trackingUrls: trackingUrls
+                            };
+                        } else {
+                            SessionDiagnostics.trigger('load_campaign_missing_tracking_urls', {}, campaign.getSession());
+                            return undefined;
+                        }
+                    }).catch(() => {
+                        SessionDiagnostics.trigger('load_campaign_failed_caching_setup', {}, campaign.getSession());
+                        return undefined;
+                    });
+                } else {
+                    SessionDiagnostics.trigger('load_campaign_undefined_campaign', {}, session);
+                    return undefined;
+                }
+            }).catch(() => {
+                SessionDiagnostics.trigger('load_campaign_parse_failure', {
+                    creativeID: parser.creativeID,
+                    seatID: parser.seatID,
+                    campaignID: parser.campaignID
+                }, session);
+                // TODO: Report to CreativeBlockingService after production testing
+                return undefined;
+            });
+        } else {
+            Diagnostics.trigger('load_campaign_no_fill', {
+                mediaId: mediaId,
+                trackingUrls: trackingUrls
+            });
+            return Promise.resolve(undefined);
+        }
+    }
+
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
         let parser: CampaignParser;
@@ -793,7 +930,8 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
+    // todo: refactor requestedPlacement to something more sensible
+    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement, requestedPlacement?: Placement): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         if(realtimePlacement && this._realtimeBody) {
@@ -901,16 +1039,25 @@ export class CampaignManager {
 
                 const placements = this._adsConfig.getPlacements();
 
-                Object.keys(placements).forEach((placementId) => {
-                    const placement = placements[placementId];
-                    if (!placement.isBannerPlacement()) {
-                        placementRequest[placementId] = {
-                            adTypes: placement.getAdTypes(),
-                            allowSkip: placement.allowSkip(),
-                            auctionType: placement.getAuctionType()
-                        };
-                    }
-                });
+                if(requestedPlacement) {
+                    placementRequest[requestedPlacement.getId()] = {
+                        adTypes: requestedPlacement.getAdTypes(),
+                        allowSkip: requestedPlacement.allowSkip(),
+                        auctionType: requestedPlacement.getAuctionType()
+                    };
+                } else {
+                    Object.keys(placements).forEach((placementId) => {
+                        const placement = placements[placementId];
+                        if (!placement.isBannerPlacement()) {
+                            placementRequest[placementId] = {
+                                adTypes: placement.getAdTypes(),
+                                allowSkip: placement.allowSkip(),
+                                auctionType: placement.getAuctionType()
+                            };
+                        }
+                    });
+                }
+
                 body.placements = placementRequest;
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
