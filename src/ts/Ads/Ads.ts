@@ -412,10 +412,11 @@ export class Ads implements IAds {
         }
 
         const trackingUrls = placement.getCurrentTrackingUrls();
-        if(trackingUrls) {
+        if (trackingUrls) {
             // Do not remove: Removing will currently break all tracking
-            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
             campaign.setTrackingUrls(trackingUrls);
+        } else {
+            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
         // First ad request within a game session can be made using recorded privacy information.
