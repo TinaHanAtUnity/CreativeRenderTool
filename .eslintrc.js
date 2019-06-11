@@ -34,6 +34,5 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': ['off'], // TODO
     '@typescript-eslint/indent': ['off'], // TODO
     '@typescript-eslint/no-inferrable-types': ['off'], // TODO
-    '@typescript-eslint/ban-types': ['off'], // TODO
   }
 }
