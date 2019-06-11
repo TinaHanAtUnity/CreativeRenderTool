@@ -5,7 +5,7 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
-export interface ICampaignTrackingUrls { 
+export interface ICampaignTrackingUrls {
     [key: string]: string[];
 }
 
