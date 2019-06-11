@@ -28,6 +28,7 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       color: $gray;
       font-size: $endscreen-default-size * .60;
       opacity: .6;
+      z-index: 10;
     }
 
     .pop-up-container {
@@ -257,8 +258,10 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
         margin-bottom: 0;  
       }
 
+      .gdpr-pop-up {
+        opacity: .9;
+      }
 
-    @media (orientation: portrait) {
       @media (max-height: 460px) {
         .pop-up-container {
           height: 'calc(100% - 3.55 * %s)' % $endscreen-default-size;
@@ -278,7 +281,6 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
         }
       }
     }
-  }
 
     &.landscape #redesigned-end-screen {
       .btn-close-region {
@@ -297,9 +299,9 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
 
       .bottom-container {
         bottom: .75 * $endscreen-default-size;
-        right: 0;
+        right: 1 * $endscreen-default-size;
         left: auto;
-        width: 50%;
+        width: 'calc(50% - 1 * %s)' % $endscreen-default-size;
       }
 
       .game-background-container {
@@ -573,6 +575,17 @@ $redesigned-end-screen-mixin();
 @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3),
 only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
 only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+
+  html.redesigned-performance-end-screen .ios-portrait #privacy {
+    top: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  html.redesigned-performance-end-screen .landscape #privacy {
+    left: 0;
+    width: 100%;
+  }
+
   body.iphone #redesigned-end-screen {
     .pop-up-container {
       height: calc(100% - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 1em);

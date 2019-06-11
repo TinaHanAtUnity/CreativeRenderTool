@@ -15,6 +15,6 @@ export class RedesignedPerformanceEndscreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        document.documentElement.classList.add('accessible-close-button');
+        document.documentElement.classList.add('accessible-close-button',  'redesigned-performance-end-screen');
     }
 }
