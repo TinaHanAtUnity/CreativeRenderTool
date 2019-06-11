@@ -6,7 +6,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { PlacementState } from 'Ads/Models/Placement';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
@@ -96,7 +96,7 @@ export class CampaignRefreshManager extends RefreshManager {
         return undefined;
     }
 
-    public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
+    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         const currentAdunit = this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             currentAdunit.onStart.unsubscribe(onStartObserver);

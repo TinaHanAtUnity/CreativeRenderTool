@@ -1,7 +1,7 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { PlacementState } from 'Ads/Models/Placement';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 
@@ -11,7 +11,7 @@ export abstract class RefreshManager {
     public static ParsingErrorRefillDelayInSeconds = 60;
 
     public abstract getCampaign(placementId: string): Campaign | undefined;
-    public abstract setCurrentAdUnit(adUnit: AbstractAdUnit): void;
+    public abstract setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void;
     public abstract refresh(nofillRetry?: boolean): Promise<INativeResponse | void>;
     public abstract refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]>;
     public abstract shouldRefill(timestamp: number): boolean;
