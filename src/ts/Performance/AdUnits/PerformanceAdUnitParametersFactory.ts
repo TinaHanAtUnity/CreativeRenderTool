@@ -53,7 +53,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
             endScreenParameters.id = 'redesigned-end-screen';
             endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (QueryCTATest.isValid(abGroup)) {
+        } else if (QueryCTATest.isValid(abGroup) && baseParams.campaign.getSquare() !== undefined) {
             endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
