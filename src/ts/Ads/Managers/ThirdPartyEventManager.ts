@@ -44,7 +44,7 @@ export enum TrackingEvent {
     PURCHASE = 'purchase'
 }
 
-export interface ITemplateValueMap { 
+export interface ITemplateValueMap {
     [id: string]: string;
 }
 
