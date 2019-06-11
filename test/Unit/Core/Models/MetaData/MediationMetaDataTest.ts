@@ -8,6 +8,8 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import * as sinon from 'sinon';
+import { StorageType } from 'Core/Native/Storage';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('MediationMetaDataTest', () => {
@@ -123,5 +125,24 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         });
 
+        describe('isMetaDataLoadEnabled', () => {
+            it('should return true when the mediation metadata is found', () => {
+                backend.Api.Storage.setStorageContents(<any>{
+                    mediation: {
+                        name: {value: 'test_name'},
+                        enable_metadata_load: {value: true}
+                    }
+                });
+
+                const metaDataManager = new MetaDataManager(core);
+                return metaDataManager.fetch(MediationMetaData).then(metaData => {
+                    if (metaData) {
+                        assert.isTrue(metaData.isMetaDataLoadEnabled());
+                    } else {
+                        throw new Error('MediationMetaData is not defined');
+                    }
+                });
+            });
+        });
     });
 });
