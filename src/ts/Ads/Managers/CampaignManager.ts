@@ -272,10 +272,10 @@ export class CampaignManager {
             }).then(response => {
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
             }).then((loadedCampaign) => {
-                if (!loadedCampaign) {
-                    this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
-                } else {
+                if (loadedCampaign) {
                     this._pts.reportMetric(LoadMetric.LoadEnabledFill);
+                } else {
+                    this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
                 }
                 return loadedCampaign;
             }).catch(() => {
