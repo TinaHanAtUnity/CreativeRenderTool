@@ -133,14 +133,11 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
 
-    public static isLoadEnabled: boolean = false;
-
     /**
      *  Method used for gating PTS metrics for this specific Zynga Game using Load API
      */
     public static isTrackedGameUsingLoadApi(gameId: string) {
-        const isZyngaSolitare = gameId === '2988443';
-        return isZyngaSolitare && this.isLoadEnabled;
+        return gameId === '2988495';
     }
 
     public static isWhiteListedForLoadApi(gameId: string) {

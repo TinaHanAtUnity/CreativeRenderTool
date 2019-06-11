@@ -83,7 +83,6 @@ import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFac
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
@@ -571,7 +570,9 @@ export class Ads implements IAds {
             this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
-                this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
+                if (this._loadApiEnabled) {
+                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
+                }
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
         });
@@ -602,7 +603,6 @@ export class Ads implements IAds {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
                 if(loadEnabled) {
                     this._loadApiEnabled = true;
-                    CustomFeatures.isLoadEnabled = true;
                     this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationSuccess);
                 } else {
                     this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationFailure);

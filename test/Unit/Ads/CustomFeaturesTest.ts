@@ -1,7 +1,6 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
-import { ABGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -87,37 +86,23 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isLoadEnabled', () => {
-        it('should set isLoadEnabled correctly', () => {
-            CustomFeatures.isLoadEnabled = false;
-            assert.isFalse(CustomFeatures.isLoadEnabled);
-            CustomFeatures.isLoadEnabled = true;
-            assert.isTrue(CustomFeatures.isLoadEnabled);
-        });
-    });
-
     describe('isTrackedGameUsingLoadApi', () => {
         const tests: {
             gameId: string;
             expected: boolean;
-            loadEnabled: boolean;
         }[] = [{
-            gameId: '2988443',
-            expected: true,
-            loadEnabled: true
+            gameId: '2988495',
+            expected: true
         }, {
-            gameId: '2988443',
-            expected: false,
-            loadEnabled: false
+            gameId: '2988494',
+            expected: false
         }, {
             gameId: '1234556',
-            expected: false,
-            loadEnabled: true
+            expected: false
         }];
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                CustomFeatures.isLoadEnabled = t.loadEnabled;
                 const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId);
                 assert.equal(value, t.expected);
             });
