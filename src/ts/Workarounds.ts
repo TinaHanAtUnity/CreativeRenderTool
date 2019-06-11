@@ -27,7 +27,7 @@ import { DOMUtils } from 'Core/Utilities/DOMUtils';
  *  Object.values() has issues with older Android Devices.
  */
 if (!Object.values) {
-    Object.values = (obj: Record<string, any>) => {
+    Object.values = (obj: {}) => {
         return Object.keys(obj).map((values) => obj[<keyof typeof obj>values]);
     };
 }
