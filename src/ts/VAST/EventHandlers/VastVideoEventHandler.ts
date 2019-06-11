@@ -102,14 +102,18 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         if (this._om && !this._omStartCalled) {
-            this._om.sessionStart({
-                adSessionId: this._om.getOMAdSessionId(),
-                timestamp: Date.now(),
-                type: 'sessionStart',
-                data: {}
+            this._adUnit.getVideoViewXYPosition().then((xypositions) => {
+                if (this._om) {
+                    this._om.setVideoViewXYPosition(xypositions);
+                    this._om.sessionStart({
+                        adSessionId: this._om.getOMAdSessionId(),
+                        timestamp: Date.now(),
+                        type: 'sessionStart',
+                        data: {}
+                    });
+                    this._omStartCalled = true;
+                }
             });
-
-            this._omStartCalled = true;
         }
     }
 
