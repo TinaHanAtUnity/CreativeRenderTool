@@ -1,8 +1,12 @@
 # Pending
 
+* Minor Fixes for Load API [#10100](https://github.com/Applifier/unity-ads-webview/pull/10100)
 * Remove/Reduce severity of IAP logs from Ads Initialization [#10022](https://github.com/Applifier/unity-ads-webview/pull/10022)
 * Use tslint through typescript-eslint [#9989](https://github.com/Applifier/unity-ads-webview/pull/9989)
 * ESLint : no-tabs rule enabled [#10017](https://github.com/Applifier/unity-ads-webview/pull/10017)
+* ESLint : no-trailing-spaces rule enabled [#10018](https://github.com/Applifier/unity-ads-webview/pull/10018)
+* ESLint : enable no-irregular-whitespace [#10016](https://github.com/Applifier/unity-ads-webview/pull/10016)
+* ESLint : Enable `ban-types` rule [#10015](https://github.com/Applifier/unity-ads-webview/pull/10015)
 
 # Tue Jun 11 02:36:41 UTC 2019
 
