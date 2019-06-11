@@ -137,7 +137,7 @@ export class CustomFeatures {
      *  Method used for gating PTS metrics for this specific Zynga Game using Load API
      */
     public static isTrackedGameUsingLoadApi(gameId: string) {
-        return gameId === '2988495';
+        return gameId === '2988443';
     }
 
     public static isWhiteListedForLoadApi(gameId: string) {
