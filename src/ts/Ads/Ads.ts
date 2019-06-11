@@ -414,6 +414,7 @@ export class Ads implements IAds {
         const trackingUrls = placement.getCurrentTrackingUrls();
         if(trackingUrls) {
             // Do not remove: Removing will currently break all tracking
+            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
             campaign.setTrackingUrls(trackingUrls);
         }
 
