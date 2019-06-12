@@ -39,7 +39,8 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     session: session,
                     mediaId: response.getMediaId(),
                     trackingUrls: response.getTrackingUrls() || {},
-                    backupCampaign: false
+                    backupCampaign: false,
+                    isLoadEnabled: false
                 };
 
                 const vpaidCampaignParams: IVPAIDCampaign = {

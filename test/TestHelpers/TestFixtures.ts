@@ -206,7 +206,8 @@ export class TestFixtures {
                 'skip': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'error': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a']
             },
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -328,7 +329,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -376,7 +378,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -433,7 +436,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
 
         return {
@@ -460,7 +464,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -496,7 +501,8 @@ export class TestFixtures {
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
-            meta: undefined
+            meta: undefined,
+            isLoadEnabled: false
         };
     }
 
