@@ -110,11 +110,7 @@ export class Ads implements IAds {
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
-    private _creativeUrl?: string;
-    private _requestDelay: number;
-    private _wasRealtimePlacement: boolean = false;
     private _loadApiEnabled: boolean = false;
-
     private _core: ICore;
     private _store: IStore;
 
@@ -423,42 +419,9 @@ export class Ads implements IAds {
         // If game method has changed since, it should be reset before e.g. showing consent dialog
         this.resetOutdatedUserPrivacy();
 
-        if (placement.getRealtimeData() && !this.isConsentShowRequired()) {
-            this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
-            const start = Date.now();
-
-            const realtimeTimeoutInMillis = 1500;
-            Promises.withTimeout(this.CampaignManager.requestRealtime(placement, campaign.getSession()), realtimeTimeoutInMillis).then(realtimeCampaign => {
-                this._requestDelay = Date.now() - start;
-                this._core.Api.Sdk.logInfo(`Unity Ads received a realtime request in ${this._requestDelay} ms.`);
-
-                if(realtimeCampaign) {
-                    this._core.Api.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
-                    this._wasRealtimePlacement = true;
-                    placement.setCurrentCampaign(realtimeCampaign);
-                    this.showAd(placement, realtimeCampaign, options);
-                } else {
-                    SessionDiagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
-                    this._core.Api.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
-                    this.showAd(placement, campaign, options);
-                }
-            }).catch((e) => {
-                if (e instanceof TimeoutError) {
-                    Diagnostics.trigger('realtime_network_timeout', {
-                        auctionId: campaign.getSession().getId()
-                    });
-                }
-                Diagnostics.trigger('realtime_error', {
-                    error: e
-                });
-                this._core.Api.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
-                this.showAd(placement, campaign, options);
-            });
-        } else {
-            this.showConsentIfNeeded(options).then(() => {
-                this.showAd(placement, campaign, options);
-            });
-        }
+        this.showConsentIfNeeded(options).then(() => {
+            this.showAd(placement, campaign, options);
+        });
     }
 
     private resetOutdatedUserPrivacy() {
@@ -555,21 +518,6 @@ export class Ads implements IAds {
 
             OperativeEventManager.setPreviousPlacementId(this.CampaignManager.getPreviousPlacementId());
             this.CampaignManager.setPreviousPlacementId(placement.getId());
-
-            // Temporary for realtime testing purposes
-            if (this._wasRealtimePlacement) {
-                this._currentAdUnit.onStart.subscribe(() => {
-                    const startDelay = Date.now() - start;
-                    Diagnostics.trigger('realtime_delay', {
-                        requestDelay: this._requestDelay,
-                        startDelay: startDelay,
-                        totalDelay: this._requestDelay + startDelay,
-                        auctionId: campaign.getSession().getId(),
-                        adUnitDescription: this._currentAdUnit.description()
-                    });
-                });
-            }
-            this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled) {
@@ -671,7 +619,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('creativeUrl')) {
-            const creativeUrl = this._creativeUrl = TestEnvironment.get<string>('creativeUrl');
+            const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
             if(platform === Platform.ANDROID) {

@@ -2,7 +2,6 @@ import AdRequestSpec from 'json/events/AdRequest.json';
 import ClickEventSpec from 'json/events/ClickEvent.json';
 import ConfigRequestSpec from 'json/events/ConfigRequest.json';
 import ParameterSpec from 'json/events/Parameters.json';
-import RealtimeAdsRequestSpec from 'json/events/RealtimeAdRequest.json';
 import VideoEventSpec from 'json/events/VideoEvents.json';
 
 export interface IEventParameter {
@@ -52,10 +51,6 @@ export class ParamsTestData {
 
     public static getClickEventParams(): IEventSpec {
         return ParamsTestData.getEventSpec(ClickEventSpec);
-    }
-
-    public static getRealtimeAdRequestParams(): IEventSpec {
-        return ParamsTestData.getEventSpec(RealtimeAdsRequestSpec);
     }
 
     private static getEventSpec(rawData: any): IEventSpec {
