@@ -47,7 +47,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _osVersion: string | undefined;
     private _apiLevel?: number;
 
-    constructor(parameters : IEndScreenParameters) {
+    constructor(parameters: IEndScreenParameters) {
         super(parameters.platform, parameters.id ? parameters.id : 'end-screen');
         this._localization = new Localization(parameters.language, 'endscreen');
         this._abGroup = parameters.abGroup;
