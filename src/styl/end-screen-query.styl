@@ -15,7 +15,7 @@ $scale-size = $default-scale-size;
 
   .download-container-query {
     display: block;
-    padding-top: 0em;
+    padding-top: 0;
     background-color: transparent;
 
     .download-button {
@@ -66,7 +66,7 @@ body {
   &.landscape #end-screen {
     .end-screen-info {
       .download-container-query {
-        margin: 0em;
+        margin: 0;
       }
     }
 
@@ -81,7 +81,7 @@ $iphone-x-overlay-styles() {
   body {
     &.portrait #end-screen {
       .download-container-query {
-        margin: 0em auto ($endscreen-default-size * .2)auto;
+        margin: 0 auto ($endscreen-default-size * .2)auto;
       }
 
       .download-query {
@@ -93,7 +93,7 @@ $iphone-x-overlay-styles() {
     &.landscape #end-screen {
       .end-screen-info {
         .download-container-query {
-          margin: 0em auto ($endscreen-default-size * .2) auto;
+          margin: 0 auto ($endscreen-default-size * .2) auto;
         }
 
         .download-query {
