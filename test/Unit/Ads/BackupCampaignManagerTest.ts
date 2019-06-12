@@ -10,7 +10,7 @@ import * as sinon from 'sinon';
 import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-xdescribe('BackupCampaignManagerTest', () => {
+describe('BackupCampaignManagerTest', () => {
     it('should store placement data', () => {
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
