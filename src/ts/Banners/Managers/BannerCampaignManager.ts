@@ -38,7 +38,6 @@ export interface IRawBannerV5Response {
     auctionId: string;
     correlationId: string;
     placements: { [key: string]: { mediaId: string; trackingId: string } };
-    realtimeData?: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls };
 }
@@ -165,7 +164,7 @@ export class BannerCampaignManager {
                 return Promise.reject(e);
             }
         } else {
-            const e = new Error('No placements found in realtime campaign json.');
+            const e = new Error('No placements found');
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }
@@ -227,7 +226,7 @@ export class BannerCampaignManager {
                 return Promise.reject(e);
             }
         } else {
-            const e = new Error('No placements found in realtime V5 campaign json.');
+            const e = new Error('No placements found in V5 campaign json.');
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }

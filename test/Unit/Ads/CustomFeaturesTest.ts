@@ -59,4 +59,53 @@ describe('CustomFeatures', () => {
             assert.isFalse(value);
         });
     });
+
+    describe('isWhiteListedForLoadApi', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '2988495',
+            expected: true
+        }, {
+            gameId: '2988494',
+            expected: true
+        }, {
+            gameId: '2988443',
+            expected: true
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
+
+    describe('isTrackedGameUsingLoadApi', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '2988443',
+            expected: true
+        }, {
+            gameId: '2988494',
+            expected: false
+        }, {
+            gameId: '1234556',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isTrackedGameUsingLoadApi(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
 });
