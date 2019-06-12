@@ -74,18 +74,18 @@ describe('MOAT', () => {
     const MockDom = () => {
         const postMessage = sinon.stub();
 
-         const iframe = {
+        const iframe = {
             contentWindow: {
                 postMessage
             },
             srcdoc: ''
         };
 
-         const container = {
+        const container = {
             querySelector: sinon.stub().returns(iframe)
         };
 
-         const createElement = sinon.stub(document, 'createElement').callsFake((name: string) => {
+        const createElement = sinon.stub(document, 'createElement').callsFake((name: string) => {
             if (name === 'div') {
                 createElement.restore();
                 return container;
@@ -93,7 +93,7 @@ describe('MOAT', () => {
             throw new Error('Not supported');
         });
 
-         return {
+        return {
             postMessage
         };
     };
