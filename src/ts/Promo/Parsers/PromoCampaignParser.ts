@@ -1,4 +1,3 @@
-import { HTML } from 'Ads/Models/Assets/HTML';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
@@ -52,7 +51,8 @@ export class PromoCampaignParser extends CampaignParser {
                 session: session,
                 mediaId: response.getMediaId(),
                 trackingUrls: response.getTrackingUrls() || {},
-                backupCampaign: false
+                backupCampaign: false,
+                isLoadEnabled: false
             };
             const promoCampaignParams: IPromoCampaign = {
                 ... baseCampaignParams,

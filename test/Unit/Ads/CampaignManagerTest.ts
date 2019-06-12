@@ -1312,6 +1312,7 @@ describe('CampaignManager', () => {
 
                 if (loadedCampaign) {
                     assert.isDefined(loadedCampaign.campaign);
+                    assert.isTrue(loadedCampaign.campaign.isLoadEnabled(), 'isLoadEnabled was not set to true');
                     assert.isDefined(loadedCampaign.trackingUrls);
                     assert.deepEqual(loadedCampaign.trackingUrls[TrackingEvent.START], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0']);
                 } else {
