@@ -50,7 +50,6 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface ILoadedCampaign {
@@ -273,7 +272,9 @@ export class CampaignManager {
             }).then(response => {
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy);
             }).then((loadedCampaign) => {
-                if (!loadedCampaign) {
+                if (loadedCampaign) {
+                    this._pts.reportMetric(LoadMetric.LoadEnabledFill);
+                } else {
                     this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
                 }
                 return loadedCampaign;
@@ -646,7 +647,6 @@ export class CampaignManager {
 
                     return this._assetManager.setup(campaign).then(() => {
                         if(trackingUrls) {
-                            this._pts.reportMetric(LoadMetric.LoadEnabledFill);
                             return {
                                 campaign: campaign,
                                 trackingUrls: trackingUrls

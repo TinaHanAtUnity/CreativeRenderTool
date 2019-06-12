@@ -141,7 +141,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         if (errorType) {
             Diagnostics.trigger(errorType, { message: errorMessage });
         }
-        this._core.Sdk.logError(errorMessage);
+        this._core.Sdk.logDebug(errorMessage);
         return new Error(errorMessage);
     }
 
