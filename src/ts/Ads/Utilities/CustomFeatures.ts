@@ -44,30 +44,6 @@ export class CustomFeatures {
                 creativeId === '153119177';
     }
 
-    public static isShowingAdInBackground(gameId: string): boolean {
-        // apps identified to show ads in background #incident-20190605-1
-        return  gameId === '2987898' ||
-                gameId === '3009163' ||
-                gameId === '3077396' ||
-                gameId === '1616475' ||
-                gameId === '3141093' ||
-                gameId === '2684029' ||
-                gameId === '3094061' ||
-                gameId === '3016669' ||
-                gameId === '2998094' ||
-                gameId === '2995425' ||
-                gameId === '3137235' ||
-                gameId === '3137232' ||
-                gameId === '3137214' ||
-                gameId === '2805006' ||
-                gameId === '2780181' ||
-                gameId === '1693629' ||
-                gameId === '1795161' ||
-                gameId === '3164622' ||
-                gameId === '2656474' ||
-                gameId === '3137213';
-    }
-
     public static isLoopMeSeat(seatId: number | undefined): boolean {
         return seatId === 9119 ||
                seatId === 9121;
