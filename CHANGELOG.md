@@ -1,6 +1,7 @@
 # Pending
 
 * Remove Realtime feature - CampaignManager refactor part 1 [#10014](https://github.com/Applifier/unity-ads-webview/pull/10014)
+* Block all background ads [#10104](https://github.com/Applifier/unity-ads-webview/pull/10104)
 
 # Tue Jun 11 22:58:07 UTC 2019
 
