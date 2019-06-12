@@ -87,12 +87,8 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
     }
 
-    public getXYLocation(): Promise<number[]> {
-        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getXYLocation');
-    }
-
-    public getViewDimensions(): Promise<number[]> {
-        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getViewDimensions');
+    public getVideoViewRectangle(): Promise<number[]> {
+        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getVideoViewRectangle');
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {

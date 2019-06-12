@@ -267,12 +267,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         }
     }
 
-    public getVideoViewXYPosition(): Promise<number[]> {
-        return this._ads.VideoPlayer.getXYLocation();
-    }
-
-    public getViewDimensions(): Promise<number[]> {
-        return this._ads.VideoPlayer.getViewDimensions();
+    public getVideoViewRectangle(): Promise<number[]> {
+        return this._ads.VideoPlayer.getVideoViewRectangle();
     }
 
     protected unsetReferences() {

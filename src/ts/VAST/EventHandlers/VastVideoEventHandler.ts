@@ -102,14 +102,9 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         if (this._om && !this._omStartCalled) {
-            const promises = [];
-            promises.push(this._adUnit.getVideoViewXYPosition());
-            promises.push(this._adUnit.getViewDimensions());
-
-            Promise.all(promises).then(([xypositions, dimensions]) => {
+            this._adUnit.getVideoViewRectangle().then((rect) => {
                 if (this._om) {
-                    this._om.setVideoViewXYPosition(xypositions);
-                    this._om.setVideoDimensions(dimensions);
+                    this._om.setVideoViewRectangle(rect);
                     this._om.sessionStart({
                         adSessionId: this._om.getOMAdSessionId(),
                         timestamp: Date.now(),

@@ -96,8 +96,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _deviceVolume: number;
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
-    private _videoViewXYPosition: number[];
-    private _videoDimensions: number[];
+    private _videoViewRectangle: number[];
 
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
         super(platform, 'openMeasurement');
@@ -176,12 +175,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this._omAdSessionId;
     }
 
-    public setVideoViewXYPosition(position: number[]) {
-        this._videoViewXYPosition = position;
-    }
-
-    public setVideoDimensions(dimensions: number[]) {
-        this._videoDimensions = dimensions;
+    public setVideoViewRectangle(rectangle: number[]) {
+        this._videoViewRectangle = rectangle;
     }
 
     public render(): void {
@@ -418,20 +413,16 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         let videoWidth;
         let videoHeight;
-        if (this._videoDimensions) {
-            videoWidth = this._videoDimensions[0];
-            videoHeight = this._videoDimensions[1];
+        let topLeftX;
+        let topLeftY;
+        if (this._videoViewRectangle) {
+            topLeftX = this._videoViewRectangle[0];
+            topLeftY = this._videoViewRectangle[1];
+            videoWidth = this._videoViewRectangle[2];
+            videoHeight = this._videoViewRectangle[3];
         } else {
             videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
             videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
-        }
-
-        let topLeftX;
-        let topLeftY;
-        if (this._videoViewXYPosition) {
-            topLeftX = this._videoViewXYPosition[0];
-            topLeftY = this._videoViewXYPosition[1];
-        } else {
             topLeftX = 0;
             topLeftY = this.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
         }
