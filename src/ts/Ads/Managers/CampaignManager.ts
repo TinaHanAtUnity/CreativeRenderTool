@@ -274,6 +274,7 @@ export class CampaignManager {
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
                     this._pts.reportMetric(LoadMetric.LoadEnabledFill);
+                    loadedCampaign.campaign.setIsLoadEnabled(true);
                 } else {
                     this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
                 }

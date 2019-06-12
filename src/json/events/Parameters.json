@@ -558,5 +558,12 @@
     "description": "Flag describing if the developer has a set up a catalog for their IAP Promo Placement",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "isLoadEnabled",
+    "type": "boolean",
+    "description": "Flag describing if the campaign was loaded using Load API or from Precached Initialization",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

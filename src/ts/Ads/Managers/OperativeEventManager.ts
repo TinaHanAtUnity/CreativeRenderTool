@@ -6,7 +6,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 import { EventType } from 'Ads/Models/Session';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -25,7 +25,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
@@ -104,6 +103,7 @@ export interface IInfoJson {
     imei?: string;
     isBackupCampaign: boolean;
     deviceFreeSpace: number;
+    isLoadEnabled: boolean;
 }
 
 export class OperativeEventManager {
@@ -403,7 +403,8 @@ export class OperativeEventManager {
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
                 'isBackupCampaign': this._campaign.isBackupCampaign(),
-                'deviceFreeSpace': session.getDeviceFreeSpace()
+                'deviceFreeSpace': session.getDeviceFreeSpace(),
+                'isLoadEnabled': this._campaign.isLoadEnabled()
             };
 
             if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

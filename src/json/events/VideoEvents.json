@@ -270,6 +270,12 @@
       "required": "yes",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "isLoadEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }
