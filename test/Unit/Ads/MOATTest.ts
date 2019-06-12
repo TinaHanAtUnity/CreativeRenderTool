@@ -4,7 +4,6 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import 'mocha';
-import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 describe('MOAT', () => {
@@ -64,7 +63,7 @@ describe('MOAT', () => {
         });
     });
 
-    const InitMoatWithPlayerVolume = (muteVideo: boolean, iframe: HTMLIFrameElement, container: HTMLElement) => {
+    const InitMoatWithPlayerVolume = (muteVideo: boolean) => {
         const nativeBridge = sinon.createStubInstance(NativeBridge);
         const sdk: SdkApi = sinon.createStubInstance(SdkApi);
         nativeBridge.Sdk = sdk;
@@ -72,119 +71,93 @@ describe('MOAT', () => {
         return new MOAT(Platform.ANDROID, nativeBridge, muteVideo);
     };
 
-    describe('MOAT player volume placement muted', () => {
-        let moat: MOAT;
-        let iframe: HTMLIFrameElement;
-        let container: HTMLElement;
+    const MockDom = () => {
+        const postMessage = sinon.stub();
 
-        beforeEach(() => {
-            const muteVideo = true;
-            moat = InitMoatWithPlayerVolume(muteVideo, iframe, container);
+         const iframe = {
+            contentWindow: {
+                postMessage
+            },
+            srcdoc: ''
+        };
 
-            container = document.createElement('div');
-            iframe = document.createElement('iframe');
+         const container = {
+            querySelector: sinon.stub().returns(iframe)
+        };
 
-            container.appendChild(iframe);
-            document.body.appendChild(container);
-
-            sinon.stub(iframe.contentWindow!, 'postMessage');
-            sinon.stub(container, 'querySelector').returns(iframe);
-            sinon.stub(moat, 'container').returns(container);
+         const createElement = sinon.stub(document, 'createElement').callsFake((name: string) => {
+            if (name === 'div') {
+                createElement.restore();
+                return container;
+            }
+            throw new Error('Not supported');
         });
 
-        afterEach(() => {
-            document.body.removeChild(container);
-        });
+         return {
+            postMessage
+        };
+    };
 
-        it('should have correct volume after initialization: 0', () => {
-            moat.render();
-            moat.triggerVideoEvent('test', 0.3);
+    [true, false].forEach(muteVideo =>
+        describe(`MOAT player volume placement muted, initial mute: ${muteVideo}`, () => {
+            let moat: MOAT;
+            let mockedDom: { postMessage: sinon.SinonStub };
+            const expectedAdVolumeAfterInit = muteVideo ? 0 : 1;
 
-            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
-                {
-                    type: 'videoEvent',
-                    data: {
-                        type: 'test',
-                        adVolume: 0,
-                        volume: 0.3
+             beforeEach(() => {
+                mockedDom = MockDom();
+                moat = InitMoatWithPlayerVolume(muteVideo);
+            });
+
+            it('should have correct volume after initialization', () => {
+                moat.render();
+                moat.triggerVideoEvent('test', 0.3);
+
+                 sinon.assert.calledWith(mockedDom.postMessage,
+                    {
+                        type: 'videoEvent',
+                        data: {
+                            type: 'test',
+                            adVolume: expectedAdVolumeAfterInit,
+                            volume: 0.3
+                        }
                     }
-                }
-            );
-        });
+                );
+            });
 
-        it('should have the correct player volume after player volume set', () => {
-            moat.render();
-            moat.setPlayerVolume(1);
-            moat.triggerVideoEvent('test', 0.3);
+            it('should have the correct player volume after player volume set to nonmuted', () => {
+                moat.render();
+                moat.setPlayerVolume(1);
+                moat.triggerVideoEvent('test', 0.3);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
-                {
-                    type: 'videoEvent',
-                    data: {
-                        type: 'test',
-                        adVolume: 1,
-                        volume: 0.3
+                 sinon.assert.calledWith(mockedDom.postMessage,
+                    {
+                        type: 'videoEvent',
+                        data: {
+                            type: 'test',
+                            adVolume: 1,
+                            volume: 0.3
+                        }
                     }
-                }
-            );
-        });
-   });
+                );
+            });
 
-   describe('MOAT player volume placement nonmuted', () => {
-        let moat: MOAT;
-        let iframe: HTMLIFrameElement;
-        let container: HTMLElement;
+            it('should have the correct player volume after player volume set to muted', () => {
+                moat.render();
+                moat.setPlayerVolume(0);
+                moat.triggerVideoEvent('test', 0.1);
 
-        beforeEach(() => {
-            const muteVideo = false;
-            moat = InitMoatWithPlayerVolume(muteVideo, iframe, container);
-
-            container = document.createElement('div');
-            iframe = document.createElement('iframe');
-
-            container.appendChild(iframe);
-            document.body.appendChild(container);
-
-            sinon.stub(iframe.contentWindow!, 'postMessage');
-            sinon.stub(container, 'querySelector').returns(iframe);
-            sinon.stub(moat, 'container').returns(container);
-        });
-
-        afterEach(() => {
-            document.body.removeChild(container);
-        });
-
-        it('should have correct volume after initialization: 1', () => {
-            moat.render();
-            moat.triggerVideoEvent('test', 0.3);
-
-            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
-                {
-                    type: 'videoEvent',
-                    data: {
-                        type: 'test',
-                        adVolume: 1,
-                        volume: 0.3
+                 sinon.assert.calledWith(mockedDom.postMessage,
+                    {
+                        type: 'videoEvent',
+                        data: {
+                            type: 'test',
+                            adVolume: 0,
+                            volume: 0.1
+                        }
                     }
-                }
-            );
-        });
-
-        it('should have the correct player volume after player volume set', () => {
-            moat.render();
-            moat.setPlayerVolume(0);
-            moat.triggerVideoEvent('test', 0.3);
-
-            sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage,
-                {
-                    type: 'videoEvent',
-                    data: {
-                        type: 'test',
-                        adVolume: 0,
-                        volume: 0.3
-                    }
-                }
-            );
-        });
-    });
+                );
+            });
+        })
+    );
 });
