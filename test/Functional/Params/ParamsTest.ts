@@ -183,7 +183,8 @@ describe('Event parameters should match specifications', () => {
             const platform = Platform.ANDROID;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const core = coreModule.Api;
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -206,7 +207,7 @@ describe('Event parameters should match specifications', () => {
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -220,7 +221,8 @@ describe('Event parameters should match specifications', () => {
             const platform = Platform.IOS;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const core = coreModule.Api;
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -243,7 +245,7 @@ describe('Event parameters should match specifications', () => {
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];

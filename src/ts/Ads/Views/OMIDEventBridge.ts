@@ -240,11 +240,11 @@ export class OMIDEventBridge {
         this._iframe = iframe;
     }
 
-    public sendSDKVersion(sdkVersion: String) {
+    public sendSDKVersion(sdkVersion: string) {
         this.postMessage(OMSessionInfo.SDK_VERSION, sdkVersion);
     }
 
-    public sendSessionId(sessionId: String) {
+    public sendSessionId(sessionId: string) {
         this.postMessage(OMSessionInfo.SESSION_ID, sessionId);
     }
 

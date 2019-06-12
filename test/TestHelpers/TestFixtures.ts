@@ -912,7 +912,7 @@ export class TestFixtures {
             core.DeviceInfo = new IosDeviceInfo(api);
             core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
         }
-
+        core.ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
 
         return <ICore>core;
@@ -928,7 +928,6 @@ export class TestFixtures {
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
             MissedImpressionManager: new MissedImpressionManager(core.Api),
             BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo, core.ClientInfo),
-            ProgrammaticTrackingService: new ProgrammaticTrackingService(platform, core.RequestManager, core.ClientInfo, core.DeviceInfo),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),
@@ -936,8 +935,8 @@ export class TestFixtures {
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
-        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, ads.ProgrammaticTrackingService!, ads.BackupCampaignManager!);
-        ads.CampaignManager = new CampaignManager(platform, core.Api, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService, ads.BackupCampaignManager!);
+        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         return <IAds>ads;
     }
@@ -958,7 +957,7 @@ export class TestFixtures {
         const banners: Partial<IBanners> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
             WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
             AdUnitFactory: new BannerAdUnitFactory()
         };

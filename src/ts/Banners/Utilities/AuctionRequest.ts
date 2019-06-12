@@ -334,12 +334,10 @@ export class AuctionRequest {
     }
 
     protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
-        const dto: { [key: string]: unknown } = {
+        return {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
         };
-
-        return dto;
     }
 
     private getStaticResponse(url: string): Promise<INativeResponse> {

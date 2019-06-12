@@ -1,3 +1,30 @@
+# Tue Jun 11 22:58:07 UTC 2019
+
+* Add Metric to Track when Tracking URLs are not set on Show [#10102](https://github.com/Applifier/unity-ads-webview/pull/10102)
+* Minor Fixes for Load API [#10100](https://github.com/Applifier/unity-ads-webview/pull/10100)
+* Remove/Reduce severity of IAP logs from Ads Initialization [#10022](https://github.com/Applifier/unity-ads-webview/pull/10022)
+* Use tslint through typescript-eslint [#9989](https://github.com/Applifier/unity-ads-webview/pull/9989)
+* ESLint : no-tabs rule enabled [#10017](https://github.com/Applifier/unity-ads-webview/pull/10017)
+* ESLint : no-trailing-spaces rule enabled [#10018](https://github.com/Applifier/unity-ads-webview/pull/10018)
+* ESLint : enable no-irregular-whitespace [#10016](https://github.com/Applifier/unity-ads-webview/pull/10016)
+* ESLint : Enable `ban-types` rule [#10015](https://github.com/Applifier/unity-ads-webview/pull/10015)
+
+# Tue Jun 11 02:36:41 UTC 2019
+
+* Fix Load Metrics [#10075](https://github.com/Applifier/unity-ads-webview/pull/10075)
+
+# Mon Jun 10 23:42:26 UTC 2019
+
+* Metadata Enabled Per Placement Load Functionality Test [#9685](https://github.com/Applifier/unity-ads-webview/pull/9685)
+
+# Fri Jun  7 19:56:54 UTC 2019
+
+* Consent CTA ab test (bolder fonts) [#10049](https://github.com/Applifier/unity-ads-webview/pull/10049)
+* Move ProgrammaticTrackingService to Core module [#10023](https://github.com/Applifier/unity-ads-webview/pull/10023)
+* Making Core Module available to CampaignManager [#10048](https://github.com/Applifier/unity-ads-webview/pull/10048)
+* Don't show ad when app is in background #incident-20190605-1 [#10024](https://github.com/Applifier/unity-ads-webview/pull/10024)
+* IMEI collection logic update for China traffic [#10021](https://github.com/Applifier/unity-ads-webview/pull/10021)
+
 # Wed Jun  5 21:58:38 UTC 2019
 
 * ESLint : No multiple blank lines and end of file must have newline [#9952](https://github.com/Applifier/unity-ads-webview/pull/9952)
@@ -5,7 +32,6 @@
 * Log update for ad_ready/received and adding china imei log [#9990](https://github.com/Applifier/unity-ads-webview/pull/9990)
 * Add back ad_shown_in_background diagnostic [#10013](https://github.com/Applifier/unity-ads-webview/pull/10013)
  
-
 # Tue Jun  4 16:35:13 UTC 2019
 
 * End card transition experiment [#9715](https://github.com/Applifier/unity-ads-webview/pull/9715)
