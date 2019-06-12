@@ -110,9 +110,6 @@ export class Ads implements IAds {
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
-    private _creativeUrl?: string;
-    private _requestDelay: number;
-
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
     private _store: IStore;
@@ -622,7 +619,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('creativeUrl')) {
-            const creativeUrl = this._creativeUrl = TestEnvironment.get<string>('creativeUrl');
+            const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
             if(platform === Platform.ANDROID) {

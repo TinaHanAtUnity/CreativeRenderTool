@@ -5,6 +5,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -50,7 +51,6 @@ import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Placement } from 'Ads/Models/Placement';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
