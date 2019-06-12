@@ -271,6 +271,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._ads.VideoPlayer.getXYLocation();
     }
 
+    public getViewDimensions(): Promise<number[]> {
+        return this._ads.VideoPlayer.getViewDimensions();
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }

@@ -97,6 +97,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
     private _videoViewXYPosition: number[];
+    private _videoDimensions: number[];
 
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
         super(platform, 'openMeasurement');
@@ -177,6 +178,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public setVideoViewXYPosition(position: number[]) {
         this._videoViewXYPosition = position;
+    }
+
+    public setVideoDimensions(dimensions: number[]) {
+        this._videoDimensions = dimensions;
     }
 
     public render(): void {
@@ -410,8 +415,16 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
      */
     public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[]): IAdView {
-        const videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
-        const videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
+
+        let videoWidth;
+        let videoHeight;
+        if (this._videoDimensions) {
+            videoWidth = this._videoDimensions[0];
+            videoHeight = this._videoDimensions[1];
+        } else {
+            videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
+            videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
+        }
 
         let topLeftX;
         let topLeftY;

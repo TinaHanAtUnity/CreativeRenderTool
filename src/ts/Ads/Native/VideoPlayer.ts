@@ -91,6 +91,10 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
         return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getXYLocation');
     }
 
+    public getViewDimensions(): Promise<number[]> {
+        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getViewDimensions');
+    }
+
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
