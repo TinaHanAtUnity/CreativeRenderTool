@@ -58,6 +58,12 @@ $accessible-close-button-icon-size($n) {
             width: auto;
             text-shadow: none;
             font-size: .5em;
+
+            @media (min-width: 1160px) and (orientation: landscape) {
+                font-size: .35em;
+                right: 1em;
+                top: 0.3em;
+            }
         }
 
         .icon-close {
