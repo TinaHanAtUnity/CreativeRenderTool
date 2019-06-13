@@ -1,6 +1,7 @@
 # Pending
 
 * \[ABT-854\] Track Admob Rewarded Video Metrics [#10129](https://github.com/Applifier/unity-ads-webview/pull/10129)
+* Fix Incorrect Ad Player Volume - MOAT [#9954](https://github.com/Applifier/unity-ads-webview/pull/9954)
 
 # Thu Jun 13 15:14:38 UTC 2019
 
