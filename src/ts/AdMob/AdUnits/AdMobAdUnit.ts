@@ -136,7 +136,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
         if (this._isRewardedPlacement) {
-            this._pts.reportMetric(AdmobMetric.AdmobUserRewarded);
+            this._pts.reportMetric(AdmobMetric.AdmobUserWasRewarded);
         }
     }
 
