@@ -22,7 +22,8 @@ export enum AdmobMetric {
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
-    AdmobUserWasRewarded = 'admob_user_was_rewarded'
+    AdmobUserWasRewarded = 'admob_user_was_rewarded',
+    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video'
 }
 
 export enum BannerMetric {

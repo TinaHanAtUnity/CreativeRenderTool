@@ -96,10 +96,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return 'AdMob';
     }
 
-    public sendImpressionEvent() {
-        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
-    }
-
     public sendClickEvent() {
         this.sendTrackingEvent(TrackingEvent.CLICK);
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
@@ -124,6 +120,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendSkipEvent() {
+        if (this._isRewardedPlacement) {
+            this._pts.reportMetric(AdmobMetric.AdmobUserSkippedRewardedVideo);
+        }
         this.sendTrackingEvent(TrackingEvent.SKIP);
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
