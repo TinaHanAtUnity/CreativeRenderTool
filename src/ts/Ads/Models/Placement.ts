@@ -47,7 +47,6 @@ export interface IPlacement {
     useCloseIconInsteadOfSkipIcon: boolean | undefined;
 
     adTypes: string[] | undefined;
-    realtimeData: string | undefined;
 
     state: PlacementState;
     previousState: PlacementState;
@@ -74,7 +73,6 @@ export class Placement extends Model<IPlacement> {
             disableVideoControlsFade: ['boolean', 'undefined'],
             useCloseIconInsteadOfSkipIcon: ['boolean', 'undefined'],
             adTypes: ['array', 'undefined'],
-            realtimeData: ['string', 'undefined'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
@@ -200,14 +198,6 @@ export class Placement extends Model<IPlacement> {
 
     public setCurrentTrackingUrls(trackingUrls: ICampaignTrackingUrls | undefined) {
         this.set('currentTrackingUrls', trackingUrls);
-    }
-
-    public getRealtimeData(): string | undefined {
-        return this.get('realtimeData');
-    }
-
-    public setRealtimeData(value: string | undefined) {
-        this.set('realtimeData', value);
     }
 
     public getRefreshDelay(): number | undefined {

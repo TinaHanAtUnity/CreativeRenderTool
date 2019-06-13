@@ -65,7 +65,8 @@ export class CometCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
 
         if(json && json.mraidUrl) {
