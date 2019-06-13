@@ -1,3 +1,9 @@
+# Pending
+
+* Remove Realtime feature - CampaignManager refactor part 1 [#10014](https://github.com/Applifier/unity-ads-webview/pull/10014)
+* Block Ads Shown while Application is Backgrounded [#10104](https://github.com/Applifier/unity-ads-webview/pull/10104)
+* Add isLoadEnabled to Operative Events [#10106](https://github.com/Applifier/unity-ads-webview/pull/10106)
+
 # Tue Jun 11 22:58:07 UTC 2019
 
 * Add Metric to Track when Tracking URLs are not set on Show [#10102](https://github.com/Applifier/unity-ads-webview/pull/10102)
