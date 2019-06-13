@@ -20,7 +20,8 @@ export enum ProgrammaticTrackingError {
 export enum AdmobMetric {
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
-    AdmobUserVideoSeeked = 'admob_user_video_seeked'
+    AdmobUserVideoSeeked = 'admob_user_video_seeked',
+    AdmobUserRewarded = 'admob_user_rewarded'
 }
 
 export enum BannerMetric {

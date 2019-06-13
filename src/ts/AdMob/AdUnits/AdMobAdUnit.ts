@@ -17,6 +17,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -36,6 +37,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
     private _clientInfo: ClientInfo;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(parameters: IAdMobAdUnitParameters) {
         super(parameters);
@@ -48,6 +50,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
+        this._pts = parameters.programmaticTrackingService;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -127,6 +130,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const params = this.getOperativeEventParams();
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
+        this._pts.reportMetric(AdmobMetric.AdmobUserRewarded);
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
