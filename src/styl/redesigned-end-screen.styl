@@ -13,9 +13,9 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
 
     .btn-close-region {
       $close-button-default($scale-size);
-      padding: $scale-size * $default-size * .25;
-      top: -0.5 * $endscreen-default-size;
+      top: -.5 * $endscreen-default-size;
       right: 0;
+      padding: $scale-size * $default-size * .25;
     }
 
     .china-advertisement {
@@ -23,20 +23,20 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       position: absolute;
       right: 0;
       bottom: 0;
+      z-index: 10;
       margin-right: .5 * $endscreen-default-size;
       padding: 0;
       color: $gray;
-      font-size: $endscreen-default-size * .60;
+      font-size: $endscreen-default-size * .6;
       opacity: .6;
-      z-index: 10;
     }
 
     .pop-up-container {
-        width: 'calc(100% - 2 * %s)' % $endscreen-default-size;
-        height: 'calc(100% - 1.5 * %s)' % $endscreen-default-size;
-        margin: .75 * $endscreen-default-size 1 * $endscreen-default-size;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-        border-radius: .75 * $endscreen-default-size;
+      margin: .75 * $endscreen-default-size 1 * $endscreen-default-size;
+      width: "calc(100% - 2 * %s)" % $endscreen-default-size;
+      height: "calc(100% - 1.5 * %s)" % $endscreen-default-size;
+      border-radius: .75 * $endscreen-default-size;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
     }
 
     .download-container {
@@ -107,14 +107,13 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       $unityads-logo-default($scale-size, false);
       position: absolute;
       z-index: 10;
-      height: 18px;
       margin-bottom: 3px;
+      height: 18px;
       opacity: .6;
     }
 
     .name-container {
       $name-container-default($scale-size);
-      color: #e4e4e4;
       max-width: 90%;
       color: $end-screen-game-name-color;
       text-align: center;
@@ -125,23 +124,22 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       position: absolute;
       bottom: 0;
       left: 0;
+      margin-bottom: .15 * $endscreen-default-size;
       width: 100%;
       height: 1.35 * $endscreen-default-size;
-      margin-bottom: .15 * $endscreen-default-size;
     }
 
     .privacy-button {
       $privacy-button-default($scale-size);
       left: 0;
-      margin-left: .5 * $endscreen-default-size;
-      line-height: 1 * $endscreen-default-size;
-      line-height: initial;
       z-index: 15;
+      margin-left: .5 * $endscreen-default-size;
+      line-height: initial;
     }
 
     .icon-gdpr {
-      font-size: 17px;
       color: $black;
+      font-size: 17px;
       opacity: .25;
     }
 
@@ -180,8 +178,8 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: .85 * $endscreen-default-size;
       margin-top: 1 * $endscreen-default-size;
+      margin-bottom: .85 * $endscreen-default-size;
     }
 
     .game-background-portrait {
@@ -193,10 +191,10 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .row-container {
+      bottom: $endscreen-default-size;
       display: flex;
       flex-direction: row;
       justify-content: center;
-      bottom: $endscreen-default-size;
     }
 
     .store-container {
@@ -218,8 +216,8 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .btn-close-region {
-      right: 0.3 * $endscreen-default-size;
-      top: -0.3 * $endscreen-default-size;
+      top: -.3 * $endscreen-default-size;
+      right: .3 * $endscreen-default-size;
     }
   }
 
@@ -255,7 +253,7 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .column-container {
-        margin-bottom: 0;  
+        margin-bottom: 0;
       }
 
       .gdpr-pop-up {
@@ -264,15 +262,15 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
 
       @media (max-height: 460px) {
         .pop-up-container {
-          height: 'calc(100% - 3.55 * %s)' % $endscreen-default-size;
+          height: "calc(100% - 3.55 * %s)" % $endscreen-default-size;
 
           .icon-close {
             font-size: 1.5 * $endscreen-default-size;
           }
 
           .btn-close-region {
-            top: -0.5 * $endscreen-default-size;
-            right: -0.3 * $endscreen-default-size;
+            top: -.5 * $endscreen-default-size;
+            right: -.3 * $endscreen-default-size;
           }
         }
 
@@ -298,10 +296,10 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .bottom-container {
-        bottom: .75 * $endscreen-default-size;
         right: 1 * $endscreen-default-size;
+        bottom: .75 * $endscreen-default-size;
         left: auto;
-        width: 'calc(50% - 1 * %s)' % $endscreen-default-size;
+        width: "calc(50% - 1 * %s)" % $endscreen-default-size;
       }
 
       .game-background-container {
@@ -331,8 +329,8 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
       .end-screen-info-background {
         width: 50%;
         height: 100%;
-        text-align: center;
         border-radius: 0 .75 * $endscreen-default-size .75 * $endscreen-default-size 0;
+        text-align: center;
       }
 
       .gdpr-pop-up {
@@ -376,8 +374,8 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
     position: relative;
     width: 100%;
     height: 100%;
-    background: $white;
     border-radius: .75 * $endscreen-default-size;
+    background: $white;
   }
 
   .game-background {
@@ -588,9 +586,9 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 
   body.iphone #redesigned-end-screen {
     .pop-up-container {
-      height: calc(100% - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 1em);
-      width: calc(100% - 2em);
       margin-top: 1em;
+      width: calc(100% - 2em);
+      height: calc(100% - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 1em);
     }
 
     .btn-close-region {
@@ -602,8 +600,8 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
     &.ios-landscape-right #redesigned-end-screen {
       .bottom-container {
         right: calc(env(safe-area-inset-right) + 1em);
-        width: calc(50% - 2em);
         margin-bottom: calc(env(safe-area-inset-bottom) - .5em);
+        width: calc(50% - 2em);
       }
     }
 
