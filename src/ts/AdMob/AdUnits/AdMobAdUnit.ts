@@ -38,6 +38,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _requestToViewTime: number = 0;
     private _clientInfo: ClientInfo;
     private _pts: ProgrammaticTrackingService;
+    private _isRewardedPlacement: boolean;
 
     constructor(parameters: IAdMobAdUnitParameters) {
         super(parameters);
@@ -51,15 +52,20 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
         this._pts = parameters.programmaticTrackingService;
+        this._isRewardedPlacement = !parameters.placement.allowSkip();
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
-        this.setFinishState(this._placement.allowSkip() ? FinishState.COMPLETED : FinishState.SKIPPED);
+        this.setFinishState(this._isRewardedPlacement ? FinishState.SKIPPED : FinishState.COMPLETED);
     }
 
     public show(): Promise<void> {
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
+
+        if (this._isRewardedPlacement) {
+            this._pts.reportMetric(AdmobMetric.AdmobRewardedVideoStart);
+        }
 
         this.sendTrackingEvent(TrackingEvent.SHOW);
         if (this._platform === Platform.ANDROID) {
@@ -130,7 +136,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const params = this.getOperativeEventParams();
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
-        this._pts.reportMetric(AdmobMetric.AdmobUserRewarded);
+        if (this._isRewardedPlacement) {
+            this._pts.reportMetric(AdmobMetric.AdmobUserRewarded);
+        }
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
