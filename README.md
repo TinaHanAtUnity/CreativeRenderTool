@@ -107,11 +107,11 @@ Or combine both:
 
 #### Automatic builds for Android
 
-http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-android/
+https://jenkins.prd.mz.internal.unity3d.com/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-android/
 
 #### Automatic builds for iOS
 
-http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-ios/
+https://jenkins.prd.mz.internal.unity3d.com/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-ios/
 
 ### Browser build tests
 
@@ -121,8 +121,8 @@ http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-
 ### Deployment tests
 
 #### Android
-http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-android/
+https://jenkins.prd.mz.internal.unity3d.com/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-android/
 
 #### iOS
-http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-ios/
+https://jenkins.prd.mz.internal.unity3d.com/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-ios/
 
