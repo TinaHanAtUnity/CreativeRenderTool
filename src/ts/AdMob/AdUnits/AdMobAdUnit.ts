@@ -234,7 +234,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private hideView() {
         this._view.hide();
-        document.body.removeChild(this._view.container());
+        if (this._view.container()) {
+            document.body.removeChild(this._view.container());
+        }
     }
 
     private onKeyDown(key: number) {
