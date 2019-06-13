@@ -27,6 +27,10 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
+    public static isShowingAdInBackground(gameId: string) {
+        return gameId === '3016669';    // anipang2 from Korea dev
+    }
+
     public static isNestedIframePlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
