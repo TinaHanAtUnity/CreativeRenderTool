@@ -33,5 +33,6 @@ export class Store implements IStore, IApiModule {
         } else {
             this.StoreManager = new AppleStoreManager(core, this.Api);
         }
+        this.StoreManager.startTracking();
     }
 }
