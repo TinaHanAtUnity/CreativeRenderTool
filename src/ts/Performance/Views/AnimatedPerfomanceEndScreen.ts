@@ -1,8 +1,5 @@
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { ICoreApi } from 'Core/ICore';
-import { Template } from 'Core/Utilities/Template';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 
 export class AnimatedPerfomanceEndScreen extends PerformanceEndScreen {
