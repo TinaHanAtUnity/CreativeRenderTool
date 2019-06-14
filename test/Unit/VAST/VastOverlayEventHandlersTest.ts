@@ -274,14 +274,20 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
             it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 0);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
                 sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
             it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
                 sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 1);
             });

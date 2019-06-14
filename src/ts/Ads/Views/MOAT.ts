@@ -25,13 +25,19 @@ export class MOAT extends View<VastCampaign> {
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
+    private _playerVolume: number;
 
-    constructor(platform: Platform, core: ICoreApi) {
+    constructor(platform: Platform, core: ICoreApi, muteVideo: boolean) {
         super(platform, 'moat');
         this._template = new Template(MOATTemplate);
         this._core = core;
         this._bindings = [];
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
+        this._playerVolume = muteVideo ? 0 : 1;
+    }
+
+    public setPlayerVolume(playerVolume: number) {
+        this._playerVolume = playerVolume;
     }
 
     public render(): void {
@@ -138,8 +144,9 @@ export class MOAT extends View<VastCampaign> {
             this._iframe.contentWindow.postMessage({
                 type: 'videoEvent',
                 data: {
-                    type,
-                    volume
+                    type: type,
+                    adVolume: this._playerVolume,
+                    volume: volume
                 }
             }, '*');
         }
