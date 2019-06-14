@@ -321,15 +321,15 @@ export class VastParserStrict {
                 if (isWarningLevel) {
                     vastAd.addCompanionAd(companionAd);
                 } else {
-                    vastAd.addUnsupportedCompanionAd(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
+                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
             }
+            // ignore element as it is not of a type we support
             if (iframeResourceElement) {
-                // ignore element as it is not of a type we support
-                vastAd.addUnsupportedCompanionAd(element.outerHTML);
+                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
             }
             if (htmlResourceElement) {
-                vastAd.addUnsupportedCompanionAd(element.outerHTML);
+                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
             }
         });
 
