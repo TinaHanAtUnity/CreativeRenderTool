@@ -27,7 +27,7 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
-    public static isShowingAdInBackground(gameId: string) {
+    public static isWhitelistedToShowInBackground(gameId: string) {
         return gameId === '3016669';    // anipang2 from Korea dev
     }
 

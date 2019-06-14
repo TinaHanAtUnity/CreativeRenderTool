@@ -343,7 +343,7 @@ export class Ads implements IAds {
 
             this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedToShowInBackground);
 
-            if (!CustomFeatures.isShowingAdInBackground(this._core.ClientInfo.getGameId())) {
+            if (!CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId())) {
                 return;
             }
         }
