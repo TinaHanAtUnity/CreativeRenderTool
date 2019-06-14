@@ -5,6 +5,9 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { AnimatedPerfomanceEndScreen } from 'Performance/Views/AnimatedPerfomanceEndScreen';
+import { AnimationEndCardTest } from 'Core/Models/ABGroup';
+
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
@@ -37,7 +40,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        let endScreen: PerformanceEndScreen | AnimatedPerfomanceEndScreen;
+        const abGroup = baseParams.coreConfig.getAbGroup();
+
+        if (AnimationEndCardTest.isValid(abGroup)) {
+            endScreen = new AnimatedPerfomanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
