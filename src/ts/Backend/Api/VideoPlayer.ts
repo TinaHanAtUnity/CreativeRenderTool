@@ -99,7 +99,7 @@ export class VideoPlayer extends BackendApi {
             videoView = this._videoView;
         }
 
-        return [0, 0, this._videoView.width, this._videoView.height];
+        return [this._videoView.getBoundingClientRect().left, this._videoView.getBoundingClientRect().top, this._videoView.width, this._videoView.height];
     }
 
     private _url: string | undefined;
