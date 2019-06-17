@@ -7,14 +7,18 @@ interface IVastCompanionAdHTMLResource extends IVastCreativeCompanionAd {
 
 export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResource> {
 
-    constructor(id: string | null, htmlResourceURL?: string | null) {
+    constructor(id: string | null, height: number, width: number, htmlResourceURL?: string | null) {
         super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
+            height: ['number'],
+            width: ['number'],
             type: ['string'],
             htmlResourceContent: ['string', 'null']
         });
 
         this.set('id', id || null);
+        this.set('height', height);
+        this.set('width', width);
         this.set('type', VastCompanionAdType.HTML);
         this.set('htmlResourceContent', htmlResourceURL || null);
     }
@@ -27,13 +31,27 @@ export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResou
         return this.get('type');
     }
 
+    public setHtmlResourceContent(htmlContent: string) {
+        this.set('htmlResourceContent', htmlContent);
+    }
+
     public getHtmlResourceContent(): string | null {
         return this.get('htmlResourceContent');
+    }
+
+    public getHeight(): number {
+        return this.get('height');
+    }
+
+    public getWidth(): number {
+        return this.get('width');
     }
 
     public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
+            'width': this.getWidth(),
+            'height': this.getHeight(),
             'type': this.getType(),
             'htmlResourceContent': this.getHtmlResourceContent()
         };

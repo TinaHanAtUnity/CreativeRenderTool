@@ -2,8 +2,6 @@ import { Model } from 'Core/Models/Model';
 import { IVastCreativeCompanionAd, VastCompanionAdType } from 'VAST/Models/IVastCreativeCompanionAd';
 
 interface IVastCompanionAdStaticResource extends IVastCreativeCompanionAd {
-    width: number;
-    height: number;
     staticResourceURL: string | null;
     creativeType: string | null;
     companionClickThroughURLTemplate: string | null;
@@ -41,7 +39,7 @@ export class VastCompanionAdStaticResource extends Model<IVastCompanionAdStaticR
         this.set('companionClickThroughURLTemplate', url);
     }
 
-    public setStaticResourceURL(url: string | null) {
+    public setStaticResourceURL(url: string) {
         this.set('staticResourceURL', url);
     }
 

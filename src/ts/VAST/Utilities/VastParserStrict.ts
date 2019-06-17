@@ -16,6 +16,8 @@ import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastComp
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VAST } from 'VAST/VAST';
+import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -509,6 +511,39 @@ export class VastParserStrict {
                 companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
             }
         });
+        return companionAd;
+    }
+
+    // private parseCompanionAdStaticResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdStaticResource
+    private parseCompanionAdIframeResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdIframeResource(id, height, width);
+
+        const iframeResourceElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
+        if (iframeResourceElement) {
+            const iframeResourceUrl = this.parseVastUrl(this.parseNodeText(iframeResourceElement), urlProtocol);
+            if (iframeResourceUrl) {
+                companionAd.setIframeResourceURL(iframeResourceUrl);
+            }
+        }
+        return companionAd;
+    }
+
+    private parseComanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
+
+        const htmlResourceElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
+        if (htmlResourceElement) {
+            const htmlResource = this.parseNodeText(htmlResourceElement);
+            if (htmlResource) {
+                companionAd.setHtmlResourceContent(htmlResource);
+            }
+        }
         return companionAd;
     }
 

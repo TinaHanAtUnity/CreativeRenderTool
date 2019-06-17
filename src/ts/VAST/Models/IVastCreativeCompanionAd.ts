@@ -7,4 +7,6 @@ export enum VastCompanionAdType {
 export interface IVastCreativeCompanionAd {
     id: string | null;          // id is not a requirement per iab spec
     type: VastCompanionAdType;  // Unity internal type classification
+    width: number;
+    height: number;
 }
