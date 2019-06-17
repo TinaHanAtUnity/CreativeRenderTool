@@ -205,7 +205,8 @@
             this._registerVideoEvents = function() {};
         }
 
-        window.omid3p = new OmidVerification();
+        // window.omid3p = new OmidVerification();
+        window.OmidVerificationClient = {'omid3p': OmidVerification};
         Object.freeze(window.omid3p);
     })();
 </script>

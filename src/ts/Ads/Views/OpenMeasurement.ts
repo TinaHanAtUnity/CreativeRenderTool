@@ -409,7 +409,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * All AdViews will assume fullscreen interstitial video
      * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
      */
-    public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[]): IAdView {
+    public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], videoView?: IRectangle): IAdView {
 
         let videoWidth;
         let videoHeight;

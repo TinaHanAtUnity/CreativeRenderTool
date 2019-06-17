@@ -30,7 +30,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const vastAd = baseParams.campaign.getVast().getAd();
-        if(OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && vastAd && vastAd.getAdVerification()) {
+        if(vastAd && vastAd.getAdVerification()) {
             const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, vastAd.getAdVerifications());
             om.addToViewHierarchy();
             om.injectAdVerifications();
