@@ -337,8 +337,15 @@ export class Ads implements IAds {
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
         if (!this._core.FocusManager.isAppForeground()) {
+            if (CustomFeatures.shouldSampleAtTenPercent()) {
+                Diagnostics.trigger('ad_shown_in_background', {});
+            }
+
             this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedToShowInBackground);
-            return;
+
+            if (!CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId())) {
+                return;
+            }
         }
 
         const campaign = this.RefreshManager.getCampaign(placementId);
