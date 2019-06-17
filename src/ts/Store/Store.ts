@@ -8,6 +8,7 @@ import { AppleStoreManager } from 'Store/Managers/AppleStoreManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
+import { IAPAutoLoggingTest } from 'Core/Models/ABGroup';
 
 export class Store implements IStore, IApiModule {
     public readonly Api: Readonly<IStoreApi>;
@@ -33,6 +34,8 @@ export class Store implements IStore, IApiModule {
         } else {
             this.StoreManager = new AppleStoreManager(core, this.Api);
         }
-        this.StoreManager.startTracking();
+        if (IAPAutoLoggingTest.isValid(this._core.Config.getAbGroup())) {
+            this.StoreManager.startTracking();
+        }
     }
 }
