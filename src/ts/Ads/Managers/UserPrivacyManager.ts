@@ -33,7 +33,8 @@ interface IUserSummary extends ITemplateData {
 export enum GDPREventSource {
     METADATA = 'metadata',
     NO_REVIEW = 'no_review',
-    USER = 'user'
+    USER = 'user',
+    SANITIZATION = 'sanitization'
 }
 
 export enum GDPREventAction {
@@ -43,9 +44,9 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
-export interface IUserPrivacyStorageData { 
-    gdpr: { 
-        consent: { 
+export interface IUserPrivacyStorageData {
+    gdpr: {
+        consent: {
             value: unknown;
         };
     };

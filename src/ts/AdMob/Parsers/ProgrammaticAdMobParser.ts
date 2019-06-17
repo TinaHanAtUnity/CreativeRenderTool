@@ -37,7 +37,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         this._core = core.Api;
         this._requestManager = core.RequestManager;
         this._abGroup = core.Config.getAbGroup();
-        this._pts = core.Ads.ProgrammaticTrackingService;
+        this._pts = core.ProgrammaticTrackingService;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -70,7 +70,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 session: session,
                 mediaId: response.getMediaId(),
                 trackingUrls: response.getTrackingUrls() || {},
-                backupCampaign: false
+                backupCampaign: false,
+                isLoadEnabled: false
             };
 
             const adMobCampaignParams: IAdMobCampaign = {

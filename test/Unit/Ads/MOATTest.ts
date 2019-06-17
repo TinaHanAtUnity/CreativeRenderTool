@@ -106,7 +106,7 @@ describe('MOAT', () => {
             let mockedDom: { postMessage: sinon.SinonStub };
             const expectedAdVolumeAfterInit = muteVideo ? 0 : 1;
 
-            beforeEach(() => {
+             beforeEach(() => {
                 mockedDom = MockDom();
                 moat = InitMoatWithPlayerVolume(muteVideo);
             });
@@ -115,7 +115,7 @@ describe('MOAT', () => {
                 moat.render();
                 moat.triggerVideoEvent('test', 0.3);
 
-                sinon.assert.calledWith(mockedDom.postMessage,
+                 sinon.assert.calledWith(mockedDom.postMessage,
                     {
                         type: 'videoEvent',
                         data: {
@@ -127,18 +127,35 @@ describe('MOAT', () => {
                 );
             });
 
-            it('should have the correct player volume after player volume set', () => {
+            it('should have the correct player volume after player volume set to nonmuted', () => {
                 moat.render();
                 moat.setPlayerVolume(1);
                 moat.triggerVideoEvent('test', 0.3);
 
-                sinon.assert.calledWith(mockedDom.postMessage,
+                 sinon.assert.calledWith(mockedDom.postMessage,
                     {
                         type: 'videoEvent',
                         data: {
                             type: 'test',
                             adVolume: 1,
                             volume: 0.3
+                        }
+                    }
+                );
+            });
+
+            it('should have the correct player volume after player volume set to muted', () => {
+                moat.render();
+                moat.setPlayerVolume(0);
+                moat.triggerVideoEvent('test', 0.1);
+
+                 sinon.assert.calledWith(mockedDom.postMessage,
+                    {
+                        type: 'videoEvent',
+                        data: {
+                            type: 'test',
+                            adVolume: 0,
+                            volume: 0.1
                         }
                     }
                 );
