@@ -1,7 +1,12 @@
-# Pending
+# Staged
+
+* Fix for #incident-20190516-2 [#9987](https://github.com/Applifier/unity-ads-webview/pull/9987)
+
+# Fri Jun 14 20:44:10 UTC 2019
 
 * \[ABT-854\] Track Admob Rewarded Video Metrics [#10129](https://github.com/Applifier/unity-ads-webview/pull/10129)
 * Fix Incorrect Ad Player Volume - MOAT [#9954](https://github.com/Applifier/unity-ads-webview/pull/9954)
+* Temporarily Whitelist in GameID 3016669 to not Block Ads in Background [#10130](https://github.com/Applifier/unity-ads-webview/pull/10130)
 
 # Thu Jun 13 15:14:38 UTC 2019
 
