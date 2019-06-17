@@ -421,8 +421,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             videoWidth = this._videoViewRectangle[2];
             videoHeight = this._videoViewRectangle[3];
         } else {
-            videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
-            videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
+            // These are the estimate values based on campaign data if we cannot get values from native
+            videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);
+            videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);
             topLeftX = 0;
             topLeftY = this.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
         }
