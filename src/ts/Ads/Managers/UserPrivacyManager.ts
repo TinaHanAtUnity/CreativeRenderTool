@@ -33,7 +33,8 @@ interface IUserSummary extends ITemplateData {
 export enum GDPREventSource {
     METADATA = 'metadata',
     NO_REVIEW = 'no_review',
-    USER = 'user'
+    USER = 'user',
+    SANITIZATION = 'sanitization'
 }
 
 export enum GDPREventAction {
