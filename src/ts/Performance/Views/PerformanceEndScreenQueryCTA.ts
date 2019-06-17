@@ -10,20 +10,6 @@ export class PerformanceEndScreenQueryCTA extends PerformanceEndScreen {
 
         this._template = new Template(EndScreenQuery, this._localization);
 
-        const portraitImage = campaign.getPortrait();
-        const landscapeImage = campaign.getLandscape();
-        const adjustedRating: number = campaign.getRating() * 20;
-        this._templateData = {
-            'gameName': campaign.getGameName(),
-            'gameIcon': campaign.getGameIcon().getUrl(),
-            // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
-            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
-            'rating': adjustedRating.toString(),
-            'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt()
-        };
-
         this._bindings = [
             {
                 event: 'click',
