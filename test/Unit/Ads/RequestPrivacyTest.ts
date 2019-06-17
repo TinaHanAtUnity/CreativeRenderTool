@@ -8,40 +8,51 @@ describe('RequestPrivacyFactoryTests', () => {
     let gamePrivacy: GamePrivacy;
 
     context('when no previous user privacy is recorded', () => {
-        let result: IRequestPrivacy;
+        let result: IRequestPrivacy | undefined;
         beforeEach(() => {
             userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should set firstRequest as true', () => assert.equal(result.firstRequest, true));
-        it('should use privacy method set to the game', () => assert.equal(result.method, PrivacyMethod.UNITY_CONSENT));
-        it('should set permissions as empty', () => assert.deepEqual(result.permissions, {}));
+        it('should set firstRequest as true', () => assert.equal(result!.firstRequest, true));
+        it('should use privacy method set to the game', () => assert.equal(result!.method, PrivacyMethod.UNITY_CONSENT));
+        it('should set permissions as empty', () => assert.deepEqual(result!.permissions, {}));
     });
 
     context('when a recorded user privacy exists', () => {
-        let result: IRequestPrivacy;
-        const expectedPermissions = { profiling: true };
+        let result: IRequestPrivacy | undefined;
+        const expectedPermissions = { gameExp: false, ads: true, external: false };
         beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT, version: 20190101, permissions: expectedPermissions });
-            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT });
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 20190101, permissions: expectedPermissions });
+            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should set firstRequest as false', () => assert.equal(result.firstRequest, false));
-        it('should set recorded privacy method', () => assert.equal(result.method, PrivacyMethod.DEVELOPER_CONSENT));
-        xit('should set recorded permissions', () => assert.deepEqual(result.permissions, expectedPermissions));
+        it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
+        it('should set recorded privacy method', () => assert.equal(result!.method, PrivacyMethod.UNITY_CONSENT));
+        it('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
     });
 
     context('if game privacy method has changed since last privacy store', () => {
-        let result: IRequestPrivacy;
-        const newGameMethod = PrivacyMethod.DEVELOPER_CONSENT;
+        let result: IRequestPrivacy | undefined;
+        const newGameMethod = PrivacyMethod.UNITY_CONSENT;
         const anyPermissions = <IPermissions>{};
         beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: anyPermissions });
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
             gamePrivacy = new GamePrivacy({ method: newGameMethod });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should not affect set privacy method', () => assert.notEqual(result.method, newGameMethod));
+        it('should not affect set privacy method', () => assert.notEqual(result!.method, newGameMethod));
+    });
+
+    context('if game privacy method is something else than PrivacyMethod.UNITY_CONSENT', () => {
+        let result: IRequestPrivacy | undefined;
+        const anyPermissions = <IPermissions>{};
+        beforeEach(() => {
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
+            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
+            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+        });
+        it('should return undefined', () => assert.isUndefined(result));
     });
 });
 
