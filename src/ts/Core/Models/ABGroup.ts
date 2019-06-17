@@ -71,5 +71,5 @@ export const OpenMeasurementTest = new DisabledABTest();
 export const AnimationEndCardTest = new ZyngaFilteredABTest(7, 8);
 export const ZyngaLoadTest = new ABTest(14, 15);
 export const IAPAutoLoggingTest = new ABTest(13);
-export const RedesignedEndScreenDesignExperiment = new ABTest(5, 6);
-//export const RedesignedEndScreenDesignExperiment = { isValid: (group: ABGroup) => true };w
+export const RedesignedEndScreenDesignTest = new ABTest(5, 6);
+//export const RedesignedEndScreenDesignTest = { isValid: (group: ABGroup) => true };w
