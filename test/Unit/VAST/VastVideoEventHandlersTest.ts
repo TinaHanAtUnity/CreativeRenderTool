@@ -249,20 +249,6 @@ describe('VastVideoEventHandler tests', () => {
         });
     });
 
-    // describe('onVideoPrepared', () => {
-
-    //     beforeEach(() => {
-    //         sandbox.stub(testAdUnit, 'getVideoViewRectangle').returns(Promise.reject(new Error('video rect retrieval failed')));
-    //         vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
-    //     });
-
-    //     it('should call session start when getting video view fails', () => {
-    //         return testAdUnit.getVideoViewRectangle().catch(() => {
-    //             sinon.assert.notCalled(<sinon.SinonStub>openMeasurement!.sessionStart);
-    //         });
-    //     });
-    // });
-
     describe('onVideoStart', () => {
 
         it('sends start events from VAST', () => {
