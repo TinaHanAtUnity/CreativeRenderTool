@@ -514,43 +514,29 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('IFrameResource Companion Ad', () => {
+            describe('Unsupported Companion Ad', () => {
                 describe('add into unsupported companion ads for iframeResource companionAd', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
+                        expectedVal: number | null;
                     }[] = [
                             {
-                                message: 'should have added into unsupported companion ads',
-                                inputXml: VastCompanionAdIFrameXml
+                                message: 'should have added into unsupported companion ads for iframeResource',
+                                inputXml: VastCompanionAdIFrameXml,
+                                expectedVal: 1
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
+                                inputXml: VastCompanionAdHTMLXml,
+                                expectedVal: 2
                             }
                         ];
 
                     tests.forEach((test) => {
                         it(test.message, () => {
                             const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
-                            assert.equal(vast.getAd()!.getUnsupportedCompanionAds().length, 1);
-                        });
-                    });
-                });
-            });
-
-            describe('HTMLResource Companion Ad', () => {
-                describe('add into unsupported companion ads for htmlResource companionAd', () => {
-                    const tests: {
-                        message: string;
-                        inputXml: string;
-                    }[] = [
-                            {
-                                message: 'should have correct companion landscape url',
-                                inputXml: VastCompanionAdHTMLXml
-                            }
-                        ];
-
-                    tests.forEach((test) => {
-                        it(test.message, () => {
-                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
-                            assert.equal(vast.getAd()!.getUnsupportedCompanionAds().length, 2);
+                            assert.equal(vast.getAd()!.getUnsupportedCompanionAds().length, test.expectedVal);
                         });
                     });
                 });
