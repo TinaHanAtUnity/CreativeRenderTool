@@ -37,7 +37,7 @@ describe('StoreTest', () => {
     });
 
     describe('GoogleStoreManager', () => {
-        
+
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID, TestFixtures.getBackend(Platform.ANDROID));
             core = TestFixtures.getCoreModule(nativeBridge);
