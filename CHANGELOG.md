@@ -1,6 +1,14 @@
 # Pending
 
 * Fix AdmobAdUnitTest failures in Hybrid Tests[#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
+* Add fields 'targetGameId' and 'campaignId' to Playable Ad Events [#8523](https://github.com/Applifier/unity-ads-webview/pull/8523)
+* UADSSDK-82 : Api's crashing iOS apps [#10157](https://github.com/Applifier/unity-ads-webview/pull/10157)
+* Fix Endcard Animation [#10155](https://github.com/Applifier/unity-ads-webview/pull/10155)
+* Introduce Consent AB Test Removing the Unity Logo [#10185](https://github.com/Applifier/unity-ads-webview/pull/10185)
+* Turn on Store API [#10156](https://github.com/Applifier/unity-ads-webview/pull/10156)
+* Improved Unit Tests for MOAT View [#10105](https://github.com/Applifier/unity-ads-webview/pull/10105)
+* Improve Makefile (part of integration test update) [#10210](https://github.com/Applifier/unity-ads-webview/pull/10210)
+* Update Test Job URLs in README [#10131](https://github.com/Applifier/unity-ads-webview/pull/10131)
 
 # Tue Jun 18 10:39:27 UTC 2019
 
