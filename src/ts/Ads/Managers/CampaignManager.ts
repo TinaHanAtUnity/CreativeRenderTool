@@ -158,7 +158,7 @@ export class CampaignManager {
 
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-        return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(requestPrivacy, countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -235,7 +235,7 @@ export class CampaignManager {
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
         const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
 
-        return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
+        return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
@@ -247,7 +247,7 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: timeout
             }).then(response => {
-                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
                     this._pts.reportMetric(LoadMetric.LoadEnabledFill);
@@ -280,7 +280,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionResponse>(response.response);
@@ -385,7 +385,7 @@ export class CampaignManager {
         }
     }
 
-    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
+    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -526,7 +526,7 @@ export class CampaignManager {
         return Promise.all(promises);
     }
 
-    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy, deviceFreeSpace: number): Promise<ILoadedCampaign | undefined> {
+    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, deviceFreeSpace: number, requestPrivacy?: IRequestPrivacy): Promise<ILoadedCampaign | undefined> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -843,7 +843,7 @@ export class CampaignManager {
     }
 
     // todo: refactor requestedPlacement to something more sensible
-    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
+    private createRequestBody(gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         const body: { [key: string]: unknown } = {
