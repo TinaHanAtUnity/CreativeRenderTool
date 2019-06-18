@@ -15,9 +15,10 @@ export abstract class StoreManager {
         this._store = store;
 
         this.onStoreTransaction.subscribe((transaction) => this.sendDiagnosticsTransaction(transaction));
+        this.startTracking();
     }
 
-    public abstract startTracking(): void;
+    protected abstract startTracking(): void;
 
     public sendDiagnosticsTransaction(transaction: StoreTransaction) {
         // when feature has been validated in production, this functionality should be removed

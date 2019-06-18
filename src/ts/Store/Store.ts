@@ -9,6 +9,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
 import { IAPAutoLoggingTest } from 'Core/Models/ABGroup';
+import { NullStoreManager } from 'Store/Managers/NullStoreManager';
 
 export class Store implements IStore, IApiModule {
     public readonly Api: Readonly<IStoreApi>;
@@ -29,13 +30,14 @@ export class Store implements IStore, IApiModule {
             } : undefined
         };
 
-        if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
-            this.StoreManager = new GoogleStoreManager(core, this.Api);
-        } else {
-            this.StoreManager = new AppleStoreManager(core, this.Api);
-        }
         if (IAPAutoLoggingTest.isValid(this._core.Config.getAbGroup())) {
-            this.StoreManager.startTracking();
+            if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.StoreManager = new GoogleStoreManager(core, this.Api);
+            } else {
+                this.StoreManager = new AppleStoreManager(core, this.Api);
+            }
+        } else {
+            this.StoreManager = new NullStoreManager(core, this.Api);
         }
     }
 }

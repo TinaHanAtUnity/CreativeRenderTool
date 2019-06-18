@@ -17,7 +17,7 @@ export class GoogleStoreManager extends StoreManager {
         this._existingOrderIds = {};
     }
 
-    public startTracking(): void {
+    protected startTracking(): void {
         this._store.Android!.Store.onInitialized.subscribe(() => this.onInitialized());
         this._store.Android!.Store.onInitializationFailed.subscribe(() => this.onInitializationFailed());
         this._store.Android!.Store.onDisconnected.subscribe(() => this.onDisconnected());
