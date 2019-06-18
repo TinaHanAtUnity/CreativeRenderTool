@@ -2,8 +2,6 @@ import { Model } from 'Core/Models/Model';
 import { IVastCreativeCompanionAd, VastCompanionAdType } from 'VAST/Models/IVastCreativeCompanionAd';
 
 interface IVastCompanionAdStaticResource extends IVastCreativeCompanionAd {
-    width: number;
-    height: number;
     staticResourceURL: string | null;
     creativeType: string | null;
     companionClickThroughURLTemplate: string | null;
@@ -13,8 +11,8 @@ interface IVastCompanionAdStaticResource extends IVastCreativeCompanionAd {
 
 export class VastCompanionAdStaticResource extends Model<IVastCompanionAdStaticResource> {
 
-    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, companionClickTrackingURLTemplates?: string[], trackingEvents?: { [eventName: string]: string[] }) {
-        super('VastCreativeCompanionAd', {
+    constructor(id: string | null, height: number, width: number, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, companionClickTrackingURLTemplates?: string[], trackingEvents?: { [eventName: string]: string[] }) {
+        super('VastCompanionAdStaticResource', {
             id: ['string', 'null'],
             width: ['number'],
             height: ['number'],

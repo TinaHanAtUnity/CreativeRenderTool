@@ -7,15 +7,19 @@ interface IVastCompanionAdIFrameResource extends IVastCreativeCompanionAd {
 
 export class VastCompanionAdIFrameResource extends Model<IVastCompanionAdIFrameResource> {
 
-    constructor(id: string | null, iframeResourceURL?: string | null) {
-        super('VastCreativeCompanionAd', {
+    constructor(id: string | null, height: number, width: number, iframeResourceURL?: string | null) {
+        super('VastCompanionAdIFrameResource', {
             id: ['string', 'null'],
             type: ['string'],
-            iframeResourceURL: ['string']
+            width: ['number'],
+            height: ['number'],
+            iframeResourceURL: ['string', 'null']
         });
 
         this.set('id', id || null);
         this.set('type', VastCompanionAdType.IFRAME);
+        this.set('width', width);
+        this.set('height', height);
         this.set('iframeResourceURL', iframeResourceURL || null);
     }
 
@@ -27,8 +31,20 @@ export class VastCompanionAdIFrameResource extends Model<IVastCompanionAdIFrameR
         return this.get('type');
     }
 
+    public setIframeResourceURL(url: string) {
+        this.set('iframeResourceURL', url);
+    }
+
     public getIframeResourceURL(): string | null {
         return this.get('iframeResourceURL');
+    }
+
+    public getHeight(): number {
+        return this.get('height');
+    }
+
+    public getWidth(): number {
+        return this.get('width');
     }
 
     public getDTO(): { [key: string]: unknown } {
