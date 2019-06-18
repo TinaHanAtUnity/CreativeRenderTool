@@ -20,7 +20,7 @@ export abstract class StoreManager {
 
     protected abstract startTracking(): void;
 
-    public sendDiagnosticsTransaction(transaction: StoreTransaction) {
+    private sendDiagnosticsTransaction(transaction: StoreTransaction) {
         // when feature has been validated in production, this functionality should be removed
         // however this functionality is essential in rollout phase where we should compare SDK diagnostics with production data pipeline
         Diagnostics.trigger('store_transaction', {
