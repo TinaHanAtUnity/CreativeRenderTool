@@ -1,4 +1,14 @@
-# Staged
+# Pending
+
+* Fix AdmobAdUnitTest failures in Hybrid Tests[#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
+* Add fields 'targetGameId' and 'campaignId' to Playable Ad Events [#8523](https://github.com/Applifier/unity-ads-webview/pull/8523)
+* UADSSDK-82 : Api's crashing iOS apps [#10157](https://github.com/Applifier/unity-ads-webview/pull/10157)
+
+# Tue Jun 18 10:39:27 UTC 2019
+
+* Stop sending sanitization events [#10186](https://github.com/Applifier/unity-ads-webview/pull/10186)
+
+# Tue Jun 18 08:57:29 UTC 2019
 
 * Fix for #incident-20190516-2 [#9987](https://github.com/Applifier/unity-ads-webview/pull/9987)
 
