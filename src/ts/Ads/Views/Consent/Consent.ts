@@ -175,7 +175,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         if (this._isABTest) {
             const homeScreenContainer = (<HTMLElement>this._container.querySelector('#consent-homescreen'));
-            homeScreenContainer.classList.add(('cta-style-abtest'));
+            homeScreenContainer.classList.add(('unityads-logo-abtest'));
         }
 
         this.showPage(this._landingPage);
