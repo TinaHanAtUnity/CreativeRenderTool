@@ -73,9 +73,16 @@ export class AdsConfigurationParser {
         if (configJson.gamePrivacy.method !== PrivacyMethod.LEGITIMATE_INTEREST) {
             return false;
         }
+        const uPP = configJson.userPrivacy.permissions;
+        if (uPP.hasOwnProperty('profiling') && uPP.hasOwnProperty('ads')) {
+            Diagnostics.trigger('ads_configuration_user_privacy_inconsistent', {
+                userPrivacy: JSON.stringify(configJson.userPrivacy),
+                gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
+            configJson.userPrivacy = undefined;
+            return false;
+        }
 
         let adsAllowed = false;
-        const uPP = configJson.userPrivacy.permissions;
         if (uPP.hasOwnProperty('profiling')) {
             adsAllowed = (<IProfilingPermissions>uPP).profiling;
         }

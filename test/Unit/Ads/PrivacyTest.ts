@@ -1,8 +1,10 @@
 import 'mocha';
 import { assert } from 'chai';
+import * as sinon from 'sinon';
 
 import { CurrentUnityConsentVersion, GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import {Diagnostics} from '../../../src/ts/Core/Utilities/Diagnostics';
 
 describe('GamePrivacyTests', () => {
     it('should be disabled if PrivacyMethod.DEFAULT', () => {
@@ -25,6 +27,7 @@ describe('GamePrivacyTests', () => {
 });
 
 describe('incident-20190516-2', () => {
+    let diagnosticTriggerStub: sinon.SinonStub;
     const baseAdsConf = {
         assetCaching: 'maybe',
         placements: [],
@@ -33,6 +36,12 @@ describe('incident-20190516-2', () => {
         gdprEnabled: true,
         gamePrivacy: {method: 'legitimate_interest'}
     };
+    beforeEach(() => {
+        diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
+    });
+    afterEach(() => {
+        diagnosticTriggerStub.restore();
+    });
     [   {profiling: false},
         {profiling: true},
         {ads: false, gameExp: false, external: false},
@@ -90,5 +99,26 @@ describe('incident-20190516-2', () => {
             const desynced = AdsConfigurationParser.isUserPrivacyAndOptOutDesynchronized(configJson);
             assert.isFalse(desynced);
         });
+    });
+
+    it('AdsConfigurationParser should NOT mark privacy as desynchronized and should send a diagnostics message if UserPrivacy is inconsistent', () => {
+        const configJson = {
+            optOutRecorded: true,
+            optOutEnabled: false,
+            userPrivacy: {
+                permissions: {profiling: true, ads: true},
+                method: 'legitimate_interest',
+                version: CurrentUnityConsentVersion
+            },
+            ...baseAdsConf
+        };
+        const expectedDiagnosticsData = {
+            gamePrivacy: JSON.stringify(configJson.gamePrivacy),
+            userPrivacy: JSON.stringify(configJson.userPrivacy)
+        };
+        const desynced = AdsConfigurationParser.isUserPrivacyAndOptOutDesynchronized(configJson);
+        assert.isFalse(desynced);
+        sinon.assert.calledWith(diagnosticTriggerStub, 'ads_configuration_user_privacy_inconsistent', expectedDiagnosticsData);
+        assert.isUndefined(configJson.userPrivacy);
     });
 });
