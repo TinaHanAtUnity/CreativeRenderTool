@@ -1,4 +1,4 @@
-# Pending
+# Tue Jun 18 23:50:11 UTC 2019
 
 * Fix AdmobAdUnitTest failures in Hybrid Tests[#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
 * Add fields 'targetGameId' and 'campaignId' to Playable Ad Events [#8523](https://github.com/Applifier/unity-ads-webview/pull/8523)
