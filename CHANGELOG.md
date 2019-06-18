@@ -1,3 +1,7 @@
+# Pending
+
+* Fix AdmobAdUnitTest failures in Hybrid Tests[#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
+
 # Tue Jun 18 10:39:27 UTC 2019
 
 * Stop sending sanitization events [#10186](https://github.com/Applifier/unity-ads-webview/pull/10186)

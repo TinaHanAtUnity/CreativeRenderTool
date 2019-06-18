@@ -43,6 +43,10 @@ describe('AdmobAdUnitTest', () => {
         placement = TestFixtures.getPlacement();
         admobAdUnitParameters = admobAdUnitParametersFactory.create(admobCampaign, placement, Orientation.LANDSCAPE, 'foo', {});
 
+        sandbox.stub(core.Api.SensorInfo.Ios!, 'startAccelerometerUpdates').callsFake(() => {
+            return Promise.resolve();
+        });
+
         sandbox.stub(core.Api.SensorInfo, 'stopAccelerometerUpdates').callsFake(() => {
             return Promise.resolve();
         });
