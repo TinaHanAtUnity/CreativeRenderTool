@@ -90,9 +90,10 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setProgressInterval', [interval]);
     }
 
-    public getProgressInterval(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getProgressInterval');
-    }
+    // This is broken on all released iOS versions
+    // public getProgressInterval(): Promise<number> {
+    //     return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getProgressInterval');
+    // }
 
     public setTimeouts(connectTimeout: number, readTimeout: number): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setTimeouts', [connectTimeout, readTimeout]);
