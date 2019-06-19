@@ -2,6 +2,7 @@
 
 * Setup model for HTML and IFrame companion ad for VAST - part 1 [#10159](https://github.com/Applifier/unity-ads-webview/pull/10159)
 * Adding more diagnostics to track #incident-20190605-1 [#10289](https://github.com/Applifier/unity-ads-webview/pull/10289)
+* Reverse the Load AB Test to 90% of Select Game Traffic [#10237](https://github.com/Applifier/unity-ads-webview/pull/10237)
 
 # Wed Jun 19 12:27:27 UTC 2019
 
