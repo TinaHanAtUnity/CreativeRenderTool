@@ -177,7 +177,7 @@ export class Ads implements IAds {
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             const promises = [];
-            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
+            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && !ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
                 promises.push(this.setupLoadApi());
             }
             promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
