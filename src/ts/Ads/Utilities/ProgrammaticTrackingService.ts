@@ -59,7 +59,12 @@ export enum LoadMetric {
     LoadEnabledInitializationFailure = 'load_enabled_initialization_failure'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric;
+export enum PurchasingMetric {
+    PurchasingAppleStoreStarted = 'purchasing_apple_store_started',
+    PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
