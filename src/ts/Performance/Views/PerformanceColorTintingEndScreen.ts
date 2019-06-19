@@ -14,7 +14,7 @@ interface IColorTheme {
     light: number[];
     medium: number[];
     dark: number[];
-};
+}
 
 // https://en.wikipedia.org/wiki/HSL_and_HSV
 function RGBToHSL(r: number, g: number, b: number): number[] {
@@ -311,7 +311,7 @@ function quantize(pixels: Uint8ClampedArray, maxColors: number): { swatches: Swa
     const pq = new PQueue((a: Box, b: Box) => b.volume() - a.volume());
 
     pq.push(box);
-    while(pq.size() < maxColors) {
+    while (pq.size() < maxColors) {
         const largestBox = pq.pop();
         if (!largestBox) {
             break;
@@ -362,6 +362,8 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
     public render(): void {
         super.render();
 
+        document.documentElement.classList.add('color-tinting-endscreen');
+
         const squareImage = this._performanceCampaign.getSquare();
         const landscapeImage = this._performanceCampaign.getLandscape();
         const portraitImage = this._performanceCampaign.getPortrait();
@@ -411,14 +413,16 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
         const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
         const privacyIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-gdpr');
         const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .unityads-logo');
+        const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.bottom-container .china-advertisement');
 
-        if (backgroundElement && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer) {
+        if (backgroundElement && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {
             backgroundElement.style.backgroundColor = `rgb(${light.join(',')})`;
             downloadContainer.style.background = `rgb(${medium.join(',')})`;
             gameNameContainer.style.color = `rgb(${dark.join(',')})`;
             gameRatingContainer.style.color = `rgb(${dark.join(',')})`;
             privacyIconContainer.style.color = `rgb(${dark.join(',')})`;
             unityIconContainer.style.color = `rgb(${dark.join(',')})`;
+            chinaAdvertisementElement.style.color = `rgb(${dark.join(',')})`;
         }
     }
 
