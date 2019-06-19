@@ -1,3 +1,7 @@
+# Pending
+
+* Setup model for HTML and IFrame companion ad for VAST - part 1 [#10159](https://github.com/Applifier/unity-ads-webview/pull/10159)
+
 # Wed Jun 19 12:27:27 UTC 2019
 
 * There was a bug in the sanitizer, fixed and added tests [#10209](https://github.com/Applifier/unity-ads-webview/pull/10209)
