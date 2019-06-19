@@ -8,9 +8,9 @@ import {
     AnalyticsLevelFailedEvent,
     AnalyticsLevelUpEvent,
     AnalyticsProtocol,
-    IAnalyticsCommonObject,
     IAnalyticsMonetizationExtras,
-    IAnalyticsObject
+    IAnalyticsObject,
+    IAnalyticsCommonObjectV1
 } from 'Analytics/AnalyticsProtocol';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
@@ -18,11 +18,14 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { StoreTransaction } from 'Store/Models/StoreTransaction';
+import { Promises } from 'Core/Utilities/Promises';
 
 interface IAnalyticsEventWrapper {
     identifier: string;
@@ -53,8 +56,9 @@ export class AnalyticsManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
-    private _userId: string;
-    private _sessionId: number;
+    private _adsConfiguration: AdsConfiguration;
+    private _analyticsUserId: string;
+    private _analyticsSessionId: number;
     private _storage: AnalyticsStorage;
     private _focusManager: FocusManager;
 
@@ -66,6 +70,10 @@ export class AnalyticsManager {
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
     private _analyticsEventQueue: {[key: string]: IAnalyticsEventWrapper};
+
+    private _adsAnalyticsSessionId: string;
+    private _latestAppStartTime: number;
+    private _canSendEvents: boolean; // flag indicating that events should be sent
 
     public static getPurchasingFailureReason(reason: string): PurchasingFailureReason {
         switch(reason) {
@@ -83,7 +91,7 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
+    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._analytics = analytics;
@@ -92,6 +100,7 @@ export class AnalyticsManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
+        this._adsConfiguration = adsConfiguration;
         this._storage = analyticsStorage;
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
@@ -102,6 +111,8 @@ export class AnalyticsManager {
         this._analytics.Analytics.addExtras({
             'unity_monetization_extras': JSON.stringify(this.buildMonetizationExtras())
         });
+        this._adsAnalyticsSessionId = JaegerUtilities.uuidv4();
+        this._canSendEvents = this._configuration.isAnalyticsEnabled();
     }
 
     public init(): Promise<void> {
@@ -110,8 +121,8 @@ export class AnalyticsManager {
                 this._storage.getUserId(),
                 this._storage.getSessionId(this._clientInfo.isReinitialized())
             ]).then(([userId, sessionId]) => {
-                this._userId = userId;
-                this._sessionId = sessionId;
+                this._analyticsUserId = userId;
+                this._analyticsSessionId = sessionId;
                 this.subscribeListeners();
             });
         } else {
@@ -121,8 +132,8 @@ export class AnalyticsManager {
                 this._storage.getAppVersion(),
                 this._storage.getOsVersion()
             ]).then(([userId, sessionId, appVersion, osVersion]) => {
-                this._userId = userId;
-                this._sessionId = sessionId;
+                this._analyticsUserId = userId;
+                this._analyticsSessionId = sessionId;
                 this._storage.setIds(userId, sessionId);
 
                 this.sendNewSession();
@@ -145,7 +156,6 @@ export class AnalyticsManager {
                 }
 
                 if(updateDeviceInfo) {
-                    this.sendDeviceInfo();
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
 
@@ -155,39 +165,50 @@ export class AnalyticsManager {
     }
 
     public getGameSessionId(): number {
-        return this._sessionId;
+        return this._analyticsSessionId;
+    }
+
+    public onStoreTransaction(storeTransaction: StoreTransaction) {
+        // Don't send this until transaction diagnostics from Store api have been verified
+        // this.send(AnalyticsProtocol.createTransactionEvent(storeTransaction));
     }
 
     // add IapTransaction to queue manually. Here for purchasing logic.
     public onIapTransaction(productId: string, receipt: string, currency: string, price: number): Promise<void[]> {
-        const event: AnalyticsIapTransactionEvent | undefined = this.createIapTransactionEvent(productId, receipt, currency, price);
-        if (event) {
-            const analyticsEvent: IAnalyticsEventWrapper = {
-                identifier: JaegerUtilities.uuidv4(),
-                event: event,
-                posting: false
-            };
-            this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
-            return this.flushEvents();
+        if (this._canSendEvents) {
+            const event: AnalyticsIapTransactionEvent | undefined = this.createIapTransactionEvent(productId, receipt, currency, price);
+            if (event) {
+                const analyticsEvent: IAnalyticsEventWrapper = {
+                    identifier: JaegerUtilities.uuidv4(),
+                    event: event,
+                    posting: false
+                };
+                this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
+                return this.flushEvents();
+            } else {
+                this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`);
+                return Promise.reject(new Error(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`));
+            }
         } else {
-            this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`);
-            return Promise.reject(new Error(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`));
+            return Promise.resolve([]);
         }
     }
 
     public onPurchaseFailed(productId: string, reason: string, price: number | undefined, currency: string | undefined) {
-        const failReason: PurchasingFailureReason = AnalyticsManager.getPurchasingFailureReason(reason);
-        const event: AnalyticsIapPurchaseFailedEvent | undefined = this.createIapPurchaseFailedEvent(productId, failReason, price, currency);
-        if (event) {
-            const analyticsEvent: IAnalyticsEventWrapper = {
-                identifier: JaegerUtilities.uuidv4(),
-                event: event,
-                posting: false
-            };
-            this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
-            this.flushEvents();
-        } else {
-            this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapFailedEvent with fields : productId: ${productId} : reason: ${reason} : currency: ${currency} : price: ${price}`);
+        if (this._canSendEvents) {
+            const failReason: PurchasingFailureReason = AnalyticsManager.getPurchasingFailureReason(reason);
+            const event: AnalyticsIapPurchaseFailedEvent | undefined = this.createIapPurchaseFailedEvent(productId, failReason, price, currency);
+            if (event) {
+                const analyticsEvent: IAnalyticsEventWrapper = {
+                    identifier: JaegerUtilities.uuidv4(),
+                    event: event,
+                    posting: false
+                };
+                this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
+                this.flushEvents();
+            } else {
+                this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapFailedEvent with fields : productId: ${productId} : reason: ${reason} : currency: ${currency} : price: ${price}`);
+            }
         }
     }
 
@@ -240,32 +261,28 @@ export class AnalyticsManager {
     }
 
     private sendNewSession(): void {
-        this.send(AnalyticsProtocol.getStartObject());
+        const appStartEvent = AnalyticsProtocol.createAppStartEvent();
+        this._latestAppStartTime = appStartEvent.msg.ts;
+        this.send(appStartEvent);
     }
 
     private sendAppRunning(): void {
-        this.send(AnalyticsProtocol.getRunningObject(Math.round((this._bgTimestamp - this._clientInfo.getInitTimestamp()) / 1000)));
+        this.send(AnalyticsProtocol.createAppRunningEvent(this._latestAppStartTime));
     }
 
     private sendNewInstall(): void {
-        this.send(AnalyticsProtocol.getInstallObject(this._clientInfo));
+        this.send(AnalyticsProtocol.createAppInstallEvent(this._clientInfo, this._latestAppStartTime));
     }
 
     private sendAppUpdate(): void {
-        this.send(AnalyticsProtocol.getUpdateObject(this._clientInfo));
-    }
-
-    private sendDeviceInfo(): void {
-        AnalyticsProtocol.getDeviceInfoObject(this._platform, this._core, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
-            this.send(deviceInfoObject);
-        });
+        this.send(AnalyticsProtocol.createAppUpdateEvent(this._clientInfo, this._latestAppStartTime));
     }
 
     private onAppForeground(): void {
         if(this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
-                this._sessionId = sessionId;
-                this._storage.setIds(this._userId, this._sessionId);
+                this._analyticsSessionId = sessionId;
+                this._storage.setIds(this._analyticsUserId, this._analyticsSessionId);
                 this.sendNewSession();
             });
         }
@@ -279,8 +296,8 @@ export class AnalyticsManager {
     private onActivityResumed(activity: string): void {
         if(this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
-                this._sessionId = sessionId;
-                this._storage.setIds(this._userId, this._sessionId);
+                this._analyticsSessionId = sessionId;
+                this._storage.setIds(this._analyticsUserId, this._analyticsSessionId);
                 this.sendNewSession();
             });
         }
@@ -300,37 +317,43 @@ export class AnalyticsManager {
     }
 
     private onPostEvent(events: AnalyticsGenericEvent[]) {
-        const operations: Promise<void>[] = [];
-        for (const event of events) {
-            const parsePromise = this.parseAnalyticsEvent(event).then((parsedEvent: AnalyticsGenericEvent | null) => {
-                if (parsedEvent) {
-                    const analyticsEvent: IAnalyticsEventWrapper = {
-                        identifier: JaegerUtilities.uuidv4(),
-                        event: parsedEvent,
-                        posting: false
-                    };
-                    this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
-                }
+        if (this._canSendEvents) {
+            const operations: Promise<void>[] = [];
+            for (const event of events) {
+                const parsePromise = this.parseAnalyticsEvent(event).then((parsedEvent: AnalyticsGenericEvent | null) => {
+                    if (parsedEvent) {
+                        const analyticsEvent: IAnalyticsEventWrapper = {
+                            identifier: JaegerUtilities.uuidv4(),
+                            event: parsedEvent,
+                            posting: false
+                        };
+                        this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
+                    }
+                });
+                operations.push(parsePromise);
+            }
+            // TODO when es6 is enabled use .finally
+            Promise.all(operations).then(() => {
+                this.flushEvents();
+            }).catch(() => {
+                this.flushEvents();
             });
-            operations.push(parsePromise);
         }
-        // TODO when es6 is enabled use .finally
-        Promise.all(operations).then(() => {
-            this.flushEvents();
-        }).catch(() => {
-            this.flushEvents();
-        });
     }
 
-    private send(event: IAnalyticsObject): Promise<INativeResponse> {
-        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._platform, this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
-        const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
+    private send<T>(event: IAnalyticsObject<T>): Promise<void> {
+        if (this._canSendEvents) {
+            const common: IAnalyticsCommonObjectV1 = AnalyticsProtocol.getCommonObject(this._platform, this._adsAnalyticsSessionId, this._analyticsUserId, this._analyticsSessionId, this._clientInfo, this._deviceInfo, this._configuration, this._adsConfiguration);
+            const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
-        return this._request.post(this._endpoint, data);
+            return Promises.voidResult(this._request.post(this._endpoint, data));
+        } else {
+            return Promise.resolve();
+        }
     }
 
     private sendEvents(events: IAnalyticsEventWrapper[]): Promise<void> {
-        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._platform, this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
+        const common: IAnalyticsCommonObjectV1 = AnalyticsProtocol.getCommonObject(this._platform, this._adsAnalyticsSessionId, this._analyticsUserId, this._analyticsSessionId, this._clientInfo, this._deviceInfo, this._configuration, this._adsConfiguration);
         const data: string = JSON.stringify(common) + '\n' + events.map((event: IAnalyticsEventWrapper) => {
             return JSON.stringify(event.event);
         }).join('\n');

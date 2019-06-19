@@ -228,12 +228,10 @@ export class Core implements ICore {
                 throw error;
             }
 
-            this.Analytics = new Analytics(this);
-            return Promise.all([configJson, this.Analytics.initialize()]);
-        }).then(([configJson, gameSessionId]: [unknown, number]) => {
+            return Promise.resolve(configJson);
+        }).then((configJson: unknown) => {
             this.Store = new Store(this);
             this.Ads = new Ads(configJson, this, this.Store);
-            this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
 
             return this.Ads.initialize(jaegerInitSpan);
