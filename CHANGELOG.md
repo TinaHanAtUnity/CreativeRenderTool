@@ -1,4 +1,34 @@
-# Pending
+# Wed Jun 19 12:27:27 UTC 2019
+
+* There was a bug in the sanitizer, fixed and added tests [#10209](https://github.com/Applifier/unity-ads-webview/pull/10209)
+
+# Tue Jun 18 23:50:11 UTC 2019
+
+* Fix AdmobAdUnitTest failures in Hybrid Tests[#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
+* Add fields 'targetGameId' and 'campaignId' to Playable Ad Events [#8523](https://github.com/Applifier/unity-ads-webview/pull/8523)
+* UADSSDK-82 : Api's crashing iOS apps [#10157](https://github.com/Applifier/unity-ads-webview/pull/10157)
+* Fix Endcard Animation [#10155](https://github.com/Applifier/unity-ads-webview/pull/10155)
+* Introduce Consent AB Test Removing the Unity Logo [#10185](https://github.com/Applifier/unity-ads-webview/pull/10185)
+* Turn on Store API [#10156](https://github.com/Applifier/unity-ads-webview/pull/10156)
+* Improved Unit Tests for MOAT View [#10105](https://github.com/Applifier/unity-ads-webview/pull/10105)
+* Improve Makefile (part of integration test update) [#10210](https://github.com/Applifier/unity-ads-webview/pull/10210)
+* Update Test Job URLs in README [#10131](https://github.com/Applifier/unity-ads-webview/pull/10131)
+
+# Tue Jun 18 10:39:27 UTC 2019
+
+* Stop sending sanitization events [#10186](https://github.com/Applifier/unity-ads-webview/pull/10186)
+
+# Tue Jun 18 08:57:29 UTC 2019
+
+* Fix for #incident-20190516-2 [#9987](https://github.com/Applifier/unity-ads-webview/pull/9987)
+
+# Fri Jun 14 20:44:10 UTC 2019
+
+* \[ABT-854\] Track Admob Rewarded Video Metrics [#10129](https://github.com/Applifier/unity-ads-webview/pull/10129)
+* Fix Incorrect Ad Player Volume - MOAT [#9954](https://github.com/Applifier/unity-ads-webview/pull/9954)
+* Temporarily Whitelist in GameID 3016669 to not Block Ads in Background [#10130](https://github.com/Applifier/unity-ads-webview/pull/10130)
+
+# Thu Jun 13 15:14:38 UTC 2019
 
 * Remove Realtime feature - CampaignManager refactor part 1 [#10014](https://github.com/Applifier/unity-ads-webview/pull/10014)
 * Block Ads Shown while Application is Backgrounded [#10104](https://github.com/Applifier/unity-ads-webview/pull/10104)

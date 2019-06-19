@@ -162,6 +162,8 @@ import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AdMobView } from 'AdMob/Views/AdMobView';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -183,7 +185,17 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, meta: string | undefined, adType?: string): ICampaign {
+    public static getAdmobCampaignBaseParams(): IAdMobCampaign {
+        const session = sinon.createStubInstance(Session);
+        return {
+            ... this.getCampaignBaseParams(session, 'fakeCampaignId', undefined),
+            dynamicMarkup: 'foo',
+            video: null,
+            useWebViewUserAgentForTracking: false
+        };
+    }
+
+    public static getCampaignBaseParams(session: Session, campaignId: string, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
             willExpireAt: undefined,
@@ -216,7 +228,7 @@ export class TestFixtures {
             session = this.getSession();
         }
         const parameters: IPerformanceCampaign = {
-            ... this.getCometCampaignBaseParams(session, json.id, undefined),
+            ... this.getCampaignBaseParams(session, json.id, undefined),
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
@@ -253,7 +265,7 @@ export class TestFixtures {
         if (!session) {
             session = this.getSession();
         }
-        const baseParams = this.getCometCampaignBaseParams(session, json.id, undefined);
+        const baseParams = this.getCampaignBaseParams(session, json.id, undefined);
         baseParams.creativeId = creativeId;
         const parameters: IXPromoCampaign = {
             ... baseParams,
@@ -292,7 +304,7 @@ export class TestFixtures {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
-            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
+            ... this.getCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
@@ -311,7 +323,8 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: mraidContentJson.gameId
         };
     }
 
@@ -361,7 +374,8 @@ export class TestFixtures {
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: mraidContentJson.gameId
         };
     }
 
@@ -528,7 +542,7 @@ export class TestFixtures {
             quantity: 1
         };
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.meta, adType),
+            ... this.getCampaignBaseParams(session, json.promo.id, json.meta, adType),
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
             limitedTimeOffer: undefined,
             costs: costProductInfoList,

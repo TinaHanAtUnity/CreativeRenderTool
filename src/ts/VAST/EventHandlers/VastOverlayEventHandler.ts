@@ -132,7 +132,8 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (isMuted) {
             this._vastAdUnit.setVideoPlayerMuted(true);
             if (this._moat) {
-                this._moat.volumeChange(0);
+                this._moat.setPlayerVolume(0);
+                this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
             if (this._om) {
                 this._om.setDeviceVolume(this._vastAdUnit.getVolume());
@@ -142,6 +143,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         } else {
             this._vastAdUnit.setVideoPlayerMuted(false);
             if (this._moat) {
+                this._moat.setPlayerVolume(1);
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
             if (this._om) {
