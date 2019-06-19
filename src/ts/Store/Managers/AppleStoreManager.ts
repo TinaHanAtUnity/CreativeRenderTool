@@ -17,7 +17,7 @@ export class AppleStoreManager extends StoreManager {
 
         this._appleStore = new AppleStore(store);
         this._programmaticTrackingService = core.ProgrammaticTrackingService;
-        
+
         this._store.iOS!.Products.onTransaction.subscribe((data) => this.onTransaction(data));
 
         this._store.iOS!.Products.startTransactionObserver();
