@@ -1,3 +1,7 @@
+# Staged
+
+* There was a bug in the sanitizer, fixed and added tests [#10209](https://github.com/Applifier/unity-ads-webview/pull/10209)
+
 # Tue Jun 18 23:50:11 UTC 2019
 
 * Fix AdmobAdUnitTest failures in Hybrid Tests[#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
