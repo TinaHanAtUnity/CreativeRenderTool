@@ -1,7 +1,7 @@
 export class IosUtils {
 
     public static isAppSheetBroken(osVersion: string, model: string): boolean {
-        if(!model.match(/ipad/i) && osVersion.match(/^12\.[0-9]/)) {
+        if(!model.match(/ipad/i) && osVersion.match(/^12\.[0]/)) {
             return true;
         } else if(!model.match(/ipad/i) && osVersion.match(/^11\.[0-2]/)) {
             return true;
