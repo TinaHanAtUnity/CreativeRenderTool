@@ -45,7 +45,7 @@ describe('VastCompanionAdStaticResourceValidatorTest', () => {
         });
 
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCompanionAdStaticResource(null, null, null);
+            const companionAd = new VastCompanionAdStaticResource(null, 0, 0);
             const errors = new VastCompanionAdStaticResourceValidator(companionAd).getErrors();
             assert.lengthOf(errors, 4, JSON.stringify(errors));
             assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(null) is missing required StaticResource Element\n    VAST Companion ad(null) "StaticResource" is missing required "creativeType" attribute\n    VAST Companion ad(null) "StaticResource" is not meeting minimum size 480 x 320\n    VAST Companion ad(null) is missing required CompanionClickThrough Element');

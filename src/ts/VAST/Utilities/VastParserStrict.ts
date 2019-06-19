@@ -15,6 +15,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { VAST } from 'VAST/VAST';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -32,6 +33,8 @@ enum VastNodeName {
     MEDIA_FILE = 'MediaFile',
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
+    HTML_RESOURCE = 'HTMLResource',
+    IFRAME_RESOURCE = 'IFrameResource',
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
     COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
@@ -299,6 +302,8 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
             const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
+            const iframeResourceElement = this.getFirstNodeWithName(element, VastNodeName.IFRAME_RESOURCE);
+            const htmlResourceElement = this.getFirstNodeWithName(element, VastNodeName.HTML_RESOURCE);
             if (staticResourceElement) {
                 const companionAd = this.parseCompanionAdStaticResourceElement(element, urlProtocol);
                 const companionAdErrors = new VastCompanionAdStaticResourceValidator(companionAd).getErrors();
@@ -316,11 +321,15 @@ export class VastParserStrict {
                 if (isWarningLevel) {
                     vastAd.addCompanionAd(companionAd);
                 } else {
-                    vastAd.addUnsupportedCompanionAd(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
+                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
-            } else {
-                // ignore element as it is not of a type we support
-                vastAd.addUnsupportedCompanionAd(element.outerHTML);
+            }
+            // ignore element as it is not of a type we support
+            if (iframeResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+            }
+            if (htmlResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
             }
         });
 
