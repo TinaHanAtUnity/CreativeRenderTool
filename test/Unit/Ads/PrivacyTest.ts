@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 
 import { CurrentUnityConsentVersion, GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import {Diagnostics} from '../../../src/ts/Core/Utilities/Diagnostics';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 describe('GamePrivacyTests', () => {
     it('should be disabled if PrivacyMethod.DEFAULT', () => {
