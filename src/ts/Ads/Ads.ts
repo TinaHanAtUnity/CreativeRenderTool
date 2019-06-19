@@ -184,7 +184,7 @@ export class Ads implements IAds {
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             const promises = [];
-            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
+            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && !ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
                 promises.push(this.setupLoadApi());
             }
             promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
@@ -343,22 +343,15 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
-        if (!this._core.FocusManager.isAppForeground()) {
-            if (CustomFeatures.shouldSampleAtTenPercent()) {
-                Diagnostics.trigger('ad_shown_in_background', {});
-            }
-
-            this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedToShowInBackground);
-
-            if (!CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId())) {
-                return;
-            }
-        }
 
         const campaign = this.RefreshManager.getCampaign(placementId);
         if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
             this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignNotFound);
+            return;
+        }
+
+        if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAttemptedToShowInBackground)) {
             return;
         }
 
@@ -460,8 +453,9 @@ export class Ads implements IAds {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
-        const testGroup = this._core.Config.getAbGroup();
-        const start = Date.now();
+        if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAttemptedToShowAdInBackground)) {
+            return;
+        }
 
         this._showing = true;
 
@@ -534,6 +528,27 @@ export class Ads implements IAds {
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
         });
+    }
+
+    private shouldSkipShowAd(campaign: Campaign, logkey: MiscellaneousMetric): boolean {
+        if (!this._core.FocusManager.isAppForeground()) {
+            if (CustomFeatures.shouldSampleAtTenPercent()) {
+                Diagnostics.trigger(logkey, {
+                    seatId: campaign.getSeatId(),
+                    creativeId: campaign.getCreativeId(),
+                    contentType: campaign.getContentType()
+                });
+            }
+
+            this._core.ProgrammaticTrackingService.reportMetric(logkey);
+
+            if (CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId())) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private getAdUnitFactory(campaign: Campaign) {
