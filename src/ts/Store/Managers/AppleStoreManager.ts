@@ -10,18 +10,16 @@ import { ProgrammaticTrackingService, PurchasingMetric } from 'Ads/Utilities/Pro
 
 export class AppleStoreManager extends StoreManager {
     private _appleStore: AppleStore;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
 
     constructor(core: ICore, store: IStoreApi) {
         super(core, store);
 
         this._appleStore = new AppleStore(store);
-        this._programmaticTrackingService = core.ProgrammaticTrackingService;
 
         this._store.iOS!.Products.onTransaction.subscribe((data) => this.onTransaction(data));
 
         this._store.iOS!.Products.startTransactionObserver();
-        this._programmaticTrackingService.reportMetric(PurchasingMetric.PurchasingAppleStoreStarted);
+        core.ProgrammaticTrackingService.reportMetric(PurchasingMetric.PurchasingAppleStoreStarted);
     }
 
     private onTransaction(data: IAppleTransaction[]): void {
