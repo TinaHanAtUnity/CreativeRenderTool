@@ -205,7 +205,7 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
+            const promo = new Promo(this._core, this, this._core.Purchasing);
             const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
             for(const contentType in promoContentTypeHandlerMap) {
                 if(promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
