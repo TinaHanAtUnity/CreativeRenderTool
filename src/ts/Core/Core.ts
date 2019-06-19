@@ -228,7 +228,7 @@ export class Core implements ICore {
                 throw error;
             }
 
-            return Promise.resolve(configJson);
+            return configJson;
         }).then((configJson: unknown) => {
             this.Store = new Store(this);
             this.Ads = new Ads(configJson, this, this.Store);

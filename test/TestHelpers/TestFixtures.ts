@@ -163,9 +163,6 @@ import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { AdMobView } from 'AdMob/Views/AdMobView';
-import { Analytics } from 'Analytics/Analytics';
-import { Store } from 'Store/Store';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {

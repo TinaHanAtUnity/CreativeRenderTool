@@ -168,11 +168,6 @@ export class AnalyticsManager {
         return this._analyticsSessionId;
     }
 
-    public onStoreTransaction(storeTransaction: StoreTransaction) {
-        // Don't send this until transaction diagnostics from Store api have been verified
-        // this.send(AnalyticsProtocol.createTransactionEvent(storeTransaction));
-    }
-
     // add IapTransaction to queue manually. Here for purchasing logic.
     public onIapTransaction(productId: string, receipt: string, currency: string, price: number): Promise<void[]> {
         if (this._canSendEvents) {
