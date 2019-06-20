@@ -281,6 +281,20 @@ describe('PerPlacementLoadManagerTest', () => {
                     sinon.assert.called(loadCampaignStub);
                 });
             });
+
+            const stateTests: PlacementState[] = [PlacementState.NOT_AVAILABLE, PlacementState.NO_FILL];
+            stateTests.forEach(state => {
+                it(`should attempt to load a campaign with a placement state of ${PlacementState[state]}`, () => {
+                    loadCampaignStub.callsFake(() => {
+                        return Promise.resolve(<ILoadedCampaign>{});
+                    });
+                    const placement = adsConfig.getPlacement(placementId);
+                    placement.setState(state);
+                    return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
+                        sinon.assert.called(loadCampaignStub);
+                    });
+                });
+            });
         });
     });
 
