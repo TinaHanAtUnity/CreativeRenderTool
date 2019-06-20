@@ -20,9 +20,10 @@ export class SdkApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDebugMode', [debugMode]);
     }
 
-    public getDebugMode(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getDebugMode');
-    }
+    // This is broken on all released iOS versions
+    // public getDebugMode(): Promise<boolean> {
+    //     return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getDebugMode');
+    // }
 
     public logError(message: string) {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'logError', [message]);

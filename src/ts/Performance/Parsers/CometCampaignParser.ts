@@ -88,7 +88,8 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                playableConfiguration: undefined
+                playableConfiguration: undefined,
+                targetGameId: json.gameId
             };
             parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 

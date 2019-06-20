@@ -60,23 +60,40 @@ export class AdsConfigurationParser {
     }
 
     // For #incident-20190516-2
-    private static isUserPrivacyAndOptOutDesynchronized(configJson: IRawAdsConfiguration) {
-        // stop sending sanitization events for now
+    public static isUserPrivacyAndOptOutDesynchronized(configJson: IRawAdsConfiguration) {
+        if (!configJson.userPrivacy) {
+            return false;
+        }
+        if (!configJson.optOutRecorded) {
+            return false;
+        }
+        if (!configJson.gamePrivacy) {
+            return false;
+        }
+        if (configJson.gamePrivacy.method !== PrivacyMethod.LEGITIMATE_INTEREST) {
+            return false;
+        }
+        const uPP = configJson.userPrivacy.permissions;
+        if (uPP.hasOwnProperty('profiling') && uPP.hasOwnProperty('ads')) {
+            Diagnostics.trigger('ads_configuration_user_privacy_inconsistent', {
+                userPrivacy: JSON.stringify(configJson.userPrivacy),
+                gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
+            configJson.userPrivacy = undefined;
+            return false;
+        }
+
+        let adsAllowed = false;
+        if (uPP.hasOwnProperty('profiling')) {
+            adsAllowed = (<IProfilingPermissions>uPP).profiling;
+        }
+        if (uPP.hasOwnProperty('ads')) {
+            adsAllowed = (<IGranularPermissions>uPP).ads;
+        }
+        if (adsAllowed === false && configJson.optOutEnabled === false) {
+            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(configJson));
+            return true;
+        }
         return false;
-        //
-        // if (!configJson.userPrivacy) {
-        //     return false;
-        // }
-        // if (!configJson.optOutRecorded) {
-        //     return false;
-        // }
-        // const uPP = configJson.userPrivacy.permissions;
-        // const configProfiling = uPP.hasOwnProperty('profiling') && (<IProfilingPermissions>uPP).profiling;
-        // const configAds = uPP.hasOwnProperty('ads') && (<IGranularPermissions>uPP).ads;
-        // if (!configProfiling && !configAds) {
-        //     return false;
-        // }
-        // return !configJson.optOutEnabled;
     }
 
     private static parseGamePrivacy(configJson: IRawAdsConfiguration) {
