@@ -90,6 +90,7 @@ export class AdsConfigurationParser {
             adsAllowed = (<IGranularPermissions>uPP).ads;
         }
         if (adsAllowed === false && configJson.optOutEnabled === false) {
+            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(configJson));
             return true;
         }
         return false;
