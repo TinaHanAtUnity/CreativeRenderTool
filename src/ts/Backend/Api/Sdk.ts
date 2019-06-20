@@ -3,7 +3,7 @@ import { BackendApi } from 'Backend/BackendApi';
 export class Sdk extends BackendApi {
 
     public loadComplete() {
-        this._enableLogs = window.location.pathname.includes('enableLogs');
+        this._enableLogs = window.location.href.includes('enableLogs');
         return [
             this._gameId,
             this._testMode,
