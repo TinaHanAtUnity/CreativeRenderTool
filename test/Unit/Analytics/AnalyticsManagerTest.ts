@@ -51,6 +51,7 @@ class TestHelper {
             clientInfo = TestFixtures.getClientInfo();
             deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             configuration = TestFixtures.getCoreConfiguration();
+            adsConfiguration = TestFixtures.getAdsConfiguration();
 
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
             (<sinon.SinonStub>request.post).returns(Promise.resolve());
