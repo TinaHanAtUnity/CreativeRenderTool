@@ -113,19 +113,32 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string) {
-        this.setPlacementState(placementId, PlacementState.WAITING);
-        this._campaignManager.loadCampaign(this._adsConfig.getPlacement(placementId), 10000).then(loadedCampaign => {
-            if(loadedCampaign) {
-                const placement = this._adsConfig.getPlacement(placementId);
-                if(placement) {
+        const placement = this._adsConfig.getPlacement(placementId);
+        if (placement && this.shouldLoadCampaignForPlacment(placement)) {
+            this.setPlacementState(placementId, PlacementState.WAITING);
+            this._campaignManager.loadCampaign(placement, 10000).then(loadedCampaign => {
+                if (loadedCampaign) {
                     placement.setCurrentCampaign(loadedCampaign.campaign);
                     placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
+                    this.setPlacementState(placementId, PlacementState.READY);
+                } else {
+                    this.setPlacementState(placementId, PlacementState.NO_FILL);
                 }
-                this.setPlacementState(placementId, PlacementState.READY);
-            } else {
-                this.setPlacementState(placementId, PlacementState.NO_FILL);
-            }
-        });
+            });
+        }
+    }
+
+    /**
+     *  Returns true if a new campaign should be fetched for the placement.
+     *  A new campaign is not fetched when the Campaign is Ready and Unexpired, or if it's Waiting to be filled.
+     */
+    private shouldLoadCampaignForPlacment(placement: Placement): boolean {
+        const isReadyPlacement = placement.getState() === PlacementState.READY;
+        const campaign = placement.getCurrentCampaign();
+        const isExpiredCampaign = !!(campaign && campaign.isExpired());
+        const isReadyAndUnexpired = isReadyPlacement && !isExpiredCampaign;
+        const isWaitingForLoadResponse = placement.getState() === PlacementState.WAITING;
+        return !(isReadyAndUnexpired || isWaitingForLoadResponse);
     }
 
     private getStoredLoads(): Promise<string[]> {
