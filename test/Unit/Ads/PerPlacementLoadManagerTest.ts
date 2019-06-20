@@ -249,10 +249,8 @@ describe('PerPlacementLoadManagerTest', () => {
             });
 
             it('should not attempt to load a campaign for a placement that\'s waiting', () => {
-                const campaign = TestFixtures.getCampaign();
                 const placement = adsConfig.getPlacement(placementId);
                 placement.setState(PlacementState.WAITING);
-                placement.setCurrentCampaign(campaign);
                 return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
                     sinon.assert.notCalled(loadCampaignStub);
                 });
