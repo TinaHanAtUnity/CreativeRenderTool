@@ -114,7 +114,7 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     private loadPlacement(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
-        if (placement && this.shouldLoadCampaignForPlacment(placement)) {
+        if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
             this._campaignManager.loadCampaign(placement, 10000).then(loadedCampaign => {
                 if (loadedCampaign) {
@@ -132,7 +132,7 @@ export class PerPlacementLoadManager extends RefreshManager {
      *  Returns true if a new campaign should be fetched for the given placement.
      *  A new campaign is not fetched when the Campaign is Ready and Unexpired, or if it's Waiting to be filled.
      */
-    private shouldLoadCampaignForPlacment(placement: Placement): boolean {
+    private shouldLoadCampaignForPlacement(placement: Placement): boolean {
         const isReadyPlacement = placement.getState() === PlacementState.READY;
         const campaign = placement.getCurrentCampaign();
         const isExpiredCampaign = !!(campaign && campaign.isExpired());
