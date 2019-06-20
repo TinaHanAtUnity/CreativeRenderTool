@@ -262,7 +262,7 @@ export class Ads implements IAds {
 
             const refreshSpan = this._core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._core.NativeBridge.getPlatform()]);
-            return this.RefreshManager.refresh().then((resp) => {
+            return this.RefreshManager.initialize().then((resp) => {
                 this._core.JaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
