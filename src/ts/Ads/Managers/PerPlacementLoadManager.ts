@@ -129,7 +129,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     /**
-     *  Returns true if a new campaign should be fetched for the placement.
+     *  Returns true if a new campaign should be fetched for the given placement.
      *  A new campaign is not fetched when the Campaign is Ready and Unexpired, or if it's Waiting to be filled.
      */
     private shouldLoadCampaignForPlacment(placement: Placement): boolean {

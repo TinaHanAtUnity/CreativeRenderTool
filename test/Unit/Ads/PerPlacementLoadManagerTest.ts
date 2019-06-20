@@ -180,6 +180,7 @@ describe('PerPlacementLoadManagerTest', () => {
             let placementId: string;
             let loadEvent: ILoadEvent;
             let sandbox: sinon.SinonSandbox;
+            let loadCampaignStub: sinon.SinonStub;
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
@@ -188,6 +189,7 @@ describe('PerPlacementLoadManagerTest', () => {
                     value: placementId,
                     ts: clientInfo.getInitTimestamp() + 1
                 };
+                loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
                 sandbox.stub(core.Api.Storage, 'get').callsFake(() => {
                     return Promise.resolve(loadEvent);
                 });
@@ -218,7 +220,7 @@ describe('PerPlacementLoadManagerTest', () => {
 
             tests.forEach((t) => {
                 it('should load/overwrite the correct campaign', () => {
-                    sandbox.stub(campaignManager, 'loadCampaign').callsFake(() => {
+                    loadCampaignStub.callsFake(() => {
                         return Promise.resolve(<ILoadedCampaign>{
                             campaign: t.expectedCampaign,
                             trackingUrls: {}
@@ -235,7 +237,7 @@ describe('PerPlacementLoadManagerTest', () => {
             });
 
             it('should set the placement state to nofill', () => {
-                sandbox.stub(campaignManager, 'loadCampaign').callsFake(() => {
+                loadCampaignStub.callsFake(() => {
                     return Promise.resolve(undefined);
                 });
                 sandbox.stub(ads.Placement, 'setPlacementState');
@@ -243,6 +245,42 @@ describe('PerPlacementLoadManagerTest', () => {
                     const testCampaign = loadManager.getCampaign(placementId);
                     assert.isUndefined(testCampaign, 'Loaded campaign was defined');
                     sinon.assert.calledWith((<sinon.SinonStub>ads.Placement.setPlacementState), placementId, PlacementState.NO_FILL);
+                });
+            });
+
+            it('should not attempt to load a campaign for a placement that\'s waiting', () => {
+                const campaign = TestFixtures.getCampaign();
+                const placement = adsConfig.getPlacement(placementId);
+                placement.setState(PlacementState.WAITING);
+                placement.setCurrentCampaign(campaign);
+                return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
+                    sinon.assert.notCalled(loadCampaignStub);
+                });
+            });
+
+            it('should not attempt to load a campaign that\'s ready and not expired', () => {
+                const campaign = TestFixtures.getCampaign();
+                const placement = adsConfig.getPlacement(placementId);
+                campaign.set('willExpireAt', Date.now() + 100);
+                placement.setState(PlacementState.READY);
+                placement.setCurrentCampaign(campaign);
+                return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
+                    sinon.assert.notCalled(loadCampaignStub);
+                });
+            });
+
+            it('should attempt to load a campaign that\'s ready and expired', () => {
+                loadCampaignStub.callsFake(() => {
+                    return Promise.resolve(<ILoadedCampaign>{});
+                });
+
+                const campaign = TestFixtures.getCampaign();
+                const placement = adsConfig.getPlacement(placementId);
+                campaign.set('willExpireAt', Date.now() - 100);
+                placement.setState(PlacementState.READY);
+                placement.setCurrentCampaign(campaign);
+                return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
+                    sinon.assert.called(loadCampaignStub);
                 });
             });
         });
