@@ -16,9 +16,10 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 class TestHelper {
-    public static getEventType(data: string) {
+    public static getEventType<T>(data: string) {
         const rawJson: string = data.split('\n')[1];
         const analyticsObject: IAnalyticsObject = JSON.parse(rawJson);
         return analyticsObject.type;
@@ -26,7 +27,7 @@ class TestHelper {
 }
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('AnalyticsManagerTest', () => {
+    describe(`AnalyticsManagerTest for ${Platform[platform]}`, () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -35,6 +36,7 @@ class TestHelper {
         let clientInfo: ClientInfo;
         let deviceInfo: DeviceInfo;
         let configuration: CoreConfiguration;
+        let adsConfiguration: AdsConfiguration;
         let analyticsManager: AnalyticsManager;
         let analyticsStorage: AnalyticsStorage;
         let focusManager: FocusManager;
@@ -54,7 +56,7 @@ class TestHelper {
             (<sinon.SinonStub>request.post).returns(Promise.resolve());
 
             analyticsStorage = new AnalyticsStorage(core);
-            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, focusManager, analyticsStorage);
+            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
         });
 
         it('should send session start event', () => {

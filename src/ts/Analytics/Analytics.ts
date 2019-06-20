@@ -4,6 +4,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalytics, IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { ICore } from 'Core/ICore';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 export class Analytics implements IAnalytics {
 
@@ -14,7 +15,7 @@ export class Analytics implements IAnalytics {
 
     private _core: ICore;
 
-    constructor(core: ICore) {
+    constructor(core: ICore, adsConfiguration: AdsConfiguration) {
         this._core = core;
 
         this.Api = {
@@ -22,7 +23,7 @@ export class Analytics implements IAnalytics {
         };
 
         this.AnalyticsStorage = new AnalyticsStorage(core.Api);
-        this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, core.FocusManager, this.AnalyticsStorage);
+        this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, adsConfiguration, core.FocusManager, this.AnalyticsStorage);
     }
 
     public initialize(): Promise<number> {
