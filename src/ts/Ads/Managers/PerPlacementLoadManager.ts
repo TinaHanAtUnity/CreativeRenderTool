@@ -130,15 +130,17 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     /**
      *  Returns true if a new campaign should be fetched for the given placement.
-     *  A new campaign is not fetched when the Campaign is Ready and Unexpired, or if it's Waiting to be filled.
+     *  A new campaign is only fetched when the campaign is:
+     *  - Unfilled (No fill or Not Available)
+     *  - Ready and the filled campaign is expired
      */
     private shouldLoadCampaignForPlacement(placement: Placement): boolean {
         const isReadyPlacement = placement.getState() === PlacementState.READY;
         const campaign = placement.getCurrentCampaign();
         const isExpiredCampaign = !!(campaign && campaign.isExpired());
-        const isReadyAndUnexpired = isReadyPlacement && !isExpiredCampaign;
-        const isWaitingForLoadResponse = placement.getState() === PlacementState.WAITING;
-        return !(isReadyAndUnexpired || isWaitingForLoadResponse);
+        const isReadyAndExpired = isReadyPlacement && isExpiredCampaign;
+        const isUnfilledPlacement = (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE);
+        return isUnfilledPlacement || isReadyAndExpired;
     }
 
     private getStoredLoads(): Promise<string[]> {
@@ -197,7 +199,7 @@ export class PerPlacementLoadManager extends RefreshManager {
                     const loadEvent: ILoadEvent = loadedEvents[key];
                     const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
 
-                    if (placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
+                    if (placement) {
                         this.loadPlacement(loadEvent.value);
                     }
                 }
