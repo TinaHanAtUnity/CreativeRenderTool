@@ -51,7 +51,7 @@ describe('GoogleStoreManager Tests', () => {
             Android: {
                 Store: androidStore
             }
-        }
+        };
         googleStoreManager = new GoogleStoreManager(core, store);
         assert.exists(googleStoreManager);
     });

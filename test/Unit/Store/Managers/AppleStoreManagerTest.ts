@@ -45,7 +45,7 @@ describe('AppleStoreManager Tests', () => {
                 Products: products,
                 AppSheet: appSheet
             }
-        }
+        };
         appleStoreManager = new AppleStoreManager(core, store);
         assert.exists(appleStoreManager);
     });
