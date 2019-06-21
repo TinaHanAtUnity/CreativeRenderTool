@@ -344,10 +344,6 @@ export class Ads implements IAds {
             return;
         }
 
-        if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAttemptedToShowInBackground)) {
-            return;
-        }
-
         const contentType = campaign.getContentType();
         const seatId = campaign.getSeatId();
 
