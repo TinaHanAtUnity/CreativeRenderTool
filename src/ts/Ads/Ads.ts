@@ -511,6 +511,10 @@ export class Ads implements IAds {
                 }
             }
 
+            if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAboutToShowAdInBackground)) {
+                return;
+            }
+
             OperativeEventManager.setPreviousPlacementId(this.CampaignManager.getPreviousPlacementId());
             this.CampaignManager.setPreviousPlacementId(placement.getId());
 
@@ -519,6 +523,7 @@ export class Ads implements IAds {
                     this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
                 }
                 this.BackupCampaignManager.deleteBackupCampaigns();
+                this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignShowedAdInBackground);
             });
         });
     }
