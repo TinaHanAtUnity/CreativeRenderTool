@@ -1,3 +1,7 @@
+# Pending
+
+* Adding more logs for #incident-20190605-1 [#10322](https://github.com/Applifier/unity-ads-webview/pull/10322)
+
 # Thu Jun 20 09:19:11 UTC 2019
 
 * Add diagnostics for privacy sanitization [#10293](https://github.com/Applifier/unity-ads-webview/pull/10293)
