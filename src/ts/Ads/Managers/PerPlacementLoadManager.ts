@@ -12,6 +12,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface ILoadEvent {
     value: string; // PlacementID for the loaded placement
@@ -29,8 +30,9 @@ export class PerPlacementLoadManager extends RefreshManager {
     private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
+    private _pts: ProgrammaticTrackingService;
 
-    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
+    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
         this._core = core;
@@ -39,6 +41,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
+        this._pts = programmaticTrackingService;
 
         this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(<ILoadStorageEvent>value));
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
@@ -125,6 +128,8 @@ export class PerPlacementLoadManager extends RefreshManager {
                     this.setPlacementState(placementId, PlacementState.NO_FILL);
                 }
             });
+        } else {
+            this._pts.reportMetric(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
 
@@ -135,12 +140,19 @@ export class PerPlacementLoadManager extends RefreshManager {
      *  - Ready and the filled campaign is expired
      */
     private shouldLoadCampaignForPlacement(placement: Placement): boolean {
+        const isUnfilledPlacement = (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE);
+        if (isUnfilledPlacement) {
+            return true;
+        }
+
         const isReadyPlacement = placement.getState() === PlacementState.READY;
         const campaign = placement.getCurrentCampaign();
         const isExpiredCampaign = !!(campaign && campaign.isExpired());
-        const isReadyAndExpired = isReadyPlacement && isExpiredCampaign;
-        const isUnfilledPlacement = (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE);
-        return isUnfilledPlacement || isReadyAndExpired;
+        if (isReadyPlacement && isExpiredCampaign) {
+            return true;
+        }
+
+        return false;
     }
 
     private getStoredLoads(): Promise<string[]> {

@@ -57,7 +57,8 @@ export enum LoadMetric {
     LoadEnabledNoFill = 'load_enabled_no_fill',
     LoadEnabledShow = 'load_enabled_show',
     LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
-    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure'
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure',
+    LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
 export enum PurchasingMetric {

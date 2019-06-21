@@ -13,7 +13,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -92,7 +92,7 @@ describe('PerPlacementLoadManagerTest', () => {
         backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager);
+        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 
     describe('getStoredLoads', () => {
@@ -253,6 +253,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 placement.setState(PlacementState.WAITING);
                 return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
                     sinon.assert.notCalled(loadCampaignStub);
+                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
                 });
             });
 
@@ -264,6 +265,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 placement.setCurrentCampaign(campaign);
                 return loadManager.refreshWithBackupCampaigns(backupCampaignManager).then(() => {
                     sinon.assert.notCalled(loadCampaignStub);
+                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
                 });
             });
 
