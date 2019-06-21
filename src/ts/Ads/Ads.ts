@@ -39,7 +39,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { Banners } from 'Banners/Banners';
-import { AuctionRequest } from 'Banners/Utilities/AuctionRequest';
+import { AuctionRequest } from 'Ads/Utilities/AuctionRequest';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
