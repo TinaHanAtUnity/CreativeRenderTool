@@ -19,7 +19,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 class TestHelper {
-    public static getEventType<T>(data: string) {
+    public static getEventType(data: string) {
         const rawJson: string = data.split('\n')[1];
         const analyticsObject: IAnalyticsObject = JSON.parse(rawJson);
         return analyticsObject.type;
