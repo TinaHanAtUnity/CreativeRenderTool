@@ -576,6 +576,7 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   html.redesigned-performance-end-screen .ios-portrait #privacy {
     top: 0;
     padding-top: constant(safe-area-inset-top);
+
     padding-top: env(safe-area-inset-top);
   }
 
@@ -589,11 +590,13 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
       margin-top: 1em;
       width: calc(100% - 2em);
       height: calc(100% - constant(safe-area-inset-bottom) - constant(safe-area-inset-top) - 1em);
+
       height: calc(100% - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 1em);
     }
 
     .btn-close-region {
       top: constant(safe-area-inset-top);
+
       top: env(safe-area-inset-top);
     }
   }
@@ -615,6 +618,7 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 
       .pop-up-container {
         width: calc(100% - 2em - constant(safe-area-inset-right));
+
         width: calc(100% - 2em - env(safe-area-inset-right));
       }
 
