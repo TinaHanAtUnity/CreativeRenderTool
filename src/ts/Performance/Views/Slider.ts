@@ -1,4 +1,5 @@
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+import { stringify } from 'querystring';
 
 export interface ISliderOptions {
     startIndex: number;
@@ -11,391 +12,105 @@ export interface ITransformationConfig {
 }
 
 export interface IDragOptions {
-    startX: number;
-    endX: number;
+    fingerCount: number | boolean;
     startY: number;
-    letItGo: boolean | null;
-    preventClick: boolean;
+    startX: number;
+    curX: number;
+    curY: number;
+    swipeLength: number;
 }
 
 type OnSlideCallback = (options: { automatic: boolean }) => void;
 type OnDownloadCallback = (event: Event) => void;
-
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
-const TRANSFORMATION_CONFIG: ITransformationConfig = {
-    duration: 300,
-    easing: 'ease'
-};
-
-const AUTOMATIC_TRANSFORMATION_CONFIG: ITransformationConfig = {
-    duration: 600,
-    easing: 'ease-in-out'
-};
-
-const INSTANT_TRANSFORMATION_CONFIG: ITransformationConfig = {
-    duration: 0,
-    easing: 'ease'
-};
-
 export class Slider {
-    private _config: ISliderOptions;
-    private _slidesContainerVisibleWidth: number;
+    private _onSlideCallback: OnSlideCallback;
     private _imageUrls: string[];
+    private _slidesContainer: HTMLElement;
+    private _slideCount: number;
+    private _rootEl: HTMLElement;
+    private _ready: Promise<void> | null;
+    private _autoplayTimeoutId: number | null;
+    private _onDownloadCallback: OnDownloadCallback;
+    private _slides: (HTMLElement | null)[];
     private _currentSlide: number;
     private _transformPropertyName: 'transform' | 'webkitTransform';
     private _transitionPropertyName: 'transition' | 'webkitTransition';
-    private _slidesContainer: HTMLElement;
-    private _rootEl: HTMLElement;
-    private _pointerDown: boolean;
+    private _isPaused: boolean;
+    private _autoPlayTimer: NodeJS.Timeout;
+    private _isInterrupted: boolean;
+    private _isAnimating: boolean;
+    private _swipeLeft: number | null;
+    private _slideSpeed: number;
     private _drag: IDragOptions;
-    private _slidesPerPage: number;
-    private _ready: Promise<void> | null;
-    private _resizeTimeId: number | null;
-    private _autoplayTimeoutId: number | null;
+    private _isDragging: boolean;
+    private _minimalSwipeLength: number;
     private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
-    private _isVisible: boolean;
-    private _onSlideCallback: OnSlideCallback;
-    private _onDownloadCallback: OnDownloadCallback;
-
+    private _resizeTimeId: number | null;
+    private _swipableIndexes: number[] | null;
     constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback, portraitImage?: string, landscapeImage?: string, squareImage?: string) {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
-
-        this._config = {
-            startIndex: 0,
-            threshold: 70
-        };
-        this._drag = {
-            startX: 0,
-            endX: 0,
-            startY: 0,
-            letItGo: null,
-            preventClick: false
-        };
-
-        this._isVisible = true;
-        this._slidesPerPage = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 1.3 : 1.666;
+        this._currentSlide = 0;
         const imageOrientationClassNamePrefix = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 'landscape' : 'portrait';
-        this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientationClassNamePrefix}-slider-images`]);
+        this._rootEl = this.createElement('div', 'slider-root-container', [ `${imageOrientationClassNamePrefix}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
-
-        // TODO: Make sure we always have 3 images
+        this._drag = this.clearDrag();
+        this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
+        this._transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
+        this._isInterrupted = false;
+        this._slideSpeed = 300;
+        this._minimalSwipeLength = 60;
+        // TODO: Make sure we always have 4 images
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
         this._imageUrls = [];
         if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
-          this._imageUrls.push(portraitImage, urls[0], urls[2]);
-          console.error('Portrait');
+            this._imageUrls.push(portraitImage, urls[0], urls[1], urls[2]);
         } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
-          this._imageUrls.push(landscapeImage, urls[0], urls[2]);
-          console.error('Landscape');
+            this._imageUrls.push(landscapeImage, urls[0], urls[1], urls[2]);
         } else {
-          this._imageUrls.push(urls[1], urls[2], urls[0]);
-          console.error('old');
-        } 
-        this._currentSlide = this._config.startIndex % this._imageUrls.length;
-        this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
-        this._transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
+            this._imageUrls.push(urls[1], urls[2], urls[0]);
+        }
 
-        const cloneSlidesAmount = 3;
-        const allSlidesCreatedPromise = [];
+        const allSlidesCreatedPromise: Promise<HTMLElement | null>[] = [];
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${urls[0]})`
         });
         this._rootEl.appendChild(blurredBackground);
-
-        for (let i = this._imageUrls.length - cloneSlidesAmount; i < this._imageUrls.length; i++) {
-            allSlidesCreatedPromise.push(this.createSlide(this._imageUrls[i]).catch(() => null));
-        }
         this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
 
         this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
             this._slidesContainer.innerHTML = '';
-            slides.forEach((slide) => {
+            if (slides.length && slides !== null) {
+                this._slides = slides;
+            }
+            slides.forEach((slide, index) => {
                 if (slide) {
+                    slide.setAttribute('slide-index', index.toString());
                     this._slidesContainer.appendChild(slide);
                 }
             });
-
+            this._slideCount = this._slides.length;
             this._rootEl.appendChild(this._slidesContainer);
-            this._slidesContainerVisibleWidth = this._slidesContainer.offsetWidth;
             this.init();
-            this.resizeContainer();
             this._ready = null;
-
-            if (this._isVisible) {
-                this.autoplay();
-            }
         });
-    }
-
-    public show(): boolean {
-        this._isVisible = true;
-
-        // If this._ready has already resolved and set to null, slider was ready
-        if (this._ready === null) {
-            this.autoplay();
-            return true;
-        }
-
-        return false;
-    }
-
-    public hide(): void {
-        this._isVisible = false;
-
-        if (this._autoplayTimeoutId) {
-            clearTimeout(this._autoplayTimeoutId);
-        }
-    }
-
-    private slideToCurrent(slideOptions?: { enableTransition?: boolean; automatic?: boolean; triggeredByResize?: boolean }): void {
-        const defaultOptions = { enableTransition: true, automatic: false, triggeredByResize: false };
-        const options = slideOptions !== undefined ? { ...defaultOptions, ...slideOptions } : defaultOptions;
-        if (!options.triggeredByResize) {
-            this._onSlideCallback({ automatic: options.automatic });
-        }
-        this.autoplay();
-        const currentSlide = this._currentSlide + this._slidesPerPage;
-
-        const offset = -Math.abs(currentSlide * (this._slidesContainerVisibleWidth / this._slidesPerPage));
-        const config = options.automatic ? AUTOMATIC_TRANSFORMATION_CONFIG : TRANSFORMATION_CONFIG;
-        if (options.enableTransition) {
-            // explanation for this one - https://youtu.be/cCOL7MC4Pl0
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    this.transformSlidesContainer(offset, config);
-                });
-            });
-        } else {
-            this.transformSlidesContainer(offset, INSTANT_TRANSFORMATION_CONFIG);
-        }
-        Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
-    }
-
-    private transformSlidesContainer(offset: number, config: ITransformationConfig = AUTOMATIC_TRANSFORMATION_CONFIG): void {
-        this._slidesContainer.style[this._transitionPropertyName] = `all ${config.duration}ms ${config.easing}`;
-        this._slidesContainer.style[this._transformPropertyName] = `translate3d(${offset}px, 0, 0)`;
-    }
-
-    private resizeContainer(): void {
-        this._slidesContainerVisibleWidth = this._rootEl.offsetWidth;
-        const widthItem = this._slidesContainerVisibleWidth / this._slidesPerPage;
-        const itemsToBuild = this._imageUrls.length + (this._slidesPerPage * 2);
-        this._slidesContainer.style.width = `${(widthItem) * itemsToBuild}px`;
-        this.slideToCurrent({ enableTransition: false, triggeredByResize: true });
-    }
-
-    private resizeHandler(): void {
-        if (this._resizeTimeId) {
-            clearTimeout(this._resizeTimeId);
-        }
-
-        if (typeof animationFrame === 'function') {
-            animationFrame(() => this.resizeContainer());
-        } else {
-            // resize debounce
-            this._resizeTimeId = window.setTimeout(() => this.resizeContainer(), 100);
-        }
-    }
-
-    private createSlide(url: string): Promise<HTMLElement> {
-        return new Promise((resolve) => {
-            const image = new Image();
-            image.onload = () => {
-                resolve(this.generateSlideHTML('id', image));
-            };
-            image.src = url;
-            image.addEventListener('click', (this._onDownloadCallback));
-        });
-    }
-
-    private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
-        const item = this.createElement('div', null, ['slider-item', 'slider-item']);
-        item.style.width = `${100 / (this._imageUrls.length + (this._slidesPerPage * 2))}%`;
-        if (image !== undefined) {
-            item.appendChild(image);
-            this._slidesContainer.appendChild(item);
-        }
-        return item;
     }
 
     private init(): void {
-        this.addEventHandlers();
-        Slider.prepareIndicator(this, 'slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
-        this._rootEl.style.overflow = 'hidden';
+        this._isPaused = true;
+        this.prepareCloneSlides();
+        this.setPosition();
+        this.prepareIndicators(this, 'slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
+        this.updateIndicators();
+        this.initializeTouchEvents();
     }
 
-    private autoplay(): void {
-        if (!this._isVisible) {
-            return;
-        }
-
-        if (this._autoplayTimeoutId !== null) {
-            window.clearTimeout(this._autoplayTimeoutId);
-        }
-
-        const interval = 2500;
-        this._autoplayTimeoutId = window.setTimeout(() => {
-            this.slideForward(1, { automatic: true });
-            this.autoplay();
-        }, interval);
-    }
-
-    private stopAutoplay(): void {
-        if (this._autoplayTimeoutId !== null) {
-            window.clearTimeout(this._autoplayTimeoutId);
-        }
-    }
-
-    private addEventHandlers(): void {
-        // Keep track pointer hold and dragging distance
-        this._pointerDown = false;
-        this._drag = {
-            startX: 0,
-            endX: 0,
-            startY: 0,
-            letItGo: null,
-            preventClick: false
-        };
-
-        // Resize event
-        window.addEventListener('resize', (this.resizeHandler).bind(this));
-        // Touch events
-        this._slidesContainer.addEventListener('touchstart', (this.touchstartHandler).bind(this));
-        this._slidesContainer.addEventListener('touchend', (this.touchendHandler).bind(this));
-        this._slidesContainer.addEventListener('touchmove', (this.touchmoveHandler).bind(this));
-    }
-
-    public attachTo(container: HTMLElement): void {
-        container.appendChild(this._rootEl);
-    }
-
-    private createElement(name: string, id: string | null, className: string[] = [], style: { [key: string]: string } = {}): HTMLElement {
-        const el = document.createElement(name);
-        if (id) {
-            el.id = id;
-        }
-        el.classList.add(...className);
-
-        this.setStyles(el, style);
-
-        return el;
-    }
-
-    private setStyles(el: HTMLElement, style: { [key: string]: string } = {}): void {
-        Object.keys(style).forEach((key) => {
-            el.style.setProperty(key, String(style[key]));
-        });
-    }
-
-    private touchstartHandler(e: TouchEvent): void {
-        this.stopAutoplay();
-        e.stopPropagation();
-        this._pointerDown = true;
-        this._drag.startX = e.touches[0].pageX;
-        this._drag.startY = e.touches[0].pageY;
-    }
-
-    private touchendHandler(e: TouchEvent): void {
-        e.stopPropagation();
-        this._pointerDown = false;
-        if (this._drag.endX) {
-            this.updateAfterDrag();
-        }
-        this.clearDrag();
-        this.autoplay();
-    }
-
-    private touchmoveHandler(e: TouchEvent): void {
-        e.stopPropagation();
-
-        if (this._drag.letItGo === null) {
-            this._drag.letItGo = Math.abs(this._drag.startY - e.touches[0].pageY) < Math.abs(this._drag.startX - e.touches[0].pageX);
-        }
-
-        if (this._pointerDown && this._drag.letItGo) {
-            e.preventDefault();
-            this._drag.endX = e.touches[0].pageX;
-            const currentSlide = this._currentSlide + this._slidesPerPage;
-            const currentOffset = currentSlide * (this._slidesContainerVisibleWidth / this._slidesPerPage);
-            const dragOffset = (this._drag.endX - this._drag.startX);
-            const offset = currentOffset - dragOffset;
-            this.transformSlidesContainer(offset * -1, INSTANT_TRANSFORMATION_CONFIG);
-        }
-
-    }
-    private clearDrag(): void {
-        this._drag = {
-            startX: 0,
-            endX: 0,
-            startY: 0,
-            letItGo: null,
-            preventClick: this._drag.preventClick
-        };
-    }
-
-    private updateAfterDrag(): void {
-        const movement = this._drag.endX - this._drag.startX;
-        const movementDistance = Math.abs(movement);
-        const howManySliderToSlide = Math.ceil(movementDistance / (this._slidesContainerVisibleWidth / this._slidesPerPage));
-
-        const slideToNegativeClone = movement > 0 && this._currentSlide - howManySliderToSlide < 0;
-        const slideToPositiveClone = movement < 0 && this._currentSlide + howManySliderToSlide > this._imageUrls.length - this._slidesPerPage;
-
-        if (movement > 0 && movementDistance > this._config.threshold && this._imageUrls.length > this._slidesPerPage) {
-            this.slideBackward(howManySliderToSlide);
-        } else if (movement < 0 && movementDistance > this._config.threshold && this._imageUrls.length > this._slidesPerPage) {
-            this.slideForward(howManySliderToSlide);
-        } else {
-            this.slideToCurrent({ enableTransition: slideToNegativeClone || slideToPositiveClone });
-        }
-    }
-
-    private slideForward(slideAmount: number = 1, options = { automatic: false }): void {
-        this.moveSlider(slideAmount, options);
-    }
-
-    private slideBackward(slideAmount: number = 1, options = { automatic: false }): void {
-        this.moveSlider(slideAmount * -1, options);
-    }
-
-    private moveSlider(slideAmount: number, options = { automatic: false }): void {
-        // early return when there is nothing to slide
-        if (this._imageUrls.length <= this._slidesPerPage) {
-            return;
-        }
-
-        const startingSlide = this._currentSlide;
-        let shouldLoop = false;
-
-        if (slideAmount > 0) {
-            shouldLoop = (this._currentSlide + slideAmount) - 1 > this._imageUrls.length - this._slidesPerPage;
-        } else {
-            shouldLoop = this._currentSlide + slideAmount < 0;
-        }
-
-        if (shouldLoop) {
-            const loopedSlideIndex = this._currentSlide + (Math.sign(slideAmount) * -1 * this._imageUrls.length);
-            const loopedSlideIndexOffset = this._slidesPerPage;
-            const moveTo = loopedSlideIndex + loopedSlideIndexOffset;
-            const offset = moveTo * -1 * (this._slidesContainerVisibleWidth / this._slidesPerPage);
-            const dragDistance = this._drag.endX - this._drag.startX;
-            this.transformSlidesContainer(offset + dragDistance, INSTANT_TRANSFORMATION_CONFIG);
-            this._currentSlide = loopedSlideIndex + slideAmount;
-        } else {
-            this._currentSlide = this._currentSlide + slideAmount;
-        }
-
-        if (startingSlide !== this._currentSlide) {
-            this.slideToCurrent({ automatic: options.automatic });
-        }
-    }
-
-    private static prepareIndicator(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: String) {
+    private prepareIndicators(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: String) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
         const indicatorContainer = document.createElement('div');
@@ -422,14 +137,411 @@ export class Slider {
         }, 0);
     }
 
-    private static updateIndicator(indicators: HTMLElement[], currentIndex: number) {
-        for (const indicator of indicators) {
+    private updateIndicators(): void {
+        for (const indicator of this._indicators) {
             indicator.classList.remove('active');
         }
-        if (currentIndex > (indicators.length - 1) || currentIndex < 0) {
-            currentIndex = 0;
+        this._indicators[this._currentSlide].classList.add('active');
+    }
+
+    private initializeTouchEvents() {
+        // Resize event
+        window.addEventListener('resize', (this.resizeHandler).bind(this));
+        // Touch events
+        this._rootEl.addEventListener('touchstart', (this.touchHandler).bind(this));
+        this._rootEl.addEventListener('touchmove', (this.touchHandler).bind(this));
+        this._rootEl.addEventListener('touchend', (this.touchHandler).bind(this));
+    }
+
+    private resizeHandler(): void {
+        if (this._resizeTimeId) {
+            clearTimeout(this._resizeTimeId);
         }
 
-        indicators[currentIndex].classList.add('active');
+        if (typeof animationFrame === 'function') {
+            animationFrame(() => this.setPosition());
+        } else {
+            // resize debounce
+            this._resizeTimeId = window.setTimeout(() => this.setPosition(), 100);
+        }
+    }
+
+    private touchHandler(event: TouchEvent) {
+        this._drag.fingerCount = event && event.touches !== undefined ?
+            event.touches.length : 1;
+
+        switch (event.type) {
+            case 'touchstart':
+                this.touchstartHandler(event);
+                break;
+            case 'touchmove':
+                this.touchmoveHandler(event);
+                break;
+            case 'touchend':
+                this.touchendHandler();
+                break;
+            default:
+        }
+    }
+
+    private clearDrag(): IDragOptions {
+        return {
+            fingerCount: 0,
+            startY: 0,
+            startX: 0,
+            curX: 0,
+            curY: 0,
+            swipeLength: 0
+        };
+    }
+
+    private touchendHandler() {
+        let slideCount;
+        let direction: string;
+
+        this._isDragging = false;
+
+        this._isInterrupted = false;
+
+        if (this._drag.curX === undefined) {
+            return false;
+        }
+        if (this._drag.swipeLength >= this._minimalSwipeLength) {
+            direction = this.swipeDirection();
+            switch (direction) {
+                case 'left':
+                    slideCount = this.checkSwipable(this._currentSlide + this.getSlideCount());
+                    break;
+                case 'right':
+                    slideCount = this.checkSwipable(this._currentSlide - this.getSlideCount());
+                    break;
+                default:
+            }
+            this.slideHandler(<number>slideCount);
+            this._drag = this.clearDrag();
+        } else {
+            if (this._drag.startX !== this._drag.curX) {
+                this.slideHandler(this._currentSlide);
+                this._drag = this.clearDrag();
+            }
+        }
+        this.updateIndicators();
+    }
+
+    private getSlideCount() {
+        let traversedIndex: number;
+        let swipedSlide;
+        let swipeTargetPos: number;
+        let centerOffset: number;
+
+        centerOffset = Math.floor(this.getWidth(this._rootEl) / 2);
+        swipeTargetPos = (<number>this._swipeLeft * -1) + centerOffset;
+        const slides = Array.from(this._slidesContainer.children);
+
+        for (const slide of slides) {
+            const el = <HTMLElement>slide;
+            let slideOffsetLeftWidth: number;
+            let slideOffsetLeft: number;
+            let rightBoundary: number;
+            slideOffsetLeftWidth = el.offsetWidth;
+            slideOffsetLeft = el.offsetLeft;
+
+            rightBoundary = slideOffsetLeft + slideOffsetLeftWidth;
+            if (swipeTargetPos < rightBoundary) {
+                swipedSlide = slide;
+                break;
+            }
+        }
+
+        let index: number;
+        if (swipedSlide && swipedSlide.hasAttribute('slide-index')) {
+            index = Number(swipedSlide.getAttribute('slide-index'));
+        } else {
+            index = 0;
+        }
+        traversedIndex = Math.abs(index - this._currentSlide) || 1;
+        return traversedIndex;
+    }
+
+    private checkSwipable(index: number): number {
+        let prevNavigable: number;
+
+        this._swipableIndexes = this.getSwipableIndexes();
+        prevNavigable = 0;
+        if (index > this._swipableIndexes[this._swipableIndexes.length - 1]) {
+            index = this._swipableIndexes[this._swipableIndexes.length - 1];
+        } else {
+            for (const i of this._swipableIndexes) {
+                if (index < i) {
+                    index = prevNavigable;
+                    break;
+                }
+                prevNavigable = i;
+            }
+        }
+        return index;
+    }
+
+    private getSwipableIndexes () {
+        const indexes = [];
+        for (const slide of this._slidesContainer.children) {
+            if (slide && slide.hasAttribute('slide-index')) {
+                indexes.push(Number(slide.getAttribute('slide-index')));
+            }
+        }
+        return indexes;
+    }
+
+    private touchstartHandler(event: TouchEvent) {
+        let touches: Touch | undefined;
+        this._isInterrupted = true;
+
+        if (this._drag.fingerCount !== 1) {
+            this._drag = this.clearDrag();
+            return false;
+        }
+
+        if (event !== undefined && event.touches !== undefined) {
+            touches = event.touches[0];
+        }
+
+        this._drag.startX = this._drag.curX = touches !== undefined ? touches.pageX : 0;
+        this._drag.startY = this._drag.curY = touches !== undefined ? touches.pageY : 0;
+        this._isDragging = true;
+    }
+
+    private touchmoveHandler(event: TouchEvent) {
+        let curLeft: number;
+        let swipeLength: number;
+        let positionOffset: number;
+        let touches: TouchList | null;
+
+        touches = event !== undefined ? event.touches : null;
+
+        if (!this._isDragging || touches && touches.length !== 1) {
+            return false;
+        }
+
+        curLeft = this.getTransitionPosition(this._currentSlide);
+
+        this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
+        this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
+        this._drag.swipeLength = Math.round(Math.sqrt(Math.pow(this._drag.curX - this._drag.startX, 2)));
+
+        if (event !== undefined && this._drag.swipeLength > 4) {
+            event.preventDefault();
+        }
+
+        positionOffset = (this._drag.curX > this._drag.startX ? 1 : -1) * 1;
+        swipeLength = this._drag.swipeLength;
+        this._swipeLeft = curLeft + swipeLength * positionOffset;
+
+        if (this._isAnimating === true) {
+            this._swipeLeft = null;
+            return false;
+        }
+
+        this.setTransition(this._swipeLeft);
+    }
+
+    private swipeDirection(): string {
+        let xDistance: number;
+        xDistance = this._drag.startX - this._drag.curX;
+        if (xDistance > 0) {
+            return 'left';
+        } else {
+            return 'right';
+        }
+    }
+
+    private autoplay() {
+        this.autoPlayClear();
+        this._autoPlayTimer = setInterval((this.autoPlayIterator).bind(this), 2000);
+    }
+
+    private autoPlayClear() {
+        if (this._autoPlayTimer) {
+            clearInterval(this._autoPlayTimer);
+        }
+    }
+
+    private autoPlayIterator() {
+        const slideTo: number = this._currentSlide + 1;
+        if (!this._isPaused && !this._isInterrupted) {
+            this.slideHandler(slideTo, true);
+        }
+    }
+
+    private slideHandler(index: number, automatic: boolean = false) {
+        let targetSlide: number;
+        let oldSlideIndex: number;
+        let slideLeft: number;
+        let animSlide: number;
+        let targetTransitionPosition: number | null = null;
+
+        if (this._isAnimating === true) {
+            return;
+        }
+
+        targetSlide = index;
+        targetTransitionPosition = this.getTransitionPosition(targetSlide);
+        slideLeft = this.getTransitionPosition(this._currentSlide);
+
+        clearInterval(this._autoPlayTimer);
+
+        if (targetSlide < 0) {
+            animSlide = this._slideCount + targetSlide;
+        } else if (targetSlide >= this._slideCount) {
+            animSlide = targetSlide - this._slideCount;
+        } else {
+            animSlide = targetSlide;
+        }
+
+        this._isAnimating = true;
+
+        oldSlideIndex = this._currentSlide;
+        this._currentSlide = animSlide;
+
+        this.animateSlide(targetTransitionPosition, () => {
+            // slide calback
+            this._onSlideCallback({ automatic: automatic });
+            this.postSlide(animSlide);
+        });
+        this.updateIndicators();
+    }
+
+    private postSlide (index?: number) {
+        this._isAnimating = false;
+        this.setPosition();
+        this._swipeLeft = null;
+        this.autoplay();
+    }
+
+    private animateSlide(targetTransitionPosition: number, callback: any) {
+        this.applyTransition();
+        targetTransitionPosition = Math.ceil(targetTransitionPosition);
+        this._slidesContainer.style[this._transformPropertyName] = `translate3d( ${targetTransitionPosition}px, 0px, 0px)`;
+        if (callback) {
+            setTimeout(() => {
+                this.disableTransition();
+                callback.call();
+            }, this._slideSpeed);
+        }
+    }
+
+    private disableTransition() {
+        this._slidesContainer.style[this._transitionPropertyName] = '';
+    }
+
+    private applyTransition() {
+        this._slidesContainer.style[this._transitionPropertyName] = `all ${this._slideSpeed}ms ease`;
+    }
+
+    private setPosition(): void {
+        this._slidesContainer.style.width = `${this._slideCount * 3000}px`;
+        this.setTransition(this.getTransitionPosition(this._currentSlide));
+    }
+
+    private getTransitionPosition(slideIndex: number): number {
+        let targetTransitionPosition: number;
+        const targetSlide =  <HTMLElement>this._slidesContainer.children[slideIndex + 2];
+        targetTransitionPosition = targetSlide ? targetSlide.offsetLeft * -1 : 0;
+        targetTransitionPosition += (this.getWidth(this._rootEl) - targetSlide.offsetWidth) / 2;
+        return targetTransitionPosition;
+    }
+
+    private getWidth(node: HTMLElement): number {
+        const computedStyle: CSSStyleDeclaration = getComputedStyle(node);
+        let width: number = node.clientWidth;
+        width -= parseFloat(<string>computedStyle.paddingLeft) + parseFloat(<string>computedStyle.paddingRight);
+        return width;
+    }
+
+    private setTransition(position: number): void {
+        const x: number = Math.ceil(position);
+        this._slidesContainer.style[this._transformPropertyName] = `translate3d( ${x}px, 0px, 0px)`;
+    }
+
+    private prepareCloneSlides(): void {
+        let slideIndex: number | null = null;
+        const infiniteCount: number = 2;
+
+        for (let i = this._slideCount; i > (this._slideCount - infiniteCount); i -= 1) {
+            slideIndex = i - 1;
+            let clone = this._slides[slideIndex];
+            if (clone) {
+                clone = <HTMLElement>clone.cloneNode(true);
+                clone.setAttribute('slide-index', (slideIndex - this._slideCount).toString());
+                clone.classList.add('slide-clone');
+                this._slidesContainer.insertBefore(clone, this._slidesContainer.firstChild);
+            }
+        }
+        for (let i = 0; i < infiniteCount  + this._slideCount; i += 1) {
+            slideIndex = i;
+            let clone = this._slides[slideIndex];
+            if (clone) {
+                clone = <HTMLElement>clone.cloneNode(true);
+                clone.setAttribute('slide-index', (slideIndex + this._slideCount).toString());
+                clone.classList.add('slide-clone');
+                this._slidesContainer.appendChild(clone);
+            }
+        }
+    }
+
+    public show(): boolean {
+        // If this._ready has already resolved and set to null, slider was ready
+        if (this._ready === null) {
+            this._isPaused = false;
+            this.setPosition();
+            this.autoplay();
+            return true;
+        }
+        return false;
+    }
+
+    public hide(): void {
+        if (this._autoplayTimeoutId) {
+            clearTimeout(this._autoplayTimeoutId);
+        }
+    }
+
+    private createSlide(url: string): Promise<HTMLElement> {
+        return new Promise((resolve) => {
+            const image = new Image();
+            image.onload = () => {
+                resolve(this.generateSlideHTML('id', image));
+            };
+            image.src = url;
+            image.addEventListener('click', (this._onDownloadCallback));
+        });
+    }
+
+    private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
+        const item: HTMLElement = this.createElement('div', null, ['slider-item', 'slider-item']);
+        if (image !== undefined) {
+            item.appendChild(image);
+            this._slidesContainer.appendChild(item);
+        }
+        return item;
+    }
+
+    public attachTo(container: HTMLElement): void {
+        container.appendChild(this._rootEl);
+    }
+
+    private createElement(name: string, id: string | null, className: string[] = [], style: { [key: string]: string } = {}): HTMLElement {
+        const el: HTMLElement = document.createElement(name);
+        if (id) {
+            el.id = id;
+        }
+        el.classList.add(...className);
+        this.setStyles(el, style);
+        return el;
+    }
+
+    private setStyles(el: HTMLElement, style: { [key: string]: string } = {}): void {
+        Object.keys(style).forEach((key) => {
+            el.style.setProperty(key, String(style[key]));
+        });
     }
 }
