@@ -1,5 +1,6 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { ICoreApi } from 'Core/ICore';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { Template } from 'Core/Utilities/Template';
@@ -21,10 +22,12 @@ export class SliderPerformanceEndScreen extends EndScreen {
     private _sliderEventParameters: ISliderEventParameters;
     private _showTimestamp: number;
     private _sliderUsageDataEventSent: boolean;
+    private _country: string | undefined;
 
-    constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign) {
+    constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign, country?: string) {
         super(parameters);
         this._campaign = campaign;
+        this._country = country;
 
         this._template = new Template(this.getTemplate(), this._localization);
 
