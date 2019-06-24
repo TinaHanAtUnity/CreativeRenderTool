@@ -2,6 +2,7 @@
 
 * Added handling of 'all: true' to incident fix [#10316](https://github.com/Applifier/unity-ads-webview/pull/10316)
 * Remove incorrect 'ad_did_showad_background' kibana log [#10369](https://github.com/Applifier/unity-ads-webview/pull/10369)
+* Allowing vast end card size minimum to 200 x 200 from 320 x 480 [#10321](https://github.com/Applifier/unity-ads-webview/pull/10321)
 
 # Fri Jun 21 22:57:46 UTC 2019
 
