@@ -210,7 +210,7 @@ export class Vast extends Model<IVast> {
             if (companionAds) {
                 for(const companionAd of companionAds) {
                     const url = companionAd.getCompanionClickThroughURLTemplate();
-                    if (url && url.length > 0) {
+                    if (url) {
                         return url;
                     }
                 }
