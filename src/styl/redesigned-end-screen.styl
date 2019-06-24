@@ -575,6 +575,7 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 
   html.redesigned-performance-end-screen .ios-portrait #privacy {
     top: 0;
+    padding-top: constant(safe-area-inset-top);
     padding-top: env(safe-area-inset-top);
   }
 
@@ -587,10 +588,12 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
     .pop-up-container {
       margin-top: 1em;
       width: calc(100% - 2em);
+      height: calc(100% - constant(safe-area-inset-bottom) - constant(safe-area-inset-top) - 1em);
       height: calc(100% - env(safe-area-inset-bottom) - env(safe-area-inset-top) - 1em);
     }
 
     .btn-close-region {
+      top: constant(safe-area-inset-top);
       top: env(safe-area-inset-top);
     }
   }
@@ -598,6 +601,9 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   .performance-end-screen body {
     &.ios-landscape-right #redesigned-end-screen {
       .bottom-container {
+        right: calc(constant(safe-area-inset-right) + 1em);
+        margin-bottom: calc(constant(safe-area-inset-bottom) - .5em);
+
         right: calc(env(safe-area-inset-right) + 1em);
         margin-bottom: calc(env(safe-area-inset-bottom) - .5em);
         width: calc(50% - 2em);
@@ -608,10 +614,14 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
       width: calc(100% - 2em);
 
       .pop-up-container {
+        width: calc(100% - 2em - constant(safe-area-inset-right));
         width: calc(100% - 2em - env(safe-area-inset-right));
       }
 
       .bottom-container {
+        right: calc(constant(safe-area-inset-right) + 1em);
+        width: calc(50% - constant(safe-area-inset-right) - 1em);
+
         right: calc(env(safe-area-inset-right) + 1em);
         width: calc(50% - env(safe-area-inset-right) - 1em);
 
