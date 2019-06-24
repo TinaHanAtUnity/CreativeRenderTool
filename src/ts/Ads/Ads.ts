@@ -519,7 +519,6 @@ export class Ads implements IAds {
                     this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
                 }
                 this.BackupCampaignManager.deleteBackupCampaigns();
-                this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignDidShowAdInBackground);
             });
         });
     }
