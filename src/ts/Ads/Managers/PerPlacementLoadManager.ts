@@ -1,6 +1,5 @@
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
@@ -68,8 +67,8 @@ export class PerPlacementLoadManager extends RefreshManager {
         return Promise.resolve(undefined);
     }
 
-    public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]> {
-        return Promise.all([this.refreshStoredLoads()]);
+    public initialize(): Promise<INativeResponse | void> {
+        return this.refreshStoredLoads();
     }
 
     public shouldRefill(timestamp: number): boolean {
