@@ -12,7 +12,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -89,7 +89,7 @@ describe('PerPlacementLoadManagerTest', () => {
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
-        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager);
+        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 
     describe('getStoredLoads', () => {
@@ -177,6 +177,7 @@ describe('PerPlacementLoadManagerTest', () => {
             let placementId: string;
             let loadEvent: ILoadEvent;
             let sandbox: sinon.SinonSandbox;
+            let loadCampaignStub: sinon.SinonStub;
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
@@ -185,6 +186,7 @@ describe('PerPlacementLoadManagerTest', () => {
                     value: placementId,
                     ts: clientInfo.getInitTimestamp() + 1
                 };
+                loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
                 sandbox.stub(core.Api.Storage, 'get').callsFake(() => {
                     return Promise.resolve(loadEvent);
                 });
@@ -215,7 +217,7 @@ describe('PerPlacementLoadManagerTest', () => {
 
             tests.forEach((t) => {
                 it('should load/overwrite the correct campaign', () => {
-                    sandbox.stub(campaignManager, 'loadCampaign').callsFake(() => {
+                    loadCampaignStub.callsFake(() => {
                         return Promise.resolve(<ILoadedCampaign>{
                             campaign: t.expectedCampaign,
                             trackingUrls: {}
@@ -232,7 +234,7 @@ describe('PerPlacementLoadManagerTest', () => {
             });
 
             it('should set the placement state to nofill', () => {
-                sandbox.stub(campaignManager, 'loadCampaign').callsFake(() => {
+                loadCampaignStub.callsFake(() => {
                     return Promise.resolve(undefined);
                 });
                 sandbox.stub(ads.Placement, 'setPlacementState');
@@ -240,6 +242,56 @@ describe('PerPlacementLoadManagerTest', () => {
                     const testCampaign = loadManager.getCampaign(placementId);
                     assert.isUndefined(testCampaign, 'Loaded campaign was defined');
                     sinon.assert.calledWith((<sinon.SinonStub>ads.Placement.setPlacementState), placementId, PlacementState.NO_FILL);
+                });
+            });
+
+            it('should not attempt to load a campaign for a placement that\'s waiting', () => {
+                const placement = adsConfig.getPlacement(placementId);
+                placement.setState(PlacementState.WAITING);
+                return loadManager.initialize().then(() => {
+                    sinon.assert.notCalled(loadCampaignStub);
+                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
+                });
+            });
+
+            it('should not attempt to load a campaign that\'s ready and not expired', () => {
+                const campaign = TestFixtures.getCampaign();
+                const placement = adsConfig.getPlacement(placementId);
+                campaign.set('willExpireAt', Date.now() + 100);
+                placement.setState(PlacementState.READY);
+                placement.setCurrentCampaign(campaign);
+                return loadManager.initialize().then(() => {
+                    sinon.assert.notCalled(loadCampaignStub);
+                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
+                });
+            });
+
+            it('should attempt to load a campaign that\'s ready and expired', () => {
+                loadCampaignStub.callsFake(() => {
+                    return Promise.resolve(<ILoadedCampaign>{});
+                });
+
+                const campaign = TestFixtures.getCampaign();
+                const placement = adsConfig.getPlacement(placementId);
+                campaign.set('willExpireAt', Date.now() - 100);
+                placement.setState(PlacementState.READY);
+                placement.setCurrentCampaign(campaign);
+                return loadManager.initialize().then(() => {
+                    sinon.assert.called(loadCampaignStub);
+                });
+            });
+
+            const stateTests: PlacementState[] = [PlacementState.NOT_AVAILABLE, PlacementState.NO_FILL];
+            stateTests.forEach(state => {
+                it(`should attempt to load a campaign with a placement state of ${PlacementState[state]}`, () => {
+                    loadCampaignStub.callsFake(() => {
+                        return Promise.resolve(<ILoadedCampaign>{});
+                    });
+                    const placement = adsConfig.getPlacement(placementId);
+                    placement.setState(state);
+                    return loadManager.initialize().then(() => {
+                        sinon.assert.called(loadCampaignStub);
+                    });
                 });
             });
         });

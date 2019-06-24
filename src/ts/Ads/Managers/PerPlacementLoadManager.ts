@@ -11,6 +11,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface ILoadEvent {
     value: string; // PlacementID for the loaded placement
@@ -28,8 +29,9 @@ export class PerPlacementLoadManager extends RefreshManager {
     private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
+    private _pts: ProgrammaticTrackingService;
 
-    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
+    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
         this._core = core;
@@ -38,6 +40,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
+        this._pts = programmaticTrackingService;
 
         this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(<ILoadStorageEvent>value));
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
@@ -112,19 +115,43 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string) {
-        this.setPlacementState(placementId, PlacementState.WAITING);
-        this._campaignManager.loadCampaign(this._adsConfig.getPlacement(placementId), 10000).then(loadedCampaign => {
-            if(loadedCampaign) {
-                const placement = this._adsConfig.getPlacement(placementId);
-                if(placement) {
+        const placement = this._adsConfig.getPlacement(placementId);
+        if (placement && this.shouldLoadCampaignForPlacement(placement)) {
+            this.setPlacementState(placementId, PlacementState.WAITING);
+            this._campaignManager.loadCampaign(placement, 10000).then(loadedCampaign => {
+                if (loadedCampaign) {
                     placement.setCurrentCampaign(loadedCampaign.campaign);
                     placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
+                    this.setPlacementState(placementId, PlacementState.READY);
+                } else {
+                    this.setPlacementState(placementId, PlacementState.NO_FILL);
                 }
-                this.setPlacementState(placementId, PlacementState.READY);
-            } else {
-                this.setPlacementState(placementId, PlacementState.NO_FILL);
-            }
-        });
+            });
+        } else {
+            this._pts.reportMetric(LoadMetric.LoadAuctionRequestBlocked);
+        }
+    }
+
+    /**
+     *  Returns true if a new campaign should be fetched for the given placement.
+     *  A new campaign is only fetched when the campaign is:
+     *  - Unfilled (No fill or Not Available)
+     *  - Ready and the filled campaign is expired
+     */
+    private shouldLoadCampaignForPlacement(placement: Placement): boolean {
+        const isUnfilledPlacement = (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE);
+        if (isUnfilledPlacement) {
+            return true;
+        }
+
+        const isReadyPlacement = placement.getState() === PlacementState.READY;
+        const campaign = placement.getCurrentCampaign();
+        const isExpiredCampaign = !!(campaign && campaign.isExpired());
+        if (isReadyPlacement && isExpiredCampaign) {
+            return true;
+        }
+
+        return false;
     }
 
     private getStoredLoads(): Promise<string[]> {
@@ -183,7 +210,7 @@ export class PerPlacementLoadManager extends RefreshManager {
                     const loadEvent: ILoadEvent = loadedEvents[key];
                     const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
 
-                    if (placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
+                    if (placement) {
                         this.loadPlacement(loadEvent.value);
                     }
                 }

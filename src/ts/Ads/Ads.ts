@@ -38,7 +38,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { Banners } from 'Banners/Banners';
-import { AuctionRequest } from 'Banners/Utilities/AuctionRequest';
+import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
@@ -246,7 +246,7 @@ export class Ads implements IAds {
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager);
             if(this._loadApiEnabled) {
-                this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
+                this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else {
                 this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
             }
