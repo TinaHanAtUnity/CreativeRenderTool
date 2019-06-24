@@ -81,6 +81,7 @@ $redesigned-end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .game-icon {
+      left: "calc(50% - (3.5 * %s)/2)" % $endscreen-default-size;
       min-width: 3.5 * $endscreen-default-size;
       min-height: 3.5 * $endscreen-default-size;
       width: 3.5 * $endscreen-default-size;
