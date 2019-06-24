@@ -6,8 +6,6 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
-import { Platform } from 'Core/Constants/Platform';
 
 export interface IRawMraidUrlCampaign extends IRawPerformanceCampaign {
     inlinedUrl?: string;
@@ -15,10 +13,7 @@ export interface IRawMraidUrlCampaign extends IRawPerformanceCampaign {
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
 
-    constructor(platform: Platform) {
-        super(platform);
-        this._contentType = CampaignContentType.ProgrammaticMRAIDUrl;
-    }
+    public static ContentType = 'programmatic/mraid-url';
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = <IRawMraidUrlCampaign>response.getJsonContent();
@@ -39,7 +34,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-            contentType: this._contentType,
+            contentType: ProgrammaticMraidUrlParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
@@ -48,7 +43,8 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
 
         const parameters: IMRAIDCampaign = {
@@ -70,7 +66,8 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             bypassAppSheet: undefined,
             store: undefined,
             appStoreId: undefined,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

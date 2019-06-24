@@ -97,7 +97,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('premiumProduct').getId();
     }
 
-    public getRequiredAssets() : Asset[] {
+    public getRequiredAssets(): Asset[] {
         const assetList: Asset[] = [];
         const orientationResources = this.getOrientationResources();
         for(const orientationResource of orientationResources) {
@@ -120,11 +120,11 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return resources;
       }
 
-    public getPayouts() : ProductInfo[] {
+    public getPayouts(): ProductInfo[] {
         return this.get('payouts');
     }
 
-    public getCosts() : ProductInfo[] {
+    public getCosts(): ProductInfo[] {
         return this.get('costs');
     }
 

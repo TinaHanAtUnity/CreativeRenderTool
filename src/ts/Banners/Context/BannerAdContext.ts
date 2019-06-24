@@ -13,6 +13,8 @@ import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
 import { ProgrammaticTrackingService, ProgrammaticTrackingError, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 const StandardRefreshDelay = 30;
 
@@ -37,6 +39,7 @@ export class BannerAdContext {
     private _bannerAdUnitFactory: BannerAdUnitFactory;
     private _focusManager: FocusManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _clientInfo: ClientInfo;
 
     private _state = BannerLoadState.Unloaded;
     private _isShowing = false;
@@ -51,7 +54,8 @@ export class BannerAdContext {
         this._bannerAdUnitFactory = banner.AdUnitFactory;
         this._adUnitParametersFactory = banner.AdUnitParametersFactory;
         this._deviceInfo = core.DeviceInfo;
-        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._clientInfo = core.ClientInfo;
+        this._programmaticTrackingService = core.ProgrammaticTrackingService;
 
         this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -86,12 +90,15 @@ export class BannerAdContext {
                 return this.sendBannerError(new Error(`Placement ${placementId} is not a banner placement`));
             }
             this._placement = placement;
-            this._placementManager.sendBannersWaiting();
             this.setState(BannerLoadState.Loading);
             return this.loadBannerAdUnit().catch((e) => {
                 if (e instanceof NoFillError) {
                     this.sendBannerError(new Error(`Banner placement ${placementId} returned no fill`));
-                    this.setUpBannerRefresh();
+                    if (CustomFeatures.shouldDisableBannerRefresh(this._clientInfo.getGameId())) {
+                        // Do not refresh
+                    } else {
+                        this.setUpBannerRefresh();
+                    }
                 }
                 throw e;
             });
@@ -156,7 +163,11 @@ export class BannerAdContext {
                 if (this._adUnit) {
                     this._adUnit.onShow();
                 }
-                this.setUpBannerRefresh();
+                if (CustomFeatures.shouldDisableBannerRefresh(this._clientInfo.getGameId())) {
+                    // Do not refresh
+                } else {
+                    this.setUpBannerRefresh();
+                }
             }
         }
     }
@@ -192,7 +203,11 @@ export class BannerAdContext {
 
     private onAppForeground() {
         if (this.isState(BannerLoadState.Loaded)) {
-            this.setUpBannerRefresh();
+            if (CustomFeatures.shouldDisableBannerRefresh(this._clientInfo.getGameId())) {
+                // Do not refresh
+            } else {
+                this.setUpBannerRefresh();
+            }
         }
     }
 

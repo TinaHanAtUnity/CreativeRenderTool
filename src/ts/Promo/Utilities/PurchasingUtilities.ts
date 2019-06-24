@@ -12,6 +12,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPromoApi } from 'Promo/IPromo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
@@ -20,7 +21,6 @@ import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurc
 import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -67,7 +67,9 @@ export class PurchasingUtilities {
         }).then(() => {
             this._isInitialized = true;
             if (this.configurationIncludesPromoPlacement()) {
-                this._purchasingAdapter.refreshCatalog();
+                this._purchasingAdapter.refreshCatalog().catch(() => {
+                    this._core.Sdk.logDebug('Purchasing Catalog failed to refresh');
+                });
             }
         });
     }
@@ -187,7 +189,7 @@ export class PurchasingUtilities {
     private static _metaDataManager: MetaDataManager;
 
     private static setProductPlacementStates(): void {
-        const placementCampaignMap = this._placementManager.getPlacementCampaignMap(CampaignContentType.IAPPromotion);
+        const placementCampaignMap = this._placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
         const promoPlacementIds = Object.keys(placementCampaignMap);
         for (const placementId of promoPlacementIds) {
             const currentCampaign = placementCampaignMap[placementId];
@@ -200,7 +202,7 @@ export class PurchasingUtilities {
         }
     }
 
-    private static getPurchasingAdapter() : Promise<IPurchasingAdapter> {
+    private static getPurchasingAdapter(): Promise<IPurchasingAdapter> {
         if (this._coreConfig.getTestMode()) {
             return Promise.resolve().then(() => {
                 this._core.Sdk.logInfo('TestMode delegate is set');
@@ -209,10 +211,8 @@ export class PurchasingUtilities {
         }
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             if (isAvailable) {
-                this._core.Sdk.logInfo('CustomPurchasing delegate is set');
                 return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
-                this._core.Sdk.logInfo('UnityPurchasing delegate is set');
                 return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
             }
         }).catch(() => {

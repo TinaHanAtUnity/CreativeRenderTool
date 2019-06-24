@@ -7,8 +7,8 @@ import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities
 import { Url } from 'Core/Utilities/Url';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class VastAdValidator implements IValidator {
 
@@ -50,7 +50,7 @@ export class VastAdValidator implements IValidator {
         vastAd.getErrorURLTemplates().forEach((url) => {
             if (!Url.isValidProtocol(url)) {
                 // Error level LOW
-                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('VastAd errorURLTemplates', url).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, vastAd.getErrorURLTemplates(), url));
+                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('VastAd errorURLTemplates', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, vastAd.getErrorURLTemplates(), url));
             }
         });
     }
@@ -59,7 +59,7 @@ export class VastAdValidator implements IValidator {
         vastAd.getImpressionURLTemplates().forEach((url) => {
             if (!Url.isValidProtocol(url)) {
                 // Error level LOW
-                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('VastAd impressionURLTemplates', url).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, vastAd.getErrorURLTemplates(), url));
+                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('VastAd impressionURLTemplates', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.LOW, VastErrorCode.INVALID_URL_ERROR, vastAd.getErrorURLTemplates(), url));
             }
         });
     }
@@ -68,7 +68,7 @@ export class VastAdValidator implements IValidator {
         vastAd.getWrapperURLs().forEach((url) => {
             if (!Url.isValidProtocol(url)) {
                 // Error level HIGH
-                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('VastAd wrapperURLs', url).message, CampaignContentType.ProgrammaticVAST, CampaignErrorLevel.HIGH, VastErrorCode.INVALID_URL_ERROR, vastAd.getErrorURLTemplates(), url));
+                this._errors.push(new CampaignError(VastValidationUtilities.invalidUrlError('VastAd wrapperURLs', url).message, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.INVALID_URL_ERROR, vastAd.getErrorURLTemplates(), url));
             }
         });
     }

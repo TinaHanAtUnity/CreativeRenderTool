@@ -162,7 +162,8 @@ import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AdMobView } from 'AdMob/Views/AdMobView';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -184,11 +185,21 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, meta: string | undefined, adType?: string): ICampaign {
+    public static getAdmobCampaignBaseParams(): IAdMobCampaign {
+        const session = sinon.createStubInstance(Session);
+        return {
+            ... this.getCampaignBaseParams(session, 'fakeCampaignId', undefined),
+            dynamicMarkup: 'foo',
+            video: null,
+            useWebViewUserAgentForTracking: false
+        };
+    }
+
+    public static getCampaignBaseParams(session: Session, campaignId: string, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CampaignContentType.CometVideo,
+            contentType: CometCampaignParser.ContentType,
             adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
@@ -207,7 +218,8 @@ export class TestFixtures {
                 'skip': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'error': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a']
             },
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -216,7 +228,7 @@ export class TestFixtures {
             session = this.getSession();
         }
         const parameters: IPerformanceCampaign = {
-            ... this.getCometCampaignBaseParams(session, json.id, undefined),
+            ... this.getCampaignBaseParams(session, json.id, undefined),
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
@@ -253,7 +265,7 @@ export class TestFixtures {
         if (!session) {
             session = this.getSession();
         }
-        const baseParams = this.getCometCampaignBaseParams(session, json.id, undefined);
+        const baseParams = this.getCampaignBaseParams(session, json.id, undefined);
         baseParams.creativeId = creativeId;
         const parameters: IXPromoCampaign = {
             ... baseParams,
@@ -292,7 +304,7 @@ export class TestFixtures {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
-            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
+            ... this.getCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
@@ -311,7 +323,8 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: mraidContentJson.gameId
         };
     }
 
@@ -320,7 +333,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CampaignContentType.ProgrammaticMRAID,
+            contentType: ProgrammaticMraidParser.ContentType,
             adType: mraidJson.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: mraidJson.creativeId || undefined,
@@ -329,7 +342,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -360,7 +374,8 @@ export class TestFixtures {
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: mraidContentJson.gameId
         };
     }
 
@@ -368,7 +383,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
-            contentType: CampaignContentType.ProgrammaticVAST,
+            contentType: ProgrammaticVastParser.ContentType,
             adType: 'adType',
             correlationId: 'correlationId',
             creativeId: 'creativeId',
@@ -377,7 +392,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -425,7 +441,7 @@ export class TestFixtures {
         const baseCampaignParams: ICampaign = {
             id: campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
-            contentType: CampaignContentType.ProgrammaticHTMLStaticInterstitial,
+            contentType: ProgrammaticStaticInterstitialParser.ContentTypeHtml,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
@@ -434,7 +450,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
 
         return {
@@ -452,7 +469,7 @@ export class TestFixtures {
         return {
             id: json.campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
-            contentType: CampaignContentType.ProgrammaticVPAID,
+            contentType: ProgrammaticVPAIDParser.ContentType,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
@@ -461,7 +478,8 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
     }
 
@@ -497,7 +515,8 @@ export class TestFixtures {
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
-            meta: undefined
+            meta: undefined,
+            isLoadEnabled: false
         };
     }
 
@@ -523,7 +542,7 @@ export class TestFixtures {
             quantity: 1
         };
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.meta, adType),
+            ... this.getCampaignBaseParams(session, json.promo.id, json.meta, adType),
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
             limitedTimeOffer: undefined,
             costs: costProductInfoList,
@@ -913,7 +932,7 @@ export class TestFixtures {
             core.DeviceInfo = new IosDeviceInfo(api);
             core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
         }
-
+        core.ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
 
         return <ICore>core;
@@ -929,7 +948,6 @@ export class TestFixtures {
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
             MissedImpressionManager: new MissedImpressionManager(core.Api),
             BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo, core.ClientInfo),
-            ProgrammaticTrackingService: new ProgrammaticTrackingService(platform, core.RequestManager, core.ClientInfo, core.DeviceInfo),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),
@@ -937,8 +955,8 @@ export class TestFixtures {
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
-        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, ads.ProgrammaticTrackingService!, ads.BackupCampaignManager!);
-        ads.CampaignManager = new CampaignManager(platform, core.Api, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService, ads.BackupCampaignManager!);
+        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         return <IAds>ads;
     }
@@ -959,7 +977,7 @@ export class TestFixtures {
         const banners: Partial<IBanners> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
             WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
             AdUnitFactory: new BannerAdUnitFactory()
         };

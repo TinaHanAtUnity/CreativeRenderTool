@@ -1,11 +1,14 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { CurrentUnityConsentVersion, GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class AdsConfigurationParser {
-    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo): AdsConfiguration {
+    private static _updateUserPrivacyForIncident: boolean = false;
+    public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
@@ -31,6 +34,11 @@ export class AdsConfigurationParser {
             throw Error('No default placement in configuration response');
         }
 
+        if (this.isUserPrivacyAndOptOutDesynchronized(configJson)) {
+            configJson.optOutEnabled = true;
+            this._updateUserPrivacyForIncident = true;
+        }
+
         const configurationParams: IAdsConfiguration = {
             cacheMode: this.parseCacheMode(configJson),
             placements: placements,
@@ -40,26 +48,106 @@ export class AdsConfigurationParser {
             optOutEnabled: configJson.optOutEnabled,
             defaultBannerPlacement: defaultBannerPlacement,
             gamePrivacy: this.parseGamePrivacy(configJson),
-            userPrivacy: this.parseUserPrivacy(configJson)
+            userPrivacy: this.parseUserPrivacy(configJson, deviceInfo)
         };
+
         return new AdsConfiguration(configurationParams);
+    }
+
+    // For #incident-20190516-2
+    public static isUpdateUserPrivacyForIncidentNeeded(): boolean {
+        return this._updateUserPrivacyForIncident;
+    }
+
+    // For #incident-20190516-2
+    public static isUserPrivacyAndOptOutDesynchronized(configJson: IRawAdsConfiguration) {
+        if (!configJson.userPrivacy) {
+            return false;
+        }
+        if (!configJson.optOutRecorded) {
+            return false;
+        }
+        if (!configJson.gamePrivacy) {
+            return false;
+        }
+        if (configJson.gamePrivacy.method !== PrivacyMethod.LEGITIMATE_INTEREST) {
+            return false;
+        }
+        const uPP = configJson.userPrivacy.permissions;
+        if (uPP.hasOwnProperty('profiling') && uPP.hasOwnProperty('ads')) {
+            Diagnostics.trigger('ads_configuration_user_privacy_inconsistent', {
+                userPrivacy: JSON.stringify(configJson.userPrivacy),
+                gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
+            configJson.userPrivacy = undefined;
+            return false;
+        }
+
+        let adsAllowed = false;
+        if (uPP.hasOwnProperty('profiling')) {
+            adsAllowed = (<IProfilingPermissions>uPP).profiling;
+        }
+        if (uPP.hasOwnProperty('ads')) {
+            adsAllowed = (<IGranularPermissions>uPP).ads;
+        }
+        if (adsAllowed === false && configJson.optOutEnabled === false) {
+            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(configJson));
+            return true;
+        }
+        return false;
     }
 
     private static parseGamePrivacy(configJson: IRawAdsConfiguration) {
         if (configJson.gamePrivacy && configJson.gamePrivacy.method) {
             return new GamePrivacy(configJson.gamePrivacy);
-        } else if (configJson.gdprEnabled === true) {
+        }
+
+        if (configJson.gdprEnabled === true) {
+            Diagnostics.trigger('ads_configuration_game_privacy_missing', {
+                userPrivacy: JSON.stringify(configJson.userPrivacy),
+                gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
             // TODO: Remove when all games have a correct method in dashboard and configuration always contains correct method
             return new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
         }
         return new GamePrivacy({ method: PrivacyMethod.DEFAULT });
     }
 
-    private static parseUserPrivacy(configJson: IRawAdsConfiguration) {
-        if (configJson.userPrivacy) {
-            return new UserPrivacy(configJson.userPrivacy);
+    private static parseUserPrivacy(configJson: IRawAdsConfiguration, deviceInfo?: DeviceInfo) {
+        if (deviceInfo && deviceInfo.getLimitAdTracking()) {
+            const gPmethod = configJson.gamePrivacy && configJson.gamePrivacy.method ? configJson.gamePrivacy.method : undefined;
+            return new UserPrivacy({
+                method: gPmethod ? gPmethod : PrivacyMethod.DEFAULT,
+                version:  gPmethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0,
+                permissions: {
+                    all: false,
+                    gameExp: false,
+                    ads: false,
+                    external: false
+                }
+            });
         }
-        return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
+        if (!configJson.gamePrivacy || !configJson.userPrivacy) {
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
+                    all: false,
+                    gameExp: false,
+                    ads: false,
+                    external: false
+            }});
+        }
+
+        if (configJson.gamePrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST ||
+            configJson.gamePrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
+                return new UserPrivacy({
+                    method: configJson.gamePrivacy.method,
+                    version: 0,
+                    permissions: {
+                        all: false,
+                        gameExp: false,
+                        ads: !configJson.optOutEnabled,
+                        external: false
+                    }
+                });
+        }
+        return new UserPrivacy(configJson.userPrivacy);
     }
 
     private static parseCacheMode(configJson: IRawAdsConfiguration): CacheMode {

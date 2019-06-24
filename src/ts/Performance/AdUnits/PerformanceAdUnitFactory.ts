@@ -2,6 +2,7 @@ import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { PerfomanceOverlayEventHandlerWithAmination } from 'Performance/EventHandlers/PerfomanceOverlayEventHandlerWithAmination';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -10,20 +11,24 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { AnimationEndCardTest } from 'Core/Models/ABGroup';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
+    public static ContentType = 'comet/campaign';
+    public static ContentTypeVideo = 'comet/video';
+    public static ContentTypeMRAID = 'comet/mraid-url';
+
     public canCreateAdUnit(contentType: string) {
-        return contentType === CampaignContentType.CometVideo || contentType === CampaignContentType.CometMRAIDUrl;
+        return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeVideo || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;
     }
 
     public createAdUnit(parameters: IPerformanceAdUnitParameters): PerformanceAdUnit {
         const useIOSPerformanceAdUnit = parameters.platform === Platform.IOS;
         const performanceAdUnit = useIOSPerformanceAdUnit ? new IOSPerformanceAdUnit(parameters) : new PerformanceAdUnit(parameters);
 
-        let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
-
+        let performanceOverlayEventHandler: PerformanceOverlayEventHandler | PerfomanceOverlayEventHandlerWithAmination;
+        const abGroup = parameters.coreConfig.getAbGroup();
         const storeHandlerParameters: IStoreHandlerParameters = {
             platform: parameters.platform,
             core: parameters.core,
@@ -41,8 +46,11 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
             deviceIdManager: parameters.deviceIdManager
         };
         const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
-
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
+        if (AnimationEndCardTest.isValid(abGroup)) {
+            performanceOverlayEventHandler = new PerfomanceOverlayEventHandlerWithAmination(performanceAdUnit, parameters, storeHandler);
+        } else {
+            performanceOverlayEventHandler =  new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
+        }
         parameters.overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, parameters, storeHandler);
         parameters.endScreen.addEventHandler(endScreenEventHandler);

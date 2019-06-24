@@ -25,6 +25,9 @@ import { ABGroup } from 'Core/Models/ABGroup';
 const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
 
 export class CometCampaignParser extends CampaignParser {
+    public static ContentType = 'comet/campaign';
+    public static ContentTypeVideo = 'comet/video';
+    public static ContentTypeMRAID = 'comet/mraid-url';
 
     private _requestManager: RequestManager;
     private _abGroup: ABGroup;
@@ -63,7 +66,7 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
-            contentType: this._contentType,
+            contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: response.getCreativeId() || undefined,
@@ -72,7 +75,8 @@ export class CometCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
 
         if(json && json.mraidUrl) {
@@ -95,9 +99,10 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                playableConfiguration: undefined
+                playableConfiguration: undefined,
+                targetGameId: json.gameId
             };
-            parameters.contentType = this._contentType = CampaignContentType.CometMRAIDUrl;
+            parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
             const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 

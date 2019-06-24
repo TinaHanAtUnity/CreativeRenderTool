@@ -8,6 +8,7 @@ BIN := node_modules/.bin
 TYPESCRIPT := $(BIN)/tsc
 REMAP_ISTANBUL := $(BIN)/remap-istanbul
 TSLINT := $(BIN)/tslint
+ESLINT := $(BIN)/eslint
 STYLUS := $(BIN)/stylus
 ROLLUP := $(BIN)/rollup
 STYLINT := $(BIN)/stylint
@@ -78,7 +79,7 @@ INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(
 BROWSER_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js $(SOURCE_BUILD_DIR)/styl/main.css $(BUILD_DIR)/browser/index.html $(BUILD_DIR)/browser/iframe.html
 DEV_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.js $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
 RELEASE_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(BUILD_DIR)/release/index.html $(BUILD_DIR)/release/config.json
-TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
+TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(TEST_BUILD_DIR)/index.html $(TEST_BUILD_DIR)/config.json
 
 # Built-in targets
 
@@ -102,15 +103,15 @@ build-test: all $(TEST_BUILD_TARGETS)
 
 test: test-unit test-integration
 
-test-unit: start-server build/test/UnitBundle.js build/test/unit-test.html
-	TEST_LIST="$(UNIT_TESTS) $(FUNCTIONAL_TESTS)" TEST_URL="http://localhost:8000/build/test/unit-test.html" node test-utils/runner.js
+test-unit: start-server $(TEST_BUILD_DIR)/UnitBundle.js $(TEST_BUILD_DIR)/unit-test.html
+	TEST_LIST="$(UNIT_TESTS) $(FUNCTIONAL_TESTS)" TEST_URL="http://localhost:8000/$(TEST_BUILD_DIR)/unit-test.html" node test-utils/runner.js
 
-test-integration: start-server build/test/IntegrationBundle.js build/test/integration-test.html
-	TEST_LIST="$(INTEGRATION_TESTS)" TEST_URL="http://localhost:8000/build/test/integration-test.html" ISOLATED=1 node test-utils/runner.js
+test-integration: start-server $(TEST_BUILD_DIR)/IntegrationBundle.js $(TEST_BUILD_DIR)/integration-test.html
+	TEST_LIST="$(INTEGRATION_TESTS)" TEST_URL="http://localhost:8000/$(TEST_BUILD_DIR)/integration-test.html" ISOLATED=1 node test-utils/runner.js
 
-test-coverage: start-server build/test/CoverageBundle.js build/test/coverage-test.html
+test-coverage: start-server $(TEST_BUILD_DIR)/CoverageBundle.js $(TEST_BUILD_DIR)/coverage-test.html
 	mkdir -p build/coverage
-	TEST_LIST="$(UNIT_TESTS) $(FUNCTIONAL_TESTS)" TEST_URL="http://localhost:8000/build/test/coverage-test.html" COVERAGE=1 node test-utils/runner.js
+	TEST_LIST="$(UNIT_TESTS) $(FUNCTIONAL_TESTS)" TEST_URL="http://localhost:8000/$(TEST_BUILD_DIR)/coverage-test.html" COVERAGE=1 node test-utils/runner.js
 	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
 	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
 	cat build/coverage/summary && echo "\n"
@@ -159,19 +160,19 @@ $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html $(SOURCE_BUILD_DI
 $(BUILD_DIR)/release/config.json:
 	INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
-$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html $(TEST_BUILD_DIR)/UnitBundle.min.js test-utils/reporter.js test-utils/setup.js
+$(TEST_BUILD_DIR)/index.html: $(SOURCE_DIR)/hybrid-test-index.html $(TEST_BUILD_DIR)/UnitBundle.min.js test-utils/reporter.js test-utils/setup.js
 	mkdir -p $(dir $@) && $(INLINE) $< $@
 
-$(BUILD_DIR)/test/config.json:
-	INPUT=$(BUILD_DIR)/test/index.html OUTPUT=$(BUILD_DIR)/test/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
+$(TEST_BUILD_DIR)/config.json:
+	INPUT=$(TEST_BUILD_DIR)/index.html OUTPUT=$(TEST_BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
 
-$(BUILD_DIR)/test/unit-test.html: $(SOURCE_DIR)/unit-test-index.html
+$(TEST_BUILD_DIR)/unit-test.html: $(SOURCE_DIR)/unit-test-index.html
 	mkdir -p $(dir $@) && cp $< $@
 
-$(BUILD_DIR)/test/integration-test.html: $(SOURCE_DIR)/integration-test-index.html
+$(TEST_BUILD_DIR)/integration-test.html: $(SOURCE_DIR)/integration-test-index.html
 	mkdir -p $(dir $@) && cp $< $@
 
-$(BUILD_DIR)/test/coverage-test.html: $(SOURCE_DIR)/coverage-test-index.html
+$(TEST_BUILD_DIR)/coverage-test.html: $(SOURCE_DIR)/coverage-test-index.html
 	mkdir -p $(dir $@) && cp $< $@
 
 # Implicit rules
@@ -242,16 +243,31 @@ $(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(H
 clean:
 	rm -rf $(BUILD_DIR)/*
 
+lint-ts: 
+	$(TSLINT) --project tsconfig.json $(TS_SOURCES)
+
+lint-es:
+	$(ESLINT) $(TS_SOURCES)
+
+lint-es-test:
+	$(ESLINT) $(TESTS)
+
+lint-es-fix:
+	$(ESLINT) --fix $(TS_SOURCES)
+
+lint-es-test-fix:
+	$(ESLINT) --fix $(TESTS)
+
 lint:
 	parallel --ungroup ::: \
 		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
-		"$(TSLINT) --project tsconfig.json $(TS_SOURCES)" \
-		"$(TSLINT) --project tsconfig.json --config test/tslint.json $(TESTS)"
+		"$(ESLINT) $(TS_SOURCES)" \
+		"$(ESLINT) $(TESTS)"
 
 lint-fix:
 	parallel --ungroup ::: \
-		"$(TSLINT) --project tsconfig.json --fix $(TS_SOURCES)" \
-		"$(TSLINT) --project tsconfig.json --config test/tslint.json --fix $(TESTS)"
+		"$(ESLINT) --fix $(TS_SOURCES)" \
+		"$(ESLINT) --fix $(TESTS)"
 
 setup: clean
 	rm -rf node_modules
@@ -275,8 +291,8 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
 		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
 		"$(ROLLUP) --watch --config rollup.config.test.integration.js" \
-		"watchman-make -p build/test/UnitBundle.js -t test-unit" \
-		"watchman-make -p build/test/IntegrationBundle.js -t test-integration"
+		"watchman-make -p $(TEST_BUILD_DIR)/UnitBundle.js -t test-unit" \
+		"watchman-make -p $(TEST_BUILD_DIR)/IntegrationBundle.js -t test-integration"
 
 start-server: 
 	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || ([ -z "$$CI" ] && (open tools/serverLauncher.command || gnome-open tools/serverLauncher.command || xdg-open tools/serverLauncher.command) || python3 -m http.server 8000 >/dev/null 2>&1 &)
@@ -288,8 +304,8 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/$(COMMIT_ID)
 	cp build/release/index.html deploy/release/index.html
 	cp build/release/config.json deploy/release/config.json
-	cp build/test/index.html deploy/test/index.html
-	cp build/test/config.json deploy/test/config.json
+	cp $(TEST_BUILD_DIR)/index.html deploy/test/index.html
+	cp $(TEST_BUILD_DIR)/config.json deploy/test/config.json
 	rsync -r deploy/release deploy/$(COMMIT_ID)
 	rsync -r deploy/test deploy/$(COMMIT_ID)
 
@@ -298,8 +314,8 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy-china/$(COMMIT_ID)
 	cp build/release/index.html deploy-china/release/index.html
 	cp build/release/config.json.cn deploy-china/release/config.json
-	cp build/test/index.html deploy-china/test/index.html
-	cp build/test/config.json.cn deploy-china/test/config.json
+	cp $(TEST_BUILD_DIR)/index.html deploy-china/test/index.html
+	cp $(TEST_BUILD_DIR)/config.json.cn deploy-china/test/config.json
 	rsync -r deploy-china/release deploy-china/$(COMMIT_ID)
 	rsync -r deploy-china/test deploy-china/$(COMMIT_ID)
 

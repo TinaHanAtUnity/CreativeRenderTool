@@ -99,6 +99,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         kafkaObject.auctionId = this._campaign.getSession().getId();
         kafkaObject.abGroup = this._coreConfig.getAbGroup();
 
+        kafkaObject.targetGameId = this._campaign.getTargetGameId();
+        kafkaObject.campaignId = this._campaign.getId();
+
         HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 

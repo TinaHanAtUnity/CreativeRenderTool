@@ -374,7 +374,7 @@ describe('Performance VideoEventHandlersTest', () => {
         };
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
-        const endScreenParams : IEndScreenParameters = {
+        const endScreenParams: IEndScreenParameters = {
             platform,
             core,
             language : 'en',
@@ -854,7 +854,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         };
         overlay = new VideoOverlay(videoOverlayParameters, xpromoPrivacy, false, false);
 
-        const xpromoEndScreenParams : IEndScreenParameters = {
+        const xpromoEndScreenParams: IEndScreenParameters = {
             platform,
             core,
             language : 'en',

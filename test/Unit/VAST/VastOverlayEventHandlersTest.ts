@@ -198,24 +198,42 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 });
             });
 
-            describe('When ad unit has an endscreen', () => {
-                it('should hide endcard', () => {
-                    vastAdUnit.setShowing(true);
-                    return vastAdUnit.hide().then(() => {
-                        const vastEndScreenParameters: IVastEndscreenParameters = {
-                            campaign: vastAdUnitParameters.campaign,
-                            clientInfo: vastAdUnitParameters.clientInfo,
-                            country: vastAdUnitParameters.coreConfig.getCountry()
-                        };
-                        const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
-                        sinon.spy(vastEndScreen, 'show');
-                        vastAdUnitParameters.endScreen = vastEndScreen;
-                        vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                        sinon.spy(vastAdUnit, 'hide');
-                        vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
-                        vastOverlayEventHandler.onOverlaySkip(1);
-                        sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
-                    });
+            it('should show endcard', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    const vastEndScreenParameters: IVastEndscreenParameters = {
+                        campaign: vastAdUnitParameters.campaign,
+                        clientInfo: vastAdUnitParameters.clientInfo,
+                        country: vastAdUnitParameters.coreConfig.getCountry()
+                    };
+                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    sinon.spy(vastEndScreen, 'show');
+                    vastAdUnitParameters.endScreen = vastEndScreen;
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setImpressionOccurred();
+                    sinon.spy(vastAdUnit, 'hide');
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+                });
+            });
+
+            it('should not show endcard if the impression has not occurred', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    const vastEndScreenParameters: IVastEndscreenParameters = {
+                        campaign: vastAdUnitParameters.campaign,
+                        clientInfo: vastAdUnitParameters.clientInfo,
+                        country: vastAdUnitParameters.coreConfig.getCountry()
+                    };
+                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    sinon.spy(vastEndScreen, 'show');
+                    vastAdUnitParameters.endScreen = vastEndScreen;
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    sinon.spy(vastAdUnit, 'hide');
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
                 });
             });
         });
@@ -226,6 +244,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setVolume(1);
                     vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
                 });
             });
@@ -255,14 +274,22 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
             it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 0);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
             it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
-                sinon.assert.called(<sinon.SinonStub>om!.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 1);
             });
         });
 

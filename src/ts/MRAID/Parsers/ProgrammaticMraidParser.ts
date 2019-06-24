@@ -5,8 +5,6 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { Platform } from 'Core/Constants/Platform';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export interface IRawMRAIDCampaign extends IRawPerformanceCampaign {
     markup?: string;
@@ -14,10 +12,7 @@ export interface IRawMRAIDCampaign extends IRawPerformanceCampaign {
 
 export class ProgrammaticMraidParser extends CampaignParser {
 
-    constructor(platform: Platform) {
-        super(platform);
-        this._contentType = CampaignContentType.ProgrammaticMRAID;
-    }
+    public static ContentType = 'programmatic/mraid';
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = <IRawMRAIDCampaign>response.getJsonContent();
@@ -39,7 +34,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-            contentType: this._contentType,
+            contentType: ProgrammaticMraidParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
@@ -48,7 +43,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            backupCampaign: false,
+            isLoadEnabled: false
         };
 
         const parameters: IMRAIDCampaign = {
@@ -70,7 +66,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             store: undefined,
             appStoreId: undefined,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking() || false,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

@@ -6,7 +6,18 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
-export type IAnalyticsMessage = {};
+// tslint:disable-next-line
+export interface IAnalyticsMessage {}
+/*
+TODO: IAnalyticsMessage should be refactored in following PRs.
+
+Looking at the code all analytic messages share the same field `ts`.
+Therefore this interface can be refactored to:
+
+export interface IAnalyticsMessage {
+    ts: number;
+}
+*/
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;

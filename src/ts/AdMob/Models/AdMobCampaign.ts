@@ -2,7 +2,6 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { Model } from 'Core/Models/Model';
-import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IAdMobVideo {
     mediaFileURL: string;

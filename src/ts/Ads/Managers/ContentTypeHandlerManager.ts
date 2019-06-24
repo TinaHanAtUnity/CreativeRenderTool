@@ -32,8 +32,4 @@ export class ContentTypeHandlerManager {
         throw new Error(`Unsupported content-type: ${contentType}`);
     }
 
-    public getContentTypes(): string[] {
-        return Object.keys(this._parsers);
-    }
-
 }

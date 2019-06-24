@@ -17,7 +17,7 @@ export enum DeviceIdStorageKeys {
 }
 
 export class DeviceIdManager {
-    private _core : ICoreApi;
+    private _core: ICoreApi;
     private _deviceInfo: AndroidDeviceInfo;
 
     constructor(core: ICoreApi, deviceInfo: AndroidDeviceInfo) {
@@ -85,11 +85,21 @@ export class DeviceIdManager {
      * @param isOptOutEnabled The consent response from user.
      * @returns True if collecting device ID is okay, else false.
      */
-    public isCompliant(country: string, isOptOutEnabled: boolean): boolean {
-        return country === 'CN'
-            && !this._deviceInfo.getAdvertisingIdentifier()
-            && !this._deviceInfo.getLimitAdTracking()
-            && !isOptOutEnabled;
+    public isCompliant(country: string, isGDPREnabled: boolean, isOptOutRecorded: boolean, isOptOutEnabled: boolean): boolean {
+        if (country === 'CN' && !this._deviceInfo.getAdvertisingIdentifier() && !this._deviceInfo.getLimitAdTracking() && this._deviceInfo instanceof AndroidDeviceInfo) {
+            Diagnostics.trigger('china_compliant_check', {
+                isGDPREnabled: isGDPREnabled,
+                isOptOutRecorded: isOptOutRecorded,
+                isOptOutEnabled: isOptOutEnabled
+            });
+
+            if (isGDPREnabled) {
+                return isOptOutRecorded && !isOptOutEnabled;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     private fetchDeviceIds(): Promise<void> {

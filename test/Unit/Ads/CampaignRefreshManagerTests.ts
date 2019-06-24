@@ -24,7 +24,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
@@ -34,12 +34,15 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
+
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
@@ -55,7 +58,6 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IStoreApi } from 'Store/IStore';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -112,6 +114,7 @@ describe('CampaignRefreshManager', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
+    let coreModule: ICore;
     let ads: IAdsApi;
     let store: IStoreApi;
     let request: RequestManager;
@@ -142,7 +145,8 @@ describe('CampaignRefreshManager', () => {
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        core = TestFixtures.getCoreApi(nativeBridge);
+        coreModule = TestFixtures.getCoreModule(nativeBridge);
+        core = coreModule.Api;
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
         privacy = sinon.createStubInstance(AbstractPrivacy);
@@ -218,7 +222,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -423,7 +427,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
-                campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
+                campaignRefreshManager.setCurrentAdUnit(currentAdUnit, placement);
                 currentAdUnit.onStart.trigger();
 
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
@@ -460,7 +464,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
-                campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
+                campaignRefreshManager.setCurrentAdUnit(currentAdUnit, placement);
                 currentAdUnit.onStart.trigger();
 
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
@@ -619,7 +623,7 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -630,7 +634,7 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as ready', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign(CampaignContentType.IAPPromotion), undefined);
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
                 return Promise.resolve();
             });
 
@@ -642,7 +646,7 @@ describe('CampaignRefreshManager', () => {
                 assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '000000000000000000000123');
-                    assert.equal(tmpCampaign.getAdType(), CampaignContentType.IAPPromotion);
+                    assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
                 }
 
                 assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.READY);
@@ -652,7 +656,7 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as nofill if product is not available', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign(CampaignContentType.IAPPromotion), undefined);
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
                 return Promise.resolve();
             });
 
