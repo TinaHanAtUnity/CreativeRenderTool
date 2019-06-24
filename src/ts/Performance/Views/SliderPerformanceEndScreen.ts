@@ -1,6 +1,5 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
-import { ICoreApi } from 'Core/ICore';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { Template } from 'Core/Utilities/Template';
