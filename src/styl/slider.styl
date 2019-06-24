@@ -12,13 +12,19 @@ $slider-experiment-dot-margin = 5px;
     overflow: hidden;
 }
 
+#slider-list {
+    height: 100%;
+}
+
 #slider-root-container {
     overflow: hidden;
     height: 100%;
     .slider-content {
-        position: relative;
-        z-index: 2;
         height: 100%;
+        position: relative;
+        left: 0;
+        top: 0;
+        display: block;
     }
     .slider-blurred-background {
         position: absolute;
@@ -35,27 +41,14 @@ $slider-experiment-dot-margin = 5px;
         text-decoration: none;
     }
     .slider-item {
-        position: relative;
-        z-index: 2;
         float: left;
         height: 100%;
-        overflow: hidden;
-        object-fit: cover;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         img {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            max-width: 100%;
-            max-height: 100%;
-            transform: translate(-50%, -50%) scale(.9);
-            height: 100%;
-            object-fit: cover;
-            pointer-events: all;
+            max-height: 90%;
+            margin: 0 .5em;
         }
     }
     .indicator-container {
@@ -76,7 +69,6 @@ $slider-experiment-dot-margin = 5px;
                 height: $slider-experiment-dot-radius;
                 border-radius: 50%;
                 background-color: $slider-experiment-dot-color;
-
                 &.active {
                     background-color: $slider-experiment-dot-active-color;
                 }
@@ -85,10 +77,14 @@ $slider-experiment-dot-margin = 5px;
     }
 }
 
-#slider-root-container.landscape-slider-images {
+.portrait #slider-root-container.landscape-slider-images {
     .slider-item img {
-        left: 95%;
-        transform: translate(-50%, -50%) scale(.95);
-        object-fit: cover;
+       max-width: 85VW;
+    }
+}
+
+.landscape #slider-root-container.landscape-slider-images {
+    .slider-item img {
+        max-width: 48VW;
     }
 }
