@@ -42,8 +42,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected _placement: Placement;
     protected _orientation: Orientation;
 
-    private _platform: Platform;
-    private _core: ICoreApi;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
     private _ads: IAdsApi;
     private _store: IStoreApi;
     private _focusManager: FocusManager;

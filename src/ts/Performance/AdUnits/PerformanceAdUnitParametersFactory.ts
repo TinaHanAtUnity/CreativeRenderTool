@@ -19,15 +19,19 @@ import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimationEndCardTest, RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
 import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
 import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
     private _downloadManager: DownloadManager;
     private _deviceIdManager: DeviceIdManager;
+    private _osVersion: string;
 
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
 
+        this._osVersion = core.DeviceInfo.getOsVersion();
         this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
@@ -48,9 +52,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         let endScreen: PerformanceEndScreen;
         const abGroup = baseParams.coreConfig.getAbGroup();
 
+        const osVersion = this._core.DeviceInfo.getOsVersion();
+        const isAndroid4 = this._platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, this._osVersion);
+
         if (AnimationEndCardTest.isValid(abGroup)) {
             endScreen = new AnimatedPerfomanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (RedesignedEndScreenDesignTest.isValid(abGroup)) {
+        } else if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
             endScreenParameters.id = 'redesigned-end-screen';
             endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
