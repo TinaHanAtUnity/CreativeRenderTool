@@ -512,7 +512,6 @@ export class Ads implements IAds {
                 if (this._loadApiEnabled) {
                     this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledShow);
                 }
-                this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignDidShowAdInBackground);
             });
         });
     }
