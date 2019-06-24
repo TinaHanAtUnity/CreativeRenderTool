@@ -9,14 +9,7 @@ import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.js
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 
-const CheetahGameIds = setGameIds(CheetahGamesJson);
-const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const Game7GameIds = setGameIds(Game7GamesJson);
-const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
-
 const SliderEndScreenImages = JSON.parse(SliderEndScreenImagesJson);
-
-function setGameIds(gameIdJson: string): string[] {
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];

@@ -18,7 +18,6 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
 
@@ -36,7 +35,6 @@ export class CometCampaignParser extends CampaignParser {
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._requestManager = core.RequestManager;
-        this._contentType = CampaignContentType.CometVideo;
         this._abGroup = core.Config.getAbGroup();
         this._core = core;
     }

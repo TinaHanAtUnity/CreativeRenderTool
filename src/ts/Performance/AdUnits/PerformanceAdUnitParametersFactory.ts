@@ -47,11 +47,11 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        let endScreen: PerformanceEndScreen;
+        let endScreen: PerformanceEndScreen |  SliderPerformanceEndScreen;
         const abGroup = baseParams.coreConfig.getAbGroup();
 
         if (baseParams.campaign instanceof SliderPerformanceCampaign) {
-            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign);
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (AnimationEndCardTest.isValid(abGroup)) {
             endScreen = new AnimatedPerfomanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
