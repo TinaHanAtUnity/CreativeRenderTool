@@ -8,7 +8,7 @@ export enum PrivacyMethod {
 }
 
 export interface IAllPermissions {
-    all: true;
+    all: boolean;
 }
 
 export interface IGranularPermissions {
