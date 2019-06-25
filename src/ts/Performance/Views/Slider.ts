@@ -22,6 +22,8 @@ export interface IDragOptions {
 
 type OnSlideCallback = (options: { automatic: boolean }) => void;
 type OnDownloadCallback = (event: Event) => void;
+type VoidCallback = () => void;
+
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
 export class Slider {
@@ -110,7 +112,7 @@ export class Slider {
         this.initializeTouchEvents();
     }
 
-    private prepareIndicators(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: String) {
+    private prepareIndicators(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
         const indicatorContainer = document.createElement('div');
@@ -417,14 +419,14 @@ export class Slider {
         this.autoplay();
     }
 
-    private animateSlide(targetTransitionPosition: number, callback: any) {
+    private animateSlide(targetTransitionPosition: number, callback: VoidCallback) {
         this.applyTransition();
         targetTransitionPosition = Math.ceil(targetTransitionPosition);
         this._slidesContainer.style[this._transformPropertyName] = `translate3d( ${targetTransitionPosition}px, 0px, 0px)`;
         if (callback) {
             setTimeout(() => {
                 this.disableTransition();
-                callback.call();
+                callback();
             }, this._slideSpeed);
         }
     }
