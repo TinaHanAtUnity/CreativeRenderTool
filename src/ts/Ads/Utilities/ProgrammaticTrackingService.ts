@@ -47,8 +47,8 @@ export enum VastMetric {
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-    CampaignAttemptedToShowInBackground = 'ad_attempted_show_background',
-    CampaignAttemptedToShowAdInBackground = 'ad_attempted_showad_background'
+    CampaignAttemptedToShowAdInBackground = 'ad_attempted_showad_background',
+    CampaignAboutToShowAdInBackground = 'ad_aboutto_showad_background'
 }
 
 export enum LoadMetric {
@@ -57,7 +57,8 @@ export enum LoadMetric {
     LoadEnabledNoFill = 'load_enabled_no_fill',
     LoadEnabledShow = 'load_enabled_show',
     LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
-    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure'
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure',
+    LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
 export enum PurchasingMetric {

@@ -2,7 +2,6 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
@@ -48,7 +47,6 @@ export interface IAds extends IApiModule {
     InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
     SessionManager: SessionManager;
     MissedImpressionManager: MissedImpressionManager;
-    BackupCampaignManager: BackupCampaignManager;
     ContentTypeHandlerManager: ContentTypeHandlerManager;
     Config: AdsConfiguration;
     Container: Activity | ViewController;
