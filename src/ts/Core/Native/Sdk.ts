@@ -1,7 +1,12 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Enum } from 'protobufjs';
 
 export type ClientInfoData = [string, boolean, string, string, number, string, boolean, string, string, string | null, string | null, number, boolean];
+
+export enum InitErrorCode {
+    Unknown = 0
+}
 
 export class SdkApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {

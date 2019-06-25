@@ -37,7 +37,7 @@ import { ListenerApi } from 'Core/Native/Listener';
 import { PermissionsApi } from 'Core/Native/Permissions';
 import { RequestApi } from 'Core/Native/Request';
 import { ResolveApi } from 'Core/Native/Resolve';
-import { SdkApi } from 'Core/Native/Sdk';
+import { SdkApi, InitErrorCode } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
@@ -239,25 +239,24 @@ export class Core implements ICore {
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
             this.Api.Sdk.initComplete();
-        }).catch((e: Error) => {
-            jaegerInitSpan.addAnnotation(e.message);
+        }).catch((error: Error) => {
+            jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, e.message);
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
             if (this.JaegerManager) {
                 this.JaegerManager.stop(jaegerInitSpan);
             }
 
-            if(e instanceof ConfigError) {
+            if(error instanceof ConfigError) {
                 // tslint:disable-next-line
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], e.message);
-            } else if(e.name === 'DisabledGame') {
+                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error.name === 'DisabledGame') {
                 return;
             }
 
-            // TODO needs a better code.
-            this.Api.Sdk.initError(e.message, 0);
-            this.Api.Sdk.logError(`Initialization error: ${e.message}, ${e.stack}`);
-            Diagnostics.trigger('initialization_error', e);
+            this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
+            this.Api.Sdk.logError(`Initialization error: ${error.message}, ${error.stack}`);
+            Diagnostics.trigger('initialization_error', error);
         });
     }
 
