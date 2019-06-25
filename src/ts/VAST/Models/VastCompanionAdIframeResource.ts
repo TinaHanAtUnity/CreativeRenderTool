@@ -10,15 +10,13 @@ export class VastCompanionAdIframeResource extends Model<IVastCompanionAdIframeR
     constructor(id: string | null, height: number, width: number, iframeResourceURL?: string | null) {
         super('VastCompanionAdIframeResource', {
             id: ['string', 'null'],
-            height: ['number'],
-            width: ['number'],
             type: ['string'],
+            width: ['number'],
+            height: ['number'],
             iframeResourceURL: ['string', 'null']
         });
 
         this.set('id', id || null);
-        this.set('height', height);
-        this.set('width', width);
         this.set('type', VastCompanionAdType.IFRAME);
         this.set('width', width);
         this.set('height', height);

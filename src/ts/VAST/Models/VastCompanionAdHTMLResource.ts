@@ -10,15 +10,13 @@ export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResou
     constructor(id: string | null, height: number, width: number, htmlResourceURL?: string | null) {
         super('VastCompanionAdHTMLResource', {
             id: ['string', 'null'],
-            height: ['number'],
-            width: ['number'],
             type: ['string'],
+            width: ['number'],
+            height: ['number'],
             htmlResourceContent: ['string', 'null']
         });
 
         this.set('id', id || null);
-        this.set('height', height);
-        this.set('width', width);
         this.set('type', VastCompanionAdType.HTML);
         this.set('width', width);
         this.set('height', height);
