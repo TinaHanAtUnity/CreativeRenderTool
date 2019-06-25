@@ -1,6 +1,14 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { CurrentUnityConsentVersion, GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import {
+    CurrentUnityConsentVersion,
+    GamePrivacy,
+    IProfilingPermissions,
+    IGranularPermissions,
+    PrivacyMethod,
+    UserPrivacy,
+    IAllPermissions
+} from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -60,20 +68,43 @@ export class AdsConfigurationParser {
     }
 
     // For #incident-20190516-2
-    private static isUserPrivacyAndOptOutDesynchronized(configJson: IRawAdsConfiguration) {
+    public static isUserPrivacyAndOptOutDesynchronized(configJson: IRawAdsConfiguration) {
         if (!configJson.userPrivacy) {
             return false;
         }
         if (!configJson.optOutRecorded) {
             return false;
         }
-        const uPP = configJson.userPrivacy.permissions;
-        const configProfiling = uPP.hasOwnProperty('profiling') && (<IProfilingPermissions>uPP).profiling;
-        const configAds = uPP.hasOwnProperty('ads') && (<IGranularPermissions>uPP).ads;
-        if (!configProfiling && !configAds) {
+        if (!configJson.gamePrivacy) {
             return false;
         }
-        return !configJson.optOutEnabled;
+        if (configJson.gamePrivacy.method !== PrivacyMethod.LEGITIMATE_INTEREST) {
+            return false;
+        }
+        const uPP = configJson.userPrivacy.permissions;
+        if (uPP.hasOwnProperty('profiling') && uPP.hasOwnProperty('ads')) {
+            Diagnostics.trigger('ads_configuration_user_privacy_inconsistent', {
+                userPrivacy: JSON.stringify(configJson.userPrivacy),
+                gamePrivacy: JSON.stringify(configJson.gamePrivacy)});
+            configJson.userPrivacy = undefined;
+            return false;
+        }
+
+        let adsAllowed = false;
+        if (uPP.hasOwnProperty('all')) {
+            adsAllowed = (<IAllPermissions>uPP).all;
+        }
+        if (uPP.hasOwnProperty('profiling')) {
+            adsAllowed = (<IProfilingPermissions>uPP).profiling;
+        }
+        if (uPP.hasOwnProperty('ads')) {
+            adsAllowed = (<IGranularPermissions>uPP).ads;
+        }
+        if (adsAllowed === false && configJson.optOutEnabled === false) {
+            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(configJson));
+            return true;
+        }
+        return false;
     }
 
     private static parseGamePrivacy(configJson: IRawAdsConfiguration) {

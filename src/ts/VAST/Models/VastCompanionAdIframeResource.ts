@@ -8,18 +8,20 @@ interface IVastCompanionAdIframeResource extends IVastCreativeCompanionAd {
 export class VastCompanionAdIframeResource extends Model<IVastCompanionAdIframeResource> {
 
     constructor(id: string | null, height: number, width: number, iframeResourceURL?: string | null) {
-        super('VastCreativeCompanionAd', {
+        super('VastCompanionAdIframeResource', {
             id: ['string', 'null'],
             height: ['number'],
             width: ['number'],
             type: ['string'],
-            iframeResourceURL: ['string']
+            iframeResourceURL: ['string', 'null']
         });
 
         this.set('id', id || null);
         this.set('height', height);
         this.set('width', width);
         this.set('type', VastCompanionAdType.IFRAME);
+        this.set('width', width);
+        this.set('height', height);
         this.set('iframeResourceURL', iframeResourceURL || null);
     }
 

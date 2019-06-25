@@ -8,7 +8,7 @@ interface IVastCompanionAdHTMLResource extends IVastCreativeCompanionAd {
 export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResource> {
 
     constructor(id: string | null, height: number, width: number, htmlResourceURL?: string | null) {
-        super('VastCreativeCompanionAd', {
+        super('VastCompanionAdHTMLResource', {
             id: ['string', 'null'],
             height: ['number'],
             width: ['number'],
@@ -20,6 +20,8 @@ export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResou
         this.set('height', height);
         this.set('width', width);
         this.set('type', VastCompanionAdType.HTML);
+        this.set('width', width);
+        this.set('height', height);
         this.set('htmlResourceContent', htmlResourceURL || null);
     }
 

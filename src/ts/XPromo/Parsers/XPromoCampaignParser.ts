@@ -44,7 +44,6 @@ export class XPromoCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 

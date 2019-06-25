@@ -1,4 +1,49 @@
-# Staged
+# Tue Jun 25 17:14:41 UTC 2019
+
+* Added handling of 'all: true' to incident fix [#10316](https://github.com/Applifier/unity-ads-webview/pull/10316)
+* Remove incorrect 'ad_did_showad_background' kibana log [#10369](https://github.com/Applifier/unity-ads-webview/pull/10369)
+* Allowing vast end card size minimum to 200 x 200 from 320 x 480 [#10321](https://github.com/Applifier/unity-ads-webview/pull/10321)
+* Block Unnecessary Load Calls to Auction [#10320](https://github.com/Applifier/unity-ads-webview/pull/10320)
+* Move AuctionRequest from Banners/Utilities => Ads/Networking [#10323](https://github.com/Applifier/unity-ads-webview/pull/10323)
+* Remove all backup campaign code [#10317](https://github.com/Applifier/unity-ads-webview/pull/10317)
+* Remove consent ab test [#10370](https://github.com/Applifier/unity-ads-webview/pull/10370)
+
+# Fri Jun 21 22:57:46 UTC 2019
+
+* Adding more logs for #incident-20190605-1 [#10322](https://github.com/Applifier/unity-ads-webview/pull/10322)
+
+# Thu Jun 20 09:19:11 UTC 2019
+
+* Add diagnostics for privacy sanitization [#10293](https://github.com/Applifier/unity-ads-webview/pull/10293)
+
+# Wed Jun 19 22:07:53 UTC 2019
+
+* Setup model for HTML and IFrame companion ad for VAST - part 1 [#10159](https://github.com/Applifier/unity-ads-webview/pull/10159)
+* Add Diagnostics to track #incident-20190605-1 [#10289](https://github.com/Applifier/unity-ads-webview/pull/10289)
+* Reverse the Load AB Test to 90% of Select Game Traffic [#10237](https://github.com/Applifier/unity-ads-webview/pull/10237)
+* Send Store Transaction Data Correctly [#10290](https://github.com/Applifier/unity-ads-webview/pull/10290)
+
+# Wed Jun 19 12:27:27 UTC 2019
+
+* There was a bug in the sanitizer, fixed and added tests [#10209](https://github.com/Applifier/unity-ads-webview/pull/10209)
+
+# Tue Jun 18 23:50:11 UTC 2019
+
+* Fix AdmobAdUnitTest failures in Hybrid Tests [#10212](https://github.com/Applifier/unity-ads-webview/pull/10212)
+* Add fields 'targetGameId' and 'campaignId' to Playable Ad Events [#8523](https://github.com/Applifier/unity-ads-webview/pull/8523)
+* UADSSDK-82 : Api's crashing iOS apps [#10157](https://github.com/Applifier/unity-ads-webview/pull/10157)
+* Fix Endcard Animation [#10155](https://github.com/Applifier/unity-ads-webview/pull/10155)
+* Introduce Consent AB Test Removing the Unity Logo [#10185](https://github.com/Applifier/unity-ads-webview/pull/10185)
+* Turn on Store API [#10156](https://github.com/Applifier/unity-ads-webview/pull/10156)
+* Improved Unit Tests for MOAT View [#10105](https://github.com/Applifier/unity-ads-webview/pull/10105)
+* Improve Makefile (part of integration test update) [#10210](https://github.com/Applifier/unity-ads-webview/pull/10210)
+* Update Test Job URLs in README [#10131](https://github.com/Applifier/unity-ads-webview/pull/10131)
+
+# Tue Jun 18 10:39:27 UTC 2019
+
+* Stop sending sanitization events [#10186](https://github.com/Applifier/unity-ads-webview/pull/10186)
+
+# Tue Jun 18 08:57:29 UTC 2019
 
 * Fix for #incident-20190516-2 [#9987](https://github.com/Applifier/unity-ads-webview/pull/9987)
 

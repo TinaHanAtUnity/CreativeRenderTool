@@ -1,5 +1,4 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { INativeResponse } from 'Core/Managers/RequestManager';
@@ -13,7 +12,7 @@ export abstract class RefreshManager {
     public abstract getCampaign(placementId: string): Campaign | undefined;
     public abstract setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void;
     public abstract refresh(nofillRetry?: boolean): Promise<INativeResponse | void>;
-    public abstract refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]>;
+    public abstract initialize(): Promise<INativeResponse | void>;
     public abstract shouldRefill(timestamp: number): boolean;
     public abstract setPlacementState(placementId: string, placementState: PlacementState): void;
     public abstract sendPlacementStateChanges(placementId: string): void;
