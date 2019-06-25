@@ -1,6 +1,7 @@
 # Pending
 
 * Add iphone x styles and china watermark for xpromo [#10371](https://github.com/Applifier/unity-ads-webview/pull/10371)
+* Move Analytics to Ads [#10319](https://github.com/Applifier/unity-ads-webview/pull/10319)
 
 # Tue Jun 25 17:14:41 UTC 2019
 
