@@ -70,7 +70,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 session: session,
                 mediaId: response.getMediaId(),
                 trackingUrls: response.getTrackingUrls() || {},
-                backupCampaign: false
+                isLoadEnabled: false
             };
 
             const adMobCampaignParams: IAdMobCampaign = {

@@ -65,7 +65,7 @@ export class CometCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            isLoadEnabled: false
         };
 
         if(json && json.mraidUrl) {
@@ -88,7 +88,8 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                playableConfiguration: undefined
+                playableConfiguration: undefined,
+                targetGameId: json.gameId
             };
             parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 

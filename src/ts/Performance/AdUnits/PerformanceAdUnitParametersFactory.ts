@@ -5,11 +5,19 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { AnimatedPerfomanceEndScreen } from 'Performance/Views/AnimatedPerfomanceEndScreen';
+import { AnimationEndCardTest } from 'Core/Models/ABGroup';
+
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { IChina } from 'China/IChina';
+import { Campaign } from 'Ads/Models/Campaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -26,8 +34,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
-        const showPrivacyDuringVideo = baseParams.placement.skipEndCardOnClose() || false;
-        const overlay = this.createOverlay(baseParams, baseParams.privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(baseParams, baseParams.privacy);
 
         const adUnitStyle: AdUnitStyle = baseParams.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
@@ -37,7 +44,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        let endScreen: PerformanceEndScreen;
+        const abGroup = baseParams.coreConfig.getAbGroup();
+
+        if (AnimationEndCardTest.isValid(abGroup)) {
+            endScreen = new AnimatedPerfomanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
@@ -49,5 +64,24 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             downloadManager: this._downloadManager,
             deviceIdManager: this._deviceIdManager
         };
+    }
+
+    private createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
+        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
+        const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
+
+        let overlay: VideoOverlay;
+        const abGroup = parameters.coreConfig.getAbGroup();
+        if (AnimationEndCardTest.isValid(abGroup)) {
+            overlay = new AnimatedVideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        } else {
+            overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        }
+
+        if (parameters.placement.disableVideoControlsFade()) {
+            overlay.setFadeEnabled(false);
+        }
+
+        return overlay;
     }
 }

@@ -6,7 +6,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 import { EventType } from 'Ads/Models/Session';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -25,7 +25,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
@@ -60,29 +59,34 @@ export interface IInfoJson {
     auctionId: string;
     gameSessionId: number;
     campaignId: string;
-    adType?: string;
-    correlationId?: string;
-    seatId?: number;
     placementId: string;
-    advertisingTrackingId?: string | null;
-    limitAdTracking?: boolean;
     osVersion: string;
-    sid?: string;
     deviceModel: string;
     sdkVersion: number;
-    previousPlacementId?: string;
     bundleId: string;
-    meta?: string;
     platform: string;
     language: string;
     cached: boolean;
-    cachedOrientation?: 'landscape' | 'portrait';
     token: string;
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
-    privacy: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
+    networkType: number;
+    connectionType: string;
+    screenWidth: number;
+    screenHeight: number;
+    deviceFreeSpace: number;
+    adType?: string;
+    correlationId?: string;
+    seatId?: number;
+    advertisingTrackingId?: string | null;
+    limitAdTracking?: boolean;
+    sid?: string;
+    previousPlacementId?: string;
+    meta?: string;
+    cachedOrientation?: 'landscape' | 'portrait';
+    privacy?: IRequestPrivacy;
     apiLevel?: number;
     deviceMake?: string;
     screenDensity?: number;
@@ -91,10 +95,6 @@ export interface IInfoJson {
     videoOrientation?: string;
     webviewUa?: string;
     adUnitStyle?: { [key: string]: unknown };
-    networkType: number;
-    connectionType: string;
-    screenWidth: number;
-    screenHeight: number;
     mediationName?: string;
     mediationVersion?: string;
     mediationOrdinal?: number;
@@ -102,8 +102,7 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     imei?: string;
-    isBackupCampaign: boolean;
-    deviceFreeSpace: number;
+    isLoadEnabled: boolean;
 }
 
 export class OperativeEventManager {
@@ -402,8 +401,8 @@ export class OperativeEventManager {
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
-                'isBackupCampaign': this._campaign.isBackupCampaign(),
-                'deviceFreeSpace': session.getDeviceFreeSpace()
+                'deviceFreeSpace': session.getDeviceFreeSpace(),
+                'isLoadEnabled': this._campaign.isLoadEnabled()
             };
 
             if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

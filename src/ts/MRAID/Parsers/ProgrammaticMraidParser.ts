@@ -2,10 +2,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
@@ -46,7 +43,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            isLoadEnabled: false
         };
 
         const parameters: IMRAIDCampaign = {
@@ -68,7 +65,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             store: undefined,
             appStoreId: undefined,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking() || false,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));
