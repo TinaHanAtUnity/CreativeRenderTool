@@ -6,6 +6,7 @@
 * Block Unnecessary Load Calls to Auction [#10320](https://github.com/Applifier/unity-ads-webview/pull/10320)
 * Move AuctionRequest from Banners/Utilities => Ads/Networking [#10323](https://github.com/Applifier/unity-ads-webview/pull/10323)
 * Remove all backup campaign code [#10317](https://github.com/Applifier/unity-ads-webview/pull/10317)
+* Remove consent ab test [#10370](https://github.com/Applifier/unity-ads-webview/pull/10370)
 
 # Fri Jun 21 22:57:46 UTC 2019
 
