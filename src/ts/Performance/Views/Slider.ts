@@ -57,7 +57,7 @@ export class Slider {
         this._onDownloadCallback = onDownloadCallback;
         this._currentSlide = 0;
         const imageOrientationClassNamePrefix = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 'landscape' : 'portrait';
-        this._rootElement = this.createElement('div', 'slider-root-container', [ `${imageOrientationClassNamePrefix}-slider-images`]);
+        this._rootElement = this.createElement('div', 'slider-root-container', [`${imageOrientationClassNamePrefix}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this._drag = this.clearDrag();
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
@@ -65,15 +65,23 @@ export class Slider {
         this._isInterrupted = false;
         this._slideSpeed = 300;
         this._minimalSwipeLength = 60;
-        // TODO: Make sure we always have 4 images
-        // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
+
         this._imageUrls = [];
         if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
-            this._imageUrls.push(portraitImage, urls[0], urls[1], urls[2]);
+            this.addImageToList(portraitImage, urls);
         } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
-            this._imageUrls.push(landscapeImage, urls[0], urls[1], urls[2]);
+            this.addImageToList(landscapeImage, urls);
         } else {
-            this._imageUrls.push(urls[1], urls[2], urls[0]);
+            // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
+            if (urls[1] !== undefined) {
+                this._imageUrls.push(urls[1]);
+            }
+            if (urls[2] !== undefined) {
+                this._imageUrls.push(urls[2]);
+            }
+            if (urls[0] !== undefined) {
+                this._imageUrls.push(urls[0]);
+            }
         }
 
         const allSlidesCreatedPromise: Promise<HTMLElement | null>[] = [];
@@ -101,6 +109,19 @@ export class Slider {
             this.init();
             this._ready = null;
         });
+    }
+
+    private addImageToList(mainImage: string, urls: string[]): void {
+        this._imageUrls.push(mainImage);
+        if (urls[0] !== undefined) {
+            this._imageUrls.push(urls[0]);
+        }
+        if (urls[1] !== undefined) {
+            this._imageUrls.push(urls[1]);
+        }
+        if (urls[2] !== undefined) {
+            this._imageUrls.push(urls[2]);
+        }
     }
 
     private init(): void {
@@ -284,7 +305,7 @@ export class Slider {
         return index;
     }
 
-    private getSwipableIndexes () {
+    private getSwipableIndexes() {
         const indexes = [];
         for (const slide of this._slidesContainer.children) {
             if (slide && slide.hasAttribute('slide-index')) {
@@ -412,7 +433,7 @@ export class Slider {
         this.updateIndicators();
     }
 
-    private postSlide () {
+    private postSlide() {
         this._isAnimating = false;
         this.setPosition();
         this._swipeLeft = null;
@@ -446,7 +467,7 @@ export class Slider {
 
     private getTransitionPosition(slideIndex: number): number {
         let targetTransitionPosition: number;
-        const targetSlide =  <HTMLElement>this._slidesContainer.children[slideIndex + 2];
+        const targetSlide = <HTMLElement>this._slidesContainer.children[slideIndex + 2];
         targetTransitionPosition = targetSlide ? targetSlide.offsetLeft * -1 : 0;
         targetTransitionPosition += (this.getWidth(this._rootElement) - targetSlide.offsetWidth) / 2;
         return targetTransitionPosition;
@@ -478,7 +499,7 @@ export class Slider {
                 this._slidesContainer.insertBefore(clone, this._slidesContainer.firstChild);
             }
         }
-        for (let i = 0; i < infiniteCount  + this._slideCount; i += 1) {
+        for (let i = 0; i < infiniteCount + this._slideCount; i += 1) {
             slideIndex = i;
             let clone = this._slides[slideIndex];
             if (clone) {
