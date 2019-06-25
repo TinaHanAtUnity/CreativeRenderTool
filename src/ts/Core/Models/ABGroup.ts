@@ -72,4 +72,3 @@ export const AnimationEndCardTest = new ZyngaFilteredABTest(7, 8);
 export const ZyngaLoadTest = new ABTest(14, 15);
 export const IAPAutoLoggingTest = new ABTest(13);
 export const RedesignedEndScreenDesignTest = new ABTest(5, 6);
-//export const RedesignedEndScreenDesignTest = { isValid: (group: ABGroup) => true };w
