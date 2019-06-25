@@ -13,7 +13,7 @@ export class XPromoAdUnitParametersFactory extends AbstractAdUnitParametersFacto
         const overlay = this.createOverlay(baseParams, baseParams.privacy);
 
         const endScreenParameters = this.createEndScreenParameters(baseParams.privacy, baseParams.campaign.getGameName(), baseParams);
-        const endScreen = new XPromoEndScreen(endScreenParameters, baseParams.campaign);
+        const endScreen = new XPromoEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
