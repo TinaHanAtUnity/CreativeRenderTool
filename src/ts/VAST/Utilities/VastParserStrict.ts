@@ -512,39 +512,6 @@ export class VastParserStrict {
         return companionAd;
     }
 
-    // private parseCompanionAdStaticResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdStaticResource
-    private parseCompanionAdIframeResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
-        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
-        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
-        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCompanionAdIframeResource(id, height, width);
-
-        const iframeResourceElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
-        if (iframeResourceElement) {
-            const iframeResourceUrl = this.parseVastUrl(this.parseNodeText(iframeResourceElement), urlProtocol);
-            if (iframeResourceUrl) {
-                companionAd.setIframeResourceURL(iframeResourceUrl);
-            }
-        }
-        return companionAd;
-    }
-
-    private parseComanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
-        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
-        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
-        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
-
-        const htmlResourceElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
-        if (htmlResourceElement) {
-            const htmlResource = this.parseNodeText(htmlResourceElement);
-            if (htmlResource) {
-                companionAd.setHtmlResourceContent(htmlResource);
-            }
-        }
-        return companionAd;
-    }
-
     private parseVastUrl(maybeUrl: string, urlProtocol: string): string | undefined {
         let url: string = maybeUrl;
         // check if relative url ex: '//www.google.com/hello'
@@ -586,5 +553,4 @@ export class VastParserStrict {
 
         return hours + minutes + seconds;
     }
-
 }
