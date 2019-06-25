@@ -19,6 +19,7 @@ $slider-experiment-dot-margin = 5px;
 #slider-root-container {
     overflow: hidden;
     height: 100%;
+
     .slider-content {
         height: 100%;
         position: relative;
@@ -26,6 +27,7 @@ $slider-experiment-dot-margin = 5px;
         top: 0;
         display: block;
     }
+
     .slider-blurred-background {
         position: absolute;
         top: 0;
@@ -40,6 +42,7 @@ $slider-experiment-dot-margin = 5px;
         transform: scale(2);
         text-decoration: none;
     }
+
     .slider-item {
         float: left;
         height: 100%;
@@ -51,6 +54,7 @@ $slider-experiment-dot-margin = 5px;
             margin: 0 .5em;
         }
     }
+    
     .indicator-container {
         position: absolute;
         bottom: .35em;
@@ -58,8 +62,10 @@ $slider-experiment-dot-margin = 5px;
         display: flex;
         width: 100%;
         pointer-events: none;
+
         .slider-indicator {
             margin: 0 auto;
+            
             .slider-dot {
                 display: block;
                 float: left;
@@ -69,6 +75,7 @@ $slider-experiment-dot-margin = 5px;
                 height: $slider-experiment-dot-radius;
                 border-radius: 50%;
                 background-color: $slider-experiment-dot-color;
+                
                 &.active {
                     background-color: $slider-experiment-dot-active-color;
                 }

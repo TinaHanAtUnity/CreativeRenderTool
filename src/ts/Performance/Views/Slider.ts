@@ -29,7 +29,7 @@ export class Slider {
     private _imageUrls: string[];
     private _slidesContainer: HTMLElement;
     private _slideCount: number;
-    private _rootEl: HTMLElement;
+    private _rootElement: HTMLElement;
     private _ready: Promise<void> | null;
     private _autoplayTimeoutId: number | null;
     private _onDownloadCallback: OnDownloadCallback;
@@ -55,7 +55,7 @@ export class Slider {
         this._onDownloadCallback = onDownloadCallback;
         this._currentSlide = 0;
         const imageOrientationClassNamePrefix = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 'landscape' : 'portrait';
-        this._rootEl = this.createElement('div', 'slider-root-container', [ `${imageOrientationClassNamePrefix}-slider-images`]);
+        this._rootElement = this.createElement('div', 'slider-root-container', [ `${imageOrientationClassNamePrefix}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this._drag = this.clearDrag();
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
@@ -78,14 +78,14 @@ export class Slider {
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${urls[0]})`
         });
-        this._rootEl.appendChild(blurredBackground);
+        this._rootElement.appendChild(blurredBackground);
         this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
 
         this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
             this._slidesContainer.innerHTML = '';
-            if (slides.length && slides !== null) {
+            if (slides !== null && slides.length) {
                 this._slides = slides;
             }
             slides.forEach((slide, index) => {
@@ -95,7 +95,7 @@ export class Slider {
                 }
             });
             this._slideCount = this._slides.length;
-            this._rootEl.appendChild(this._slidesContainer);
+            this._rootElement.appendChild(this._slidesContainer);
             this.init();
             this._ready = null;
         });
@@ -130,10 +130,10 @@ export class Slider {
         slider._indicatorWrap = indicatorWrap;
         slider._indicators = indicators;
         indicatorContainer.appendChild(indicatorWrap);
-        slider._rootEl.appendChild(indicatorContainer);
+        slider._rootElement.appendChild(indicatorContainer);
 
         setTimeout(() => {
-            indicatorWrap.style.left = 20 + 'px';
+            indicatorWrap.style.left = '20px';
         }, 0);
     }
 
@@ -148,9 +148,9 @@ export class Slider {
         // Resize event
         window.addEventListener('resize', (this.resizeHandler).bind(this));
         // Touch events
-        this._rootEl.addEventListener('touchstart', (this.touchHandler).bind(this));
-        this._rootEl.addEventListener('touchmove', (this.touchHandler).bind(this));
-        this._rootEl.addEventListener('touchend', (this.touchHandler).bind(this));
+        this._rootElement.addEventListener('touchstart', (this.touchHandler).bind(this));
+        this._rootElement.addEventListener('touchmove', (this.touchHandler).bind(this));
+        this._rootElement.addEventListener('touchend', (this.touchHandler).bind(this));
     }
 
     private resizeHandler(): void {
@@ -234,7 +234,7 @@ export class Slider {
         let swipeTargetPos: number;
         let centerOffset: number;
 
-        centerOffset = Math.floor(this.getWidth(this._rootEl) / 2);
+        centerOffset = Math.floor(this.getWidth(this._rootElement) / 2);
         swipeTargetPos = (<number>this._swipeLeft * -1) + centerOffset;
         const slides = Array.from(this._slidesContainer.children);
 
@@ -405,12 +405,12 @@ export class Slider {
         this.animateSlide(targetTransitionPosition, () => {
             // slide calback
             this._onSlideCallback({ automatic: automatic });
-            this.postSlide(animSlide);
+            this.postSlide();
         });
         this.updateIndicators();
     }
 
-    private postSlide (index?: number) {
+    private postSlide () {
         this._isAnimating = false;
         this.setPosition();
         this._swipeLeft = null;
@@ -446,7 +446,7 @@ export class Slider {
         let targetTransitionPosition: number;
         const targetSlide =  <HTMLElement>this._slidesContainer.children[slideIndex + 2];
         targetTransitionPosition = targetSlide ? targetSlide.offsetLeft * -1 : 0;
-        targetTransitionPosition += (this.getWidth(this._rootEl) - targetSlide.offsetWidth) / 2;
+        targetTransitionPosition += (this.getWidth(this._rootElement) - targetSlide.offsetWidth) / 2;
         return targetTransitionPosition;
     }
 
@@ -526,7 +526,7 @@ export class Slider {
     }
 
     public attachTo(container: HTMLElement): void {
-        container.appendChild(this._rootEl);
+        container.appendChild(this._rootElement);
     }
 
     private createElement(name: string, id: string | null, className: string[] = [], style: { [key: string]: string } = {}): HTMLElement {
