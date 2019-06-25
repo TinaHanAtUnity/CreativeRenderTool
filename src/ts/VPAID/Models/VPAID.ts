@@ -28,7 +28,7 @@ export class VPAID {
     public hasCompanionAd(): boolean {
         const ad = this.vast.getAd();
         if (ad) {
-            const companions = ad.getCompanionAds();
+            const companions = ad.getCompanionAdsStatic();
             return companions.length !== 0;
         }
         return false;
@@ -37,7 +37,7 @@ export class VPAID {
     public getCompanion(): VastCompanionAdStaticResource | null {
         const ad = this.vast.getAd();
         if (ad) {
-            const companions = ad.getCompanionAds();
+            const companions = ad.getCompanionAdsStatic();
             if (companions.length) {
                 return companions[0];
             }

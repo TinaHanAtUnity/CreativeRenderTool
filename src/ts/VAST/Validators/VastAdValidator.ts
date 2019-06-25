@@ -41,7 +41,7 @@ export class VastAdValidator implements IValidator {
     }
 
     private validateCompanionAds(vastAd: VastAd) {
-        vastAd.getCompanionAds().forEach((companionAd) => {
+        vastAd.getCompanionAdsStatic().forEach((companionAd) => {
             this._errors = this._errors.concat(new VastCompanionAdStaticResourceValidator(companionAd).getErrors());
         });
     }

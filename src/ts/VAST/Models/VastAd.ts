@@ -9,7 +9,7 @@ interface IVastAd {
     id: string | null;
     creatives: VastCreative[];
     unsupportedCompanionAds: string[];
-    companionAds: VastCompanionAdStaticResource[];
+    companionAdsStatic: VastCompanionAdStaticResource[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
     wrapperURLs: string[];
@@ -19,12 +19,12 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCompanionAdStaticResource[], unsupportedCompanionAds: string[], adVerifications: VastAdVerification[]);
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCompanionAdStaticResource[], unsupportedCompanionAds?: string[], adVerifications?: VastAdVerification[]) {
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAdsStatic: VastCompanionAdStaticResource[], unsupportedCompanionAds: string[], adVerifications: VastAdVerification[]);
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAdsStatic?: VastCompanionAdStaticResource[], unsupportedCompanionAds?: string[], adVerifications?: VastAdVerification[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
-            companionAds: ['array'],
+            companionAdsStatic: ['array'],
             errorURLTemplates: ['array'],
             impressionURLTemplates: ['array'],
             wrapperURLs: ['array'],
@@ -34,7 +34,7 @@ export class VastAd extends Model<IVastAd> {
 
         this.set('id', id || null);
         this.set('creatives', creatives || []);
-        this.set('companionAds', companionAds || []);
+        this.set('companionAdsStatic', companionAdsStatic || []);
         this.set('errorURLTemplates', errorURLTemplates || []);
         this.set('impressionURLTemplates', impressionURLTemplates || []);
         this.set('wrapperURLs', wrapperURLs || []);
@@ -77,12 +77,12 @@ export class VastAd extends Model<IVastAd> {
         this.get('creatives').push(creative);
     }
 
-    public getCompanionAds(): VastCompanionAdStaticResource[] {
-        return this.get('companionAds');
+    public getCompanionAdsStatic(): VastCompanionAdStaticResource[] {
+        return this.get('companionAdsStatic');
     }
 
-    public addCompanionAd(companionAd: VastCompanionAdStaticResource) {
-        this.get('companionAds').push(companionAd);
+    public addCompanionAdStatic(companionAd: VastCompanionAdStaticResource) {
+        this.get('companionAdsStatic').push(companionAd);
     }
 
     public getUnsupportedCompanionAds(): string[] {
@@ -173,9 +173,9 @@ export class VastAd extends Model<IVastAd> {
             vastCreatives.push(vastCreative.getDTO());
         }
 
-        const companionAds = [];
-        for (const companionAd of this.get('companionAds')) {
-            companionAds.push(companionAd.getDTO());
+        const companionAdsStatic = [];
+        for (const companionAd of this.get('companionAdsStatic')) {
+            companionAdsStatic.push(companionAd.getDTO());
         }
 
         return {
@@ -184,7 +184,7 @@ export class VastAd extends Model<IVastAd> {
             'impressionURLTemplates': this.getImpressionURLTemplates(),
             'wrapperURLs': this.getWrapperURLs(),
             'vastCreatives': vastCreatives,
-            'companionAds': companionAds,
+            'companionAdsStatic': companionAdsStatic,
             'unsupportedItems': this.getUnsupportedCompanionAds()
         };
     }
@@ -195,7 +195,7 @@ export class VastAd extends Model<IVastAd> {
 
     private getCompanionEventTrackingUrls(eventType: string): string[] {
         let urls: string[] = [];
-        const companions = this.getCompanionAds();
+        const companions = this.getCompanionAdsStatic();
 
         for (const companion of companions) {
             urls = urls.concat(companion.getEventTrackingUrls(eventType));
