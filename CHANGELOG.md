@@ -1,4 +1,4 @@
-# Staged
+# Tue Jun 25 17:14:41 UTC 2019
 
 * Added handling of 'all: true' to incident fix [#10316](https://github.com/Applifier/unity-ads-webview/pull/10316)
 * Remove incorrect 'ad_did_showad_background' kibana log [#10369](https://github.com/Applifier/unity-ads-webview/pull/10369)
