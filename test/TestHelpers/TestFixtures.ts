@@ -138,7 +138,6 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
@@ -219,7 +218,6 @@ export class TestFixtures {
                 'skip': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'error': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a']
             },
-            backupCampaign: false,
             isLoadEnabled: false
         };
     }
@@ -343,7 +341,6 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
     }
@@ -393,7 +390,6 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
     }
@@ -451,7 +447,6 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 
@@ -479,7 +474,6 @@ export class TestFixtures {
             session: session,
             mediaId: TestMediaID,
             trackingUrls: {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
     }
@@ -510,7 +504,6 @@ export class TestFixtures {
             id: json.campaignId,
             session: this.getSession(),
             mediaId: '000000000000000000000003',
-            backupCampaign: false,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
             adType: json.adType,
             correlationId: json.correlationId || undefined,
@@ -948,7 +941,6 @@ export class TestFixtures {
             InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
             MissedImpressionManager: new MissedImpressionManager(core.Api),
-            BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo, core.ClientInfo),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),
@@ -956,8 +948,8 @@ export class TestFixtures {
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
-        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService, ads.BackupCampaignManager!);
-        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
+        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         return <IAds>ads;
     }

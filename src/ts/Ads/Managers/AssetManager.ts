@@ -1,4 +1,3 @@
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -59,11 +58,10 @@ export class AssetManager {
     private _optionalQueue: IAssetQueueObject[];
     private _campaignQueue: { [id: number]: ICampaignQueueObject };
     private _queueId: number;
-    private _backupCampaignManager: BackupCampaignManager;
 
     private _sendCacheDiagnostics = false;
 
-    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager, pts: ProgrammaticTrackingService, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager, pts: ProgrammaticTrackingService) {
         this._platform = platform;
         this._core = core;
         this._cache = cache;
@@ -78,7 +76,6 @@ export class AssetManager {
         this._optionalQueue = [];
         this._campaignQueue = {};
         this._queueId = 0;
-        this._backupCampaignManager = backupCampaignManager;
 
         if(cacheMode === CacheMode.ADAPTIVE) {
             this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
@@ -101,10 +98,7 @@ export class AssetManager {
 
             if(this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
-                        // store as backup campaign only when all required and optional assets are cached
-                        this._backupCampaignManager.storeCampaign(campaign);
-                    }).catch(() => {
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
                         // allow optional assets to fail caching when in CacheMode.FORCED
                     });
                     return campaign;
@@ -153,10 +147,7 @@ export class AssetManager {
                     return promise;
                 }
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
-                    // store as backup campaign only when all required and optional assets are cached
-                    this._backupCampaignManager.storeCampaign(campaign);
-                }).catch(() => {
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
                 });
             }

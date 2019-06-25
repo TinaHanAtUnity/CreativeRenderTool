@@ -1,6 +1,5 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -129,28 +128,8 @@ export class CampaignRefreshManager extends RefreshManager {
         return Promise.resolve();
     }
 
-    public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]> {
-        this.setPlacementStates(PlacementState.WAITING, this._adsConfig.getPlacementIds());
-        this._refillTimestamp = 0;
-        this.invalidateCampaigns(false, this._adsConfig.getPlacementIds());
-        this._campaignCount = 0;
-
-        const promises = [this._campaignManager.request()];
-
-        const placements = this._adsConfig.getPlacements();
-        for(const placement in this._adsConfig.getPlacements()) {
-            if(placements.hasOwnProperty(placement)) {
-                const promise = Promise.all([backupCampaignManager.loadCampaign(this._adsConfig.getPlacement(placement)), backupCampaignManager.loadTrackingUrls(this._adsConfig.getPlacement(placement))]).then(([campaign, trackingUrls]) => {
-                    if(campaign) {
-                        // todo: during auction v5 test it's ok if trackingUrls is undefined but after unconditional transition to v5 loading trackingUrls should be enforced
-                        this.setPlacementReady(placement, campaign, trackingUrls);
-                    }
-                });
-                promises.push(promise);
-            }
-        }
-
-        return Promise.all(promises);
+    public initialize(): Promise<INativeResponse | void> {
+        return this.refresh();
     }
 
     public shouldRefill(timestamp: number): boolean {
