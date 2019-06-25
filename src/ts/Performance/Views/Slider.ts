@@ -287,7 +287,7 @@ export class Slider {
 
         let index: number;
         if (swipedSlide && swipedSlide.hasAttribute('slide-index')) {
-            index = Number(swipedSlide.getAttribute('slide-index'));
+            index = parseInt(swipedSlide.getAttribute('slide-index')!, 10);
         } else {
             index = 0;
         }
@@ -317,7 +317,7 @@ export class Slider {
         const indexes = [];
         for (const slide of this._slidesContainer.children) {
             if (slide && slide.hasAttribute('slide-index')) {
-                indexes.push(Number(slide.getAttribute('slide-index')));
+                indexes.push(parseInt(slide.getAttribute('slide-index')!, 10));
             }
         }
 
