@@ -1,3 +1,7 @@
+# Pending
+
+* Add iphone x styles and china watermark for xpromo [#10371](https://github.com/Applifier/unity-ads-webview/pull/10371)
+
 # Tue Jun 25 17:14:41 UTC 2019
 
 * Added handling of 'all: true' to incident fix [#10316](https://github.com/Applifier/unity-ads-webview/pull/10316)
