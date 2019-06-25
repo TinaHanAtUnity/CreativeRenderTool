@@ -51,7 +51,8 @@ export class Slider {
     private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
     private _resizeTimeId: number | null;
-    private _swipableIndexes: number[] | null;
+    private _swipableIndexes: number[];
+
     constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback, portraitImage?: string, landscapeImage?: string, squareImage?: string) {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
@@ -65,6 +66,7 @@ export class Slider {
         this._isInterrupted = false;
         this._slideSpeed = 300;
         this._minimalSwipeLength = 60;
+        this._swipableIndexes = [];
 
         this._imageUrls = [];
         let blurredBackgroundImageUrl: string;
@@ -102,12 +104,14 @@ export class Slider {
             if (slides !== null && slides.length) {
                 this._slides = slides;
             }
+
             slides.forEach((slide, index) => {
                 if (slide) {
                     slide.setAttribute('slide-index', index.toString());
                     this._slidesContainer.appendChild(slide);
                 }
             });
+
             this._slideCount = this._slides.length;
             this._rootElement.appendChild(this._slidesContainer);
             this.init();
@@ -131,6 +135,7 @@ export class Slider {
     private init(): void {
         this._isPaused = true;
         this.prepareCloneSlides();
+        this._swipableIndexes = this.getSwipableIndexes();
         this.setPosition();
         this.prepareIndicators(this, 'slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
         this.updateIndicators();
@@ -293,7 +298,6 @@ export class Slider {
     private checkSwipable(index: number): number {
         let prevNavigable: number;
 
-        this._swipableIndexes = this.getSwipableIndexes();
         prevNavigable = 0;
         if (index > this._swipableIndexes[this._swipableIndexes.length - 1]) {
             index = this._swipableIndexes[this._swipableIndexes.length - 1];
@@ -309,13 +313,14 @@ export class Slider {
         return index;
     }
 
-    private getSwipableIndexes() {
+    private getSwipableIndexes(): number[] {
         const indexes = [];
         for (const slide of this._slidesContainer.children) {
             if (slide && slide.hasAttribute('slide-index')) {
                 indexes.push(Number(slide.getAttribute('slide-index')));
             }
         }
+
         return indexes;
     }
 
