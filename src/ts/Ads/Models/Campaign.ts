@@ -33,7 +33,6 @@ export interface ICampaign {
     session: Session;
     mediaId: string;
     trackingUrls: ICampaignTrackingUrls;
-    backupCampaign: boolean;
     isLoadEnabled: boolean;
 }
 
@@ -50,7 +49,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         session: ['object'],
         mediaId: ['string'],
         trackingUrls: ['object'],
-        backupCampaign: ['boolean'],
         isLoadEnabled: ['boolean']
     };
 
@@ -97,10 +95,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public isExpired(): boolean {
         const willExpireAt = this.get('willExpireAt');
         return willExpireAt !== undefined && Date.now() > willExpireAt;
-    }
-
-    public isBackupCampaign(): boolean {
-        return this.get('backupCampaign');
     }
 
     public setIsLoadEnabled(isLoadEnabled: boolean) {
