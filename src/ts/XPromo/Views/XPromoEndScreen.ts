@@ -42,6 +42,13 @@ export class XPromoEndScreen extends EndScreen {
             store: this._campaign.getStore()
         }));
     }
+
+    public render(): void {
+        super.render();
+
+        document.documentElement.classList.add('performance-end-screen');
+    }
+
     protected getEndscreenAlt(): string | undefined {
         if (this._campaign.getSquare()) {
             return SQUARE_END_SCREEN;
