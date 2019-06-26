@@ -1031,7 +1031,7 @@ export class TestFixtures {
                 AdUnit: new IosAdUnitApi(nativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(nativeBridge)
             } : undefined,
-            Load: new LoadApi(nativeBridge)
+            LoadApi: new LoadApi(nativeBridge)
         };
     }
 

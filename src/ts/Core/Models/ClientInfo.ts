@@ -106,7 +106,7 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('initTimestamp');
     }
 
-    public getUsePerPlacementLoad() {
+    public getUsePerPlacementLoad(): boolean {
         return this.get('usePerPlacementLoad');
     }
 

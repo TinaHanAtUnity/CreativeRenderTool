@@ -25,5 +25,5 @@ export enum EventCategory {
     STORE,
     WEB_AUTH_SESSION,
     NATIVE_ERROR,
-    LOAD
+    LOAD_API
 }

@@ -39,7 +39,7 @@ export interface IAdsApi extends IModuleApi {
         AdUnit: IosAdUnitApi;
         VideoPlayer: IosVideoPlayerApi;
     };
-    Load: LoadApi;
+    LoadApi: LoadApi;
 }
 
 export interface IAds extends IApiModule {

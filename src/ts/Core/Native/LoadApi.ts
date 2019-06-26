@@ -12,7 +12,7 @@ export class LoadApi extends NativeApi {
     public readonly onLoad = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Load', ApiPackage.ADS, EventCategory.LOAD);
+        super(nativeBridge, 'Load', ApiPackage.ADS, EventCategory.LOAD_API);
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {

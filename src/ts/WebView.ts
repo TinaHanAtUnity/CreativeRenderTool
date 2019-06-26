@@ -14,7 +14,7 @@ export class WebView {
         this._core = new Core(nativeBridge);
     }
 
-    public initialize() {
+    public initialize(): Promise<void> {
         return this._core.initialize();
     }
 

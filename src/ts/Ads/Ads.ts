@@ -138,7 +138,7 @@ export class Ads implements IAds {
                 AdUnit: new IosAdUnitApi(core.NativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(core.NativeBridge)
             } : undefined,
-            Load: new LoadApi(core.NativeBridge)
+            LoadApi: new LoadApi(core.NativeBridge)
         };
 
         this.AdMobSignalFactory = new AdMobSignalFactory(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.ClientInfo, this._core.DeviceInfo, this._core.FocusManager);

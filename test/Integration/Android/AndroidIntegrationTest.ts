@@ -9,8 +9,6 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
-import { StorageType, StorageEvent } from 'Core/Native/Storage';
-import { ILoadEvent } from 'Ads/Managers/PerPlacementLoadManager';
 import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 import { EventCategory } from 'Core/Constants/EventCategory';
 import { LoadEvent } from 'Core/Native/LoadApi';
@@ -127,7 +125,7 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ['video']);
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ['video']);
         }).catch(() => {
             chai.assert.fail('should not throw');
         });
@@ -191,7 +189,7 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'rewardedVideo', 'video');
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'rewardedVideo', 'video');
         }).catch(() => {
             chai.assert.fail('should not throw');
         });
@@ -306,7 +304,7 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ['rewardedVideo']);
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ['rewardedVideo']);
         }).catch(() => {
             chai.assert.fail('should not throw');
         });

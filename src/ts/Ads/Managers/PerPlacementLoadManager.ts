@@ -45,7 +45,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(<ILoadStorageEvent>value));
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
-        this._ads.Load.onLoad.subscribe((placementId: string) => {
+        this._ads.LoadApi.onLoad.subscribe((placementId: string) => {
             this._core.Sdk.logDebug(`PerPlacementLoadManager is trying to load ${placementId}`);
             this.loadPlacement(placementId);
         });
