@@ -1,5 +1,8 @@
 # Pending
 
+* Move osVersion from PerformanceAdUnitParametersFactory to AbstractAdUnitParametersFactory to make creation of staging branches more easy [#10399](https://github.com/Applifier/unity-ads-webview/pull/10399)
+* New End Card UI with "pop" out element experiment [#10163](https://github.com/Applifier/unity-ads-webview/pull/10163)
+* Remove animated endcard test [#10372](https://github.com/Applifier/unity-ads-webview/pull/10372)
 * Add iphone x styles and china watermark for xpromo [#10371](https://github.com/Applifier/unity-ads-webview/pull/10371)
 * Move Analytics to Ads [#10319](https://github.com/Applifier/unity-ads-webview/pull/10319)
 
