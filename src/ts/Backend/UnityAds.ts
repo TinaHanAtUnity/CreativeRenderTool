@@ -32,7 +32,7 @@ export class UnityAds {
         UnityAds._listener = listener;
 
         UnityAds._webView = new WebView(nativeBridge);
-        UnityAds._webView.initialize();
+        return UnityAds._webView.initialize();
     }
 
     public static show(placement: string) {

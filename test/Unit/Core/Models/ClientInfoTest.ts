@@ -24,6 +24,7 @@ describe('ClientInfoTest', () => {
             '54321',
             '2.0.0-webview-test',
             0,
+            false,
             false
         ];
 
@@ -58,6 +59,7 @@ describe('ClientInfoTest', () => {
             '54321',
             '2.0.0-webview-test',
             0,
+            false,
             false
         ];
 

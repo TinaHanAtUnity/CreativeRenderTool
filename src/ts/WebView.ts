@@ -15,7 +15,7 @@ export class WebView {
     }
 
     public initialize() {
-        this._core.initialize();
+        return this._core.initialize();
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
