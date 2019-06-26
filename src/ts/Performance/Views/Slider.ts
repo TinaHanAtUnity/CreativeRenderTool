@@ -118,12 +118,12 @@ export class Slider {
         this.prepareCloneSlides();
         this._swipableIndexes = this.getSwipableIndexes();
         this.setPosition();
-        this.prepareIndicators(this, 'slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
+        this.prepareIndicators('slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
         this.updateIndicators();
         this.initializeTouchEvents();
     }
 
-    private prepareIndicators(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string) {
+    private prepareIndicators(wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
         const indicatorContainer = document.createElement('div');
@@ -139,10 +139,10 @@ export class Slider {
         indicators.push(indicatorWrap.appendChild(item));
         indicators[activeIndex].className = 'slider-dot ' + activeClass;
 
-        slider._indicatorWrap = indicatorWrap;
-        slider._indicators = indicators;
+        this._indicatorWrap = indicatorWrap;
+        this._indicators = indicators;
         indicatorContainer.appendChild(indicatorWrap);
-        slider._rootElement.appendChild(indicatorContainer);
+        this._rootElement.appendChild(indicatorContainer);
 
         setTimeout(() => {
             indicatorWrap.style.left = '20px';
