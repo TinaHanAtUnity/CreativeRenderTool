@@ -295,7 +295,7 @@ export class Slider {
 
         if (this._drag.fingerCount !== 1) {
             this._drag = this.clearDrag();
-            return false;
+            return;
         }
 
         if (event !== undefined && event.touches !== undefined) {
@@ -308,18 +308,13 @@ export class Slider {
     }
 
     private touchmoveHandler(event: TouchEvent) {
-        let curLeft: number;
-        let swipeLength: number;
-        let positionOffset: number;
-        let touches: TouchList | null;
-
-        touches = event !== undefined ? event.touches : null;
+        const touches: TouchList | null = event !== undefined ? event.touches : null;
 
         if (!this._isDragging || touches && touches.length !== 1) {
-            return false;
+            return;
         }
 
-        curLeft = this.getTransitionPosition(this._currentSlideIndex);
+        const curLeft = this.getTransitionPosition(this._currentSlideIndex);
 
         this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
         this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
@@ -329,13 +324,12 @@ export class Slider {
             event.preventDefault();
         }
 
-        positionOffset = (this._drag.curX > this._drag.startX ? 1 : -1) * 1;
-        swipeLength = this._drag.swipeLength;
-        this._swipeLeft = curLeft + swipeLength * positionOffset;
+        const positionOffset = (this._drag.curX > this._drag.startX ? 1 : -1) * 1;
+        this._swipeLeft = curLeft + this._drag.swipeLength * positionOffset;
 
         if (this._isAnimating === true) {
             this._swipeLeft = null;
-            return false;
+            return;
         }
 
         this.setTransition(this._swipeLeft);
