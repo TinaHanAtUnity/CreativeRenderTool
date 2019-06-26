@@ -138,7 +138,7 @@ export class ClientInfo extends Model<IClientInfo> {
             'initTimestamp': this.getInitTimestamp(),
             'reinitialized': this.isReinitialized(),
             'monetizationInUse': this.isMonetizationInUse(),
-            'usePerPlacmentLoad': this.getUsePerPlacementLoad()
+            'usePerPlacementLoad': this.getUsePerPlacementLoad()
         };
     }
 }
