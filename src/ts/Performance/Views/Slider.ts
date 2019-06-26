@@ -265,20 +265,17 @@ export class Slider {
         return Math.abs(index - this._currentSlideIndex) || 1;
     }
 
-    private calculateSwipableSlideIndex(index: number): number {
-        let prevNavigable = 0;
-        if (index > this._swipableIndexes[this._swipableIndexes.length - 1]) {
-            index = this._swipableIndexes[this._swipableIndexes.length - 1];
-        } else {
-            for (const i of this._swipableIndexes) {
-                if (index < i) {
-                    index = prevNavigable;
-                    break;
-                }
-                prevNavigable = i;
-            }
+    private calculateSwipableSlideIndex(targetIndex: number): number {
+        const lastSwipableIndex = this._swipableIndexes[this._swipableIndexes.length - 1];
+        if (targetIndex >= lastSwipableIndex) {
+            return lastSwipableIndex;
         }
-        return index;
+
+        if (targetIndex <= this._swipableIndexes[0]) {
+            return this._swipableIndexes[0];
+        }
+
+        return targetIndex;
     }
 
     private getSwipableIndexes(): number[] {
