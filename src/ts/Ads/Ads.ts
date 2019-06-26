@@ -177,9 +177,7 @@ export class Ads implements IAds {
 
             const promises = [];
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
-            // if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && !ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
-            //     promises.push(this.setupLoadApi());
-            // }
+
             promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
