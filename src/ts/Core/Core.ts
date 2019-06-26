@@ -37,7 +37,7 @@ import { ListenerApi } from 'Core/Native/Listener';
 import { PermissionsApi } from 'Core/Native/Permissions';
 import { RequestApi } from 'Core/Native/Request';
 import { ResolveApi } from 'Core/Native/Resolve';
-import { SdkApi } from 'Core/Native/Sdk';
+import { SdkApi, InitErrorCode } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
@@ -165,7 +165,6 @@ export class Core implements ICore {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this._initialized = true;
             this._initializedAt = Date.now();
-            this.Api.Sdk.initComplete();
 
             this.WakeUpManager.setListenConnectivity(true);
             if(this.NativeBridge.getPlatform() === Platform.IOS) {
@@ -239,7 +238,8 @@ export class Core implements ICore {
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
-        }).catch((error: { message: string; name: unknown }) => {
+            this.Api.Sdk.initComplete();
+        }).catch((error: Error) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
             jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
@@ -248,14 +248,13 @@ export class Core implements ICore {
             }
 
             if(error instanceof ConfigError) {
-                // tslint:disable-next-line
-                error = { 'message': error.message, 'name': error.name };
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if(error instanceof Error && error.name === 'DisabledGame') {
+            } else if(error.name === 'DisabledGame') {
                 return;
             }
 
-            this.Api.Sdk.logError(JSON.stringify(error));
+            this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
+            this.Api.Sdk.logError(`Initialization error: ${error.message}, ${error.stack}`);
             Diagnostics.trigger('initialization_error', error);
         });
     }
