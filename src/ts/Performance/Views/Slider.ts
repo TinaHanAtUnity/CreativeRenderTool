@@ -216,18 +216,15 @@ export class Slider {
         }
 
         if (this._drag.swipeLength >= this._minimalSwipeLength) {
-            let slideCount;
+            let targetSlideIndex: number;
             const direction = this.swipeDirection();
-            switch (direction) {
-                case 'left':
-                    slideCount = this.checkSwipable(this._currentSlide + this.getSlideCount());
-                    break;
-                case 'right':
-                    slideCount = this.checkSwipable(this._currentSlide - this.getSlideCount());
-                    break;
-                default:
+            if (direction === 'left') {
+                targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlide + this.getSlideCount());
+            } else {
+                targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlide - this.getSlideCount());
             }
-            this.slideHandler(<number>slideCount);
+
+            this.slideHandler(targetSlideIndex);
             this._drag = this.clearDrag();
         } else if (this._drag.startX !== this._drag.curX) {
             this.slideHandler(this._currentSlide);
@@ -268,7 +265,7 @@ export class Slider {
         return Math.abs(index - this._currentSlide) || 1;
     }
 
-    private checkSwipable(index: number): number {
+    private calculateSwipableSlideIndex(index: number): number {
         let prevNavigable = 0;
         if (index > this._swipableIndexes[this._swipableIndexes.length - 1]) {
             index = this._swipableIndexes[this._swipableIndexes.length - 1];
@@ -347,7 +344,7 @@ export class Slider {
         this.setTransition(this._swipeLeft);
     }
 
-    private swipeDirection(): string {
+    private swipeDirection(): 'left' | 'right' {
         let xDistance: number;
         xDistance = this._drag.startX - this._drag.curX;
         if (xDistance > 0) {
