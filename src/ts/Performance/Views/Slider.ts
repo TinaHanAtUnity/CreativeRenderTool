@@ -67,32 +67,18 @@ export class Slider {
         this._slideSpeed = 300;
         this._minimalSwipeLength = 60;
         this._swipableIndexes = [];
-
         this._imageUrls = [];
-        let blurredBackgroundImageUrl: string;
-        if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
-            this.addImageToList(portraitImage, urls);
-            blurredBackgroundImageUrl = portraitImage;
-        } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
-            this.addImageToList(landscapeImage, urls);
-            blurredBackgroundImageUrl = landscapeImage;
-        } else {
-            // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
-            if (urls[1] !== undefined) {
-                this._imageUrls.push(urls[1]);
-            }
-            if (urls[2] !== undefined) {
-                this._imageUrls.push(urls[2]);
-            }
-            if (urls[0] !== undefined) {
-                this._imageUrls.push(urls[0]);
-            }
-            blurredBackgroundImageUrl = urls[0];
+
+        const mainImage = this.getMainImage(imageOrientation, portraitImage, landscapeImage);
+        if (mainImage) {
+            this._imageUrls.push(mainImage);
         }
+
+        this._imageUrls.push(...urls);
 
         const allSlidesCreatedPromise: Promise<HTMLElement | null>[] = [];
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
-            'background-image': `url(${blurredBackgroundImageUrl})`
+            'background-image': `url(${this._imageUrls[0]})`
         });
         this._rootElement.appendChild(blurredBackground);
         this._imageUrls.forEach((url, i) => {
@@ -119,16 +105,11 @@ export class Slider {
         });
     }
 
-    private addImageToList(mainImage: string, urls: string[]): void {
-        this._imageUrls.push(mainImage);
-        if (urls[0] !== undefined) {
-            this._imageUrls.push(urls[0]);
-        }
-        if (urls[1] !== undefined) {
-            this._imageUrls.push(urls[1]);
-        }
-        if (urls[2] !== undefined) {
-            this._imageUrls.push(urls[2]);
+    private getMainImage(imageOrientation: SliderEndScreenImageOrientation, portraitImage?: string, landscapeImage?: string): string | undefined {
+        if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
+            return portraitImage;
+        } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
+            return landscapeImage;
         }
     }
 
