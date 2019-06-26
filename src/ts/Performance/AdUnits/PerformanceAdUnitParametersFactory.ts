@@ -23,12 +23,10 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
     private _downloadManager: DownloadManager;
     private _deviceIdManager: DeviceIdManager;
-    private _osVersion: string;
 
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
 
-        this._osVersion = core.DeviceInfo.getOsVersion();
         this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
