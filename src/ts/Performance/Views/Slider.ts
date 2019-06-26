@@ -36,7 +36,7 @@ export class Slider {
     private _autoplayTimeoutId: number | null;
     private _onDownloadCallback: OnDownloadCallback;
     private _slides: (HTMLElement | null)[];
-    private _currentSlide: number;
+    private _currentSlideIndex: number;
     private _transformPropertyName: 'transform' | 'webkitTransform';
     private _transitionPropertyName: 'transition' | 'webkitTransition';
     private _isPaused: boolean;
@@ -56,7 +56,7 @@ export class Slider {
     constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback, portraitImage?: string, landscapeImage?: string, squareImage?: string) {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
-        this._currentSlide = 0;
+        this._currentSlideIndex = 0;
         const imageOrientationClassNamePrefix = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 'landscape' : 'portrait';
         this._rootElement = this.createElement('div', 'slider-root-container', [`${imageOrientationClassNamePrefix}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
@@ -153,7 +153,7 @@ export class Slider {
         for (const indicator of this._indicators) {
             indicator.classList.remove('active');
         }
-        this._indicators[this._currentSlide].classList.add('active');
+        this._indicators[this._currentSlideIndex].classList.add('active');
     }
 
     private initializeTouchEvents() {
@@ -219,15 +219,15 @@ export class Slider {
             let targetSlideIndex: number;
             const direction = this.swipeDirection();
             if (direction === 'left') {
-                targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlide + this.getSlideCount());
+                targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex + this.getSlideCount());
             } else {
-                targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlide - this.getSlideCount());
+                targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
             }
 
             this.slideHandler(targetSlideIndex);
             this._drag = this.clearDrag();
         } else if (this._drag.startX !== this._drag.curX) {
-            this.slideHandler(this._currentSlide);
+            this.slideHandler(this._currentSlideIndex);
             this._drag = this.clearDrag();
         }
         this.updateIndicators();
@@ -262,7 +262,7 @@ export class Slider {
             index = 0;
         }
 
-        return Math.abs(index - this._currentSlide) || 1;
+        return Math.abs(index - this._currentSlideIndex) || 1;
     }
 
     private calculateSwipableSlideIndex(index: number): number {
@@ -322,7 +322,7 @@ export class Slider {
             return false;
         }
 
-        curLeft = this.getTransitionPosition(this._currentSlide);
+        curLeft = this.getTransitionPosition(this._currentSlideIndex);
 
         this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
         this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
@@ -366,7 +366,7 @@ export class Slider {
     }
 
     private autoPlayIterator() {
-        const slideTo: number = this._currentSlide + 1;
+        const slideTo: number = this._currentSlideIndex + 1;
         if (!this._isPaused && !this._isInterrupted) {
             this.slideHandler(slideTo, true);
         }
@@ -385,7 +385,7 @@ export class Slider {
 
         targetSlide = index;
         targetTransitionPosition = this.getTransitionPosition(targetSlide);
-        slideLeft = this.getTransitionPosition(this._currentSlide);
+        slideLeft = this.getTransitionPosition(this._currentSlideIndex);
 
         clearInterval(this._autoPlayTimer);
 
@@ -399,8 +399,8 @@ export class Slider {
 
         this._isAnimating = true;
 
-        oldSlideIndex = this._currentSlide;
-        this._currentSlide = animSlide;
+        oldSlideIndex = this._currentSlideIndex;
+        this._currentSlideIndex = animSlide;
 
         this.animateSlide(targetTransitionPosition, () => {
             // slide calback
@@ -439,7 +439,7 @@ export class Slider {
 
     private setPosition(): void {
         this._slidesContainer.style.width = `${this._slideCount * 3000}px`;
-        this.setTransition(this.getTransitionPosition(this._currentSlide));
+        this.setTransition(this.getTransitionPosition(this._currentSlideIndex));
     }
 
     private getTransitionPosition(slideIndex: number): number {
