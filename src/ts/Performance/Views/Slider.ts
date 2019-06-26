@@ -43,7 +43,6 @@ export class Slider {
     private _autoPlayTimer: NodeJS.Timeout;
     private _isInterrupted: boolean;
     private _isAnimating: boolean;
-    private _swipeLeft: number | null;
     private _slideSpeed: number;
     private _drag: IDragOptions;
     private _isDragging: boolean;
@@ -211,8 +210,8 @@ export class Slider {
         this._isDragging = false;
         this._isInterrupted = false;
 
-        if (this._drag.curX === undefined) {
-            return false;
+        if (this._drag.swipeLength <= 0) {
+            return;
         }
 
         if (this._drag.swipeLength >= this._minimalSwipeLength) {
@@ -237,29 +236,23 @@ export class Slider {
         let swipedSlide;
 
         const centerOffset = Math.floor(this.getWidth(this._rootElement) / 2);
-        const swipeTargetPos = (<number>this._swipeLeft * -1) + centerOffset;
+        const sliderOffsetLeftWithDrag = this.getCurrentSliderOffsetLeftWithDrag();
+        const swipeTargetPos = (sliderOffsetLeftWithDrag * -1) + centerOffset;
         const slides = Array.from(this._slidesContainer.children);
 
         for (const slide of slides) {
             const el = <HTMLElement>slide;
-            let slideOffsetLeftWidth: number;
-            let slideOffsetLeft: number;
-            let rightBoundary: number;
-            slideOffsetLeftWidth = el.offsetWidth;
-            slideOffsetLeft = el.offsetLeft;
+            const rightBoundary = el.offsetWidth + el.offsetLeft;
 
-            rightBoundary = slideOffsetLeft + slideOffsetLeftWidth;
             if (swipeTargetPos < rightBoundary) {
                 swipedSlide = slide;
                 break;
             }
         }
 
-        let index: number;
+        let index = 0;
         if (swipedSlide && swipedSlide.hasAttribute('slide-index')) {
             index = parseInt(swipedSlide.getAttribute('slide-index')!, 10);
-        } else {
-            index = 0;
         }
 
         return Math.abs(index - this._currentSlideIndex) || 1;
@@ -314,8 +307,6 @@ export class Slider {
             return;
         }
 
-        const curLeft = this.getTransitionPosition(this._currentSlideIndex);
-
         this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
         this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
         this._drag.swipeLength = Math.round(Math.sqrt(Math.pow(this._drag.curX - this._drag.startX, 2)));
@@ -324,15 +315,23 @@ export class Slider {
             event.preventDefault();
         }
 
-        const positionOffset = (this._drag.curX > this._drag.startX ? 1 : -1) * 1;
-        this._swipeLeft = curLeft + this._drag.swipeLength * positionOffset;
-
         if (this._isAnimating === true) {
-            this._swipeLeft = null;
             return;
         }
 
-        this.setTransition(this._swipeLeft);
+        const sliderOffsetLeftWithDrag = this.getCurrentSliderOffsetLeftWithDrag();
+        this.setTransition(sliderOffsetLeftWithDrag);
+    }
+
+    private getCurrentSliderOffsetLeftWithDrag() {
+        const currentSliderOffsetLeft = this.getTransitionPosition(this._currentSlideIndex);
+
+        if (this._drag.swipeLength <= 0) {
+            return currentSliderOffsetLeft;
+        }
+
+        const positionOffset = this._drag.curX > this._drag.startX ? 1 : -1;
+        return currentSliderOffsetLeft + this._drag.swipeLength * positionOffset;
     }
 
     private swipeDirection(): 'left' | 'right' {
@@ -404,7 +403,6 @@ export class Slider {
     private postSlide() {
         this._isAnimating = false;
         this.setPosition();
-        this._swipeLeft = null;
         this.autoplay();
     }
 
