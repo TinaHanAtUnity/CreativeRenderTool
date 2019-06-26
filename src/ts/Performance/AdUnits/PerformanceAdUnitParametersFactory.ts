@@ -14,15 +14,21 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
+import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
     private _downloadManager: DownloadManager;
     private _deviceIdManager: DeviceIdManager;
+    private _osVersion: string;
 
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
 
+        this._osVersion = core.DeviceInfo.getOsVersion();
         this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
@@ -40,7 +46,18 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+
+        let endScreen: PerformanceEndScreen;
+
+        const abGroup = baseParams.coreConfig.getAbGroup();
+        const isAndroid4 = this._platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, this._osVersion);
+        if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
+            endScreenParameters.id = 'redesigned-end-screen';
+            endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
