@@ -3,6 +3,10 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export type ClientInfoData = [string, boolean, string, string, number, string, boolean, string, string, string | null, string | null, number, boolean];
 
+export enum InitErrorCode {
+    Unknown = 0
+}
+
 export class SdkApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Sdk', ApiPackage.CORE);
@@ -14,6 +18,10 @@ export class SdkApi extends NativeApi {
 
     public initComplete(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initComplete');
+    }
+
+    public initError(message: string, code: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initError', [message, code]);
     }
 
     public setDebugMode(debugMode: boolean): Promise<void> {
