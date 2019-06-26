@@ -208,18 +208,16 @@ export class Slider {
     }
 
     private touchendHandler() {
-        let slideCount;
-        let direction: string;
-
         this._isDragging = false;
-
         this._isInterrupted = false;
 
         if (this._drag.curX === undefined) {
             return false;
         }
+
         if (this._drag.swipeLength >= this._minimalSwipeLength) {
-            direction = this.swipeDirection();
+            let slideCount;
+            const direction = this.swipeDirection();
             switch (direction) {
                 case 'left':
                     slideCount = this.checkSwipable(this._currentSlide + this.getSlideCount());
@@ -231,23 +229,18 @@ export class Slider {
             }
             this.slideHandler(<number>slideCount);
             this._drag = this.clearDrag();
-        } else {
-            if (this._drag.startX !== this._drag.curX) {
-                this.slideHandler(this._currentSlide);
-                this._drag = this.clearDrag();
-            }
+        } else if (this._drag.startX !== this._drag.curX) {
+            this.slideHandler(this._currentSlide);
+            this._drag = this.clearDrag();
         }
         this.updateIndicators();
     }
 
     private getSlideCount() {
-        let traversedIndex: number;
         let swipedSlide;
-        let swipeTargetPos: number;
-        let centerOffset: number;
 
-        centerOffset = Math.floor(this.getWidth(this._rootElement) / 2);
-        swipeTargetPos = (<number>this._swipeLeft * -1) + centerOffset;
+        const centerOffset = Math.floor(this.getWidth(this._rootElement) / 2);
+        const swipeTargetPos = (<number>this._swipeLeft * -1) + centerOffset;
         const slides = Array.from(this._slidesContainer.children);
 
         for (const slide of slides) {
@@ -271,14 +264,12 @@ export class Slider {
         } else {
             index = 0;
         }
-        traversedIndex = Math.abs(index - this._currentSlide) || 1;
-        return traversedIndex;
+
+        return Math.abs(index - this._currentSlide) || 1;
     }
 
     private checkSwipable(index: number): number {
-        let prevNavigable: number;
-
-        prevNavigable = 0;
+        let prevNavigable = 0;
         if (index > this._swipableIndexes[this._swipableIndexes.length - 1]) {
             index = this._swipableIndexes[this._swipableIndexes.length - 1];
         } else {
