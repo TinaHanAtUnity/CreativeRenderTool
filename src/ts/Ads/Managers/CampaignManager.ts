@@ -41,7 +41,6 @@ import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFact
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
@@ -110,7 +109,6 @@ export class CampaignManager {
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
-    private _backupCampaignManager: BackupCampaignManager;
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
@@ -120,7 +118,7 @@ export class CampaignManager {
     private _auctionProtocol: AuctionProtocol;
     private _pts: ProgrammaticTrackingService;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -136,7 +134,6 @@ export class CampaignManager {
         this._contentTypeHandlerManager = contentTypeHandlerManager;
         this._requesting = false;
         this._jaegerManager = jaegerManager;
-        this._backupCampaignManager = backupCampaignManager;
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._pts = core.ProgrammaticTrackingService;
     }
@@ -305,9 +302,6 @@ export class CampaignManager {
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
 
-        this._backupCampaignManager.deleteBackupCampaigns();
-        this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
-
         if('placements' in json) {
             const fill: { [mediaId: string]: AuctionPlacement[] } = {};
             const noFill: string[] = [];
@@ -324,8 +318,6 @@ export class CampaignManager {
                         } else {
                             fill[mediaId] = [auctionPlacement];
                         }
-
-                        this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId);
                     } else {
                         noFill.push(placement);
                     }
@@ -410,9 +402,6 @@ export class CampaignManager {
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
 
-        this._backupCampaignManager.deleteBackupCampaigns();
-        this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
-
         if(!('placements' in json)) {
             throw new Error('No placements found');
         }
@@ -459,8 +448,6 @@ export class CampaignManager {
                             }, session);
                             throw new Error('Missing tracking ID');
                         }
-
-                        this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId, trackingUrls);
 
                         const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, trackingUrls);
 

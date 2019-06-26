@@ -43,7 +43,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 
@@ -66,7 +65,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             store: undefined,
             appStoreId: undefined,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking() || false,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

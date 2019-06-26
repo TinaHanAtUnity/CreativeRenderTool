@@ -5,6 +5,7 @@ import { IGooglePurchaseData, IGooglePurchaseStatus } from 'Store/Native/Android
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { ProgrammaticTrackingService, PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class GoogleStoreManager extends StoreManager {
     private _googleStore: GoogleStore;
@@ -15,9 +16,7 @@ export class GoogleStoreManager extends StoreManager {
 
         this._googleStore = new GoogleStore(store);
         this._existingOrderIds = {};
-    }
 
-    public startTracking(): void {
         this._store.Android!.Store.onInitialized.subscribe(() => this.onInitialized());
         this._store.Android!.Store.onInitializationFailed.subscribe(() => this.onInitializationFailed());
         this._store.Android!.Store.onDisconnected.subscribe(() => this.onDisconnected());
@@ -25,6 +24,7 @@ export class GoogleStoreManager extends StoreManager {
         this._store.Android!.Store.onPurchaseStatusOnStop.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnStop(activity, data));
 
         this._store.Android!.Store.initialize('com.android.vending.billing.InAppBillingService.BIND', 'com.android.vending');
+        core.ProgrammaticTrackingService.reportMetric(PurchasingMetric.PurchasingGoogleStoreStarted);
     }
 
     private onInitialized() {

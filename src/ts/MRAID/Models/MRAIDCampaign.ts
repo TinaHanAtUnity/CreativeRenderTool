@@ -24,6 +24,7 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
     store: StoreName | undefined;
     appStoreId: string | undefined;
     playableConfiguration: IPlayableConfiguration | undefined;
+    targetGameId: number | undefined;
 }
 
 export interface IPlayableConfiguration {
@@ -51,7 +52,8 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
             videoEventUrls: ['object', 'undefined'],
-            playableConfiguration: ['object', 'undefined']
+            playableConfiguration: ['object', 'undefined'],
+            targetGameId: ['number', 'undefined']
         }, campaign);
     }
 
@@ -157,6 +159,10 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
     public getVideoEventUrl(eventType: string): string | undefined {
         const urls = this.get('videoEventUrls');
         return urls ? urls[eventType] : undefined;
+    }
+
+    public getTargetGameId(): number | undefined {
+        return this.get('targetGameId');
     }
 
     public setPlayableConfiguration(configuration: IPlayableConfiguration) {

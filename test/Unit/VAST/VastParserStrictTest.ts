@@ -8,14 +8,15 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import RootVastClean from 'xml/RootVastClean.xml';
 import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
-import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
+import VastCompanionAdSmallXml from 'xml/VastCompanionAdSmall.xml';
 import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
 import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
 import VastCompanionAdWithRelativeUrlsXml from 'xml/VastCompanionAdWithRelativeUrls.xml';
+import VastCompanionAdIFrameXml from 'xml/VastCompanionAdIFrame.xml';
+import VastCompanionAdHTMLXml from 'xml/VastCompanionAdHTML.xml';
 import VastStaticResourceWithTypeInsteadOfCreativeTypeXml from 'xml/VastStaticResourceWithTypeInsteadOfCreativeType.xml';
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
@@ -24,6 +25,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastAboutBlank from 'xml/VastAboutBlank.xml';
 import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
 import VastAdVerificationAsStandAlone from 'xml/VastWithAdVerification4_1.xml';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
@@ -427,8 +429,8 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('Companion Ad', () => {
-                describe('getCompanionLandscapeUrl', () => {
+            describe('StaticResource Companion Ad', () => {
+                describe('getCompanionLandscapeUrl from StaticResource type CompanionAd', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
@@ -508,6 +510,44 @@ describe('VastParserStrict', () => {
                             assert.doesNotThrow(() => {
                                 vastParser.parseVast(test.inputVast);
                             });
+                        });
+                    });
+                });
+            });
+
+            describe('Unsupported Companion Ad', () => {
+                describe('add into unsupported companion ads list for unsupported companion ads', () => {
+                    const tests: {
+                        message: string;
+                        inputXml: string;
+                        expectedVal: number | null;
+                    }[] = [
+                            {
+                                message: 'should have not added into unsupported companion ads for valid companion ads',
+                                inputXml: VastCompanionAdXml,
+                                expectedVal: 0
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for iframeResource',
+                                inputXml: VastCompanionAdIFrameXml,
+                                expectedVal: 1
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
+                                inputXml: VastCompanionAdHTMLXml,
+                                expectedVal: 2
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',
+                                inputXml: VastCompanionAdSmallXml,
+                                expectedVal: 1
+                            }
+                        ];
+
+                    tests.forEach((test) => {
+                        it(test.message, () => {
+                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
+                            assert.equal(vast.getAd()!.getUnsupportedCompanionAds().length, test.expectedVal);
                         });
                     });
                 });
