@@ -148,12 +148,11 @@ export class Slider {
         const indicatorContainer = document.createElement('div');
         indicatorContainer.classList.add('indicator-container');
         const indicators = [];
-        let i;
 
         indicatorWrap.className = wrapClassName;
 
         item.className = className;
-        for (i = 1; i < howMany; i++) {
+        for (let i = 1; i < howMany; i++) {
             indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
         }
         indicators.push(indicatorWrap.appendChild(item));
