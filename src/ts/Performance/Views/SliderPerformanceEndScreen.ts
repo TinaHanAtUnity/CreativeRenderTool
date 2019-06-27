@@ -65,7 +65,22 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
         this._sliderUsageDataEventSent = false;
 
-        this._slider = new Slider(screenshots, screenshotOrientation, this.onSlideCallback, this.onDownloadCallback, portraitImageUrl, landscapeImageUrl, squareImageUrl);
+        const mainImageUrl = this.getMainImageUrl(screenshotOrientation, squareImageUrl, portraitImageUrl, landscapeImageUrl);
+        if (mainImageUrl) {
+            screenshots.unshift(mainImageUrl);
+        }
+
+        this._slider = new Slider(screenshots, screenshotOrientation, this.onSlideCallback, this.onDownloadCallback);
+    }
+
+    private getMainImageUrl(imageOrientation: SliderEndScreenImageOrientation, squareImageUrl?: string, portraitImageUrl?: string, landscapeImageUrl?: string): string | undefined {
+        if (squareImageUrl !== undefined) {
+            return squareImageUrl;
+        } else if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImageUrl) {
+            return portraitImageUrl;
+        } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImageUrl) {
+            return landscapeImageUrl;
+        }
     }
 
     public show(): void {

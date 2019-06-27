@@ -52,7 +52,7 @@ export class Slider {
     private _resizeTimeId: number | null;
     private _swipableIndexes: number[];
 
-    constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback, portraitImage?: string, landscapeImage?: string, squareImage?: string) {
+    constructor(slideImageUrls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
         this._currentSlideIndex = 0;
@@ -66,14 +66,7 @@ export class Slider {
         this._slideSpeed = 300;
         this._minimalSwipeLength = 60;
         this._swipableIndexes = [];
-        this._imageUrls = [];
-
-        const mainImage = this.getMainImage(imageOrientation, squareImage, portraitImage, landscapeImage);
-        if (mainImage) {
-            this._imageUrls.push(mainImage);
-        }
-
-        this._imageUrls.push(...urls);
+        this._imageUrls = slideImageUrls;
 
         const allSlidesCreatedPromise: Promise<HTMLElement | null>[] = [];
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
@@ -102,16 +95,6 @@ export class Slider {
             this.init();
             this._ready = null;
         });
-    }
-
-    private getMainImage(imageOrientation: SliderEndScreenImageOrientation, squareImage?: string, portraitImage?: string, landscapeImage?: string): string | undefined {
-        if (squareImage !== undefined) {
-            return squareImage;
-        } else if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
-            return portraitImage;
-        } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
-            return landscapeImage;
-        }
     }
 
     private init(): void {
