@@ -451,6 +451,42 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return adView;
     }
 
+    private calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number): number {
+
+        let adjustedScreenWidth = screenWidth;
+        let adjustedScreeHeight = screenHeight;
+
+        if (videoWidth < screenWidth && this.isVideoCutOffX(videoWidth, screenWidth, xOffset)) {
+            // screen dimensions must take on dimensions of offset, video dimension not changed
+            adjustedScreenWidth = screenWidth - xOffset;
+        } else {
+            // we can assume these dimensions are 100% in view since video is not cut off
+            videoWidth = (videoWidth < screenWidth) ? screenWidth : videoWidth;
+        }
+
+        if (videoHeight < screenHeight && this.isVideoCutOffY(videoHeight, screenHeight, yOffset)) {
+            // screen dimensions must take on dimensions of offset, video dimension not changed
+            adjustedScreeHeight = screenHeight - yOffset;
+        } else {
+            // we can assume these dimensions are 100% in view since video is not cut off
+            videoHeight = (videoHeight < screenHeight) ? screenHeight : videoHeight;
+        }
+
+        const videoArea = videoWidth * videoHeight;
+        const screenArea = adjustedScreenWidth * adjustedScreeHeight;
+        const percentCovered = (videoArea - screenArea) / videoArea;
+
+        return (1 - percentCovered) * 100;
+    }
+
+    private isVideoCutOffX(videoWidth: number, screenWidth: number, xOffset: number): boolean {
+        return (videoWidth + xOffset) > screenWidth;
+    }
+
+    private isVideoCutOffY(videoHeight: number, screenHeight: number, yOffset: number): boolean {
+        return (videoHeight + yOffset) > screenHeight;
+    }
+
     /**
      * Used to ensure OMID#SessionStart is fired prior to video playback events
      * Used to ensure DOM is removed prior to OMID#SessionFinish
@@ -495,6 +531,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (accessMode === AccessMode.LIMITED) {
             impressionObject.viewPort = this.calculateViewPort(screenWidth, screenHeight);
+
+            // const x = this._videoViewRectangle[0];
+            // const y = this._videoViewRectangle[1];
+            // const videoWidth = this._videoViewRectangle[2];
+            // const videoHeight = this._videoViewRectangle[3];
+            // const percentInView = this.calculatePercentageInView(videoWidth, videoHeight, screenWidth, screenHeight, x, y);
+            // impressionObject.adView = this.calculateVastAdView(percentInView, [], measuringElementAvailable, []);
+
             impressionObject.adView = this.calculateVastAdView(100, [], screenWidth, screenHeight, measuringElementAvailable, []);
         }
 
