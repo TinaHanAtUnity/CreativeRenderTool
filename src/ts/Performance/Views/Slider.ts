@@ -362,39 +362,28 @@ export class Slider {
         }
     }
 
-    private slideHandler(index: number, automatic: boolean = false) {
-        let targetSlide: number;
-        let oldSlideIndex: number;
-        let slideLeft: number;
-        let animSlide: number;
-        let targetTransitionPosition: number | null = null;
-
+    private slideHandler(targetSlideIndex: number, automatic: boolean = false) {
         if (this._isAnimating === true) {
             return;
         }
 
-        targetSlide = index;
-        targetTransitionPosition = this.getTransitionPosition(targetSlide);
-        slideLeft = this.getTransitionPosition(this._currentSlideIndex);
+        const targetTransitionPosition = this.getTransitionPosition(targetSlideIndex);
 
         clearInterval(this._autoPlayTimer);
 
-        if (targetSlide < 0) {
-            animSlide = this._slideCount + targetSlide;
-        } else if (targetSlide >= this._slideCount) {
-            animSlide = targetSlide - this._slideCount;
-        } else {
-            animSlide = targetSlide;
-        }
-
         this._isAnimating = true;
 
-        oldSlideIndex = this._currentSlideIndex;
-        this._currentSlideIndex = animSlide;
+        if (targetSlideIndex < 0) {
+            this._currentSlideIndex = this._slideCount + targetSlideIndex;
+        } else if (targetSlideIndex >= this._slideCount) {
+            this._currentSlideIndex = targetSlideIndex - this._slideCount;
+        } else {
+            this._currentSlideIndex = targetSlideIndex;
+        }
 
         this.animateSlide(targetTransitionPosition, () => {
             // slide calback
-            this._onSlideCallback({ automatic: automatic });
+            this._onSlideCallback({ automatic });
             this.postSlide();
         });
         this.updateIndicators();
