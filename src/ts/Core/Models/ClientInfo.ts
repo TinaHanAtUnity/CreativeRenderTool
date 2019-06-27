@@ -53,8 +53,7 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('webviewVersion', data[10]);
         this.set('initTimestamp', data[11]);
         this.set('reinitialized', data[12]);
-        const maybeUserPerPlacementLoad = data[13];
-        this.set('usePerPlacementLoad', !!maybeUserPerPlacementLoad);
+        this.set('usePerPlacementLoad', !!data[13]);
         this.set('monetizationInUse', false);
     }
 

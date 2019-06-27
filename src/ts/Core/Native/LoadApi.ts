@@ -26,7 +26,7 @@ export class LoadApi extends NativeApi {
         }
     }
 
-    public handleLoadPlacements(placements: string[]) {
+    private handleLoadPlacements(placements: string[]) {
         for (const placement of placements) {
             const placementId: string = placement;
             if (placementId) {

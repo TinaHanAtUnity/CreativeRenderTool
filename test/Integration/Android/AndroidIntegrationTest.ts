@@ -9,6 +9,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 import { EventCategory } from 'Core/Constants/EventCategory';
 import { LoadEvent } from 'Core/Native/LoadApi';
@@ -125,14 +126,14 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ['video']);
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'video');
         }).catch(() => {
-            chai.assert.fail('should not throw');
+            assert.fail('should not throw');
         });
 
         return promiseReady.then(() => {
-            chai.assert.equal(readyCount, 1);
-            chai.assert.equal(readyPlacement, 'video');
+            assert.equal(readyCount, 1);
+            assert.equal(readyPlacement, 'video');
         });
     });
 
@@ -191,13 +192,13 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
             UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'rewardedVideo', 'video');
         }).catch(() => {
-            chai.assert.fail('should not throw');
+            assert.fail('should not throw');
         });
 
         return promiseReady.then(() => {
-            chai.assert.equal(readyPlacement.length, 2);
-            chai.assert.isTrue(readyPlacement.includes('rewardedVideo'));
-            chai.assert.isTrue(readyPlacement.includes('video'));
+            assert.equal(readyPlacement.length, 2);
+            assert.isTrue(readyPlacement.includes('rewardedVideo'));
+            assert.isTrue(readyPlacement.includes('video'));
         });
     });
 
@@ -247,7 +248,7 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
 
         return new Promise(resolve => setTimeout(resolve, 5000)).then(() => {
-            chai.assert.equal(readyCount, 0);
+            assert.equal(readyCount, 0);
         });
     });
 
@@ -304,14 +305,14 @@ describe('AndroidIntegrationTest', () => {
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ['rewardedVideo']);
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'rewardedVideo');
         }).catch(() => {
-            chai.assert.fail('should not throw');
+            assert.fail('should not throw');
         });
 
         return promiseReady.then(() => {
-            chai.assert.equal(readyCount, 1);
-            chai.assert.equal(readyPlacement, 'rewardedVideo');
+            assert.equal(readyCount, 1);
+            assert.equal(readyPlacement, 'rewardedVideo');
         });
     });
 
