@@ -68,7 +68,7 @@ export class Slider {
         this._swipableIndexes = [];
         this._imageUrls = [];
 
-        const mainImage = this.getMainImage(imageOrientation, portraitImage, landscapeImage);
+        const mainImage = this.getMainImage(imageOrientation, squareImage, portraitImage, landscapeImage);
         if (mainImage) {
             this._imageUrls.push(mainImage);
         }
@@ -104,8 +104,10 @@ export class Slider {
         });
     }
 
-    private getMainImage(imageOrientation: SliderEndScreenImageOrientation, portraitImage?: string, landscapeImage?: string): string | undefined {
-        if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
+    private getMainImage(imageOrientation: SliderEndScreenImageOrientation, squareImage?: string, portraitImage?: string, landscapeImage?: string): string | undefined {
+        if (squareImage !== undefined) {
+            return squareImage;
+        } else if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImage) {
             return portraitImage;
         } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImage) {
             return landscapeImage;
@@ -142,10 +144,6 @@ export class Slider {
         this._indicators = indicators;
         indicatorContainer.appendChild(indicatorWrap);
         this._rootElement.appendChild(indicatorContainer);
-
-        setTimeout(() => {
-            indicatorWrap.style.left = '20px';
-        }, 0);
     }
 
     private updateIndicators(): void {
