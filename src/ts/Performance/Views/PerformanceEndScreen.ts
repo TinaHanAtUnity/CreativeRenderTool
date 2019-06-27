@@ -7,7 +7,7 @@ import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class PerformanceEndScreen extends EndScreen {
-    private _core: ICoreApi;
+    protected _core: ICoreApi;
     private _campaign: PerformanceCampaign;
     private _country: string | undefined;
 

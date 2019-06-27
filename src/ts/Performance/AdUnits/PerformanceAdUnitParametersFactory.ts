@@ -3,7 +3,7 @@ import { IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdU
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { IEndScreenParameters, EndScreen } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
@@ -49,7 +49,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        let endScreen: PerformanceEndScreen;
+        let endScreen: EndScreen;
 
         const abGroup = baseParams.coreConfig.getAbGroup();
         if (DoubleShadowCloseButtonTest.isValid(abGroup)) {

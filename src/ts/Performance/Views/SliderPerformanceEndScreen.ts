@@ -14,14 +14,13 @@ interface ISliderEventParameters {
 }
 
 export class SliderPerformanceEndScreen extends EndScreen {
-    private _core: ICoreApi;
-    private _country: string | undefined;
+    protected _country: string | undefined;
+    protected _core: ICoreApi;
     private _campaign: SliderPerformanceCampaign;
     private _slider: Slider;
     private _sliderEventParameters: ISliderEventParameters;
     private _showTimestamp: number;
     private _sliderUsageDataEventSent: boolean;
-    private _country: string | undefined;
 
     constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign, country?: string) {
         super(parameters);
