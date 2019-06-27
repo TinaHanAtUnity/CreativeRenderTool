@@ -63,7 +63,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
-        this._templateData = {};
+        this._templateData = {
+            myChoicesCTATextTest: parameters.consentABTest
+        };
 
         this._bindings = [
             {
