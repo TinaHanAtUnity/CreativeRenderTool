@@ -451,7 +451,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return adView;
     }
 
-    private calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number): number {
+    public calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number): number {
 
         let adjustedScreenWidth = screenWidth;
         let adjustedScreeHeight = screenHeight;

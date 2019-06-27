@@ -178,6 +178,44 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 });
             });
 
+            describe('Calculating percentageInView', () => {
+                it('should calculate video view percentage of 100 if video dimensions are smaller than screen dimensions', () => {
+                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 0);
+                    const percentage = 100;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage of 100 if video dimensions are equal screen dimensions', () => {
+                    const calculatedPercentage = om.calculatePercentageInView(1080, 1800, 1080, 1800, 0, 0);
+                    const percentage = 100;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if video width exceeds screen width', () => {
+                    const calculatedPercentage = om.calculatePercentageInView(1400, 400, 1080, 1800, 0, 0);
+                    const percentage = 77.14285714285715;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if video height exceeds screen height', () => {
+                    const calculatedPercentage = om.calculatePercentageInView(800, 2000, 1080, 1800, 0, 0);
+                    const percentage = 90;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if video dimensions are smaller than screen dimensions with x offset', () => {
+                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 700, 0);
+                    const percentage = 47.5;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if video dimensions are smaller than screen dimensions with y offset', () => {
+                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 1500);
+                    const percentage = 75;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+            });
+
             describe('Calculating Vast AdView', () => {
                 it('should return the adview in landscape', () => {
                     const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 200, 100, false, []);
