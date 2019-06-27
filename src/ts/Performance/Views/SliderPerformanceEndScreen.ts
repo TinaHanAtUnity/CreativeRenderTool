@@ -1,5 +1,5 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { Template } from 'Core/Utilities/Template';
@@ -36,6 +36,9 @@ export class SliderPerformanceEndScreen extends EndScreen {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
+        const squareImageUrl = squareImage ? squareImage.getUrl() : undefined;
+        const portraitImageUrl = portraitImage ? portraitImage.getUrl() : undefined;
+        const landscapeImageUrl = landscapeImage ? landscapeImage.getUrl() : undefined;
 
         this._templateData = {
             'gameName': campaign.getGameName(),
@@ -44,21 +47,25 @@ export class SliderPerformanceEndScreen extends EndScreen {
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt(),
             'screenshots': screenshots,
-            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
-            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
-            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined
+            'endScreenLandscape': portraitImageUrl,
+            'endScreenPortrait': landscapeImageUrl,
+            'endScreenSquare': squareImageUrl
         };
+
+        const screenshotOrientation = campaign.getScreenshotsOrientation();
 
         this._sliderEventParameters = {
             automaticSlideCount: 0,
             manualSlideCount: 0,
             downloadClicked: false,
-            sliderReadyWhenShown: undefined
+            sliderReadyWhenShown: undefined,
+            squareImageAsMainImage: !!squareImage,
+            screenshotOrientation: screenshotOrientation === SliderEndScreenImageOrientation.PORTRAIT ? 'portrait' : 'landscape'
         };
 
         this._sliderUsageDataEventSent = false;
 
-        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback, this.onDownloadCallback, portraitImage ? portraitImage.getUrl() : undefined, landscapeImage ? landscapeImage.getUrl() : undefined, squareImage ? squareImage.getUrl() : undefined);
+        this._slider = new Slider(screenshots, screenshotOrientation, this.onSlideCallback, this.onDownloadCallback, portraitImageUrl, landscapeImageUrl, squareImageUrl);
     }
 
     public show(): void {
