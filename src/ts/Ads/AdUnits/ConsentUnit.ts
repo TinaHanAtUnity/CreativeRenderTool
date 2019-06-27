@@ -48,13 +48,18 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
         this._landingPage = ConsentPage.HOMESCREEN;
 
+        let consentABTest: boolean = false;
+        if (ConsentTest.isValid(parameters.abGroup) && parameters.deviceInfo.getLanguage().match('en.*')) {
+            consentABTest = true;
+        }
+
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
             pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
-            consentABTest: ConsentTest.isValid(parameters.abGroup)
+            consentABTest: consentABTest
         };
 
         if (this._platform === Platform.ANDROID) {
