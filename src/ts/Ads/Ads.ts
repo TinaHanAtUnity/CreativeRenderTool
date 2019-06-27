@@ -590,6 +590,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('sessionId')) {
             CampaignManager.setSessionId(TestEnvironment.get('sessionId'));
+            AuctionRequest.setSessionId(TestEnvironment.get('sessionId'));
         }
 
         if(TestEnvironment.get('country')) {
