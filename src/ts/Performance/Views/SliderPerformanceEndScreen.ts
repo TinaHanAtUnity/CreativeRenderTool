@@ -11,6 +11,7 @@ interface ISliderEventParameters {
     automaticSlideCount: number;
     downloadClicked: boolean;
     sliderReadyWhenShown: boolean | undefined;
+    [key: string]: boolean | undefined | number | string;
 }
 
 export class SliderPerformanceEndScreen extends EndScreen {
@@ -87,7 +88,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
         }
         this._sliderUsageDataEventSent = true;
 
-        const kafkaObject: { [key: string]: unknown } = this._sliderEventParameters;
+        const kafkaObject = this._sliderEventParameters;
         kafkaObject.type = 'slider_data';
         kafkaObject.auctionId = this._campaign.getSession().getId();
         kafkaObject.timeVisible = Date.now() - this._showTimestamp;
