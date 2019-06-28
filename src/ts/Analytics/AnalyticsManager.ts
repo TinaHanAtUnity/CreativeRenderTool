@@ -8,9 +8,9 @@ import {
     AnalyticsLevelFailedEvent,
     AnalyticsLevelUpEvent,
     AnalyticsProtocol,
-    IAnalyticsCommonObject,
     IAnalyticsMonetizationExtras,
-    IAnalyticsObject
+    IAnalyticsObject,
+    IAnalyticsCommonObject
 } from 'Analytics/AnalyticsProtocol';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
@@ -23,6 +23,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 interface IAnalyticsEventWrapper {
     identifier: string;
@@ -53,6 +54,7 @@ export class AnalyticsManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
+    private _adsConfiguration: AdsConfiguration;
     private _userId: string;
     private _sessionId: number;
     private _storage: AnalyticsStorage;
@@ -83,7 +85,7 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
+    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._analytics = analytics;
@@ -92,6 +94,7 @@ export class AnalyticsManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
+        this._adsConfiguration = adsConfiguration;
         this._storage = analyticsStorage;
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';

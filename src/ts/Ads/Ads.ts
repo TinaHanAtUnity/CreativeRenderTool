@@ -84,6 +84,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { ZyngaLoadTest } from 'Core/Models/ABGroup';
+import { Analytics } from 'Analytics/Analytics';
 
 export class Ads implements IAds {
 
@@ -117,11 +118,14 @@ export class Ads implements IAds {
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
+    public Analytics: Analytics;
 
     constructor(config: unknown, core: ICore, store: IStore) {
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this._core = core;
         this._store = store;
+
+        this.Analytics = new Analytics(core, this.Config);
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -167,6 +171,9 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
+            return this.Analytics.initialize();
+        }).then((gameSessionId: number) => {
+            this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
 
             if (AdsConfigurationParser.isUpdateUserPrivacyForIncidentNeeded()) {
@@ -193,7 +200,7 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
+            const promo = new Promo(this._core, this, this._core.Purchasing);
             const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
             for(const contentType in promoContentTypeHandlerMap) {
                 if(promoContentTypeHandlerMap.hasOwnProperty(contentType)) {

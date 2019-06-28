@@ -24,6 +24,7 @@ import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
+import { Analytics } from 'Analytics/Analytics';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -57,4 +58,5 @@ export interface IAds extends IApiModule {
     CampaignManager: CampaignManager;
     RefreshManager: RefreshManager;
     ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
+    Analytics: Analytics;
 }
