@@ -7,7 +7,7 @@ import { PlacementState } from 'Ads/Models/Placement';
 
 export class UnityAds {
 
-    public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false) {
+    public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false): Promise<void> {
         let nativeBridge: NativeBridge;
         switch(platform) {
             // Setting auto batching on does not work in a "single-threaded" environment due to callbacks and events
@@ -32,7 +32,7 @@ export class UnityAds {
         UnityAds._listener = listener;
 
         UnityAds._webView = new WebView(nativeBridge);
-        UnityAds._webView.initialize();
+        return UnityAds._webView.initialize();
     }
 
     public static show(placement: string) {

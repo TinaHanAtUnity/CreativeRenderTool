@@ -254,7 +254,7 @@ export class Core implements ICore {
             }
 
             this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
-            this.Api.Sdk.logError(`Initialization error: ${error.message}, ${error.stack}`);
+            this.Api.Sdk.logError(`Initialization error: ${error.message}`);
             Diagnostics.trigger('initialization_error', error);
         });
     }

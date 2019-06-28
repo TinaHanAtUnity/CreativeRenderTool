@@ -16,7 +16,8 @@ export class Sdk extends BackendApi {
             this._webViewHash,
             this._webViewVersion,
             this._initTimeStamp,
-            this._reinitialized
+            this._reinitialized,
+            this._usePerPlacementLoad
         ];
     }
 
@@ -100,6 +101,10 @@ export class Sdk extends BackendApi {
         this._reinitialized = reinitialized;
     }
 
+    public setUsePerPlacementLoad(usePerPlacementLoad: boolean) {
+        this._usePerPlacementLoad = usePerPlacementLoad;
+    }
+
     private _gameId: string = '345';
     private _testMode: boolean = true;
     private _appName: string = 'com.test.app.name';
@@ -113,4 +118,5 @@ export class Sdk extends BackendApi {
     private _webViewVersion: string = '2.0.0.-webviewversion';
     private _initTimeStamp: number = 12345;
     private _reinitialized: boolean = false;
+    private _usePerPlacementLoad: boolean = false;
 }
