@@ -178,42 +178,66 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 });
             });
 
-            describe('Calculating calculatePercentageInView', () => {
-                // it('should calculate video view percentage of 100 if video dimensions are smaller than screen dimensions', () => {
-                //     const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 0);
-                //     const percentage = 100;
-                //     assert.equal(calculatedPercentage, percentage);
-                // });
+            describe('Calculating PercentageInView', () => {
+                it('should calculate video view percentage if video is full screen portrait and obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(1080, 1800, 1080, 1800, 0, 0, obstruction);
+                    const percentage = 90.23976337448559;
+                    assert.equal(calculatedPercentage, percentage);
+                });
 
-                // it('should calculate video view percentage of 100 if video dimensions are equal screen dimensions', () => {
-                //     const calculatedPercentage = om.calculatePercentageInView(1080, 1800, 1080, 1800, 0, 0);
-                //     const percentage = 100;
-                //     assert.equal(calculatedPercentage, percentage);
-                // });
+                it('should calculate video view percentage if video width exceeds screen width and is obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(1400, 400, 1080, 1800, 0, 0, obstruction);
+                    const percentage = 43.26089285714287;
+                    assert.equal(calculatedPercentage, percentage);
+                });
 
-                // it('should calculate video view percentage if video width exceeds screen width', () => {
-                //     const calculatedPercentage = om.calculatePercentageInView(1400, 400, 1080, 1800, 0, 0);
-                //     const percentage = 77.14285714285715;
-                //     assert.equal(calculatedPercentage, percentage);
-                // });
+                it('should calculate video view percentage with view obstructed and video height larger than viewport', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(800, 2000, 1080, 1800, 0, 0, obstruction);
+                    const percentage = 78.1413125;
+                    assert.equal(calculatedPercentage, percentage);
+                });
 
-                // it('should calculate video view percentage if video height exceeds screen height', () => {
-                //     const calculatedPercentage = om.calculatePercentageInView(800, 2000, 1080, 1800, 0, 0);
-                //     const percentage = 90;
-                //     assert.equal(calculatedPercentage, percentage);
-                // });
+                it('should calculate video view percentage if video dimensions are smaller than screen dimensions with x offset and obstruction', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 800,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 700, 0, obstruction);
+                    const percentage = 36.03125;
+                    assert.equal(calculatedPercentage, percentage);
+                });
 
-                // it('should calculate video view percentage if video dimensions are smaller than screen dimensions with x offset', () => {
-                //     const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 700, 0);
-                //     const percentage = 47.5;
-                //     assert.equal(calculatedPercentage, percentage);
-                // });
-
-                // it('should calculate video view percentage if video dimensions are smaller than screen dimensions with y offset', () => {
-                //     const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 1500);
-                //     const percentage = 75;
-                //     assert.equal(calculatedPercentage, percentage);
-                // });
+                it('should calculate video view percentage if video dimensions are smaller than screen dimensions with y offset and obstruction', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 1400,
+                        width: 800,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 1500, obstruction);
+                    const percentage = 8.25;
+                    assert.equal(calculatedPercentage, percentage);
+                });
             });
 
             describe('Calculating PercentageInScreenViewPort', () => {

@@ -452,7 +452,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number, obstruction: IRectangle) {
-        const obstructionOverlapPercentage = 100 - this.calculateObstructionOverlapPercentage(videoWidth, videoHeight, xOffset, yOffset, obstruction);
+        const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoWidth, videoHeight, xOffset, yOffset, obstruction);
         const percentageInViewPort = this.calculatePercentageInScreenViewPort(videoWidth, videoHeight, screenWidth, screenHeight, xOffset, yOffset);
 
         const percentageInView = percentageInViewPort - obstructionOverlapPercentage;
@@ -480,8 +480,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         const videoArea = videoWidth * videoHeight;
-        const obstructionArea = obstruction.width * obstruction.height;
-        // const obstructionOverlapPercentage = (obstructionOverlapArea) / ((videoArea + obstructionArea) - obstructionOverlapArea);
         const obstructionOverlapPercentage = obstructionOverlapArea / videoArea;
 
         return obstructionOverlapPercentage * 100;
