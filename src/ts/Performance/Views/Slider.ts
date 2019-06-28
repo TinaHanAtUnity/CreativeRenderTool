@@ -254,7 +254,11 @@ export class Slider {
 
     private getSwipableIndexes(): number[] {
         const indexes = [];
-        for (const slide of this._slidesContainer.children) {
+
+        // Using for-of for NodeList will not work on some devices like on iOS 10.3
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < this._slidesContainer.children.length; i++) {
+            const slide = this._slidesContainer.children[i];
             if (slide && slide.hasAttribute('slide-index')) {
                 indexes.push(parseInt(slide.getAttribute('slide-index')!, 10));
             }
