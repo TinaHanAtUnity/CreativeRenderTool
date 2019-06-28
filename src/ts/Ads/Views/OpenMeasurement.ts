@@ -565,14 +565,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (accessMode === AccessMode.LIMITED) {
             impressionObject.viewPort = this.calculateViewPort(screenWidth, screenHeight);
-
-            // const x = this._videoViewRectangle[0];
-            // const y = this._videoViewRectangle[1];
-            // const videoWidth = this._videoViewRectangle[2];
-            // const videoHeight = this._videoViewRectangle[3];
-            // const percentInView = this.calculatePercentageInView(videoWidth, videoHeight, screenWidth, screenHeight, x, y);
-            // impressionObject.adView = this.calculateVastAdView(percentInView, [], measuringElementAvailable, []);
-
             impressionObject.adView = this.calculateVastAdView(100, [], screenWidth, screenHeight, measuringElementAvailable, []);
         }
 
