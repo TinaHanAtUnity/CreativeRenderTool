@@ -161,6 +161,7 @@ import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { LoadApi } from 'Core/Native/LoadApi';
 import { IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
 import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
@@ -865,6 +866,7 @@ export class TestFixtures {
             null,
             '2.0.0-webview',
             123456,
+            false,
             false
         ]);
     }
@@ -1029,7 +1031,8 @@ export class TestFixtures {
             iOS: platform === Platform.IOS ? {
                 AdUnit: new IosAdUnitApi(nativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(nativeBridge)
-            } : undefined
+            } : undefined,
+            LoadApi: new LoadApi(nativeBridge)
         };
     }
 
