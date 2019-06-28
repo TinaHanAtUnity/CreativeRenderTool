@@ -451,7 +451,43 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return adView;
     }
 
-    public calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number): number {
+    public calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number, obstruction: IRectangle) {
+        const obstructionOverlapPercentage = 100 - this.calculateObstructionOverlapPercentage(videoWidth, videoHeight, xOffset, yOffset, obstruction);
+        const percentageInViewPort = this.calculatePercentageInScreenViewPort(videoWidth, videoHeight, screenWidth, screenHeight, xOffset, yOffset);
+
+        const percentageInView = percentageInViewPort - obstructionOverlapPercentage;
+
+        return percentageInView < 0 ? 0 : percentageInView;
+    }
+
+    public calculateObstructionOverlapPercentage(videoWidth: number, videoHeight: number, xOffset: number, yOffset: number, obstruction: IRectangle) {
+        let obstructionOverlapArea = 0;
+
+        const videoXMin = xOffset;
+        const videoYMin = yOffset;
+        const videoXMax = xOffset + videoWidth;
+        const videoYMax = yOffset + videoHeight;
+
+        const obstructionXMin = obstruction.x;
+        const obstructionYMin = obstruction.y;
+        const obstructionXMax = obstruction.x + obstruction.width;
+        const obstructionYMax = obstruction.y + obstruction.height;
+
+        const dx = Math.min(videoXMax, obstructionXMax) - Math.max(videoXMin, obstructionXMin);
+        const dy = Math.min(videoYMax, obstructionYMax) - Math.max(videoYMin, obstructionYMin);
+        if ((dx >= 0) && (dy >= 0)) {
+            obstructionOverlapArea = dx * dy;
+        }
+
+        const videoArea = videoWidth * videoHeight;
+        const obstructionArea = obstruction.width * obstruction.height;
+        // const obstructionOverlapPercentage = (obstructionOverlapArea) / ((videoArea + obstructionArea) - obstructionOverlapArea);
+        const obstructionOverlapPercentage = obstructionOverlapArea / videoArea;
+
+        return obstructionOverlapPercentage * 100;
+    }
+
+    public calculatePercentageInScreenViewPort(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number): number {
 
         let adjustedScreenWidth = screenWidth;
         let adjustedScreeHeight = screenHeight;

@@ -178,40 +178,174 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 });
             });
 
-            describe('Calculating percentageInView', () => {
+            describe('Calculating calculatePercentageInView', () => {
+                // it('should calculate video view percentage of 100 if video dimensions are smaller than screen dimensions', () => {
+                //     const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 0);
+                //     const percentage = 100;
+                //     assert.equal(calculatedPercentage, percentage);
+                // });
+
+                // it('should calculate video view percentage of 100 if video dimensions are equal screen dimensions', () => {
+                //     const calculatedPercentage = om.calculatePercentageInView(1080, 1800, 1080, 1800, 0, 0);
+                //     const percentage = 100;
+                //     assert.equal(calculatedPercentage, percentage);
+                // });
+
+                // it('should calculate video view percentage if video width exceeds screen width', () => {
+                //     const calculatedPercentage = om.calculatePercentageInView(1400, 400, 1080, 1800, 0, 0);
+                //     const percentage = 77.14285714285715;
+                //     assert.equal(calculatedPercentage, percentage);
+                // });
+
+                // it('should calculate video view percentage if video height exceeds screen height', () => {
+                //     const calculatedPercentage = om.calculatePercentageInView(800, 2000, 1080, 1800, 0, 0);
+                //     const percentage = 90;
+                //     assert.equal(calculatedPercentage, percentage);
+                // });
+
+                // it('should calculate video view percentage if video dimensions are smaller than screen dimensions with x offset', () => {
+                //     const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 700, 0);
+                //     const percentage = 47.5;
+                //     assert.equal(calculatedPercentage, percentage);
+                // });
+
+                // it('should calculate video view percentage if video dimensions are smaller than screen dimensions with y offset', () => {
+                //     const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 1500);
+                //     const percentage = 75;
+                //     assert.equal(calculatedPercentage, percentage);
+                // });
+            });
+
+            describe('Calculating PercentageInScreenViewPort', () => {
                 it('should calculate video view percentage of 100 if video dimensions are smaller than screen dimensions', () => {
-                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 0);
+                    const calculatedPercentage = om.calculatePercentageInScreenViewPort(800, 400, 1080, 1800, 0, 0);
                     const percentage = 100;
                     assert.equal(calculatedPercentage, percentage);
                 });
 
                 it('should calculate video view percentage of 100 if video dimensions are equal screen dimensions', () => {
-                    const calculatedPercentage = om.calculatePercentageInView(1080, 1800, 1080, 1800, 0, 0);
+                    const calculatedPercentage = om.calculatePercentageInScreenViewPort(1080, 1800, 1080, 1800, 0, 0);
                     const percentage = 100;
                     assert.equal(calculatedPercentage, percentage);
                 });
 
                 it('should calculate video view percentage if video width exceeds screen width', () => {
-                    const calculatedPercentage = om.calculatePercentageInView(1400, 400, 1080, 1800, 0, 0);
+                    const calculatedPercentage = om.calculatePercentageInScreenViewPort(1400, 400, 1080, 1800, 0, 0);
                     const percentage = 77.14285714285715;
                     assert.equal(calculatedPercentage, percentage);
                 });
 
                 it('should calculate video view percentage if video height exceeds screen height', () => {
-                    const calculatedPercentage = om.calculatePercentageInView(800, 2000, 1080, 1800, 0, 0);
+                    const calculatedPercentage = om.calculatePercentageInScreenViewPort(800, 2000, 1080, 1800, 0, 0);
                     const percentage = 90;
                     assert.equal(calculatedPercentage, percentage);
                 });
 
                 it('should calculate video view percentage if video dimensions are smaller than screen dimensions with x offset', () => {
-                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 700, 0);
+                    const calculatedPercentage = om.calculatePercentageInScreenViewPort(800, 400, 1080, 1800, 700, 0);
                     const percentage = 47.5;
                     assert.equal(calculatedPercentage, percentage);
                 });
 
                 it('should calculate video view percentage if video dimensions are smaller than screen dimensions with y offset', () => {
-                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 1500);
+                    const calculatedPercentage = om.calculatePercentageInScreenViewPort(800, 400, 1080, 1800, 0, 1500);
                     const percentage = 75;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+            });
+
+            describe('Calculating ObstructionOverlapPercentage', () => {
+                it('should calculate video view percentage if full screen landscape video is obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(1280, 768, 0, 0, obstruction);
+                    const percentage = 19.301249186197918;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+                it('should calculate video view percentage if full screen portrait video is obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 1280, 0, 0, obstruction);
+                    const percentage = 19.301249186197918;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+                it('should calculate video view percentage if sized-to-fit portrait video is fully obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 350,
+                        width: 768,
+                        height: 500
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 500, 0, 350, obstruction);
+                    const percentage = 100;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if sized-to-fit portrait video is fully obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 350,
+                        width: 768,
+                        height: 600
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 500, 0, 350, obstruction);
+                    const percentage = 100;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if sized-to-fit portrait video is mostly obstructed', () => {
+                    const obstruction = {
+                        x: 20,
+                        y: 20,
+                        width: 730,
+                        height: 900
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 500, 0, 350, obstruction);
+                    const percentage = 95.05208333333334;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if sized-to-fit portrait video is obstructed', () => {
+                    const obstruction = {
+                        x: 20,
+                        y: 20,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 500, 0, 350, obstruction);
+                    const percentage = 4.981510416666667;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate video view percentage if sized-to-fit portrait video is partially obstructed', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 367
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 500, 0, 350, obstruction);
+                    const percentage = 2.2888020833333336;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+
+                it('should calculate overlap percentage as 0 if obstruction does not pass over video view', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 517,
+                        height: 349
+                    };
+                    const calculatedPercentage = om.calculateObstructionOverlapPercentage(768, 500, 0, 350, obstruction);
+                    const percentage = 0;
                     assert.equal(calculatedPercentage, percentage);
                 });
             });
