@@ -11,7 +11,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IVerificationScriptResource, IAdView, ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
+import { IAdView, ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 import OMID3p from 'html/omid/omid3p.html';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
