@@ -1,3 +1,10 @@
+# Staged
+
+* Make the RedesignedEndScreenDesignTest ZyngaFilteredABTest instead of a normal one [#10401](https://github.com/Applifier/unity-ads-webview/pull/10401)
+* AB test: Replace 'Agree to all' with 'Accept all' in English versions [#10400](https://github.com/Applifier/unity-ads-webview/pull/10400)
+* Change Stackdriver Trace endpoint to new trace endpoint [#10183](https://github.com/Applifier/unity-ads-webview/pull/10183)
+
+
 # Wed Jun 26 22:46:04 UTC 2019
 
 * Move osVersion from PerformanceAdUnitParametersFactory to AbstractAdUnitParametersFactory to make creation of staging branches more easy [#10399](https://github.com/Applifier/unity-ads-webview/pull/10399)
