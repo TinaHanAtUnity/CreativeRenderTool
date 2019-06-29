@@ -76,7 +76,6 @@ export interface IInfoJson {
     connectionType: string;
     screenWidth: number;
     screenHeight: number;
-    isBackupCampaign: boolean;
     deviceFreeSpace: number;
     adType?: string;
     correlationId?: string;
@@ -402,7 +401,6 @@ export class OperativeEventManager {
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
-                'isBackupCampaign': this._campaign.isBackupCampaign(),
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
                 'isLoadEnabled': this._campaign.isLoadEnabled()
             };

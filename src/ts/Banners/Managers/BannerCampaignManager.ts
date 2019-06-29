@@ -8,7 +8,7 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
-import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
+import { BannerAuctionRequest } from 'Banners/Networking/BannerAuctionRequest';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
