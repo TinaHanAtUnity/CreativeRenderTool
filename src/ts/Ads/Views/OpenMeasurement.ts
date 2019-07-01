@@ -16,6 +16,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
@@ -519,6 +520,17 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private isVideoCutOffY(videoHeight: number, screenHeight: number, yOffset: number): boolean {
         return (videoHeight + yOffset) > screenHeight;
+    }
+
+    public getAndroidViewSize(size: number, density: number): number {
+        return size * (density / 160);
+    }
+
+    public getScreenDensity(): number {
+        if (this._platform === Platform.ANDROID) {
+            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
+        }
+        return 0;
     }
 
     /**
