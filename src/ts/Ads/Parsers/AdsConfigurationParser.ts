@@ -1,6 +1,14 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { CurrentUnityConsentVersion, GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import {
+    CurrentUnityConsentVersion,
+    GamePrivacy,
+    IProfilingPermissions,
+    IGranularPermissions,
+    PrivacyMethod,
+    UserPrivacy,
+    IAllPermissions
+} from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -83,6 +91,9 @@ export class AdsConfigurationParser {
         }
 
         let adsAllowed = false;
+        if (uPP.hasOwnProperty('all')) {
+            adsAllowed = (<IAllPermissions>uPP).all;
+        }
         if (uPP.hasOwnProperty('profiling')) {
             adsAllowed = (<IProfilingPermissions>uPP).profiling;
         }
@@ -90,6 +101,7 @@ export class AdsConfigurationParser {
             adsAllowed = (<IGranularPermissions>uPP).ads;
         }
         if (adsAllowed === false && configJson.optOutEnabled === false) {
+            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(configJson));
             return true;
         }
         return false;

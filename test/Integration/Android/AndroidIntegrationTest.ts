@@ -11,12 +11,17 @@ import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
 import { StorageType, StorageEvent } from 'Core/Native/Storage';
 import { ILoadEvent } from 'Ads/Managers/PerPlacementLoadManager';
+import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 
 describe('AndroidIntegrationTest', () => {
     const sandbox = sinon.createSandbox();
 
     beforeEach(() => {
         fakeARUtils(sandbox);
+        // Force AB Test to return false to comply with hardcoded ABGroup 14 in FAB for reverse AB Test
+        sandbox.stub(ZyngaLoadTest, 'isValid').callsFake(() => {
+            return false;
+        });
     });
 
     afterEach(() => {

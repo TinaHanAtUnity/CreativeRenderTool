@@ -37,7 +37,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 
