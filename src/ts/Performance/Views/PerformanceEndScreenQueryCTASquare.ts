@@ -11,7 +11,7 @@ export class PerformanceEndScreenQueryCTASquare extends PerformanceEndScreen {
         //The UI currently does not respond well to the square image and it has been decided not to support it for the initial experiment
         const kafkaObject: IEndScreenQueryParameters = {
             type: 'ask_to_download',
-            endcard: 'sqaure',
+            endcard: 'square',
             auctionId: campaign.getSession().getId()
         };
         HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
