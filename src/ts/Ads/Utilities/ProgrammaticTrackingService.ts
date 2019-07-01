@@ -47,7 +47,8 @@ export enum VastMetric {
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-    CampaignAttemptedToShowInBackground = 'ad_attempted_show_background'
+    CampaignAttemptedToShowAdInBackground = 'ad_attempted_showad_background',
+    CampaignAboutToShowAdInBackground = 'ad_aboutto_showad_background'
 }
 
 export enum LoadMetric {
@@ -56,10 +57,16 @@ export enum LoadMetric {
     LoadEnabledNoFill = 'load_enabled_no_fill',
     LoadEnabledShow = 'load_enabled_show',
     LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
-    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure'
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure',
+    LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric;
+export enum PurchasingMetric {
+    PurchasingAppleStoreStarted = 'purchasing_apple_store_started',
+    PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
