@@ -170,7 +170,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected abstract onDownloadEvent(event: Event): void;
 
-    private onCloseEvent(event: Event): void {
+    protected onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }

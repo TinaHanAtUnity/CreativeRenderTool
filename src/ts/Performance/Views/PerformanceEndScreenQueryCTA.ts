@@ -3,6 +3,7 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Template } from 'Core/Utilities/Template';
 import EndScreenQuery from 'html/EndScreenQuery.html';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class PerformanceEndScreenQueryCTA extends PerformanceEndScreen {
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
@@ -27,6 +28,14 @@ export class PerformanceEndScreenQueryCTA extends PerformanceEndScreen {
                 selector: '.privacy-button, .gdpr-link, .icon-gdpr'
             }
         ];
+
+        const kafkaObject: IEndScreenQueryParameters = {
+            type: 'ask_to_download',
+            endcard: 'nonsquare',
+            auctionId: campaign.getSession().getId()
+        };
+
+        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     public render(): void {
