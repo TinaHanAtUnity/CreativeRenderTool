@@ -1,3 +1,40 @@
+# Pending
+
+* Prevent two consent dialogs from opening at the same time [#10429](https://github.com/Applifier/unity-ads-webview/pull/10429)
+* Disable logging by default, add option ENABLE_LOGS [#10286](https://github.com/Applifier/unity-ads-webview/pull/10286)
+
+# Tue Jul 2 17:05:52 UTC 2019
+
+* Make the RedesignedEndScreenDesignTest ZyngaFilteredABTest instead of a normal one [#10401](https://github.com/Applifier/unity-ads-webview/pull/10401)
+* AB test: Replace 'Agree to all' with 'Accept all' in English versions [#10400](https://github.com/Applifier/unity-ads-webview/pull/10400)
+* Change Stackdriver Trace endpoint to new trace endpoint [#10183](https://github.com/Applifier/unity-ads-webview/pull/10183)
+* Remove call to console.log from HttpKafka if RequestManager is not set [#10287](https://github.com/Applifier/unity-ads-webview/pull/10287)
+* Integration test framewrok to mimic tape [#10262](https://github.com/Applifier/unity-ads-webview/pull/10262)
+* Enable Banner in stage testing for DSP [#10424](https://github.com/Applifier/unity-ads-webview/pull/10424)
+
+# Wed Jun 26 22:46:04 UTC 2019
+
+* Move osVersion from PerformanceAdUnitParametersFactory to AbstractAdUnitParametersFactory to make creation of staging branches more easy [#10399](https://github.com/Applifier/unity-ads-webview/pull/10399)
+* New End Card UI with "pop" out element experiment [#10163](https://github.com/Applifier/unity-ads-webview/pull/10163)
+* Remove animated endcard test [#10372](https://github.com/Applifier/unity-ads-webview/pull/10372)
+* Add iphone x styles and china watermark for xpromo [#10371](https://github.com/Applifier/unity-ads-webview/pull/10371)
+* Move Analytics to Ads [#10319](https://github.com/Applifier/unity-ads-webview/pull/10319)
+* Promo TLO impressionDate should send number to sdks [#9988](https://github.com/Applifier/unity-ads-webview/pull/9988)
+
+# Tue Jun 25 17:14:41 UTC 2019
+
+* Added handling of 'all: true' to incident fix [#10316](https://github.com/Applifier/unity-ads-webview/pull/10316)
+* Remove incorrect 'ad_did_showad_background' kibana log [#10369](https://github.com/Applifier/unity-ads-webview/pull/10369)
+* Allowing vast end card size minimum to 200 x 200 from 320 x 480 [#10321](https://github.com/Applifier/unity-ads-webview/pull/10321)
+* Block Unnecessary Load Calls to Auction [#10320](https://github.com/Applifier/unity-ads-webview/pull/10320)
+* Move AuctionRequest from Banners/Utilities => Ads/Networking [#10323](https://github.com/Applifier/unity-ads-webview/pull/10323)
+* Remove all backup campaign code [#10317](https://github.com/Applifier/unity-ads-webview/pull/10317)
+* Remove consent ab test [#10370](https://github.com/Applifier/unity-ads-webview/pull/10370)
+
+# Fri Jun 21 22:57:46 UTC 2019
+
+* Adding more logs for #incident-20190605-1 [#10322](https://github.com/Applifier/unity-ads-webview/pull/10322)
+
 # Thu Jun 20 09:19:11 UTC 2019
 
 * Add diagnostics for privacy sanitization [#10293](https://github.com/Applifier/unity-ads-webview/pull/10293)

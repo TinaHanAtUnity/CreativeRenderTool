@@ -83,7 +83,6 @@ export interface ICore extends IApiModule {
     DeviceInfo: DeviceInfo;
     Config: CoreConfiguration;
     Ads: IAds;
-    Analytics: IAnalytics;
     Purchasing: IPurchasing;
     Store: IStore;
     ProgrammaticTrackingService: ProgrammaticTrackingService;

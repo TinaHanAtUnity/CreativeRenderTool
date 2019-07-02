@@ -1,4 +1,3 @@
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
@@ -15,7 +14,6 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { VAST } from 'VAST/VAST';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -553,5 +551,4 @@ export class VastParserStrict {
 
         return hours + minutes + seconds;
     }
-
 }
