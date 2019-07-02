@@ -1,5 +1,19 @@
 # Pending
 
+* Prevent two consent dialogs from opening at the same time [#10429](https://github.com/Applifier/unity-ads-webview/pull/10429)
+* Disable logging by default, add option ENABLE_LOGS [#10286](https://github.com/Applifier/unity-ads-webview/pull/10286)
+
+# Tue Jul 2 17:05:52 UTC 2019
+
+* Make the RedesignedEndScreenDesignTest ZyngaFilteredABTest instead of a normal one [#10401](https://github.com/Applifier/unity-ads-webview/pull/10401)
+* AB test: Replace 'Agree to all' with 'Accept all' in English versions [#10400](https://github.com/Applifier/unity-ads-webview/pull/10400)
+* Change Stackdriver Trace endpoint to new trace endpoint [#10183](https://github.com/Applifier/unity-ads-webview/pull/10183)
+* Remove call to console.log from HttpKafka if RequestManager is not set [#10287](https://github.com/Applifier/unity-ads-webview/pull/10287)
+* Integration test framewrok to mimic tape [#10262](https://github.com/Applifier/unity-ads-webview/pull/10262)
+* Enable Banner in stage testing for DSP [#10424](https://github.com/Applifier/unity-ads-webview/pull/10424)
+
+# Wed Jun 26 22:46:04 UTC 2019
+
 * Move osVersion from PerformanceAdUnitParametersFactory to AbstractAdUnitParametersFactory to make creation of staging branches more easy [#10399](https://github.com/Applifier/unity-ads-webview/pull/10399)
 * New End Card UI with "pop" out element experiment [#10163](https://github.com/Applifier/unity-ads-webview/pull/10163)
 * Remove animated endcard test [#10372](https://github.com/Applifier/unity-ads-webview/pull/10372)

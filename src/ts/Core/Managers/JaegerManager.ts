@@ -22,7 +22,7 @@ export class JaegerManager {
     }
 
     public getTraceId(span: IJaegerSpan): [string, string] {
-        const jaegerFlags = this._isJaegerTracingEnabled ? '01' : '00';
+        const jaegerFlags = this.isJaegerTracingEnabled() ? '01' : '00';
         const parentId = span.parentId ? span.parentId : '0';
         const jaegerTraceId: string = span.traceId + ':' + span.id + ':' + parentId + ':' + jaegerFlags;
         return ['uber-trace-id', jaegerTraceId];
@@ -60,9 +60,10 @@ export class JaegerManager {
     }
 
     private postToJaeger(spans: IJaegerSpan[]) {
-        if (this._isJaegerTracingEnabled === true) {
+        if (this.isJaegerTracingEnabled()) {
             const headers: [string, string][] = [];
-            const url: string = 'https://tracing-collector-stg.internal.unity3d.com/api/v2/spans';
+            // staging: https://traces-stg.unityads.unity3d.com/api/v2/spans
+            const url: string = 'https://traces.unityads.unity3d.com/api/v2/spans';
             const data: string = JSON.stringify(spans);
 
             headers.push(['Content-Type', 'application/json']);
