@@ -22,6 +22,7 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PlacementContentManager', () => {
@@ -82,6 +83,19 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 sandbox.restore();
             });
 
+            const firstImpressionDate = new Date(0);
+            firstImpressionDate.setUTCSeconds(1559664);
+
+            const tloWithFirstImpression: ILimitedTimeOffer = {
+                duration: 86400,
+                firstImpression: firstImpressionDate
+            };
+
+            const tloWithoutFirstImpression: ILimitedTimeOffer = {
+                duration: 86400,
+                firstImpression: undefined
+            };
+
             const t: ITest[] = [{
                 name: 'Performance Campaign (Rewarded)',
                 placementId: 'rewardedVideoZone',
@@ -91,7 +105,32 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     assert.equal(params.rewarded, !placement.allowSkip());
                 }
             }, {
-                name: 'Promo Campaign',
+                name: 'Promo Campaign with limited time offer containing first impression',
+                placementId: 'rewardedVideoZone',
+                campaign: TestFixtures.getPromoCampaign(undefined, undefined, tloWithFirstImpression),
+                matcher: (placement, campaign, params) => {
+                    if(campaign instanceof PromoCampaign) {
+                        assert.equal(params.type, IPlacementContentType.PROMO_AD);
+                        assert.equal(params.product!.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId!));
+                        assert.equal(params.product!.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId!));
+                        assert.equal(params.product!.localizedTitle, PurchasingUtilities.getProductName(params.productId!));
+                        assert.equal(params.product!.productId, campaign.getIapProductId());
+                        assert.equal(params.costs!.length, campaign.getCosts().length);
+                        assert.equal(params.costs![0].productId, campaign.getCosts()[0].getId());
+                        assert.equal(params.costs![0].quantity, campaign.getCosts()[0].getQuantity());
+                        assert.equal(params.costs![0].type, campaign.getCosts()[0].getType());
+                        assert.equal(params.payouts!.length, campaign.getPayouts().length);
+                        assert.equal(params.payouts![0].productId, campaign.getPayouts()[0].getId());
+                        assert.equal(params.payouts![0].type, campaign.getPayouts()[0].getType());
+                        assert.equal(params.payouts![0].quantity, campaign.getPayouts()[0].getQuantity());
+                        assert.equal(params.offerDuration, campaign.getLimitedTimeOffer()!.getDuration());
+                        assert.equal(params.impressionDate, campaign.getLimitedTimeOffer()!.getFirstImpression()!.getTime());
+                    } else {
+                        assert.fail('campaign must be of type PromoCampaign');
+                    }
+                }
+            }, {
+                name: 'Promo Campaign without limited time offer',
                 placementId: 'rewardedVideoZone',
                 campaign: TestFixtures.getPromoCampaign(),
                 matcher: (placement, campaign, params) => {
@@ -109,6 +148,33 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                         assert.equal(params.payouts![0].productId, campaign.getPayouts()[0].getId());
                         assert.equal(params.payouts![0].type, campaign.getPayouts()[0].getType());
                         assert.equal(params.payouts![0].quantity, campaign.getPayouts()[0].getQuantity());
+                        assert.isUndefined(params.offerDuration);
+                    } else {
+                        assert.fail('campaign must be of type PromoCampaign');
+                    }
+                }
+            }, {
+                name: 'Promo Campaign with time limited offer but no first impression',
+                placementId: 'rewardedVideoZone',
+                campaign: TestFixtures.getPromoCampaign(undefined, undefined, tloWithoutFirstImpression),
+                matcher: (placement, campaign, params) => {
+                    if(campaign instanceof PromoCampaign) {
+                        assert.equal(params.type, IPlacementContentType.PROMO_AD);
+                        assert.equal(params.product!.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId!));
+                        assert.equal(params.product!.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId!));
+                        assert.equal(params.product!.localizedTitle, PurchasingUtilities.getProductName(params.productId!));
+                        assert.equal(params.product!.productId, campaign.getIapProductId());
+                        assert.equal(params.costs!.length, campaign.getCosts().length);
+                        assert.equal(params.costs![0].productId, campaign.getCosts()[0].getId());
+                        assert.equal(params.costs![0].quantity, campaign.getCosts()[0].getQuantity());
+                        assert.equal(params.costs![0].type, campaign.getCosts()[0].getType());
+                        assert.equal(params.payouts!.length, campaign.getPayouts().length);
+                        assert.equal(params.payouts![0].productId, campaign.getPayouts()[0].getId());
+                        assert.equal(params.payouts![0].type, campaign.getPayouts()[0].getType());
+                        assert.equal(params.payouts![0].quantity, campaign.getPayouts()[0].getQuantity());
+                        assert.equal(params.payouts![0].quantity, campaign.getPayouts()[0].getQuantity());
+                        assert.equal(params.offerDuration, campaign.getLimitedTimeOffer()!.getDuration());
+                        assert.isUndefined(params.impressionDate);
                     } else {
                         assert.fail('campaign must be of type PromoCampaign');
                     }

@@ -11,6 +11,7 @@ import * as sinon from 'sinon';
 import RootVastClean from 'xml/RootVastClean.xml';
 import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
+import VastCompanionAdSmallXml from 'xml/VastCompanionAdSmall.xml';
 import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
 import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
 import VastCompanionAdWithRelativeUrlsXml from 'xml/VastCompanionAdWithRelativeUrls.xml';
@@ -515,12 +516,17 @@ describe('VastParserStrict', () => {
             });
 
             describe('Unsupported Companion Ad', () => {
-                describe('add into unsupported companion ads for iframeResource companionAd', () => {
+                describe('add into unsupported companion ads list for unsupported companion ads', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
                         expectedVal: number | null;
                     }[] = [
+                            {
+                                message: 'should have not added into unsupported companion ads for valid companion ads',
+                                inputXml: VastCompanionAdXml,
+                                expectedVal: 0
+                            },
                             {
                                 message: 'should have added into unsupported companion ads for iframeResource',
                                 inputXml: VastCompanionAdIFrameXml,
@@ -530,6 +536,11 @@ describe('VastParserStrict', () => {
                                 message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
                                 inputXml: VastCompanionAdHTMLXml,
                                 expectedVal: 2
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',
+                                inputXml: VastCompanionAdSmallXml,
+                                expectedVal: 1
                             }
                         ];
 

@@ -13,6 +13,7 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
     private static readonly _minPortraitWidth = 320;
     private static readonly _minLandscapeHeight = 320;
     private static readonly _minLandscapeWidth = 480;
+    private static readonly _minSquareSize = 200;   // minimum size requirement
 
     private _errors: CampaignError[] = [];
 
@@ -60,12 +61,14 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const width = companionAd.getWidth();
         const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
         if (height > width) {   // Portrait
-            if (height < VastCompanionAdStaticResourceValidator._minPortraitHeight || width < VastCompanionAdStaticResourceValidator._minPortraitWidth) {
-                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
+            // Check minimum square size but notify minimum Portrait/Landscape as suggestion
+            // minimum square size 200 px will be the limit to cuoff rendering
+            if (height < VastCompanionAdStaticResourceValidator._minSquareSize || width < VastCompanionAdStaticResourceValidator._minSquareSize) {
+                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size ${VastCompanionAdStaticResourceValidator._minPortraitWidth} x ${VastCompanionAdStaticResourceValidator._minPortraitHeight} for Portrait display`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
-        } else {
-            if (height < VastCompanionAdStaticResourceValidator._minLandscapeHeight || width < VastCompanionAdStaticResourceValidator._minLandscapeWidth) {
-                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
+        } else {    // Landscape
+            if (height < VastCompanionAdStaticResourceValidator._minSquareSize || width < VastCompanionAdStaticResourceValidator._minSquareSize) {
+                this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size ${VastCompanionAdStaticResourceValidator._minLandscapeWidth} x ${VastCompanionAdStaticResourceValidator._minLandscapeHeight} for Landscape display`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
         }
     }

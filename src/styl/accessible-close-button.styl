@@ -1,0 +1,89 @@
+@import "vars.styl";
+
+@charset "UTF-8";
+
+@font-face {
+    font-weight: normal;
+    font-style: normal;
+    font-family: "AccessibleCloseButton";
+    src: url("../fonts/accessible-button/AccessibleCloseButton.ttf") format("truetype");
+}
+
+$accessible-close-button-icon-size($n) {
+    width: $n;
+    height: $n;
+}
+
+.accessible-close-button {
+    // Portrait view specific
+    .portrait {
+        #redesigned-end-screen {
+            .btn-close-region {
+                padding: 1em;
+            }
+
+            .icon-close {
+                $icon-size(2.4em);
+            }
+        }
+    }
+
+    #redesigned-end-screen {
+        [data-icon]:before {
+            content: attr(data-icon);
+            font-weight: normal !important; // @stylint ignore
+            font-style: normal !important; // @stylint ignore
+            font-variant: normal !important; // @stylint ignore
+            font-family: "AccessibleCloseButton" !important; // @stylint ignore
+            text-transform: none !important; // @stylint ignore
+            line-height: 1;
+        }
+
+        [class^='experimental-']:before, [class*=' experimental-']:before {
+            font-family: "AccessibleCloseButton" !important; // @stylint ignore
+            font-style: normal !important; // @stylint ignore
+            font-weight: normal !important; // @stylint ignore
+            font-variant: normal !important; // @stylint ignore
+            text-transform: none !important; // @stylint ignore
+            line-height: 1;
+        }
+
+        .experimental-android:before {
+            content: "\e001";
+        }
+
+        .btn-close-region {
+            z-index: 100;
+            padding: 1.2em;
+            width: auto;
+            text-shadow: none;
+            font-size: .5em;
+
+            @media (min-width: 1160px) and (orientation: landscape) {
+                top: .3em;
+                right: 1em;
+                font-size: .35em;
+            }
+        }
+
+        .icon-close {
+            display: table-cell;
+            border-radius: 100%;
+            background: $white;
+            box-shadow: 0 2px 4px rgba(12, 12, 12, .3);
+            color: rgba(0, 0, 0, .9);
+            vertical-align: middle;
+            text-align: center;
+            text-decoration: none;
+            line-height: 100%;
+            opacity: .9;
+            $accessible-close-button-icon-size(2.4em);
+        }
+
+        .icon-close:before {
+            display: block;
+            content: "\e000";
+            font-family: 'AccessibleCloseButton' !important; // @stylint ignore
+        }
+    }
+}
