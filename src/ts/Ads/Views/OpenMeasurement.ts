@@ -96,6 +96,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _deviceVolume: number;
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
+    private _videoViewRectangle: number[];
 
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
         super(platform, 'openMeasurement');
@@ -172,6 +173,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public getOMAdSessionId() {
         return this._omAdSessionId;
+    }
+
+    public setVideoViewRectangle(rectangle: number[]) {
+        this._videoViewRectangle = rectangle;
     }
 
     public render(): void {
@@ -404,21 +409,35 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * All AdViews will assume fullscreen interstitial video
      * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
      */
-    public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[]): IAdView {
-        const videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
-        const videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
-        const topLeftY = this.calculateAdViewTopLeftYPosition(videoHeight, screenWidth, screenHeight); // If in portrait, video adview height will be different
+    public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], videoView?: IRectangle): IAdView {
+
+        let videoWidth;
+        let videoHeight;
+        let topLeftX;
+        let topLeftY;
+        if (this._videoViewRectangle) {
+            topLeftX = this._videoViewRectangle[0];
+            topLeftY = this._videoViewRectangle[1];
+            videoWidth = this._videoViewRectangle[2];
+            videoHeight = this._videoViewRectangle[3];
+        } else {
+            // These are the estimate values based on campaign data if we cannot get values from native
+            videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);
+            videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);
+            topLeftX = 0;
+            topLeftY = this.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+        }
 
         const adView: IAdView = {
             percentageInView: percentInView,
             geometry: {
-                x: 0,
+                x: topLeftX,
                 y: topLeftY,
                 width: videoWidth,
                 height: videoHeight
             },
             onScreenGeometry: {
-                x: 0,
+                x: topLeftX,
                 y: topLeftY,
                 width: videoWidth,
                 height: videoHeight,
@@ -525,7 +544,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return videoHeight;
     }
 
-    private calculateAdViewTopLeftYPosition(videoHeight: number, screenWidth: number, screenHeight: number) {
+    private estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
         let topLeftY = 0;
 
         const isLandscape = screenWidth > screenHeight;

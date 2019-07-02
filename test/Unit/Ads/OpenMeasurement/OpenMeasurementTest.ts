@@ -11,7 +11,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IVerificationScriptResource, IAdView, ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
+import { IAdView, ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 import OMID3p from 'html/omid/omid3p.html';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
@@ -290,6 +290,32 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                             obstructions: []
                         }
                     };
+                    assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
+                });
+
+                it('should return the adview based on videoViewRectangle', () => {
+                    om.setVideoViewRectangle([0, 200, 300, 300]);
+                    const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 200, 100, false, []);
+
+                    const testAdView: IAdView = {
+                        percentageInView: 100,
+                        geometry: {
+                            x: 0,
+                            y: 200,
+                            width: 300,
+                            height: 300
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 200,
+                            width: 300,
+                            height: 300,
+                            obstructions: []
+                        },
+                        measuringElement: false,
+                        reasons: []
+                    };
+
                     assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
                 });
             });

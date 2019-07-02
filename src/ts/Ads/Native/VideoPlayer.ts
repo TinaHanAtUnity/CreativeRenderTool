@@ -87,6 +87,10 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
     }
 
+    public getVideoViewRectangle(): Promise<number[]> {
+        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getVideoViewRectangle');
+    }
+
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
