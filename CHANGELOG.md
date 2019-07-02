@@ -1,4 +1,4 @@
-# Staged
+# Tue Jul 2 16:49:52 UTC 2019
 
 * Make the RedesignedEndScreenDesignTest ZyngaFilteredABTest instead of a normal one [#10401](https://github.com/Applifier/unity-ads-webview/pull/10401)
 * AB test: Replace 'Agree to all' with 'Accept all' in English versions [#10400](https://github.com/Applifier/unity-ads-webview/pull/10400)
