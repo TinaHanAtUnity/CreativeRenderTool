@@ -237,6 +237,28 @@ export class Vast extends Model<IVast> {
         return [];
     }
 
+    public getIframeCompanionResourceUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const iframeCompanionAd = ad.getIframeCompanionAd();
+            if (iframeCompanionAd) {
+                return iframeCompanionAd.getIframeResourceURL();
+            }
+        }
+        return null;
+    }
+
+    public getHtmlCompanionResourceContent(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const htmlCompanionAd = ad.getHtmlCompanionAd();
+            if (htmlCompanionAd) {
+                return htmlCompanionAd.getHtmlResourceContent();
+            }
+        }
+        return null;
+    }
+
     public getVideoMediaFiles(): VastMediaFile[] {
         const ad = this.getAd();
         const mediaFiles: VastMediaFile[] = [];
