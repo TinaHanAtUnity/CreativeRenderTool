@@ -392,7 +392,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
     }
 
-    public calculateObstruction(x: number, y: number, width: number, height: number): IRectangle {
+    public createRectangle(x: number, y: number, width: number, height: number): IRectangle {
         return {
             x: x,
             y: y,
@@ -453,21 +453,24 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number, obstruction: IRectangle) {
-        const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoWidth, videoHeight, xOffset, yOffset, obstruction);
-        const percentageInViewPort = this.calculatePercentageInScreenViewPort(videoWidth, videoHeight, screenWidth, screenHeight, xOffset, yOffset);
+        const videoRectangle = this.createRectangle(xOffset, yOffset, videoWidth, videoHeight);
+        const screenRectangle = this.createRectangle(0, 0, screenWidth, screenHeight);
+
+        const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoRectangle, obstruction);
+        const percentageInViewPort = this.calculateObstructionOverlapPercentage(videoRectangle, screenRectangle);
 
         const percentageInView = percentageInViewPort - obstructionOverlapPercentage;
 
         return percentageInView < 0 ? 0 : percentageInView;
     }
 
-    public calculateObstructionOverlapPercentage(videoWidth: number, videoHeight: number, xOffset: number, yOffset: number, obstruction: IRectangle) {
+    public calculateObstructionOverlapPercentage(videoView: IRectangle, obstruction: IRectangle) {
         let obstructionOverlapArea = 0;
 
-        const videoXMin = xOffset;
-        const videoYMin = yOffset;
-        const videoXMax = xOffset + videoWidth;
-        const videoYMax = yOffset + videoHeight;
+        const videoXMin = videoView.x;
+        const videoYMin = videoView.y;
+        const videoXMax = videoView.x + videoView.width;
+        const videoYMax = videoView.y + videoView.height;
 
         const obstructionXMin = obstruction.x;
         const obstructionYMin = obstruction.y;
@@ -480,46 +483,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             obstructionOverlapArea = dx * dy;
         }
 
-        const videoArea = videoWidth * videoHeight;
+        const videoArea = videoView.width * videoView.height;
         const obstructionOverlapPercentage = obstructionOverlapArea / videoArea;
 
         return obstructionOverlapPercentage * 100;
-    }
-
-    public calculatePercentageInScreenViewPort(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number): number {
-
-        let adjustedScreenWidth = screenWidth;
-        let adjustedScreeHeight = screenHeight;
-
-        if (videoWidth < screenWidth && this.isVideoCutOffX(videoWidth, screenWidth, xOffset)) {
-            // screen dimensions must take on dimensions of offset, video dimension not changed
-            adjustedScreenWidth = screenWidth - xOffset;
-        } else {
-            // we can assume these dimensions are 100% in view since video is not cut off
-            videoWidth = (videoWidth < screenWidth) ? screenWidth : videoWidth;
-        }
-
-        if (videoHeight < screenHeight && this.isVideoCutOffY(videoHeight, screenHeight, yOffset)) {
-            // screen dimensions must take on dimensions of offset, video dimension not changed
-            adjustedScreeHeight = screenHeight - yOffset;
-        } else {
-            // we can assume these dimensions are 100% in view since video is not cut off
-            videoHeight = (videoHeight < screenHeight) ? screenHeight : videoHeight;
-        }
-
-        const videoArea = videoWidth * videoHeight;
-        const screenArea = adjustedScreenWidth * adjustedScreeHeight;
-        const percentCovered = (videoArea - screenArea) / videoArea;
-
-        return (1 - percentCovered) * 100;
-    }
-
-    private isVideoCutOffX(videoWidth: number, screenWidth: number, xOffset: number): boolean {
-        return (videoWidth + xOffset) > screenWidth;
-    }
-
-    private isVideoCutOffY(videoHeight: number, screenHeight: number, yOffset: number): boolean {
-        return (videoHeight + yOffset) > screenHeight;
     }
 
     public getAndroidViewSize(size: number, density: number): number {

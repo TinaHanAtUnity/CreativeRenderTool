@@ -181,7 +181,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
                 if (this._om) {
                     const viewPort = this._om.calculateViewPort(width, height);
-                    const obstructionRectangle = this._om.calculateObstruction(0, 0, width, height);
+                    const obstructionRectangle = this._om.createRectangle(0, 0, width, height);
                     const adView = this._om.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
                     this._om.geometryChange(viewPort, adView);
                 }
