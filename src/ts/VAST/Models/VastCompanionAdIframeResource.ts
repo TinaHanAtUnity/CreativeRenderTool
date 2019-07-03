@@ -7,7 +7,7 @@ interface IVastCompanionAdIframeResource extends IVastCreativeCompanionAd {
 
 export class VastCompanionAdIframeResource extends Model<IVastCompanionAdIframeResource> {
 
-    constructor(id: string | null, height: number, width: number, iframeResourceURL?: string | null) {
+    constructor(id: string | null, height: number, width: number, iframeResourceURL?: string) {
         super('VastCompanionAdIframeResource', {
             id: ['string', 'null'],
             type: ['string'],

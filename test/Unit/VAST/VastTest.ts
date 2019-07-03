@@ -7,8 +7,10 @@ import { VastAd } from 'VAST/Models/VastAd';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIFrameResource';
+import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 
-describe('Vast', () => {
+describe('VastTest', () => {
     let vastCreative: VastCreativeLinear;
     let vastMediaFile: VastMediaFile;
     let vastAd: VastAd;
@@ -127,6 +129,26 @@ describe('Vast', () => {
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://url.com/landscape.gif');
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.gif');
+        });
+
+        it('should return iframe url when it has iframe companion ad', () => {
+            const vast = new Vast([vastAd], []);
+
+            vastAd.setIframeCompanionAd(new VastCompanionAdIframeResource('id1', 320, 480, 'http://url.com/iframe.html'));
+            assert.equal(vast.getIframeCompanionResourceUrl(), 'http://url.com/iframe.html');
+
+            vastAd.setIframeCompanionAd(new VastCompanionAdIframeResource('id2', 320, 480));
+            assert.equal(vast.getIframeCompanionResourceUrl(), null);
+        });
+
+        it('should return html content when it has html companion ad', () => {
+            const vast = new Vast([vastAd], []);
+            
+            vastAd.setHtmlCompanionAd(new VastCompanionAdHTMLResource('id1', 320, 480, '<div>hello click me</div>'));
+            assert.equal(vast.getHtmlCompanionResourceContent(), '<div>hello click me</div>');
+
+            vastAd.setHtmlCompanionAd(new VastCompanionAdHTMLResource('id2', 320, 480));
+            assert.equal(vast.getHtmlCompanionResourceContent(), null);
         });
     });
 });

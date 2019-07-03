@@ -7,7 +7,7 @@ interface IVastCompanionAdHTMLResource extends IVastCreativeCompanionAd {
 
 export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResource> {
 
-    constructor(id: string | null, height: number, width: number, htmlResourceURL?: string | null) {
+    constructor(id: string | null, height: number, width: number, htmlResourceURL?: string) {
         super('VastCompanionAdHTMLResource', {
             id: ['string', 'null'],
             type: ['string'],
