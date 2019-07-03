@@ -326,10 +326,18 @@ export class VastParserStrict {
             }
             // ignore element as it is not of a type we support
             if (iframeResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+                const companionAd = this.parseCompanionAdIFrameResourceElement(element, urlProtocol);
+                if (companionAd.getIframeResourceURL()) {
+                    vastAd.setIframeCompanionAd(companionAd);
+                    vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+                }
             }
-            if (htmlResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+            if (htmlResourceElement && htmlResourceElement.innerHTML.length > 0) {
+                const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
+                if (companionAd.getHtmlResourceContent()) {
+                    vastAd.setHtmlCompanionAd(companionAd);
+                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                }
             }
         });
 
@@ -509,6 +517,38 @@ export class VastParserStrict {
                 companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
             }
         });
+        return companionAd;
+    }
+
+    private parseCompanionAdIFrameResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdIframeResource(id, height, width);
+
+        const iframeResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
+        if (iframeResource) {
+            const iframeUrl = this.parseVastUrl(this.parseNodeText(iframeResource), urlProtocol);
+            if (iframeUrl) {
+                companionAd.setIframeResourceURL(iframeUrl);
+            }
+        }
+        return companionAd;
+    }
+
+    private parseCompanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
+
+        const htmlResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
+        if (htmlResource) {
+            const htmlContent = this.parseNodeText(htmlResource);
+            if (htmlContent.length > 0) {
+                companionAd.setHtmlResourceContent(htmlContent);
+            }
+        }
         return companionAd;
     }
 
