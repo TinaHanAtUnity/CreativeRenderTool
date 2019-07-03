@@ -4,7 +4,7 @@ import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStatic
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { VastCompanionAdIFrameResource } from 'VAST/Models/VastCompanionAdIFrameResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 
 interface IVastAd {
@@ -12,7 +12,7 @@ interface IVastAd {
     creatives: VastCreative[];
     unsupportedCompanionAds: string[];
     staticCompanionAds: VastCompanionAdStaticResource[];
-    iframeCompanionAd: VastCompanionAdIFrameResource | null;
+    iframeCompanionAd: VastCompanionAdIframeResource | null;
     htmlCompanionAd: VastCompanionAdHTMLResource | null;
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
@@ -23,8 +23,8 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], staticCompanionAds: VastCompanionAdStaticResource[], iframeCompanionAd: VastCompanionAdIFrameResource, htmlCompanionAd: VastCompanionAdHTMLResource, unsupportedCompanionAds: string[], adVerifications: VastAdVerification[]);
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], staticCompanionAds?: VastCompanionAdStaticResource[], iframeCompanionAd?: VastCompanionAdIFrameResource, htmlCompanionAd?: VastCompanionAdHTMLResource, unsupportedCompanionAds?: string[], adVerifications?: VastAdVerification[]) {
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], staticCompanionAds: VastCompanionAdStaticResource[], unsupportedCompanionAds: string[], adVerifications: VastAdVerification[], iframeCompanionAd?: VastCompanionAdIframeResource, htmlCompanionAd?: VastCompanionAdHTMLResource);
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], staticCompanionAds?: VastCompanionAdStaticResource[], unsupportedCompanionAds?: string[], adVerifications?: VastAdVerification[], iframeCompanionAd?: VastCompanionAdIframeResource, htmlCompanionAd?: VastCompanionAdHTMLResource) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
@@ -89,8 +89,24 @@ export class VastAd extends Model<IVastAd> {
         return this.get('staticCompanionAds');
     }
 
-    public addCompanionAdStatic(companionAd: VastCompanionAdStaticResource) {
+    public addStaticCompanionAd(companionAd: VastCompanionAdStaticResource) {
         this.get('staticCompanionAds').push(companionAd);
+    }
+
+    public getIframeCompanionAd(): VastCompanionAdIframeResource | null {
+        return this.get('iframeCompanionAd');
+    }
+
+    public setIframeCompanionAd(companionAd: VastCompanionAdIframeResource) {
+        this.set('iframeCompanionAd', companionAd);
+    }
+
+    public getHtmlCompanionAd(): VastCompanionAdHTMLResource | null {
+        return this.get('htmlCompanionAd');
+    }
+
+    public setHtmlCompanionAd(companionAd: VastCompanionAdHTMLResource) {
+        this.set('htmlCompanionAd', companionAd);
     }
 
     public getUnsupportedCompanionAds(): string[] {
@@ -182,7 +198,7 @@ export class VastAd extends Model<IVastAd> {
         }
 
         const companionAdsStatic = [];
-        for (const companionAd of this.get('companionAdsStatic')) {
+        for (const companionAd of this.get('staticCompanionAds')) {
             companionAdsStatic.push(companionAd.getDTO());
         }
 
@@ -192,7 +208,9 @@ export class VastAd extends Model<IVastAd> {
             'impressionURLTemplates': this.getImpressionURLTemplates(),
             'wrapperURLs': this.getWrapperURLs(),
             'vastCreatives': vastCreatives,
-            'companionAdsStatic': companionAdsStatic,
+            'staticCompanionAds': companionAdsStatic,
+            'iframeCompanionAd': this.getIframeCompanionAd(),
+            'htmlCompanionAd': this.getHtmlCompanionAd(),
             'unsupportedItems': this.getUnsupportedCompanionAds()
         };
     }
@@ -211,5 +229,4 @@ export class VastAd extends Model<IVastAd> {
 
         return urls;
     }
-
 }

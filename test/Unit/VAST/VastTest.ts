@@ -66,64 +66,64 @@ describe('Vast', () => {
 
     describe('when VAST has a companion ad', () => {
         it('should return url for landscape endcard image', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://url.com/landscape.png');
         });
 
         it('should return url for landscape endcard image', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.png');
         });
 
         it('should return url for click through url', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionClickThroughUrl(), 'https://url.com/click');
         });
 
         it('should return urls for companion click trackings', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click', ['https://url.com/clickTracking']));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click', ['https://url.com/clickTracking']));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click', ['https://url.com/clickTracking']));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click', ['https://url.com/clickTracking']));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click', ['https://url.com/clickTracking']));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click', ['https://url.com/clickTracking']));
             const vast = new Vast([vastAd], []);
             assert.deepEqual(vast.getCompanionClickTrackingUrls(), ['https://url.com/clickTracking']);
         });
 
         it('should return image urls when image mime type is jpeg or jpg', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/jpeg', 'http://url.com/landscape.jpeg', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/jpg', 'http://url.com/portrait.jpg', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/jpeg', 'http://url.com/landscape.jpeg', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/jpg', 'http://url.com/portrait.jpg', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://url.com/landscape.jpeg');
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.jpg');
         });
 
         it('should return image urls when image mime type is png', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://url.com/landscape.png');
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.png');
         });
 
         it('should return image urls when image mime type is gif', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/gif', 'http://url.com/landscape.gif', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'image/gif', 'http://url.com/portrait.gif', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/gif', 'http://url.com/landscape.gif', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/gif', 'http://url.com/portrait.gif', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://url.com/landscape.gif');
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.gif');
         });
 
         it('should return image urls when image mime type is in caps', () => {
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id1', 320, 480, 'image/GIF', 'http://url.com/landscape.gif', 'https://url.com/click'));
-            vastAd.addCompanionAdStatic(new VastCompanionAdStaticResource('id2', 480, 320, 'IMAGE/Gif',  'http://url.com/portrait.gif', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/GIF', 'http://url.com/landscape.gif', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'IMAGE/Gif',  'http://url.com/portrait.gif', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://url.com/landscape.gif');
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.gif');

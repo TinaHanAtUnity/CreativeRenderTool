@@ -319,7 +319,7 @@ export class VastParserStrict {
                     }
                 }
                 if (isWarningLevel) {
-                    vastAd.addCompanionAdStatic(companionAd);
+                    vastAd.addStaticCompanionAd(companionAd);
                 } else {
                     vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
