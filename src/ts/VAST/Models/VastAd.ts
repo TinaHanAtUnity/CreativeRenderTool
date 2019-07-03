@@ -197,9 +197,9 @@ export class VastAd extends Model<IVastAd> {
             vastCreatives.push(vastCreative.getDTO());
         }
 
-        const companionAdsStatic = [];
+        const staticCompanionAds = [];
         for (const companionAd of this.get('staticCompanionAds')) {
-            companionAdsStatic.push(companionAd.getDTO());
+            staticCompanionAds.push(companionAd.getDTO());
         }
 
         return {
@@ -208,7 +208,7 @@ export class VastAd extends Model<IVastAd> {
             'impressionURLTemplates': this.getImpressionURLTemplates(),
             'wrapperURLs': this.getWrapperURLs(),
             'vastCreatives': vastCreatives,
-            'staticCompanionAds': companionAdsStatic,
+            'staticCompanionAds': staticCompanionAds,
             'iframeCompanionAd': this.getIframeCompanionAd(),
             'htmlCompanionAd': this.getHtmlCompanionAd(),
             'unsupportedItems': this.getUnsupportedCompanionAds()
