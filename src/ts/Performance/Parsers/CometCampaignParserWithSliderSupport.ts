@@ -1,14 +1,11 @@
-import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ICore } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import {
@@ -18,17 +15,21 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 
-export class CometCampaignParser extends CampaignParser {
-    public static ContentType = 'comet/campaign';
-    public static ContentTypeVideo = 'comet/video';
-    public static ContentTypeMRAID = 'comet/mraid-url';
+const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
 
-    protected _requestManager: RequestManager;
+export class CometCampaignParserWithSliderSupport extends CometCampaignParser {
+    protected _abGroup: ABGroup;
+    protected _core: ICore;
 
     constructor(core: ICore) {
-        super(core.NativeBridge.getPlatform());
-        this._requestManager = core.RequestManager;
+        super(core);
+
+        this._abGroup = core.Config.getAbGroup();
+        this._core = core;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -146,29 +147,21 @@ export class CometCampaignParser extends CampaignParser {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
 
-            return Promise.resolve(new PerformanceCampaign(parameters));
-        }
-    }
-
-    protected validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
-                    urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
-                }
+            let promise;
+            const osVersion = this._core.DeviceInfo.getOsVersion();
+            const platform = this._core.NativeBridge.getPlatform();
+            if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
+                const orientation = CustomFeatures.getSliderEndScreenImageOrientation(parameters.appStoreId);
+                parameters.screenshotsOrientation = orientation;
+                parameters.screenshots = Array.from([1, 2, 3], i => {
+                    const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
+                    return new Image(url, session);
+                });
+                promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
+            } else {
+                promise = Promise.resolve(new PerformanceCampaign(parameters));
             }
+            return promise;
         }
-
-        return urls;
-    }
-
-    protected parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
-        let adUnitStyle: AdUnitStyle | undefined;
-        try {
-            adUnitStyle = new AdUnitStyle(adUnitStyleJson);
-        } catch(error) {
-            // do nothing
-        }
-        return adUnitStyle;
     }
 }
