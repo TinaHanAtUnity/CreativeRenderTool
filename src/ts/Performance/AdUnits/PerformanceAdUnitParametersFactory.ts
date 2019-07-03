@@ -49,7 +49,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        let endScreen: EndScreen;
+        let endScreen: PerformanceEndScreen;
 
         const abGroup = baseParams.coreConfig.getAbGroup();
         if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
