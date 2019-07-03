@@ -7,7 +7,7 @@ import { VastAd } from 'VAST/Models/VastAd';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIFrameResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 
 describe('VastTest', () => {
