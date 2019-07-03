@@ -1,0 +1,32 @@
+<script type="text/javascript">
+  (function() {
+    var _iframeOrientationListeners = [];
+    var originalAddEventListener = window.addEventListener;
+    window.addEventListener = function (event, listener, useCapture) {
+        if(event === 'deviceorientation') {
+            _iframeOrientationListeners.push(listener);
+        } else {
+            originalAddEventListener.apply(window, [event, listener, useCapture]);
+        }
+    }
+
+    window.addEventListener('message', function(event) {
+        switch(event.data.type) {
+            case 'deviceorientation':
+                var orientationEvent = document.createEvent('HTMLEvents');
+                orientationEvent.initEvent('deviceorientation', true, true);
+                orientationEvent.eventName = 'deviceorientation';
+                orientationEvent.absolute = event.data.event.absolute;
+                orientationEvent.alpha = event.data.event.alpha;
+                orientationEvent.beta = event.data.event.beta;
+                orientationEvent.gamma = event.data.event.gamma;
+                _iframeOrientationListeners.forEach(function (listener) {
+                    listener.apply(window, [orientationEvent]);
+                });
+                break;
+            default:
+                break;
+        }
+    });
+  })();
+</script>

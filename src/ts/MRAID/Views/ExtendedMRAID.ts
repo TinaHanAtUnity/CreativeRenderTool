@@ -215,4 +215,17 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
     }
+    protected handleDeviceOrientation(event: DeviceOrientationEvent) {
+        if (this._isLoaded) {
+            this._iframe.contentWindow!.postMessage({
+                type: 'deviceorientation',
+                event: {
+                    alpha: event.alpha,
+                    beta: event.beta,
+                    gamma: event.gamma,
+                    absolute: event.absolute
+                }
+            }, '*');
+        }
+    }
 }
