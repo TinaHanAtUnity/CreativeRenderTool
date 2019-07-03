@@ -1,10 +1,11 @@
-import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { Template } from 'Core/Utilities/Template';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { ICoreApi } from 'Core/ICore';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
 interface ISliderEventParameters {
     manualSlideCount: number;
@@ -14,17 +15,17 @@ interface ISliderEventParameters {
     [key: string]: boolean | undefined | number | string;
 }
 
-export class SliderPerformanceEndScreen extends EndScreen {
+export class SliderPerformanceEndScreen extends PerformanceEndScreen {
     protected _country: string | undefined;
     protected _core: ICoreApi;
-    private _campaign: SliderPerformanceCampaign;
+    protected _campaign: SliderPerformanceCampaign;
     private _slider: Slider;
     private _sliderEventParameters: ISliderEventParameters;
     private _showTimestamp: number;
     private _sliderUsageDataEventSent: boolean;
 
     constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign, country?: string) {
-        super(parameters);
+        super(parameters, campaign, country);
         this._campaign = campaign;
         this._country = country;
 

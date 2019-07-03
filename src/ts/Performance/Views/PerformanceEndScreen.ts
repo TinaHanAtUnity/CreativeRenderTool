@@ -8,8 +8,8 @@ const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class PerformanceEndScreen extends EndScreen {
     protected _core: ICoreApi;
-    private _campaign: PerformanceCampaign;
-    private _country: string | undefined;
+    protected _campaign: PerformanceCampaign;
+    protected _country: string | undefined;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters);
