@@ -133,4 +133,35 @@ describe('MRAID', () => {
             mraid.hide();
         });
     });
+
+    it('should not expose deviceorientation data to ad if the ad does not need it', () => {
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
+        params.resourceAsset = undefined;
+        params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script></script><div>Hello World</div>';
+        params.dynamicMarkup = 'InjectMe';
+        const campaign = new MRAIDCampaign(params);
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.render();
+
+        return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
+            assert.include(mraidSrc, '<script id=\"deviceorientation-support\"></script>', 'deviceorientation script stub not found');
+            mraid.hide();
+        });
+    });
+
+    it('should expose deviceorientation data to ad if the ad needs it', () => {
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
+        params.resourceAsset = undefined;
+        params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>window.addEventListener("deviceorientation", (event) => {});</script><div>Hello World</div>';
+        params.dynamicMarkup = 'InjectMe';
+        const campaign = new MRAIDCampaign(params);
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.render();
+        return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
+            assert.notInclude(mraidSrc, '<script id=\"deviceorientation-support\"></script>', 'deviceorientation script stub not replaced');
+            mraid.hide();
+        });
+    });
 });
