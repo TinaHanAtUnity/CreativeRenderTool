@@ -86,7 +86,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _mraidAdapterContainer: MRAIDAdapterContainer;
 
-    protected _deviceorientationListener?: EventListener;
+    protected _deviceorientationListener: EventListener | undefined;
 
     protected _privacyPanelOpen: boolean;
 
@@ -501,6 +501,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     protected handleDeviceOrientation(event: DeviceOrientationEvent) {
-        // Do nothing by default
+        this._mraidAdapterContainer.sendDeviceOrientationEvent(event);
     }
 }

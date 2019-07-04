@@ -31,6 +31,10 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
         this._eventAdapter.sendViewableEvent(viewable);
     }
 
+    public sendDeviceOrientationEvent(event: DeviceOrientationEvent) {
+        this._eventAdapter.sendDeviceOrientationEvent(event);
+    }
+
     public onBridgeSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation): void {
         this._handler.onBridgeSetOrientationProperties(allowOrientationChange, orientation);
     }

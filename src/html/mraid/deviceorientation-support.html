@@ -12,14 +12,14 @@
 
     window.addEventListener('message', function(event) {
         switch(event.data.type) {
-            case 'deviceorientation':
+            case 'deviceorientation_unity_v1':
                 var orientationEvent = document.createEvent('HTMLEvents');
                 orientationEvent.initEvent('deviceorientation', true, true);
                 orientationEvent.eventName = 'deviceorientation';
-                orientationEvent.absolute = event.data.event.absolute;
-                orientationEvent.alpha = event.data.event.alpha;
-                orientationEvent.beta = event.data.event.beta;
-                orientationEvent.gamma = event.data.event.gamma;
+                orientationEvent.absolute = event.data.value.absolute;
+                orientationEvent.alpha = event.data.value.alpha;
+                orientationEvent.beta = event.data.value.beta;
+                orientationEvent.gamma = event.data.value.gamma;
                 _iframeOrientationListeners.forEach(function (listener) {
                     listener.apply(window, [orientationEvent]);
                 });

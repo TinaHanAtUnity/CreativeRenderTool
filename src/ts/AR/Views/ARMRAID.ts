@@ -351,20 +351,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    protected handleDeviceOrientation(event: DeviceOrientationEvent) {
-        if (this._iframeLoaded) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'deviceorientation',
-                event: {
-                    alpha: event.alpha,
-                    beta: event.beta,
-                    gamma: event.gamma,
-                    absolute: event.absolute
-                }
-            }, '*');
-        }
-    }
-
     protected onAREvent(event: MessageEvent): Promise<void> {
         if (!this._hasCameraPermission) {
             return Promise.resolve();

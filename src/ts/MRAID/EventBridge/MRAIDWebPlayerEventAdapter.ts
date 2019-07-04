@@ -33,6 +33,10 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
         this.sendEvent('viewable', [viewable]);
     }
 
+    public sendDeviceOrientationEvent(event: DeviceOrientationEvent): void {
+        this.sendEvent('deviceorientation_unity_v1', [event]);
+    }
+
     private onWebPlayerEvent(args: unknown[]) {
         const eventType = <string>args.shift();
         const params = args.shift();
