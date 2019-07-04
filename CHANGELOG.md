@@ -1,4 +1,4 @@
-# Pending
+# Wed Jul  3 16:15:07 UTC 2019
 
 * Prevent two consent dialogs from opening at the same time [#10429](https://github.com/Applifier/unity-ads-webview/pull/10429)
 * Disable logging by default, add option ENABLE_LOGS [#10286](https://github.com/Applifier/unity-ads-webview/pull/10286)
