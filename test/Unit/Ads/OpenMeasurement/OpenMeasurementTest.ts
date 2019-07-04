@@ -186,7 +186,19 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         width: 517,
                         height: 367
                     };
-                    const calculatedPercentage = om.calculatePercentageInView(1080, 1800, 1080, 1800, 0, 0, obstruction);
+                    const videoView = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
                     const percentage = 90.23976337448559;
                     assert.equal(calculatedPercentage, percentage);
                 });
@@ -198,7 +210,19 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         width: 517,
                         height: 367
                     };
-                    const calculatedPercentage = om.calculatePercentageInView(1400, 400, 1080, 1800, 0, 0, obstruction);
+                    const videoView = {
+                        x: 0,
+                        y: 0,
+                        width: 1400,
+                        height: 400
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
                     const percentage = 43.26089285714287;
                     assert.equal(calculatedPercentage, percentage);
                 });
@@ -210,7 +234,19 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         width: 517,
                         height: 367
                     };
-                    const calculatedPercentage = om.calculatePercentageInView(800, 2000, 1080, 1800, 0, 0, obstruction);
+                    const videoView = {
+                        x: 0,
+                        y: 0,
+                        width: 800,
+                        height: 2000
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
                     const percentage = 78.1413125;
                     assert.equal(calculatedPercentage, percentage);
                 });
@@ -222,7 +258,19 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         width: 800,
                         height: 367
                     };
-                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 700, 0, obstruction);
+                    const videoView = {
+                        x: 700,
+                        y: 0,
+                        width: 800,
+                        height: 400
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
                     const percentage = 36.03125;
                     assert.equal(calculatedPercentage, percentage);
                 });
@@ -234,7 +282,19 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         width: 800,
                         height: 367
                     };
-                    const calculatedPercentage = om.calculatePercentageInView(800, 400, 1080, 1800, 0, 1500, obstruction);
+                    const videoView = {
+                        x: 0,
+                        y: 1500,
+                        width: 800,
+                        height: 400
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
                     const percentage = 8.25;
                     assert.equal(calculatedPercentage, percentage);
                 });

@@ -452,10 +452,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return adView;
     }
 
-    public calculatePercentageInView(videoWidth: number, videoHeight: number, screenWidth: number, screenHeight: number, xOffset: number, yOffset: number, obstruction: IRectangle) {
-        const videoRectangle = this.createRectangle(xOffset, yOffset, videoWidth, videoHeight);
-        const screenRectangle = this.createRectangle(0, 0, screenWidth, screenHeight);
-
+    public calculatePercentageInView(videoRectangle: IRectangle, obstruction: IRectangle, screenRectangle: IRectangle) {
         const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoRectangle, obstruction);
         const percentageInViewPort = this.calculateObstructionOverlapPercentage(videoRectangle, screenRectangle);
 
