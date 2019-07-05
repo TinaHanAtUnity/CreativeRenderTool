@@ -1,6 +1,6 @@
 # Pending
 	
-* Reverted the pop-out experiment[#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
+* Reverted the pop-out experiment [#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
 
 # Wed Jul  3 16:15:07 UTC 2019
 
