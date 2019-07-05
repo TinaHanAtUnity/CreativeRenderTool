@@ -14,8 +14,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
+import { RedesignedEndScreenDesignTest, AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
 import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
+import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 import { Platform } from 'Core/Constants/Platform';
 
@@ -52,6 +53,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
             endScreenParameters.id = 'redesigned-end-screen';
             endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (AnimatedDownloadButtonTest.isValid(abGroup)) {
+            endScreen = new AnimatedDownloadButtonEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

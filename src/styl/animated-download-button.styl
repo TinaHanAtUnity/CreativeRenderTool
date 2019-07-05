@@ -1,0 +1,37 @@
+@keyframes heartbeat {
+  from {
+            transform: scale(1);
+            transform-origin: center center;
+            animation-timing-function: ease;
+            background: $blue;
+            box-shadow: 0px 0px 0px 0px rgba(30,54,82,0);
+  }
+  4% {
+            transform: scale(1.1);
+            animation-timing-function: ease;
+            background: rgb(72, 154, 255);
+            box-shadow: 0px 18px 5px -14px rgba(30,54,82, .8);
+  }
+  8% {
+            transform: scale(.95);
+            animation-timing-function: ease;
+            background: $blue;
+            box-shadow: 0px 0px 0px 0px rgba(30,54,82,0);
+  }
+  12% {
+            transform: scale(1.05);
+            animation-timing-function: ease;
+            background: rgb(72, 154, 255);
+            box-shadow: 0px 16px 5px -12px rgba(30,54,82, .8);
+  }
+  18% {
+            transform: scale(1);
+            animation-timing-function: ease-out;
+            background: $blue;
+            box-shadow: 0px 0px 0px 0px rgba(30,54,82,0);
+  }
+}
+
+.animated-download-button-end-screen #end-screen.on-show .download-container {
+    animation: heartbeat 6.5s ease-in .5s infinite;
+}
