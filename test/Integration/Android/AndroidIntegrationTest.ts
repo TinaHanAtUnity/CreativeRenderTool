@@ -118,15 +118,14 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
-        UnityAds.getBackend().Api.Sdk.setUsePerPlacementLoad(true);
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'video');
+        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+            UnityAds.load('video');
         }).catch(() => {
             assert.fail('should not throw');
         });
@@ -182,15 +181,15 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
-        UnityAds.getBackend().Api.Sdk.setUsePerPlacementLoad(true);
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'rewardedVideo', 'video');
+        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+            UnityAds.load('rewardedVideo');
+            UnityAds.load('video');
         }).catch(() => {
             assert.fail('should not throw');
         });
@@ -238,14 +237,13 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
-        UnityAds.getBackend().Api.Sdk.setUsePerPlacementLoad(true);
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true);
 
         return new Promise(resolve => setTimeout(resolve, 5000)).then(() => {
             assert.equal(readyCount, 0);
@@ -297,15 +295,14 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
-        UnityAds.getBackend().Api.Sdk.setUsePerPlacementLoad(true);
 
         ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true).then(() => {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], 'rewardedVideo');
+        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+            UnityAds.load('rewardedVideo');
         }).catch(() => {
             assert.fail('should not throw');
         });
