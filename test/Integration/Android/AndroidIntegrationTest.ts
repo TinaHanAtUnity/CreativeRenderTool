@@ -313,4 +313,75 @@ describe('AndroidIntegrationTest', () => {
         });
     });
 
+    it('should handle happy path on Android with Load API, ready called twice for same placement', function(this: Mocha.ITestCallbackContext): Promise<any> {
+        this.timeout(10000);
+
+        let stateChangeCount = 0;
+        let readyPlacement: string[] = [];
+        let promiseReadyResolve: any = null;
+        const promiseReady = new Promise(resolve => promiseReadyResolve = resolve);
+
+        const listener: IUnityAdsListener = {
+            onUnityAdsReady: (placement: string) => {
+                readyPlacement = readyPlacement.concat(placement);
+
+                if (readyPlacement.length === 1) {
+                    UnityAds.load('video');
+                }
+
+                if (readyPlacement.length >= 2) {
+                    if (promiseReadyResolve) {
+                        promiseReadyResolve();
+                        promiseReadyResolve = null;
+                    }
+                }
+            },
+            onUnityAdsStart: (placement: string) => {
+                return;
+            },
+            onUnityAdsFinish: (placement: string, state: string) => {
+                return;
+            },
+            onUnityAdsError: (error: string, message: string) => {
+                return;
+            },
+            onUnityAdsClick: (placement: string) => {
+                return;
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
+                return;
+            }
+        };
+
+        UnityAds.setBackend(new Backend(Platform.ANDROID));
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
+
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('LGE');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('Nexus 5');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('6.0.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
+        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
+
+        ConfigManager.setAbGroup(14);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+
+        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+            UnityAds.load('video');
+        }).catch(() => {
+            assert.fail('should not throw');
+        });
+
+        return promiseReady.then(() => {
+            assert.equal(stateChangeCount, 2);
+            assert.equal(readyPlacement.length, 2);
+            assert.isTrue(readyPlacement.includes('video'));
+        });
+    });
+
 });
