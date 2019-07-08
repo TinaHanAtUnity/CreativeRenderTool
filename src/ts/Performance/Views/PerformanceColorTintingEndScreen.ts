@@ -422,6 +422,8 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
             privacyIconContainer.style.color = `rgb(${dark.join(',')})`;
             unityIconContainer.style.color = `rgb(${dark.join(',')})`;
             chinaAdvertisementElement.style.color = `rgb(${dark.join(',')})`;
+        } else {
+            this.sendKafkaEvent('theming_failed');
         }
     }
 
