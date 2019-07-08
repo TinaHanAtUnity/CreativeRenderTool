@@ -14,11 +14,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { RedesignedEndScreenDesignTest, AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
-import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
-import { Platform } from 'Core/Constants/Platform';
+import { DoubleShadowCloseButtonTest, AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
+import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -49,12 +47,10 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         let endScreen: PerformanceEndScreen;
 
         const abGroup = baseParams.coreConfig.getAbGroup();
-        const isAndroid4 = this._platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, this._osVersion);
-        if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
-            endScreenParameters.id = 'redesigned-end-screen';
-            endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (AnimatedDownloadButtonTest.isValid(abGroup)) {
+        if (AnimatedDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
+            endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

@@ -329,7 +329,6 @@ $iphone-x-styles() {
     }
   }
 
-  #redesigned-end-screen,
   #end-screen,
   #vast-end-screen {
     padding-top: constant(safe-area-inset-top);
@@ -455,7 +454,6 @@ $iphone-x-styles() {
 
 $iphone-x-performance-end-screen-styles() {
   .performance-end-screen {
-    .portrait #redesigned-end-screen,
     .portrait #end-screen {
       padding: 0;
       padding-top: env(safe-area-inset-top);
@@ -470,7 +468,6 @@ $iphone-x-performance-end-screen-styles() {
       }
     }
 
-    .landscape #redesigned-end-screen,
     .landscape #end-screen {
       padding: 0;
       height: 100vh;
@@ -503,7 +500,6 @@ $iphone-x-performance-end-screen-styles() {
       }
     }
 
-    .ios-landscape-right #redesigned-end-screen,
     .ios-landscape-right #end-screen {
       padding-right: env(safe-area-inset-right);
       padding-right: constant(safe-area-inset-right); // @stylint ignore
@@ -511,7 +507,6 @@ $iphone-x-performance-end-screen-styles() {
       width: calc(100vw - constant(safe-area-inset-right)); // @stylint ignore
     }
 
-    .ios-landscape-left #redesigned-end-screen,
     .ios-landscape-left #end-screen {
       padding-left: env(safe-area-inset-left);
       padding-left: constant(safe-area-inset-left); // @stylint ignore
@@ -546,7 +541,6 @@ $iphone-x-performance-end-screen-styles() {
       width: calc(100% - env(safe-area-inset-right));
     }
 
-    #redesigned-end-screen .end-screen-info-background,
     #end-screen .end-screen-info-background{
       @media (orientation: portrait) {
         /* iPhone X & iPhone XS */
