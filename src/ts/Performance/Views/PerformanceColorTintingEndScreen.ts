@@ -273,12 +273,16 @@ function getHistogram(pixels: Uint8ClampedArray): number[][] {
     for (let i = 0; i < length; i += 4 * 5) {
         // assuming we don't have transparent end screens, skip alpha channel
         const pixelKey: number = pixels[i] * 0x10000 + pixels[i + 1] * 0x100 + pixels[i + 2];
+        // color is an array where [r, g, b, population]
         let color = histogramMap[pixelKey];
         if (!color) {
             color = [pixels[i], pixels[i + 1], pixels[i + 2], 0];
             histogramMap[pixelKey] = color;
             histogram.push(color);
         }
+
+        // calculate population to get color density
+        color[3] += 1;
     }
 
     return histogram;
