@@ -27,6 +27,10 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
+    public static isWhitelistedToShowInBackground(gameId: string) {
+        return gameId === '3016669';    // anipang2 from Korea dev
+    }
+
     public static isNestedIframePlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
@@ -107,6 +111,19 @@ export class CustomFeatures {
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
         return this.existsInList(LionStudiosGameIds, gameId);
+    }
+
+    /**
+     *  Method used for gating PTS metrics for this specific Zynga Game using Load API
+     */
+    public static isTrackedGameUsingLoadApi(gameId: string) {
+        return gameId === '2988443';
+    }
+
+    public static isWhiteListedForLoadApi(gameId: string) {
+        return gameId === '2988443' ||  // Zynga Solitaire          : Android
+               gameId === '2988494' ||  // Zynga Freecell           : iOS
+               gameId === '2988495';    // Zynga Freecell Solitaire : Android
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

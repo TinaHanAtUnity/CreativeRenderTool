@@ -63,7 +63,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
-        this._templateData = {};
+        this._templateData = {
+            myChoicesCTATextTest: parameters.consentABTest
+        };
 
         this._bindings = [
             {
@@ -171,11 +173,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         if (this._landingPage === ConsentPage.HOMESCREEN || this._landingPage === ConsentPage.HOMEPAGE) {
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
-        }
-
-        if (this._isABTest) {
-            const homeScreenContainer = (<HTMLElement>this._container.querySelector('#consent-homescreen'));
-            homeScreenContainer.classList.add(('cta-style-abtest'));
         }
 
         this.showPage(this._landingPage);

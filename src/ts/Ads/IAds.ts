@@ -2,7 +2,6 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
@@ -20,10 +19,11 @@ import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { RefreshManager } from 'Ads/Managers/RefreshManager';
+import { Analytics } from 'Analytics/Analytics';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -47,8 +47,6 @@ export interface IAds extends IApiModule {
     InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
     SessionManager: SessionManager;
     MissedImpressionManager: MissedImpressionManager;
-    BackupCampaignManager: BackupCampaignManager;
-    ProgrammaticTrackingService: ProgrammaticTrackingService;
     ContentTypeHandlerManager: ContentTypeHandlerManager;
     Config: AdsConfiguration;
     Container: Activity | ViewController;
@@ -56,6 +54,7 @@ export interface IAds extends IApiModule {
     PlacementManager: PlacementManager;
     AssetManager: AssetManager;
     CampaignManager: CampaignManager;
-    RefreshManager: CampaignRefreshManager;
+    RefreshManager: RefreshManager;
     ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
+    Analytics: Analytics;
 }

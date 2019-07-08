@@ -8,7 +8,7 @@ export enum PrivacyMethod {
 }
 
 export interface IAllPermissions {
-    all: true;
+    all: boolean;
 }
 
 export interface IGranularPermissions {
@@ -32,7 +32,7 @@ export interface IProfilingPermissions {
 
 export type IPermissions = IUnityConsentPermissions | IProfilingPermissions;
 
-const CurrentUnityConsentVersion = 20181106;
+export const CurrentUnityConsentVersion = 20181106;
 
 export interface IRawGamePrivacy {
     method: string | undefined;

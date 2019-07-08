@@ -1,5 +1,4 @@
 import { Ads } from 'Ads/Ads';
-import { Analytics } from 'Analytics/Analytics';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
@@ -52,6 +51,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class Core implements ICore {
 
@@ -76,10 +76,10 @@ export class Core implements ICore {
     public UnityInfo: UnityInfo;
     public Config: CoreConfiguration;
 
-    public Analytics: Analytics;
     public Ads: Ads;
     public Purchasing: Purchasing;
     public Store: Store;
+    public ProgrammaticTrackingService: ProgrammaticTrackingService;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -142,6 +142,7 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
+            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo);
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
@@ -225,13 +226,11 @@ export class Core implements ICore {
                 throw error;
             }
 
-            this.Analytics = new Analytics(this);
-            return Promise.all([configJson, this.Analytics.initialize()]);
-        }).then(([configJson, gameSessionId]: [unknown, number]) => {
+            return configJson;
+        }).then((configJson: unknown) => {
             this.Store = new Store(this);
-            this.Ads = new Ads(configJson, this, this.Store);
-            this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
+            this.Ads = new Ads(configJson, this, this.Store);
 
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {

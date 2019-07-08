@@ -8,7 +8,7 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
-import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
+import { BannerAuctionRequest } from 'Banners/Networking/BannerAuctionRequest';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
@@ -38,7 +38,6 @@ export interface IRawBannerV5Response {
     auctionId: string;
     correlationId: string;
     placements: { [key: string]: { mediaId: string; trackingId: string } };
-    realtimeData?: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls };
 }
@@ -165,7 +164,7 @@ export class BannerCampaignManager {
                 return Promise.reject(e);
             }
         } else {
-            const e = new Error('No placements found in realtime campaign json.');
+            const e = new Error('No placements found');
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }
@@ -227,7 +226,7 @@ export class BannerCampaignManager {
                 return Promise.reject(e);
             }
         } else {
-            const e = new Error('No placements found in realtime V5 campaign json.');
+            const e = new Error('No placements found in V5 campaign json.');
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }

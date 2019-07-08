@@ -97,38 +97,6 @@ describe('Vast', () => {
             assert.deepEqual(vast.getCompanionClickTrackingUrls(), ['https://url.com/clickTracking']);
         });
 
-        it('should not return url for landscape endcard if dimensions are too small', () => {
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 319, 500, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 350, 479, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            const vast = new Vast([vastAd], []);
-            assert.equal(vast.getCompanionLandscapeUrl(), null);
-        });
-
-        it('should not return url for portrait endcard if dimensions are too small', () => {
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 490, 319, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 479, 350, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
-            const vast = new Vast([vastAd], []);
-            assert.equal(vast.getCompanionPortraitUrl(), null);
-        });
-
-        it('should not return image urls when image mime types are not supported', () => {
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'application/json', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'js', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id3', 700, 800, 'blah', 'http://image.com', 'https://url.com/click'));
-            const vast = new Vast([vastAd], []);
-            assert.equal(vast.getCompanionLandscapeUrl(), null);
-            assert.equal(vast.getCompanionPortraitUrl(), null);
-        });
-
-        it('should not return image urls when image mime types are not supported', () => {
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'application/json', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'js', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCompanionAdStaticResource('id3', 700, 800, 'blah', 'http://image.com', 'https://url.com/click'));
-            const vast = new Vast([vastAd], []);
-            assert.equal(vast.getCompanionLandscapeUrl(), null);
-            assert.equal(vast.getCompanionPortraitUrl(), null);
-        });
-
         it('should return image urls when image mime type is jpeg or jpg', () => {
             vastAd.addCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/jpeg', 'http://url.com/landscape.jpeg', 'https://url.com/click'));
             vastAd.addCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'image/jpg', 'http://url.com/portrait.jpg', 'https://url.com/click'));

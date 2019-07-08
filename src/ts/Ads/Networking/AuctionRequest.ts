@@ -26,7 +26,6 @@ export interface IAuctionResponse {
     auctionId: string;
     placements: { [placementID: string]: string };
     media: { [mediaID: string]: IPlacementMedia };
-    realtimeData: { [placementID: string]: string };
 }
 
 export interface IPlacementMedia {
@@ -335,15 +334,10 @@ export class AuctionRequest {
     }
 
     protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
-        const dto: { [key: string]: unknown } = {
+        return {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
         };
-
-        if (placement.getRealtimeData()) {
-            dto.realtimeData = placement.getRealtimeData();
-        }
-        return dto;
     }
 
     private getStaticResponse(url: string): Promise<INativeResponse> {

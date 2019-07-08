@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -12,13 +13,17 @@ export enum ProgrammaticTrackingError {
     PlacementWithIdDoesNotExist = 'placement_with_id_does_not_exist',
     PromoWithoutCreatives = 'promo_without_creatives',
     CampaignExpired = 'campaign_expired',
-    NoConnectionWhenNeeded = 'no_connection_when_needed'
+    NoConnectionWhenNeeded = 'no_connection_when_needed',
+    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show'
 }
 
 export enum AdmobMetric {
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
-    AdmobUserVideoSeeked = 'admob_user_video_seeked'
+    AdmobUserVideoSeeked = 'admob_user_video_seeked',
+    AdmobRewardedVideoStart = 'admob_rewarded_video_start',
+    AdmobUserWasRewarded = 'admob_user_was_rewarded',
+    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video'
 }
 
 export enum BannerMetric {
@@ -41,10 +46,27 @@ export enum VastMetric {
 
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
+    CampaignAttemptedToShowAdInBackground = 'ad_attempted_showad_background',
+    CampaignAboutToShowAdInBackground = 'ad_aboutto_showad_background'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
+export enum LoadMetric {
+    LoadEnabledAuctionRequest = 'load_enabled_auction_request',
+    LoadEnabledFill = 'load_enabled_fill',
+    LoadEnabledNoFill = 'load_enabled_no_fill',
+    LoadEnabledShow = 'load_enabled_show',
+    LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure',
+    LoadAuctionRequestBlocked = 'load_auction_request_blocked'
+}
+
+export enum PurchasingMetric {
+    PurchasingAppleStoreStarted = 'purchasing_apple_store_started',
+    PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
@@ -109,6 +131,12 @@ export class ProgrammaticTrackingService {
     }
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
+
+        const isLoadMetric = Object.values(LoadMetric).includes(event);
+        const isZyngaFreeCellSolitareUsingLoad = CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId());
+        if (isLoadMetric && !isZyngaFreeCellSolitareUsingLoad) {
+            return Promise.resolve(<INativeResponse>{});
+        }
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
