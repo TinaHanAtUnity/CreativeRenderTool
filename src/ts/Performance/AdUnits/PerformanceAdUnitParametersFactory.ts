@@ -16,10 +16,6 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { DoubleShadowCloseButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
-import { RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
-import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
-import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
-import { Platform } from 'Core/Constants/Platform';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
