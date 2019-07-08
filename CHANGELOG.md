@@ -1,4 +1,4 @@
-# Pending
+# Mon Jul  8 19:54:39 UTC 2019
 	
 * Added double shadow to the end-screen [#10458](https://github.com/Applifier/unity-ads-webview/pull/10458)
 * Reverted the pop-out experiment [#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
