@@ -279,7 +279,6 @@ function getHistogram(pixels: Uint8ClampedArray): number[][] {
             histogramMap[pixelKey] = color;
             histogram.push(color);
         }
-        color[3] += 1;
     }
 
     return histogram;
