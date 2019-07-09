@@ -2,7 +2,6 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
@@ -14,6 +13,9 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
+import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -317,17 +319,25 @@ export class VastParserStrict {
                     }
                 }
                 if (isWarningLevel) {
-                    vastAd.addCompanionAd(companionAd);
+                    vastAd.addStaticCompanionAd(companionAd);
                 } else {
                     vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
             }
             // ignore element as it is not of a type we support
             if (iframeResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+                const companionAd = this.parseCompanionAdIFrameResourceElement(element, urlProtocol);
+                if (companionAd.getIframeResourceURL()) {
+                    vastAd.setIframeCompanionAd(companionAd);
+                    vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+                }
             }
-            if (htmlResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+            if (htmlResourceElement && htmlResourceElement.innerHTML.length > 0) {
+                const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
+                if (companionAd.getHtmlResourceContent()) {
+                    vastAd.setHtmlCompanionAd(companionAd);
+                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                }
             }
         });
 
@@ -507,6 +517,38 @@ export class VastParserStrict {
                 companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
             }
         });
+        return companionAd;
+    }
+
+    private parseCompanionAdIFrameResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdIframeResource(id, height, width);
+
+        const iframeResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
+        if (iframeResource) {
+            const iframeUrl = this.parseVastUrl(this.parseNodeText(iframeResource), urlProtocol);
+            if (iframeUrl) {
+                companionAd.setIframeResourceURL(iframeUrl);
+            }
+        }
+        return companionAd;
+    }
+
+    private parseCompanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
+
+        const htmlResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
+        if (htmlResource) {
+            const htmlContent = this.parseNodeText(htmlResource);
+            if (htmlContent.length > 0) {
+                companionAd.setHtmlResourceContent(htmlContent);
+            }
+        }
         return companionAd;
     }
 

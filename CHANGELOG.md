@@ -1,3 +1,7 @@
+# Pending
+	
+* Parse HTML and IFrame companion ad for VAST - part 2 [#10455](https://github.com/Applifier/unity-ads-webview/pull/10455)
+
 # Mon Jul  8 19:54:39 UTC 2019
 	
 * Added double shadow to the end-screen [#10458](https://github.com/Applifier/unity-ads-webview/pull/10458)
