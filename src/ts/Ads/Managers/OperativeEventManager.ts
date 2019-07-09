@@ -1,31 +1,32 @@
-import { IAdsApi } from 'Ads/IAds';
-import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { Asset } from 'Ads/Models/Assets/Asset';
-import { Campaign } from 'Ads/Models/Campaign';
-import { Placement } from 'Ads/Models/Placement';
-import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
-import { EventType } from 'Ads/Models/Session';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import {IAdsApi} from 'Ads/IAds';
+import {FailedOperativeEventManager} from 'Ads/Managers/FailedOperativeEventManager';
+import {SessionManager} from 'Ads/Managers/SessionManager';
+import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {AdUnitStyle} from 'Ads/Models/AdUnitStyle';
+import {Asset} from 'Ads/Models/Assets/Asset';
+import {Campaign} from 'Ads/Models/Campaign';
+import {Placement} from 'Ads/Models/Placement';
+import {IRequestPrivacy} from 'Ads/Models/RequestPrivacy';
+import {EventType} from 'Ads/Models/Session';
+import {CampaignAssetInfo} from 'Ads/Utilities/CampaignAssetInfo';
+import {GameSessionCounters, IGameSessionCounters} from 'Ads/Utilities/GameSessionCounters';
+import {SessionUtils} from 'Ads/Utilities/SessionUtils';
+import {Platform} from 'Core/Constants/Platform';
+import {ICoreApi} from 'Core/ICore';
+import {MetaDataManager} from 'Core/Managers/MetaDataManager';
+import {INativeResponse, RequestManager} from 'Core/Managers/RequestManager';
+import {AndroidDeviceInfo} from 'Core/Models/AndroidDeviceInfo';
+import {ClientInfo} from 'Core/Models/ClientInfo';
+import {CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import {DeviceInfo} from 'Core/Models/DeviceInfo';
+import {FrameworkMetaData} from 'Core/Models/MetaData/FrameworkMetaData';
+import {MediationMetaData} from 'Core/Models/MetaData/MediationMetaData';
+import {Diagnostics} from 'Core/Utilities/Diagnostics';
+import {HttpKafka, KafkaCommonObjectType} from 'Core/Utilities/HttpKafka';
+import {StorageBridge} from 'Core/Utilities/StorageBridge';
+import {CustomFeatures} from 'Ads/Utilities/CustomFeatures';
+import {TrackingIdentifierFilter} from 'Ads/Utilities/TrackingIdentifierFilter';
+import {PrivacyMethod} from 'Ads/Models/Privacy';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -102,6 +103,7 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     imei?: string;
+    privacyType?: string;
     isLoadEnabled: boolean;
 }
 
@@ -413,6 +415,11 @@ export class OperativeEventManager {
                     'screenDensity': this._deviceInfo.getScreenDensity(),
                     'screenSize': this._deviceInfo.getScreenLayout()
                 };
+            }
+
+            const privacyMethod = this._adsConfig.getUserPrivacy().getMethod();
+            if(privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
+                infoJson.privacyType = privacyMethod;
             }
 
             const trackingIDs: Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
