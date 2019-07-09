@@ -486,17 +486,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return obstructionOverlapPercentage * 100;
     }
 
-    public getAndroidViewSize(size: number, density: number): number {
-        return size * (density / 160);
-    }
-
-    public getScreenDensity(): number {
-        if (this._platform === Platform.ANDROID) {
-            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
-        }
-        return 0;
-    }
-
     /**
      * Used to ensure OMID#SessionStart is fired prior to video playback events
      * Used to ensure DOM is removed prior to OMID#SessionFinish
