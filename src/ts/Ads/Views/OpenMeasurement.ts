@@ -16,7 +16,6 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
