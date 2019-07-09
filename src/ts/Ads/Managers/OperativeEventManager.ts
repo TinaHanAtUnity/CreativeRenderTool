@@ -417,7 +417,11 @@ export class OperativeEventManager {
                 };
             }
 
-            const privacyMethod = this._adsConfig.getUserPrivacy().getMethod();
+            let privacyMethod;
+            const privacy = session.getPrivacy();
+            if(privacy) {
+                privacyMethod = privacy.method;
+            }
             if(privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
                 infoJson.privacyType = privacyMethod;
             }
