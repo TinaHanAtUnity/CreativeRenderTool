@@ -354,6 +354,7 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
     private _coreApi: ICoreApi;
     private _performanceCampaign: PerformanceCampaign;
     private _image: Asset | undefined;
+    private _startTime: number;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
@@ -364,6 +365,7 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
+        this._startTime = new Date().getTime();
 
         document.documentElement.classList.add('color-tinting-endscreen');
 
@@ -426,6 +428,7 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
             privacyIconContainer.style.color = `rgb(${dark.join(',')})`;
             unityIconContainer.style.color = `rgb(${dark.join(',')})`;
             chinaAdvertisementElement.style.color = `rgb(${dark.join(',')})`;
+            this.sendKafkaEvent('theme', colorTheme);
         } else {
             this.sendKafkaEvent('theming_failed');
         }
@@ -479,11 +482,16 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
         });
     }
 
-    private sendKafkaEvent(message: string) {
+    private sendKafkaEvent(message: string, theme?: IColorTheme) {
         const kafkaObject: { [key: string]: unknown } = {};
+        const timeSinceStart = new Date().getTime() - this._startTime;
         kafkaObject.type = 'color_tinting_data';
         kafkaObject.auctionId = this._performanceCampaign.getSession().getId();
         kafkaObject.message = message;
+        kafkaObject.time_since_start = timeSinceStart;
+        if (theme) {
+            kafkaObject.theme = theme;
+        }
         HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 }
