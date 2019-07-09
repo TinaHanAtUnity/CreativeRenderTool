@@ -9,7 +9,7 @@ import { LoadEvent } from 'Core/Native/LoadApi';
 
 export class UnityAds {
 
-    public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false, loadMode: boolean = false): Promise<void> {
+    public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false, enablePerPlacementLoad: boolean = false): Promise<void> {
         let nativeBridge: NativeBridge;
         switch(platform) {
             // Setting auto batching on does not work in a "single-threaded" environment due to callbacks and events
@@ -30,7 +30,7 @@ export class UnityAds {
 
         UnityAds._backend.Api.Sdk.setGameId(gameId);
         UnityAds._backend.Api.Sdk.setTestMode(testMode);
-        UnityAds._backend.Api.Sdk.setUsePerPlacementLoad(loadMode);
+        UnityAds._backend.Api.Sdk.setUsePerPlacementLoad(enablePerPlacementLoad);
 
         UnityAds._listener = listener;
 
