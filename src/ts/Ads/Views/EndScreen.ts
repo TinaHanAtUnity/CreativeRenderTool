@@ -24,7 +24,6 @@ export interface IEndScreenParameters {
     adUnitStyle?: AdUnitStyle;
     campaignId?: string;
     osVersion?: string;
-    id?: string;
 }
 
 export interface IEndScreenHandler extends IGDPREventHandler {
@@ -48,7 +47,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _apiLevel?: number;
 
     constructor(parameters: IEndScreenParameters) {
-        super(parameters.platform, parameters.id ? parameters.id : 'end-screen');
+        super(parameters.platform, 'end-screen');
         this._localization = new Localization(parameters.language, 'endscreen');
         this._abGroup = parameters.abGroup;
         this._gameName = parameters.targetGameName;

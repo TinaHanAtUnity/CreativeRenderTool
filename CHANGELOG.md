@@ -1,9 +1,27 @@
-# Staged
+# Pending
+	
+* Parse HTML and IFrame companion ad for VAST - part 2 [#10455](https://github.com/Applifier/unity-ads-webview/pull/10455)
+
+# Mon Jul  8 19:54:39 UTC 2019
+	
+* Added double shadow to the end-screen [#10458](https://github.com/Applifier/unity-ads-webview/pull/10458)
+* Reverted the pop-out experiment [#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
+* Added a test for the Version Matcher [#10452](https://github.com/Applifier/unity-ads-webview/pull/10452)
+* Fix test runner to support older Node version [#10456](https://github.com/Applifier/unity-ads-webview/pull/10456)
+
+# Wed Jul  3 16:15:07 UTC 2019
+
+* Prevent two consent dialogs from opening at the same time [#10429](https://github.com/Applifier/unity-ads-webview/pull/10429)
+* Disable logging by default, add option ENABLE_LOGS [#10286](https://github.com/Applifier/unity-ads-webview/pull/10286)
+
+# Tue Jul 2 17:05:52 UTC 2019
 
 * Make the RedesignedEndScreenDesignTest ZyngaFilteredABTest instead of a normal one [#10401](https://github.com/Applifier/unity-ads-webview/pull/10401)
 * AB test: Replace 'Agree to all' with 'Accept all' in English versions [#10400](https://github.com/Applifier/unity-ads-webview/pull/10400)
 * Change Stackdriver Trace endpoint to new trace endpoint [#10183](https://github.com/Applifier/unity-ads-webview/pull/10183)
-
+* Remove call to console.log from HttpKafka if RequestManager is not set [#10287](https://github.com/Applifier/unity-ads-webview/pull/10287)
+* Integration test framewrok to mimic tape [#10262](https://github.com/Applifier/unity-ads-webview/pull/10262)
+* Enable Banner in stage testing for DSP [#10424](https://github.com/Applifier/unity-ads-webview/pull/10424)
 
 # Wed Jun 26 22:46:04 UTC 2019
 
