@@ -110,6 +110,7 @@ export class Ads implements IAds {
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
+    private _showingConsent: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
     private _store: IStore;
@@ -323,6 +324,8 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
+        this._showingConsent = true;
+
         const consentView = new ConsentUnit({
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
@@ -349,7 +352,7 @@ export class Ads implements IAds {
         const contentType = campaign.getContentType();
         const seatId = campaign.getSeatId();
 
-        if(this._showing) {
+        if(this._showing || this._showingConsent) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
             this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
@@ -412,6 +415,7 @@ export class Ads implements IAds {
         this.resetOutdatedUserPrivacy();
 
         this.showConsentIfNeeded(options).then(() => {
+            this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
     }
@@ -575,6 +579,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('sessionId')) {
             CampaignManager.setSessionId(TestEnvironment.get('sessionId'));
+            AuctionRequest.setSessionId(TestEnvironment.get('sessionId'));
         }
 
         if(TestEnvironment.get('country')) {
