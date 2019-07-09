@@ -81,10 +81,6 @@ export class BannerCampaignManager {
         }
 
         GameSessionCounters.addAdRequest();
-
-        const jaegerSpan = this._jaegerManager.startSpan('BannerCampaignManagerRequest');
-        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-
         const request = BannerAuctionRequest.create({
             platform: this._platform,
             core: this._core,
@@ -106,9 +102,6 @@ export class BannerCampaignManager {
                 this._promise = null;
                 const nativeResponse = request.getNativeResponse();
                 if (nativeResponse) {
-                    if (nativeResponse.responseCode) {
-                        jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
-                    }
                     if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
@@ -121,14 +114,9 @@ export class BannerCampaignManager {
                 return this.handleError(e, 'banner_auction_request_failed');
             })
             .then((campaign) => {
-                this._jaegerManager.stop(jaegerSpan);
                 return campaign;
             })
             .catch((e) => {
-                jaegerSpan.addTag(JaegerTags.Error, 'true');
-                jaegerSpan.addTag(JaegerTags.ErrorMessage, e.message);
-                jaegerSpan.addAnnotation(e.message);
-                this._jaegerManager.stop(jaegerSpan);
                 throw e;
             });
 

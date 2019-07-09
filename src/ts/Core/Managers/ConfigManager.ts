@@ -51,7 +51,7 @@ export class ConfigManager {
         this._request = request;
     }
 
-    public getConfig(jaegerSpan: JaegerSpan): Promise<unknown> {
+    public getConfig(): Promise<unknown> {
         if(this._rawConfig) {
             return Promise.resolve(this._rawConfig);
         } else {
@@ -71,7 +71,6 @@ export class ConfigManager {
                 }
 
                 const url: string = this.createConfigUrl(framework, adapter, gamerToken);
-                jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -79,7 +78,6 @@ export class ConfigManager {
                     followRedirects: false,
                     retryWithConnectionEvents: true
                 }).then(response => {
-                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                     try {
                         this._rawConfig = JsonParser.parse(response.response);
                         return this._rawConfig;
@@ -95,9 +93,6 @@ export class ConfigManager {
                     let modifiedError = error;
                     if(modifiedError instanceof RequestError) {
                         const requestError = modifiedError;
-                        if(requestError.nativeResponse && requestError.nativeResponse.responseCode) {
-                            jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
-                        }
                         if(requestError.nativeResponse && requestError.nativeResponse.response) {
                             const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
                             modifiedError = new ConfigError((new Error(responseObj.error)));

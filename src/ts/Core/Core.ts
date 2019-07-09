@@ -174,21 +174,14 @@ export class Core implements ICore {
                 this.FocusManager.setListenAndroidLifecycle(true);
             }
 
-            const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
             let configPromise: Promise<unknown>;
             if(TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
             } else {
-                configPromise = this.ConfigManager.getConfig(configSpan);
+                configPromise = this.ConfigManager.getConfig();
             }
-
-            configPromise.then(() => {
-                this.JaegerManager.stop(configSpan);
-            }).catch(() => {
-                this.JaegerManager.stop(configSpan);
-            });
 
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
@@ -201,9 +194,6 @@ export class Core implements ICore {
 
                 return [configJson, coreConfig];
             }).catch((error) => {
-                configSpan.addTag(JaegerTags.Error, 'true');
-                configSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                configSpan.addAnnotation(error.message);
                 throw new Error(error);
             });
 
