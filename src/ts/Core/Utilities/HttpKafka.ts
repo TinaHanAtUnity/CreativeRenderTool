@@ -55,9 +55,6 @@ export class HttpKafka {
             if(HttpKafka._request) {
                 return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
             } else {
-                // tslint:disable:no-console
-                console.log(JSON.stringify(data));
-                // tslint:enable:no-console
                 return Promise.resolve(<INativeResponse>{});
             }
         });

@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
+import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Ads/Networking/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
 import { BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 

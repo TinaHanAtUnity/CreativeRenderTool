@@ -45,7 +45,8 @@ describe('incident-20190516-2', () => {
     [   {profiling: false},
         {profiling: true},
         {ads: false, gameExp: false, external: false},
-        {ads: true, gameExp: true, external: true}]
+        {ads: true, gameExp: true, external: true},
+        {all: true}]
         .forEach((permissions) => {
         it('AdsConfigurationParser should NOT mark privacy as desynchronized if optOutEnabled is true and UserPrivacy.permissions = ' + JSON.stringify(permissions), () => {
             const configJson = {
@@ -83,7 +84,8 @@ describe('incident-20190516-2', () => {
     });
 
     [   {profiling: true},
-        {ads: true, gameExp: true, external: true}]
+        {ads: true, gameExp: true, external: true},
+        {all: true}]
         .forEach((permissions) => {
         it('AdsConfigurationParser should NOT mark privacy as desynchronized if optOutEnabled is false and Privacy.permission = ' + JSON.stringify(permissions), () => {
             const configJson = {
