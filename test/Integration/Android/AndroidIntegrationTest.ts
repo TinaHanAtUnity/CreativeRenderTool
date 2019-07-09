@@ -11,8 +11,6 @@ import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { ZyngaLoadTest } from 'Core/Models/ABGroup';
-import { EventCategory } from 'Core/Constants/EventCategory';
-import { LoadEvent } from 'Core/Native/LoadApi';
 
 describe('AndroidIntegrationTest', () => {
     const sandbox = sinon.createSandbox();
@@ -383,7 +381,10 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
             UnityAds.load('video');
         }).catch(() => {
             assert.fail('should not throw');
