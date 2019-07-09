@@ -126,7 +126,10 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
             UnityAds.load('video');
         }).catch(() => {
             assert.fail('should not throw');
@@ -193,7 +196,10 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
             UnityAds.load('rewardedVideo');
             UnityAds.load('video');
         }).catch(() => {
@@ -252,7 +258,10 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true);
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad);
 
         return new Promise(resolve => setTimeout(resolve, 5000)).then(() => {
             assert.equal(readyCount, 0);
@@ -313,7 +322,10 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true, true).then(() => {
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
             UnityAds.load('rewardedVideo');
         }).catch(() => {
             assert.fail('should not throw');
