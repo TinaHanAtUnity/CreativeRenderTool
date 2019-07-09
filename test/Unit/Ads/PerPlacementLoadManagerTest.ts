@@ -178,6 +178,7 @@ describe('PerPlacementLoadManagerTest', () => {
             let loadEvent: ILoadEvent;
             let sandbox: sinon.SinonSandbox;
             let loadCampaignStub: sinon.SinonStub;
+            let sendReadyEventStub: sinon.SinonStub;
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
@@ -187,6 +188,7 @@ describe('PerPlacementLoadManagerTest', () => {
                     ts: clientInfo.getInitTimestamp() + 1
                 };
                 loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
+                sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
                 sandbox.stub(core.Api.Storage, 'get').callsFake(() => {
                     return Promise.resolve(loadEvent);
                 });
@@ -250,6 +252,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 placement.setState(PlacementState.WAITING);
                 return loadManager.initialize().then(() => {
                     sinon.assert.notCalled(loadCampaignStub);
+                    sinon.assert.notCalled(sendReadyEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
                 });
             });
@@ -262,6 +265,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 placement.setCurrentCampaign(campaign);
                 return loadManager.initialize().then(() => {
                     sinon.assert.notCalled(loadCampaignStub);
+                    sinon.assert.calledWith(sendReadyEventStub, placementId);
                     sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
                 });
             });
