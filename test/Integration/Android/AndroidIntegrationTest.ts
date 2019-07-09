@@ -76,6 +76,7 @@ describe('AndroidIntegrationTest', () => {
     it('should handle happy path on Android with Load API', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
         let readyCount = 0;
+        let stateChangeCount = 0;
 
         let readyPlacement: string = '';
         let promiseReadyResolve: any = null;
@@ -103,6 +104,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -134,6 +136,7 @@ describe('AndroidIntegrationTest', () => {
         });
 
         return promiseReady.then(() => {
+            assert.equal(stateChangeCount, 2);
             assert.equal(readyCount, 1);
             assert.equal(readyPlacement, 'video');
         });
@@ -141,6 +144,8 @@ describe('AndroidIntegrationTest', () => {
 
     it('should handle happy path on Android with Load API, ready called twice', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
+
+        let stateChangeCount = 0;
 
         let readyPlacement: string[] = [];
         let promiseReadyResolve: any = null;
@@ -169,6 +174,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -201,6 +207,7 @@ describe('AndroidIntegrationTest', () => {
         });
 
         return promiseReady.then(() => {
+            assert.equal(stateChangeCount, 4);
             assert.equal(readyPlacement.length, 2);
             assert.isTrue(readyPlacement.includes('rewardedVideo'));
             assert.isTrue(readyPlacement.includes('video'));
@@ -210,6 +217,7 @@ describe('AndroidIntegrationTest', () => {
     it('should handle happy path on Android with Load API, should do nothing', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
         let readyCount = 0;
+        let stateChangeCount = 0;
 
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
@@ -228,6 +236,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -256,12 +265,14 @@ describe('AndroidIntegrationTest', () => {
 
         return new Promise(resolve => setTimeout(resolve, 5000)).then(() => {
             assert.equal(readyCount, 0);
+            assert.equal(stateChangeCount, 0);
         });
     });
 
-    it('should handle happy path on Android with Load API, request after init', function(this: Mocha.ITestCallbackContext): Promise<any> {
+    it('should handle happy path on Android with Load API, request before init', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
         let readyCount = 0;
+        let stateChangeCount = 0;
 
         let readyPlacement: string = '';
         let promiseReadyResolve: any = null;
@@ -289,6 +300,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -320,6 +332,7 @@ describe('AndroidIntegrationTest', () => {
         });
 
         return promiseReady.then(() => {
+            assert.equal(stateChangeCount, 2);
             assert.equal(readyCount, 1);
             assert.equal(readyPlacement, 'rewardedVideo');
         });
