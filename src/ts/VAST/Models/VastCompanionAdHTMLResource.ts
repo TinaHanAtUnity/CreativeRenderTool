@@ -7,7 +7,7 @@ interface IVastCompanionAdHTMLResource extends IVastCreativeCompanionAd {
 
 export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResource> {
 
-    constructor(id: string | null, height: number, width: number, htmlResourceURL?: string | null) {
+    constructor(id: string | null, height: number, width: number, htmlResourceURL?: string) {
         super('VastCompanionAdHTMLResource', {
             id: ['string', 'null'],
             type: ['string'],
@@ -31,8 +31,8 @@ export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResou
         return this.get('type');
     }
 
-    public setHtmlResourceContent(html: string) {
-        this.set('htmlResourceContent', html);
+    public setHtmlResourceContent(htmlContent: string) {
+        this.set('htmlResourceContent', htmlContent);
     }
 
     public getHtmlResourceContent(): string | null {
@@ -50,6 +50,8 @@ export class VastCompanionAdHTMLResource extends Model<IVastCompanionAdHTMLResou
     public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
+            'width': this.getWidth(),
+            'height': this.getHeight(),
             'type': this.getType(),
             'htmlResourceContent': this.getHtmlResourceContent()
         };

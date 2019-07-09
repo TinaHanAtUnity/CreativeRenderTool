@@ -89,9 +89,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             this._ads.Placement.setPlacementState(placementId, placement.getState());
             this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
         }
-        if(placement.getState() === PlacementState.READY) {
-            this._ads.Listener.sendReadyEvent(placementId);
-        }
+        this.alertPlacementReadyStatus(placement);
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
@@ -128,6 +126,7 @@ export class PerPlacementLoadManager extends RefreshManager {
                 }
             });
         } else {
+            this.alertPlacementReadyStatus(placement);
             this._pts.reportMetric(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
@@ -231,6 +230,12 @@ export class PerPlacementLoadManager extends RefreshManager {
                     this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                 }
             }
+        }
+    }
+
+    private alertPlacementReadyStatus(placement: Placement) {
+        if (placement && placement.getState() === PlacementState.READY) {
+            this._ads.Listener.sendReadyEvent(placement.getId());
         }
     }
 }
