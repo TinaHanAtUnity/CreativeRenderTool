@@ -326,10 +326,10 @@ export class VastParserStrict {
             }
             // ignore element as it is not of a type we support
             if (iframeResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${iframeResourceElement.outerHTML}`);
+                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
             }
-            if (htmlResourceElement && htmlResourceElement.innerHTML.length > 0) {
-                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${htmlResourceElement.outerHTML}`);
+            if (htmlResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
             }
         });
 
