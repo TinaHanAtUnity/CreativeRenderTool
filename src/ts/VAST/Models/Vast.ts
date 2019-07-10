@@ -155,7 +155,7 @@ export class Vast extends Model<IVast> {
     public getLandscapeOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
                 for(const companionAd of companionAds) {
@@ -180,7 +180,7 @@ export class Vast extends Model<IVast> {
     public getPortraitOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
                 for(const companionAd of companionAds) {
@@ -205,7 +205,7 @@ export class Vast extends Model<IVast> {
     public getCompanionClickThroughUrl(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
                 for(const companionAd of companionAds) {
@@ -223,7 +223,7 @@ export class Vast extends Model<IVast> {
     public getCompanionClickTrackingUrls(): string[] {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
                 for (const companionAd of companionAds) {
@@ -235,6 +235,28 @@ export class Vast extends Model<IVast> {
             }
         }
         return [];
+    }
+
+    public getIframeCompanionResourceUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const iframeCompanionAd = ad.getIframeCompanionAd();
+            if (iframeCompanionAd) {
+                return iframeCompanionAd.getIframeResourceURL();
+            }
+        }
+        return null;
+    }
+
+    public getHtmlCompanionResourceContent(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const htmlCompanionAd = ad.getHtmlCompanionAd();
+            if (htmlCompanionAd) {
+                return htmlCompanionAd.getHtmlResourceContent();
+            }
+        }
+        return null;
     }
 
     public getVideoMediaFiles(): VastMediaFile[] {
