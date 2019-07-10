@@ -15,10 +15,8 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICore } from 'Core/ICore';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager, AuctionProtocol, INativeResponse } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -98,7 +96,6 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { Placement } from 'Backend/Api/Placement';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 describe('CampaignManager', () => {
@@ -118,7 +115,6 @@ describe('CampaignManager', () => {
     let sessionManager: SessionManager;
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
-    let jaegerManager: JaegerManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let contentTypeHandlerManager: ContentTypeHandlerManager;
     let adUnitParametersFactory: IAbstractAdUnitParametersFactory<Campaign, IAdUnitParameters<Campaign>>;
@@ -152,9 +148,6 @@ describe('CampaignManager', () => {
         metaDataManager = core.MetaDataManager;
         sessionManager = new SessionManager(core.Api, request, storageBridge);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
-        jaegerManager = sinon.createStubInstance(JaegerManager);
-        jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
-        jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);

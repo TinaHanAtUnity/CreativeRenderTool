@@ -222,7 +222,7 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this, this.Store);
 
-            return this.Ads.initialize(jaegerInitSpan);
+            return this.Ads.initialize();
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
         }).catch((error: { message: string; name: unknown }) => {

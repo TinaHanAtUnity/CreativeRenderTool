@@ -44,13 +44,11 @@ import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICore } from 'Core/ICore';
-import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
@@ -164,7 +162,7 @@ export class Ads implements IAds {
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
-    public initialize(jaegerInitSpan: JaegerSpan) {
+    public initialize() {
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();

@@ -18,7 +18,6 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi, ICore } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
@@ -111,7 +110,6 @@ export class CampaignManager {
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
@@ -132,7 +130,6 @@ export class CampaignManager {
         this._cacheBookkeeping = cacheBookkeeping;
         this._contentTypeHandlerManager = contentTypeHandlerManager;
         this._requesting = false;
-        this._jaegerManager = core.JaegerManager;
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._pts = core.ProgrammaticTrackingService;
     }

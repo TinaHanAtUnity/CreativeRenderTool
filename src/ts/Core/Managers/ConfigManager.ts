@@ -2,7 +2,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
-import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroup } from 'Core/Models/ABGroup';

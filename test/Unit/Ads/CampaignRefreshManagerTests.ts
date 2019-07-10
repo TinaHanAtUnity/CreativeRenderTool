@@ -24,11 +24,9 @@ import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi, ICore } from 'Core/ICore';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -130,7 +128,6 @@ describe('CampaignRefreshManager', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
-    let jaegerManager: JaegerManager;
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
@@ -210,9 +207,6 @@ describe('CampaignRefreshManager', () => {
         };
 
         RefreshManager.ParsingErrorRefillDelayInSeconds = 0; // prevent tests from hanging due to long retry timeouts
-        jaegerManager = sinon.createStubInstance(JaegerManager);
-        jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
-        jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
     });
 
     describe('PLC campaigns', () => {

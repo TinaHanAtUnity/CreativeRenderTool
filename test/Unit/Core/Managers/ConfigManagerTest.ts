@@ -5,8 +5,6 @@ import { ConfigError } from 'Core/Errors/ConfigError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';

@@ -7,17 +7,14 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -197,7 +194,6 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
             const campaignParserManager = new ContentTypeHandlerManager();
-            const jaegerManager = sinon.createStubInstance(JaegerManager);
             sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
@@ -233,8 +229,6 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
             const campaignParserManager = new ContentTypeHandlerManager();
-            const jaegerManager = sinon.createStubInstance(JaegerManager);
-            jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
             sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
