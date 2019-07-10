@@ -515,7 +515,7 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('IFrameResource Companion Ad', () => {
+            xdescribe('IFrameResource Companion Ad', () => {
                 describe('getIframeResourceURL from IFrameResource type CompanionAd', () => {
                     const tests: {
                         message: string;
@@ -543,7 +543,7 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('HTMLResource Companion Ad', () => {
+            xdescribe('HTMLResource Companion Ad', () => {
                 describe('getHtmlCompanionResourceContent from HTMLResource type CompanionAd', () => {
                     const tests: {
                         message: string;
