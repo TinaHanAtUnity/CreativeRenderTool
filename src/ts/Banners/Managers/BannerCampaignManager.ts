@@ -11,8 +11,6 @@ import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParse
 import { BannerAuctionRequest } from 'Banners/Networking/BannerAuctionRequest';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -54,12 +52,11 @@ export class BannerCampaignManager {
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _jaegerManager: JaegerManager;
     private _pts: ProgrammaticTrackingService;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -70,7 +67,6 @@ export class BannerCampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
-        this._jaegerManager = jaegerManager;
         this._pts = pts;
     }
 
