@@ -17,6 +17,7 @@ import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { ColorTintingTest, DoubleShadowCloseButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
 import { PerformanceColorTintingEndScreen } from 'Performance/Views/PerformanceColorTintingEndScreen';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -49,7 +50,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const abGroup = baseParams.coreConfig.getAbGroup();
         if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
             endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (ColorTintingTest.isValid(abGroup)) {
+        } else if (ColorTintingTest.isValid(abGroup) && this._platform === Platform.IOS) {
             endScreen = new PerformanceColorTintingEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
