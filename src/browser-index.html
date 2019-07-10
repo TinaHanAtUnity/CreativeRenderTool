@@ -425,12 +425,19 @@
                         </label>
                     </div>
                     <div class="form-check">
+                        <label for="loadMode" class="form-check-label">
+                            <input id="loadMode" class="form-check-input" type="checkbox" />
+                            Load Mode
+                        </label>
+                    </div>
+                    <div class="form-check">
                         <label for="autoSkip" class="form-check-label">
                             <input id="autoSkip" class="form-check-input" type="checkbox" />
                             Auto Skip
                         </label>
                     </div>
                     <button id="initialize" class="btn btn-primary btn-block" disabled="disabled">Initialize</button>
+                    <button id="load" class="btn btn-primary btn-block" disabled="disabled">Load</button>
                     <button id="defaultVideoAndPictureZone" class="btn btn-secondary btn-block" disabled="disabled">Interstitial</button>
                     <button id="incentivizedZone" class="btn btn-secondary btn-block" disabled="disabled">Incentivized</button>
                     <button id="rewardedVideoZone" style="display: none"></button>
@@ -439,7 +446,7 @@
         </div>
     </div>
     <video id="videoView"></video>
-    <iframe name="webview-frame" id="webView" src="iframe.html"></iframe>
+    <iframe name="webview-frame" id="webView" src="iframe.html?enableLogs=1"></iframe>
     <script>
         var getHeadless = function() {
             if(typeof location !== 'undefined' && location.search.indexOf('headless=1') !== -1) {
@@ -447,6 +454,12 @@
             }
             return false;
         };
+        var getHeadlessLoad = function() {
+             if(typeof location !== 'undefined' && location.search.indexOf('headlessload=1') !== -1) {
+                 return true;
+             }
+             return false;
+         };
     </script>
 </body>
 </html>

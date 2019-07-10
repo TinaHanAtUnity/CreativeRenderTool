@@ -416,7 +416,7 @@ export class TestFixtures {
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             vast: vast,
             video: new Video(vast.getVideoUrl(), session),
-            hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
+            hasStaticEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
             appCategory: 'appCategory',
