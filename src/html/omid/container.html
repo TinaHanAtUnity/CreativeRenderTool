@@ -6,7 +6,7 @@
      * Please only refer to omid3p or OmidVerification for js verification
      */
     (function() {
-        var OmidSessionClient = function() {
+        var OmidSessionInterface = function() {
 
             var ErrorType = {
                 GENERIC: 'generic',                     // An error unrelated to video playback.
@@ -70,10 +70,6 @@
             var videoElement;
             var sentQuartiles = {};
 
-            this.getUnitySDKVersion = function() {
-                return sdkVersion;
-            }
-
             /*
             * Based on https://github.com/InteractiveAdvertisingBureau/Open-Measurement-JSClients/blob/master/version.txt
             */
@@ -110,7 +106,7 @@
                 SESSION_ERROR:  'sessionError'
             };
 
-            this.sessionError = function(errorType, message) {
+            this.reportError = function(errorType, message) {
                 var sessionErrorEventData = {
                     errorType: errorType,
                     message: message
@@ -124,10 +120,10 @@
                 }
 
                 sessionCallback.call(eventData);
-                this.postMessage('sessionError', eventData);
+                this.postMessage('reportError', eventData);
             };
 
-            this.sessionStart = function() {
+            this.startAdSession = function() {
                 var sessionStartEventData = {
                     context: this.Context,
                     verificationParameters: undefined
@@ -139,10 +135,10 @@
                     data: sessionStartEventData
                 }
                 sessionCallback.call(eventData);
-                this.postMessage('sessionStart', eventData);
+                this.postMessage('startAdSession', eventData);
             };
             
-            this.sessionFinish = function() {
+            this.finishAdSession = function() {
                 var eventData = {
                     adSessionId: this.getSessionId(),
                     timestamp: + new Date(),
@@ -151,7 +147,7 @@
                 }
 
                 sessionCallback.call(eventData);
-                this.postMessage('sessionFinish', eventData);
+                this.postMessage('finishAdSession', eventData);
                 
                 sessionCallback = {};
             };
@@ -165,10 +161,88 @@
                 videoElement = el;
             };
 
+            /**
+             * Events will be registered to the following objects and the creative session interface will call via
+             */ 
+            this.adEvents = {}
+            this.mediaEvents = {}
 
-            this.registerAdEvents = function() {};
+            this.registerAdEvents = function() {
+                adEvents['impressionOccured'] = impressionOccured;
+            };
 
-            this.registerVideoEvents = function() {};
+            this.registerMediaEvents = function() {
+                mediaEvents['loaded'] = loaded;
+                mediaEvents['start'] = start;
+                mediaEvents['firstQuartile'] = firstQuartile;
+                mediaEvents['midpoint'] = midpoint;
+                mediaEvents['thirdQuartile'] = thirdQuartile;
+                mediaEvents['complete'] = complete;
+                mediaEvents['pause'] = pause;
+                mediaEvents['resume'] = resume;
+                mediaEvents['bufferStart'] = bufferStart;
+                mediaEvents['bufferFinish'] = bufferFinish;
+                mediaEvents['skipped'] = skipped;
+                mediaEvents['volumeChange'] = volumeChange;
+                mediaEvents['playerStateChange'] = playerStateChange;
+                mediaEvents['adUserInteraction'] = adUserInteraction;
+            };
+
+            var impressionOccured = function(impressionEventData) {
+                this.postMessage('impressionOccured', impressionEventData);
+            }
+
+            var loaded = function(vastProperties) {
+                this.postMessage('loaded', vastProperties);
+            }
+            var start = function(duration, videoPlayerVolume) {
+                this.postMessage('start', {
+                    duration: duration,
+                    videoPlayerVolume: videoPlayerVolume
+                });
+            }
+            var firstQuartile = function() {
+                this.postMessage('firstQuartile');
+            }
+            var midpoint = function() {
+                this.postMessage('midpoint');
+            }
+            var thirdQuartile = function() {
+                this.postMessage('thirdQuartile');
+            }
+            var complete = function() {
+                this.postMessage('complete');
+            }
+            var pause = function() {
+                this.postMessage('pause');
+            }
+            var resume = function() {
+                this.postMessage('resume');
+            }
+            var bufferStart = function() {
+                this.postMessage('bufferStart');
+            }
+            var bufferFinish = function() {
+                this.postMessage('bufferFinish');
+            }
+            var skipped = function() {
+                this.postMessage('skipped');
+            }
+            var volumeChange = function(videoPlayerVolume) {
+                this.postMessage('volumeChange', {
+                    videoPlayerVolume: videoPlayerVolume
+                });
+            }
+            var playerStateChange = function(playerState) {
+                this.postMessage('playerStateChange', {
+                    playerState: playerState
+                });
+            }
+            var adUserInteraction = function(interactionType) {
+                this.postMessage('adUserInteraction', {
+                    interactionType: interactionType
+                });
+            }
 
             /** 
              * setSlotElement: 
@@ -180,68 +254,29 @@
             /**
             * setElementBounds:
             * Only relevant to display ad slot elements. Called at beginning of playback and sessionfinish
-            * @param elementBounds
+            * @param (omidSessionInterface.Rectangle) elementBounds
             */
             this.setElementBounds = function(elementBounds) {};
+
+            /**
+             * Sets the creative type for the active ad session, or the next one if there is no
+             * active ad session.
+             * @param {omidSessionInterface.CreativeType} creativeType
+             */
+            this.setCreativeType = function(creativeType) {};
+
+            /**
+             * Sets the impression type for the active ad session, or the next one if there is no active ad session.
+             * @param {omidSessionInterface.ImpressionType} impressionType
+             */
+            this.setImpressionType = function(impressionType) {};
 
             this.getSessionId = function() {
                 return sessionId;
             }
 
-            this.impressionOccured = function(impressionEventData) {
-                this.postMessage('impressionOccured', impressionEventData);
-            }
-
-            this.loaded = function(vastProperties) {
-                this.postMessage('loaded', vastProperties);
-            }
-            this.start = function(duration, videoPlayerVolume) {
-                this.postMessage('start', {
-                    duration: duration,
-                    videoPlayerVolume: videoPlayerVolume
-                });
-            }
-            this.firstQuartile = function() {
-                this.postMessage('firstQuartile');
-            }
-            this.midpoint = function() {
-                this.postMessage('midpoint');
-            }
-            this.thirdQuartile = function() {
-                this.postMessage('thirdQuartile');
-            }
-            this.complete = function() {
-                this.postMessage('complete');
-            }
-            this.pause = function() {
-                this.postMessage('pause');
-            }
-            this.resume = function() {
-                this.postMessage('resume');
-            }
-            this.bufferStart = function() {
-                this.postMessage('bufferStart');
-            }
-            this.bufferFinish = function() {
-                this.postMessage('bufferFinish');
-            }
-            this.skipped = function() {
-                this.postMessage('skipped');
-            }
-            this.volumeChange = function(videoPlayerVolume) {
-                this.postMessage('volumeChange', {
-                    videoPlayerVolume: videoPlayerVolume
-                });
-            }
-            this.playerStateChange = function(playerState) {
-                this.postMessage('playerStateChange', {
-                    playerState: playerState
-                });
-            }
-            this.adUserInteraction = function(interactionType) {
-                this.postMessage('adUserInteraction', {
-                    interactionType: interactionType
-                });
+            this.getUnitySDKVersion = function() {
+                return sdkVersion;
             }
 
             this.postMessage = function(event, data) {
@@ -263,10 +298,10 @@
 
         }
 
-        Object.defineProperty(window, 'omidSessionClient', {
-            value: new OmidSessionClient(),
+        Object.defineProperty(window, 'omidSessionInterface', {
+            value: new OmidSessionInterface(),
             writable: false
         });
-        Object.freeze(window.omidSessionClient);
+        Object.freeze(window.omidSessionInterface);
     })();
 </script>
