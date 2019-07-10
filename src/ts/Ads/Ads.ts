@@ -82,6 +82,7 @@ import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 import { Analytics } from 'Analytics/Analytics';
+import { Promises } from 'Core/Utilities/Promises';
 
 export class Ads implements IAds {
 
@@ -162,7 +163,7 @@ export class Ads implements IAds {
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
-    public initialize() {
+    public initialize(): Promise<void> {
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -272,7 +273,7 @@ export class Ads implements IAds {
                 throw error;
             });
         }).then(() => {
-            return this.SessionManager.sendUnsentSessions();
+            return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         });
     }
 

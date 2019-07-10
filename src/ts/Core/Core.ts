@@ -3,7 +3,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { ICore, ICoreApi } from 'Core/ICore';
-import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
@@ -123,9 +122,7 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const jaegerInitSpan = new JaegerSpan('Initialize'); // start a span
         return this.Api.Sdk.loadComplete().then((data) => {
-            jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this.ClientInfo = new ClientInfo(data);
 
             if(!/^\d+$/.test(this.ClientInfo.getGameId())) {
@@ -146,7 +143,6 @@ export class Core implements ICore {
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
-            this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
@@ -223,16 +219,7 @@ export class Core implements ICore {
             this.Ads = new Ads(configJson, this, this.Store);
 
             return this.Ads.initialize();
-        }).then(() => {
-            this.JaegerManager.stop(jaegerInitSpan);
         }).catch((error: { message: string; name: unknown }) => {
-            jaegerInitSpan.addAnnotation(error.message);
-            jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
-            if (this.JaegerManager) {
-                this.JaegerManager.stop(jaegerInitSpan);
-            }
-
             if(error instanceof ConfigError) {
                 // tslint:disable-next-line
                 error = { 'message': error.message, 'name': error.name };
