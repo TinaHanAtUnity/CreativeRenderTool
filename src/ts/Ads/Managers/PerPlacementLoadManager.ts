@@ -12,6 +12,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 
 export interface ILoadEvent {
     value: string; // PlacementID for the loaded placement
@@ -113,6 +114,8 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string) {
+        LoadCalledCounter.report(this._clientInfo.getGameId(), placementId);
+
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
