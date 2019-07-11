@@ -82,7 +82,6 @@ import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFac
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 import { Analytics } from 'Analytics/Analytics';
 
 export class Ads implements IAds {
@@ -182,7 +181,7 @@ export class Ads implements IAds {
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             const promises = [];
-            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) && !ZyngaLoadTest.isValid(this._core.Config.getAbGroup())) {
+            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
                 promises.push(this.setupLoadApi());
             }
             promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
