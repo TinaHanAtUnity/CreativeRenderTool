@@ -14,13 +14,11 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { PerformanceEndScreenQueryCTA } from 'Performance/Views/PerformanceEndScreenQueryCTA';
-import { Platform } from 'Core/Constants/Platform';
-import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
-import { RedesignedEndScreenDesignTest, QueryCTATest } from 'Core/Models/ABGroup';
-import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
+import { QueryCTATest } from 'Core/Models/ABGroup';
+import { RedesignedPerformanceEndscreen, DoubleShadowCloseButtonTest } from 'Performance/Views/RedesignedPerformanceEndScreen';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { PerformanceEndScreenQueryCTASquare } from 'Performance/Views/PerformanceEndScreenQueryCTASquare';
+import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -51,16 +49,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         let endScreen: PerformanceEndScreen;
 
         const abGroup = baseParams.coreConfig.getAbGroup();
-        const isAndroid4 = this._platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, this._osVersion);
-        if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
-            endScreenParameters.id = 'redesigned-end-screen';
-            endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (QueryCTATest.isValid(abGroup)) {
+        if (QueryCTATest.isValid(abGroup)) {
             if (baseParams.campaign.getSquare() !== undefined) {
                 endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             } else {
                 endScreen = new PerformanceEndScreenQueryCTASquare(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             }
+        }
+        else if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
+            endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

@@ -4,6 +4,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
 const chai = require('chai');
+const URL = require('url');
 
 const testUrl = process.env.TEST_URL;
 const testList = process.env.TEST_LIST;
@@ -56,7 +57,7 @@ const runTest = async (browser, isolated, testFilter) => {
         });
     });
 
-    const url = new URL(testUrl);
+    const url = new URL.URL(testUrl);
 
     if (testFilter) {
         url.searchParams.append('grep', testFilter);
