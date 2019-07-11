@@ -1,9 +1,12 @@
-# Pending
-	
+# Thu Jul 11 20:38:11 UTC 2019
+
 * Parse HTML and IFrame companion ad for VAST - part 2 [#10455](https://github.com/Applifier/unity-ads-webview/pull/10455)
+* Send Ready Event for Blocked Load Calls on Ready Placements [#10490](https://github.com/Applifier/unity-ads-webview/pull/10490)
+* Post SDK Bot Messages to #ads-sdk-devs [#10516](https://github.com/Applifier/unity-ads-webview/pull/10516)
+* Disable HTML companionAd to fix failing Android hybrid test [#10514](https://github.com/Applifier/unity-ads-webview/pull/10514)
 
 # Mon Jul  8 19:54:39 UTC 2019
-	
+
 * Added double shadow to the end-screen [#10458](https://github.com/Applifier/unity-ads-webview/pull/10458)
 * Reverted the pop-out experiment [#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
 * Added a test for the Version Matcher [#10452](https://github.com/Applifier/unity-ads-webview/pull/10452)
