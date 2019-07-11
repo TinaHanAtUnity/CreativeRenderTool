@@ -113,7 +113,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -181,7 +180,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -254,7 +252,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -316,7 +313,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
