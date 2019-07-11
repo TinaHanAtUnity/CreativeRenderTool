@@ -1,4 +1,4 @@
-# Pending
+# Thu Jul 11 20:38:11 UTC 2019
 
 * Parse HTML and IFrame companion ad for VAST - part 2 [#10455](https://github.com/Applifier/unity-ads-webview/pull/10455)
 * Send Ready Event for Blocked Load Calls on Ready Placements [#10490](https://github.com/Applifier/unity-ads-webview/pull/10490)
