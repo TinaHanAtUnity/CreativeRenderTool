@@ -9,7 +9,7 @@ export enum LoadEvent {
 
 export class LoadApi extends NativeApi {
 
-    public readonly onLoad = new Observable1<string>();
+    public readonly onLoad = new Observable1<{[key: string]: number}>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Load', ApiPackage.ADS, EventCategory.LOAD_API);
@@ -18,7 +18,7 @@ export class LoadApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case LoadEvent[LoadEvent.LOAD_PLACEMENTS]:
-                this.handleLoadPlacements(<string[]>parameters);
+                this.handleLoadPlacements(<{[key: string]: number}>parameters[0]);
                 break;
 
             default:
@@ -26,12 +26,9 @@ export class LoadApi extends NativeApi {
         }
     }
 
-    private handleLoadPlacements(placements: string[]) {
-        for (const placement of placements) {
-            const placementId: string = placement;
-            if (placementId) {
-                this.onLoad.trigger(placementId);
-            }
+    private handleLoadPlacements(placements: {[key: string]: number}) {
+        if (placements) {
+            this.onLoad.trigger(placements);
         }
     }
 }
