@@ -289,17 +289,15 @@ export class UserPrivacyManager {
         this._adsConfig.setOptOutRecorded(true);
 
         const gamePrivacy = this._adsConfig.getGamePrivacy();
-        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-            const userPrivacy = this._adsConfig.getUserPrivacy();
-            userPrivacy.update({
-                method: gamePrivacy.getMethod(),
-                version: gamePrivacy.getVersion(),
-                permissions: {
-                    profiling: consent
-                }
-            });
-        }
+        gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+        const userPrivacy = this._adsConfig.getUserPrivacy();
+        userPrivacy.update({
+            method: gamePrivacy.getMethod(),
+            version: gamePrivacy.getVersion(),
+            permissions: {
+                profiling: consent
+            }
+        });
     }
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
