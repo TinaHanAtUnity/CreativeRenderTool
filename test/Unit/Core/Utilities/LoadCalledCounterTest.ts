@@ -27,7 +27,7 @@ describe('LoadCalledCounterTest', () => {
         tests.forEach((t) => {
             it(`should send the correct payload"`, () => {
                 LoadCalledCounter.report(t.kafkaObject.gameId, t.kafkaObject.placementId);
-                httpKafkaStub.calledWithExactly('ads.creative.blocking', KafkaCommonObjectType.EMPTY, t.kafkaObject);
+                sinon.assert.calledWith(httpKafkaStub, 'ads.load.counting', KafkaCommonObjectType.EMPTY, t.kafkaObject);
             });
         });
     });
