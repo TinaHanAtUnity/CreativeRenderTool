@@ -165,7 +165,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         }
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
-        if(clickThroughURL) {
+        if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
             const redirectBreakers = Url.getAppStoreUrlTemplates(this._platform);

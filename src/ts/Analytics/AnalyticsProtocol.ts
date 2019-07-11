@@ -245,7 +245,7 @@ export class AnalyticsProtocol {
     }
 
     public static getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return 'iOS ' + deviceInfo.getOsVersion();
         } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
@@ -257,7 +257,7 @@ export class AnalyticsProtocol {
     private static getAdvertisingIdentifier(deviceInfo: DeviceInfo): string | undefined {
         const adsid: string | undefined | null = deviceInfo.getAdvertisingIdentifier();
 
-        if(adsid) {
+        if (adsid) {
             return adsid.toLowerCase();
         } else {
             return undefined;
@@ -265,7 +265,7 @@ export class AnalyticsProtocol {
     }
 
     private static getScreen(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return Promise.all([
                 deviceInfo.getScreenWidth(),
                 deviceInfo.getScreenHeight(),
@@ -275,7 +275,7 @@ export class AnalyticsProtocol {
                 let screenWidth = width;
                 let screenHeight = height;
 
-                if(!statusBarHidden) {
+                if (!statusBarHidden) {
                     screenHeight = screenHeight + statusBarHeight;
                 }
 
@@ -284,7 +284,7 @@ export class AnalyticsProtocol {
                     screenHeight = width;
                 }
 
-                if(deviceInfo instanceof IosDeviceInfo) {
+                if (deviceInfo instanceof IosDeviceInfo) {
                     screenWidth = screenWidth * deviceInfo.getScreenScale();
                     screenHeight = screenHeight * deviceInfo.getScreenScale();
                 }
@@ -309,7 +309,7 @@ export class AnalyticsProtocol {
     }
 
     private static getDeviceModel(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return Promise.resolve(deviceInfo.getModel());
         } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return core.DeviceInfo.Android!.getDevice().then(device => {
