@@ -452,12 +452,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public calculatePercentageInView(videoRectangle: IRectangle, obstruction: IRectangle, screenRectangle: IRectangle) {
-        const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoRectangle, obstruction);
-        const percentageInViewPort = this.calculateObstructionOverlapPercentage(videoRectangle, screenRectangle);
+        const adjustedObstruction = this.calculateScreenAdjustedObstruction(obstruction, screenRectangle);
+        const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoRectangle, adjustedObstruction);
+        const percentOfVideoInViewPort = this.calculateObstructionOverlapPercentage(videoRectangle, screenRectangle);
 
-        const percentageInView = percentageInViewPort - obstructionOverlapPercentage;
-
-        return percentageInView < 0 ? 0 : percentageInView;
+        return  percentOfVideoInViewPort - obstructionOverlapPercentage;
     }
 
     public calculateObstructionOverlapPercentage(videoView: IRectangle, obstruction: IRectangle) {
@@ -483,6 +482,37 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         const obstructionOverlapPercentage = obstructionOverlapArea / videoArea;
 
         return obstructionOverlapPercentage * 100;
+    }
+
+    private calculateScreenAdjustedObstruction(obstruction: IRectangle, screenRectangle: IRectangle) {
+        let adjustedObstruction = obstruction;
+
+        const obstructionXMin = obstruction.x;
+        const obstructionYMin = obstruction.y;
+        const obstructionXMax = obstruction.x + obstruction.width;
+        const obstructionYMax = obstruction.y + obstruction.height;
+
+        const screenXMax = screenRectangle.x + screenRectangle.width;
+        const screenYMax = screenRectangle.y + screenRectangle.height;
+
+        if (obstructionXMax > screenXMax) {
+            adjustedObstruction.width = screenRectangle.width - obstruction.x;
+        }
+
+        if (obstructionYMax > screenYMax) {
+            adjustedObstruction.height = screenRectangle.height - obstruction.y;
+        }
+
+        if (obstructionXMin >= screenXMax || obstructionYMin >= screenYMax) {
+            adjustedObstruction = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+        }
+
+        return adjustedObstruction;
     }
 
     /**

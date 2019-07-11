@@ -298,6 +298,76 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     const percentage = 8.25;
                     assert.equal(calculatedPercentage, percentage);
                 });
+
+                it('should calculate video view percentage if video dimensions are larger than screen dimensions and obstruction is larger than screen', () => {
+                    const obstruction = {
+                        x: 50,
+                        y: 50,
+                        width: 1280,
+                        height: 3000
+                    };
+                    const videoView = {
+                        x: 0,
+                        y: 0,
+                        width: 1400,
+                        height: 1800
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
+                    const percentage = 5.615079365079367;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+                it('should calculate video view percentage if video dimensions are larger than screen dimensions and obstruction is not in screen view', () => {
+                    const obstruction = {
+                        x: 1081,
+                        y: 1801,
+                        width: 1280,
+                        height: 3000
+                    };
+                    const videoView = {
+                        x: 0,
+                        y: 0,
+                        width: 1400,
+                        height: 1800
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
+                    const percentage = 77.14285714285715;
+                    assert.equal(calculatedPercentage, percentage);
+                });
+                it('should calculate video view percentage if video dimensions are larger than screen dimensions and obstruction is ZeroRect', () => {
+                    const obstruction = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                    const videoView = {
+                        x: 0,
+                        y: 0,
+                        width: 1400,
+                        height: 1800
+                    };
+                    const screenRectangle = {
+                        x: 0,
+                        y: 0,
+                        width: 1080,
+                        height: 1800
+                    };
+                    const calculatedPercentage = om.calculatePercentageInView(videoView, obstruction, screenRectangle);
+                    const percentage = 77.14285714285715;
+                    assert.equal(calculatedPercentage, percentage);
+                });
             });
 
             describe('Calculating ObstructionOverlapPercentage', () => {
