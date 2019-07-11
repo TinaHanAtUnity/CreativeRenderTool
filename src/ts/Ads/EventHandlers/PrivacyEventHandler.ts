@@ -73,7 +73,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 version: 0,
                 permissions: {
                     all: false,
-                    ads: optOutEnabled,
+                    ads: !optOutEnabled,
                     external: false,
                     gameExp: false}});
         }
