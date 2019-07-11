@@ -14,10 +14,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { QueryCTATest } from 'Core/Models/ABGroup';
-import { RedesignedPerformanceEndscreen, DoubleShadowCloseButtonTest } from 'Performance/Views/RedesignedPerformanceEndScreen';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { QueryCTATest, DoubleShadowCloseButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceEndScreenQueryCTASquare } from 'Performance/Views/PerformanceEndScreenQueryCTASquare';
+import { PerformanceEndScreenQueryCTA } from 'Performance/Views/PerformanceEndScreenQueryCTA';
 import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
@@ -55,8 +54,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             } else {
                 endScreen = new PerformanceEndScreenQueryCTASquare(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             }
-        }
-        else if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
+        } else if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
             endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
