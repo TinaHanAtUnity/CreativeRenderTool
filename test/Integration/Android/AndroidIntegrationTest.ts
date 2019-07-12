@@ -28,7 +28,7 @@ describe('AndroidIntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
+                if (++readyCount === 1) {
                     done();
                 }
             },
@@ -79,7 +79,7 @@ describe('AndroidIntegrationTest', () => {
             onUnityAdsReady: (placement: string) => {
                 readyPlacement = placement;
                 readyCount++;
-                if(promiseReadyResolve) {
+                if (promiseReadyResolve) {
                     promiseReadyResolve();
                     promiseReadyResolve = null;
                 }
@@ -146,7 +146,7 @@ describe('AndroidIntegrationTest', () => {
             onUnityAdsReady: (placement: string) => {
                 readyPlacement = placement;
                 readyCount++;
-                if(promiseReadyResolve) {
+                if (promiseReadyResolve) {
                     promiseReadyResolve();
                     promiseReadyResolve = null;
                 }
@@ -218,7 +218,7 @@ describe('AndroidIntegrationTest', () => {
             onUnityAdsReady: (placement: string) => {
                 readyPlacement = placement;
                 readyCount++;
-                if(promiseReadyResolve) {
+                if (promiseReadyResolve) {
                     promiseReadyResolve();
                     promiseReadyResolve = null;
                 }
@@ -279,7 +279,7 @@ describe('AndroidIntegrationTest', () => {
             onUnityAdsReady: (placement: string) => {
                 readyPlacement = placement;
                 readyCount++;
-                if(promiseReadyResolve) {
+                if (promiseReadyResolve) {
                     promiseReadyResolve();
                     promiseReadyResolve = null;
                 }

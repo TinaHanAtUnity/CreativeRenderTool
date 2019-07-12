@@ -79,8 +79,8 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
             const tpl = new Template(this._promoIndexTemplate, this._localization);
             this._iframe.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
         }
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._GDPRPopupElement = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement> this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -166,7 +166,7 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
         const landscapePrefix = 'landscape';
         const portraitCSSKey = '{DATA_FONT_PORTRAIT}';
         const landscapeCSSKey = '{DATA_FONT_LANDSCAPE}';
-        if(campaign) {
+        if (campaign) {
             this._templateData = {
                 'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
                 'rewardedPromoTimerDuration': !placement.allowSkip() ? 5 : 0

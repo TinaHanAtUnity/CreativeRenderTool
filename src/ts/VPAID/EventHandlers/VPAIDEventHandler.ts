@@ -61,20 +61,20 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidEventHandlers.AdVideoComplete = this.onAdVideoComplete;
         this._vpaidEventHandlers.AdPaused = this.onAdPaused;
         this._vpaidEventHandlers.AdPlaying = this.onAdPlaying;
-        this._vpaidEventHandlers.AdClickThru = <(...args: unknown[]) => void>this.onAdClickThru;
+        this._vpaidEventHandlers.AdClickThru = <(...args: unknown[]) => void> this.onAdClickThru;
         this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
     }
 
     public onVPAIDEvent(eventType: string, args: unknown[]) {
         let argsCopy: unknown[] | undefined;
-        if(args) {
+        if (args) {
             argsCopy = Array.prototype.slice.call(args);
         }
 
         this._core.Sdk.logDebug(`vpaid event ${eventType} with args ${argsCopy && argsCopy.length ? argsCopy.join(' ') : 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
-            if(argsCopy && argsCopy.length && argsCopy instanceof Array) {
+            if (argsCopy && argsCopy.length && argsCopy instanceof Array) {
                 handler.apply(this, argsCopy);
             } else {
                 handler.call(this);
@@ -152,8 +152,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
             this._adUnit.setWebViewSize(shouldFullScreenWebview).then(() => {
                 if (this._vpaidEndScreen) {
                     this._vpaidEndScreen.show();
-                    (<HTMLElement>this._closer.container().querySelector('.close-region')).style.visibility = 'hidden';
-                    (<HTMLElement>this._closer.container().querySelector('.gdpr-pop-up')).style.visibility = 'hidden';
+                    (<HTMLElement> this._closer.container().querySelector('.close-region')).style.visibility = 'hidden';
+                    (<HTMLElement> this._closer.container().querySelector('.gdpr-pop-up')).style.visibility = 'hidden';
                 }
             });
         } else {

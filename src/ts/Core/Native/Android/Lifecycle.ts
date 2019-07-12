@@ -42,7 +42,7 @@ export class LifecycleApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case LifecycleEvent[LifecycleEvent.CREATED]:
                 this.onActivityCreated.trigger(<string>parameters[0]);
                 break;

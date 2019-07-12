@@ -9,7 +9,7 @@ import { FileId } from 'Core/Utilities/FileId';
 export class VideoFileInfo {
 
     public static getVideoInfo(platform: Platform, cache: CacheApi, fileId: string): Promise<[number, number, number]> {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return cache.iOS!.getVideoInfo(fileId).then(([width, height, duration]) => {
                 return <[number, number, number]>[width, height, duration];
             });
@@ -52,10 +52,10 @@ export class VideoFileInfo {
             return VideoFileInfo.getVideoInfo(platform, cache, fileId).then(([width, height, duration]) => {
                 const isValid = (width > 0 && height > 0 && duration > 0 && duration <= this._maxVideoDuration);
                 let errorType = 'video_validation_failed';
-                if(duration > this._maxVideoDuration) {
+                if (duration > this._maxVideoDuration) {
                     errorType = 'video_validation_failed_video_too_long';
                 }
-                if(!isValid) {
+                if (!isValid) {
                     SessionDiagnostics.trigger(errorType, {
                         url: video.getOriginalUrl(),
                         width: width,

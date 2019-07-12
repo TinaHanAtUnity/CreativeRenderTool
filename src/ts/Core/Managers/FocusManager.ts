@@ -26,7 +26,7 @@ export class FocusManager {
     constructor(platform: Platform, core: ICoreApi) {
         this._appForeground = true;
         this._core = core;
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             core.Android!.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
             core.Android!.Lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
             core.Android!.Lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
@@ -37,7 +37,7 @@ export class FocusManager {
     }
 
     public setListenAppForeground(status: boolean) {
-        if(status) {
+        if (status) {
             return this._core.iOS!.Notification.addNotificationObserver(FocusManager._appForegroundNotification, []);
         } else {
             return this._core.iOS!.Notification.removeNotificationObserver(FocusManager._appForegroundNotification);
@@ -45,7 +45,7 @@ export class FocusManager {
     }
 
     public setListenAppBackground(status: boolean): Promise<void> {
-        if(status) {
+        if (status) {
             return this._core.iOS!.Notification.addNotificationObserver(FocusManager._appBackgroundNotification, []);
         } else {
             return this._core.iOS!.Notification.removeNotificationObserver(FocusManager._appBackgroundNotification);
@@ -53,7 +53,7 @@ export class FocusManager {
     }
 
     public setListenAndroidLifecycle(status: boolean): Promise<void> {
-        if(status) {
+        if (status) {
             return this._core.Android!.Lifecycle.register(['onActivityResumed', 'onActivityPaused']);
         } else {
             return this._core.Android!.Lifecycle.unregister();
@@ -61,7 +61,7 @@ export class FocusManager {
     }
 
     public setListenScreen(status: boolean): Promise<void> {
-        if(status) {
+        if (status) {
             return this._core.Android!.Broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON]);
         } else {
             return this._core.Android!.Broadcast.removeBroadcastListener(this._screenListener);
@@ -73,10 +73,10 @@ export class FocusManager {
     }
 
     private onNotification(event: string, parameters: unknown): void {
-        if(event === FocusManager._appForegroundNotification) {
+        if (event === FocusManager._appForegroundNotification) {
             this._appForeground = true;
             this.onAppForeground.trigger();
-        } else if(event === FocusManager._appBackgroundNotification) {
+        } else if (event === FocusManager._appBackgroundNotification) {
             this._appForeground = false;
             this.onAppBackground.trigger();
         }
@@ -89,7 +89,7 @@ export class FocusManager {
     }
 
     private onPause(activity: string) {
-        if(!this._topActivity || activity === this._topActivity) {
+        if (!this._topActivity || activity === this._topActivity) {
             this._appForeground = false;
             delete this._topActivity;
         }
@@ -101,11 +101,11 @@ export class FocusManager {
     }
 
     private onBroadcastAction(name: string, action: string, data: string, extra: unknown) {
-        if(name !== this._screenListener) {
+        if (name !== this._screenListener) {
             return;
         }
 
-        switch(action) {
+        switch (action) {
             case this.ACTION_SCREEN_ON:
                 this.onScreenOn.trigger();
                 break;
