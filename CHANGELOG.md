@@ -1,6 +1,8 @@
 # Pending
 
 * ESLint: keyword-spacing [#10523](https://github.com/Applifier/unity-ads-webview/pull/10523)
+* Proposal for improving AdmobAdUnitTest [#10261](https://github.com/Applifier/unity-ads-webview/pull/10261)
+* Enable Load Functionality on 100% of Whitelisted Traffic [#10522](https://github.com/Applifier/unity-ads-webview/pull/10522)
 
 # Thu Jul 11 20:38:11 UTC 2019
 
