@@ -19,7 +19,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
 
         const endScreen = this._performanceAdUnit.getEndScreen();
 
-        if(endScreen) {
+        if (endScreen) {
             endScreen.show();
         }
     }

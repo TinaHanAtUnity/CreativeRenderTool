@@ -89,7 +89,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
             this._unityConsentView.show();
 
-            if(TestEnvironment.get('autoAcceptConsent')) {
+            if (TestEnvironment.get('autoAcceptConsent')) {
                 const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
                 this.handleAutoConsent(consentValues);
             }
@@ -163,11 +163,11 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     private handleAutoConsent(consent: IPermissions) {
         setTimeout(() => {
-            if(consent.hasOwnProperty('all')) {
+            if (consent.hasOwnProperty('all')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
                 this._unityConsentView.testAutoConsentAll();
             }
-            if(consent.hasOwnProperty('ads')) {
+            if (consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
                 this._unityConsentView.testAutoConsent(consent);
             }

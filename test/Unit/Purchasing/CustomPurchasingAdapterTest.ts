@@ -130,7 +130,7 @@ describe('CustomPurchasingAdapter', () => {
         }];
 
         const isValidProductType = 'isValidProductType';
-        for(const testCase of testCaseList) {
+        for (const testCase of testCaseList) {
             it(testCase.name, () => {
                 const actualResult = purchasingAdapter[isValidProductType](testCase.productType);
                 assert.equal(testCase.expectedResult, actualResult);

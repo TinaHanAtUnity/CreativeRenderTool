@@ -10,11 +10,11 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class OperativeEventManagerFactory {
     public static createOperativeEventManager(params: IOperativeEventManagerParams<Campaign>): OperativeEventManager {
-        if(params.campaign instanceof PerformanceCampaign) {
+        if (params.campaign instanceof PerformanceCampaign) {
             return new PerformanceOperativeEventManager(<IOperativeEventManagerParams<PerformanceCampaign>>params);
-        } else if(params.campaign instanceof XPromoCampaign) {
+        } else if (params.campaign instanceof XPromoCampaign) {
             return new XPromoOperativeEventManager(<IOperativeEventManagerParams<XPromoCampaign>>params);
-        } else if(params.campaign instanceof MRAIDCampaign) {
+        } else if (params.campaign instanceof MRAIDCampaign) {
             return new MRAIDOperativeEventManager(<IOperativeEventManagerParams<MRAIDCampaign>>params);
         } else {
             return new ProgrammaticOperativeEventManager(params);

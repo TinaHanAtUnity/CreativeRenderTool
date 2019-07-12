@@ -10,22 +10,22 @@ export class AdUnit extends BackendApi {
 
         this._activityId = activityId;
 
-        if(videoView) {
+        if (videoView) {
             videoView.style.display = 'block';
         }
 
-        if(webView) {
+        if (webView) {
             webView.style.display = 'block';
         }
 
         const platform = this._backend.getPlatform();
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             setTimeout(() => {
                 this._backend.sendEvent('ADUNIT', 'ON_CREATE', activityId);
                 this._backend.sendEvent('ADUNIT', 'ON_START', activityId);
                 this._backend.sendEvent('ADUNIT', 'ON_RESUME', activityId);
             }, 0);
-        } else if(platform === Platform.IOS) {
+        } else if (platform === Platform.IOS) {
             setTimeout(() => {
                 this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_LOAD');
                 this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_INIT');
@@ -40,22 +40,22 @@ export class AdUnit extends BackendApi {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         const webView = <HTMLIFrameElement>window.parent.document.getElementById('webView');
 
-        if(videoView) {
+        if (videoView) {
             videoView.style.display = 'none';
         }
 
-        if(webView) {
+        if (webView) {
             webView.style.display = 'none';
         }
 
         const platform = this._backend.getPlatform();
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             setTimeout(() => {
                 this._backend.sendEvent('ADUNIT', 'ON_PAUSE', false, this._activityId);
                 this._backend.sendEvent('ADUNIT', 'ON_STOP', this._activityId);
                 this._backend.sendEvent('ADUNIT', 'ON_DESTROY', true, this._activityId);
             }, 0);
-        } else if(platform === Platform.IOS) {
+        } else if (platform === Platform.IOS) {
             setTimeout(() => {
                 this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_WILL_DISAPPEAR');
                 this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_DISAPPEAR');

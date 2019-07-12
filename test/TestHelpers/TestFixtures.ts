@@ -247,12 +247,12 @@ export class TestFixtures {
             appDownloadUrl: json.appDownloadUrl
         };
 
-        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+        if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
             parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize, json.creativeId);
             parameters.streamingVideo = new Video(json.trailerStreaming, session, undefined, json.creativeId);
         }
 
-        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+        if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
             parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
             parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session, undefined, json.portraitCreativeId);
         }
@@ -283,12 +283,12 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls
         };
 
-        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+        if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
             parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
             parameters.streamingVideo = new Video(json.trailerStreaming, session);
         }
 
-        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+        if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
             parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
             parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
         }
@@ -400,13 +400,13 @@ export class TestFixtures {
         }
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
-        if(portraitUrl) {
+        if (portraitUrl) {
             portraitAsset = new Image(portraitUrl, session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
-        if(landscapeUrl) {
+        if (landscapeUrl) {
             landscapeAsset = new Image(landscapeUrl, session);
         }
 

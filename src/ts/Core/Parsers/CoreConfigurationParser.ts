@@ -32,7 +32,7 @@ export class CoreConfigurationParser {
         };
 
         const coreConfig = new CoreConfiguration(configurationParams);
-        if(coreConfig.getToken()) {
+        if (coreConfig.getToken()) {
             return coreConfig;
         } else {
             throw new Error('gamer token missing in PLC config');
