@@ -189,7 +189,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     protected getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
         const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
-        if(!video) {
+        if (!video) {
             throw new WebViewError('Unable to select an oriented video');
         }
         return video;

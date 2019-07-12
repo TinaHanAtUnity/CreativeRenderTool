@@ -128,17 +128,17 @@ export class Core implements ICore {
             jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this.ClientInfo = new ClientInfo(data);
 
-            if(!/^\d+$/.test(this.ClientInfo.getGameId())) {
+            if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 return Promise.reject(message);
             }
 
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
-                this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
-                this.DeviceIdManager = new DeviceIdManager(this.Api, <AndroidDeviceInfo>this.DeviceInfo);
-            } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
+                this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo> this.DeviceInfo);
+                this.DeviceIdManager = new DeviceIdManager(this.Api, <AndroidDeviceInfo> this.DeviceInfo);
+            } else if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
@@ -152,7 +152,7 @@ export class Core implements ICore {
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
             HttpKafka.setClientInfo(this.ClientInfo);
 
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.Api.Request.Android!.setKeepAliveTime(10000);
             }
 
@@ -166,7 +166,7 @@ export class Core implements ICore {
             this.Api.Sdk.initComplete();
 
             this.WakeUpManager.setListenConnectivity(true);
-            if(this.NativeBridge.getPlatform() === Platform.IOS) {
+            if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.FocusManager.setListenAppForeground(true);
                 this.FocusManager.setListenAppBackground(true);
             } else {
@@ -178,7 +178,7 @@ export class Core implements ICore {
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
             let configPromise: Promise<unknown>;
-            if(TestEnvironment.get('creativeUrl')) {
+            if (TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
             } else {
                 configPromise = this.ConfigManager.getConfig(configSpan);
@@ -193,7 +193,7 @@ export class Core implements ICore {
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
-                if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
+                if (this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
                     this.ConfigManager.storeGamerToken(coreConfig.getToken());
                 }
 
@@ -220,7 +220,7 @@ export class Core implements ICore {
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
-            if(!this.Config.isEnabled()) {
+            if (!this.Config.isEnabled()) {
                 const error = new Error('Game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
@@ -243,11 +243,11 @@ export class Core implements ICore {
                 this.JaegerManager.stop(jaegerInitSpan);
             }
 
-            if(error instanceof ConfigError) {
+            if (error instanceof ConfigError) {
                 // tslint:disable-next-line
                 error = { 'message': error.message, 'name': error.name };
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if(error instanceof Error && error.name === 'DisabledGame') {
+            } else if (error instanceof Error && error.name === 'DisabledGame') {
                 return;
             }
 
@@ -258,19 +258,19 @@ export class Core implements ICore {
 
     private setupTestEnvironment(): Promise<void> {
         return TestEnvironment.setup(new MetaData(this.Api)).then(() => {
-            if(TestEnvironment.get('serverUrl')) {
+            if (TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
-            if(TestEnvironment.get('configUrl')) {
+            if (TestEnvironment.get('configUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('configUrl'));
             }
 
-            if(TestEnvironment.get('kafkaUrl')) {
+            if (TestEnvironment.get('kafkaUrl')) {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
-            if(TestEnvironment.get('abGroup')) {
+            if (TestEnvironment.get('abGroup')) {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
@@ -279,7 +279,7 @@ export class Core implements ICore {
                 }
             }
 
-            if(TestEnvironment.get('forceAuthorization')) {
+            if (TestEnvironment.get('forceAuthorization')) {
                 const value = TestEnvironment.get<string>('forceAuthorization');
                 const params = value.split('|');
 

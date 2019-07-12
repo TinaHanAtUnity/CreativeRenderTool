@@ -78,9 +78,9 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public render() {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._closeElement = <HTMLElement> this._container.querySelector('.close-region');
+        this._GDPRPopupElement = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement> this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -138,7 +138,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private updateProgressCircle(container: HTMLElement, progress: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
+        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
@@ -154,7 +154,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         const degrees = progress * 360;
         leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
 
-        if(progress >= 0.5) {
+        if (progress >= 0.5) {
             wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
             rightCircleElement.style.webkitAnimationName = 'right-spin';
         }

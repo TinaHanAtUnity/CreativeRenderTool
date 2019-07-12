@@ -40,7 +40,7 @@ import { StorageType } from 'Core/Native/Storage';
 
             const metaDataManager = new MetaDataManager(core);
             return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
-                if(metaData) {
+                if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                     assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
                     assert.deepEqual(metaData.getDTO(), {
@@ -65,14 +65,14 @@ import { StorageType } from 'Core/Native/Storage';
 
             const metaDataManager = new MetaDataManager(core);
             return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
-                if(metaData) {
+                if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                     assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
                     assert.equal(metaData.getOrdinal(), undefined, 'MediationMetaData.getOrdinal() did not pass through correctly');
 
                     return metaDataManager.fetch(MediationMetaData, true, ['ordinal']).then(metaData2 => {
                         assert.equal(metaData, metaData2, 'MediationMetaData was redefined');
-                        if(metaData2) {
+                        if (metaData2) {
                             assert.equal(metaData2.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                             assert.equal(metaData2.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
                             assert.equal(metaData2.getOrdinal(), 42, 'MediationMetaData.getOrdinal() did not pass through correctly');
@@ -115,7 +115,7 @@ import { StorageType } from 'Core/Native/Storage';
 
             const metaDataManager = new MetaDataManager(core);
             return metaDataManager.fetch(MediationMetaData).then(metaData => {
-                if(metaData) {
+                if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                     assert.isUndefined(metaData.getVersion(), 'MediationMetaData.getVersion() did not pass through correctly');
                     assert.isUndefined(metaData.getOrdinal(), 'MediationMetaData.getOrdinal() did not pass through correctly');

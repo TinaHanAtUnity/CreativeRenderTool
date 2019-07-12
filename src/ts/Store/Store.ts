@@ -31,7 +31,7 @@ export class Store implements IStore, IApiModule {
         };
 
         if (IAPAutoLoggingTest.isValid(this._core.Config.getAbGroup())) {
-            if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
+            if (core.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.StoreManager = new GoogleStoreManager(core, this.Api);
             } else {
                 this.StoreManager = new AppleStoreManager(core, this.Api);

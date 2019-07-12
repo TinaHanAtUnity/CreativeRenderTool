@@ -147,7 +147,7 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
-        if(this._coreConfig.getTestMode()) {
+        if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
             this._baseURL = RequestManager.getAuctionProtocol() === AuctionProtocol.V5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;

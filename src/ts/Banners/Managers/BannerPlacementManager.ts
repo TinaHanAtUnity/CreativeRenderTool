@@ -38,11 +38,11 @@ export class BannerPlacementManager {
     }
 
     private sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState) {
-        if(oldState !== newState) {
+        if (oldState !== newState) {
             this._ads.Placement.setPlacementState(placementId, newState);
             this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
 
-            if(newState === PlacementState.READY) {
+            if (newState === PlacementState.READY) {
                 this._ads.Listener.sendReadyEvent(placementId);
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);

@@ -19,7 +19,7 @@ export class AnalyticsStorage {
 
     public getUserId(): Promise<string> {
         return this.getValue<string>('analytics.userid').then(userId => {
-            if(userId) {
+            if (userId) {
                 return userId;
             } else {
                 return this._core.DeviceInfo.getUniqueEventId().then(id => {
@@ -30,9 +30,9 @@ export class AnalyticsStorage {
     }
 
     public getSessionId(reinit: boolean): Promise<number> {
-        if(reinit) {
+        if (reinit) {
             return this.getValue<number>('analytics.sessionid').then(sessionId => {
-                if(sessionId) {
+                if (sessionId) {
                     return sessionId;
                 } else {
                     return this.getIntegerId();

@@ -69,7 +69,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowing()) {
+        if (!this.isShowing()) {
             return Promise.resolve();
         }
         this.setShowing(false);
@@ -111,7 +111,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
@@ -138,7 +138,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private sendTrackingEvent(event: TrackingEvent): void {
         this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             const sessionId = this._campaign.getSession().getId();
-            if(this._additionalTrackingEvents) {
+            if (this._additionalTrackingEvents) {
                 const trackingEventUrls = this._additionalTrackingEvents[event].map((value: string): string => {
                     // add native flag false to designate promo
                     if (PromoEvents.purchaseHostnameRegex.test(value)) {

@@ -62,7 +62,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public getPlacementIds(): string[] {
         const placementIds: string[] = [];
-        for(const placement in this.getPlacements()) {
+        for (const placement in this.getPlacements()) {
             if (this.getPlacements().hasOwnProperty(placement)) {
                 placementIds.push(placement);
             }
@@ -76,13 +76,13 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
     }
 
     public getPlacementCount(): number {
-        if(!this.getPlacements()) {
+        if (!this.getPlacements()) {
             return 0;
         }
 
         let count = 0;
-        for(const placement in this.getPlacements()) {
-            if(this.getPlacements().hasOwnProperty(placement)) {
+        for (const placement in this.getPlacements()) {
+            if (this.getPlacements().hasOwnProperty(placement)) {
                 count++;
             }
         }
@@ -132,8 +132,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public getDTO(): { [key: string]: unknown } {
         const placements = [];
-        for(const placement in this.getPlacements()) {
-            if(this.getPlacements().hasOwnProperty(placement)) {
+        for (const placement in this.getPlacements()) {
+            if (this.getPlacements().hasOwnProperty(placement)) {
                 placements.push(this.getPlacements()[placement].getDTO());
             }
         }
