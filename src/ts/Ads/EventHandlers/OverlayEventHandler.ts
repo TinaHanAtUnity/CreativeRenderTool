@@ -72,8 +72,8 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onKeyEvent(keyCode: number): void {
-        if(keyCode === KeyCode.BACK && this.canSkipVideo()) {
-            if(!this._placement.skipEndCardOnClose()) {
+        if (keyCode === KeyCode.BACK && this.canSkipVideo()) {
+            if (!this._placement.skipEndCardOnClose()) {
                 this.onOverlaySkip(this._adUnit.getVideo().getPosition());
             } else {
                 this.onOverlayClose();
@@ -82,7 +82,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     private canSkipVideo(): boolean {
-        if(!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
+        if (!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
             return false;
         }
 
@@ -92,8 +92,8 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     protected getVideoOrientation(): string | undefined {
-        if(this._adUnit instanceof PerformanceAdUnit) {
-            return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
+        if (this._adUnit instanceof PerformanceAdUnit) {
+            return (<PerformanceAdUnit> this._adUnit).getVideoOrientation();
         }
 
         return undefined;

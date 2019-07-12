@@ -37,7 +37,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         this._country = parameters.country;
         this._privacy = privacy;
 
-        if(this._campaign) {
+        if (this._campaign) {
             const landscape = this._campaign.getLandscape();
             const portrait = this._campaign.getPortrait();
 
@@ -65,7 +65,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             }
         ];
 
-        if(CustomFeatures.isTimehopApp(parameters.clientInfo.getGameId())) {
+        if (CustomFeatures.isTimehopApp(parameters.clientInfo.getGameId())) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({
@@ -84,8 +84,8 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             chinaAdvertisementElement.style.display = 'block';
         }
 
-        if(this._isSwipeToCloseEnabled) {
-            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        if (this._isSwipeToCloseEnabled) {
+            (<HTMLElement> this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
     }
 
@@ -94,7 +94,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
         this._handlers.forEach(handler => handler.onVastEndScreenShow());
 
-        if(AbstractAdUnit.getAutoClose()) {
+        if (AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this._handlers.forEach(handler => handler.onVastEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());

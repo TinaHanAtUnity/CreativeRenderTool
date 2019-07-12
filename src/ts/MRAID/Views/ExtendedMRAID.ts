@@ -38,21 +38,21 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
 
-        if(campaign) {
+        if (campaign) {
             this._templateData = {
                 'gameName': campaign.getGameName()
             };
             const gameIcon = campaign.getGameIcon();
-            if(gameIcon) {
+            if (gameIcon) {
                 this._templateData.gameIcon = gameIcon.getUrl();
             }
             const rating = campaign.getRating();
-            if(rating) {
+            if (rating) {
                 const adjustedRating: number = rating * 20;
                 this._templateData.rating = adjustedRating.toString();
             }
             const ratingCount = campaign.getRatingCount();
-            if(ratingCount) {
+            if (ratingCount) {
                 this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
             }
         }
@@ -61,7 +61,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     public render(): void {
         super.render();
 
-        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
+        this._loadingScreen = <HTMLElement> this._container.querySelector('.loading-screen');
         this.loadIframe();
     }
 
@@ -73,12 +73,12 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        if(this._loadingScreenTimeout) {
+        if (this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
         }
 
-        if(this._prepareTimeout) {
+        if (this._prepareTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
         }
@@ -88,14 +88,14 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public setViewableState(viewable: boolean) {
-        if(this._isLoaded && !this._loadingScreenTimeout) {
+        if (this._isLoaded && !this._loadingScreenTimeout) {
             this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
     }
 
     private loadIframe(): void {
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         const container = this.setUpMraidContainer();
@@ -110,10 +110,10 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     private setUpMraidContainer(): string {
         let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MRAIDContainer;
         const playableConfiguration = this._campaign.getPlayableConfiguration();
-        if(playableConfiguration) {
+        if (playableConfiguration) {
             // check configuration based on the ab group
             const groupKey = 'group' + this._abGroup;
-            if(playableConfiguration[groupKey]) {
+            if (playableConfiguration[groupKey]) {
                 this._configuration = playableConfiguration[groupKey];
             } else if (playableConfiguration.default) {
                 this._configuration = playableConfiguration.default;
@@ -128,7 +128,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onIframeLoaded() {
         this._isLoaded = true;
 
-        if(!this._loadingScreenTimeout) {
+        if (!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
             this.showMRAIDAd();
@@ -145,7 +145,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
         this._loadingScreenTimeout = window.setTimeout(() => {
-            if(this._isLoaded) {
+            if (this._isLoaded) {
                 this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
@@ -171,7 +171,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.prepareProgressCircle();
 
         ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
-            if(this._loadingScreen.style.display === 'none') {
+            if (this._loadingScreen.style.display === 'none') {
                 return;
             }
 
