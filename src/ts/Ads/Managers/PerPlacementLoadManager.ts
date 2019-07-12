@@ -12,15 +12,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
-export interface ILoadEvent {
-    value: string; // PlacementID for the loaded placement
-    ts: number; // Set by metadata api on the native level
-}
-
-export interface ILoadStorageEvent {
-    load?: { [key: string]: ILoadEvent };
-}
-
 export class PerPlacementLoadManager extends RefreshManager {
     private _core: ICoreApi;
     private _ads: IAdsApi;
