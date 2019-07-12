@@ -88,7 +88,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowing()) {
+        if (!this.isShowing()) {
             return Promise.resolve();
         }
 
@@ -154,7 +154,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     public getVideoOrientation(): 'landscape' | 'portrait' | undefined {
         let videoOrientation: 'landscape' | 'portrait' | undefined = 'landscape';
         const portraitVideo = CampaignAssetInfo.getPortraitVideo(this._campaign);
-        if(portraitVideo && this._finalVideoUrl === portraitVideo.getUrl()) {
+        if (portraitVideo && this._finalVideoUrl === portraitVideo.getUrl()) {
             videoOrientation = 'portrait';
         }
 
@@ -168,9 +168,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerShow(): void {
-        if(this.isShowing() && this.isActive()) {
-            if(this._platform === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
-                if(this.getVideo().isCached()) {
+        if (this.isShowing() && this.isActive()) {
+            if (this._platform === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+                if (this.getVideo().isCached()) {
                     this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
                 } else {
                     this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
@@ -182,7 +182,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this.setActive(false);
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
@@ -190,7 +190,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.setActive(false);
             this.setFinishState(FinishState.SKIPPED);
             this.setVideoState(VideoState.SKIPPED);
@@ -198,9 +198,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             return;
         }
 
-        if(this.isShowing() && this.getContainer().isPaused()) {
+        if (this.isShowing() && this.getContainer().isPaused()) {
             this.setActive(false);
-            if(this.canShowVideo()) {
+            if (this.canShowVideo()) {
                 this.setVideoState(VideoState.PAUSED);
                 /*
                     We try pause the video-player and if we get a VIDEOVIEW_NULL error
@@ -209,7 +209,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                     re-prepare the video.
                 */
                 this._ads.VideoPlayer.pause().catch((error) => {
-                    if(error === 'VIDEOVIEW_NULL') {
+                    if (error === 'VIDEOVIEW_NULL') {
                         this.setVideoState(VideoState.NOT_READY);
                     }
                 });
@@ -222,7 +222,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing() && !this.isActive() && !this.getContainer().isPaused()) {
+        if (this.isShowing() && !this.isActive() && !this.getContainer().isPaused()) {
             this.setActive(true);
             /*
                 Check if we can show the video and if the video is paused.
@@ -234,22 +234,22 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             if (!this.isAppSheetOpen() && this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
                 this.setVideoState(VideoState.PLAYING);
                 this._ads.VideoPlayer.play();
-            } else if(this.canPrepareVideo()) {
+            } else if (this.canPrepareVideo()) {
                 this.prepareVideo();
             }
         }
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
-        switch(message) {
+        switch (message) {
             case AdUnitContainerSystemMessage.MEMORY_WARNING:
-                if(this.isShowing()) {
+                if (this.isShowing()) {
                     this._lowMemory = true;
                 }
                 break;
 
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN:
-                if(this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
+                if (this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
                     this.setVideoState(VideoState.PAUSED);
                     this._ads.VideoPlayer.pause();
                 }
@@ -313,10 +313,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private getValidVideoUrl(): Promise<string> {
         let streamingUrl: string = this.getVideo().getOriginalUrl();
 
-        if(this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             // Should this use this._container.getLockedOrientation() instead?
             const orientedStreamingVideo = CampaignAssetInfo.getOrientedVideo(this._campaign, this.getForceOrientation(), VideoType.STREAM);
-            if(!orientedStreamingVideo) {
+            if (!orientedStreamingVideo) {
                 throw new WebViewError('Unable to fallback to an oriented streaming video');
             }
 
@@ -325,11 +325,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         // check that if we think video has been cached, it is still available on device cache directory
         return Promise.resolve().then(() => {
-            if(this.getVideo().isCached() && this.getVideo().getFileId()) {
-                return this._core.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
-                    if(result.found) {
+            if (this.getVideo().isCached() && this.getVideo().getFileId()) {
+                return this._core.Cache.getFileInfo(<string> this.getVideo().getFileId()).then(result => {
+                    if (result.found) {
                         const remoteVideoSize: number | undefined = this.getVideo().getSize();
-                        if(remoteVideoSize && remoteVideoSize !== result.size) {
+                        if (remoteVideoSize && remoteVideoSize !== result.size) {
                             SessionDiagnostics.trigger('video_size_mismatch', {
                                 remoteVideoSize: remoteVideoSize,
                                 localVideoSize: result.size,

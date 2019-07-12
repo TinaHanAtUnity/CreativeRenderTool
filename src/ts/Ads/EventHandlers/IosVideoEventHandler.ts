@@ -10,7 +10,7 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
 
     public onLikelyToKeepUp(url: string, likelyToKeepUp: boolean): void {
         const container = this._adUnit.getContainer();
-        if(!container.isPaused() && this._adUnit.canPlayVideo() && likelyToKeepUp) {
+        if (!container.isPaused() && this._adUnit.canPlayVideo() && likelyToKeepUp) {
             this._adUnit.setVideoState(VideoState.PLAYING);
             this._ads.VideoPlayer.play();
         }

@@ -101,13 +101,13 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
-        if(portraitUrl) {
+        if (portraitUrl) {
             portraitAsset = new Image(Url.encode(portraitUrl), session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
-        if(landscapeUrl) {
+        if (landscapeUrl) {
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 

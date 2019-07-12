@@ -33,9 +33,9 @@ export class Template {
             source += templateString.slice(index, offset).replace(Template._escapeRegExp, Template._escapeChar);
             index = offset + match.length;
 
-            if(interpolate) {
+            if (interpolate) {
                 source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-            } else if(evaluate) {
+            } else if (evaluate) {
                 source += "';\n" + evaluate + "\n__p+='";
             }
 
@@ -50,14 +50,14 @@ export class Template {
             this._templateFunction = (data: unknown) => {
                 return templateFunction.call(this, data);
             };
-        } catch(error) {
+        } catch (error) {
             error.source = source;
             throw error;
         }
     }
 
     public render(data: { [key: string]: unknown }): string {
-        if(this._localization) {
+        if (this._localization) {
             data.t = (phrase: string) => this._localization!.translate(phrase);
         } else {
             data.t = (phrase: string) => phrase;

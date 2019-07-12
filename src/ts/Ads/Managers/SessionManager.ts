@@ -40,7 +40,7 @@ export class SessionManager {
         return this.getUnsentSessions().then(sessions => {
             const promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
-                    if(outdated) {
+                    if (outdated) {
                         return this.deleteSession(sessionId);
                     } else {
                         return this.sendUnsentEvents(sessionId);
