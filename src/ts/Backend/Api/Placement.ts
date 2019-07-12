@@ -15,10 +15,10 @@ export class Placement extends BackendApi {
     }
 
     public getPlacementState(placement?: string) {
-        if(!placement) {
+        if (!placement) {
             return this._placements[this._defaultPlacement!];
         }
-        if(placement) {
+        if (placement) {
             return this._placements[placement];
         }
         return 'NOT_AVAILABLE';

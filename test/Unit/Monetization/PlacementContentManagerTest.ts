@@ -109,7 +109,7 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
                 placementId: 'rewardedVideoZone',
                 campaign: TestFixtures.getPromoCampaign(undefined, undefined, tloWithFirstImpression),
                 matcher: (placement, campaign, params) => {
-                    if(campaign instanceof PromoCampaign) {
+                    if (campaign instanceof PromoCampaign) {
                         assert.equal(params.type, IPlacementContentType.PROMO_AD);
                         assert.equal(params.product!.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId!));
                         assert.equal(params.product!.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId!));
@@ -134,7 +134,7 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
                 placementId: 'rewardedVideoZone',
                 campaign: TestFixtures.getPromoCampaign(),
                 matcher: (placement, campaign, params) => {
-                    if(campaign instanceof PromoCampaign) {
+                    if (campaign instanceof PromoCampaign) {
                         assert.equal(params.type, IPlacementContentType.PROMO_AD);
                         assert.equal(params.product!.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId!));
                         assert.equal(params.product!.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId!));
@@ -158,7 +158,7 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
                 placementId: 'rewardedVideoZone',
                 campaign: TestFixtures.getPromoCampaign(undefined, undefined, tloWithoutFirstImpression),
                 matcher: (placement, campaign, params) => {
-                    if(campaign instanceof PromoCampaign) {
+                    if (campaign instanceof PromoCampaign) {
                         assert.equal(params.type, IPlacementContentType.PROMO_AD);
                         assert.equal(params.product!.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId!));
                         assert.equal(params.product!.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId!));

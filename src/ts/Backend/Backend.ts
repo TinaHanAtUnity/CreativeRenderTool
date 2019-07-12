@@ -143,18 +143,18 @@ export class Backend implements IWebViewBridge {
 
     private executeInvocation(invocation: IInvocation): IResult {
         const api = (() => {
-            if(this._platform === Platform.ANDROID) {
+            if (this._platform === Platform.ANDROID) {
                 const splitClassName = invocation.className.split('.');
                 const apiKey = splitClassName[splitClassName.length - 1];
                 return this.Api[apiKey];
-            } else if(this._platform === Platform.IOS) {
+            } else if (this._platform === Platform.IOS) {
                 const splitClassName = invocation.className.split('Api');
                 const apiKey = splitClassName[1];
                 return this.Api[apiKey];
             }
         })();
 
-        if(!api) {
+        if (!api) {
             throw new Error('Missing backend API implementation for: ' + invocation.className);
         }
 
@@ -170,7 +170,7 @@ export class Backend implements IWebViewBridge {
                 callbackStatus: CallbackStatus.OK,
                 parameters: [method.apply(api, invocation.parameters)]
             };
-        } catch(error) {
+        } catch (error) {
             return {
                 callbackId: invocation.callbackId,
                 callbackStatus: CallbackStatus.ERROR,

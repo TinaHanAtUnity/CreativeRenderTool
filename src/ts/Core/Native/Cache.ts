@@ -47,7 +47,7 @@ export class CacheApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Cache', ApiPackage.CORE, EventCategory.CACHE);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+        if (nativeBridge.getPlatform() === Platform.IOS) {
             this.iOS = new IosCacheApi(nativeBridge);
         } else {
             this.Android = new AndroidCacheApi(nativeBridge);
@@ -120,7 +120,7 @@ export class CacheApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
                 this.onDownloadStarted.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <[string, string][]>parameters[4]);
                 break;

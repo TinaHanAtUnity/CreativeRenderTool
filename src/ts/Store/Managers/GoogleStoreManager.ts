@@ -29,7 +29,7 @@ export class GoogleStoreManager extends StoreManager {
 
     private onInitialized() {
         this._googleStore.isBillingSupported('inapp').then(result => {
-            if(result === 0) {
+            if (result === 0) {
                 this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp']);
             } else {
                 Diagnostics.trigger('store_billing_not_supported', {
@@ -52,9 +52,9 @@ export class GoogleStoreManager extends StoreManager {
     private onPurchaseStatusOnResume(activity: string, data: IGooglePurchaseStatus) {
         const orderIds: string[] = [];
 
-        if(data.inapp) {
-            if(data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
-                for(const purchaseData of data.inapp.purchaseDataList) {
+        if (data.inapp) {
+            if (data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
+                for (const purchaseData of data.inapp.purchaseDataList) {
                     orderIds.push(purchaseData.orderId);
                 }
             }
@@ -64,11 +64,11 @@ export class GoogleStoreManager extends StoreManager {
     }
 
     private onPurchaseStatusOnStop(activity: string, data: IGooglePurchaseStatus) {
-        if(data.inapp) {
-            if(data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
+        if (data.inapp) {
+            if (data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
                 data.inapp.purchaseDataList.forEach((purchaseData: IGooglePurchaseData, index: number) => {
-                    if(purchaseData.orderId && this.isNewPurchase(activity, purchaseData.orderId)) {
-                        if(data.inapp!.signatureList && data.inapp!.signatureList[index]) {
+                    if (purchaseData.orderId && this.isNewPurchase(activity, purchaseData.orderId)) {
+                        if (data.inapp!.signatureList && data.inapp!.signatureList[index]) {
                             this.logNewPurchase(purchaseData, data.inapp!.signatureList[index]);
                         } else {
                             Diagnostics.trigger('store_signature_missing', {
@@ -82,8 +82,8 @@ export class GoogleStoreManager extends StoreManager {
     }
 
     private isNewPurchase(activity: string, orderId: string) {
-        if(this._existingOrderIds[activity]) {
-            if(this._existingOrderIds[activity].indexOf(orderId) !== -1) {
+        if (this._existingOrderIds[activity]) {
+            if (this._existingOrderIds[activity].indexOf(orderId) !== -1) {
                 return false;
             }
         }
