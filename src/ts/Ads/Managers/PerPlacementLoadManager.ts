@@ -8,19 +8,9 @@ import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-
-export interface ILoadEvent {
-    value: string; // PlacementID for the loaded placement
-    ts: number; // Set by metadata api on the native level
-}
-
-export interface ILoadStorageEvent {
-    load?: { [key: string]: ILoadEvent };
-}
 
 export class PerPlacementLoadManager extends RefreshManager {
     private _core: ICoreApi;
@@ -42,12 +32,13 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._focusManager = focusManager;
         this._pts = programmaticTrackingService;
 
-        this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(<ILoadStorageEvent>value));
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
-        this._ads.LoadApi.onLoad.subscribe((placementId: string) => {
-            this._core.Sdk.logDebug(`PerPlacementLoadManager is trying to load ${placementId}`);
-            this.loadPlacement(placementId);
+        this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
+            Object.keys(placements).forEach((placementId) => {
+                const count = placements[placementId];
+                this.loadPlacement(placementId, count);
+            });
         });
     }
 
@@ -72,7 +63,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     public initialize(): Promise<INativeResponse | void> {
-        return this.refreshStoredLoads();
+        return Promise.resolve();
     }
 
     public shouldRefill(timestamp: number): boolean {
@@ -104,19 +95,8 @@ export class PerPlacementLoadManager extends RefreshManager {
         // todo: implement method or remove from parent class
     }
 
-    private refreshStoredLoads(): Promise<void> {
-        return this.getStoredLoads().then(storedLoads => {
-            this._adsConfig.getPlacementIds().forEach(placementId => {
-                if(!this._adsConfig.getPlacement(placementId).isBannerPlacement()) {
-                    if(storedLoads.indexOf(placementId) !== -1) {
-                        this.loadPlacement(placementId);
-                    }
-                }
-            });
-        });
-    }
-
-    private loadPlacement(placementId: string) {
+    // count is the number of times load was called for a placementId before we could process it
+    private loadPlacement(placementId: string, count: number) {
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
@@ -155,71 +135,6 @@ export class PerPlacementLoadManager extends RefreshManager {
         }
 
         return false;
-    }
-
-    private getStoredLoads(): Promise<string[]> {
-        return this._core.Storage.getKeys(StorageType.PUBLIC, 'load', false).then(keys => {
-            if(keys && keys.length > 0) {
-                const promises = [];
-
-                for(const key of keys) {
-                    promises.push(this.getStoredLoad(key));
-                    this.deleteStoredLoad(key);
-                }
-
-                return Promise.all(promises).then(storedLoads => {
-                    const validLoads: string[] = [];
-                    for(const load of storedLoads) {
-                        if(load) {
-                            validLoads.push(load);
-                        }
-                    }
-
-                    return validLoads;
-                });
-            } else {
-                return [];
-            }
-        }).catch(() => {
-            // no keys found, no error
-            return Promise.resolve([]);
-        });
-    }
-
-    private getStoredLoad(key: string): Promise<string | undefined> {
-        return this._core.Storage.get<ILoadEvent>(StorageType.PUBLIC, 'load.' + key).then(loadEvent => {
-            if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp() - 60000) { // Ignore loads set more than 60 seconds prior to SDK initialization
-                return loadEvent.value;
-            } else {
-                return undefined;
-            }
-        }).catch(() => {
-            return Promise.resolve(undefined);
-        });
-    }
-
-    private deleteStoredLoad(key: string): Promise<void[]> {
-        const promises = [];
-        promises.push(this._core.Storage.delete(StorageType.PUBLIC, 'load.' + key));
-        promises.push(this._core.Storage.write(StorageType.PUBLIC));
-        return Promise.all(promises);
-    }
-
-    private onStorageSet(event: ILoadStorageEvent) {
-        if(event && event.load) {
-            const loadedEvents = event.load;
-            Object.keys(event.load).forEach(key => {
-                if (loadedEvents[key]) {
-                    const loadEvent: ILoadEvent = loadedEvents[key];
-                    const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
-
-                    if (placement) {
-                        this.loadPlacement(loadEvent.value);
-                    }
-                }
-                this.deleteStoredLoad(key);
-            });
-        }
     }
 
     private invalidateExpiredCampaigns() {

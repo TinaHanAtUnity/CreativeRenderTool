@@ -50,7 +50,9 @@ export class UnityAds {
 
     public static load(placement: string) {
         if (UnityAds._initialized) {
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], placement);
+            const placements: {[key: string]: number} = {};
+            placements[placement] = 1;
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], placements);
         } else {
             UnityAds._loadRequests.push(placement);
         }
