@@ -43,7 +43,7 @@ describe('XHRequestTest', () => {
 
             try {
                 await XHRequest.get('https://api.unity3d.com/test');
-            } catch(err) {
+            } catch (err) {
                 assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
                 assert.isTrue(err instanceof Error, 'Did not fail from the file not being found');
                 assert.equal(err.toString(), `Error: Request failed with status code ${params[0]}`);
@@ -68,7 +68,7 @@ describe('XHRequestTest', () => {
 
         try {
             await XHRequest.get('file:///path/to/file.txt');
-        } catch(err) {
+        } catch (err) {
             assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
             assert.equal(err.toString(), 'Error: Request failed with status code 300');
@@ -88,7 +88,7 @@ describe('XHRequestTest', () => {
 
         try {
             await promise;
-        } catch(err) {
+        } catch (err) {
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
             assert.equal(err.toString(), 'Error: Error ocurred while executing request: status - 0');
             return;
@@ -108,7 +108,7 @@ describe('XHRequestTest', () => {
 
         try {
             await promise;
-        } catch(err) {
+        } catch (err) {
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
             assert.equal(err.toString(), 'Error: Request was aborted');
             return;
@@ -126,7 +126,7 @@ describe('XHRequestTest', () => {
 
         try {
             await promise;
-        } catch(err) {
+        } catch (err) {
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
             assert.equal(err.toString(), 'Error: Request timed out');
             return;
@@ -141,7 +141,7 @@ describe('XHRequestTest', () => {
 
         try {
             await XHRequest.get('https://api.unity3d.com/test');
-        } catch(err) {
+        } catch (err) {
             // ignore error
         } finally {
             // Restoring 'open' method even in error case

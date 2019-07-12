@@ -298,7 +298,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
-            if(!this.getAdvertisingIdentifier()) {
+            if (!this.getAdvertisingIdentifier()) {
                 dto.androidId = this.getAndroidId();
             }
 
@@ -358,7 +358,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'totalSpaceExternal': this.getTotalSpaceExternal()
         };
 
-        if(!this.getAdvertisingIdentifier()) {
+        if (!this.getAdvertisingIdentifier()) {
             dto.androidId = this.getAndroidId();
         }
 

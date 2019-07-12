@@ -109,15 +109,15 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
     public getOptionalAssets(): Asset[] {
         const assets: Asset[] = [];
         const gameIcon = this.getGameIcon();
-        if(gameIcon) {
+        if (gameIcon) {
             assets.push(gameIcon);
         }
         const portrait = this.getPortrait();
-        if(portrait) {
+        if (portrait) {
             assets.push(portrait);
         }
         const landscape = this.getLandscape();
-        if(landscape) {
+        if (landscape) {
             assets.push(landscape);
         }
 
@@ -171,7 +171,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
 
     public isConnectionNeeded(): boolean {
         const resourceUrl = this.getResourceUrl();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+        if (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
             return false;
         }
         return true;

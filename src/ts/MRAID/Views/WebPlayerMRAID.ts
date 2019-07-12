@@ -42,7 +42,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this.prepareProgressCircle();
 
-        if(this._domContentLoaded) {
+        if (this._domContentLoaded) {
             this.setViewableState(true);
             this.sendCustomImpression();
         } else {
@@ -61,7 +61,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public setViewableState(viewable: boolean) {
-        if(this._domContentLoaded) {
+        if (this._domContentLoaded) {
             this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
@@ -107,10 +107,10 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
             spanData: this._jaegarSpan
         }, this._campaign.getSession());
 
-        if(this._canSkip && !this._canClose) {
+        if (this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
             this.sendMraidAnalyticsEvent('playable_skip');
-        } else if(this._canClose) {
+        } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
             this.sendMraidAnalyticsEvent('playable_close');
         }

@@ -179,7 +179,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             sinon.spy(endScreen, 'show');
             performanceOverlayEventHandler.onOverlaySkip(1);
 
-            if(endScreen) {
+            if (endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
         });

@@ -77,7 +77,7 @@ export class AssetManager {
         this._campaignQueue = {};
         this._queueId = 0;
 
-        if(cacheMode === CacheMode.ADAPTIVE) {
+        if (cacheMode === CacheMode.ADAPTIVE) {
             this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
         }
     }
@@ -87,7 +87,7 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
-        if(this._cacheMode === CacheMode.DISABLED) {
+        if (this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }
 
@@ -96,15 +96,15 @@ export class AssetManager {
                 return this.validateVideos(requiredAssets, campaign);
             });
 
-            if(this._cacheMode === CacheMode.FORCED) {
+            if (this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
                     this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
                         // allow optional assets to fail caching when in CacheMode.FORCED
                     });
                     return campaign;
                 });
-            } else if(this._cacheMode === CacheMode.ADAPTIVE) {
-                if(this._fastConnectionDetected) {
+            } else if (this._cacheMode === CacheMode.ADAPTIVE) {
+                if (this._fastConnectionDetected) {
                     // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
                     requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
                         // allow optional assets to fail
@@ -118,8 +118,8 @@ export class AssetManager {
                     requiredChain.then(() => {
                         const campaignObject = this._campaignQueue[id];
 
-                        if(campaignObject) {
-                            if(!campaignObject.resolved) {
+                        if (campaignObject) {
+                            if (!campaignObject.resolved) {
                                 campaignObject.resolved = true;
                                 campaignObject.resolve(campaign);
                             }
@@ -134,8 +134,8 @@ export class AssetManager {
                     }).catch(error => {
                         const campaignObject = this._campaignQueue[id];
 
-                        if(campaignObject) {
-                            if(!campaignObject.resolved) {
+                        if (campaignObject) {
+                            if (!campaignObject.resolved) {
                                 campaignObject.resolved = true;
                                 campaignObject.reject(error);
                             }
@@ -160,7 +160,7 @@ export class AssetManager {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             return this.getOrientedVideo(campaign).then(video => {
                 return [[video], optionalAssets];
             });
@@ -181,29 +181,29 @@ export class AssetManager {
         this._fastConnectionDetected = false;
         this._cache.stop();
 
-        while(this._requiredQueue.length) {
+        while (this._requiredQueue.length) {
             const object: IAssetQueueObject | undefined = this._requiredQueue.shift();
-            if(object) {
+            if (object) {
                 object.reject(CacheStatus.STOPPED);
             }
         }
 
-        while(this._optionalQueue.length) {
+        while (this._optionalQueue.length) {
             const object: IAssetQueueObject | undefined = this._optionalQueue.shift();
-            if(object) {
+            if (object) {
                 object.reject(CacheStatus.STOPPED);
             }
         }
     }
 
     public checkFreeSpace(): Promise<void> {
-        if(this._cacheMode === CacheMode.DISABLED) {
+        if (this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve();
         }
 
         return this._cache.getFreeSpace().then(freeSpace => {
             // disable caching if there is less than 20 megabytes free space in cache directory
-            if(freeSpace < 20480) {
+            if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
 
                 Diagnostics.trigger('caching_disabled', {
@@ -219,9 +219,9 @@ export class AssetManager {
 
     private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
         let chain = Promise.resolve();
-        for(const asset of assets) {
+        for (const asset of assets) {
             chain = chain.then(() => {
-                if(this._stopped) {
+                if (this._stopped) {
                     return Promise.reject(CacheStatus.STOPPED);
                 }
 
@@ -251,7 +251,7 @@ export class AssetManager {
                 resolve: resolve,
                 reject: reject
             };
-            if(cacheType === CacheType.REQUIRED) {
+            if (cacheType === CacheType.REQUIRED) {
                 this._requiredQueue.push(queueObject);
             } else {
                 this._optionalQueue.push(queueObject);
@@ -260,25 +260,25 @@ export class AssetManager {
     }
 
     private executeAssetQueue(campaign: Campaign): void {
-        if(!this._caching) {
+        if (!this._caching) {
             let currentAsset: IAssetQueueObject | undefined = this._requiredQueue.shift();
-            if(!currentAsset) {
+            if (!currentAsset) {
                 currentAsset = this._optionalQueue.shift();
             }
 
-            if(currentAsset) {
+            if (currentAsset) {
                 const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
                 const tooLargeFileObserver = this._cache.onTooLargeFile.subscribe((callback, size, totalSize, responseCode, headers) => {
                     this.handleTooLargeFile(asset.url, campaign, size, totalSize, responseCode, headers);
                 });
                 let cacheDiagnostics: CacheDiagnostics | undefined;
-                if(currentAsset.diagnostics) {
+                if (currentAsset.diagnostics) {
                     cacheDiagnostics = new CacheDiagnostics(this._cache, currentAsset.diagnostics);
                 }
                 this._cache.cache(asset.url).then(([fileId, fileUrl]) => {
                     this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
-                    if(cacheDiagnostics) {
+                    if (cacheDiagnostics) {
                         cacheDiagnostics.stop();
                     }
                     asset.resolve([fileId, fileUrl]);
@@ -286,7 +286,7 @@ export class AssetManager {
                     this.executeAssetQueue(campaign);
                 }).catch(error => {
                     this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
-                    if(cacheDiagnostics) {
+                    if (cacheDiagnostics) {
                         cacheDiagnostics.stop();
                     }
                     asset.reject(error);
@@ -299,10 +299,10 @@ export class AssetManager {
 
     private validateVideos(assets: Asset[], campaign: Campaign): Promise<void[]> {
         const promises = [];
-        for(const asset of assets) {
-            if(asset instanceof Video) {
+        for (const asset of assets) {
+            if (asset instanceof Video) {
                 promises.push(VideoFileInfo.isVideoValid(this._platform, this._core.Cache, asset, campaign).then(valid => {
-                    if(!valid) {
+                    if (!valid) {
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }
                 }));
@@ -323,20 +323,20 @@ export class AssetManager {
             const landscapeVideo = campaign.getVideo();
             const portraitVideo = campaign.getPortraitVideo();
 
-            if(landscape) {
-                if(landscapeVideo) {
+            if (landscape) {
+                if (landscapeVideo) {
                     return landscapeVideo;
                 }
-                if(portraitVideo) {
+                if (portraitVideo) {
                     return portraitVideo;
                 }
             }
 
-            if(portrait) {
-                if(portraitVideo) {
+            if (portrait) {
+                if (portraitVideo) {
                     return portraitVideo;
                 }
-                if(landscapeVideo) {
+                if (landscapeVideo) {
                     return landscapeVideo;
                 }
             }
@@ -348,10 +348,10 @@ export class AssetManager {
     private onFastConnectionDetected(): void {
         this._fastConnectionDetected = true;
 
-        for(const id in this._campaignQueue) {
-            if(this._campaignQueue.hasOwnProperty(id)) {
+        for (const id in this._campaignQueue) {
+            if (this._campaignQueue.hasOwnProperty(id)) {
                 const campaignObject = this._campaignQueue[id];
-                if(!campaignObject.resolved) {
+                if (!campaignObject.resolved) {
                     campaignObject.resolved = true;
                     campaignObject.resolve(campaignObject.campaign);
                 }
@@ -372,7 +372,7 @@ export class AssetManager {
     }
 
     private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics | undefined {
-        if(this._sendCacheDiagnostics) {
+        if (this._sendCacheDiagnostics) {
             return {
                 creativeType: asset.getDescription(),
                 targetGameId: campaign instanceof PerformanceCampaign ? campaign.getGameId() : 0,

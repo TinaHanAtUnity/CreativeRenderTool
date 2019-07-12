@@ -158,7 +158,7 @@ export class Vast extends Model<IVast> {
             const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
+                for (const companionAd of companionAds) {
                     if (companionAd.getHeight() <= companionAd.getWidth()) {
                         return companionAd;
                     }
@@ -183,7 +183,7 @@ export class Vast extends Model<IVast> {
             const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
+                for (const companionAd of companionAds) {
                     if (companionAd.getHeight() >= companionAd.getWidth()) {
                         return companionAd;
                     }
@@ -208,7 +208,7 @@ export class Vast extends Model<IVast> {
             const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
+                for (const companionAd of companionAds) {
                     const url = companionAd.getCompanionClickThroughURLTemplate();
                     if (url) {
                         return url;

@@ -72,8 +72,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onMraidOrientationProperties(orientationProperties: IOrientationProperties): void {
-        if(this._adUnit.isShowing()) {
-            if(this._platform === Platform.IOS) {
+        if (this._adUnit.isShowing()) {
+            if (this._platform === Platform.IOS) {
                 this._adUnit.getContainer().reorient(true, orientationProperties.forceOrientation);
             } else {
                 this._adUnit.getContainer().reorient(orientationProperties.allowOrientationChange, orientationProperties.forceOrientation);
@@ -107,7 +107,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     public onMraidShowEndScreen(): void {
         const endScreen = this._adUnit.getEndScreen();
-        if(endScreen) {
+        if (endScreen) {
             this._adUnit.setShowingMRAID(false);
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
@@ -145,7 +145,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     protected openUrl(url: string): Promise<void> {
-        if(this._platform === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             return this._core.iOS!.UrlScheme.open(url);
         } else {
             return this._core.Android!.Intent.launch({

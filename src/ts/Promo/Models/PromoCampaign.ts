@@ -48,14 +48,14 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         const result: { [url: string]: string[] } = { };
         if (trackingUrls !== undefined) {
             for (const key in trackingUrls) {
-                if(trackingUrls.hasOwnProperty(key)) {
+                if (trackingUrls.hasOwnProperty(key)) {
                     result[key] = [];
                     const trackingURLs = trackingUrls[key];
-                    for(const trackingURL of trackingURLs) {
-                        if(trackingURL) {
+                    for (const trackingURL of trackingURLs) {
+                        if (trackingURL) {
                             const isStagingURL = trackingURL.indexOf('events-iap.staging.unityads.unity3d.com') !== -1;
                             const isProductionURL = trackingURL.indexOf('events.iap.unity3d.com') !== -1;
-                            if(isStagingURL || isProductionURL) {
+                            if (isStagingURL || isProductionURL) {
                                 result[key].push(trackingURL + '&productType=' + productType);
                             } else {
                                 result[key].push(trackingURL);
@@ -100,7 +100,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     public getRequiredAssets(): Asset[] {
         const assetList: Asset[] = [];
         const orientationResources = this.getOrientationResources();
-        for(const orientationResource of orientationResources) {
+        for (const orientationResource of orientationResources) {
             assetList.push(orientationResource.getButtonAsset().getImage());
             assetList.push(orientationResource.getBackgroundAsset().getImage());
         }
