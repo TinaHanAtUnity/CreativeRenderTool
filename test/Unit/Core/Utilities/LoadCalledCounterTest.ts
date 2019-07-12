@@ -4,6 +4,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 
 describe('LoadCalledCounterTest', () => {
+    let sandbox: sinon.SinonSandbox;
     let httpKafkaStub: sinon.SinonStub;
 
     const tests: {
@@ -11,22 +12,28 @@ describe('LoadCalledCounterTest', () => {
     }[] = [{
         kafkaObject: {
             gameId: '1234',
-            placementId: 'rewardedVideo'
+            placementId: 'rewardedVideo',
+            country: 'US',
+            organizationId: 'scottsgames-inc',
+            ts: '1234'
         }
     }];
 
     beforeEach(() => {
-        httpKafkaStub = sinon.stub(HttpKafka, 'sendEvent').resolves();
+        sandbox = sinon.createSandbox();
+        httpKafkaStub = sandbox.stub(HttpKafka, 'sendEvent').resolves();
+        sandbox.stub(Date, 'now').returns(1234);
     });
 
     afterEach(() => {
-        httpKafkaStub.reset();
+        sandbox.restore();
     });
 
     describe('Sending with correct fields', () => {
         tests.forEach((t) => {
             it(`should send the correct payload"`, () => {
-                LoadCalledCounter.report(t.kafkaObject.gameId, t.kafkaObject.placementId);
+                const x = t.kafkaObject;
+                LoadCalledCounter.report(x.gameId, x.placementId, x.country, x.organizationId);
                 sinon.assert.calledWith(httpKafkaStub, 'ads.load.counting', KafkaCommonObjectType.EMPTY, t.kafkaObject);
             });
         });
