@@ -140,7 +140,7 @@ export class ThirdPartyEventManager {
                 protocol: urlParts.protocol,
                 auctionProtocol: auctionProtocol
             };
-            if(error instanceof RequestError) {
+            if (error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), diagnosticData);
             }
             // Auction V5 start dip investigation

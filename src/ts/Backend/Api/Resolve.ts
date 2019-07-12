@@ -3,7 +3,7 @@ import { BackendApi } from 'Backend/BackendApi';
 export class Resolve extends BackendApi {
 
     public resolve(id: string, host: string): string {
-        if(host.indexOf('fail') !== -1) {
+        if (host.indexOf('fail') !== -1) {
             setTimeout(() => {
                 this._backend.sendEvent('RESOLVE', 'FAILED', id, host, 'Error', 'Error message');
             }, 0);
