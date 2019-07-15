@@ -131,7 +131,7 @@ export class SliderPerformanceEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        this._slider.attachTo(<HTMLElement>this.container().querySelector('.game-background-container'));
+        this._slider.attachTo(<HTMLElement> this.container().querySelector('.game-background-container'));
     }
 
     protected onDownloadEvent(event: Event): void {

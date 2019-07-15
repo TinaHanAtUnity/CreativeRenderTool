@@ -150,9 +150,9 @@ export class CometCampaignParser extends CampaignParser {
     }
 
     protected validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
+        if (urls && urls !== null) {
+            for (const urlKey in urls) {
+                if (urls.hasOwnProperty(urlKey)) {
                     urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
                 }
             }

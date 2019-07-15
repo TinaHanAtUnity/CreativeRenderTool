@@ -406,7 +406,7 @@ export class Slider {
     }
 
     private getTransitionPosition(slideIndex: number): number {
-        const targetSlide = <HTMLElement>this._slidesContainer.children[slideIndex + 2];
+        const targetSlide = <HTMLElement> this._slidesContainer.children[slideIndex + 2];
         let targetTransitionPosition = targetSlide ? targetSlide.offsetLeft * -1 : 0;
         targetTransitionPosition += (this.getWidth(this._rootElement) - targetSlide.offsetWidth) / 2;
 
