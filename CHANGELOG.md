@@ -1,4 +1,4 @@
-# Pending
+# Mon Jul 15 12:56:51 UTC 2019
 
 * Added 'privacyType' field to operative events [#10488](https://github.com/Applifier/unity-ads-webview/pull/10488)
 * Revert "Merge branch 'master' into feature/DoubleDropShadow" [#10549](https://github.com/Applifier/unity-ads-webview/pull/10549)
