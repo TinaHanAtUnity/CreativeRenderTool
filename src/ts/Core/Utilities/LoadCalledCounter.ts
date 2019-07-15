@@ -4,10 +4,11 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class LoadCalledCounter {
 
-    public static report(gameId: string, placementId: string, country: string, abGroup: ABGroup, organizationId: string | undefined): Promise<INativeResponse> {
+    public static report(gameId: string, placementId: string, country: string, count: number, abGroup: ABGroup, organizationId: string | undefined): Promise<INativeResponse> {
         const kafkaObject: { [key: string]: unknown } = {
             gameId: gameId,
             placementId: placementId,
+            count: count,
             country: country,
             abGroup: abGroup,
             organizationId: organizationId || '',

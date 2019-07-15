@@ -13,6 +13,7 @@ describe('LoadCalledCounterTest', () => {
             gameId: string;
             placementId: string;
             country: string;
+            count: number;
             abGroup: ABGroup;
             organizationId: string;
             ts: number;
@@ -21,6 +22,7 @@ describe('LoadCalledCounterTest', () => {
         kafkaObject: {
             gameId: '1234',
             placementId: 'rewardedVideo',
+            count: 1,
             country: 'US',
             abGroup: 99,
             organizationId: 'scottsgames-inc',
@@ -42,7 +44,7 @@ describe('LoadCalledCounterTest', () => {
         tests.forEach((t) => {
             it(`should send the correct payload"`, () => {
                 const x = t.kafkaObject;
-                LoadCalledCounter.report(x.gameId, x.placementId, x.country, x.abGroup, x.organizationId);
+                LoadCalledCounter.report(x.gameId, x.placementId, x.country, x.count, x.abGroup, x.organizationId);
                 sinon.assert.calledWith(httpKafkaStub, 'ads.load.counting', KafkaCommonObjectType.EMPTY, t.kafkaObject);
             });
         });
