@@ -26,6 +26,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -102,6 +103,7 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     imei?: string;
+    privacyType?: string;
     isLoadEnabled: boolean;
 }
 
@@ -413,6 +415,11 @@ export class OperativeEventManager {
                     'screenDensity': this._deviceInfo.getScreenDensity(),
                     'screenSize': this._deviceInfo.getScreenLayout()
                 };
+            }
+
+            const privacyMethod = this._adsConfig.getUserPrivacy().getMethod();
+            if (privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
+                infoJson.privacyType = privacyMethod;
             }
 
             const trackingIDs: Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
