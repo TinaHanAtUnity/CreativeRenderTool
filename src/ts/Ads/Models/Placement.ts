@@ -28,7 +28,7 @@ export interface IRawPlacement {
     refreshDelay: number;
     position?: string;
     auctionType?: string;
-    banner?: {refreshRate?: number};
+    banner?: { refreshRate?: number };
 }
 
 export interface IPlacement {
