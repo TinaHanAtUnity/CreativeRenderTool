@@ -27,7 +27,7 @@ export class Analytics implements IAnalytics {
     }
 
     public initialize(): Promise<number> {
-        if(this._core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId())) {
+        if (this._core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId())) {
             return this.AnalyticsManager.init().then(() => {
                 return this.AnalyticsManager.getGameSessionId();
             });

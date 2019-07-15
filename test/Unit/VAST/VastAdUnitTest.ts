@@ -104,7 +104,7 @@ describe('VastAdUnitTest', () => {
         const adsConfig = TestFixtures.getAdsConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
-        if(duration) {
+        if (duration) {
             duration = duration * 1000;
             video.setDuration(duration);
         }

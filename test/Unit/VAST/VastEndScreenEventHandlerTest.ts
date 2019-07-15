@@ -65,10 +65,10 @@ import { IStoreApi } from 'Store/IStore';
 
             const clientInfo = TestFixtures.getClientInfo(platform);
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
                 container = new Activity(core, ads, <AndroidDeviceInfo>deviceInfo);
-            } else if(platform === Platform.IOS) {
+            } else if (platform === Platform.IOS) {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
                 container = new ViewController(core, ads, <IosDeviceInfo>deviceInfo, focusManager, clientInfo);
             }
@@ -192,7 +192,7 @@ import { IStoreApi } from 'Store/IStore';
                 return vastAdUnit.hide();
             });
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
 
                 it('should send a tracking event for vast video end card click', () => {
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
@@ -241,7 +241,7 @@ import { IStoreApi } from 'Store/IStore';
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 it('should open click through link on Android', () => {
                     sinon.stub(core.Android!.Intent, 'launch').resolves();
                     sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');

@@ -85,10 +85,10 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
             clientInfo = TestFixtures.getClientInfo(platform);
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
                 container = new Activity(core, ads, <AndroidDeviceInfo>deviceInfo);
-            } else if(platform === Platform.IOS) {
+            } else if (platform === Platform.IOS) {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
                 container = new ViewController(core, ads, <IosDeviceInfo>deviceInfo, focusManager, clientInfo);
             }
@@ -306,7 +306,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 });
             });
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 it('should call video click through tracking url', () => {
                     sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
@@ -324,7 +324,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 it('should open click trough link in Android web browser when call button is clicked', () => {
                     sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
                     sinon.stub(core.Android!.Intent, 'launch').resolves();

@@ -15,7 +15,7 @@ export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
     }
 
     public fetch(): Promise<any[]> {
-        return Promise.resolve(<any>void(0));
+        return Promise.resolve(<any> void(0));
     }
 
     public getStores(): string {

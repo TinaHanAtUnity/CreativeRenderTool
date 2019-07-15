@@ -1,8 +1,22 @@
 # Pending
-	
+
+* ESLint: keyword-spacing [#10523](https://github.com/Applifier/unity-ads-webview/pull/10523)
+* Proposal for improving AdmobAdUnitTest [#10261](https://github.com/Applifier/unity-ads-webview/pull/10261)
+* Enable Load Functionality on 100% of Whitelisted Traffic [#10522](https://github.com/Applifier/unity-ads-webview/pull/10522)
+
+# Thu Jul 11 20:38:11 UTC 2019
+
+* Parse HTML and IFrame companion ad for VAST - part 2 [#10455](https://github.com/Applifier/unity-ads-webview/pull/10455)
+* Send Ready Event for Blocked Load Calls on Ready Placements [#10490](https://github.com/Applifier/unity-ads-webview/pull/10490)
+* Post SDK Bot Messages to #ads-sdk-devs [#10516](https://github.com/Applifier/unity-ads-webview/pull/10516)
+* Disable HTML companionAd to fix failing Android hybrid test [#10514](https://github.com/Applifier/unity-ads-webview/pull/10514)
+
+# Mon Jul  8 19:54:39 UTC 2019
+
 * Added double shadow to the end-screen [#10458](https://github.com/Applifier/unity-ads-webview/pull/10458)
 * Reverted the pop-out experiment [#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
 * Added a test for the Version Matcher [#10452](https://github.com/Applifier/unity-ads-webview/pull/10452)
+* Fix test runner to support older Node version [#10456](https://github.com/Applifier/unity-ads-webview/pull/10456)
 
 # Wed Jul  3 16:15:07 UTC 2019
 

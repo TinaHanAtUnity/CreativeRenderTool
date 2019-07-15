@@ -24,14 +24,14 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
         const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
         parameters.overlay.addEventHandler(vastOverlayHandler);
 
-        if(parameters.campaign.hasEndscreen() && parameters.endScreen) {
+        if (parameters.campaign.hasStaticEndscreen() && parameters.endScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
             parameters.endScreen.addEventHandler(vastEndScreenHandler);
 
             if (parameters.platform === Platform.ANDROID) {
                 const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
                     vastEndScreenHandler.onKeyEvent(keyCode);
-                    if(CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
+                    if (CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);
                     }
                 });
@@ -47,21 +47,21 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
 
         let onVolumeChangeObserverAndroid: IObserver3<number, number, number>;
         let onVolumeChangeObserverIOS: IObserver2<number, number>;
-        if(parameters.platform === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             parameters.core.DeviceInfo.Android!.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
             onVolumeChangeObserverAndroid = parameters.core.DeviceInfo.Android!.onVolumeChanged.subscribe((streamType, volume, maxVolume) => vastVideoEventHandler.onVolumeChange(volume, maxVolume));
-        } else if(parameters.platform === Platform.IOS) {
+        } else if (parameters.platform === Platform.IOS) {
             parameters.core.DeviceInfo.Ios!.registerVolumeChangeListener();
             onVolumeChangeObserverIOS = parameters.core.DeviceInfo.Ios!.onVolumeChanged.subscribe((volume, maxVolume) => vastVideoEventHandler.onVolumeChange(volume, maxVolume));
         }
 
         vastAdUnit.onClose.subscribe(() => {
-            if(onVolumeChangeObserverAndroid) {
+            if (onVolumeChangeObserverAndroid) {
                 parameters.core.DeviceInfo.Android!.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
                 parameters.core.DeviceInfo.Android!.onVolumeChanged.unsubscribe(onVolumeChangeObserverAndroid);
             }
 
-            if(onVolumeChangeObserverIOS) {
+            if (onVolumeChangeObserverIOS) {
                 parameters.core.DeviceInfo.Ios!.unregisterVolumeChangeListener();
                 parameters.core.DeviceInfo.Ios!.onVolumeChanged.unsubscribe(onVolumeChangeObserverIOS);
             }
