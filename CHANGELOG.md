@@ -1,3 +1,7 @@
+# Pending
+
+* Enabling AppSheet for ios 12.1 and above [#10260](https://github.com/Applifier/unity-ads-webview/pull/10260)
+
 # Mon Jul 15 12:56:51 UTC 2019
 
 * Added 'privacyType' field to operative events [#10488](https://github.com/Applifier/unity-ads-webview/pull/10488)
