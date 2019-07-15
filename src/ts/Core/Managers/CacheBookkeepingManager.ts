@@ -188,15 +188,6 @@ export class CacheBookkeepingManager {
         this._core.Storage.write(StorageType.PRIVATE);
     }
 
-    public deleteCachedCampaignResponse(): Promise<unknown> {
-        const cacheCampaignUrlPromise = this._core.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
-        const cachedCampaignResponsePromise = this._core.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
-
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._core.Storage.write(StorageType.PRIVATE)).catch(error => {
-            // ignore error
-        });
-    }
-
     private deleteCacheBookKeepingData(): Promise<void> {
         return this._core.Storage.delete(StorageType.PRIVATE, this._rootKey).then(() => {
             return this._core.Storage.write(StorageType.PRIVATE);
@@ -211,7 +202,7 @@ export class CacheBookkeepingManager {
                 .filter(cacheKey => cacheKey && !(cacheKey.toUpperCase() in CacheKey))
                 .map(cacheKey => this._core.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
 
-            if(promises.length > 0) {
+            if (promises.length > 0) {
                 return Promise.all(promises).catch(() => {
                     return Promise.resolve();
                 }).then(() => {
@@ -245,7 +236,7 @@ export class CacheBookkeepingManager {
 
     private makeCacheKey(key: CacheKey, ...subKeys: string[]): string {
         let finalKey = this._rootKey + '.' + key;
-        if(subKeys && subKeys.length > 0) {
+        if (subKeys && subKeys.length > 0) {
             finalKey = subKeys.reduce((previousValue, currentValue) => previousValue + '.' + currentValue, finalKey);
         }
 

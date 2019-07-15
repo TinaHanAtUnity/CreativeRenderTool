@@ -8,9 +8,9 @@ import {
     AnalyticsLevelFailedEvent,
     AnalyticsLevelUpEvent,
     AnalyticsProtocol,
-    IAnalyticsCommonObject,
     IAnalyticsMonetizationExtras,
-    IAnalyticsObject
+    IAnalyticsObject,
+    IAnalyticsCommonObject
 } from 'Analytics/AnalyticsProtocol';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
@@ -23,6 +23,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 interface IAnalyticsEventWrapper {
     identifier: string;
@@ -53,6 +54,7 @@ export class AnalyticsManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
+    private _adsConfiguration: AdsConfiguration;
     private _userId: string;
     private _sessionId: number;
     private _storage: AnalyticsStorage;
@@ -68,7 +70,7 @@ export class AnalyticsManager {
     private _analyticsEventQueue: {[key: string]: IAnalyticsEventWrapper};
 
     public static getPurchasingFailureReason(reason: string): PurchasingFailureReason {
-        switch(reason) {
+        switch (reason) {
             case 'NOT_SUPPORTED':
                 return PurchasingFailureReason.ProductUnavailable;
             case 'ITEM_UNAVAILABLE':
@@ -83,7 +85,7 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
+    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._analytics = analytics;
@@ -92,6 +94,7 @@ export class AnalyticsManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
+        this._adsConfiguration = adsConfiguration;
         this._storage = analyticsStorage;
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
@@ -105,7 +108,7 @@ export class AnalyticsManager {
     }
 
     public init(): Promise<void> {
-        if(this._clientInfo.isReinitialized()) {
+        if (this._clientInfo.isReinitialized()) {
             return Promise.all([
                 this._storage.getUserId(),
                 this._storage.getSessionId(this._clientInfo.isReinitialized())
@@ -128,7 +131,7 @@ export class AnalyticsManager {
                 this.sendNewSession();
 
                 let updateDeviceInfo: boolean = false;
-                if(appVersion) {
+                if (appVersion) {
                     if (this._clientInfo.getApplicationVersion() !== appVersion) {
                         this.sendAppUpdate();
                         updateDeviceInfo = true;
@@ -138,13 +141,13 @@ export class AnalyticsManager {
                     updateDeviceInfo = true;
                 }
 
-                if(osVersion) {
+                if (osVersion) {
                     if (this._deviceInfo.getOsVersion() !== osVersion) {
                         updateDeviceInfo = true;
                     }
                 }
 
-                if(updateDeviceInfo) {
+                if (updateDeviceInfo) {
                     this.sendDeviceInfo();
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
@@ -262,7 +265,7 @@ export class AnalyticsManager {
     }
 
     private onAppForeground(): void {
-        if(this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._sessionId = sessionId;
                 this._storage.setIds(this._userId, this._sessionId);
@@ -277,7 +280,7 @@ export class AnalyticsManager {
     }
 
     private onActivityResumed(activity: string): void {
-        if(this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._sessionId = sessionId;
                 this._storage.setIds(this._userId, this._sessionId);
@@ -289,12 +292,12 @@ export class AnalyticsManager {
     }
 
     private onActivityPaused(activity: string): void {
-        if(this._topActivity === activity || !this._topActivity) {
+        if (this._topActivity === activity || !this._topActivity) {
             this._bgTimestamp = Date.now();
             this.sendAppRunning();
         }
 
-        if(!this._topActivity) {
+        if (!this._topActivity) {
             this._topActivity = activity;
         }
     }
@@ -396,7 +399,7 @@ export class AnalyticsManager {
                 this._core.Sdk.logError('parseAnalyticsEvent was not able to parse event');
                 return Promise.resolve(null);
             }
-        } catch(error) {
+        } catch (error) {
             this._core.Sdk.logError(error);
             return Promise.resolve(null);
         }

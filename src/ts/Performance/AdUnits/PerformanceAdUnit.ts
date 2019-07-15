@@ -8,9 +8,10 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
+import { EndScreen } from 'Ads/Views/EndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
-    endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
+    endScreen: EndScreen;
     adUnitStyle?: AdUnitStyle;
     downloadManager?: DownloadManager;
     deviceIdManager?: DeviceIdManager;
@@ -18,7 +19,7 @@ export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<Per
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    private _endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
+    private _endScreen: EndScreen;
     private _privacy: AbstractPrivacy;
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -61,7 +62,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         return 'performance';
     }
 
-    public getEndScreen(): PerformanceEndScreen | SliderPerformanceEndScreen | undefined {
+    public getEndScreen(): EndScreen | undefined {
         return this._endScreen;
     }
 
@@ -88,7 +89,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     public onVideoError(): void {
         const endScreen = this.getEndScreen();
-        if(endScreen) {
+        if (endScreen) {
             endScreen.show();
         }
         this.sendTrackingEvent(TrackingEvent.ERROR);

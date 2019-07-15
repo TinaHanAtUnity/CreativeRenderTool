@@ -1,27 +1,31 @@
-import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { Template } from 'Core/Utilities/Template';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { ICoreApi } from 'Core/ICore';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
 interface ISliderEventParameters {
     manualSlideCount: number;
     automaticSlideCount: number;
     downloadClicked: boolean;
     sliderReadyWhenShown: boolean | undefined;
+    [key: string]: boolean | undefined | number | string;
 }
 
-export class SliderPerformanceEndScreen extends EndScreen {
-    private _campaign: SliderPerformanceCampaign;
+export class SliderPerformanceEndScreen extends PerformanceEndScreen {
+    protected _country: string | undefined;
+    protected _core: ICoreApi;
+    protected _campaign: SliderPerformanceCampaign;
     private _slider: Slider;
     private _sliderEventParameters: ISliderEventParameters;
     private _showTimestamp: number;
     private _sliderUsageDataEventSent: boolean;
-    private _country: string | undefined;
 
     constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign, country?: string) {
-        super(parameters);
+        super(parameters, campaign, country);
         this._campaign = campaign;
         this._country = country;
 
@@ -33,6 +37,9 @@ export class SliderPerformanceEndScreen extends EndScreen {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
+        const squareImageUrl = squareImage ? squareImage.getUrl() : undefined;
+        const portraitImageUrl = portraitImage ? portraitImage.getUrl() : undefined;
+        const landscapeImageUrl = landscapeImage ? landscapeImage.getUrl() : undefined;
 
         this._templateData = {
             'gameName': campaign.getGameName(),
@@ -41,21 +48,40 @@ export class SliderPerformanceEndScreen extends EndScreen {
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt(),
             'screenshots': screenshots,
-            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
-            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
-            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined
+            'endScreenLandscape': portraitImageUrl,
+            'endScreenPortrait': landscapeImageUrl,
+            'endScreenSquare': squareImageUrl
         };
+
+        const screenshotOrientation = campaign.getScreenshotsOrientation();
 
         this._sliderEventParameters = {
             automaticSlideCount: 0,
             manualSlideCount: 0,
             downloadClicked: false,
-            sliderReadyWhenShown: undefined
+            sliderReadyWhenShown: undefined,
+            squareImageAsMainImage: !!squareImage,
+            screenshotOrientation: screenshotOrientation === SliderEndScreenImageOrientation.PORTRAIT ? 'portrait' : 'landscape'
         };
 
         this._sliderUsageDataEventSent = false;
 
-        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback, this.onDownloadCallback, portraitImage ? portraitImage.getUrl() : undefined, landscapeImage ? landscapeImage.getUrl() : undefined, squareImage ? squareImage.getUrl() : undefined);
+        const mainImageUrl = this.getMainImageUrl(screenshotOrientation, squareImageUrl, portraitImageUrl, landscapeImageUrl);
+        if (mainImageUrl) {
+            screenshots.unshift(mainImageUrl);
+        }
+
+        this._slider = new Slider(screenshots, screenshotOrientation, this.onSlideCallback, this.onDownloadCallback);
+    }
+
+    private getMainImageUrl(imageOrientation: SliderEndScreenImageOrientation, squareImageUrl?: string, portraitImageUrl?: string, landscapeImageUrl?: string): string | undefined {
+        if (squareImageUrl !== undefined) {
+            return squareImageUrl;
+        } else if (imageOrientation === SliderEndScreenImageOrientation.PORTRAIT && portraitImageUrl) {
+            return portraitImageUrl;
+        } else if (imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE && landscapeImageUrl) {
+            return landscapeImageUrl;
+        }
     }
 
     public show(): void {
@@ -85,7 +111,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
         }
         this._sliderUsageDataEventSent = true;
 
-        const kafkaObject: { [key: string]: unknown } = this._sliderEventParameters;
+        const kafkaObject = this._sliderEventParameters;
         kafkaObject.type = 'slider_data';
         kafkaObject.auctionId = this._campaign.getSession().getId();
         kafkaObject.timeVisible = Date.now() - this._showTimestamp;

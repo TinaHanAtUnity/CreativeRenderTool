@@ -155,11 +155,11 @@ export class Vast extends Model<IVast> {
     public getLandscapeOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
-                    if (this.isValidLandscapeCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                for (const companionAd of companionAds) {
+                    if (companionAd.getHeight() <= companionAd.getWidth()) {
                         return companionAd;
                     }
                 }
@@ -180,11 +180,11 @@ export class Vast extends Model<IVast> {
     public getPortraitOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
-                    if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                for (const companionAd of companionAds) {
+                    if (companionAd.getHeight() >= companionAd.getWidth()) {
                         return companionAd;
                     }
                 }
@@ -205,16 +205,12 @@ export class Vast extends Model<IVast> {
     public getCompanionClickThroughUrl(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
+                for (const companionAd of companionAds) {
                     const url = companionAd.getCompanionClickThroughURLTemplate();
-                    const height = companionAd.getHeight();
-                    const width = companionAd.getWidth();
-                    const creativeType = companionAd.getCreativeType();
-                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
-                    if (url && validCompanion) {
+                    if (url) {
                         return url;
                     }
                 }
@@ -227,22 +223,40 @@ export class Vast extends Model<IVast> {
     public getCompanionClickTrackingUrls(): string[] {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
                 for (const companionAd of companionAds) {
                     const urls = companionAd.getCompanionClickTrackingURLTemplates();
-                    const height = companionAd.getHeight();
-                    const width = companionAd.getWidth();
-                    const creativeType = companionAd.getCreativeType();
-                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
-                    if (urls.length > 0 && validCompanion) {
+                    if (urls.length > 0) {
                         return urls;
                     }
                 }
             }
         }
         return [];
+    }
+
+    public getIframeCompanionResourceUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const iframeCompanionAd = ad.getIframeCompanionAd();
+            if (iframeCompanionAd) {
+                return iframeCompanionAd.getIframeResourceURL();
+            }
+        }
+        return null;
+    }
+
+    public getHtmlCompanionResourceContent(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const htmlCompanionAd = ad.getHtmlCompanionAd();
+            if (htmlCompanionAd) {
+                return htmlCompanionAd.getHtmlResourceContent();
+            }
+        }
+        return null;
     }
 
     public getVideoMediaFiles(): VastMediaFile[] {
@@ -307,23 +321,6 @@ export class Vast extends Model<IVast> {
             return true;
         }
         return false;
-    }
-
-    private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
-        const minHeight = 320;
-        const minWidth = 480;
-        return this.isValidCompanionCreativeType(creativeType) && (height < width) && (height >= minHeight) && (width >= minWidth);
-    }
-
-    private isValidPortraitCompanion(creativeType: string | null, height: number, width: number): boolean {
-        const minHeight = 480;
-        const minWidth = 320;
-        return this.isValidCompanionCreativeType(creativeType) && (height > width) && (height >= minHeight) && (width >= minWidth);
-    }
-
-    private isValidCompanionCreativeType(creativeType: string | null): boolean {
-        const reg = new RegExp('(jpe?g|gif|png)', 'gi');
-        return !!creativeType && reg.test(creativeType);
     }
 
     private isSupportedMIMEType(MIMEType: string): boolean {

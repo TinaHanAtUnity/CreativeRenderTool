@@ -76,7 +76,6 @@ export interface IInfoJson {
     connectionType: string;
     screenWidth: number;
     screenHeight: number;
-    isBackupCampaign: boolean;
     deviceFreeSpace: number;
     adType?: string;
     correlationId?: string;
@@ -163,7 +162,7 @@ export class OperativeEventManager {
     public sendStart(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.START)) {
+        if (session.getEventSent(EventType.START)) {
             return Promise.resolve();
         }
 
@@ -183,7 +182,7 @@ export class OperativeEventManager {
     public sendFirstQuartile(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.FIRST_QUARTILE)) {
+        if (session.getEventSent(EventType.FIRST_QUARTILE)) {
             return Promise.resolve(void(0));
         }
 
@@ -199,7 +198,7 @@ export class OperativeEventManager {
     public sendMidpoint(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.MIDPOINT)) {
+        if (session.getEventSent(EventType.MIDPOINT)) {
             return Promise.resolve(void(0));
         }
 
@@ -215,7 +214,7 @@ export class OperativeEventManager {
     public sendThirdQuartile(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.THIRD_QUARTILE)) {
+        if (session.getEventSent(EventType.THIRD_QUARTILE)) {
             return Promise.resolve(void(0));
         }
 
@@ -231,13 +230,13 @@ export class OperativeEventManager {
     public sendSkip(params: IOperativeSkipEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.SKIP)) {
+        if (session.getEventSent(EventType.SKIP)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.SKIP);
 
         const fulfilled = ([id, infoJson]: [string, IInfoJson]) => {
-            if(params.videoProgress) {
+            if (params.videoProgress) {
                 infoJson.skippedAt = params.videoProgress;
             }
 
@@ -271,7 +270,7 @@ export class OperativeEventManager {
     public sendView(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.VIEW)) {
+        if (session.getEventSent(EventType.VIEW)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.VIEW);
@@ -288,7 +287,7 @@ export class OperativeEventManager {
     public sendClick(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.CLICK)) {
+        if (session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.CLICK);
@@ -305,7 +304,7 @@ export class OperativeEventManager {
     }
 
     public sendEvent(event: string, eventId: string, sessionId: string, url: string | undefined, data: string): Promise<INativeResponse | void> {
-        if(!url) {
+        if (!url) {
             return Promise.resolve();
         }
 
@@ -402,12 +401,11 @@ export class OperativeEventManager {
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
-                'isBackupCampaign': this._campaign.isBackupCampaign(),
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
                 'isLoadEnabled': this._campaign.isLoadEnabled()
             };
 
-            if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 infoJson = {
                     ... infoJson,
                     'apiLevel': this._deviceInfo.getApiLevel(),
@@ -422,21 +420,21 @@ export class OperativeEventManager {
 
             infoJson.videoOrientation = params.videoOrientation;
 
-            if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            if (typeof navigator !== 'undefined' && navigator.userAgent) {
                 infoJson.webviewUa = navigator.userAgent;
             }
 
-            if(params.adUnitStyle) {
+            if (params.adUnitStyle) {
                 infoJson.adUnitStyle = params.adUnitStyle.getDTO();
             }
 
-            if(mediation) {
+            if (mediation) {
                 infoJson.mediationName = mediation.getName();
                 infoJson.mediationVersion = mediation.getVersion();
                 infoJson.mediationOrdinal = mediation.getOrdinal();
             }
 
-            if(framework) {
+            if (framework) {
                 infoJson.frameworkName = framework.getName();
                 infoJson.frameworkVersion = framework.getVersion();
             }

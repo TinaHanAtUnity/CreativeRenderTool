@@ -1,3 +1,56 @@
+# Pending
+
+* ESLint: keyword-spacing [#10523](https://github.com/Applifier/unity-ads-webview/pull/10523)
+* Proposal for improving AdmobAdUnitTest [#10261](https://github.com/Applifier/unity-ads-webview/pull/10261)
+* Enable Load Functionality on 100% of Whitelisted Traffic [#10522](https://github.com/Applifier/unity-ads-webview/pull/10522)
+
+# Thu Jul 11 20:38:11 UTC 2019
+
+* Parse HTML and IFrame companion ad for VAST - part 2 [#10455](https://github.com/Applifier/unity-ads-webview/pull/10455)
+* Send Ready Event for Blocked Load Calls on Ready Placements [#10490](https://github.com/Applifier/unity-ads-webview/pull/10490)
+* Post SDK Bot Messages to #ads-sdk-devs [#10516](https://github.com/Applifier/unity-ads-webview/pull/10516)
+* Disable HTML companionAd to fix failing Android hybrid test [#10514](https://github.com/Applifier/unity-ads-webview/pull/10514)
+
+# Mon Jul  8 19:54:39 UTC 2019
+
+* Added double shadow to the end-screen [#10458](https://github.com/Applifier/unity-ads-webview/pull/10458)
+* Reverted the pop-out experiment [#10428](https://github.com/Applifier/unity-ads-webview/pull/10428)
+* Added a test for the Version Matcher [#10452](https://github.com/Applifier/unity-ads-webview/pull/10452)
+* Fix test runner to support older Node version [#10456](https://github.com/Applifier/unity-ads-webview/pull/10456)
+
+# Wed Jul  3 16:15:07 UTC 2019
+
+* Prevent two consent dialogs from opening at the same time [#10429](https://github.com/Applifier/unity-ads-webview/pull/10429)
+* Disable logging by default, add option ENABLE_LOGS [#10286](https://github.com/Applifier/unity-ads-webview/pull/10286)
+
+# Tue Jul 2 17:05:52 UTC 2019
+
+* Make the RedesignedEndScreenDesignTest ZyngaFilteredABTest instead of a normal one [#10401](https://github.com/Applifier/unity-ads-webview/pull/10401)
+* AB test: Replace 'Agree to all' with 'Accept all' in English versions [#10400](https://github.com/Applifier/unity-ads-webview/pull/10400)
+* Change Stackdriver Trace endpoint to new trace endpoint [#10183](https://github.com/Applifier/unity-ads-webview/pull/10183)
+* Remove call to console.log from HttpKafka if RequestManager is not set [#10287](https://github.com/Applifier/unity-ads-webview/pull/10287)
+* Integration test framewrok to mimic tape [#10262](https://github.com/Applifier/unity-ads-webview/pull/10262)
+* Enable Banner in stage testing for DSP [#10424](https://github.com/Applifier/unity-ads-webview/pull/10424)
+
+# Wed Jun 26 22:46:04 UTC 2019
+
+* Move osVersion from PerformanceAdUnitParametersFactory to AbstractAdUnitParametersFactory to make creation of staging branches more easy [#10399](https://github.com/Applifier/unity-ads-webview/pull/10399)
+* New End Card UI with "pop" out element experiment [#10163](https://github.com/Applifier/unity-ads-webview/pull/10163)
+* Remove animated endcard test [#10372](https://github.com/Applifier/unity-ads-webview/pull/10372)
+* Add iphone x styles and china watermark for xpromo [#10371](https://github.com/Applifier/unity-ads-webview/pull/10371)
+* Move Analytics to Ads [#10319](https://github.com/Applifier/unity-ads-webview/pull/10319)
+* Promo TLO impressionDate should send number to sdks [#9988](https://github.com/Applifier/unity-ads-webview/pull/9988)
+
+# Tue Jun 25 17:14:41 UTC 2019
+
+* Added handling of 'all: true' to incident fix [#10316](https://github.com/Applifier/unity-ads-webview/pull/10316)
+* Remove incorrect 'ad_did_showad_background' kibana log [#10369](https://github.com/Applifier/unity-ads-webview/pull/10369)
+* Allowing vast end card size minimum to 200 x 200 from 320 x 480 [#10321](https://github.com/Applifier/unity-ads-webview/pull/10321)
+* Block Unnecessary Load Calls to Auction [#10320](https://github.com/Applifier/unity-ads-webview/pull/10320)
+* Move AuctionRequest from Banners/Utilities => Ads/Networking [#10323](https://github.com/Applifier/unity-ads-webview/pull/10323)
+* Remove all backup campaign code [#10317](https://github.com/Applifier/unity-ads-webview/pull/10317)
+* Remove consent ab test [#10370](https://github.com/Applifier/unity-ads-webview/pull/10370)
+
 # Fri Jun 21 22:57:46 UTC 2019
 
 * Adding more logs for #incident-20190605-1 [#10322](https://github.com/Applifier/unity-ads-webview/pull/10322)

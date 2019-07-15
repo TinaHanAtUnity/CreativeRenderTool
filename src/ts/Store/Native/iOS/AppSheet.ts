@@ -76,7 +76,7 @@ export class AppSheetApi extends NativeApi {
     }
 
     public destroy(options?: IAppSheetOptions): Promise<void> {
-        if(typeof options === 'undefined') {
+        if (typeof options === 'undefined') {
             return this._nativeBridge.invoke<void>(this._fullApiClassName, 'destroy');
         }
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'destroy', [options]);
@@ -91,7 +91,7 @@ export class AppSheetApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case AppSheetEvent[AppSheetEvent.PREPARED]:
                 this.onPrepared.trigger(<IAppSheetOptions>parameters[0]);
                 break;

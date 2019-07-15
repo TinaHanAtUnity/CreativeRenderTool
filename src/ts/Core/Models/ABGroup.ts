@@ -67,7 +67,10 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 // Add actual A/B tests below
 export const ConsentTest = new ABTest(9, 10);
 export const OpenMeasurementTest = new DisabledABTest();
-export const SliderEndCardExperiment = new ZyngaFilteredABTest(5, 6);
-export const AnimationEndCardTest = new ZyngaFilteredABTest(7, 8);
-export const ZyngaLoadTest = new ABTest(14, 15);
 export const IAPAutoLoggingTest = new ABTest(13);
+<<<<<<< HEAD
+export const RedesignedEndScreenDesignTest = new ZyngaFilteredABTest(5, 6);
+=======
+export const DoubleShadowCloseButtonTest = new ZyngaFilteredABTest(5, 6);
+>>>>>>> 03696113c6d48cbf94e28733f5858726d3ab00db
+export const SliderEndCardExperiment = new ZyngaFilteredABTest(7, 8);

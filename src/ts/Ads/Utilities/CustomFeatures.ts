@@ -3,6 +3,13 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
+import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
+import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
+import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+
+const SliderEndScreenImages = JSON.parse(SliderEndScreenImagesJson);
+<<<<<<< HEAD
 
 import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
@@ -10,6 +17,8 @@ import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerfor
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 
 const SliderEndScreenImages = JSON.parse(SliderEndScreenImagesJson);
+=======
+>>>>>>> 03696113c6d48cbf94e28733f5858726d3ab00db
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];

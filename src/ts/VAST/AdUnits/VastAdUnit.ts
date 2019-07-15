@@ -36,20 +36,20 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._moat = MoatViewabilityService.getMoat();
         this._om = parameters.om;
 
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
         }
 
-        if(parameters.platform === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             Promise.all([
                 parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
                 parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });
-        } else if(parameters.platform === Platform.IOS) {
+        } else if (parameters.platform === Platform.IOS) {
             parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
                 this.setVolume(volume);
             });

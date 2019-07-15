@@ -1,9 +1,7 @@
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
@@ -15,7 +13,9 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { VAST } from 'VAST/VAST';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
+import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -107,7 +107,7 @@ export class VastParserStrict {
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
-            for(const element of parseErrors) {
+            for (const element of parseErrors) {
                 if (element.textContent) {
                     parseMessages.push(element.textContent);
                 }
@@ -231,7 +231,7 @@ export class VastParserStrict {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
-            if(ad && parsedAd) {
+            if (ad && parsedAd) {
                 for (const errorUrl of ad.getErrorURLTemplates()) {
                     parsedAd.addErrorURLTemplate(errorUrl);
                 }
@@ -319,7 +319,7 @@ export class VastParserStrict {
                     }
                 }
                 if (isWarningLevel) {
-                    vastAd.addCompanionAd(companionAd);
+                    vastAd.addStaticCompanionAd(companionAd);
                 } else {
                     vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
@@ -512,6 +512,38 @@ export class VastParserStrict {
         return companionAd;
     }
 
+    private parseCompanionAdIFrameResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdIframeResource(id, height, width);
+
+        const iframeResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
+        if (iframeResource) {
+            const iframeUrl = this.parseVastUrl(this.parseNodeText(iframeResource), urlProtocol);
+            if (iframeUrl) {
+                companionAd.setIframeResourceURL(iframeUrl);
+            }
+        }
+        return companionAd;
+    }
+
+    private parseCompanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
+
+        const htmlResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
+        if (htmlResource) {
+            const htmlContent = this.parseNodeText(htmlResource);
+            if (htmlContent.length > 0) {
+                companionAd.setHtmlResourceContent(htmlContent);
+            }
+        }
+        return companionAd;
+    }
+
     private parseVastUrl(maybeUrl: string, urlProtocol: string): string | undefined {
         let url: string = maybeUrl;
         // check if relative url ex: '//www.google.com/hello'
@@ -553,5 +585,4 @@ export class VastParserStrict {
 
         return hours + minutes + seconds;
     }
-
 }

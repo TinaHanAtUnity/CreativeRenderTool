@@ -28,9 +28,13 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
+<<<<<<< HEAD
     private _requestManager: RequestManager;
     private _abGroup: ABGroup;
     private _core: ICore;
+=======
+    protected _requestManager: RequestManager;
+>>>>>>> 03696113c6d48cbf94e28733f5858726d3ab00db
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -44,7 +48,7 @@ export class CometCampaignParser extends CampaignParser {
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
-        switch(campaignStore) {
+        switch (campaignStore) {
             case 'apple':
                 storeName = StoreName.APPLE;
                 break;
@@ -73,11 +77,10 @@ export class CometCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 
-        if(json && json.mraidUrl) {
+        if (json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
@@ -141,20 +144,21 @@ export class CometCampaignParser extends CampaignParser {
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
-            if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+            if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
                 parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, json.creativeId);
                 parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session, undefined, json.creativeId);
             }
 
-            if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+            if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
                 parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
-            if(json.appDownloadUrl) {
+            if (json.appDownloadUrl) {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
 
+<<<<<<< HEAD
             let promise;
             const osVersion = this._core.DeviceInfo.getOsVersion();
             const platform = this._core.NativeBridge.getPlatform();
@@ -170,10 +174,13 @@ export class CometCampaignParser extends CampaignParser {
                 promise = Promise.resolve(new PerformanceCampaign(parameters));
             }
             return promise;
+=======
+            return Promise.resolve(new PerformanceCampaign(parameters));
+>>>>>>> 03696113c6d48cbf94e28733f5858726d3ab00db
         }
     }
 
-    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
+    protected validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
         if(urls && urls !== null) {
             for(const urlKey in urls) {
                 if(urls.hasOwnProperty(urlKey)) {
@@ -185,11 +192,11 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
+    protected parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
-        } catch(error) {
+        } catch (error) {
             // do nothing
         }
         return adUnitStyle;

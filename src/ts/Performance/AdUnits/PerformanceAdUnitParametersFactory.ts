@@ -3,11 +3,8 @@ import { IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdU
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { IEndScreenParameters, EndScreen } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { AnimatedPerfomanceEndScreen } from 'Performance/Views/AnimatedPerfomanceEndScreen';
-import { AnimationEndCardTest } from 'Core/Models/ABGroup';
-
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
@@ -19,7 +16,17 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
+<<<<<<< HEAD
+import { RedesignedEndScreenDesignTest } from 'Core/Models/ABGroup';
+import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import { Platform } from 'Core/Constants/Platform';
+=======
+import { DoubleShadowCloseButtonTest } from 'Core/Models/ABGroup';
+import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
+>>>>>>> 03696113c6d48cbf94e28733f5858726d3ab00db
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -47,13 +54,20 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        let endScreen: PerformanceEndScreen |  SliderPerformanceEndScreen;
-        const abGroup = baseParams.coreConfig.getAbGroup();
+        let endScreen: EndScreen;
 
-        if (baseParams.campaign instanceof SliderPerformanceCampaign) {
-            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (AnimationEndCardTest.isValid(abGroup)) {
-            endScreen = new AnimatedPerfomanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const abGroup = baseParams.coreConfig.getAbGroup();
+<<<<<<< HEAD
+        const isAndroid4 = this._platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, this._osVersion);
+        if (RedesignedEndScreenDesignTest.isValid(abGroup) && !isAndroid4) {
+            endScreenParameters.id = 'redesigned-end-screen';
+            endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+=======
+        if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
+            endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+>>>>>>> 03696113c6d48cbf94e28733f5858726d3ab00db
+        } else if (baseParams.campaign instanceof SliderPerformanceCampaign) {
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign);
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
@@ -61,7 +75,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
-            ... baseParams,
+            ...baseParams,
             video: video,
             overlay: overlay,
             endScreen: endScreen,
@@ -74,14 +88,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
     private createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
-
-        let overlay: VideoOverlay;
-        const abGroup = parameters.coreConfig.getAbGroup();
-        if (AnimationEndCardTest.isValid(abGroup)) {
-            overlay = new AnimatedVideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
-        } else {
-            overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
-        }
+        const overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);

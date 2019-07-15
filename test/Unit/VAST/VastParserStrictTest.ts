@@ -11,6 +11,7 @@ import * as sinon from 'sinon';
 import RootVastClean from 'xml/RootVastClean.xml';
 import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
+import VastCompanionAdSmallXml from 'xml/VastCompanionAdSmall.xml';
 import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
 import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
 import VastCompanionAdWithRelativeUrlsXml from 'xml/VastCompanionAdWithRelativeUrls.xml';
@@ -514,13 +515,74 @@ describe('VastParserStrict', () => {
                 });
             });
 
+            xdescribe('IFrameResource Companion Ad', () => {
+                describe('getIframeResourceURL from IFrameResource type CompanionAd', () => {
+                    const tests: {
+                        message: string;
+                        inputXml: string;
+                        expectedValue: string | null;
+                    }[] = [
+                            {
+                                message: 'should have correct iframeResourceURL',
+                                inputXml: VastCompanionAdIFrameXml,
+                                expectedValue: 'https://search.spotxchange.com/banner?=iframe'
+                            },
+                            {
+                                message: 'should return null if the companion does not have a valid iframeResource Url',
+                                inputXml: VastCompanionAdXml,
+                                expectedValue: null
+                            }
+                        ];
+
+                    tests.forEach((test) => {
+                        it(test.message, () => {
+                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
+                            assert.equal(vast.getIframeCompanionResourceUrl(), test.expectedValue);
+                        });
+                    });
+                });
+            });
+
+            xdescribe('HTMLResource Companion Ad', () => {
+                describe('getHtmlCompanionResourceContent from HTMLResource type CompanionAd', () => {
+                    const tests: {
+                        message: string;
+                        inputXml: string;
+                        expectedValue: string | null;
+                    }[] = [
+                            {
+                                message: 'should have correct html companion content',
+                                inputXml: VastCompanionAdHTMLXml,
+                                expectedValue: '<a href="https://search.spotxchange.com/click?_a=235398" border="0" target="_blank" title="MOBILE Segment Bundle"><img style="border:0; width:300px; height:250px;" src="https://search.spotxchange.com/banner" alt="MOBILE Segment Bundle" /></a>'
+                            },
+                            {
+                                message: 'should return null if the companion does not have a valid htmlResource content',
+                                inputXml: VastCompanionAdXml,
+                                expectedValue: null
+                            }
+                        ];
+
+                    tests.forEach((test) => {
+                        it(test.message, () => {
+                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
+                            assert.equal(vast.getHtmlCompanionResourceContent(), test.expectedValue);
+                        });
+                    });
+                });
+            });
+
             describe('Unsupported Companion Ad', () => {
-                describe('add into unsupported companion ads for iframeResource companionAd', () => {
+                describe('add into unsupported companion ads list for unsupported companion ads', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
                         expectedVal: number | null;
                     }[] = [
+                            {
+                                message: 'should have not added into unsupported companion ads for valid companion ads',
+                                inputXml: VastCompanionAdXml,
+                                expectedVal: 0
+                            },
                             {
                                 message: 'should have added into unsupported companion ads for iframeResource',
                                 inputXml: VastCompanionAdIFrameXml,
@@ -530,6 +592,11 @@ describe('VastParserStrict', () => {
                                 message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
                                 inputXml: VastCompanionAdHTMLXml,
                                 expectedVal: 2
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',
+                                inputXml: VastCompanionAdSmallXml,
+                                expectedVal: 1
                             }
                         ];
 

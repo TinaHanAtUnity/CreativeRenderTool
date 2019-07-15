@@ -18,10 +18,10 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = <IRawMraidUrlCampaign>response.getJsonContent();
 
-        if(!jsonMraidUrl) {
+        if (!jsonMraidUrl) {
             throw new Error('Corrupted mraid-url content');
         }
-        if(!jsonMraidUrl.inlinedUrl) {
+        if (!jsonMraidUrl.inlinedUrl) {
             const MRAIDError = new DiagnosticError(
                 new Error('MRAID Campaign missing inlinedUrl'),
                 {mraid: jsonMraidUrl}
@@ -43,7 +43,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 
