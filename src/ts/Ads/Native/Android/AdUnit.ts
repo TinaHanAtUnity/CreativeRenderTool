@@ -131,7 +131,7 @@ export class AndroidAdUnitApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
                 this.onStart.trigger(<number>parameters[0]);
                 break;

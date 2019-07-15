@@ -43,8 +43,8 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        if(this._configuration.isOptOutRecorded()) {
-            if(optOutEnabled !== this._configuration.isOptOutEnabled()) {
+        if (this._configuration.isOptOutRecorded()) {
+            if (optOutEnabled !== this._configuration.isOptOutEnabled()) {
                 this._configuration.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner

@@ -28,7 +28,7 @@ describe('IosMraidTest V4', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 2) {
+                if (++readyCount === 2) {
                     done();
                 }
             },

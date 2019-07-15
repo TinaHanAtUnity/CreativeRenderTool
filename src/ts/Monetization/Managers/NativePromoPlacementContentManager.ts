@@ -16,7 +16,7 @@ export class NativePromoPlacementContentEventManager {
                 return;
             }
             if (campaign instanceof PromoCampaign) {
-                switch(data.type) {
+                switch (data.type) {
                     case 'shown':
                         nativePromoEventHandler.onImpression(campaign, placementId);
                         break;
@@ -34,7 +34,7 @@ export class NativePromoPlacementContentEventManager {
 
     private getCampaign(placementId: string): Campaign | undefined {
         const placement = this._configuration.getPlacement(placementId);
-        if(placement) {
+        if (placement) {
             return placement.getCurrentCampaign();
         }
         return undefined;

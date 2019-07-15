@@ -14,15 +14,15 @@ export class MetaDataManager {
         let metaData: T = new MetaDataConstructor();
 
         if (this._metaDataCache[metaData.getCategory()]) {
-            metaData = <T>this._metaDataCache[metaData.getCategory()];
-            if(!keys) {
+            metaData = <T> this._metaDataCache[metaData.getCategory()];
+            if (!keys) {
                 return Promise.resolve(metaData);
             }
         }
 
         return metaData.fetch(this._core, keys).then((success) => {
             if (success) {
-                if(cache) {
+                if (cache) {
                     this._metaDataCache[metaData.getCategory()] = metaData;
                 }
                 return metaData;
@@ -32,8 +32,8 @@ export class MetaDataManager {
     }
 
     public clearCache(category?: string): void {
-        if(category) {
-            if(this._metaDataCache[category]) {
+        if (category) {
+            if (this._metaDataCache[category]) {
                 this._metaDataCache[category] = undefined;
             }
             return;

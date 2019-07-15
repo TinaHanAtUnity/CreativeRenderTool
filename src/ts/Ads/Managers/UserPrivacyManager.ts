@@ -276,7 +276,7 @@ export class UserPrivacyManager {
     private getConsent(): Promise<boolean> {
         return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: unknown) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
-            if(typeof(value) !== 'undefined') {
+            if (typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
             } else {
                 throw new Error('gdpr.consent.value is undefined');
@@ -303,10 +303,10 @@ export class UserPrivacyManager {
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
-            if(data && data.gdpr && data.gdpr.consent) {
+            if (data && data.gdpr && data.gdpr.consent) {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
-                if(typeof(value) !== 'undefined') {
+                if (typeof(value) !== 'undefined') {
                     this.updateConfigurationWithConsent(value);
                     this.pushConsent(value);
                 }
@@ -318,12 +318,12 @@ export class UserPrivacyManager {
     // with Android Java native layer method that takes Object as value
     // this hack allows anyone use both booleans and string "true" and "false" values
     private getConsentTypeHack(value: unknown): boolean | undefined {
-        if(typeof(value) === 'boolean') {
+        if (typeof(value) === 'boolean') {
             return value;
-        } else if(typeof(value) === 'string') {
-            if(value === 'true') {
+        } else if (typeof(value) === 'string') {
+            if (value === 'true') {
                 return true;
-            } else if(value === 'false') {
+            } else if (value === 'false') {
                 return false;
             }
         }
