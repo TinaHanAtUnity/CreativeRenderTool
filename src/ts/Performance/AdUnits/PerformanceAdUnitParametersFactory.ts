@@ -14,8 +14,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { DoubleShadowCloseButtonTest } from 'Core/Models/ABGroup';
-import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -42,16 +40,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
-
-        let endScreen: PerformanceEndScreen;
-
-        const abGroup = baseParams.coreConfig.getAbGroup();
-        if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
-            endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else {
-            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        }
-
+        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
