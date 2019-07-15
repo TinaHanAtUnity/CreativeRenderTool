@@ -1,6 +1,14 @@
 # Pending
 
+* Enabling AppSheet for ios 12.1 and above [#10260](https://github.com/Applifier/unity-ads-webview/pull/10260)
+
+# Mon Jul 15 12:56:51 UTC 2019
+
+* Added 'privacyType' field to operative events [#10488](https://github.com/Applifier/unity-ads-webview/pull/10488)
+* Revert "Merge branch 'master' into feature/DoubleDropShadow" [#10549](https://github.com/Applifier/unity-ads-webview/pull/10549)
 * ESLint: keyword-spacing [#10523](https://github.com/Applifier/unity-ads-webview/pull/10523)
+* Proposal for improving AdmobAdUnitTest [#10261](https://github.com/Applifier/unity-ads-webview/pull/10261)
+* Enable Load Functionality on 100% of Whitelisted Traffic [#10522](https://github.com/Applifier/unity-ads-webview/pull/10522)
 
 # Thu Jul 11 20:38:11 UTC 2019
 
