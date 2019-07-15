@@ -41,6 +41,6 @@ export class PerformanceEndScreenQueryCTA extends PerformanceEndScreen {
     public render(): void {
         super.render();
 
-        (<HTMLElement>this._container.querySelector('.download-container')).style.background = 'rgba(255, 255, 255, 0)';
+        (<HTMLElement> this._container.querySelector('.download-container')).style.background = 'rgba(255, 255, 255, 0)';
     }
 }
