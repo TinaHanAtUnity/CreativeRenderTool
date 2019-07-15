@@ -70,6 +70,62 @@
             var videoElement;
             var sentQuartiles = {};
 
+            var impressionOccured = function(impressionEventData) {
+                this.postMessage('impressionOccured', impressionEventData);
+            }
+
+            var loaded = function(vastProperties) {
+                this.postMessage('loaded', vastProperties);
+            }
+            var start = function(duration, videoPlayerVolume) {
+                this.postMessage('start', {
+                    duration: duration,
+                    videoPlayerVolume: videoPlayerVolume
+                });
+            }
+            var firstQuartile = function() {
+                this.postMessage('firstQuartile');
+            }
+            var midpoint = function() {
+                this.postMessage('midpoint');
+            }
+            var thirdQuartile = function() {
+                this.postMessage('thirdQuartile');
+            }
+            var complete = function() {
+                this.postMessage('complete');
+            }
+            var pause = function() {
+                this.postMessage('pause');
+            }
+            var resume = function() {
+                this.postMessage('resume');
+            }
+            var bufferStart = function() {
+                this.postMessage('bufferStart');
+            }
+            var bufferFinish = function() {
+                this.postMessage('bufferFinish');
+            }
+            var skipped = function() {
+                this.postMessage('skipped');
+            }
+            var volumeChange = function(videoPlayerVolume) {
+                this.postMessage('volumeChange', {
+                    videoPlayerVolume: videoPlayerVolume
+                });
+            }
+            var playerStateChange = function(playerState) {
+                this.postMessage('playerStateChange', {
+                    playerState: playerState
+                });
+            }
+            var adUserInteraction = function(interactionType) {
+                this.postMessage('adUserInteraction', {
+                    interactionType: interactionType
+                });
+            }
+
             /*
             * Based on https://github.com/InteractiveAdvertisingBureau/Open-Measurement-JSClients/blob/master/version.txt
             */
@@ -187,62 +243,6 @@
                 mediaEvents['playerStateChange'] = playerStateChange;
                 mediaEvents['adUserInteraction'] = adUserInteraction;
             };
-
-            var impressionOccured = function(impressionEventData) {
-                this.postMessage('impressionOccured', impressionEventData);
-            }
-
-            var loaded = function(vastProperties) {
-                this.postMessage('loaded', vastProperties);
-            }
-            var start = function(duration, videoPlayerVolume) {
-                this.postMessage('start', {
-                    duration: duration,
-                    videoPlayerVolume: videoPlayerVolume
-                });
-            }
-            var firstQuartile = function() {
-                this.postMessage('firstQuartile');
-            }
-            var midpoint = function() {
-                this.postMessage('midpoint');
-            }
-            var thirdQuartile = function() {
-                this.postMessage('thirdQuartile');
-            }
-            var complete = function() {
-                this.postMessage('complete');
-            }
-            var pause = function() {
-                this.postMessage('pause');
-            }
-            var resume = function() {
-                this.postMessage('resume');
-            }
-            var bufferStart = function() {
-                this.postMessage('bufferStart');
-            }
-            var bufferFinish = function() {
-                this.postMessage('bufferFinish');
-            }
-            var skipped = function() {
-                this.postMessage('skipped');
-            }
-            var volumeChange = function(videoPlayerVolume) {
-                this.postMessage('volumeChange', {
-                    videoPlayerVolume: videoPlayerVolume
-                });
-            }
-            var playerStateChange = function(playerState) {
-                this.postMessage('playerStateChange', {
-                    playerState: playerState
-                });
-            }
-            var adUserInteraction = function(interactionType) {
-                this.postMessage('adUserInteraction', {
-                    interactionType: interactionType
-                });
-            }
 
             /** 
              * setSlotElement: 
