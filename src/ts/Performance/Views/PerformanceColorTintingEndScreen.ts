@@ -129,7 +129,7 @@ export class PerformanceColorTintingEndScreen extends PerformanceEndScreen {
             const originalUrl = asset.getOriginalUrl();
             const imageExt = originalUrl.split('.').pop();
 
-            if(fileId) {
+            if (fileId) {
                 this._coreApi.Cache.getFileContent(fileId, 'Base64').then((res: string) => {
                     resolve(`data:image/${imageExt};base64,${res}`);
                 }).catch(() => {

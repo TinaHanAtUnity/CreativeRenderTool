@@ -38,7 +38,7 @@ export function quantize(pixels: Uint8ClampedArray, maxColors: number): { swatch
     let dominantSwatch;
 
     if (colors.length <= maxColors) {
-        for(const color of colors) {
+        for (const color of colors) {
             const [r, g, b, population] = color;
             const swatch = new Swatch([r, g, b], population);
             swatches.push(swatch);
@@ -75,7 +75,7 @@ export function quantize(pixels: Uint8ClampedArray, maxColors: number): { swatch
     }
 
     const length = pq.size();
-    for(let i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
         const largestBox = pq.pop();
         if (!largestBox) {
             continue;
