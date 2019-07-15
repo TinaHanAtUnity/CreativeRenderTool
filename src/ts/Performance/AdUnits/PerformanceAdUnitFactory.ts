@@ -57,12 +57,12 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
 
-                if(CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
+                if (CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
                     performanceOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });
             performanceAdUnit.onClose.subscribe(() => {
-                if(onBackKeyObserver) {
+                if (onBackKeyObserver) {
                     parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 }
             });

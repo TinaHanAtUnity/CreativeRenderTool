@@ -28,7 +28,7 @@ export class China implements IApiModule, IChina {
     }
 
     public initialize() {
-        this.DownloadManager = new DownloadManager(this._core.Api, this.Api, (<AndroidDeviceInfo>this._core.DeviceInfo).getApiLevel());
+        this.DownloadManager = new DownloadManager(this._core.Api, this.Api, (<AndroidDeviceInfo> this._core.DeviceInfo).getApiLevel());
         this.DownloadManager.restoreStoredDownloadIds().catch((error) => {
             Diagnostics.trigger('download_storage', error);
         });

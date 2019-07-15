@@ -48,7 +48,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     }
 
     public getVideo() {
-        if(!this.get('video')) {
+        if (!this.get('video')) {
             this.set('video', new Video(this.get('vast').getVideoUrl(), this.getSession()));
         }
         return this.get('video');
