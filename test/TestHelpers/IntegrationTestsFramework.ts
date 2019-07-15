@@ -18,7 +18,7 @@ export class Assertions {
     public equal(actual: unknown, expected: unknown, message: string) {
         try {
             chai.expect(actual, message).to.be.equal(expected);
-        } catch(err) {
+        } catch (err) {
             this._done(err);
             throw new IntegrationTestsFrameworkError();
         }

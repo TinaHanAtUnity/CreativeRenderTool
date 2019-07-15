@@ -64,7 +64,7 @@ export class ViewController extends AdUnitContainer {
         this._showing = true;
 
         let nativeViews: string[] = views;
-        if(nativeViews.length === 0) {
+        if (nativeViews.length === 0) {
             nativeViews = ['webview'];
         }
 
@@ -94,7 +94,7 @@ export class ViewController extends AdUnitContainer {
     public close(): Promise<void> {
         this._showing = false;
 
-        if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if (CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.unPause();
         }
 
@@ -116,7 +116,7 @@ export class ViewController extends AdUnitContainer {
             const width = screenWidth;
             const height = screenHeight + this._deviceInfo.getStatusBarHeight();
 
-            switch(configuration) {
+            switch (configuration) {
                 case ViewConfiguration.ENDSCREEN:
                     promises.push(this._ads.iOS!.AdUnit.setViews(['webview']));
                     promises.push(this._ads.iOS!.AdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
@@ -139,7 +139,7 @@ export class ViewController extends AdUnitContainer {
 
     public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void> {
         return this._ads.iOS!.AdUnit.setShouldAutorotate(allowRotation).then(() => {
-            if(this._options) {
+            if (this._options) {
                 return this._ads.iOS!.AdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
             }
         });
@@ -167,7 +167,7 @@ export class ViewController extends AdUnitContainer {
 
     private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: Orientation) {
         let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
-        if(forceOrientation === Orientation.LANDSCAPE) {
+        if (forceOrientation === Orientation.LANDSCAPE) {
             switch (options.statusBarOrientation) {
                 case UIInterfaceOrientation.LANDSCAPE_LEFT:
                     orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
@@ -177,7 +177,7 @@ export class ViewController extends AdUnitContainer {
                     break;
                 default:
             }
-        } else if(forceOrientation === Orientation.PORTRAIT) {
+        } else if (forceOrientation === Orientation.PORTRAIT) {
             switch (options.statusBarOrientation) {
                 case UIInterfaceOrientation.PORTRAIT:
                     orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;
@@ -189,7 +189,7 @@ export class ViewController extends AdUnitContainer {
             }
         }
         // safety check
-        if((options.supportedOrientations & orientation) !== orientation) {
+        if ((options.supportedOrientations & orientation) !== orientation) {
             orientation = options.supportedOrientations;
         }
 
@@ -220,26 +220,26 @@ export class ViewController extends AdUnitContainer {
 
     private onNotification(event: string, parameters: unknown): void {
         // ignore notifications if ad unit is not active
-        if(!this._showing) {
+        if (!this._showing) {
             return;
         }
 
-        switch(event) {
+        switch (event) {
             case ViewController._audioSessionInterrupt:
                 const interruptData = <{ AVAudioSessionInterruptionTypeKey: number; AVAudioSessionInterruptionOptionKey: number }>parameters;
 
-                if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
-                    if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
+                if (interruptData.AVAudioSessionInterruptionTypeKey === 0) {
+                    if (interruptData.AVAudioSessionInterruptionOptionKey === 1) {
                         this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED));
                     }
-                } else if(interruptData.AVAudioSessionInterruptionTypeKey === 1) {
+                } else if (interruptData.AVAudioSessionInterruptionTypeKey === 1) {
                     this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN));
                 }
                 break;
 
             case ViewController._audioSessionRouteChange:
                 const routeChangeData = <{ AVAudioSessionRouteChangeReasonKey: number }>parameters;
-                if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
+                if (routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
                     this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED));
                 } else {
                     this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_CATEGORY_CHANGED));
