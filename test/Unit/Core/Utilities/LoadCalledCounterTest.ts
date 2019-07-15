@@ -2,20 +2,29 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 describe('LoadCalledCounterTest', () => {
     let sandbox: sinon.SinonSandbox;
     let httpKafkaStub: sinon.SinonStub;
 
     const tests: {
-        kafkaObject: { [key: string]: string };
+        kafkaObject: {
+            gameId: string;
+            placementId: string;
+            country: string;
+            abGroup: ABGroup;
+            organizationId: string;
+            ts: number;
+         };
     }[] = [{
         kafkaObject: {
             gameId: '1234',
             placementId: 'rewardedVideo',
             country: 'US',
+            abGroup: 99,
             organizationId: 'scottsgames-inc',
-            ts: '1234'
+            ts: 1234
         }
     }];
 
@@ -33,7 +42,7 @@ describe('LoadCalledCounterTest', () => {
         tests.forEach((t) => {
             it(`should send the correct payload"`, () => {
                 const x = t.kafkaObject;
-                LoadCalledCounter.report(x.gameId, x.placementId, x.country, x.organizationId);
+                LoadCalledCounter.report(x.gameId, x.placementId, x.country, x.abGroup, x.organizationId);
                 sinon.assert.calledWith(httpKafkaStub, 'ads.load.counting', KafkaCommonObjectType.EMPTY, t.kafkaObject);
             });
         });

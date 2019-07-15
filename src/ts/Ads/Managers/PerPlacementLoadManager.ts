@@ -117,7 +117,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string) {
-        LoadCalledCounter.report(this._clientInfo.getGameId(), placementId, this._coreConfig.getCountry(), this._coreConfig.getOrganizationId());
+        LoadCalledCounter.report(this._clientInfo.getGameId(), placementId, this._coreConfig.getCountry(), this._coreConfig.getAbGroup(), this._coreConfig.getOrganizationId());
 
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
