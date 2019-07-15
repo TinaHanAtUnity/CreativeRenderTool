@@ -18,7 +18,7 @@ export class Storage extends BackendApi {
 
     public get<T>(storageType: StorageType, key: string): Promise<T> {
         const retValue = this.getInMemoryValue(this._storage, key);
-        if(!retValue) {
+        if (!retValue) {
             return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
         return Promise.resolve(<T>retValue);
@@ -46,8 +46,8 @@ export class Storage extends BackendApi {
     private setInMemoryValue<T>(storage: IStorageData, key: string, value: T): {} {
         const keyArray: string[] = key.split('.');
 
-        if(keyArray.length > 1) {
-            if(!storage[keyArray[0]]) {
+        if (keyArray.length > 1) {
+            if (!storage[keyArray[0]]) {
                 storage[keyArray[0]] = {};
             }
 
@@ -63,8 +63,8 @@ export class Storage extends BackendApi {
     private getInMemoryValue(storage: IStorageData, key: string): unknown {
         const keyArray: string[] = key.split('.');
 
-        if(keyArray.length > 1) {
-            if(!storage[keyArray[0]]) {
+        if (keyArray.length > 1) {
+            if (!storage[keyArray[0]]) {
                 return null;
             }
 
@@ -77,20 +77,20 @@ export class Storage extends BackendApi {
     private getInMemoryKeys(storage: IStorageData, key: string): string[] {
         const keyArray: string[] = key.split('.');
 
-        if(keyArray.length > 1) {
-            if(!storage[keyArray[0]]) {
+        if (keyArray.length > 1) {
+            if (!storage[keyArray[0]]) {
                 return [];
             }
 
             return this.getInMemoryKeys(storage[keyArray[0]], keyArray.slice(1).join('.'));
         } else {
-            if(!storage[key]) {
+            if (!storage[key]) {
                 return [];
             }
 
             const retArray: string[] = [];
-            for(const property in storage[key]) {
-                if(storage.hasOwnProperty(key)) {
+            for (const property in storage[key]) {
+                if (storage.hasOwnProperty(key)) {
                     retArray.push(property);
                 }
             }
@@ -102,8 +102,8 @@ export class Storage extends BackendApi {
     private deleteInMemoryValue(storage: IStorageData, key: string): {} {
         const keyArray: string[] = key.split('.');
 
-        if(keyArray.length > 1) {
-            if(!storage[keyArray[0]]) {
+        if (keyArray.length > 1) {
+            if (!storage[keyArray[0]]) {
                 storage[keyArray[0]] = {};
             }
 
@@ -117,7 +117,7 @@ export class Storage extends BackendApi {
 
     public hasFileEntry(fileId: string): boolean {
         const splitFileId = fileId.split('.')[0];
-        if(this._storage && this._storage.cache && this._storage.cache.files && this._storage.cache.files[splitFileId]) {
+        if (this._storage && this._storage.cache && this._storage.cache.files && this._storage.cache.files[splitFileId]) {
             return true;
         }
 
@@ -125,7 +125,7 @@ export class Storage extends BackendApi {
     }
 
     public hasCampaignEntry(id: string): boolean {
-        if(this._storage && this._storage.cache && this._storage.cache.campaigns && this._storage.cache.campaigns[id]) {
+        if (this._storage && this._storage.cache && this._storage.cache.campaigns && this._storage.cache.campaigns[id]) {
             return true;
         }
 

@@ -8,14 +8,15 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import RootVastClean from 'xml/RootVastClean.xml';
 import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
-import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
+import VastCompanionAdSmallXml from 'xml/VastCompanionAdSmall.xml';
 import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
 import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
 import VastCompanionAdWithRelativeUrlsXml from 'xml/VastCompanionAdWithRelativeUrls.xml';
+import VastCompanionAdIFrameXml from 'xml/VastCompanionAdIFrame.xml';
+import VastCompanionAdHTMLXml from 'xml/VastCompanionAdHTML.xml';
 import VastStaticResourceWithTypeInsteadOfCreativeTypeXml from 'xml/VastStaticResourceWithTypeInsteadOfCreativeType.xml';
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
@@ -24,8 +25,11 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastAboutBlank from 'xml/VastAboutBlank.xml';
 import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
 import VastAdVerificationAsStandAlone from 'xml/VastWithAdVerification4_1.xml';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 describe('VastParserStrict', () => {
 
@@ -55,8 +59,8 @@ describe('VastParserStrict', () => {
                 });
             } catch (e) {
                 // tslint:disable:no-string-literal
-                assert.deepEqual(e.diagnostic['vast'], vastNoAdRaw);
-                assert.equal(e.diagnostic['wrapperDepth'], 0);
+                assert.deepEqual(e.errorData['vast'], vastNoAdRaw);
+                assert.equal(e.errorData['wrapperDepth'], 0);
                 // tslint:enable:no-string-literal
             }
         });
@@ -167,7 +171,7 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('start'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.START), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=0&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=1413711906',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=start&vastcrtype=linear&crid=7286756'
                         ]);
@@ -175,7 +179,7 @@ describe('VastParserStrict', () => {
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('start'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.START), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=0&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=1413711906',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=start&vastcrtype=linear&crid=7286756'
                         ]);
@@ -187,7 +191,7 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('firstQuartile'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.FIRST_QUARTILE), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=25&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=830833129',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=firstQuartile&vastcrtype=linear&crid=7286756'
                         ]);
@@ -195,7 +199,7 @@ describe('VastParserStrict', () => {
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('firstQuartile'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.FIRST_QUARTILE), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=25&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=830833129',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=firstQuartile&vastcrtype=linear&crid=7286756'
                         ]);
@@ -207,7 +211,7 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('midpoint'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.MIDPOINT), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=50&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=2023345290',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=midpoint&vastcrtype=linear&crid=7286756'
                         ]);
@@ -215,7 +219,7 @@ describe('VastParserStrict', () => {
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('midpoint'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.MIDPOINT), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=50&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=2023345290',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=midpoint&vastcrtype=linear&crid=7286756'
                         ]);
@@ -227,7 +231,7 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('thirdQuartile'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.THIRD_QUARTILE), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=75&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=1253990772',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=thirdQuartile&vastcrtype=linear&crid=7286756'
                         ]);
@@ -235,7 +239,7 @@ describe('VastParserStrict', () => {
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('thirdQuartile'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.THIRD_QUARTILE), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=75&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=1253990772',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=thirdQuartile&vastcrtype=linear&crid=7286756'
                         ]);
@@ -247,7 +251,7 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('complete'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.COMPLETE), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&RcpF=1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=100&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=671283626',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=complete&vastcrtype=linear&crid=7286756'
                         ]);
@@ -255,7 +259,7 @@ describe('VastParserStrict', () => {
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('complete'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.COMPLETE), [
                             'http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&vastrequest=true&EC=7&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&EiN=1&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&RcpF=1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&Eipct=100&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=671283626',
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=complete&vastcrtype=linear&crid=7286756'
                         ]);
@@ -267,14 +271,14 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('mute'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.MUTE), [
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=mute&vastcrtype=linear&crid=7286756'
                         ]);
                     });
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('mute'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.MUTE), [
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=mute&vastcrtype=linear&crid=7286756'
                         ]);
                     });
@@ -285,14 +289,14 @@ describe('VastParserStrict', () => {
 
                     it('sanity check', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
-                        assert.deepEqual(vast.getTrackingEventUrls('unmute'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.UNMUTE), [
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=unmute&vastcrtype=linear&crid=7286756'
                         ]);
                     });
 
                     it('should have spaces trimmed', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
-                        assert.deepEqual(vast.getTrackingEventUrls('unmute'), [
+                        assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.UNMUTE), [
                             'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=unmute&vastcrtype=linear&crid=7286756'
                         ]);
                     });
@@ -416,7 +420,7 @@ describe('VastParserStrict', () => {
             describe('Decoding', () => {
                 it('should leave encoded urls alone except for encoded protocols should be decoded', () => {
                     const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
-                    assert.deepEqual(vast.getTrackingEventUrls('start'), [
+                    assert.deepEqual(vast.getTrackingEventUrls(TrackingEvent.START), [
                         'https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=vst&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111',
                         'https://nym1-ib.adnxs.com/it?referrer=play.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.episodeinteractive.android.catalog&e=wqT_3QK2CaC2BAAAAwDWAAUBCKLuy98FEPur583z1P7wFBj2lqKwnafJ5VcqNgkAAAECCDBAEQEHNAAAMEAZAAAAwMxMMEAhERIAKREJADERCagw6uHrBTi5OUC5OUgCUNjKszpYr6NPYABo2KtzeKm_BIABAYoBA1VTRJIBAQbwb5gBAaABAagBAbABALgBA8ABBMgBAtABCdgBAOABAPABAIoCWnVmKCdhJywgMjkzMzE2NywgMTU0MjY0OTYzNCk7dWYoJ3InLCAxMjI0Nzk5NjAsIDE1NDI2NDk2MzQpO3VmKCdjJywgMjU0MDA5Njk2PQDwjZICjQIhSVRmamFRaUpyWTRNRU5qS3N6b1lBQ0N2bzA4d0FEZ0FRQVJJdVRsUTZ1SHJCVmdBWUk0RGFBQndPSGlNR1lBQk9JZ0JqQm1RQVFHWUFRR2dBUUdvQVFPd0FRQzVBU21MaUlNQUFEQkF3UUVwaTRpREFBQXdRTWtCU2dJVzdqVGJ6al9aQVFBQUEBAyRQQV80QUVBOVFFAQ6QQWdBSUFpQUtXdkFhSUFwZThCcEFDQXBnQ0FLQUNBS2dDQUxVQwUpCEwwQwUI8EhNQUNBTWdDQU9BQ0FPZ0NBUGdDQUlBREFaQURBSmdEQWFnRGlhMk9ETG9EQ1U1WlRUSTZNell5TnVBRDFRRS6aAmEheWd5dVJnNhABJHI2TlBJQVFvQUQJmABBAcRQRG9KVGxsTk1qb3pOakkyUU5VQlNRARsEQUEByABVEQwMQUFBVx0M9JoB2AK0rQHgAv3gOeoCTHBsYXkuZ29vZ2xlLmNvbS9zdG9yZS9hcHBzL2RldGFpbHM_aWQ9Y29tLmVwaXNvZGVpbnRlcmFjdGl2ZS5hbmRyb2lkLmNhdGFsb2eAAwCIAwGQAwCYAxSgAwGqAwDAA-CoAcgDANIDKAgAEiQ1MmYyZDcwNS03MWU3LTQ0NTItOThhMS1kYjE5MWVjY2M2ZTXSAywIAhIoNWQ1NGJkNWVkOTllMzMyMmVlYjNiZTRlMGI0MWQzMGNlNWFmN2ZjNdIDJAgEEiAxMzQwNDM1MmFhYzVkMGFhMmVmMWE3ZDBlYmI3OGEwZtIDKAgKEiQ4M2M5NDZmMi0wNmQ1LTRlM2QtYTBlMC1mNmI2NmNhMjA1NTfYA8G8V-ADAOgDAvgDAIAEAJIECS9vcGVucnRiMpgEAKIEDjk5LjIwMy4xMjguMTExqASBiA6yBA4IARAAGNAFIIAKMAA4ArgEAMAEAMgEANIEDjczNTMjTllNMjozNjI22gQCCADgBADwBNjKszr6BBIJAAAAIIc2RUARYeAY989UwIIFJpZzASCIBQGYBQCgBf8RAXwBqgUWRHEyOHlqeHpXa05MbTY1UHgwNnppdsAFAMkFAAUBEPA_0gUJAXYFAZzYBQHgBQHwBdz4J_oFBAgAEACQBgGYBgC4BgDBBgAAAAAAAPA_yAYA&s=e36f70042d51515729e9a8355f5ef410e93be582',
                         'http://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz',
@@ -425,8 +429,8 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('Companion Ad', () => {
-                describe('getCompanionLandscapeUrl', () => {
+            describe('StaticResource Companion Ad', () => {
+                describe('getCompanionLandscapeUrl from StaticResource type CompanionAd', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
@@ -511,6 +515,100 @@ describe('VastParserStrict', () => {
                 });
             });
 
+            xdescribe('IFrameResource Companion Ad', () => {
+                describe('getIframeResourceURL from IFrameResource type CompanionAd', () => {
+                    const tests: {
+                        message: string;
+                        inputXml: string;
+                        expectedValue: string | null;
+                    }[] = [
+                            {
+                                message: 'should have correct iframeResourceURL',
+                                inputXml: VastCompanionAdIFrameXml,
+                                expectedValue: 'https://search.spotxchange.com/banner?=iframe'
+                            },
+                            {
+                                message: 'should return null if the companion does not have a valid iframeResource Url',
+                                inputXml: VastCompanionAdXml,
+                                expectedValue: null
+                            }
+                        ];
+
+                    tests.forEach((test) => {
+                        it(test.message, () => {
+                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
+                            assert.equal(vast.getIframeCompanionResourceUrl(), test.expectedValue);
+                        });
+                    });
+                });
+            });
+
+            xdescribe('HTMLResource Companion Ad', () => {
+                describe('getHtmlCompanionResourceContent from HTMLResource type CompanionAd', () => {
+                    const tests: {
+                        message: string;
+                        inputXml: string;
+                        expectedValue: string | null;
+                    }[] = [
+                            {
+                                message: 'should have correct html companion content',
+                                inputXml: VastCompanionAdHTMLXml,
+                                expectedValue: '<a href="https://search.spotxchange.com/click?_a=235398" border="0" target="_blank" title="MOBILE Segment Bundle"><img style="border:0; width:300px; height:250px;" src="https://search.spotxchange.com/banner" alt="MOBILE Segment Bundle" /></a>'
+                            },
+                            {
+                                message: 'should return null if the companion does not have a valid htmlResource content',
+                                inputXml: VastCompanionAdXml,
+                                expectedValue: null
+                            }
+                        ];
+
+                    tests.forEach((test) => {
+                        it(test.message, () => {
+                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
+                            assert.equal(vast.getHtmlCompanionResourceContent(), test.expectedValue);
+                        });
+                    });
+                });
+            });
+
+            describe('Unsupported Companion Ad', () => {
+                describe('add into unsupported companion ads list for unsupported companion ads', () => {
+                    const tests: {
+                        message: string;
+                        inputXml: string;
+                        expectedVal: number | null;
+                    }[] = [
+                            {
+                                message: 'should have not added into unsupported companion ads for valid companion ads',
+                                inputXml: VastCompanionAdXml,
+                                expectedVal: 0
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for iframeResource',
+                                inputXml: VastCompanionAdIFrameXml,
+                                expectedVal: 1
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
+                                inputXml: VastCompanionAdHTMLXml,
+                                expectedVal: 2
+                            },
+                            {
+                                message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',
+                                inputXml: VastCompanionAdSmallXml,
+                                expectedVal: 1
+                            }
+                        ];
+
+                    tests.forEach((test) => {
+                        it(test.message, () => {
+                            const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
+                            assert.equal(vast.getAd()!.getUnsupportedCompanionAds().length, test.expectedVal);
+                        });
+                    });
+                });
+            });
+
             describe('AdVerification', () => {
                 let vast: Vast;
                 let vastAdVerifications: VastAdVerification[];
@@ -577,24 +675,6 @@ describe('VastParserStrict', () => {
         });
 
         describe('fail', () => {
-            const tests: {
-                message: string;
-                inputVast: string;
-            }[] = [
-                    {
-                        message: 'Should fail to parse VastCompanionAdWithoutClickThrough.xml',
-                        inputVast: VastCompanionAdWithoutClickThrough
-                    }
-                ];
-            tests.forEach((test) => {
-                it(test.message, () => {
-                    const vastParser = TestFixtures.getVastParserStrict();
-                    assert.throws(() => {
-                        vastParser.parseVast(test.inputVast);
-                    });
-                });
-            });
-
             it('should throw when given null', () => {
                 assert.throws(() => {
                     TestFixtures.getVastParserStrict().parseVast(null);
@@ -612,7 +692,7 @@ describe('VastParserStrict', () => {
                     assert.isNull(TestFixtures.getVastParserStrict().parseVast(
                         '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo></foo>'
                     ));
-                }, 'VAST xml data is missing');
+                }, VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR]);
             });
         });
     });

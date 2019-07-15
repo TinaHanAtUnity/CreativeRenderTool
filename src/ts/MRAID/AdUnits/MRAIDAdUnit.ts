@@ -5,7 +5,7 @@ import {
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -18,6 +18,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -40,7 +41,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
-    protected _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    protected _additionalTrackingEvents: ICampaignTrackingUrls;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -59,7 +60,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
 
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
@@ -106,7 +107,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowing()) {
+        if (!this.isShowing()) {
             return Promise.resolve();
         }
         this.setShowing(false);
@@ -140,11 +141,11 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClick(): void {
-        this.sendTrackingEvent('click');
+        this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 
     public sendImpression(): void {
-        this.sendTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public getEndScreen(): EndScreen | undefined {
@@ -166,7 +167,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerShow(): void {
         this._mraid.setViewableState(true);
 
-        if(AbstractAdUnit.getAutoClose()) {
+        if (AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
                 this.hide();
@@ -175,17 +176,17 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this._mraid.setViewableState(false);
 
-            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            if (CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
                 this.setFinishState(FinishState.SKIPPED);
                 this.hide();
             }
@@ -193,7 +194,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this._mraid.setViewableState(true);
         }
     }
@@ -208,18 +209,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         delete this._privacy;
     }
 
-    protected sendTrackingEvent(eventName: string): void {
-        const sessionId = this._campaign.getSession().getId();
-
-        if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
-            const trackingEventUrls = this._additionalTrackingEvents[eventName];
-
-            if(trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
-                }
-            }
-        }
+    protected sendTrackingEvent(event: TrackingEvent): void {
+        this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'mraid', this._campaign.getUseWebViewUserAgentForTracking());
     }
 
     protected getOperativeEventParams(): IOperativeEventParams {
@@ -230,7 +221,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     protected removeEndScreenContainer() {
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.hide();
 
             const endScreenContainer = this._endScreen.container();
@@ -262,17 +253,17 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const operativeEventParams = this.getOperativeEventParams();
         const finishState = this.getFinishState();
 
-        if(finishState === FinishState.COMPLETED) {
-            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+        if (finishState === FinishState.COMPLETED) {
+            if (!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
                 this._operativeEventManager.sendThirdQuartile(operativeEventParams);
             }
 
-            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+            if (!this._campaign.getSession().getEventSent(EventType.VIEW)) {
                 this._operativeEventManager.sendView(operativeEventParams);
             }
 
-            this.sendTrackingEvent('complete');
-        } else if(finishState === FinishState.SKIPPED) {
+            this.sendTrackingEvent(TrackingEvent.COMPLETE);
+        } else if (finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }
     }

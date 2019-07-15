@@ -374,7 +374,7 @@ describe('Performance VideoEventHandlersTest', () => {
         };
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
-        const endScreenParams : IEndScreenParameters = {
+        const endScreenParams: IEndScreenParameters = {
             platform,
             core,
             language : 'en',
@@ -585,7 +585,7 @@ describe('Performance VideoEventHandlersTest', () => {
             performanceVideoEventHandler.onCompleted(video.getUrl());
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
         });
@@ -701,7 +701,7 @@ describe('Performance VideoEventHandlersTest', () => {
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
             sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
@@ -736,7 +736,7 @@ describe('Performance VideoEventHandlersTest', () => {
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
@@ -754,7 +754,7 @@ describe('Performance VideoEventHandlersTest', () => {
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
@@ -854,7 +854,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         };
         overlay = new VideoOverlay(videoOverlayParameters, xpromoPrivacy, false, false);
 
-        const xpromoEndScreenParams : IEndScreenParameters = {
+        const xpromoEndScreenParams: IEndScreenParameters = {
             platform,
             core,
             language : 'en',

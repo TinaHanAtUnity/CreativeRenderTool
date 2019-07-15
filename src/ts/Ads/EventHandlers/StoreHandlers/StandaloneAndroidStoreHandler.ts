@@ -3,7 +3,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DownloadStatus } from 'China/Native/Android/Download';
 import { Localization } from 'Core/Utilities/Localization';
 import { DownloadManager, DownloadMessage, DownloadState } from 'China/Managers/DownloadManager';
-import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IObserver0, IObserver3 } from 'Core/Utilities/IObserver';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
@@ -76,7 +76,7 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
         }
 
         const deviceIdPromise = new Promise<void> ((resolve, reject) => {
-            if (this._deviceIdManager && !(<AndroidDeviceInfo>this._deviceInfo).getDeviceId1()) {
+            if (this._deviceIdManager && !(<AndroidDeviceInfo> this._deviceInfo).getDeviceId1()) {
                 this._deviceIdManager.getDeviceIdsWithPermissionRequest().then(resolve).catch(reject);
             } else {
                 resolve();
@@ -90,9 +90,9 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
                 return;
             }
 
-            const title = (<PerformanceCampaign>this._campaign).getGameName();
+            const title = (<PerformanceCampaign> this._campaign).getGameName();
             const description = title;
-            const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit>this._adUnit;
+            const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit> this._adUnit;
 
             perfAdUnit.disableDownloadButton();
             perfAdUnit.setDownloadStatusMessage('');
@@ -126,7 +126,7 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
             return;
         }
 
-        const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit>this._adUnit;
+        const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit> this._adUnit;
         switch (status) {
             case DownloadStatus.RUNNING:
                 const runningMessage = `${this._localization.translate(DownloadMessage.DOWNLOADING)} (${update}%) - ${this._localization.translate(DownloadMessage.DOWNLOADING_REMINDER)}`;

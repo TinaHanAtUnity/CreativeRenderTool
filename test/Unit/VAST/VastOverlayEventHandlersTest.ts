@@ -5,7 +5,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MOAT } from 'Ads/Views/MOAT';
@@ -35,6 +35,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -84,10 +85,10 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
             clientInfo = TestFixtures.getClientInfo(platform);
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
                 container = new Activity(core, ads, <AndroidDeviceInfo>deviceInfo);
-            } else if(platform === Platform.IOS) {
+            } else if (platform === Platform.IOS) {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
                 container = new ViewController(core, ads, <IosDeviceInfo>deviceInfo, focusManager, clientInfo);
             }
@@ -197,24 +198,42 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
                 });
             });
 
-            describe('When ad unit has an endscreen', () => {
-                it('should hide endcard', () => {
-                    vastAdUnit.setShowing(true);
-                    return vastAdUnit.hide().then(() => {
-                        const vastEndScreenParameters: IVastEndscreenParameters = {
-                            campaign: vastAdUnitParameters.campaign,
-                            clientInfo: vastAdUnitParameters.clientInfo,
-                            country: vastAdUnitParameters.coreConfig.getCountry()
-                        };
-                        const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
-                        sinon.spy(vastEndScreen, 'show');
-                        vastAdUnitParameters.endScreen = vastEndScreen;
-                        vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                        sinon.spy(vastAdUnit, 'hide');
-                        vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
-                        vastOverlayEventHandler.onOverlaySkip(1);
-                        sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
-                    });
+            it('should show endcard', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    const vastEndScreenParameters: IVastEndscreenParameters = {
+                        campaign: vastAdUnitParameters.campaign,
+                        clientInfo: vastAdUnitParameters.clientInfo,
+                        country: vastAdUnitParameters.coreConfig.getCountry()
+                    };
+                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    sinon.spy(vastEndScreen, 'show');
+                    vastAdUnitParameters.endScreen = vastEndScreen;
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setImpressionOccurred();
+                    sinon.spy(vastAdUnit, 'hide');
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+                });
+            });
+
+            it('should not show endcard if the impression has not occurred', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    const vastEndScreenParameters: IVastEndscreenParameters = {
+                        campaign: vastAdUnitParameters.campaign,
+                        clientInfo: vastAdUnitParameters.clientInfo,
+                        country: vastAdUnitParameters.coreConfig.getCountry()
+                    };
+                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    sinon.spy(vastEndScreen, 'show');
+                    vastAdUnitParameters.endScreen = vastEndScreen;
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    sinon.spy(vastAdUnit, 'hide');
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
                 });
             });
         });
@@ -225,14 +244,15 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setVolume(1);
                     vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
                 });
             });
 
             const testMuteEvent = (muted: boolean) => {
-                const eventName = muted ? 'mute' : 'unmute';
+                const eventName = muted ? TrackingEvent.MUTE : TrackingEvent.UNMUTE;
                 const mockEventManager = sinon.mock(thirdPartyEventManager);
-                mockEventManager.expects('sendWithGet').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1`);
+                mockEventManager.expects('sendTrackingEvents').withArgs(campaign, eventName, 'vast');
 
                 vastOverlayEventHandler.onOverlayMute(muted);
                 mockEventManager.verify();
@@ -254,14 +274,22 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
             it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 0);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
             it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
-                sinon.assert.called(<sinon.SinonStub>om!.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 1);
             });
         });
 
@@ -278,7 +306,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
                 });
             });
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 it('should call video click through tracking url', () => {
                     sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
@@ -296,7 +324,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 it('should open click trough link in Android web browser when call button is clicked', () => {
                     sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
                     sinon.stub(core.Android!.Intent, 'launch').resolves();
@@ -308,6 +336,41 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
                     });
                 });
             }
+        });
+
+        describe('When calling onShowPrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+
+                return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
+            });
+
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 11.82291666666666, [ObstructionReasons.OBSTRUCTED], 1280, 768, true, [{
+                    x: 20,
+                    y: 20,
+                    width: 517,
+                    height: 367
+                }]);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
+        });
+
+        describe('When calling onClosePrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+
+                return vastOverlayEventHandler.onClosePrivacyPopUp();
+            });
+
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 100, [], 1280, 768, true, []);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
         });
     });
 });

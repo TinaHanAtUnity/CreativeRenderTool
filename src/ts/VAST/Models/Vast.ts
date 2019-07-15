@@ -1,10 +1,11 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVast {
     ads: VastAd[];
@@ -14,7 +15,9 @@ interface IVast {
 
 export class Vast extends Model<IVast> {
 
-    constructor(ads: VastAd[], parseErrorURLTemplates: unknown[]) {
+    private _campaignErrors: CampaignError[];
+
+    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
         super('Vast', {
             ads: ['array'],
             parseErrorURLTemplates: ['array'],
@@ -22,8 +25,10 @@ export class Vast extends Model<IVast> {
         });
 
         this.set('ads', ads);
-        this.set('parseErrorURLTemplates', <string[]>parseErrorURLTemplates);
+        this.set('parseErrorURLTemplates', parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
+
+        this._campaignErrors = campaignErrors || [];
     }
 
     public getAds(): VastAd[] {
@@ -58,6 +63,10 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
+    public getCampaignErrors(): CampaignError[] {
+        return this._campaignErrors;
+    }
+
     public getVideoUrl(): string {
         const ad = this.getAd();
         if (ad) {
@@ -73,25 +82,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast);
-    }
-
-    public getMediaVideoUrl(): string | null {
-        const ad = this.getAd();
-        if (ad) {
-            for (const creative of ad.getCreatives()) {
-                for (const mediaFile of creative.getMediaFiles()) {
-                    const mimeType = mediaFile.getMIMEType();
-                    const playable = mimeType && this.isSupportedMIMEType(mimeType);
-                    const fileUrl = mediaFile.getFileURL();
-                    if (fileUrl && playable) {
-                        return fileUrl;
-                    }
-                }
-            }
-        }
-
-        return null;
+        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
     }
 
     public getImpressionUrls(): string[] {
@@ -102,7 +93,7 @@ export class Vast extends Model<IVast> {
         return [];
     }
 
-    public getTrackingEventUrls(eventName: string): string[] {
+    public getTrackingEventUrls(eventName: TrackingEvent): string[] {
         const ad = this.getAd();
         if (ad) {
             const adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
@@ -161,14 +152,14 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getLandscapeOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
+    public getLandscapeOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
-                    if (this.isValidLandscapeCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                for (const companionAd of companionAds) {
+                    if (companionAd.getHeight() <= companionAd.getWidth()) {
                         return companionAd;
                     }
                 }
@@ -186,14 +177,14 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getPortraitOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
+    public getPortraitOrientedCompanionAd(): VastCompanionAdStaticResource | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
-                    if (this.isValidPortraitCompanion(companionAd.getCreativeType(), companionAd.getHeight(), companionAd.getWidth())) {
+                for (const companionAd of companionAds) {
+                    if (companionAd.getHeight() >= companionAd.getWidth()) {
                         return companionAd;
                     }
                 }
@@ -214,16 +205,12 @@ export class Vast extends Model<IVast> {
     public getCompanionClickThroughUrl(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
-                for(const companionAd of companionAds) {
+                for (const companionAd of companionAds) {
                     const url = companionAd.getCompanionClickThroughURLTemplate();
-                    const height = companionAd.getHeight();
-                    const width = companionAd.getWidth();
-                    const creativeType = companionAd.getCreativeType();
-                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
-                    if (url && validCompanion) {
+                    if (url) {
                         return url;
                     }
                 }
@@ -236,22 +223,40 @@ export class Vast extends Model<IVast> {
     public getCompanionClickTrackingUrls(): string[] {
         const ad = this.getAd();
         if (ad) {
-            const companionAds = ad.getCompanionAds();
+            const companionAds = ad.getStaticCompanionAds();
 
             if (companionAds) {
                 for (const companionAd of companionAds) {
                     const urls = companionAd.getCompanionClickTrackingURLTemplates();
-                    const height = companionAd.getHeight();
-                    const width = companionAd.getWidth();
-                    const creativeType = companionAd.getCreativeType();
-                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
-                    if (urls.length > 0 && validCompanion) {
+                    if (urls.length > 0) {
                         return urls;
                     }
                 }
             }
         }
         return [];
+    }
+
+    public getIframeCompanionResourceUrl(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const iframeCompanionAd = ad.getIframeCompanionAd();
+            if (iframeCompanionAd) {
+                return iframeCompanionAd.getIframeResourceURL();
+            }
+        }
+        return null;
+    }
+
+    public getHtmlCompanionResourceContent(): string | null {
+        const ad = this.getAd();
+        if (ad) {
+            const htmlCompanionAd = ad.getHtmlCompanionAd();
+            if (htmlCompanionAd) {
+                return htmlCompanionAd.getHtmlResourceContent();
+            }
+        }
+        return null;
     }
 
     public getVideoMediaFiles(): VastMediaFile[] {
@@ -316,23 +321,6 @@ export class Vast extends Model<IVast> {
             return true;
         }
         return false;
-    }
-
-    private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
-        const minHeight = 320;
-        const minWidth = 480;
-        return this.isValidCompanionCreativeType(creativeType) && (height < width) && (height >= minHeight) && (width >= minWidth);
-    }
-
-    private isValidPortraitCompanion(creativeType: string | null, height: number, width: number): boolean {
-        const minHeight = 480;
-        const minWidth = 320;
-        return this.isValidCompanionCreativeType(creativeType) && (height > width) && (height >= minHeight) && (width >= minWidth);
-    }
-
-    private isValidCompanionCreativeType(creativeType: string | null): boolean {
-        const reg = new RegExp('(jpe?g|gif|png)', 'gi');
-        return !!creativeType && reg.test(creativeType);
     }
 
     private isSupportedMIMEType(MIMEType: string): boolean {

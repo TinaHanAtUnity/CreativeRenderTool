@@ -146,13 +146,13 @@ describe('MRAIDEventHandlersTest', () => {
             });
 
             describe('MRAIDEventHandler', () => {
-                it('should not send a analytics event', () => {
+                it('should send an analytics event', () => {
                     mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                     sinon.stub(mraidAdUnit, 'sendClick');
                     mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
                     mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
-                    sinon.assert.notCalled(<sinon.SinonStub>HttpKafka.sendEvent);
+                    sinon.assert.called(<sinon.SinonStub>HttpKafka.sendEvent);
                 });
             });
         });

@@ -2,38 +2,39 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { EventType } from 'Ads/Models/Session';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
+import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
     private _vastAdUnit: VastAdUnit;
     private _vastCampaign: VastCampaign;
-    private _clientInfo: ClientInfo;
     private _om?: OpenMeasurement;
     private _omStartCalled = false;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
-        this._clientInfo = params.clientInfo;
         this._om = this._vastAdUnit.getOpenMeasurement();
+        this._pts = params.programmaticTrackingService;
     }
 
     public onProgress(progress: number): void {
         super.onProgress(progress);
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             const events = this._vastAdUnit.getEvents();
             const event = events.shift();
-            if(event) {
-                if(progress / this._vastCampaign.getVideo().getDuration() >= event[0]) {
+            if (event) {
+                if (progress / this._vastCampaign.getVideo().getDuration() >= event[0]) {
                     moat.triggerVideoEvent(event[1], this._vastAdUnit.getVolume());
                 } else {
                     events.unshift(event);
@@ -46,22 +47,26 @@ export class VastVideoEventHandler extends VideoEventHandler {
     public onCompleted(url: string): void {
         super.onCompleted(url);
 
+        if (!this._vastAdUnit.hasImpressionOccurred()) {
+            this._pts.reportMetric(VastMetric.VastVideoImpressionFailed);
+        }
+
         const session = this._vastCampaign.getSession();
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.completed(this._vastAdUnit.getVolume());
         }
 
-        if(session) {
-            if(session.getEventSent(EventType.VAST_COMPLETE)) {
+        if (session) {
+            if (session.getEventSent(EventType.VAST_COMPLETE)) {
                 return;
             }
             session.setEventSent(EventType.VAST_COMPLETE);
         }
 
         const endScreen = this._vastAdUnit.getEndScreen();
-        if(endScreen) {
+        if (endScreen && this._vastAdUnit.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this._vastAdUnit.hide();
@@ -70,8 +75,8 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.completed();
             this._om.sessionFinish({
-                adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                adSessionId: this._om.getOMAdSessionId(),
+                timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
             });
@@ -82,24 +87,24 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-        if(overlay && this._vastAdUnit.getVideoClickThroughURL()) {
+        if (overlay && this._vastAdUnit.getVideoClickThroughURL()) {
             overlay.setCallButtonVisible(true);
             overlay.setFadeEnabled(false);
 
-            if(TestEnvironment.get('debugOverlayEnabled')) {
+            if (TestEnvironment.get('debugOverlayEnabled')) {
                 overlay.setDebugMessage('Programmatic Ad');
             }
         }
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.init(MoatViewabilityService.getMoatIds(), duration / 1000, url, MoatViewabilityService.getMoatData(), this._vastAdUnit.getVolume());
         }
 
         if (this._om && !this._omStartCalled) {
             this._om.sessionStart({
-                adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                adSessionId: this._om.getOMAdSessionId(),
+                timestamp: Date.now(),
                 type: 'sessionStart',
                 data: {}
             });
@@ -116,33 +121,34 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         if (this._om) {
             this._om.resume();
-            this._om.start(this._vastCampaign.getVideo().getDuration(), this._vastAdUnit.getVolume());
+            this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+            this._om.start(this._vastCampaign.getVideo().getDuration());
             this._om.playerStateChanged(VideoPlayerState.FULLSCREEN);
         }
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.play(this._vastAdUnit.getVolume());
         }
 
-        if(session) {
-            if(session.getEventSent(EventType.IMPRESSION)) {
+        if (session) {
+            if (session.getEventSent(EventType.IMPRESSION)) {
                 return;
             }
             session.setEventSent(EventType.IMPRESSION);
         }
 
         this.sendThirdPartyVastImpressionEvent();
-        this.sendThirdPartyTrackingEvent('creativeView');
-        this.sendThirdPartyTrackingEvent('start');
-        this.sendThirdPartyTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
+        this.sendTrackingEvent(TrackingEvent.START);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public onPause(url: string): void {
         super.onPause(url);
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.pause(this._vastAdUnit.getVolume());
         }
 
@@ -155,20 +161,26 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onStop(url);
 
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             moat.stop(this._vastAdUnit.getVolume());
         }
     }
 
     public onVolumeChange(volume: number, maxVolume: number) {
         const moat = MoatViewabilityService.getMoat();
-        if(moat) {
+        if (moat) {
             this._vastAdUnit.setVolume(volume / maxVolume);
             moat.volumeChange(this._vastAdUnit.getVolume());
         }
 
-        if(this._om) {
-            this._om.volumeChange(this._vastAdUnit.getVolume());
+        if (this._om) {
+            this._vastAdUnit.setVolume(volume / maxVolume);
+            this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+            if (this._vastAdUnit.getVideoPlayerMuted()) {
+                this._om.volumeChange(0);
+            } else {
+                this._om.volumeChange(1);
+            }
         }
     }
 
@@ -177,7 +189,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.sendFirstQuartile();
         }
-        this.sendThirdPartyTrackingEvent('firstQuartile');
+        this.sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
     }
 
     protected handleMidPointEvent(progress: number): void {
@@ -185,7 +197,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.sendMidpoint();
         }
-        this.sendThirdPartyTrackingEvent('midpoint');
+        this.sendTrackingEvent(TrackingEvent.MIDPOINT);
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
@@ -193,12 +205,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.sendThirdQuartile();
         }
-        this.sendThirdPartyTrackingEvent('thirdQuartile');
+        this.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
     }
 
     protected handleCompleteEvent(url: string): void {
         super.handleCompleteEvent(url);
-        this.sendThirdPartyTrackingEvent('complete');
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 
     private sendThirdPartyVastImpressionEvent(): void {
@@ -208,9 +220,10 @@ export class VastVideoEventHandler extends VideoEventHandler {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
             }
         }
+        this._vastAdUnit.setImpressionOccurred();
     }
 
-    private sendThirdPartyTrackingEvent(eventName: string): void {
+    private sendTrackingEvent(eventName: TrackingEvent): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {

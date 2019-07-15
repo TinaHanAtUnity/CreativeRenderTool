@@ -14,7 +14,8 @@ fi
 echo "Proceeding in five seconds."
 sleep 5
 
-releases="release-scripts/releases.txt"
+webviewdir=$(git rev-parse --show-toplevel)
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 git pull --tags
 while IFS= read -r release
@@ -25,7 +26,10 @@ while IFS= read -r release
     sleep 1
 done <"$releases"
 
-curl -X POST -H 'Content-type: application/json' --data '{"attachments":[{"text":"Ads SDK Deployment has been reverted. :frowning:","color":"danger"}]}' https://hooks.slack.com/services/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
+# ads-sdk-devs slack channel
+curl -X POST -H 'Content-type: application/json' --data '{"attachments":[{"text":"Ads SDK Deployment has been reverted. :frowning:","color":"danger"}]}' https://hooks.slack.com/services/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
+
+# ads-deploys slack channel
 curl -X POST -H 'Content-type: application/json' --data '{"attachments":[{"text":"Ads SDK Deployment has been reverted. :frowning:","color":"danger"}]}' https://hooks.slack.com/services/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
 
 echo "Get yourself a nice bottle of tequila. 🥃✨🥃"

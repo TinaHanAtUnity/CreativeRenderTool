@@ -16,6 +16,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 class TestHelper {
     public static getEventType(data: string) {
@@ -26,7 +27,7 @@ class TestHelper {
 }
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('AnalyticsManagerTest', () => {
+    describe(`AnalyticsManagerTest for ${Platform[platform]}`, () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -35,6 +36,7 @@ class TestHelper {
         let clientInfo: ClientInfo;
         let deviceInfo: DeviceInfo;
         let configuration: CoreConfiguration;
+        let adsConfiguration: AdsConfiguration;
         let analyticsManager: AnalyticsManager;
         let analyticsStorage: AnalyticsStorage;
         let focusManager: FocusManager;
@@ -49,12 +51,13 @@ class TestHelper {
             clientInfo = TestFixtures.getClientInfo();
             deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             configuration = TestFixtures.getCoreConfiguration();
+            adsConfiguration = TestFixtures.getAdsConfiguration();
 
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
             (<sinon.SinonStub>request.post).returns(Promise.resolve());
 
             analyticsStorage = new AnalyticsStorage(core);
-            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, focusManager, analyticsStorage);
+            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
         });
 
         it('should send session start event', () => {
@@ -62,7 +65,7 @@ class TestHelper {
 
             return analyticsManager.init().then(() => {
                 sinon.assert.called(requestSpy);
-                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appStart.v1');
+                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'ads.analytics.appStart.v1');
             });
         });
 
@@ -74,7 +77,7 @@ class TestHelper {
                 focusManager.onActivityPaused.trigger('com.test.activity');
 
                 sinon.assert.called(requestSpy);
-                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appRunning.v1');
+                assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'ads.analytics.appRunning.v1');
             });
         });
 
@@ -108,7 +111,7 @@ class TestHelper {
                     let cdpPostCalls: number = 0;
                     postStub.getCalls().map((call) => {
                         const url = call.args[0];
-                        if(url === 'https://cdp.cloud.unity3d.com/v1/events') {
+                        if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
                             cdpPostCalls++;
                         }
                     });
@@ -137,7 +140,7 @@ class TestHelper {
                             let cdpPostCalls: number = 0;
                             postStub.getCalls().map((call) => {
                                 const url = call.args[0];
-                                if(url === 'https://cdp.cloud.unity3d.com/v1/events') {
+                                if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
                                     cdpPostCalls++;
                                 }
                             });

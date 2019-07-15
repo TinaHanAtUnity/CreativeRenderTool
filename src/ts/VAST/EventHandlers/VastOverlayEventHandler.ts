@@ -11,8 +11,10 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
-import { InteractionType } from 'Ads/Views/OMIDEventBridge';
+import { InteractionType, ObstructionReasons, IViewPort, IAdView } from 'Ads/Views/OMIDEventBridge';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -25,6 +27,11 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: OpenMeasurement;
+    private _deviceInfo: DeviceInfo;
+
+    private _viewPort: IViewPort;
+    private _obstructedAdView: IAdView;
+    private _unObstructedAdView: IAdView;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -40,6 +47,58 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._om = this._vastAdUnit.getOpenMeasurement();
+        this._deviceInfo = parameters.deviceInfo;
+    }
+
+    public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
+
+        if (this._om) {
+            // if obstruction already calculated
+            if (this._viewPort && this._obstructedAdView) {
+                this._om.geometryChange(this._viewPort, this._obstructedAdView);
+                return Promise.resolve();
+            }
+
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+                if (this._om) {
+                    this._viewPort = this._om.calculateViewPort(screenWidth, screenHeight);
+                    const obstructionRectangle = {
+                        x: x,
+                        y: y,
+                        width: width,
+                        height: height
+                    };
+                    const percentCoverage = (width / screenWidth) + (height / screenHeight);
+                    const percentInView = (1 - percentCoverage) * 100;
+
+                    this._obstructedAdView = this._om.calculateVastAdView(percentInView, [ObstructionReasons.OBSTRUCTED], screenWidth, screenHeight, true, [obstructionRectangle]);
+                    this._om.geometryChange(this._viewPort, this._obstructedAdView);
+                }
+            });
+        }
+
+        return super.onShowPrivacyPopUp(x, y, width, height);
+    }
+
+    public onClosePrivacyPopUp(): Promise<void> {
+
+        if (this._om) {
+            // if obstruction already calculated
+            if (this._viewPort && this._unObstructedAdView) {
+                this._om.geometryChange(this._viewPort, this._unObstructedAdView);
+                return Promise.resolve();
+            }
+
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+                if (this._om) {
+                    this._viewPort = this._om.calculateViewPort(width, height);
+                    this._unObstructedAdView = this._om.calculateVastAdView(100, [], width, height, true, []);
+                    this._om.geometryChange(this._viewPort, this._unObstructedAdView);
+                }
+            });
+        }
+
+        return super.onClosePrivacyPopUp();
     }
 
     public onOverlaySkip(position: number): void {
@@ -49,7 +108,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             super.onOverlaySkip(position);
 
             const endScreen = this._vastAdUnit.getEndScreen();
-            if (endScreen) {
+            if (endScreen && this._vastAdUnit.hasImpressionOccurred()) {
                 endScreen.show();
                 this._vastAdUnit.onFinish.trigger();
             } else {
@@ -60,8 +119,8 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (this._om) {
             this._om.skipped();
             this._om.sessionFinish({
-                adSessionId: this._campaign.getSession().getId(),
-                timestamp: new Date(),
+                adSessionId: this._om.getOMAdSessionId(),
+                timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
             });
@@ -71,24 +130,27 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     public onOverlayMute(isMuted: boolean): void {
         super.onOverlayMute(isMuted);
         if (isMuted) {
+            this._vastAdUnit.setVideoPlayerMuted(true);
             if (this._moat) {
-                this._moat.volumeChange(0);
-            }
-
-            if (this._om) {
-                this._om.volumeChange(0);
-            }
-
-            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId());
-        } else {
-            if (this._moat) {
+                this._moat.setPlayerVolume(0);
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
-
             if (this._om) {
-                this._om.volumeChange(this._vastAdUnit.getVolume());
+                this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+                this._om.volumeChange(0);
             }
-            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE);
+        } else {
+            this._vastAdUnit.setVideoPlayerMuted(false);
+            if (this._moat) {
+                this._moat.setPlayerVolume(1);
+                this._moat.volumeChange(this._vastAdUnit.getVolume());
+            }
+            if (this._om) {
+                this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+                this._om.volumeChange(1);
+            }
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.UNMUTE);
         }
     }
 
@@ -103,7 +165,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         }
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
-        if(clickThroughURL) {
+        if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
             const redirectBreakers = Url.getAppStoreUrlTemplates(this._platform);

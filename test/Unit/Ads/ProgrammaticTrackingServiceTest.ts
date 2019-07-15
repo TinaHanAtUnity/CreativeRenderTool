@@ -1,16 +1,18 @@
 import {
-    ProgrammaticTrackingErrorName,
-    ProgrammaticTrackingMetricName,
+    ProgrammaticTrackingError,
     ProgrammaticTrackingService,
-    IProgrammaticTrackingData
+    IProgrammaticTrackingData,
+    AdmobMetric,
+    LoadMetric
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import 'mocha';
 import * as sinon from 'sinon';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 describe('Ads/Utilities', () => {
 
@@ -58,10 +60,10 @@ describe('Ads/Utilities', () => {
         ];
 
         const tests: {
-            input: ProgrammaticTrackingErrorName;
+            input: ProgrammaticTrackingError;
             expected: IProgrammaticTrackingData;
         }[] = [{
-            input: ProgrammaticTrackingErrorName.TooLargeFile,
+            input: ProgrammaticTrackingError.TooLargeFile,
             expected: {
                 metrics: [
                     {
@@ -74,7 +76,7 @@ describe('Ads/Utilities', () => {
             }
         },
         {
-            input: ProgrammaticTrackingErrorName.BannerRequestError,
+            input: ProgrammaticTrackingError.BannerRequestError,
             expected: {
                 metrics: [
                     {
@@ -101,10 +103,10 @@ describe('Ads/Utilities', () => {
 
     describe('reportMetric', () => {
         const tests: {
-            input: ProgrammaticTrackingMetricName;
+            input: AdmobMetric;
             expected: IProgrammaticTrackingData;
         }[] = [{
-            input: ProgrammaticTrackingMetricName.AdmobUsedCachedVideo,
+            input: AdmobMetric.AdmobUsedCachedVideo,
             expected: {
                 metrics: [
                     {
@@ -115,7 +117,7 @@ describe('Ads/Utilities', () => {
                 ]
             }
         }, {
-            input: ProgrammaticTrackingMetricName.AdmobUsedStreamedVideo,
+            input: AdmobMetric.AdmobUsedStreamedVideo,
             expected: {
                 metrics: [
                     {
@@ -139,4 +141,45 @@ describe('Ads/Utilities', () => {
         });
     });
 
+    describe('reportMetric with Load metrics', () => {
+        let test: {
+            input: LoadMetric;
+            expected: IProgrammaticTrackingData | undefined;
+        };
+
+        it(`should send load metric when isTrackedGameUsingLoadApi returns true`, () => {
+            test = {
+                input: LoadMetric.LoadEnabledShow,
+                expected: {
+                    metrics: [
+                        {
+                            tags: [
+                                'ads_sdk2_mevt:load_enabled_show'
+                            ]
+                        }
+                    ]
+                }
+            };
+            sinon.stub(CustomFeatures, 'isTrackedGameUsingLoadApi').returns(true);
+            const promise = programmaticTrackingService.reportMetric(test.input);
+            sinon.assert.calledOnce(postStub);
+            assert.equal(postStub.firstCall.args.length, 3);
+            assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+            assert.equal(postStub.firstCall.args[1], JSON.stringify(test.expected));
+            assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+            return promise;
+        });
+
+        it(`should not send load metric when isTrackedGameUsingLoadApi returns false`, () => {
+            test = {
+                input: LoadMetric.LoadEnabledShow,
+                expected: undefined
+            };
+            sinon.stub(CustomFeatures, 'isTrackedGameUsingLoadApi').returns(false);
+            return programmaticTrackingService.reportMetric(test.input).then(res => {
+                sinon.assert.notCalled(postStub);
+                return res;
+            });
+        });
+    });
 });

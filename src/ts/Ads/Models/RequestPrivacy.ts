@@ -1,4 +1,12 @@
-import { GamePrivacy, IPermissions, IProfilingPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import {
+    GamePrivacy,
+    IAllPermissions,
+    IGranularPermissions,
+    IPermissions,
+    IProfilingPermissions,
+    PrivacyMethod,
+    UserPrivacy
+} from 'Ads/Models/Privacy';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -17,7 +25,11 @@ function isProfilingPermissions(permissions: IPermissions | { [key: string]: nev
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy {
+    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy | undefined {
+        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return undefined;
+        }
+
         if (!userPrivacy.isRecorded()) {
             return {
                 method: gamePrivacy.getMethod(),
@@ -28,8 +40,22 @@ export class RequestPrivacyFactory {
         return {
             method: userPrivacy.getMethod(),
             firstRequest: false,
-            permissions: userPrivacy.getPermissions()
+            permissions: RequestPrivacyFactory.toGranularPermissions(userPrivacy)
         };
+    }
+
+    private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
+        const permissions = userPrivacy.getPermissions();
+
+        if ((<IAllPermissions>permissions).all === true) {
+            return {
+                gameExp: true,
+                ads: true,
+                external: true
+            };
+        }
+
+        return <IGranularPermissions>permissions;
     }
 
     public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {

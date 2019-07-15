@@ -8,6 +8,7 @@ import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { PersonalizationSwitchGroup } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
 import { IPermissions } from 'Ads/Models/Privacy';
+import { Localization } from 'Core/Utilities/Localization';
 
 enum ViewState {
     INITIAL,
@@ -30,7 +31,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     constructor(platform: Platform, campaign: Campaign, privacyManager: UserPrivacyManager,
                 gdprEnabled: boolean,
-                isCoppaCompliant: boolean) {
+                isCoppaCompliant: boolean,
+                language: string) {
         super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy-settings', false);
 
         this._campaign = campaign;
@@ -39,7 +41,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         // https://github.com/Microsoft/TypeScript/issues/13775#issuecomment-276381229 explains "keyof typeof EnumType" cast
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason) => ReportReason[<keyof typeof ReportReason>reason]);
 
-        this._template = new Template(PrivacySettingsTemplate);
+        this._template = new Template(PrivacySettingsTemplate, new Localization(language, 'consent'));
         this._bindings = [
             {
                 event: 'click',
@@ -78,8 +80,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDeleteYourDataButtonEvent(event),
-                selector: '#delete-your-data-button'
+                listener: (event: Event) => this.onDeleteYourDataLinkEvent(event),
+                selector: '.delete-your-data-link'
             },
             {
                 event: 'click',
@@ -104,27 +106,27 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, language);
         this._privacyRowItemContainer.addEventHandler(this);
 
-        this._personalizationSwitchGroup = new PersonalizationSwitchGroup(platform, this._userPrivacyManager);
+        this._personalizationSwitchGroup = new PersonalizationSwitchGroup(platform, this._userPrivacyManager, language);
     }
 
     public render(): void {
         super.render();
 
         this._privacyRowItemContainer.render();
-        (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._privacyRowItemContainer.container());
+        (<HTMLElement> this._container.querySelector('.info-container')).appendChild(this._privacyRowItemContainer.container());
 
         this._personalizationSwitchGroup.render();
-        (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationSwitchGroup.container());
+        (<HTMLElement> this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationSwitchGroup.container());
 
         this.showView(ViewState.INITIAL);
     }
 
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => {
-            if(handler.onPrivacy) {
+            if (handler.onPrivacy) {
                 handler.onPrivacy(url);
             }
         });
@@ -133,7 +135,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     public hide(): void {
         super.hide();
 
-        if(this._currentViewState === ViewState.PERSONALIZATION) {
+        if (this._currentViewState === ViewState.PERSONALIZATION) {
             this.triggerPersonalizedConsent();
         }
     }
@@ -147,7 +149,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => {
-            if(handler.onPrivacy) {
+            if (handler.onPrivacy) {
                 handler.onPrivacy((<HTMLLinkElement>event.target).href);
             }
         });
@@ -189,7 +191,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     private onReportAdEvent(event: Event): void {
         event.preventDefault();
         if (!this._reportSent) {
-            const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
+            const checkedReportButton = <HTMLElement> this._container.querySelector('.report-choice-radio:checked');
             const reportText = this._container.querySelector('.report-confirmed-text');
             if (checkedReportButton && checkedReportButton.id) {
                 this._reportSent = true;
@@ -223,7 +225,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         };
 
         this._handlers.forEach(handler => {
-            if(handler.onPersonalizedConsent) {
+            if (handler.onPersonalizedConsent) {
                 handler.onPersonalizedConsent(consent);
             }
         });
@@ -268,15 +270,15 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         });
     }
 
-    private onDeleteYourDataButtonEvent(event: Event): void {
+    private onDeleteYourDataLinkEvent(event: Event): void {
         event.preventDefault();
-        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.add('active');
+        (<HTMLElement> this._container.querySelector('.delete-data-container')).classList.add('active');
     }
 
     private onDataDeletionConfirmationEvent(event: Event): void {
         event.preventDefault();
 
-        const dataDeletionContainer = (<HTMLElement>this._container.querySelector('.delete-data-container'));
+        const dataDeletionContainer = (<HTMLElement> this._container.querySelector('.delete-data-container'));
         dataDeletionContainer.classList.remove('active');
         dataDeletionContainer.classList.add('data-deletion-confirmed');
 
@@ -286,7 +288,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     private onDataDeletionCancelEvent(event: Event): void {
         event.preventDefault();
-        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
+        (<HTMLElement> this._container.querySelector('.delete-data-container')).classList.remove('active');
     }
 
     private onViewContainerEvent(event: Event): void {

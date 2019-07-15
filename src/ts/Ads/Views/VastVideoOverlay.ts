@@ -11,7 +11,7 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
         super(parameters, privacy, showGDPRBanner, true);
 
         this._seatId = parameters.campaign.getSeatId();
-        this._hasEndcard = parameters.campaign.hasEndscreen();
+        this._hasEndcard = parameters.campaign.hasStaticEndscreen();
     }
 
     protected cleanUpPrivacy() {
@@ -21,5 +21,23 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
             document.body.removeChild(this._privacy.container());
             delete this._privacy;
         }
+    }
+
+    protected onPrivacyEvent(event: Event) {
+        super.onPrivacyEvent(event);
+
+        const popup = <HTMLElement>document.querySelector('.pop-up');
+        const rect = popup.getBoundingClientRect();
+        const x = rect.left;
+        const y = rect.top;
+        const width = rect.width;
+        const height = rect.height;
+
+        this._handlers.forEach(handler => handler.onShowPrivacyPopUp(x, y, width, height));
+    }
+
+    public onPrivacyClose(): void {
+        super.onPrivacyClose();
+        this._handlers.forEach(handler => handler.onClosePrivacyPopUp());
     }
 }

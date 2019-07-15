@@ -1,5 +1,5 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -22,6 +22,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _muted: boolean = false;
     private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
+    private _impressionSent = false;
     private _om?: OpenMeasurement;
 
     constructor(parameters: IVastAdUnitParameters) {
@@ -35,20 +36,20 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._moat = MoatViewabilityService.getMoat();
         this._om = parameters.om;
 
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
         }
 
-        if(parameters.platform === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             Promise.all([
                 parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
                 parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });
-        } else if(parameters.platform === Platform.IOS) {
+        } else if (parameters.platform === Platform.IOS) {
             parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
                 this.setVolume(volume);
             });
@@ -98,9 +99,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getVolume() {
-        if(this._muted) {
-            return 0;
-        }
         return this._volume;
     }
 
@@ -108,11 +106,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._volume = volume;
     }
 
-    public setMuted(muted: boolean) {
+    public setVideoPlayerMuted(muted: boolean) {
         this._muted = muted;
     }
 
-    public getMuted() {
+    public getVideoPlayerMuted() {
         return this._muted;
     }
 
@@ -120,17 +118,12 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._endScreen;
     }
 
-    public getOpenMeasurement(): OpenMeasurement | undefined {
-        return this._om;
+    public sendTrackingEvent(eventName: TrackingEvent): void {
+        this._thirdPartyEventManager.sendTrackingEvents(this._vastCampaign, eventName, 'vast', this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 
-    public sendTrackingEvent(eventName: string, sessionId: string): void {
-        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
-        if (trackingEventUrls) {
-            for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-            }
-        }
+    public getOpenMeasurement(): OpenMeasurement | undefined {
+        return this._om;
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -166,10 +159,9 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendVideoClickTrackingEvent(sessionId: string): void {
-        this.sendTrackingEvent('click', sessionId);
+        this.sendTrackingEvent(TrackingEvent.CLICK);
 
         const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
-
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
                 this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
@@ -189,12 +181,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
                 if (this._om) {
                     const viewPort = this._om.calculateViewPort(width, height);
-                    const obstructionRectangle = {
-                        x: 0,
-                        y: 0,
-                        width: width,
-                        height: height
-                    };
+                    const obstructionRectangle = this._om.calculateObstruction(0, 0, width, height);
                     const adView = this._om.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
                     this._om.geometryChange(viewPort, adView);
                 }
@@ -223,11 +210,19 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public onVideoError(): void {
         const endScreen = this.getEndScreen();
-        if(endScreen) {
+        if (endScreen && this.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this.hide();
         }
+    }
+
+    public setImpressionOccurred(): void {
+        this._impressionSent = true;
+    }
+
+    public hasImpressionOccurred(): boolean {
+        return this._impressionSent;
     }
 
     private isValidURL(url: string | null): boolean {

@@ -25,23 +25,29 @@ export class MOAT extends View<VastCampaign> {
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
+    private _playerVolume: number;
 
-    constructor(platform: Platform, core: ICoreApi) {
+    constructor(platform: Platform, core: ICoreApi, muteVideo: boolean) {
         super(platform, 'moat');
         this._template = new Template(MOATTemplate);
         this._core = core;
         this._bindings = [];
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
+        this._playerVolume = muteVideo ? 0 : 1;
+    }
+
+    public setPlayerVolume(playerVolume: number) {
+        this._playerVolume = playerVolume;
     }
 
     public render(): void {
         super.render();
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#moat-iframe');
         iframe.srcdoc = MOATContainer;
     }
 
     public play(volume: number): void {
-        if(this.getState() === MoatState.STOPPED || this.getState() === MoatState.PAUSED) {
+        if (this.getState() === MoatState.STOPPED || this.getState() === MoatState.PAUSED) {
             this.setState(MoatState.PLAYING);
             this.triggerVideoEvent('AdPlaying', volume);
             this.triggerViewabilityEvent('exposure', true);
@@ -49,7 +55,7 @@ export class MOAT extends View<VastCampaign> {
     }
 
     public pause(volume: number): void {
-        if(this.getState() === MoatState.PLAYING && this._iframe.contentWindow) {
+        if (this.getState() === MoatState.PLAYING && this._iframe.contentWindow) {
             this.setState(MoatState.PAUSED);
             this.triggerVideoEvent('AdPaused', volume);
             this.triggerViewabilityEvent('exposure', false);
@@ -57,21 +63,21 @@ export class MOAT extends View<VastCampaign> {
     }
 
     public stop(volume: number): void {
-        if(this.getState() === MoatState.PLAYING || this.getState() === MoatState.PAUSED) {
+        if (this.getState() === MoatState.PLAYING || this.getState() === MoatState.PAUSED) {
             this.setState(MoatState.STOPPED);
             this.triggerVideoEvent('AdStopped', volume);
         }
     }
 
     public completed(volume: number): void {
-        if(this.getState() !== MoatState.COMPLETED) {
+        if (this.getState() !== MoatState.COMPLETED) {
             this.setState(MoatState.COMPLETED);
             this.triggerVideoEvent('AdVideoComplete', volume);
         }
     }
 
     public volumeChange(volume: number): void {
-        if(this.getState() !== MoatState.COMPLETED) {
+        if (this.getState() !== MoatState.COMPLETED) {
             this.triggerVideoEvent('AdVolumeChange', volume);
             this.triggerViewabilityEvent('volume', volume * 100);
         }
@@ -87,7 +93,7 @@ export class MOAT extends View<VastCampaign> {
             };
 
             this._resizeHandler = (event: Event) => {
-                if(this._iframe.contentWindow) {
+                if (this._iframe.contentWindow) {
                     this._iframe.contentWindow.postMessage({
                         type: 'resize',
                         width: window.innerWidth,
@@ -96,7 +102,7 @@ export class MOAT extends View<VastCampaign> {
                 }
             };
 
-            if(this._platform === Platform.IOS) {
+            if (this._platform === Platform.IOS) {
                 window.addEventListener('resize', this._resizeDelayer, false);
             } else {
                 window.addEventListener('resize', this._resizeHandler, false);
@@ -118,7 +124,7 @@ export class MOAT extends View<VastCampaign> {
                 height: window.innerHeight
             }, '*');
         } else {
-            if(this._platform === Platform.ANDROID) {
+            if (this._platform === Platform.ANDROID) {
                 this.play(volume);
             }
         }
@@ -138,8 +144,9 @@ export class MOAT extends View<VastCampaign> {
             this._iframe.contentWindow.postMessage({
                 type: 'videoEvent',
                 data: {
-                    type,
-                    volume
+                    type: type,
+                    adVolume: this._playerVolume,
+                    volume: volume
                 }
             }, '*');
         }
@@ -165,7 +172,7 @@ export class MOAT extends View<VastCampaign> {
 
     private onMessage(e: MessageEvent) {
         if (e && e.data && e.data.type) {
-            switch(e.data.type) {
+            switch (e.data.type) {
                 case 'MOATVideoError':
                     Diagnostics.trigger('moat_video_error', e.data.error);
                     break;

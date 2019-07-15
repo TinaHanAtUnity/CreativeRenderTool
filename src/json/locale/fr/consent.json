@@ -1,0 +1,56 @@
+{
+  "homepage-title": "Autorisez-vous les cookies Unity à collecter et à utiliser vos données pour personnaliser vos publicités et votre expérience ?",
+  "homepage-main-text": "Unity et nos <span class=\"third-parties-link page-link\">partenaires externes</span> collectent <span class=\"data-link page-link\">des données</span>, notamment <span class=\"demographic-link page-link\">des informations à caractère démographique</span>, et utilisent <span class=\"mobile-identifiers-link page-link\">les identifiants des mobiles</span> pour <span class=\"personalization-link page-link\">personnaliser</span> et <span class=\"measurement-link page-link\">évaluer</span> les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
+  "homepage-accept-all": "J'accepte",
+  "homepage-show-my-choices": "Configurer",
+
+  "my-choices-title": "Autorisez-vous les cookies Unity à collecter et à utiliser vos données pour personnaliser vos publicités et votre expérience ?",
+  "my-choices-text": "Unity et nos partenaires externes collectent des données, notamment des informations à caractère démographique, et utilisent les identifiants des mobiles pour personnaliser et évaluer les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
+  "my-choices-switch-game-experience": "J'accepte que mes données soient utilisées pour me fournir une expérience de jeu personnalisée",
+  "my-choices-switch-personalized-ads": "J'accepte l'affichage de publicités et de contenu in-app Unity personnalisés",
+  "my-choices-switch-personalized-third-party": "J'accepte également les publicités et les mesures, y compris la collecte de données démographiques et autres par des partenaires externes",
+  "my-choices-back": "Retour",
+
+  "save-my-choices": "Sauvegarder mes préférences",
+  "agree-to-all": "Tout accepter",
+  "no-thanks": "Non merci",
+
+  "privacy-what-we-collect-title": "Informations collectées et utilisation",
+  "privacy-what-we-collect-desc-p1": "La plupart des informations utilisées pour ce service de personnalisation sont basées sur l'identifiant publicitaire de votre appareil (l'identifiant de publicité Apple ou Google) et sur votre adresse IP.",
+  "privacy-what-we-collect-desc-p2": "Voici un exemple des informations que nous pouvons collecter et utiliser lors de votre interaction avec cette application pour prédire quelles autres applications pourraient vous intéresser :",
+  "privacy-what-we-collect-desc-p3": "Nous utiliserions ces informations pour vous montrer des publicités pour d'autres jeux que vous pourriez apprécier et pour personnaliser l'expérience de jeu lorsque c'est possible. Ces opérations peuvent inclure de modifier l'affichage de la boutique du jeu en proposant les outils et suppléments que vous êtes plus susceptible d'utiliser, ou de modifier votre expérience de jeu pour l'adapter à votre niveau de maîtrise.",
+  "privacy-what-we-collect-desc-p4": "Nous conservons les données personnelles pour une durée maximale de 30 jours. Cependant, il est possible que nous conservions pendant 180 jours un historique des transactions, qui utilise vos données personnelles, à des fins de facturation et de répression des fraudes.",
+  "privacy-what-we-collect-sub-title": "Données collectées par nos partenaires (informations démographiques et mesures)",
+  "privacy-what-we-collect-desc-p5": "Nos partenaires peuvent utiliser votre identifiant publicitaire et votre adresse IP pour vous créer un profil en fonction de vos préférences et des informations démographiques de votre foyer.  Ces informations démographiques peuvent inclure des éléments tels que votre statut matrimonial ou votre niveau de revenus.  Consultez les politiques de confidentialité de nos partenaires pour voir comment accéder aux informations qu'ils possèdent à votre égard et comment les supprimer.",
+  "privacy-what-we-collect-desc-p6": "Ces données collectées peuvent concerner votre téléphone, par exemple la façon dont vous appuyez sur l'écran (mesure de la pression).  L'objectif de nos partenaires est d'empêcher toute tentative de fraude en évaluant si l'application est utilisée par une vraie personne (pression irrégulière) ou par un robot introduit sur le marché par un acteur malveillant qui cherche à tromper les réseaux publicitaires.",
+  "privacy-using": "Vous utilisez un {0}",
+  "privacy-located-in": "Vous êtes en {0}",
+  "privacy-used-this-app": "Vous avez utilisé l'application à {0} reprises cette semaine",
+  "privacy-seen-ads": "Vous avez vu {0} publicités dans l'application",
+  "privacy-installed-based-on": "Vous avez installé {0} application à partir de ces publicités",
+
+  "privacy-data-transfer-title": "Transfert des données hors de l'Union européenne",
+  "privacy-data-transfer-desc": "Il est possible que Unity transfère et traite vos données sur des serveurs situés aux États-Unis.  Nous nous engageons à traiter vos données avec le même niveau de protection que celui offert dans l'Espace économique européen, si elles sont collectées dans cette région du monde. Nous avons pour cela signé et appliqué des contrats en interne et avec des gestionnaires externes.  Pour plus d'informations sur les transferts, consultez la <a href=\"https://unity3d.com/legal/privacy-policy\">politique de confidentialité de Unity</a>.",
+
+  "privacy-third-party-title": "Consulter la liste de nos partenaires publicitaires",
+
+  "privacy-changing-privacy-choice-title": "Modifier vos préférences de confidentialité",
+  "privacy-changing-privacy-choice-text": "Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
+
+  "privacy-our-privacy-policy-title": "Notre politique de confidentialité",
+  "privacy-our-privacy-policy-desc": "Notre <a href=\"https://unity3d.com/legal/privacy-policy\">politique de confidentialité</a> explique la façon dont nous gérons vos données, notamment comment et dans quelles régions du monde nous les transférons à des fins de traitement. Elle indique aussi les modalités de notre collaboration avec les partenaires qui proposent des publicités. Ces partenaires peuvent collecter des informations sur votre identifiant publicitaire de sources tierces, pour personnaliser encore davantage le service. Consultez les politiques de confidentialité de ces tierces parties pour savoir quelles données elles collectent.",
+
+  "privacy-settings-title": "Paramètres de confidentialité",
+  "privacy-settings-personalization-settings": "Modifier mon profil",
+  "privacy-settings-manage-your-data": "Gérer vos données",
+  "privacy-settings-manage-your-data-desc": "Vous pouvez supprimer toute donnée relative à votre appareil que possède Unity en cliquant <span class=\"delete-your-data-link page-link\">ici</span>.",
+  "privacy-settings-manage-your-data-are-you-sure": "Vous êtes sûr(e) ?",
+  "privacy-settings-manage-your-data-yes": "Oui",
+  "privacy-settings-manage-your-data-no": "Non",
+  "privacy-settings-manage-your-data-deletion-msg": "Nous allons traiter votre requête et supprimer vos données sous 30 jours. Vous êtes aussi désinscrit dès à présent du service de publicités personnalisées. Attention : il est possible que nous conservions un historique des transactions utilisant vos informations personnelles pendant 180 jours, à des fins de facturation et de répression des fraudes.",
+  "privacy-settings-report-ad": "Signaler une publicité",
+  "privacy-settings-build-info": "Informations de version",
+  "privacy-settings-close": "Retour",
+
+  "disagree": "Non merci"
+}

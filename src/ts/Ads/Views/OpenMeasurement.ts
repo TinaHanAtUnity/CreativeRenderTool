@@ -8,13 +8,14 @@ import { ICoreApi } from 'Core/ICore';
 import { OMIDEventBridge, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, ISessionEvent, IVerificationScriptResource, IViewPort, IAdView, VideoPosition, ObstructionReasons, MediaType, AccessMode, VideoEventAdaptorType, IRectangle, OMID3pEvents, SESSIONEvents } from 'Ads/Views/OMIDEventBridge';
 import { Template } from 'Core/Utilities/Template';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VerificationReasonCode, VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
@@ -55,7 +56,10 @@ interface IContext {
     transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
     podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
     adCount?: number;                       // VAST optional field - number of <InLine> elements
-    omidNativeInfo?: {};
+    omidNativeInfo?: {
+        partnerName: string;
+        partnerVersion: string;
+    };
     omidJsInfo: IOmidJsInfo;
     app?: IApp;
     deviceInfo: IDeviceInfo;
@@ -77,7 +81,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
     private _core: ICoreApi;
     private _clientInfo: ClientInfo;
-    private _campaign: Campaign;
+    private _campaign: VastCampaign;
     private _omBridge: OMIDEventBridge;
     private _request: RequestManager;
 
@@ -87,14 +91,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _state: OMState = OMState.STOPPED;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
-    private _sessionId: string;
+    private _omAdSessionId: string;
 
-    private _videoDuration: number;
-    private _startVolume: number;
+    private _deviceVolume: number;
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: Campaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
         super(platform, 'openMeasurement');
         this._template = new Template(OMIDTemplate);
         this._bindings = [];
@@ -106,13 +109,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._sessionId = this._campaign.getSession().getId();
         this._adVerifications = vastAdVerifications;
+        this._omAdSessionId = JaegerUtilities.uuidv4();
 
         this._omBridge = new OMIDEventBridge(core, {
             onImpression: (impressionValues) => this.impression(impressionValues),
             onLoaded: (vastProperties) => this.loaded(vastProperties),
-            onStart: (duration, videoPlayerVolume) => this.start(duration, videoPlayerVolume),
+            onStart: (duration, videoPlayerVolume) => this.start(duration),
             onSendFirstQuartile: () => this.sendFirstQuartile(),
             onSendMidpoint: () =>  this.sendMidpoint(),
             onSendThirdQuartile: () => this.sendThirdQuartile(),
@@ -131,11 +134,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             onInjectVerificationResources: (verifcationResources) => this.injectVerificationResources(verifcationResources),
             onPopulateVendorKey: (vendorKey) => this.populateVendorKey(vendorKey),
             onEventProcessed: (eventType) => this.onEventProcessed(eventType)
-        }, this._omIframe, this._sessionId);
+        }, this._omIframe, this);
 
         if (this._useOmidForWeb) {
             this._omBridge.sendSDKVersion(this._clientInfo.getSdkVersionName());
-            this._omBridge.sendSessionId(this._sessionId);
+            this._omBridge.sendSessionId(this._omAdSessionId);
         }
     }
 
@@ -167,9 +170,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this.injectVerificationResources(verificationResources);
     }
 
+    public getOMAdSessionId() {
+        return this._omAdSessionId;
+    }
+
     public render(): void {
         super.render();
-        this._omIframe = <HTMLIFrameElement>this._container.querySelector('#omid-iframe');
+        this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
         this._omIframe.srcdoc = OMID3p;
 
         if (this._useOmidForWeb) {
@@ -182,7 +189,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_IMPRESSION, impressionValues);
     }
 
-    /*
+    /**
      * Video-only event. The player has loaded and buffered the creative’s
      * media and assets either fully or to the extent that it is ready
      * to play the media. Corresponds to the VAST  loaded  event.
@@ -196,12 +203,15 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Video-only event. The player began playback of the video ad creative.
      * Corresponds to the VAST  start event.
      */
-    public start(duration: number, videoPlayerVolume: number) {
-        this._videoDuration = duration;
-        this._startVolume = videoPlayerVolume;
+    public start(duration: number) {
         if (this.getState() === OMState.STOPPED && this._sessionStartCalled) {
             this.setState(OMState.PLAYING);
-            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_START, {duration, videoPlayerVolume});
+
+            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_START, {
+                duration: duration,
+                videoPlayerVolume: this._placement.muteVideo() ? 0 : 1,
+                deviceVolume: this._deviceVolume
+            });
         }
     }
 
@@ -233,14 +243,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public pause() {
-        if(this.getState() === OMState.PLAYING) {
+        if (this.getState() === OMState.PLAYING) {
             this.setState(OMState.PAUSED);
             this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_PAUSE);
         }
     }
 
     public resume() {
-        if(this.getState() !== OMState.STOPPED && this.getState() === OMState.PAUSED) {
+        if (this.getState() !== OMState.STOPPED && this.getState() === OMState.PAUSED) {
             this.setState(OMState.PLAYING);
             this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_RESUME);
         }
@@ -251,39 +261,50 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_SKIPPED);
     }
 
+    public setDeviceVolume(deviceVolume: number) {
+        this._deviceVolume = deviceVolume;
+    }
+
+    public getDeviceVolume(deviceVolume: number) {
+        return this._deviceVolume;
+    }
+
     public volumeChange(videoPlayerVolume: number) {
-        if(this.getState() !== OMState.COMPLETED) {
-            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {videoPlayerVolume});
+        if (this.getState() !== OMState.COMPLETED) {
+            this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {
+                videoPlayerVolume: videoPlayerVolume,
+                deviceVolume: this._deviceVolume
+            });
         }
     }
 
-    /*
-    * The user has interacted with the ad outside of any standard playback controls
-    * (e.g. clicked the ad to load an ad landing page).
-    */
+    /**
+     * The user has interacted with the ad outside of any standard playback controls
+     * (e.g. clicked the ad to load an ad landing page).
+     */
     public adUserInteraction(interactionType: InteractionType) {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, interactionType);
     }
 
-    // Not used at the moment because vast is not streamed
+    // TODO: Not used at the moment
     public bufferStart() {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_BUFFER_START);
     }
 
-    // Not used at the moment because vast is not streamed
+    // TODO: Not used at the moment
     public bufferFinish() {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_BUFFER_FINISH);
     }
 
-    /*
-    * Must ensure this is only called once per background and foreground
-    * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
-    * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
-    * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
-    * TODO: Calculate Geometry change for Privacy coverage
-    */
+    /**
+     * Must ensure this is only called once per background and foreground
+     * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
+     * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
+     * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
+     * TODO: Calculate Geometry change for Privacy coverage
+     */
     public geometryChange(viewPort: IViewPort, adView: IAdView) {
-        if(this.getState() !== OMState.STOPPED && (this.getState() === OMState.PAUSED || this.getState() === OMState.PLAYING)) {
+        if (this.getState() !== OMState.STOPPED && (this.getState() === OMState.PAUSED || this.getState() === OMState.PLAYING)) {
             this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewPort, adView});
         }
     }
@@ -313,6 +334,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
             adSessionType: AdSessionType.HTML,
+            omidNativeInfo: {
+                partnerName: 'Unity',
+                partnerVersion: this._clientInfo.getSdkVersionName()
+            },
             omidJsInfo: {
                 omidImplementor: 'Unity',
                 serviceVersion: this._clientInfo.getSdkVersionName(),
@@ -366,24 +391,37 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
     }
 
-    /*
-    * All AdViews will assume fullscreen interstitial video
-    * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
-    */
+    public calculateObstruction(x: number, y: number, width: number, height: number): IRectangle {
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height
+        };
+    }
+
+    /**
+     * All AdViews will assume fullscreen interstitial video
+     * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
+     */
     public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[]): IAdView {
+        const videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
+        const videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
+        const topLeftY = this.calculateAdViewTopLeftYPosition(videoHeight, screenWidth, screenHeight); // If in portrait, video adview height will be different
+
         const adView: IAdView = {
             percentageInView: percentInView,
             geometry: {
                 x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight
+                y: topLeftY,
+                width: videoWidth,
+                height: videoHeight
             },
             onScreenGeometry: {
                 x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight,
+                y: topLeftY,
+                width: videoWidth,
+                height: videoHeight,
                 obstructions: obstructionRectangles
             },
             measuringElement: measuringElementAvailable,
@@ -406,17 +444,17 @@ export class OpenMeasurement extends View<AdMobCampaign> {
                 y: 0,
                 width: screenWidth,
                 height: screenHeight,
-                obstructions: []
+                obstructions: obstructionRectangles
             };
         }
 
         return adView;
     }
 
-    /*
-    * Used to ensure OMID#SessionStart is fired prior to video playback events
-    * Used to ensure DOM is removed prior to OMID#SessionFinish
-    */
+    /**
+     * Used to ensure OMID#SessionStart is fired prior to video playback events
+     * Used to ensure DOM is removed prior to OMID#SessionFinish
+     */
     public onEventProcessed(eventType: string) {
         if (eventType === SESSIONEvents.SESSION_START) {
 
@@ -435,7 +473,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === SESSIONEvents.SESSION_FINISH) {
-            this.removeFromViewHieararchy();
+            // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
+            // to reach server before removing the Verification Client from the DOM
+            window.setTimeout(() => this.removeFromViewHieararchy(), 1000);
         }
 
         if (eventType === 'loadError') {
@@ -443,7 +483,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
-    public buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
+    private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
         const impressionObject: IImpressionValues = {
             mediaType: mediaTypeValue
         };
@@ -459,6 +499,42 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         return impressionObject;
+    }
+
+    private calculateAdViewVideoWidth(screenWidth: number, screenHeight: number) {
+        let videoWidth = screenWidth;
+
+        const isLandscape = screenWidth > screenHeight;
+        const campaignVideoWidth = this._campaign.getVideo().getWidth();
+        if (!isLandscape && campaignVideoWidth > 0) {
+            videoWidth = campaignVideoWidth;
+        }
+
+        return videoWidth;
+    }
+
+    private calculateAdViewVideoHeight(screenWidth: number, screenHeight: number) {
+        let videoHeight = screenHeight;
+
+        const isLandscape = screenWidth > screenHeight;
+        const campaignVideoHeight = this._campaign.getVideo().getHeight();
+        if (!isLandscape && campaignVideoHeight > 0) {
+            videoHeight = campaignVideoHeight;
+        }
+
+        return videoHeight;
+    }
+
+    private calculateAdViewTopLeftYPosition(videoHeight: number, screenWidth: number, screenHeight: number) {
+        let topLeftY = 0;
+
+        const isLandscape = screenWidth > screenHeight;
+        if (!isLandscape && videoHeight > 0) {
+            const centerpoint = screenHeight / 2;
+            topLeftY = centerpoint - (videoHeight / 2);
+        }
+
+        return topLeftY;
     }
 
     private getState(): OMState {

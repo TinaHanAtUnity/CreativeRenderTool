@@ -96,7 +96,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, campaign, privacyManager, false, false);
-        const endScreenParams : IEndScreenParameters = {
+        const endScreenParams: IEndScreenParameters = {
             platform,
             core,
             language : deviceInfo.getLanguage(),
@@ -179,7 +179,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             sinon.spy(endScreen, 'show');
             performanceOverlayEventHandler.onOverlaySkip(1);
 
-            if(endScreen) {
+            if (endScreen) {
                 sinon.assert.called(<sinon.SinonSpy>endScreen.show);
             }
         });

@@ -10,6 +10,8 @@ export interface IOverlayHandler extends IGDPREventHandler {
     onOverlayCallButton(): void;
     onOverlayClose(): void;
     onOverlayDownload?(parameters: IVideoOverlayDownloadParameters): void;
+    onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void>;
+    onClosePrivacyPopUp(): Promise<void>;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
@@ -48,7 +50,7 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     }
 
     public setFadeEnabled(value: boolean) {
-        if(this._fadeEnabled !== value) {
+        if (this._fadeEnabled !== value) {
             this._fadeEnabled = value;
         }
     }

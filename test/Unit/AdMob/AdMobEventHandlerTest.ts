@@ -6,7 +6,7 @@ import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -58,10 +58,10 @@ const resolveAfter = (timeout: number): Promise<void> => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 core.Android!.Intent = sinon.createStubInstance(IntentApi);
             }
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
             }
             campaign = sinon.createStubInstance(AdMobCampaign);
@@ -99,7 +99,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
         describe('on open URL', () => {
             const url = 'https://unityads.unity3d.com/open';
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 describe('on iOS', () => {
                     it('should open the UrlScheme', () => {
                         sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
@@ -110,7 +110,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
                                 try {
                                     sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, url);
                                     resolve();
-                                } catch(e) {
+                                } catch (e) {
                                     reject(e);
                                 }
                             });
@@ -119,7 +119,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 describe('on Android', () => {
                     it('should open using the VIEW Intent', () => {
                         sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
@@ -178,7 +178,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
                     const call = (<sinon.SinonStub>thirdPartyEventManager.sendWithGet).getCall(0);
                     const calledUrl = call.args[2];
                     const param = Url.getQueryParameter(calledUrl, 'ms');
-                    if(!param) {
+                    if (!param) {
                         throw new Error('Expected param not to be null');
                     }
 
@@ -198,7 +198,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
                     const call = (<sinon.SinonStub>thirdPartyEventManager.sendWithGet).getCall(0);
                     const calledUrl = call.args[2];
                     const param = Url.getQueryParameter(calledUrl, 'rvdt');
-                    if(!param) {
+                    if (!param) {
                         throw new Error('Expected param not to be null');
                     }
                     assert.equal(param, adUnit.getRequestToViewTime().toString());
@@ -208,8 +208,8 @@ const resolveAfter = (timeout: number): Promise<void> => {
 
         describe('tracking event', () => {
             it('should forward the event to the ad unit', () => {
-                admobEventHandler.onTrackingEvent('foo');
-                (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith('foo');
+                admobEventHandler.onTrackingEvent(TrackingEvent.MIDPOINT);
+                (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith(TrackingEvent.MIDPOINT);
             });
         });
     });

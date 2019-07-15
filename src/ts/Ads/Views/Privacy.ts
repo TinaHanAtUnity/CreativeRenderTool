@@ -81,15 +81,15 @@ export class Privacy extends AbstractPrivacy {
         if (this._gdprEnabled) {
             const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
-            const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
+            const activeRadioButton = <HTMLInputElement> this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
 
             // Disables reporting for GDPR Regions by hiding the report screen from being activated
-            const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
+            const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
             middleLink.style.visibility = 'hidden';
         }
 
-        const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
+        const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
         if (agreeRadioButton) {
             agreeRadioButton.onclick = () => {
                 const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
@@ -105,10 +105,10 @@ export class Privacy extends AbstractPrivacy {
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        const gdprReduceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        const gdprReduceRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-refuse-radio');
         if (this._gdprEnabled) {
             this._handlers.forEach(handler => {
-                if(handler.onGDPROptOut) {
+                if (handler.onGDPROptOut) {
                     handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation);
                 }
             });
@@ -119,7 +119,7 @@ export class Privacy extends AbstractPrivacy {
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => {
-            if(handler.onPrivacy) {
+            if (handler.onPrivacy) {
                 handler.onPrivacy((<HTMLLinkElement>event.target).href);
             }
         });
@@ -146,14 +146,14 @@ export class Privacy extends AbstractPrivacy {
         const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
         requestContainer.classList.add('active');
 
-        const activeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        const activeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-refuse-radio');
         activeRadioButton.checked = true;
     }
 
     private onReportAd(event: Event): void {
         event.preventDefault();
         if (!this._reportSent) {
-            const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
+            const checkedReportButton = <HTMLElement> this._container.querySelector('.report-choice-radio:checked');
             const reportText = this._container.querySelector('.report-confirmed-text');
             if (checkedReportButton && checkedReportButton.id) {
                 this._reportSent = true;
@@ -182,9 +182,9 @@ export class Privacy extends AbstractPrivacy {
     private changePrivacyState(event: Event, isLeftClick: boolean) {
         event.preventDefault();
 
-        const leftSideLink = <HTMLDivElement>this._container.querySelector('.left-side-link');
-        const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
-        const closeButton = <HTMLDivElement>this._container.querySelector('.close-button');
+        const leftSideLink = <HTMLDivElement> this._container.querySelector('.left-side-link');
+        const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
+        const closeButton = <HTMLDivElement> this._container.querySelector('.close-button');
         const classList = this._container.classList;
         const reportButtonText = 'Report Ad ⚑';
         const privacyButtonText = 'Privacy info 👁';

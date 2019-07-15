@@ -4,7 +4,7 @@ import { IClickSignalResponse, IOpenableIntentsResponse } from 'AdMob/Views/AFMA
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -17,6 +17,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -36,6 +37,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
     private _clientInfo: ClientInfo;
+    private _pts: ProgrammaticTrackingService;
+    private _isRewardedPlacement: boolean;
 
     constructor(parameters: IAdMobAdUnitParameters) {
         super(parameters);
@@ -48,17 +51,23 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
+        this._pts = parameters.programmaticTrackingService;
+        this._isRewardedPlacement = !parameters.placement.allowSkip();
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
-        this.setFinishState(this._placement.allowSkip() ? FinishState.COMPLETED : FinishState.SKIPPED);
+        this.setFinishState(this._isRewardedPlacement ? FinishState.SKIPPED : FinishState.COMPLETED);
     }
 
     public show(): Promise<void> {
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
 
-        this.sendTrackingEvent('show');
+        if (this._isRewardedPlacement) {
+            this._pts.reportMetric(AdmobMetric.AdmobRewardedVideoStart);
+        }
+
+        this.sendTrackingEvent(TrackingEvent.SHOW);
         if (this._platform === Platform.ANDROID) {
             this._ads.Android!.AdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
@@ -87,12 +96,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return 'AdMob';
     }
 
-    public sendImpressionEvent() {
-        this.sendTrackingEvent('impression');
-    }
-
     public sendClickEvent() {
-        this.sendTrackingEvent('click');
+        this.sendTrackingEvent(TrackingEvent.CLICK);
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
         UserCountData.getClickCount(this._core).then((clickCount) => {
@@ -108,25 +113,31 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendStartEvent() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
-        this.sendTrackingEvent('start');
+        this.sendTrackingEvent(TrackingEvent.START);
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
     }
 
     public sendSkipEvent() {
-        this.sendTrackingEvent('skip');
+        if (this._isRewardedPlacement) {
+            this._pts.reportMetric(AdmobMetric.AdmobUserSkippedRewardedVideo);
+        }
+        this.sendTrackingEvent(TrackingEvent.SKIP);
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
 
     public sendCompleteEvent() {
-        this.sendTrackingEvent('complete');
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 
     public sendRewardEvent() {
         const params = this.getOperativeEventParams();
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
+        if (this._isRewardedPlacement) {
+            this._pts.reportMetric(AdmobMetric.AdmobUserWasRewarded);
+        }
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
@@ -141,12 +152,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return this._startTime;
     }
 
-    public sendTrackingEvent(event: string) {
-        const urls = this._campaign.getTrackingUrlsForEvent(event);
-
-        for (const url of urls) {
-            this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
-        }
+    public sendTrackingEvent(event: TrackingEvent, useWebviewUserAgentForTracking?: boolean, headers?: [string, string][]) {
+        return this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'admob', useWebviewUserAgentForTracking, headers);
     }
 
     public sendClickSignalResponse(response: IClickSignalResponse) {
@@ -227,7 +234,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private hideView() {
         this._view.hide();
-        document.body.removeChild(this._view.container());
+        if (this._view.container()) {
+            document.body.removeChild(this._view.container());
+        }
     }
 
     private onKeyDown(key: number) {

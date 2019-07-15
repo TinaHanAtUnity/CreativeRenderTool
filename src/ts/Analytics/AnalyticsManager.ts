@@ -8,9 +8,9 @@ import {
     AnalyticsLevelFailedEvent,
     AnalyticsLevelUpEvent,
     AnalyticsProtocol,
-    IAnalyticsCommonObject,
     IAnalyticsMonetizationExtras,
-    IAnalyticsObject
+    IAnalyticsObject,
+    IAnalyticsCommonObject
 } from 'Analytics/AnalyticsProtocol';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
@@ -23,11 +23,24 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 interface IAnalyticsEventWrapper {
     identifier: string;
     event: AnalyticsGenericEvent;
     posting: boolean;
+}
+
+// Topics sent to kafka and cdp
+enum AnalyticsTopic {
+    Custom = 'ads.analytics.custom.v1',
+    Transaction = 'ads.analytics.transaction.v1'
+}
+
+// Topics coming from native sdk
+enum NativeAnalyticsTopic {
+    Custom = 'analytics.custom.v1',
+    Transaction = 'analytics.transaction.v1'
 }
 
 export class AnalyticsManager {
@@ -41,6 +54,7 @@ export class AnalyticsManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
+    private _adsConfiguration: AdsConfiguration;
     private _userId: string;
     private _sessionId: number;
     private _storage: AnalyticsStorage;
@@ -56,7 +70,7 @@ export class AnalyticsManager {
     private _analyticsEventQueue: {[key: string]: IAnalyticsEventWrapper};
 
     public static getPurchasingFailureReason(reason: string): PurchasingFailureReason {
-        switch(reason) {
+        switch (reason) {
             case 'NOT_SUPPORTED':
                 return PurchasingFailureReason.ProductUnavailable;
             case 'ITEM_UNAVAILABLE':
@@ -71,7 +85,7 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
+    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._analytics = analytics;
@@ -80,6 +94,7 @@ export class AnalyticsManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
+        this._adsConfiguration = adsConfiguration;
         this._storage = analyticsStorage;
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
@@ -93,7 +108,7 @@ export class AnalyticsManager {
     }
 
     public init(): Promise<void> {
-        if(this._clientInfo.isReinitialized()) {
+        if (this._clientInfo.isReinitialized()) {
             return Promise.all([
                 this._storage.getUserId(),
                 this._storage.getSessionId(this._clientInfo.isReinitialized())
@@ -116,7 +131,7 @@ export class AnalyticsManager {
                 this.sendNewSession();
 
                 let updateDeviceInfo: boolean = false;
-                if(appVersion) {
+                if (appVersion) {
                     if (this._clientInfo.getApplicationVersion() !== appVersion) {
                         this.sendAppUpdate();
                         updateDeviceInfo = true;
@@ -126,13 +141,13 @@ export class AnalyticsManager {
                     updateDeviceInfo = true;
                 }
 
-                if(osVersion) {
+                if (osVersion) {
                     if (this._deviceInfo.getOsVersion() !== osVersion) {
                         updateDeviceInfo = true;
                     }
                 }
 
-                if(updateDeviceInfo) {
+                if (updateDeviceInfo) {
                     this.sendDeviceInfo();
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
@@ -182,7 +197,7 @@ export class AnalyticsManager {
     private createIapTransactionEvent(productId: string, receipt: string, currency: string, price: number): AnalyticsIapTransactionEvent | undefined {
         if (productId && receipt && currency && price) {
             return <AnalyticsIapTransactionEvent>{
-                type: 'analytics.transaction.v1',
+                type: AnalyticsTopic.Transaction,
                 msg: {
                     ts: new Date().getTime(),
                     productid: productId,
@@ -203,7 +218,7 @@ export class AnalyticsManager {
     private createIapPurchaseFailedEvent(productId: string, reason: PurchasingFailureReason, price: number | undefined, currency: string | undefined): AnalyticsIapPurchaseFailedEvent | undefined {
         if (productId && reason && price && currency) {
             return <AnalyticsIapPurchaseFailedEvent>{
-                type: 'analytics.custom.v1',
+                type: AnalyticsTopic.Custom,
                 msg: {
                     ts: new Date().getTime(),
                     name: 'unity.PurchaseFailed',
@@ -250,7 +265,7 @@ export class AnalyticsManager {
     }
 
     private onAppForeground(): void {
-        if(this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._sessionId = sessionId;
                 this._storage.setIds(this._userId, this._sessionId);
@@ -265,7 +280,7 @@ export class AnalyticsManager {
     }
 
     private onActivityResumed(activity: string): void {
-        if(this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._sessionId = sessionId;
                 this._storage.setIds(this._userId, this._sessionId);
@@ -277,12 +292,12 @@ export class AnalyticsManager {
     }
 
     private onActivityPaused(activity: string): void {
-        if(this._topActivity === activity || !this._topActivity) {
+        if (this._topActivity === activity || !this._topActivity) {
             this._bgTimestamp = Date.now();
             this.sendAppRunning();
         }
 
-        if(!this._topActivity) {
+        if (!this._topActivity) {
             this._topActivity = activity;
         }
     }
@@ -384,13 +399,14 @@ export class AnalyticsManager {
                 this._core.Sdk.logError('parseAnalyticsEvent was not able to parse event');
                 return Promise.resolve(null);
             }
-        } catch(error) {
+        } catch (error) {
             this._core.Sdk.logError(error);
             return Promise.resolve(null);
         }
     }
 
     private buildIapTransaction(event: AnalyticsIapTransactionEvent): Promise<AnalyticsIapTransactionEvent> {
+        event.type = AnalyticsTopic.Transaction; // use kafka topic
         event.msg.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         event.msg.transactionid = 0; // this field has been deprecated so just filling with 0
         // this field is to denote if analytics events are being sent from IAP
@@ -399,7 +415,7 @@ export class AnalyticsManager {
     }
 
     private isIapTransaction(event: AnalyticsIapTransactionEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.transaction.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Transaction) {
             const msg = event.msg;
             if (!msg.ts) {
                 throw new Error('AnalyticsIapTransactionEvent is missing field : "ts"');
@@ -426,13 +442,14 @@ export class AnalyticsManager {
 
     private buildAdComplete(event: AnalyticsAdCompleteEvent): Promise<AnalyticsAdCompleteEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isAdComplete(event: AnalyticsAdCompleteEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'ad_complete') {
                 const customParams = msg.custom_params;
@@ -453,13 +470,14 @@ export class AnalyticsManager {
 
     private buildLevelFailed(event: AnalyticsLevelFailedEvent): Promise<AnalyticsLevelFailedEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isLevelFailed(event: AnalyticsLevelFailedEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'level_fail') {
                 const customParams = msg.custom_params;
@@ -474,13 +492,14 @@ export class AnalyticsManager {
 
     private buildLevelUp(event: AnalyticsLevelUpEvent): Promise<AnalyticsLevelUpEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isLevelUp(event: AnalyticsLevelUpEvent): boolean {
-        if (event && event.msg && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'level_up') {
                 const customParams = msg.custom_params;
@@ -495,13 +514,14 @@ export class AnalyticsManager {
 
     private buildItemSpent(event: AnalyticsItemSpentEvent): Promise<AnalyticsItemSpentEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isItemSpent(event: AnalyticsItemSpentEvent): boolean {
-        if (event && event.msg && event.type && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'item_spent') {
                 const customParams = msg.custom_params;
@@ -537,13 +557,14 @@ export class AnalyticsManager {
 
     private buildItemAcquired(event: AnalyticsItemAcquiredEvent): Promise<AnalyticsItemAcquiredEvent> {
         const currentTime = new Date().getTime();
+        event.type = AnalyticsTopic.Custom; // use kafka topic
         event.msg.t_since_start = (currentTime - event.msg.ts) * 1000; // convert milliseconds to microseconds
         event.msg.custom_params.unity_monetization_extras = JSON.stringify(this.buildMonetizationExtras());
         return Promise.resolve(event);
     }
 
     private isItemAcquired(event: AnalyticsItemAcquiredEvent): boolean {
-        if (event && event.msg && event.type && event.type === 'analytics.custom.v1') {
+        if (event && event.msg && event.type && event.type === NativeAnalyticsTopic.Custom) {
             const msg = event.msg;
             if (msg.ts && msg.name && msg.custom_params && msg.name === 'item_acquired') {
                 const customParams = msg.custom_params;

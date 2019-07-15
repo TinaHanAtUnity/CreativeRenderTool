@@ -3,7 +3,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions, isUnityConsentPermissions } from 'Ads/Models/Privacy';
+import { IPermissions, isUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 export interface IPrivacyEventHandlerParameters {
@@ -43,8 +43,8 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        if(this._configuration.isOptOutRecorded()) {
-            if(optOutEnabled !== this._configuration.isOptOutEnabled()) {
+        if (this._configuration.isOptOutRecorded()) {
+            if (optOutEnabled !== this._configuration.isOptOutEnabled()) {
                 this._configuration.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
@@ -65,6 +65,17 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             } else {
                 this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
             }
+        }
+        const userPrivacy = this._configuration.getUserPrivacy();
+        if (userPrivacy) {
+            userPrivacy.update({
+                method: PrivacyMethod.LEGITIMATE_INTEREST,
+                version: 0,
+                permissions: {
+                    all: false,
+                    ads: !optOutEnabled,
+                    external: false,
+                    gameExp: false}});
         }
     }
 

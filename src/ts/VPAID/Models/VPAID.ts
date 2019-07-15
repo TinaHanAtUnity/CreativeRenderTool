@@ -1,7 +1,8 @@
 import { Vast } from 'VAST/Models/Vast';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class VPAID {
     private vast: Vast;
@@ -27,16 +28,16 @@ export class VPAID {
     public hasCompanionAd(): boolean {
         const ad = this.vast.getAd();
         if (ad) {
-            const companions = ad.getCompanionAds();
+            const companions = ad.getStaticCompanionAds();
             return companions.length !== 0;
         }
         return false;
     }
 
-    public getCompanion(): VastCreativeStaticResourceCompanionAd | null {
+    public getCompanion(): VastCompanionAdStaticResource | null {
         const ad = this.vast.getAd();
         if (ad) {
-            const companions = ad.getCompanionAds();
+            const companions = ad.getStaticCompanionAds();
             if (companions.length) {
                 return companions[0];
             }
@@ -70,11 +71,11 @@ export class VPAID {
         return this.vast.getVideoClickTrackingURLs() || [];
     }
 
-    public getTrackingEventUrls(eventName: string) {
+    public getTrackingEventUrls(eventName: TrackingEvent) {
         return this.vast.getTrackingEventUrls(eventName);
     }
 
-    public getImpressionUrls(): string[] | null {
+    public getImpressionUrls(): string[] {
         return this.vast.getImpressionUrls();
     }
 

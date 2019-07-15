@@ -31,7 +31,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _showGDPRBanner: boolean;
 
     private _ads: IAdsApi;
-    private _localization: Localization;
+    protected _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
 
@@ -60,7 +60,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _gameId: string;
 
     private _country: string | undefined;
-    private _campaign: Campaign;
+    protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
 
@@ -273,19 +273,12 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     protected onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-        this._isPrivacyShowing = true;
         this._showGDPRBanner = false;
         this.choosePrivacyShown();
-
-        this._ads.VideoPlayer.pause();
-        if (this._privacy) {
-            this._privacy.show();
-        }
+        this.onPrivacyEvent(event);
     }
 
-    private onPrivacyEvent(event: Event) {
+    protected onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
         event.stopPropagation();
@@ -368,13 +361,13 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     private setupElementReferences(): void {
-        this._skipButtonElement = <HTMLElement>this._container.querySelector('.skip-button');
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
-        this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
+        this._skipButtonElement = <HTMLElement> this._container.querySelector('.skip-button');
+        this._spinnerElement = <HTMLElement> this._container.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement> this._container.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement> this._container.querySelector('.call-button');
+        this._timerElement = <HTMLElement> this._container.querySelector('.timer');
+        this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
 
     private showSkipButton() {

@@ -25,10 +25,6 @@ describe('DisplayInterstitialTest', () => {
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
 
-    describe('on Display Interstitial Markup Campaign', () => {
-        viewUnitTests();
-    });
-
     function viewUnitTests() {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
@@ -82,4 +78,8 @@ describe('DisplayInterstitialTest', () => {
             view.hide();
         });
     }
+
+    describe('on Display Interstitial Markup Campaign', () => {
+        viewUnitTests();
+    });
 });

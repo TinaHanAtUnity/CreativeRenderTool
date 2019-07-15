@@ -13,6 +13,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -71,8 +72,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onMraidOrientationProperties(orientationProperties: IOrientationProperties): void {
-        if(this._adUnit.isShowing()) {
-            if(this._platform === Platform.IOS) {
+        if (this._adUnit.isShowing()) {
+            if (this._platform === Platform.IOS) {
                 this._adUnit.getContainer().reorient(true, orientationProperties.forceOrientation);
             } else {
                 this._adUnit.getContainer().reorient(orientationProperties.allowOrientationChange, orientationProperties.forceOrientation);
@@ -83,12 +84,30 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: unknown): void {
-        // no-op
+        const kafkaObject: { [key: string]: unknown } = {};
+        kafkaObject.type = event;
+        kafkaObject.eventData = eventData;
+        kafkaObject.timeFromShow = timeFromShow;
+        kafkaObject.timeFromPlayableStart = timeFromPlayableStart;
+        kafkaObject.backgroundTime = backgroundTime;
+
+        const resourceUrl = this._campaign.getResourceUrl();
+        if (resourceUrl) {
+            kafkaObject.url = resourceUrl.getOriginalUrl();
+        }
+
+        kafkaObject.auctionId = this._campaign.getSession().getId();
+        kafkaObject.abGroup = this._coreConfig.getAbGroup();
+
+        kafkaObject.targetGameId = this._campaign.getTargetGameId();
+        kafkaObject.campaignId = this._campaign.getId();
+
+        HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     public onMraidShowEndScreen(): void {
         const endScreen = this._adUnit.getEndScreen();
-        if(endScreen) {
+        if (endScreen) {
             this._adUnit.setShowingMRAID(false);
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
@@ -126,7 +145,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     protected openUrl(url: string): Promise<void> {
-        if(this._platform === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             return this._core.iOS!.UrlScheme.open(url);
         } else {
             return this._core.Android!.Intent.launch({

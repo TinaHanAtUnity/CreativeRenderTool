@@ -1,10 +1,11 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ICoreApi } from 'Core/ICore';
-import { IntentData } from 'Core/Native/Android/Intent';
+import { IIntentData } from 'Core/Native/Android/Intent';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IOpenableIntentsRequest {
     id: string;
-    intents: IntentData[];
+    intents: IIntentData[];
 }
 
 export interface IOpenableIntentsResponse {
@@ -73,7 +74,7 @@ export interface IAFMAHandler {
     onAFMAOpenInAppStore(productId: string, url: string): void;
     onAFMAFetchAppStoreOverlay(productId: string): void;
     onAFMAResolveOpenableIntents(productId: IOpenableIntentsRequest): void;
-    onAFMATrackingEvent(event: string, data?: unknown): void;
+    onAFMATrackingEvent(event: TrackingEvent, data?: unknown): void;
     onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
     onAFMAUserSeeked(): void;
 }
@@ -101,7 +102,7 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_IN_APP_STORE] = (msg) => this._handler.onAFMAOpenInAppStore(<string>msg.data.productId, <string>msg.data.url);
         this._afmaHandlers[AFMAEvents.FETCH_APP_STORE_OVERLAY] = (msg) => this._handler.onAFMAFetchAppStoreOverlay(<string>msg.data.productId);
         this._afmaHandlers[AFMAEvents.OPEN_INTENTS_REQUEST] = (msg) => this._handler.onAFMAResolveOpenableIntents(<IOpenableIntentsRequest>msg.data);
-        this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(<string>msg.data.event, msg.data.data);
+        this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(<TrackingEvent>msg.data.event, msg.data.data);
         this._afmaHandlers[AFMAEvents.GET_CLICK_SIGNAL] = (msg) => this._handler.onAFMAClickSignalRequest(<ITouchInfo>msg.data);
         this._afmaHandlers[AFMAEvents.USER_SEEKED] = (msg) => this._handler.onAFMAUserSeeked();
     }

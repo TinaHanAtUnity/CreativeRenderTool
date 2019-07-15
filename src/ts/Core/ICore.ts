@@ -35,6 +35,9 @@ import { StorageApi } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 import { IStore } from 'Store/IStore';
+import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -47,6 +50,7 @@ export interface ICoreApi extends IModuleApi {
     Sdk: SdkApi;
     SensorInfo: SensorInfoApi;
     Storage: StorageApi;
+    NativeError: NativeErrorApi;
     Android?: {
         Broadcast: BroadcastApi;
         Intent: IntentApi;
@@ -74,11 +78,12 @@ export interface ICore extends IApiModule {
     RequestManager: RequestManager;
     CacheManager: CacheManager;
     JaegerManager: JaegerManager;
+    DeviceIdManager: DeviceIdManager;
     ClientInfo: ClientInfo;
     DeviceInfo: DeviceInfo;
     Config: CoreConfiguration;
     Ads: IAds;
-    Analytics: IAnalytics;
     Purchasing: IPurchasing;
     Store: IStore;
+    ProgrammaticTrackingService: ProgrammaticTrackingService;
 }

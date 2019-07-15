@@ -5,6 +5,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class XPromoVideoEventHandler extends VideoEventHandler {
 
@@ -35,7 +36,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         if (overlay) {
             overlay.setCallButtonVisible(true);
 
-            if(TestEnvironment.get('debugOverlayEnabled')) {
+            if (TestEnvironment.get('debugOverlayEnabled')) {
                 overlay.setDebugMessage('XPromo');
             }
         }
@@ -46,12 +47,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
             this._adUnit.onStartProcessed.trigger();
         });
 
-        const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
-
-        for (const url of trackingUrls) {
-            this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
-        }
-
+        this.sendTrackingEvent(TrackingEvent.START);
         this._ads.Listener.sendStartEvent(this._placement.getId());
     }
 
@@ -65,10 +61,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
     protected handleCompleteEvent(): void {
         this._xpromoOperativeEventManager.sendView(this.getXPromoOperativeEventParams());
-        const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('view');
-        for (const clickUrl of clickTrackingUrls) {
-            this._thirdPartyEventManager.sendWithGet('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);
-        }
+        this.sendTrackingEvent(TrackingEvent.VIEW);
     }
 
     protected getVideoOrientation(): string | undefined {
@@ -80,5 +73,9 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation()
         };
+    }
+
+    private sendTrackingEvent(event: TrackingEvent) {
+        this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'xpromo');
     }
 }

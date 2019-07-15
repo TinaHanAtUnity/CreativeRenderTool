@@ -7,7 +7,7 @@ addons:
     - parallel
 env:
   global:
-    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+  - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 install:
 - ". $HOME/.nvm/nvm.sh"
 - nvm install 10
@@ -19,28 +19,7 @@ cache:
   directories:
   - node_modules
   - "$HOME/google-cloud-sdk/"
-jobs:
-  include:
-    - stage: "Tests"
-      script:
-        make lint
-      name: "Lint"
-    - script:
-        make test-coverage
-      name: "Coverage"
-    - script:
-        make test-integration
-      name: "Integration test"
-    - script:
-        make test-browser
-      name: "Browser test"
-
-    - stage: "Deployment"
-      script:
-        make build-test &&
-        make build-release &&
-        make deploy
-      name: "Deploy"
+script: make lint && make test-coverage && make test-integration && make build-test && make test-browser && make build-release && make deploy
 notifications:
   slack:
     rooms:

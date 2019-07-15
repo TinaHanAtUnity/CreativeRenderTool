@@ -33,7 +33,8 @@ interface IUserSummary extends ITemplateData {
 export enum GDPREventSource {
     METADATA = 'metadata',
     NO_REVIEW = 'no_review',
-    USER = 'user'
+    USER = 'user',
+    SANITIZATION = 'sanitization'
 }
 
 export enum GDPREventAction {
@@ -43,7 +44,13 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
-export type UserPrivacyStorageData = { gdpr: { consent: { value: unknown }}};
+export interface IUserPrivacyStorageData {
+    gdpr: {
+        consent: {
+            value: unknown;
+        };
+    };
+}
 
 export class UserPrivacyManager {
 
@@ -70,7 +77,7 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <UserPrivacyStorageData>data));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -80,7 +87,8 @@ export class UserPrivacyManager {
             'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._platform].toLowerCase(),
             'country': this._coreConfig.getCountry(),
-            'gameId': this._clientInfo.getGameId()
+            'gameId': this._clientInfo.getGameId(),
+            'bundleId': this._clientInfo.getApplicationName()
         };
         if (source) {
             infoJson = {
@@ -169,6 +177,7 @@ export class UserPrivacyManager {
             method: PrivacyMethod.UNITY_CONSENT,
             version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
+            bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions
         };
 
@@ -199,10 +208,12 @@ export class UserPrivacyManager {
     }
 
     public retrieveUserSummary(): Promise<IUserSummary> {
-        const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+        let url = `https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
-        // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
-        // const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
+        if (this._coreConfig.getTestMode()) {
+            url = `https://ads-privacy-api.stg.mz.internal.unity3d.com/api/v1/summary?adid=f2c5a456-229f-49c8-abed-c4047c86f8e7&projectId=24295855-8602-4efc-a30d-a9d84b275eda&storeId=google&gameId=1490325`;
+        }
+
         const personalPayload = {
             deviceModel: this._deviceInfo.getModel(),
             country: this._coreConfig.getCountry()
@@ -265,7 +276,7 @@ export class UserPrivacyManager {
     private getConsent(): Promise<boolean> {
         return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: unknown) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
-            if(typeof(value) !== 'undefined') {
+            if (typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
             } else {
                 throw new Error('gdpr.consent.value is undefined');
@@ -278,26 +289,24 @@ export class UserPrivacyManager {
         this._adsConfig.setOptOutRecorded(true);
 
         const gamePrivacy = this._adsConfig.getGamePrivacy();
-        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-            const userPrivacy = this._adsConfig.getUserPrivacy();
-            userPrivacy.update({
-                method: gamePrivacy.getMethod(),
-                version: gamePrivacy.getVersion(),
-                permissions: {
-                    profiling: consent
-                }
-            });
-        }
+        gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+        const userPrivacy = this._adsConfig.getUserPrivacy();
+        userPrivacy.update({
+            method: gamePrivacy.getMethod(),
+            version: gamePrivacy.getVersion(),
+            permissions: {
+                profiling: consent
+            }
+        });
     }
 
-    private onStorageSet(eventType: string, data: UserPrivacyStorageData) {
+    private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
-            if(data && data.gdpr && data.gdpr.consent) {
+            if (data && data.gdpr && data.gdpr.consent) {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
-                if(typeof(value) !== 'undefined') {
+                if (typeof(value) !== 'undefined') {
                     this.updateConfigurationWithConsent(value);
                     this.pushConsent(value);
                 }
@@ -309,12 +318,12 @@ export class UserPrivacyManager {
     // with Android Java native layer method that takes Object as value
     // this hack allows anyone use both booleans and string "true" and "false" values
     private getConsentTypeHack(value: unknown): boolean | undefined {
-        if(typeof(value) === 'boolean') {
+        if (typeof(value) === 'boolean') {
             return value;
-        } else if(typeof(value) === 'string') {
-            if(value === 'true') {
+        } else if (typeof(value) === 'string') {
+            if (value === 'true') {
                 return true;
-            } else if(value === 'false') {
+            } else if (value === 'false') {
                 return false;
             }
         }

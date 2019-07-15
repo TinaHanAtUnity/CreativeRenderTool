@@ -15,7 +15,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ABGroup, ConsentCTATest } from 'Core/Models/ABGroup';
+import { ABGroup, ConsentTest } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -45,15 +45,21 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
+
         this._landingPage = ConsentPage.HOMESCREEN;
+
+        let consentABTest: boolean = false;
+        if (ConsentTest.isValid(parameters.abGroup) && parameters.deviceInfo.getLanguage().match('en.*')) {
+            consentABTest = true;
+        }
 
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
             pts: parameters.pts,
-            useAltMyChoicesButtonText: false, // will be re-tested later
-            ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
+            language: parameters.deviceInfo.getLanguage(),
+            consentABTest: consentABTest
         };
 
         if (this._platform === Platform.ANDROID) {
@@ -83,7 +89,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
             this._unityConsentView.show();
 
-            if(TestEnvironment.get('autoAcceptConsent')) {
+            if (TestEnvironment.get('autoAcceptConsent')) {
                 const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
                 this.handleAutoConsent(consentValues);
             }
@@ -157,11 +163,11 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     private handleAutoConsent(consent: IPermissions) {
         setTimeout(() => {
-            if(consent.hasOwnProperty('all')) {
+            if (consent.hasOwnProperty('all')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
                 this._unityConsentView.testAutoConsentAll();
             }
-            if(consent.hasOwnProperty('ads')) {
+            if (consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
                 this._unityConsentView.testAutoConsent(consent);
             }

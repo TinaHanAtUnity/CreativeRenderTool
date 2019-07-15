@@ -46,7 +46,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _osVersion: string | undefined;
     private _apiLevel?: number;
 
-    constructor(parameters : IEndScreenParameters) {
+    constructor(parameters: IEndScreenParameters) {
         super(parameters.platform, 'end-screen');
         this._localization = new Localization(parameters.language, 'endscreen');
         this._abGroup = parameters.abGroup;
@@ -96,12 +96,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         super.render();
 
         if (this._isSwipeToCloseEnabled) {
-            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+            (<HTMLElement> this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
         const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
         if (ctaButtonColor) {
-            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+            (<HTMLElement> this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
@@ -129,7 +129,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // this is most certainly not a proper solution to this problem but without this hack, sometimes game name
         // would prevent download button from showing which completely breaks layout and monetization
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
-        const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
+        const nameContainer: HTMLElement = <HTMLElement> this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
         if (AbstractAdUnit.getAutoClose()) {

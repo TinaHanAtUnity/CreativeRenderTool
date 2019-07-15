@@ -9,7 +9,7 @@ import {
 } from 'AdMob/Views/AFMABridge';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { ProgrammaticTrackingMetricName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -20,6 +20,7 @@ import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -30,7 +31,7 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation): void;
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
-    onTrackingEvent(event: string, data?: unknown): void;
+    onTrackingEvent(event: TrackingEvent, data?: unknown): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
@@ -107,8 +108,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         super.render();
         this.setupIFrame();
 
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._gdprBanner = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement> this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -125,7 +126,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.disconnect();
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -167,7 +168,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private setupIFrame() {
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#admob-iframe');
         this._iframe = iframe;
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;
@@ -199,10 +200,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                     const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
                     scriptEl.textContent = replacedSrc;
                     // report using cached video
-                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.AdmobUsedCachedVideo).catch();
+                    this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUsedCachedVideo).catch();
                 } else {
                     // report using streaming video
-                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.AdmobUsedStreamedVideo).catch();
+                    this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUsedStreamedVideo).catch();
                 }
             }
         }
@@ -268,12 +269,12 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 
-    private onTrackingEvent(event: string, data?: unknown) {
+    private onTrackingEvent(event: TrackingEvent, data?: unknown) {
         this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 
     private onUserSeeked() {
-        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.AdmobUserVideoSeeked).catch();
+        this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUserVideoSeeked).catch();
     }
 
     private onGDPRPopupEvent(event: Event) {

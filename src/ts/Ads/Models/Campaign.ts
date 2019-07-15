@@ -3,8 +3,11 @@ import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
-export type ICampaignTrackingUrls = { [key: string]: string[] };
+export interface ICampaignTrackingUrls {
+    [key: string]: string[];
+}
 
 export interface IRawCampaign {
     id: string;
@@ -30,7 +33,7 @@ export interface ICampaign {
     session: Session;
     mediaId: string;
     trackingUrls: ICampaignTrackingUrls;
-    backupCampaign: boolean;
+    isLoadEnabled: boolean;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -46,7 +49,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         session: ['object'],
         mediaId: ['string'],
         trackingUrls: ['object'],
-        backupCampaign: ['boolean']
+        isLoadEnabled: ['boolean']
     };
 
     constructor(name: string, schema: ISchema<T>, data: T) {
@@ -94,8 +97,12 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return willExpireAt !== undefined && Date.now() > willExpireAt;
     }
 
-    public isBackupCampaign(): boolean {
-        return this.get('backupCampaign');
+    public setIsLoadEnabled(isLoadEnabled: boolean) {
+        this.set('isLoadEnabled', isLoadEnabled);
+    }
+
+    public isLoadEnabled(): boolean {
+        return this.get('isLoadEnabled');
     }
 
     public setMediaId(id: string) {
@@ -114,7 +121,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('trackingUrls');
     }
 
-    public getTrackingUrlsForEvent(event: string): string[] {
+    public getTrackingUrlsForEvent(event: TrackingEvent): string[] {
         const urls = this.getTrackingUrls();
         if (urls) {
             return urls[event] || [];

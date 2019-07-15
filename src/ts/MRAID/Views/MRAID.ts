@@ -49,7 +49,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this.prepareProgressCircle();
 
-        if(this._domContentLoaded) {
+        if (this._domContentLoaded) {
             this.setViewableState(true);
             this.sendCustomImpression();
         } else {
@@ -68,7 +68,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public setViewableState(viewable: boolean) {
-        if(this._domContentLoaded) {
+        if (this._domContentLoaded) {
             this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
@@ -88,17 +88,17 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         event.preventDefault();
         event.stopPropagation();
 
-        if(this._canSkip && !this._canClose) {
+        if (this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
             this.sendMraidAnalyticsEvent('playable_skip');
-        } else if(this._canClose) {
+        } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
             this.sendMraidAnalyticsEvent('playable_close');
         }
     }
 
     private loadIframe(): void {
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         this.createMRAID(
@@ -109,7 +109,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
 
-            if (CustomFeatures.isSonicPlayable(this._creativeId)) {
+            if (CustomFeatures.isNestedIframePlayable(this._creativeId)) {
                 iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
             }
         }).catch(e => {

@@ -1,7 +1,6 @@
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -43,10 +42,10 @@ class SpecVerifier {
         this._platform = platform;
         this._spec = spec;
         const parsedUrl: string[] = url.split('?');
-        if(parsedUrl.length > 1) {
+        if (parsedUrl.length > 1) {
             this._queryParams = parsedUrl[1].split('&');
         }
-        if(body) {
+        if (body) {
             this._bodyParams = JSON.parse(body);
         }
     }
@@ -57,8 +56,8 @@ class SpecVerifier {
     }
 
     private assertUnspecifiedParams(): void {
-        if(this._queryParams) {
-            for(const queryParam of this._queryParams) {
+        if (this._queryParams) {
+            for (const queryParam of this._queryParams) {
                 const paramName: string = queryParam.split('=')[0];
                 const paramValue: any = queryParam.split('=')[1];
 
@@ -69,9 +68,9 @@ class SpecVerifier {
             }
         }
 
-        if(this._bodyParams) {
-            for(const key in this._bodyParams) {
-                if(this._bodyParams.hasOwnProperty(key)) {
+        if (this._bodyParams) {
+            for (const key in this._bodyParams) {
+                if (this._bodyParams.hasOwnProperty(key)) {
                     assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
                     this.assertBodyParamType(key, this._bodyParams[key]);
@@ -81,15 +80,15 @@ class SpecVerifier {
     }
 
     private assertRequiredParams(): void {
-        for(const param in this._spec) {
-            if(this._spec.hasOwnProperty(param)) {
-                if(this.isRequired(this._spec[param].required)) {
-                    if(this._spec[param].queryString) {
+        for (const param in this._spec) {
+            if (this._spec.hasOwnProperty(param)) {
+                if (this.isRequired(this._spec[param].required)) {
+                    if (this._spec[param].queryString) {
                         let found: boolean = false;
 
-                        for(const queryParam of this._queryParams) {
+                        for (const queryParam of this._queryParams) {
                             const paramName: string = queryParam.split('=')[0];
-                            if(paramName === param) {
+                            if (paramName === param) {
                                 found = true;
                             }
                         }
@@ -97,7 +96,7 @@ class SpecVerifier {
                         assert.isTrue(found, 'Required parameter not found in query string: ' + param);
                     }
 
-                    if(this._spec[param].body) {
+                    if (this._spec[param].body) {
                         assert.isTrue(this._bodyParams.hasOwnProperty(param), 'Required parameter not found in body: ' + param);
                     }
                 }
@@ -106,11 +105,11 @@ class SpecVerifier {
     }
 
     private assertQueryParamType(name: string, value: string): void {
-        if(this._spec[name].type === 'boolean') {
+        if (this._spec[name].type === 'boolean') {
             assert.match(value, /(true|false)/i, 'Query parameter type mismatch: ' + name);
-        } else if(this._spec[name].type === 'number') {
+        } else if (this._spec[name].type === 'number') {
             assert.match(value, /[0-9]+/, 'Query parameter type mismatch: ' + name);
-        } else if(this._spec[name].type === 'string') {
+        } else if (this._spec[name].type === 'string') {
             // due to lack of better alternatives check that string has legal URL characters
             assert.match(value, /^([\!\#\$\&-\;\=\?-\[\]_a-z\~]|%[0-9a-fA-F]{2})+$/i, 'Query parameter type mismatch: ' + name);
         } else {
@@ -183,7 +182,8 @@ describe('Event parameters should match specifications', () => {
             const platform = Platform.ANDROID;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const core = coreModule.Api;
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -193,9 +193,8 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
             const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, clientInfo);
             const wakeUpManager = new WakeUpManager(core);
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
@@ -206,7 +205,7 @@ describe('Event parameters should match specifications', () => {
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -220,7 +219,8 @@ describe('Event parameters should match specifications', () => {
             const platform = Platform.IOS;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const core = coreModule.Api;
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -230,9 +230,8 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
             const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, clientInfo);
             const wakeUpManager = new WakeUpManager(core);
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
@@ -243,7 +242,7 @@ describe('Event parameters should match specifications', () => {
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -532,110 +531,6 @@ describe('Event parameters should match specifications', () => {
                     const body: string = requestSpy.getCall(0).args[1];
 
                     const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getVideoEventParams(), url, body);
-                    verifier.assert();
-                });
-            });
-        });
-    });
-
-    describe('with realtime ad request', () => {
-        let coreConfig: CoreConfiguration;
-        let adsConfig: AdsConfiguration;
-        let realtimePlacement: Placement;
-
-        beforeEach(() => {
-            coreConfig = TestFixtures.getCoreConfiguration();
-            adsConfig = TestFixtures.getAdsConfiguration();
-            realtimePlacement = new Placement({
-                id: 'placementStrictlyforScooters',
-                name: 'test',
-                default: true,
-                allowSkip: true,
-                skipInSeconds: 5,
-                disableBackButton: true,
-                useDeviceOrientationForVideo: false,
-                skipEndCardOnClose: false,
-                disableVideoControlsFade: false,
-                useCloseIconInsteadOfSkipIcon: false,
-                adTypes: [],
-                refreshDelay: 1000,
-                muteVideo: false,
-                banner: {'refreshRate': 40}
-            });
-            realtimePlacement.setRealtimeData('XXXscootVids');
-        });
-
-        it('on Android', () => {
-            const platform = Platform.ANDROID;
-            const backend = TestFixtures.getBackend(platform);
-            const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
-            const ads = TestFixtures.getAdsApi(nativeBridge);
-            const storageBridge = new StorageBridge(core);
-            const metaDataManager = new MetaDataManager(core);
-            const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const clientInfo = TestFixtures.getClientInfo(platform);
-            const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-            const cacheBookkeeping = new CacheBookkeepingManager(core);
-            const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, clientInfo);
-            const wakeUpManager = new WakeUpManager(core);
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            const sessionManager = new SessionManager(core, request, storageBridge);
-            const focusManager = new FocusManager(platform, core);
-            const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
-            const campaignParserManager = new ContentTypeHandlerManager();
-            const jaegerManager = sinon.createStubInstance(JaegerManager);
-            jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
-            sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
-            const session = new Session('abcde-12345');
-            sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(session));
-            sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-            campaignManager.request().then(() => {
-                const requestSpy: any = sinon.spy(request, 'post');
-                return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
-                    const url: string = requestSpy.getCall(0).args[0];
-                    const body: string = requestSpy.getCall(0).args[1];
-                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getRealtimeAdRequestParams(), url, body);
-                    verifier.assert();
-                });
-            });
-       });
-
-        it('on iOS', () => {
-            const platform = Platform.IOS;
-            const backend = TestFixtures.getBackend(platform);
-            const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
-            const ads = TestFixtures.getAdsApi(nativeBridge);
-            const storageBridge = new StorageBridge(core);
-            const metaDataManager = new MetaDataManager(core);
-            const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const clientInfo = TestFixtures.getClientInfo(platform);
-            const deviceInfo = TestFixtures.getIosDeviceInfo(core);
-            const cacheBookkeeping = new CacheBookkeepingManager(core);
-            const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo, clientInfo);
-            const wakeUpManager = new WakeUpManager(core);
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            const sessionManager = new SessionManager(core, request, storageBridge);
-            const focusManager = new FocusManager(platform, core);
-            const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
-            const campaignParserManager = new ContentTypeHandlerManager();
-            const jaegerManager = sinon.createStubInstance(JaegerManager);
-            jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
-            sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
-            const session = new Session('abcde-12345');
-            sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(session));
-            sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-            campaignManager.request().then(() => {
-                const requestSpy: any = sinon.spy(request, 'post');
-                return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
-                    const url: string = requestSpy.getCall(0).args[0];
-                    const body: string = requestSpy.getCall(0).args[1];
-                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getRealtimeAdRequestParams(), url, body);
                     verifier.assert();
                 });
             });

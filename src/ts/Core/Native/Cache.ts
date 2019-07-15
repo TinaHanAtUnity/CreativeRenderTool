@@ -47,7 +47,7 @@ export class CacheApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Cache', ApiPackage.CORE, EventCategory.CACHE);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+        if (nativeBridge.getPlatform() === Platform.IOS) {
             this.iOS = new IosCacheApi(nativeBridge);
         } else {
             this.Android = new AndroidCacheApi(nativeBridge);
@@ -90,9 +90,10 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setProgressInterval', [interval]);
     }
 
-    public getProgressInterval(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getProgressInterval');
-    }
+    // This is broken on all released iOS versions
+    // public getProgressInterval(): Promise<number> {
+    //     return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getProgressInterval');
+    // }
 
     public setTimeouts(connectTimeout: number, readTimeout: number): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setTimeouts', [connectTimeout, readTimeout]);
@@ -119,7 +120,7 @@ export class CacheApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
                 this.onDownloadStarted.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <[string, string][]>parameters[4]);
                 break;

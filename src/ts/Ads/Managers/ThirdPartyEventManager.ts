@@ -1,13 +1,10 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Analytics } from 'Ads/Utilities/Analytics';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -22,7 +19,34 @@ export enum ThirdPartyEventMacro {
     GAMER_SID = '%GAMER_SID%'
 }
 
-export type TemplateValueMap = { [id: string]: string };
+export enum TrackingEvent {
+    IMPRESSION = 'impression',
+    CLICK = 'click',
+    START = 'start',
+    SHOW = 'show',
+    LOADED = 'loaded',
+    FIRST_QUARTILE = 'firstQuartile',
+    MIDPOINT = 'midpoint',
+    THIRD_QUARTILE = 'thirdQuartile',
+    COMPLETE = 'complete',
+    ERROR = 'error',
+    SKIP = 'skip',
+    VIEW = 'view',
+    STALLED = 'stalled',
+    COMPANION_CLICK = 'companionClick',
+    COMPANION = 'companion',
+    VIDEO_ENDCARD_CLICK = 'videoEndCardClick',
+    MUTE = 'mute',
+    UNMUTE = 'unmute',
+    PAUSED = 'paused',
+    RESUME = 'resume',
+    CREATIVE_VIEW = 'creativeView',
+    PURCHASE = 'purchase'
+}
+
+export interface ITemplateValueMap {
+    [id: string]: string;
+}
 
 export class ThirdPartyEventManager {
 
@@ -30,13 +54,24 @@ export class ThirdPartyEventManager {
     private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: TemplateValueMap) {
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
         this._core = core;
         this._request = request;
 
         if (templateValues) {
             this.setTemplateValues(templateValues);
         }
+    }
+
+    public sendTrackingEvents(campaign: Campaign, event: TrackingEvent, adDescription: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse[]> {
+        const urls = campaign.getTrackingUrlsForEvent(event);
+        const sessionId = campaign.getSession().getId();
+        const events = [];
+
+        for (const url of urls) {
+            events.push(this.sendWithGet(`${adDescription} ${event}`, sessionId, url, useWebViewUserAgentForTracking, headers));
+        }
+        return Promise.all(events);
     }
 
     public replaceTemplateValuesAndEncodeUrls(urls: string[]): string[] {
@@ -105,12 +140,12 @@ export class ThirdPartyEventManager {
                 protocol: urlParts.protocol,
                 auctionProtocol: auctionProtocol
             };
-            if(error instanceof RequestError) {
+            if (error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), diagnosticData);
             }
             // Auction V5 start dip investigation
             if (CustomFeatures.shouldSampleAtTenPercent()) {
-                if (event.toLowerCase().indexOf('start') !== -1 || event.toLowerCase().indexOf('impression') !== -1) {
+                if (event === TrackingEvent.START || event === TrackingEvent.IMPRESSION) {
                     Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
                 }
             }
@@ -119,33 +154,12 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public setTemplateValues(templateValues: TemplateValueMap): void {
+    public setTemplateValues(templateValues: ITemplateValueMap): void {
         this._templateValues = templateValues;
     }
 
     public setTemplateValue(key: ThirdPartyEventMacro, value: string): void {
         this._templateValues[key] = value;
-    }
-
-    public sendPerformanceTrackingEvent(campaign: Campaign, event: ICometTrackingUrlEvents): Promise<void> {
-        if (campaign instanceof PerformanceCampaign) {
-            const urls = campaign.getTrackingUrls();
-            // Object.keys... is Currently to protect against the integration tests FAB dependency on static performance configurations not including the tracking URLs
-            if (urls && urls[event] && Object.keys(urls[event]).length !== 0) {
-                for (const eventUrl of urls[event]) {
-                    if (eventUrl) {
-                        this.sendWithGet(event, campaign.getSession().getId(), eventUrl);
-                    } else {
-                        const error = {
-                            eventUrl: eventUrl,
-                            event: event
-                        };
-                        SessionDiagnostics.trigger('invalid_tracking_url', error, campaign.getSession());
-                    }
-                }
-            }
-        }
-        return Promise.resolve();
     }
 
     private replaceTemplateValuesAndEncodeUrl(url: string): string {
@@ -162,7 +176,7 @@ export class ThirdPartyEventManager {
 }
 
 export interface IThirdPartyEventManagerFactory {
-    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
+    create(templateValues: ITemplateValueMap): ThirdPartyEventManager;
 }
 
 export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
@@ -175,7 +189,7 @@ export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFac
         this._requestManager = requestManager;
     }
 
-    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
+    public create(templateValues: ITemplateValueMap): ThirdPartyEventManager {
         return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
     }
 }

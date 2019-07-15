@@ -4,6 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { IGranularPermissions } from 'Ads/Models/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IPersonalizationSwitchGroupHandler {
     onSwitchGroupSelectionChange(): void;
@@ -17,12 +18,12 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     private _personalizedAdsSwitch: HTMLInputElement;
     private _personalized3rdPartySwitch: HTMLInputElement;
 
-    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, language: string) {
         super(platform, 'personalization-switch-group');
 
         this._userPrivacyManager = userPrivacyManager;
 
-        this._template = new Template(SwitchGroupTemplate);
+        this._template = new Template(SwitchGroupTemplate, new Localization(language, 'consent'));
 
         this._bindings = [
             {
@@ -46,9 +47,9 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     public render(): void {
         super.render();
 
-        this._personalizedExpSwitch = <HTMLInputElement>this._container.querySelector('#personalized-experience-switch');
-        this._personalizedAdsSwitch = <HTMLInputElement>this._container.querySelector('#personalized-ads-switch');
-        this._personalized3rdPartySwitch = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party-switch');
+        this._personalizedExpSwitch = <HTMLInputElement> this._container.querySelector('#personalized-experience-switch');
+        this._personalizedAdsSwitch = <HTMLInputElement> this._container.querySelector('#personalized-ads-switch');
+        this._personalized3rdPartySwitch = <HTMLInputElement> this._container.querySelector('#personalized-ads-3rd-party-switch');
     }
 
     public show(): void {

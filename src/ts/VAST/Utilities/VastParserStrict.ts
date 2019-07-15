@@ -1,17 +1,21 @@
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
-import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
+import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
+import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -29,6 +33,8 @@ enum VastNodeName {
     MEDIA_FILE = 'MediaFile',
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
+    HTML_RESOURCE = 'HTMLResource',
+    IFRAME_RESOURCE = 'IFrameResource',
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
     COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
@@ -73,11 +79,12 @@ export class VastParserStrict {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
-    private _rootWrapperVast: unknown;
+    private _compiledCampaignErrors: CampaignError[];
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
+        this._compiledCampaignErrors = [];
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -86,28 +93,30 @@ export class VastParserStrict {
 
     public parseVast(vast: string | null, urlProtocol: string = 'https:'): Vast {
         if (!vast) {
-            throw new Error('VAST data is missing');
+            throw new CampaignError('VAST data is missing', CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR);
         }
 
         const xml = this._domParser.parseFromString(vast, 'text/xml');
         const ads: VastAd[] = [];
         const parseErrorURLTemplates: string[] = [];
 
+        this._compiledCampaignErrors = [];
+
         // use the parsererror tag from DomParser to give accurate error messages
-        const parseErrors = xml.getElementsByTagName(VastNodeName.PARSE_ERROR); // TODO move to enum
+        const parseErrors = xml.getElementsByTagName(VastNodeName.PARSE_ERROR);
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
-            for(const element of parseErrors) {
+            for (const element of parseErrors) {
                 if (element.textContent) {
                     parseMessages.push(element.textContent);
                 }
             }
-            throw new Error(`VAST xml was not parseable:\n   ${parseMessages.join('\n    ')}`);
+            throw new CampaignError(`VAST xml was not parseable:\n   ${parseMessages.join('\n    ')}`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR);
         }
 
-        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== VastNodeName.VAST) { // TODO move vast to enum
-            throw new Error('VAST xml data is missing');
+        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== VastNodeName.VAST) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.XML_PARSER_ERROR);
         }
 
         const documentElement = xml.documentElement;
@@ -116,57 +125,54 @@ export class VastParserStrict {
         this.getChildrenNodesWithName(documentElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
             parseErrorURLTemplates.push(this.parseNodeText(element));
         });
-        let errors: Error[] = [];
+        let isWarningLevel = true;
         // parse each Ad element
         this.getNodesWithName(documentElement, VastNodeName.AD).forEach((element: HTMLElement) => {
             if (ads.length <= 0) {
                 const ad = this.parseAdElement(element, urlProtocol);
                 const adErrors = new VastAdValidator(ad).getErrors();
-                if (adErrors.length > 0) {
-                    errors = errors.concat(adErrors);
-                } else {
+                for (const adError of adErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        isWarningLevel = false;
+                    }
+
+                    if (adError.errorTrackingUrls.length === 0) {
+                        adError.errorTrackingUrls = parseErrorURLTemplates.concat(ad.getErrorURLTemplates());
+                    }
+                }
+
+                if (isWarningLevel) {
                     ads.push(ad);
                 }
+
+                this._compiledCampaignErrors = this._compiledCampaignErrors.concat(adErrors);
             }
         });
 
-        if (errors.length > 0) {
-            // Format all errors into a single error message
-            throw this.formatErrorMessage(errors);
-        }
-
+        // throw campaign error when it fails to get any vast ad
         if (ads.length === 0) {
-            throw new Error('VAST Ad tag is missing');
+            throw this.formatErrorMessage('Failed to parse VAST XML', this._compiledCampaignErrors);
         }
 
-        return new Vast(ads, parseErrorURLTemplates);
+        // return vast ads with generated non-severe errors
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
     }
 
     // default to https: for relative urls
     public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
-        if (depth === 0) {
-            this._rootWrapperVast = vast;
-        }
-
         try {
             parsedVast = this.parseVast(vast, urlProtocol);
-        } catch (e) {
-            let errorData: object;
-            if (depth > 0) {
-                errorData = {
-                    vast: vast,
-                    wrapperDepth: depth,
-                    rootWrapperVast: this._rootWrapperVast
-                };
-            } else {
-                errorData = {
-                    vast: vast,
-                    wrapperDepth: depth
-                };
-            }
-            throw new DiagnosticError(e, errorData);
+        } catch (campaignError) {
+            const errorData: {} = {
+                vast: vast,
+                wrapperDepth: depth,
+                rootWrapperVast: depth === 0 ? vast : ''
+            };
+            campaignError.errorData = errorData;
+
+            throw campaignError;
         }
 
         this.applyParentURLs(parsedVast, parent);
@@ -174,8 +180,10 @@ export class VastParserStrict {
         const wrapperURL = parsedVast.getWrapperURL();
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
-        } else if (depth >= this._maxWrapperDepth) {
-            throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
+        }
+
+        if (depth >= this._maxWrapperDepth) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
         }
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
@@ -190,10 +198,12 @@ export class VastParserStrict {
         return (duration * kbitrate * 1000) / 8;
     }
 
-    private formatErrorMessage(errors: Error[]): Error {
-        return new Error(`VAST parse encountered these errors while parsing:
-            ${VastValidationUtilities.formatErrors(errors)}
-        `);
+    private formatErrorMessage(msg: string, errors: CampaignError[]): CampaignError {
+        const consolidatedCampaignError = new CampaignError(msg, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.XML_PARSER_ERROR);
+        for (const e of errors) {
+            consolidatedCampaignError.addSubCampaignError(e);
+        }
+        return consolidatedCampaignError;
     }
 
     // only searches direct children for nodes with matching name
@@ -221,7 +231,7 @@ export class VastParserStrict {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
-            if(ad && parsedAd) {
+            if (ad && parsedAd) {
                 for (const errorUrl of ad.getErrorURLTemplates()) {
                     parsedAd.addErrorURLTemplate(errorUrl);
                 }
@@ -231,7 +241,7 @@ export class VastParserStrict {
                 for (const clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
                     parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
                 }
-                for (const eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                for (const eventName of Object.keys(TrackingEvent).map((event) => TrackingEvent[<keyof typeof TrackingEvent>event])) {
                     for (const url of parent.getTrackingEventUrls(eventName)) {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
@@ -292,12 +302,34 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
             const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
+            const iframeResourceElement = this.getFirstNodeWithName(element, VastNodeName.IFRAME_RESOURCE);
+            const htmlResourceElement = this.getFirstNodeWithName(element, VastNodeName.HTML_RESOURCE);
             if (staticResourceElement) {
-                const companionAd = this.parseCreativeStaticResourceCompanionAdElement(element, urlProtocol);
-                vastAd.addCompanionAd(companionAd);
-            } else {
-                // ignore element as it is not of a type we support
-                vastAd.addUnparseableCompanionAd(element.outerHTML);
+                const companionAd = this.parseCompanionAdStaticResourceElement(element, urlProtocol);
+                const companionAdErrors = new VastCompanionAdStaticResourceValidator(companionAd).getErrors();
+                let isWarningLevel = true;
+                for (const adError of companionAdErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        if (adError.errorTrackingUrls.length === 0) {
+                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                        }
+                        this._compiledCampaignErrors.push(adError);
+                        isWarningLevel = false;
+                        break;
+                    }
+                }
+                if (isWarningLevel) {
+                    vastAd.addStaticCompanionAd(companionAd);
+                } else {
+                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                }
+            }
+            // ignore element as it is not of a type we support
+            if (iframeResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+            }
+            if (htmlResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
             }
         });
 
@@ -437,11 +469,11 @@ export class VastParserStrict {
         return creative;
     }
 
-    private parseCreativeStaticResourceCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeStaticResourceCompanionAd {
+    private parseCompanionAdStaticResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdStaticResource {
         const id = companionAdElement.getAttribute(VastAttributeNames.ID);
         const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
         const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCreativeStaticResourceCompanionAd(id, height, width);
+        const companionAd = new VastCompanionAdStaticResource(id, height, width);
 
         // Get tracking urls for companion ad
         this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
@@ -477,6 +509,38 @@ export class VastParserStrict {
                 companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
             }
         });
+        return companionAd;
+    }
+
+    private parseCompanionAdIFrameResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdIframeResource(id, height, width);
+
+        const iframeResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
+        if (iframeResource) {
+            const iframeUrl = this.parseVastUrl(this.parseNodeText(iframeResource), urlProtocol);
+            if (iframeUrl) {
+                companionAd.setIframeResourceURL(iframeUrl);
+            }
+        }
+        return companionAd;
+    }
+
+    private parseCompanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
+
+        const htmlResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
+        if (htmlResource) {
+            const htmlContent = this.parseNodeText(htmlResource);
+            if (htmlContent.length > 0) {
+                companionAd.setHtmlResourceContent(htmlContent);
+            }
+        }
         return companionAd;
     }
 
@@ -521,5 +585,4 @@ export class VastParserStrict {
 
         return hours + minutes + seconds;
     }
-
 }

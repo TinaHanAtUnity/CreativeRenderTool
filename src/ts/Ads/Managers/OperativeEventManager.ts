@@ -6,7 +6,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 import { EventType } from 'Ads/Models/Session';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -25,7 +25,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -59,29 +60,34 @@ export interface IInfoJson {
     auctionId: string;
     gameSessionId: number;
     campaignId: string;
-    adType?: string;
-    correlationId?: string;
-    seatId?: number;
     placementId: string;
-    advertisingTrackingId?: string | null;
-    limitAdTracking?: boolean;
     osVersion: string;
-    sid?: string;
     deviceModel: string;
     sdkVersion: number;
-    previousPlacementId?: string;
     bundleId: string;
-    meta?: string;
     platform: string;
     language: string;
     cached: boolean;
-    cachedOrientation?: 'landscape' | 'portrait';
     token: string;
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
-    privacy: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
+    networkType: number;
+    connectionType: string;
+    screenWidth: number;
+    screenHeight: number;
+    deviceFreeSpace: number;
+    adType?: string;
+    correlationId?: string;
+    seatId?: number;
+    advertisingTrackingId?: string | null;
+    limitAdTracking?: boolean;
+    sid?: string;
+    previousPlacementId?: string;
+    meta?: string;
+    cachedOrientation?: 'landscape' | 'portrait';
+    privacy?: IRequestPrivacy;
     apiLevel?: number;
     deviceMake?: string;
     screenDensity?: number;
@@ -90,10 +96,6 @@ export interface IInfoJson {
     videoOrientation?: string;
     webviewUa?: string;
     adUnitStyle?: { [key: string]: unknown };
-    networkType: number;
-    connectionType: string;
-    screenWidth: number;
-    screenHeight: number;
     mediationName?: string;
     mediationVersion?: string;
     mediationOrdinal?: number;
@@ -101,8 +103,8 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     imei?: string;
-    isBackupCampaign: boolean;
-    deviceFreeSpace: number;
+    privacyType?: string;
+    isLoadEnabled: boolean;
 }
 
 export class OperativeEventManager {
@@ -162,7 +164,7 @@ export class OperativeEventManager {
     public sendStart(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.START)) {
+        if (session.getEventSent(EventType.START)) {
             return Promise.resolve();
         }
 
@@ -182,7 +184,7 @@ export class OperativeEventManager {
     public sendFirstQuartile(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.FIRST_QUARTILE)) {
+        if (session.getEventSent(EventType.FIRST_QUARTILE)) {
             return Promise.resolve(void(0));
         }
 
@@ -198,7 +200,7 @@ export class OperativeEventManager {
     public sendMidpoint(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.MIDPOINT)) {
+        if (session.getEventSent(EventType.MIDPOINT)) {
             return Promise.resolve(void(0));
         }
 
@@ -214,7 +216,7 @@ export class OperativeEventManager {
     public sendThirdQuartile(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.THIRD_QUARTILE)) {
+        if (session.getEventSent(EventType.THIRD_QUARTILE)) {
             return Promise.resolve(void(0));
         }
 
@@ -230,13 +232,13 @@ export class OperativeEventManager {
     public sendSkip(params: IOperativeSkipEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.SKIP)) {
+        if (session.getEventSent(EventType.SKIP)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.SKIP);
 
         const fulfilled = ([id, infoJson]: [string, IInfoJson]) => {
-            if(params.videoProgress) {
+            if (params.videoProgress) {
                 infoJson.skippedAt = params.videoProgress;
             }
 
@@ -270,7 +272,7 @@ export class OperativeEventManager {
     public sendView(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.VIEW)) {
+        if (session.getEventSent(EventType.VIEW)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.VIEW);
@@ -287,7 +289,7 @@ export class OperativeEventManager {
     public sendClick(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.CLICK)) {
+        if (session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.CLICK);
@@ -304,7 +306,7 @@ export class OperativeEventManager {
     }
 
     public sendEvent(event: string, eventId: string, sessionId: string, url: string | undefined, data: string): Promise<INativeResponse | void> {
-        if(!url) {
+        if (!url) {
             return Promise.resolve();
         }
 
@@ -380,8 +382,6 @@ export class OperativeEventManager {
                 'correlationId': this._campaign.getCorrelationId(),
                 'seatId': this._campaign.getSeatId(),
                 'placementId': params.placement.getId(),
-                'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
-                'limitAdTracking': this._deviceInfo.getLimitAdTracking(),
                 'osVersion': this._deviceInfo.getOsVersion(),
                 'sid': this._playerMetadataServerId,
                 'deviceModel': this._deviceInfo.getModel(),
@@ -403,11 +403,11 @@ export class OperativeEventManager {
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
-                'isBackupCampaign': this._campaign.isBackupCampaign(),
-                'deviceFreeSpace': session.getDeviceFreeSpace()
+                'deviceFreeSpace': session.getDeviceFreeSpace(),
+                'isLoadEnabled': this._campaign.isLoadEnabled()
             };
 
-            if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 infoJson = {
                     ... infoJson,
                     'apiLevel': this._deviceInfo.getApiLevel(),
@@ -415,49 +415,33 @@ export class OperativeEventManager {
                     'screenDensity': this._deviceInfo.getScreenDensity(),
                     'screenSize': this._deviceInfo.getScreenLayout()
                 };
-
-                // for china SDK prioritize both android id and imei over GAID
-                if (CustomFeatures.isChinaSDK(this._platform, this._clientInfo.getSdkVersionName())) {
-                    if (this._deviceInfo.getAndroidId() || this._deviceInfo.getDeviceId1()) {
-                        infoJson = {
-                            ... infoJson,
-                            'advertisingTrackingId': undefined,
-                            'androidId': this._deviceInfo.getAndroidId()
-                        };
-
-                        if(this._deviceInfo.getDeviceId1()) {
-                            infoJson = {
-                                ... infoJson,
-                                'imei': this._deviceInfo.getDeviceId1()
-                            };
-                        }
-                    }
-
-                } else if (!this._deviceInfo.getAdvertisingIdentifier()) {
-                    infoJson = {
-                        ... infoJson,
-                        'androidId': this._deviceInfo.getAndroidId()
-                    };
-                }
             }
+
+            const privacyMethod = this._adsConfig.getUserPrivacy().getMethod();
+            if (privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
+                infoJson.privacyType = privacyMethod;
+            }
+
+            const trackingIDs: Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+            Object.assign(infoJson, trackingIDs);
 
             infoJson.videoOrientation = params.videoOrientation;
 
-            if(typeof navigator !== 'undefined' && navigator.userAgent) {
+            if (typeof navigator !== 'undefined' && navigator.userAgent) {
                 infoJson.webviewUa = navigator.userAgent;
             }
 
-            if(params.adUnitStyle) {
+            if (params.adUnitStyle) {
                 infoJson.adUnitStyle = params.adUnitStyle.getDTO();
             }
 
-            if(mediation) {
+            if (mediation) {
                 infoJson.mediationName = mediation.getName();
                 infoJson.mediationVersion = mediation.getVersion();
                 infoJson.mediationOrdinal = mediation.getOrdinal();
             }
 
-            if(framework) {
+            if (framework) {
                 infoJson.frameworkName = framework.getName();
                 infoJson.frameworkVersion = framework.getVersion();
             }

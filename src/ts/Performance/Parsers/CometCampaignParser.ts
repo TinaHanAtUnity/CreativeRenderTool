@@ -19,22 +19,6 @@ import {
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
-// Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
-export enum ICometTrackingUrlEvents {
-    START = 'start',
-    CLICK = 'click',
-    ENDCARD_CLICK = 'videoEndCardClick', //
-    FIRST_QUARTILE = 'firstQuartile',
-    MIDPOINT = 'midpoint',
-    THIRD_QUARTILE = 'thirdQuartile',
-    ERROR = 'error',
-    STALLED = 'stalled', //
-    LOADED_IMPRESSION = 'loaded',
-    SHOW = 'show', //
-    COMPLETE = 'complete',
-    SKIP = 'skip'
-}
-
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
     public static ContentTypeVideo = 'comet/video';
@@ -52,7 +36,7 @@ export class CometCampaignParser extends CampaignParser {
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
-        switch(campaignStore) {
+        switch (campaignStore) {
             case 'apple':
                 storeName = StoreName.APPLE;
                 break;
@@ -81,10 +65,10 @@ export class CometCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            isLoadEnabled: false
         };
 
-        if(json && json.mraidUrl) {
+        if (json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
@@ -104,7 +88,8 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                playableConfiguration: undefined
+                playableConfiguration: undefined,
+                targetGameId: json.gameId
             };
             parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
@@ -147,17 +132,17 @@ export class CometCampaignParser extends CampaignParser {
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
-            if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+            if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
                 parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, json.creativeId);
                 parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session, undefined, json.creativeId);
             }
 
-            if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+            if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
                 parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
-            if(json.appDownloadUrl) {
+            if (json.appDownloadUrl) {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
             return Promise.resolve(new PerformanceCampaign(parameters));
@@ -165,9 +150,9 @@ export class CometCampaignParser extends CampaignParser {
     }
 
     private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
+        if (urls && urls !== null) {
+            for (const urlKey in urls) {
+                if (urls.hasOwnProperty(urlKey)) {
                     urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
                 }
             }
@@ -180,7 +165,7 @@ export class CometCampaignParser extends CampaignParser {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
-        } catch(error) {
+        } catch (error) {
             // do nothing
         }
         return adUnitStyle;

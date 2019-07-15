@@ -24,6 +24,7 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
     store: StoreName | undefined;
     appStoreId: string | undefined;
     playableConfiguration: IPlayableConfiguration | undefined;
+    targetGameId: number | undefined;
 }
 
 export interface IPlayableConfiguration {
@@ -51,7 +52,8 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
             videoEventUrls: ['object', 'undefined'],
-            playableConfiguration: ['object', 'undefined']
+            playableConfiguration: ['object', 'undefined'],
+            targetGameId: ['number', 'undefined']
         }, campaign);
     }
 
@@ -107,15 +109,15 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
     public getOptionalAssets(): Asset[] {
         const assets: Asset[] = [];
         const gameIcon = this.getGameIcon();
-        if(gameIcon) {
+        if (gameIcon) {
             assets.push(gameIcon);
         }
         const portrait = this.getPortrait();
-        if(portrait) {
+        if (portrait) {
             assets.push(portrait);
         }
         const landscape = this.getLandscape();
-        if(landscape) {
+        if (landscape) {
             assets.push(landscape);
         }
 
@@ -159,13 +161,17 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
         return urls ? urls[eventType] : undefined;
     }
 
+    public getTargetGameId(): number | undefined {
+        return this.get('targetGameId');
+    }
+
     public setPlayableConfiguration(configuration: IPlayableConfiguration) {
         this.set('playableConfiguration', configuration);
     }
 
     public isConnectionNeeded(): boolean {
         const resourceUrl = this.getResourceUrl();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+        if (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
             return false;
         }
         return true;

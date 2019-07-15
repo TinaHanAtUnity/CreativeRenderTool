@@ -6,7 +6,18 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
-export type IAnalyticsMessage = {};
+// tslint:disable-next-line
+export interface IAnalyticsMessage {}
+/*
+TODO: IAnalyticsMessage should be refactored in following PRs.
+
+Looking at the code all analytic messages share the same field `ts`.
+Therefore this interface can be refactored to:
+
+export interface IAnalyticsMessage {
+    ts: number;
+}
+*/
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;
@@ -183,7 +194,7 @@ export class AnalyticsProtocol {
             };
 
             return {
-                type: 'analytics.deviceInfo.v1',
+                type: 'ads.analytics.deviceInfo.v1',
                 msg: event
             };
         });
@@ -194,7 +205,7 @@ export class AnalyticsProtocol {
             ts: Date.now()
         };
         return {
-            type: 'analytics.appStart.v1',
+            type: 'ads.analytics.appStart.v1',
             msg: startEvent
         };
     }
@@ -205,7 +216,7 @@ export class AnalyticsProtocol {
             app_ver: clientInfo.getApplicationVersion()
         };
         return {
-            type: 'analytics.appInstall.v1',
+            type: 'ads.analytics.appInstall.v1',
             msg: installEvent
         };
     }
@@ -216,7 +227,7 @@ export class AnalyticsProtocol {
             app_ver: clientInfo.getApplicationVersion()
         };
         return {
-            type: 'analytics.appUpdate.v1',
+            type: 'ads.analytics.appUpdate.v1',
             msg: updateEvent
         };
     }
@@ -228,13 +239,13 @@ export class AnalyticsProtocol {
             local_time_offset: new Date().getTimezoneOffset() * -1 * 60 * 1000
         };
         return {
-            type: 'analytics.appRunning.v1',
+            type: 'ads.analytics.appRunning.v1',
             msg: appRunningEvent
         };
     }
 
     public static getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return 'iOS ' + deviceInfo.getOsVersion();
         } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
@@ -246,7 +257,7 @@ export class AnalyticsProtocol {
     private static getAdvertisingIdentifier(deviceInfo: DeviceInfo): string | undefined {
         const adsid: string | undefined | null = deviceInfo.getAdvertisingIdentifier();
 
-        if(adsid) {
+        if (adsid) {
             return adsid.toLowerCase();
         } else {
             return undefined;
@@ -254,7 +265,7 @@ export class AnalyticsProtocol {
     }
 
     private static getScreen(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return Promise.all([
                 deviceInfo.getScreenWidth(),
                 deviceInfo.getScreenHeight(),
@@ -264,7 +275,7 @@ export class AnalyticsProtocol {
                 let screenWidth = width;
                 let screenHeight = height;
 
-                if(!statusBarHidden) {
+                if (!statusBarHidden) {
                     screenHeight = screenHeight + statusBarHeight;
                 }
 
@@ -273,7 +284,7 @@ export class AnalyticsProtocol {
                     screenHeight = width;
                 }
 
-                if(deviceInfo instanceof IosDeviceInfo) {
+                if (deviceInfo instanceof IosDeviceInfo) {
                     screenWidth = screenWidth * deviceInfo.getScreenScale();
                     screenHeight = screenHeight * deviceInfo.getScreenScale();
                 }
@@ -298,7 +309,7 @@ export class AnalyticsProtocol {
     }
 
     private static getDeviceModel(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return Promise.resolve(deviceInfo.getModel());
         } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return core.DeviceInfo.Android!.getDevice().then(device => {

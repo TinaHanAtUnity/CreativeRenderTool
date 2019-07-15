@@ -3,10 +3,13 @@ import { CampaignError } from 'Ads/Errors/CampaignError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
-// VAST Error code defined in 3.0
-// https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
-// https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
+/**
+ * VAST Error code defined in 3.0
+ * https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
+ * https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
+ */
 export enum VastErrorCode {
     XML_PARSER_ERROR = 100,
     SCHEMA_VAL_ERROR = 101,
@@ -24,22 +27,25 @@ export enum VastErrorCode {
     MEDIA_FILE_UNSUPPORTED = 403,
     MEDIA_FILE_UNSUPPORTED_IOS = 404,
     MEDIA_FILE_PLAY_ERROR = 405,
+    MEDIA_FILE_NO_CLICKTHROUGH_URL = 499,
     COMPANION_GENERAL_ERROR = 600,   // code 5xx for Non-Linear ads
     COMPANION_SIZE_UNSUPPORTED = 601,
     COMPANION_UNABLE_TO_DISPLAY = 602,
     COMPANION_UNABLE_TO_FETCH = 603,
     COMPANION_RESOURCE_NOT_FOUND = 604,
+    COMPANION_NO_CLICKTHROUGH = 699,
     UNDEFINED_ERROR = 900,
     GENERAL_VPAID_ERROR = 901,
-    UNKNOWN_ERROR = 9999
+    INVALID_URL_ERROR = 998,
+    UNKNOWN_ERROR = 999
 }
 export class VastErrorInfo {
     public static errorMap: { [key: number]: string } = {
-        [VastErrorCode.XML_PARSER_ERROR] : 'VAST xml data is missing',
+        [VastErrorCode.XML_PARSER_ERROR] : 'VAST xml parsing error',
         [VastErrorCode.SCHEMA_VAL_ERROR]: 'VAST schema validation error',
         [VastErrorCode.VERSION_UNSUPPORTED]: 'VAST version Unsupported',
         [VastErrorCode.FORMAT_UNSUPPORTED]: 'VAST format unsupported',
-        [VastErrorCode.DURATION_UNSUPPORTED]: 'VAST duration unsupported',
+        [VastErrorCode.DURATION_UNSUPPORTED]: 'VAST linear creative is missing valid duration',
         [VastErrorCode.SIZE_UNSUPPORTED]: 'VAST size unsupported',
         [VastErrorCode.WRAPPER_GENERAL_ERROR]: 'Wrapper ad request failed',
         [VastErrorCode.WRAPPER_URI_TIMEOUT]: 'Wrapper ad request timed out',
@@ -51,14 +57,17 @@ export class VastErrorInfo {
         [VastErrorCode.MEDIA_FILE_UNSUPPORTED]: 'No Media file found supported in Video Player',
         [VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS]: 'Campaign video url needs to be https for iOS',
         [VastErrorCode.MEDIA_FILE_PLAY_ERROR]: 'Problem displaying Media file',
+        [VastErrorCode.MEDIA_FILE_NO_CLICKTHROUGH_URL]: 'Media file is missing valid ClickThrough URL',
         // code 5xx for Non-Linear ads
         [VastErrorCode.COMPANION_GENERAL_ERROR]: 'General error from Companion Ad',
         [VastErrorCode.COMPANION_SIZE_UNSUPPORTED]: 'Companion creative size unsupported',
         [VastErrorCode.COMPANION_UNABLE_TO_DISPLAY]: 'Companion unable to display',
         [VastErrorCode.COMPANION_UNABLE_TO_FETCH]: 'Unable to fetch Companion resource',
         [VastErrorCode.COMPANION_RESOURCE_NOT_FOUND]: 'Supported Companion resource not found',
+        [VastErrorCode.COMPANION_NO_CLICKTHROUGH]: 'Companion is missing valid ClickThrough URL',
         [VastErrorCode.UNDEFINED_ERROR]: 'Undefined Error',
         [VastErrorCode.GENERAL_VPAID_ERROR]: 'General VPAID error',
+        [VastErrorCode.INVALID_URL_ERROR]: 'Provided URL is invalid',
         [VastErrorCode.UNKNOWN_ERROR]: 'Unknown Error'
     };
 }
@@ -73,22 +82,30 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
-        if (campaignError.errorTrackingUrl) {
-            const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
-            const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._core.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
-
-            this._request.get(errorUrl, []).then(() => {
-                return Promise.resolve();
-            });
+        const errorList: CampaignError[] = campaignError.getAllCampaignErrors();
+        for (const oneError of errorList) {
+            const errorTrackingUrls = oneError.errorTrackingUrls;
+            for (const errorTrackingUrl of errorTrackingUrls) {
+                const errorCode = oneError.errorCode ? oneError.errorCode : VastErrorCode.UNDEFINED_ERROR;
+                const errorUrl = this.formatVASTErrorURL(errorTrackingUrl, errorCode, oneError.assetUrl);
+                this._request.get(errorUrl, []);
+                Diagnostics.trigger('vast_error_tracking_sent', {
+                    errorUrl: errorUrl,
+                    errorCode: errorCode,
+                    errorMessage: VastErrorInfo.errorMap[errorCode] || 'not found',
+                    erroLevel: oneError.errorLevel,
+                    seatId: oneError.seatId || -1,
+                    creativeId: oneError.creativeId || 'not found'
+                });
+            }
         }
-        return Promise.reject(new Error('VastCampaignErrorHandler errorTrackingUrl was undefined'));
+        return Promise.resolve();
     }
 
     private formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
-        let formattedUrl = errorUrl.replace('[ERRORCODE]', errorCode.toString());
+        let formattedUrl = errorUrl.replace(/\[ERRORCODE\]|%5BERRORCODE%5D/ig, errorCode.toString());
         if (assetUrl) {
-            formattedUrl = formattedUrl.replace('[ASSETURI]', Url.encodeParam(assetUrl));
+            formattedUrl = formattedUrl.replace(/\[ASSETURI\]|%5BASSETURI%5D/ig, Url.encodeParam(assetUrl));
         }
         return formattedUrl;
     }
