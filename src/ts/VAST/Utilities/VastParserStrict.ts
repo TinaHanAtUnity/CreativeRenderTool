@@ -107,7 +107,7 @@ export class VastParserStrict {
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
-            for(const element of parseErrors) {
+            for (const element of parseErrors) {
                 if (element.textContent) {
                     parseMessages.push(element.textContent);
                 }
@@ -231,7 +231,7 @@ export class VastParserStrict {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
-            if(ad && parsedAd) {
+            if (ad && parsedAd) {
                 for (const errorUrl of ad.getErrorURLTemplates()) {
                     parsedAd.addErrorURLTemplate(errorUrl);
                 }

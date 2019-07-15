@@ -11,7 +11,7 @@ export class DeviceInfoApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+        if (nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosDeviceInfoApi(nativeBridge);
         } else {
             this.Android = new AndroidDeviceInfoApi(nativeBridge);
@@ -60,9 +60,9 @@ export class DeviceInfoApi extends NativeApi {
 
     public getNetworkOperator(): Promise<string> {
         // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getNetworkOperator').then(result => {
-                if(typeof result === 'string') {
+                if (typeof result === 'string') {
                     return result;
                 } else {
                     return '';
@@ -75,9 +75,9 @@ export class DeviceInfoApi extends NativeApi {
 
     public getNetworkOperatorName(): Promise<string> {
         // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getNetworkOperatorName').then(result => {
-                if(typeof result === 'string') {
+                if (typeof result === 'string') {
                     return result;
                 } else {
                     return '';

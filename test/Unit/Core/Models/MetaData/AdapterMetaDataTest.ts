@@ -38,7 +38,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             const metaDataManager: MetaDataManager = new MetaDataManager(core);
             return metaDataManager.fetch(AdapterMetaData).then(metaData => {
-                if(metaData) {
+                if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
                     assert.equal(metaData.getVersion(), 'test_version', 'AdapterMetaData.getVersion() did not pass through correctly');
                     assert.deepEqual(metaData.getDTO(), {
@@ -74,7 +74,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             const metaDataManager: MetaDataManager = new MetaDataManager(core);
             return metaDataManager.fetch(AdapterMetaData).then(metaData => {
-                if(metaData) {
+                if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'AdapterMetaData.getName() did not pass through correctly');
                     assert.equal(metaData.getVersion(), undefined, 'AdapterMetaData.getVersion() did not pass through correctly');
                 } else {

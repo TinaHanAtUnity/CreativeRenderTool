@@ -138,7 +138,7 @@ export class VPAID extends View<IVPAIDHandler> {
                     bitrate: 500,
                     viewMode: 'normal',
                     creativeData: {
-                        AdParameters: this.decodeHTMLEntityChars(<string>this._campaign.getVPAID().getCreativeParameters()!)
+                        AdParameters: this.decodeHTMLEntityChars(<string> this._campaign.getVPAID().getCreativeParameters()!)
                     }
                 };
             });

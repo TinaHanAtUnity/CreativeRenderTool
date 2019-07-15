@@ -154,12 +154,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         super.render();
 
         this._switchGroup.render();
-        (<HTMLElement>this._container.querySelector('.switch-group-container')).appendChild(this._switchGroup.container());
+        (<HTMLElement> this._container.querySelector('.switch-group-container')).appendChild(this._switchGroup.container());
 
         this._privacyRowItemContainer.render();
-        (<HTMLElement>this._container.querySelector('.privacy-container')).appendChild(this._privacyRowItemContainer.container());
+        (<HTMLElement> this._container.querySelector('.privacy-container')).appendChild(this._privacyRowItemContainer.container());
 
-        this._consentButtonContainer = (<HTMLElement>this._container.querySelector('.consent-button-container'));
+        this._consentButtonContainer = (<HTMLElement> this._container.querySelector('.consent-button-container'));
 
         // Android <= 4.4.4
         if (this._platform === Platform.ANDROID && this._apiLevel && this._apiLevel <= 19) {
@@ -171,7 +171,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
 
         if (this._landingPage === ConsentPage.HOMESCREEN || this._landingPage === ConsentPage.HOMEPAGE) {
-            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
+            const myChoicesElement = (<HTMLElement> this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
         }
 
@@ -236,7 +236,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             all: true
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
-        const element = (<HTMLElement>this._container.querySelector('.accept-all'));
+        const element = (<HTMLElement> this._container.querySelector('.accept-all'));
         this.closeWithAnimation(element);
     }
 
@@ -247,7 +247,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             all: true
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
-        const element = (<HTMLElement>this._container.querySelector('.homepage-accept-all'));
+        const element = (<HTMLElement> this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }
 
@@ -262,7 +262,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             external: true
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
-        const element = (<HTMLElement>this._container.querySelector('.agree'));
+        const element = (<HTMLElement> this._container.querySelector('.agree'));
         this.closeWithAnimation(element);
     }
 
@@ -275,7 +275,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             external: false
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
-        const element = (<HTMLElement>this._container.querySelector('.disagree'));
+        const element = (<HTMLElement> this._container.querySelector('.disagree'));
 
         this.closeWithAnimation(element);
     }
@@ -289,7 +289,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             external: this._switchGroup.isAds3rdPartyChecked()
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
-        const element = (<HTMLElement>this._container.querySelector('.save-my-choices'));
+        const element = (<HTMLElement> this._container.querySelector('.save-my-choices'));
         this.closeWithAnimation(element);
     }
 

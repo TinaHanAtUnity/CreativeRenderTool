@@ -7,7 +7,7 @@ describe('JsonParserTest', () => {
     it('should contain diagnostic fields', () => {
         try {
             JsonParser.parse('bad content');
-        } catch(e) {
+        } catch (e) {
             // tslint:disable:no-string-literal
             assert.equal(e.diagnostic['json'], 'bad content');
             // tslint:enable:no-string-literal

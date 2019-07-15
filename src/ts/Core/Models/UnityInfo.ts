@@ -29,7 +29,7 @@ export class UnityInfo extends Model<IUnityInfo> {
         let nativeUserIdPromise: Promise<string>;
         let nativeSessionIdPromise: Promise<string>;
 
-        if(this._platform === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             nativeUserIdPromise = this._core.iOS!.Preferences.getString(UnityInfo._userIdKey);
             nativeSessionIdPromise = this._core.iOS!.Preferences.getString(UnityInfo._sessionIdKey);
         } else {

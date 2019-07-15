@@ -108,8 +108,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         super.render();
         this.setupIFrame();
 
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._gdprBanner = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement> this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -126,7 +126,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.disconnect();
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -168,7 +168,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private setupIFrame() {
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#admob-iframe');
         this._iframe = iframe;
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;
