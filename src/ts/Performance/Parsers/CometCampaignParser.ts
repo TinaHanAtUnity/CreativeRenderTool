@@ -36,7 +36,7 @@ export class CometCampaignParser extends CampaignParser {
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
-        switch(campaignStore) {
+        switch (campaignStore) {
             case 'apple':
                 storeName = StoreName.APPLE;
                 break;
@@ -68,7 +68,7 @@ export class CometCampaignParser extends CampaignParser {
             isLoadEnabled: false
         };
 
-        if(json && json.mraidUrl) {
+        if (json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
@@ -132,17 +132,17 @@ export class CometCampaignParser extends CampaignParser {
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
-            if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+            if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
                 parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, json.creativeId);
                 parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session, undefined, json.creativeId);
             }
 
-            if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+            if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
                 parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
-            if(json.appDownloadUrl) {
+            if (json.appDownloadUrl) {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
 
@@ -166,7 +166,7 @@ export class CometCampaignParser extends CampaignParser {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
-        } catch(error) {
+        } catch (error) {
             // do nothing
         }
         return adUnitStyle;

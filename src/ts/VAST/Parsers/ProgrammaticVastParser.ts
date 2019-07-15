@@ -101,13 +101,13 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
-        if(portraitUrl) {
+        if (portraitUrl) {
             portraitAsset = new Image(Url.encode(portraitUrl), session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
-        if(landscapeUrl) {
+        if (landscapeUrl) {
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
@@ -135,7 +135,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             ... baseCampaignParams,
             vast: vast,
             video: new Video(mediaVideoUrl, session, undefined, response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
-            hasEndscreen: !!portraitAsset || !!landscapeAsset,
+            hasStaticEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),

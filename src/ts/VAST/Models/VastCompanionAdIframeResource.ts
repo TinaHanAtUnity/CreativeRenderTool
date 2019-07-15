@@ -1,14 +1,14 @@
 import { IVastCreativeCompanionAd, VastCompanionAdType } from 'VAST/Models/IVastCreativeCompanionAd';
 import { Model } from 'Core/Models/Model';
 
-interface IVastCompanionAdIFrameResource extends IVastCreativeCompanionAd {
+interface IVastCompanionAdIframeResource extends IVastCreativeCompanionAd {
     iframeResourceURL: string | null;
 }
 
-export class VastCompanionAdIFrameResource extends Model<IVastCompanionAdIFrameResource> {
+export class VastCompanionAdIframeResource extends Model<IVastCompanionAdIframeResource> {
 
-    constructor(id: string | null, height: number, width: number, iframeResourceURL?: string | null) {
-        super('VastCompanionAdIFrameResource', {
+    constructor(id: string | null, height: number, width: number, iframeResourceURL?: string) {
+        super('VastCompanionAdIframeResource', {
             id: ['string', 'null'],
             type: ['string'],
             width: ['number'],
@@ -50,6 +50,8 @@ export class VastCompanionAdIFrameResource extends Model<IVastCompanionAdIFrameR
     public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
+            'width': this.getWidth(),
+            'height': this.getHeight(),
             'type': this.getType(),
             'iframeResourceURL': this.getIframeResourceURL()
         };

@@ -233,7 +233,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
 
     public getDTO(): Promise<{ [key: string]: unknown }> {
         return this.getAnonymousDTO().then(dto => {
-            if(this.getAdvertisingIdentifier()) {
+            if (this.getAdvertisingIdentifier()) {
                 dto.advertisingTrackingId = this.getAdvertisingIdentifier();
                 dto.limitAdTracking = this.getLimitAdTracking();
             }
@@ -300,7 +300,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     public getStaticDTO(): { [key: string]: unknown } {
         const dto = this.getAnonymousStaticDTO();
 
-        if(this.getAdvertisingIdentifier()) {
+        if (this.getAdvertisingIdentifier()) {
             dto.advertisingTrackingId = this.getAdvertisingIdentifier();
             dto.limitAdTracking = this.getLimitAdTracking();
         }
