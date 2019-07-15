@@ -87,7 +87,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     public onVideoError(): void {
         const endScreen = this.getEndScreen();
-        if(endScreen) {
+        if (endScreen) {
             endScreen.show();
         }
         this.sendTrackingEvent(TrackingEvent.ERROR);

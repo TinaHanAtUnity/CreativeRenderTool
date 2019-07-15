@@ -178,7 +178,7 @@ describe('CampaignManager', () => {
 
             // when the campaign manager requests the placement
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -379,7 +379,7 @@ describe('CampaignManager', () => {
             const wrappedVAST = WrappedVast3;
 
             // create intermediate wrappers
-            for(let i = 0; i < 8; i++) {
+            for (let i = 0; i < 8; i++) {
                 mockRequest.expects('get').returns(Promise.resolve({
                     response: wrappedVAST
                 }));
@@ -435,7 +435,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
-            if(errorURLs) {
+            if (errorURLs) {
                 for (const errorURL of errorURLs) {
                     mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
                 }
@@ -448,7 +448,7 @@ describe('CampaignManager', () => {
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
-                if(triggeredError instanceof Error) {
+                if (triggeredError instanceof Error) {
                     assert.equal(triggeredError.message, expectedErrorMessage);
                 } else if (triggeredError instanceof WebViewError) {
                     assert.equal(triggeredError.message, expectedErrorMessage);
@@ -589,7 +589,7 @@ describe('CampaignManager', () => {
 
             // when the campaign manager requests the placement
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -620,7 +620,7 @@ describe('CampaignManager', () => {
 
             // when the campaign manager requests the placement
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -672,7 +672,7 @@ describe('CampaignManager', () => {
             });
 
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -688,7 +688,7 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getDynamicMarkup(), content.dynamicMarkup);
                 const willExpireAt = triggeredCampaign.getWillExpireAt();
                 assert.isDefined(willExpireAt, 'Will expire at should be defined');
-                if(willExpireAt) {
+                if (willExpireAt) {
                     const timeDiff = willExpireAt - (Date.now() + json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].cacheTTL * 1000);
                     assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
                 }
@@ -717,7 +717,7 @@ describe('CampaignManager', () => {
             });
 
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -728,7 +728,7 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getResource(), content.markup);
                 const willExpireAt = triggeredCampaign.getWillExpireAt();
                 assert.isDefined(willExpireAt, 'Will expire at should be defined');
-                if(willExpireAt) {
+                if (willExpireAt) {
                     const timeDiff = willExpireAt - (Date.now() + json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].cacheTTL * 1000);
                     assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
                 }
@@ -832,7 +832,7 @@ describe('CampaignManager', () => {
             });
 
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -904,7 +904,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -920,7 +920,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -939,7 +939,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -957,7 +957,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -985,7 +985,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -1013,7 +1013,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -1048,7 +1048,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -1085,7 +1085,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -1120,7 +1120,7 @@ describe('CampaignManager', () => {
                 }));
 
                 return campaignManager.request().then(() => {
-                    if(triggeredError) {
+                    if (triggeredError) {
                         throw triggeredError;
                     }
 
@@ -1209,16 +1209,16 @@ describe('CampaignManager', () => {
             }));
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
-                if(placement === 'premium') {
+                if (placement === 'premium') {
                     premiumCampaign = campaign;
                     premiumTrackingUrls = trackingUrls;
-                } else if(placement === 'video') {
+                } else if (placement === 'video') {
                     videoCampaign = campaign;
                     videoTrackingUrls = trackingUrls;
-                } else if(placement === 'mraid') {
+                } else if (placement === 'mraid') {
                     mraidCampaign = campaign;
                     mraidTrackingUrls = trackingUrls;
-                } else if(placement === 'rewardedVideoZone') {
+                } else if (placement === 'rewardedVideoZone') {
                     rewardedCampaign = campaign;
                     rewardedTrackingUrls = trackingUrls;
                 }
@@ -1238,7 +1238,7 @@ describe('CampaignManager', () => {
             });
 
             return campaignManager.request().then(() => {
-                if(triggeredError) {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 

@@ -111,9 +111,6 @@ export class BannerCampaignManager {
             })
             .then((campaign) => {
                 return campaign;
-            })
-            .catch((e) => {
-                throw e;
             });
 
         return this._promise;

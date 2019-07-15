@@ -94,7 +94,7 @@ export class IosAdUnitApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_INIT]:
                 this.onViewControllerInit.trigger();
                 break;

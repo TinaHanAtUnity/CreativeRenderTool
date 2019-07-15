@@ -39,10 +39,10 @@ class SpecVerifier {
         this._platform = platform;
         this._spec = spec;
         const parsedUrl: string[] = url.split('?');
-        if(parsedUrl.length > 1) {
+        if (parsedUrl.length > 1) {
             this._queryParams = parsedUrl[1].split('&');
         }
-        if(body) {
+        if (body) {
             this._bodyParams = JSON.parse(body);
         }
     }
@@ -53,8 +53,8 @@ class SpecVerifier {
     }
 
     private assertUnspecifiedParams(): void {
-        if(this._queryParams) {
-            for(const queryParam of this._queryParams) {
+        if (this._queryParams) {
+            for (const queryParam of this._queryParams) {
                 const paramName: string = queryParam.split('=')[0];
                 const paramValue: any = queryParam.split('=')[1];
 
@@ -65,9 +65,9 @@ class SpecVerifier {
             }
         }
 
-        if(this._bodyParams) {
-            for(const key in this._bodyParams) {
-                if(this._bodyParams.hasOwnProperty(key)) {
+        if (this._bodyParams) {
+            for (const key in this._bodyParams) {
+                if (this._bodyParams.hasOwnProperty(key)) {
                     assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
                     this.assertBodyParamType(key, this._bodyParams[key]);
@@ -77,15 +77,15 @@ class SpecVerifier {
     }
 
     private assertRequiredParams(): void {
-        for(const param in this._spec) {
-            if(this._spec.hasOwnProperty(param)) {
-                if(this.isRequired(this._spec[param].required)) {
-                    if(this._spec[param].queryString) {
+        for (const param in this._spec) {
+            if (this._spec.hasOwnProperty(param)) {
+                if (this.isRequired(this._spec[param].required)) {
+                    if (this._spec[param].queryString) {
                         let found: boolean = false;
 
-                        for(const queryParam of this._queryParams) {
+                        for (const queryParam of this._queryParams) {
                             const paramName: string = queryParam.split('=')[0];
-                            if(paramName === param) {
+                            if (paramName === param) {
                                 found = true;
                             }
                         }
@@ -93,7 +93,7 @@ class SpecVerifier {
                         assert.isTrue(found, 'Required parameter not found in query string: ' + param);
                     }
 
-                    if(this._spec[param].body) {
+                    if (this._spec[param].body) {
                         assert.isTrue(this._bodyParams.hasOwnProperty(param), 'Required parameter not found in body: ' + param);
                     }
                 }
@@ -102,11 +102,11 @@ class SpecVerifier {
     }
 
     private assertQueryParamType(name: string, value: string): void {
-        if(this._spec[name].type === 'boolean') {
+        if (this._spec[name].type === 'boolean') {
             assert.match(value, /(true|false)/i, 'Query parameter type mismatch: ' + name);
-        } else if(this._spec[name].type === 'number') {
+        } else if (this._spec[name].type === 'number') {
             assert.match(value, /[0-9]+/, 'Query parameter type mismatch: ' + name);
-        } else if(this._spec[name].type === 'string') {
+        } else if (this._spec[name].type === 'string') {
             // due to lack of better alternatives check that string has legal URL characters
             assert.match(value, /^([\!\#\$\&-\;\=\?-\[\]_a-z\~]|%[0-9a-fA-F]{2})+$/i, 'Query parameter type mismatch: ' + name);
         } else {
