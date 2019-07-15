@@ -77,7 +77,8 @@ interface IProgrammaticTrackingMetric {
 }
 
 export class ProgrammaticTrackingService {
-    private static productionMetricServiceUrl: string = 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric';
+    private static productionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
+    private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics';
 
     private _platform: Platform;
     private _request: RequestManager;
