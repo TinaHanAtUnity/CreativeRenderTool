@@ -418,7 +418,7 @@ export class OperativeEventManager {
             }
 
             const privacyMethod = this._adsConfig.getUserPrivacy().getMethod();
-            if(privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
+            if (privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
                 infoJson.privacyType = privacyMethod;
             }
 
