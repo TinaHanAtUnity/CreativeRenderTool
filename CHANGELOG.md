@@ -135,7 +135,7 @@
 * ESLint : semi rule enabled [#9949](https://github.com/Applifier/unity-ads-webview/pull/9949)
 * Log update for ad_ready/received and adding china imei log [#9990](https://github.com/Applifier/unity-ads-webview/pull/9990)
 * Add back ad_shown_in_background diagnostic [#10013](https://github.com/Applifier/unity-ads-webview/pull/10013)
- 
+
 # Tue Jun  4 16:35:13 UTC 2019
 
 * End card transition experiment [#9715](https://github.com/Applifier/unity-ads-webview/pull/9715)
@@ -259,16 +259,16 @@
 
 * China config json deploy [#9272](https://github.com/Applifier/unity-ads-webview/pull/9272)
 
-# Mon May  6 22:35:49 UTC 2019 
+# Mon May  6 22:35:49 UTC 2019
 
 * Remove top overlay progress bar experiment [#9393](https://github.com/Applifier/unity-ads-webview/pull/9393)
 * ABTest round 2 for MRAID webplayer [#9486](https://github.com/Applifier/unity-ads-webview/pull/9486)
 
 # Mon May  6 11:54:47 UTC 2019
 
-* Italian and Portuguese localization for consent views [#9443](https://github.com/Applifier/unity-ads-webview/pull/9443) 
+* Italian and Portuguese localization for consent views [#9443](https://github.com/Applifier/unity-ads-webview/pull/9443)
 
-# Fri May  3 19:52:17 UTC 2019 
+# Fri May  3 19:52:17 UTC 2019
 
 * Russian localization for consent views [#9419](https://github.com/Applifier/unity-ads-webview/pull/9419)
 * Temporarily disable video_size_mismatch for VAST Videos [#9394](https://github.com/Applifier/unity-ads-webview/pull/9394)
@@ -455,7 +455,7 @@
 
 * Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
 * Making creativeType case agnostic [#8685](https://github.com/Applifier/unity-ads-webview/pull/8685)
-* V5 Rolling out iOS and diagnostics for failed send events [#8688](https://github.com/Applifier/unity-ads-webview/pull/8688) 
+* V5 Rolling out iOS and diagnostics for failed send events [#8688](https://github.com/Applifier/unity-ads-webview/pull/8688)
 
 # Fri Mar 15 14:46:01 UTC 2019
 
@@ -732,7 +732,7 @@
 * VAST media selector update to pick the lowest bitrate file [#7725](https://github.com/Applifier/unity-ads-webview/pull/7725)
 * Removes the unnecessary parameters from parse method [#7542](https://github.com/Applifier/unity-ads-webview/pull/7542)
 * Update GDPR text for retention period [#7728](https://github.com/Applifier/unity-ads-webview/pull/7728)
-* Ensure Game was made with Unity before initializing Unity Purchasing Adapter [#7726](https://github.com/Applifier/unity-ads-webview/pull/7726) 
+* Ensure Game was made with Unity before initializing Unity Purchasing Adapter [#7726](https://github.com/Applifier/unity-ads-webview/pull/7726)
 
 # Thu Dec 20 01:58:04 UTC 2018
 
@@ -1002,7 +1002,7 @@
 * Remove old backup campaign implementation, use new as default [#6778](https://github.com/Applifier/unity-ads-webview/pull/6778)
 * A/B test CTA Button on Video Overlay v2 [#6807](https://github.com/Applifier/unity-ads-webview/pull/6807)
 * Remove endscreen layout A/B test [#6805](https://github.com/Applifier/unity-ads-webview/pull/6805)
-* TSLint no-parameter-reassignment [#6777](https://github.com/Applifier/unity-ads-webview/pull/6777) 
+* TSLint no-parameter-reassignment [#6777](https://github.com/Applifier/unity-ads-webview/pull/6777)
 
 # Wed Oct 24 17:13:55 UTC 2018
 
@@ -1069,7 +1069,7 @@
 # Mon Oct  8 23:15:42 UTC 2018
 
 * AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
-* AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238) 
+* AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238)
 * Fix session ad plan loading for backup campaigns [#6595](https://github.com/Applifier/unity-ads-webview/pull/6595)
 * Removed CTA button color test from groups 16, 17, 18 & 19 [#6472](https://github.com/Applifier/unity-ads-webview/pull/6576/)
 
@@ -1112,7 +1112,7 @@
 
 * Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
 
-# Mon Sep 24 09:44:02 UTC 2018 
+# Mon Sep 24 09:44:02 UTC 2018
 
 * Enable close icon skip for specific game IDs [#6406](https://github.com/Applifier/unity-ads-webview/pull/6406)
 
@@ -1379,8 +1379,8 @@
 # Wed Jun 27 06:05:33 UTC 2018
 
 * Remove circular dependencies
-* Fix iOS 7.x appsheet problems by sending user to the browser 
-* Fix new js_error that surfaced by because of fixing the c.join js_error 
+* Fix iOS 7.x appsheet problems by sending user to the browser
+* Fix new js_error that surfaced by because of fixing the c.join js_error
 
 # Tue Jun 26 08:23:00 UTC 2018
 
