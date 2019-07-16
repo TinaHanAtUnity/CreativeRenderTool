@@ -59,7 +59,7 @@ export class Slider {
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this._drag = this.clearDrag();
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
-        this._transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
+        this._transitionPropertyName = typeof document.documentElement.style.transition === 'string' ? 'transition' : 'webkitTransition';
         this._isInterrupted = false;
         this._slideSpeed = 300;
         this._minimalSwipeLength = 60;
