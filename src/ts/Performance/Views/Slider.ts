@@ -46,7 +46,6 @@ export class Slider {
     private _drag: IDragOptions;
     private _isDragging: boolean;
     private _minimalSwipeLength: number;
-    private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
     private _resizeTimeId: number | null;
     private _swipableIndexes: number[];
@@ -121,8 +120,6 @@ export class Slider {
         }
         indicators.push(indicatorWrap.appendChild(item));
         indicators[activeIndex].className = 'slider-dot ' + activeClass;
-
-        this._indicatorWrap = indicatorWrap;
         this._indicators = indicators;
         indicatorContainer.appendChild(indicatorWrap);
         this._rootElement.appendChild(indicatorContainer);
