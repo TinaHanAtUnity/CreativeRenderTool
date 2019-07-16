@@ -26,12 +26,6 @@ export class SliderPerformanceEndScreen extends PerformanceEndScreen {
 
     constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
-        this._campaign = campaign;
-        this._country = country;
-
-        this._template = new Template(this.getTemplate(), this._localization);
-
-        const adjustedRating: number = campaign.getRating() * 20;
 
         const screenshots = campaign.getScreenshots().map(s => s.getUrl());
         const portraitImage = campaign.getPortrait();
@@ -40,19 +34,6 @@ export class SliderPerformanceEndScreen extends PerformanceEndScreen {
         const squareImageUrl = squareImage ? squareImage.getUrl() : undefined;
         const portraitImageUrl = portraitImage ? portraitImage.getUrl() : undefined;
         const landscapeImageUrl = landscapeImage ? landscapeImage.getUrl() : undefined;
-
-        this._templateData = {
-            'gameName': campaign.getGameName(),
-            'gameIcon': campaign.getGameIcon().getUrl(),
-            'rating': adjustedRating.toString(),
-            'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt(),
-            'screenshots': screenshots,
-            'endScreenLandscape': portraitImageUrl,
-            'endScreenPortrait': landscapeImageUrl,
-            'endScreenSquare': squareImageUrl
-        };
-
         const screenshotOrientation = campaign.getScreenshotsOrientation();
 
         this._sliderEventParameters = {
