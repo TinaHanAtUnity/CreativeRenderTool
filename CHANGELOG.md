@@ -7,6 +7,8 @@
 * Remove Sending SessionDiagnostics with AdPlans greater than 1MB [#10552](https://github.com/Applifier/unity-ads-webview/pull/10552)
 * Add Unit tests for GoogleStoreManager and AppleStoreManager [#10318](https://github.com/Applifier/unity-ads-webview/pull/10318)
 * Open Measurement - Add Support for more robust obstruction calculations [#10427](https://github.com/Applifier/unity-ads-webview/pull/10427)
+* Update Banner Refresh Rate from Configuration Dashboard [#8681](https://github.com/Applifier/unity-ads-webview/pull/8681)
+* Remove Jaeger from Initialization and Request paths - Refactor Part 1 [#10520](https://github.com/Applifier/unity-ads-webview/pull/10520)
 
 # Mon Jul 15 12:56:51 UTC 2019
 
