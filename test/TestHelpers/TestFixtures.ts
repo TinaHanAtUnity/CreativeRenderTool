@@ -182,7 +182,8 @@ export class TestFixtures {
             disableVideoControlsFade: false,
             refreshDelay: 1000,
             muteVideo: false,
-            adTypes: ['TEST']
+            adTypes: ['TEST'],
+            banner: { refreshRate: 30 }
         });
     }
 
