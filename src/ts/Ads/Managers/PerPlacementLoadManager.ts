@@ -12,6 +12,8 @@ import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export interface ILoadEvent {
     value: string; // PlacementID for the loaded placement
@@ -26,17 +28,19 @@ export class PerPlacementLoadManager extends RefreshManager {
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _adsConfig: AdsConfiguration;
+    private _coreConfig: CoreConfiguration;
     private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
     private _pts: ProgrammaticTrackingService;
 
-    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
         this._core = core;
         this._ads = ads;
         this._adsConfig = adsConfig;
+        this._coreConfig = coreConfig;
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
@@ -113,6 +117,9 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string) {
+        const count = 1; // Will be updated in 3.2 to include the actual count of loads called before initialization
+        LoadCalledCounter.report(this._clientInfo.getGameId(), placementId, this._coreConfig.getCountry(), count, this._coreConfig.getAbGroup(), this._coreConfig.getOrganizationId());
+
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
