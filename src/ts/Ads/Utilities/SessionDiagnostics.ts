@@ -21,8 +21,9 @@ export class SessionDiagnostics {
         }
 
         const adPlan = session.getAdPlan();
-        // Don't send kafka messages with adplans greater than 1MB
-        if (adPlan && adPlan.length > 1048576) {
+        // Don't send kafka messages greater than 1MB
+        const slightlyLessThanOneMegaByte = 1038576;
+        if (adPlan && adPlan.length > slightlyLessThanOneMegaByte) {
             const errorWithOldDiagnosticType = {
                 error,
                 type
