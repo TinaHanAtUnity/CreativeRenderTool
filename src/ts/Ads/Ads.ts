@@ -44,13 +44,11 @@ import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICore } from 'Core/ICore';
-import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
@@ -83,6 +81,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Analytics } from 'Analytics/Analytics';
+import { Promises } from 'Core/Utilities/Promises';
 
 export class Ads implements IAds {
 
@@ -163,7 +162,7 @@ export class Ads implements IAds {
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
-    public initialize(jaegerInitSpan: JaegerSpan) {
+    public initialize(): Promise<void> {
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -251,9 +250,9 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager);
             if (this._loadApiEnabled) {
-                this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else {
                 this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
             }
@@ -267,19 +266,13 @@ export class Ads implements IAds {
                 }
             });
 
-            const refreshSpan = this._core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
-            refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._core.NativeBridge.getPlatform()]);
             return this.RefreshManager.initialize().then((resp) => {
-                this._core.JaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
-                refreshSpan.addTag(JaegerTags.Error, 'true');
-                refreshSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                this._core.JaegerManager.stop(refreshSpan);
                 throw error;
             });
         }).then(() => {
-            return this.SessionManager.sendUnsentSessions();
+            return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         });
     }
 
