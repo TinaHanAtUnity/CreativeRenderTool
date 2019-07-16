@@ -99,7 +99,7 @@ export class TestAdUnit extends AbstractAdUnit {
     }
 }
 
-describe('CampaignRefreshManager', () => {
+xdescribe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let vastParser: VastParserStrict;
