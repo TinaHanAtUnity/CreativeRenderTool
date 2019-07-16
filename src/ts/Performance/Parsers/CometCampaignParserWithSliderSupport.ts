@@ -71,7 +71,7 @@ export class CometCampaignParserWithSliderSupport extends CometCampaignParser {
 
         if (json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
-                ... baseCampaignParams,
+                ...baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
                 resourceAsset: json.mraidUrl ? new HTML(this.validateAndEncodeUrl(json.mraidUrl, session), session, json.creativeId) : undefined,
                 resource: undefined,
@@ -114,7 +114,7 @@ export class CometCampaignParserWithSliderSupport extends CometCampaignParser {
             return Promise.resolve(mraidCampaign);
         } else {
             const parameters: IPerformanceCampaign = {
-                ... baseCampaignParams,
+                ...baseCampaignParams,
                 appStoreId: json.appStoreId,
                 gameId: json.gameId,
                 gameName: json.gameName,
@@ -147,20 +147,21 @@ export class CometCampaignParserWithSliderSupport extends CometCampaignParser {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
 
-            let promise;
             const osVersion = this._core.DeviceInfo.getOsVersion();
             const platform = this._core.NativeBridge.getPlatform();
-            if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
-                const orientation = CustomFeatures.getSliderEndScreenImageOrientation(parameters.appStoreId);
-                parameters.screenshotsOrientation = orientation;
-                parameters.screenshots = Array.from([1, 2, 3], i => {
-                    const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
-                    return new Image(url, session);
-                });
-                promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
+
+            if (!CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
+                return Promise.resolve(new PerformanceCampaign(parameters));
             }
-            promise = Promise.resolve(new PerformanceCampaign(parameters));
-            return promise;
+
+            const orientation = CustomFeatures.getSliderEndScreenImageOrientation(parameters.appStoreId);
+            parameters.screenshotsOrientation = orientation;
+            parameters.screenshots = Array.from([1, 2, 3], i => {
+                const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
+                return new Image(url, session);
+            });
+
+            return Promise.resolve(new SliderPerformanceCampaign(parameters));
         }
     }
 }
