@@ -46,7 +46,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         let endScreen: EndScreen;
 
         if (baseParams.campaign instanceof SliderPerformanceCampaign) {
-            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign);
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
