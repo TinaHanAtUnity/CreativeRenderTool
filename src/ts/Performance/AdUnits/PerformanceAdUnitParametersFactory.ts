@@ -15,8 +15,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { DoubleShadowCloseButtonTest, AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
-import { PerformanceEndScreenDoubleShadowClose } from 'Performance/Views/PerformanceEndScreenDoubleShadowClose';
+import { AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -45,16 +44,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         };
 
         let endScreen: PerformanceEndScreen;
-
         const abGroup = baseParams.coreConfig.getAbGroup();
         if (AnimatedDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (DoubleShadowCloseButtonTest.isValid(abGroup)) {
-            endScreen = new PerformanceEndScreenDoubleShadowClose(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
-
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
