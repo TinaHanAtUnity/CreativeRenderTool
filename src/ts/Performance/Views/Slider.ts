@@ -105,7 +105,7 @@ export class Slider {
         this.initializeTouchEvents();
     }
 
-    private prepareIndicators(wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string) {
+    private prepareIndicators(wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string): void {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
         const indicatorContainer = document.createElement('div');
@@ -132,7 +132,7 @@ export class Slider {
         this._indicators[this._currentSlideIndex].classList.add('active');
     }
 
-    private initializeTouchEvents() {
+    private initializeTouchEvents(): void {
         // Resize event
         window.addEventListener('resize', (this.resizeHandler).bind(this));
         // Touch events
@@ -154,7 +154,7 @@ export class Slider {
         }
     }
 
-    private touchHandler(event: TouchEvent) {
+    private touchHandler(event: TouchEvent): void {
         this._drag.fingerCount = event && event.touches !== undefined ?
             event.touches.length : 1;
 
@@ -183,7 +183,7 @@ export class Slider {
         };
     }
 
-    private touchendHandler() {
+    private touchendHandler(): void {
         this._isDragging = false;
         this._isInterrupted = false;
 
@@ -209,7 +209,7 @@ export class Slider {
         this.updateIndicators();
     }
 
-    private getSlideCount() {
+    private getSlideCount(): number {
         let swipedSlide;
 
         const centerOffset = Math.floor(this.getWidth(this._rootElement) / 2);
@@ -263,7 +263,7 @@ export class Slider {
         return indexes;
     }
 
-    private touchstartHandler(event: TouchEvent) {
+    private touchstartHandler(event: TouchEvent): void {
         let touches: Touch | undefined;
         this._isInterrupted = true;
 
@@ -281,7 +281,7 @@ export class Slider {
         this._isDragging = true;
     }
 
-    private touchmoveHandler(event: TouchEvent) {
+    private touchmoveHandler(event: TouchEvent): void {
         const touches: TouchList | null = event !== undefined ? event.touches : null;
 
         if (!this._isDragging || touches && touches.length !== 1) {
@@ -304,7 +304,7 @@ export class Slider {
         this.setTransition(sliderOffsetLeftWithDrag);
     }
 
-    private getCurrentSliderOffsetLeftWithDrag() {
+    private getCurrentSliderOffsetLeftWithDrag(): number {
         const currentSliderOffsetLeft = this.getTransitionPosition(this._currentSlideIndex);
 
         if (this._drag.swipeLength <= 0) {
@@ -325,25 +325,25 @@ export class Slider {
         }
     }
 
-    private autoplay() {
+    private autoplay(): void {
         this.autoPlayClear();
         this._autoPlayTimer = setInterval((this.autoPlayIterator).bind(this), 2000);
     }
 
-    private autoPlayClear() {
+    private autoPlayClear(): void {
         if (this._autoPlayTimer) {
             clearInterval(this._autoPlayTimer);
         }
     }
 
-    private autoPlayIterator() {
+    private autoPlayIterator(): void {
         const slideTo: number = this._currentSlideIndex + 1;
         if (!this._isPaused && !this._isInterrupted) {
             this.slideHandler(slideTo, true);
         }
     }
 
-    private slideHandler(targetSlideIndex: number, automatic: boolean = false) {
+    private slideHandler(targetSlideIndex: number, automatic: boolean = false): void {
         if (this._isAnimating === true) {
             return;
         }
@@ -370,13 +370,13 @@ export class Slider {
         this.updateIndicators();
     }
 
-    private postSlide() {
+    private postSlide(): void {
         this._isAnimating = false;
         this.setPosition();
         this.autoplay();
     }
 
-    private animateSlide(targetTransitionPosition: number, callback: VoidCallback) {
+    private animateSlide(targetTransitionPosition: number, callback: VoidCallback): void {
         this.applyTransition();
         targetTransitionPosition = Math.ceil(targetTransitionPosition);
         this._slidesContainer.style[this._transformPropertyName] = `translate3d( ${targetTransitionPosition}px, 0px, 0px)`;
@@ -388,11 +388,11 @@ export class Slider {
         }
     }
 
-    private disableTransition() {
+    private disableTransition(): void {
         this._slidesContainer.style[this._transitionPropertyName] = '';
     }
 
-    private applyTransition() {
+    private applyTransition(): void {
         this._slidesContainer.style[this._transitionPropertyName] = `all ${this._slideSpeed}ms ease`;
     }
 
