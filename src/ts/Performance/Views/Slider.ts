@@ -1,5 +1,4 @@
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
-import { stringify } from 'querystring';
 
 export interface ISliderOptions {
     startIndex: number;
