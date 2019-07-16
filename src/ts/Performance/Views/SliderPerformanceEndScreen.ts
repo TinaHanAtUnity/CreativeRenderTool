@@ -2,7 +2,6 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
-import { Template } from 'Core/Utilities/Template';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { ICoreApi } from 'Core/ICore';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
