@@ -133,4 +133,8 @@ export class SliderPerformanceEndScreen extends PerformanceEndScreen {
     protected getTemplate() {
         return SliderEndScreenTemplate;
     }
+
+    protected getEndscreenAlt(): string | undefined {
+        return undefined;
+    }
 }
