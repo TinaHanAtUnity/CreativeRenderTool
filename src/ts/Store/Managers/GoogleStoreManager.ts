@@ -5,7 +5,7 @@ import { IGooglePurchaseData, IGooglePurchaseStatus } from 'Store/Native/Android
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ProgrammaticTrackingService, PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class GoogleStoreManager extends StoreManager {
     private _googleStore: GoogleStore;

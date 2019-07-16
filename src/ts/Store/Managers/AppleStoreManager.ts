@@ -6,7 +6,7 @@ import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { AppleStore } from 'Store/Utilities/AppleStore';
 import { PaymentTransactionState } from 'Store/Constants/iOS/PaymentTransactionState';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ProgrammaticTrackingService, PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class AppleStoreManager extends StoreManager {
     private _appleStore: AppleStore;
