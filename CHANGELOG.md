@@ -1,4 +1,4 @@
-# Pending
+# Tue Jul 16 21:49:48 UTC 2019
 
 * Enabling AppSheet for ios 12.1 and above [#10260](https://github.com/Applifier/unity-ads-webview/pull/10260)
 * Send Kafka Message to ads.load.counting Topic for Every Load Call [#10521](https://github.com/Applifier/unity-ads-webview/pull/10521)
