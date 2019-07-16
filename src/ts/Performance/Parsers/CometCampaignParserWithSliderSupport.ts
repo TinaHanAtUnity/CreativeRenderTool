@@ -158,9 +158,8 @@ export class CometCampaignParserWithSliderSupport extends CometCampaignParser {
                     return new Image(url, session);
                 });
                 promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
-            } else {
-                promise = Promise.resolve(new PerformanceCampaign(parameters));
             }
+            promise = Promise.resolve(new PerformanceCampaign(parameters));
             return promise;
         }
     }
