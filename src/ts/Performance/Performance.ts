@@ -8,18 +8,11 @@ import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/Performa
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { IARApi } from 'AR/AR';
 import { IChina } from 'China/IChina';
-import { SliderEndCardExperiment } from 'Core/Models/ABGroup';
-import { CometCampaignParserWithSliderSupport } from 'Performance/Parsers/CometCampaignParserWithSliderSupport';
 
 export class Performance extends AbstractParserModule {
     constructor(ar: IARApi, core: ICore, ads: IAds, china?: IChina) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
-        let parser;
-        if (SliderEndCardExperiment.isValid(core.Config.getAbGroup())) {
-            parser = new CometCampaignParserWithSliderSupport(core);
-        } else {
-            parser = new CometCampaignParser(core);
-        }
+        const parser = new CometCampaignParser(core);
         contentTypeHandlerMap[CometCampaignParser.ContentType] = {
             parser,
             factory: new PerformanceAdUnitFactory(new PerformanceAdUnitParametersFactory(core, ads, china))
