@@ -20,7 +20,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
@@ -164,7 +164,7 @@ export class AuctionRequest {
     private _sessionManager: SessionManager;
     private _placements: { [id: string]: Placement } = {};
     private _previousPlacementID: string | undefined;
-    private _noFillRetry: boolean = false;
+    private _noFillRetry: boolean | undefined;
     private _retryCount: number = 2;
     private _retryDelay: number = 10000;
     private _baseURL: string;
@@ -173,6 +173,7 @@ export class AuctionRequest {
     private _url: string | null;
     private _body: IAuctionRequestBody | null;
     private _headers: [string, string][] = [];
+    private _privacy: IRequestPrivacy | undefined;
 
     private _requestStart: number;
     private _requestDuration: number = 0;
@@ -191,6 +192,7 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
+        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy());
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
@@ -441,7 +443,7 @@ export class AuctionRequest {
                     versionCode: versionCode,
                     mediationName: mediation ? mediation.getName() : undefined,
                     mediationVersion: mediation ? mediation.getVersion() : undefined,
-                    mediationOrdinal: mediation ? (mediation.getOrdinal() ? mediation.getOrdinal() : undefined) : undefined,
+                    mediationOrdinal: mediation && mediation.getOrdinal() ? mediation.getOrdinal() : undefined,
                     frameworkName: framework ? framework.getName() : undefined,
                     frameworkVersion: framework ? framework.getVersion() : undefined,
                     placements: this.createPlacementRequest(),
@@ -452,10 +454,10 @@ export class AuctionRequest {
                     gdprEnabled: this._adsConfig.isGDPREnabled(),
                     optOutEnabled: this._adsConfig.isOptOutEnabled(),
                     optOutRecorded: this._adsConfig.isOptOutRecorded(),
-                    privacy: undefined, // Todo: When this is used for anything other than banners, change this to send actual privacy method
+                    privacy: this._privacy,
                     abGroup: this._coreConfig.getAbGroup(),
                     organizationId: this._coreConfig.getOrganizationId(),
-                    isLoadEnabled: false // Todo: When this is used for anything other than banners, pass actual flag
+                    isLoadEnabled: false // TODO: When this is used for anything other than banners, pass actual flag
                 };
             });
         });

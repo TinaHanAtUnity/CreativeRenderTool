@@ -913,7 +913,7 @@ export class TestFixtures {
     public static getOkNativeResponse(): INativeResponse {
         return {
             url: 'http://foo.url.com',
-            response: 'foo response',
+            response: '{}',
             responseCode: 200,
             headers: [['location', 'http://foobar.com']]
         };
