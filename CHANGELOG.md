@@ -1,3 +1,7 @@
+# Pending
+
+* Fixed the CTA button being visible before it should on larger devices [#10554](https://github.com/Applifier/unity-ads-webview/pull/10554)
+
 # Tue Jul 16 21:49:48 UTC 2019
 
 * Enabling AppSheet for ios 12.1 and above [#10260](https://github.com/Applifier/unity-ads-webview/pull/10260)
