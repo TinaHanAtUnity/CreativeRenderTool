@@ -1,6 +1,7 @@
 # Pending
 
 * Fixed the CTA button being visible before it should on larger devices [#10554](https://github.com/Applifier/unity-ads-webview/pull/10554)
+* Add color tinting experiment [#9842](https://github.com/Applifier/unity-ads-webview/pull/9842)
 
 # Tue Jul 16 21:49:48 UTC 2019
 

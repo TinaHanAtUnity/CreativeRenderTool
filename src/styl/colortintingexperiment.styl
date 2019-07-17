@@ -1,0 +1,25 @@
+@font-face {
+    font-family: "colortintingexperiment";
+    src: url("../fonts/ColorTintingExperiment/colortintingexperiment.ttf") format("truetype");
+}
+
+.color-tinting-endscreen #end-screen .bottom-container {
+    .icon-gdpr,
+    .china-advertisement,
+    .unityads-logo {
+        opacity: .35;
+    }
+    
+    .unityads-logo {
+        bottom: auto;
+        background-image: none;
+        text-align: center;
+        font-size: 3.3em;
+        line-height: .9em;
+
+        &:before {
+            content: "\e001";
+            font-family: "colortintingexperiment" !important; // @stylint ignore
+        }
+    }
+}

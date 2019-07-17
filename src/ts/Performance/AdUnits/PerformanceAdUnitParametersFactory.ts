@@ -14,9 +14,11 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { QueryCTATest } from 'Core/Models/ABGroup';
+import { QueryCTATest, ColorTintingTest } from 'Core/Models/ABGroup';
 import { PerformanceEndScreenQueryCTASquare } from 'Performance/Views/PerformanceEndScreenQueryCTASquare';
 import { PerformanceEndScreenQueryCTA } from 'Performance/Views/PerformanceEndScreenQueryCTA';
+import { PerformanceColorTintingEndScreen } from 'Performance/Views/PerformanceColorTintingEndScreen';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -53,9 +55,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             } else {
                 endScreen = new PerformanceEndScreenQueryCTASquare(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             }
+        } else if (ColorTintingTest.isValid(abGroup) && this._platform === Platform.IOS) {
+            endScreen = new PerformanceColorTintingEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
