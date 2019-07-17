@@ -78,7 +78,7 @@ export class CometCampaignParser extends CampaignParser {
 
         if (json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
-                ...baseCampaignParams,
+                ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
                 resourceAsset: json.mraidUrl ? new HTML(this.validateAndEncodeUrl(json.mraidUrl, session), session, json.creativeId) : undefined,
                 resource: undefined,
