@@ -121,7 +121,7 @@ export class CometCampaignParser extends CampaignParser {
             return Promise.resolve(mraidCampaign);
         } else {
             const parameters: IPerformanceCampaign = {
-                ...baseCampaignParams,
+                ... baseCampaignParams,
                 appStoreId: json.appStoreId,
                 gameId: json.gameId,
                 gameName: json.gameName,
