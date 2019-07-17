@@ -54,7 +54,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
-            ...baseParams,
+            ... baseParams,
             video: video,
             overlay: overlay,
             endScreen: endScreen,
