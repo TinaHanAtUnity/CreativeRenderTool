@@ -8,7 +8,15 @@ import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.js
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 
-const SliderEndScreenImages = JSON.parse(SliderEndScreenImagesJson);
+const JsonStringObjectParser = (json: string): { [index: string]: number } => {
+    try {
+        return JSON.parse(json);
+    } catch {
+        return {};
+    }
+};
+
+const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
