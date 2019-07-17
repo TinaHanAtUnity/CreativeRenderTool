@@ -15,8 +15,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
-import { ColorTintingTest } from 'Core/Models/ABGroup';
+import { ColorTintingTest, AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceColorTintingEndScreen } from 'Performance/Views/PerformanceColorTintingEndScreen';
 import { Platform } from 'Core/Constants/Platform';
 
