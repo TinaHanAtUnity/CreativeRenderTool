@@ -16,6 +16,9 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
+import { ColorTintingTest } from 'Core/Models/ABGroup';
+import { PerformanceColorTintingEndScreen } from 'Performance/Views/PerformanceColorTintingEndScreen';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -44,12 +47,16 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         };
 
         let endScreen: PerformanceEndScreen;
+
         const abGroup = baseParams.coreConfig.getAbGroup();
         if (AnimatedDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (ColorTintingTest.isValid(abGroup) && this._platform === Platform.IOS) {
+            endScreen = new PerformanceColorTintingEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         return {
