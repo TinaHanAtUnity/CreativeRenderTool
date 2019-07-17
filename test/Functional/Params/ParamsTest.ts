@@ -216,7 +216,7 @@ describe('Event parameters should match specifications', () => {
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
             });
-       });
+        });
 
         it('on iOS', () => {
             const sandbox = sinon.createSandbox();
@@ -255,33 +255,31 @@ describe('Event parameters should match specifications', () => {
         });
     });
 
-    describe('with ad request using AuctionRequest', () => {
-        let coreConfig: CoreConfiguration;
-        let adsConfig: AdsConfiguration;
-        let backend: Backend;
-        let nativeBridge: NativeBridge;
-        let core: ICore;
-        let ads: IAdsApi;
-        let storageBridge: StorageBridge;
-        let metaDataManager: MetaDataManager;
-        let requestManager: RequestManager;
-        let clientInfo: ClientInfo;
-        let deviceInfo: DeviceInfo;
-        let sessionManager: SessionManager;
-        let focusManager: FocusManager;
-        let adMobSignalFactory: AdMobSignalFactory;
-        let auctionRequestParams: IAuctionRequestParams;
-        let auctionRequest: AuctionRequest;
+    [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
-        let requestStub: sinon.SinonStub;
-        const sandbox = sinon.createSandbox();
+        describe(`with ad request using AuctionRequest on ${Platform[platform]}`, () => {
+            let coreConfig: CoreConfiguration;
+            let adsConfig: AdsConfiguration;
+            let backend: Backend;
+            let nativeBridge: NativeBridge;
+            let core: ICore;
+            let ads: IAdsApi;
+            let storageBridge: StorageBridge;
+            let metaDataManager: MetaDataManager;
+            let requestManager: RequestManager;
+            let clientInfo: ClientInfo;
+            let deviceInfo: DeviceInfo;
+            let sessionManager: SessionManager;
+            let focusManager: FocusManager;
+            let adMobSignalFactory: AdMobSignalFactory;
+            let auctionRequestParams: IAuctionRequestParams;
+            let auctionRequest: AuctionRequest;
 
-        afterEach(() => {
-            sandbox.restore();
-        });
+            let requestStub: sinon.SinonStub;
+            let sandbox: sinon.SinonSandbox;
 
-        [Platform.ANDROID, Platform.IOS].forEach(platform => {
-            it(`on ${Platform[platform]}`, () => {
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
                 coreConfig = TestFixtures.getCoreConfiguration();
                 adsConfig = TestFixtures.getAdsConfiguration();
                 backend = TestFixtures.getBackend(platform);
@@ -303,11 +301,12 @@ describe('Event parameters should match specifications', () => {
                 }
 
                 adMobSignalFactory = new AdMobSignalFactory(platform, core.Api, ads, clientInfo, deviceInfo, focusManager);
-                sessionManager.setGameSessionId(1234);
 
                 sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
                 sandbox.stub(core.Api.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
                 sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+
+                sessionManager.setGameSessionId(1234);
 
                 auctionRequestParams = {
                     platform: platform,
@@ -323,6 +322,13 @@ describe('Event parameters should match specifications', () => {
                     programmaticTrackingService: core.ProgrammaticTrackingService
                 };
                 auctionRequest = new AuctionRequest(auctionRequestParams);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should have the correct parameters', () => {
                 return auctionRequest.request().then(() => {
                     const url: string = requestStub.getCall(0).args[0];
                     const body: string = requestStub.getCall(0).args[1];
