@@ -391,7 +391,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
     }
 
-    public calculateObstruction(x: number, y: number, width: number, height: number): IRectangle {
+    public createRectangle(x: number, y: number, width: number, height: number): IRectangle {
         return {
             x: x,
             y: y,
@@ -449,6 +449,70 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         return adView;
+    }
+
+    public calculatePercentageInView(videoRectangle: IRectangle, obstruction: IRectangle, screenRectangle: IRectangle) {
+        const adjustedObstruction = this.calculateScreenAdjustedObstruction(obstruction, screenRectangle);
+        const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoRectangle, adjustedObstruction);
+        const percentOfVideoInViewPort = this.calculateObstructionOverlapPercentage(videoRectangle, screenRectangle);
+
+        return  percentOfVideoInViewPort - obstructionOverlapPercentage;
+    }
+
+    public calculateObstructionOverlapPercentage(videoView: IRectangle, obstruction: IRectangle) {
+        let obstructionOverlapArea = 0;
+
+        const videoXMin = videoView.x;
+        const videoYMin = videoView.y;
+        const videoXMax = videoView.x + videoView.width;
+        const videoYMax = videoView.y + videoView.height;
+
+        const obstructionXMin = obstruction.x;
+        const obstructionYMin = obstruction.y;
+        const obstructionXMax = obstruction.x + obstruction.width;
+        const obstructionYMax = obstruction.y + obstruction.height;
+
+        const dx = Math.min(videoXMax, obstructionXMax) - Math.max(videoXMin, obstructionXMin);
+        const dy = Math.min(videoYMax, obstructionYMax) - Math.max(videoYMin, obstructionYMin);
+        if ((dx >= 0) && (dy >= 0)) {
+            obstructionOverlapArea = dx * dy;
+        }
+
+        const videoArea = videoView.width * videoView.height;
+        const obstructionOverlapPercentage = obstructionOverlapArea / videoArea;
+
+        return obstructionOverlapPercentage * 100;
+    }
+
+    private calculateScreenAdjustedObstruction(obstruction: IRectangle, screenRectangle: IRectangle) {
+        let adjustedObstruction = obstruction;
+
+        const obstructionXMin = obstruction.x;
+        const obstructionYMin = obstruction.y;
+        const obstructionXMax = obstruction.x + obstruction.width;
+        const obstructionYMax = obstruction.y + obstruction.height;
+
+        const screenXMax = screenRectangle.x + screenRectangle.width;
+        const screenYMax = screenRectangle.y + screenRectangle.height;
+
+        if (obstructionXMax > screenXMax) {
+            adjustedObstruction.width = screenRectangle.width - obstruction.x;
+        }
+
+        if (obstructionYMax > screenYMax) {
+            adjustedObstruction.height = screenRectangle.height - obstruction.y;
+        }
+
+        if (obstructionXMin >= screenXMax || obstructionYMin >= screenYMax) {
+            adjustedObstruction = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+        }
+
+        return adjustedObstruction;
     }
 
     /**
