@@ -183,15 +183,14 @@ export class Ads implements IAds {
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            const promises = [];
-            this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
+            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
+                this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
+            }
 
-            promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
-            }));
-
-            return Promise.all(promises);
+            });
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
