@@ -23,6 +23,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -63,6 +64,12 @@ export interface IAuctionRequestParams {
     programmaticTrackingService: ProgrammaticTrackingService;
 }
 
+export interface IPlacementRequestDTO {
+    adTypes: string[] | undefined;
+    allowSkip: boolean;
+    dimensions?: IBannerDimensions;
+}
+
 interface IAuctionRequestBody {
     bundleVersion: string;
     bundleId: string;
@@ -90,7 +97,7 @@ interface IAuctionRequestBody {
     mediationOrdinal: number | undefined;
     frameworkName: string | undefined;
     frameworkVersion: string | undefined;
-    placements: { [key: string]: unknown };
+    placements: { [key: string]: IPlacementRequestDTO };
     properties: string;
     sessionDepth: number;
     projectId: string;
@@ -370,8 +377,8 @@ export class AuctionRequest {
         });
     }
 
-    protected createPlacementRequest(): { [key: string]: unknown } {
-        const placementRequest: { [key: string]: unknown } = {};
+    protected createPlacementRequest(): { [key: string]: IPlacementRequestDTO } {
+        const placementRequest: { [key: string]: IPlacementRequestDTO } = {};
         Object.keys(this._placements).forEach((placementId) => {
             const placement = this._placements[placementId];
             placementRequest[placementId] = this.createPlacementDTO(placement);
@@ -379,7 +386,7 @@ export class AuctionRequest {
         return placementRequest;
     }
 
-    protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
+    protected createPlacementDTO(placement: Placement): IPlacementRequestDTO {
         return {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
