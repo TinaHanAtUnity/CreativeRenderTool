@@ -14,8 +14,8 @@ export class WebView {
         this._core = new Core(nativeBridge);
     }
 
-    public initialize(): Promise<void> {
-        return this._core.initialize();
+    public initialize(isBrowserTesterInUse: boolean = false): Promise<void> {
+        return this._core.initialize(isBrowserTesterInUse);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {

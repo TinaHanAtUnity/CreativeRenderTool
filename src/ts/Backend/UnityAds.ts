@@ -9,7 +9,7 @@ import { LoadEvent } from 'Core/Native/LoadApi';
 
 export class UnityAds {
 
-    public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false, enablePerPlacementLoad: boolean = false): Promise<void> {
+    public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false, enablePerPlacementLoad: boolean = false, isBrowserTesterInUse: boolean = false): Promise<void> {
         let nativeBridge: NativeBridge;
         switch (platform) {
             // Setting auto batching on does not work in a "single-threaded" environment due to callbacks and events
@@ -35,7 +35,8 @@ export class UnityAds {
         UnityAds._listener = listener;
 
         UnityAds._webView = new WebView(nativeBridge);
-        return UnityAds._webView.initialize().then(() => {
+
+        return UnityAds._webView.initialize(isBrowserTesterInUse).then(() => {
             UnityAds._initialized = true;
             UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ...UnityAds._loadRequests);
             UnityAds._loadRequests = [];

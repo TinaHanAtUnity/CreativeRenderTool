@@ -17,6 +17,7 @@ interface IClientInfo {
     reinitialized: boolean;
     monetizationInUse: boolean;
     usePerPlacementLoad: boolean;
+    browserTesterInUse: boolean;
 }
 
 export class ClientInfo extends Model<IClientInfo> {
@@ -37,7 +38,8 @@ export class ClientInfo extends Model<IClientInfo> {
             initTimestamp: ['number'],
             reinitialized: ['boolean'],
             monetizationInUse: ['boolean'],
-            usePerPlacementLoad: ['boolean']
+            usePerPlacementLoad: ['boolean'],
+            browserTesterInUse: ['boolean']
         });
 
         this.set('gameId', data[0]);
@@ -55,6 +57,7 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('reinitialized', data[12]);
         this.set('usePerPlacementLoad', !!data[13]);
         this.set('monetizationInUse', false);
+        this.set('browserTesterInUse', false);
     }
 
     public getGameId(): string {
@@ -119,6 +122,14 @@ export class ClientInfo extends Model<IClientInfo> {
 
     public setMonetizationInUse(using: boolean) {
         this.set('monetizationInUse', using);
+    }
+
+    public isBrowserTesterInUse(): boolean {
+        return this.get('browserTesterInUse');
+    }
+
+    public setBrowserTesterInUse(browserTesterInUse: boolean) {
+        this.set('browserTesterInUse', browserTesterInUse);
     }
 
     public getDTO() {

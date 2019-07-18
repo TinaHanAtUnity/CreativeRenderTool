@@ -121,9 +121,10 @@ export class Core implements ICore {
         this.StorageBridge = new StorageBridge(this.Api);
     }
 
-    public initialize(): Promise<void> {
+    public initialize(isBrowserTesterInUse: boolean = false): Promise<void> {
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
+            this.ClientInfo.setBrowserTesterInUse(isBrowserTesterInUse);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
