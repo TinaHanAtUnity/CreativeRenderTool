@@ -51,7 +51,6 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const abGroup = baseParams.coreConfig.getAbGroup();
         let endScreen: PerformanceEndScreen;
 
-        const abGroup = baseParams.coreConfig.getAbGroup();
         if (QueryCTATest.isValid(abGroup)) {
             if (baseParams.campaign.getSquare() !== undefined) {
                 endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
