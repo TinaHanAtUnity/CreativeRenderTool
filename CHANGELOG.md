@@ -1,5 +1,6 @@
-# Pending
+# Thu Jul 18 18:05:40 UTC 2019
 
+* Slider V2 [#10346](https://github.com/Applifier/unity-ads-webview/pull/10346)
 * Fixed the CTA button being visible before it should on larger devices [#10554](https://github.com/Applifier/unity-ads-webview/pull/10554)
 * Add color tinting experiment [#9842](https://github.com/Applifier/unity-ads-webview/pull/9842)
 
