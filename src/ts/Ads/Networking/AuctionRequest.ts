@@ -3,7 +3,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
-import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -20,6 +20,10 @@ import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -58,6 +62,53 @@ export interface IAuctionRequestParams {
     deviceInfo: DeviceInfo;
     sessionManager: SessionManager;
     programmaticTrackingService: ProgrammaticTrackingService;
+}
+
+export interface IPlacementRequestDTO {
+    adTypes: string[] | undefined;
+    allowSkip: boolean;
+    dimensions?: IBannerDimensions;
+}
+
+interface IAuctionRequestBody {
+    bundleVersion: string;
+    bundleId: string;
+    coppa: boolean;
+    language: string;
+    gameSessionId: number;
+    timeZone: string;
+    simulator: boolean | undefined;
+    token: string;
+    previousPlacementId: string | undefined;
+    webviewUa: string | undefined;
+    nofillRetry: boolean | undefined;
+    deviceFreeSpace: number;
+    networkOperator: string | null;
+    networkOperatorName: string | null;
+    wiredHeadset: boolean;
+    volume: number;
+    requestSignal: string;
+    ext: { [key: string]: unknown };
+    isPromoCatalogAvailable: boolean;
+    cachedCampaigns: string[] | undefined;
+    versionCode: number | undefined;
+    mediationName: string | undefined;
+    mediationVersion: string | undefined;
+    mediationOrdinal: number | undefined;
+    frameworkName: string | undefined;
+    frameworkVersion: string | undefined;
+    placements: { [key: string]: IPlacementRequestDTO };
+    properties: string;
+    sessionDepth: number;
+    projectId: string;
+    gameSessionCounters: IGameSessionCounters;
+    gdprEnabled: boolean;
+    optOutEnabled: boolean;
+    optOutRecorded: boolean;
+    privacy: IRequestPrivacy | undefined;
+    abGroup: ABGroup;
+    organizationId: string | undefined;
+    isLoadEnabled: boolean;
 }
 
 /**
@@ -120,15 +171,16 @@ export class AuctionRequest {
     private _sessionManager: SessionManager;
     private _placements: { [id: string]: Placement } = {};
     private _previousPlacementID: string | undefined;
-    private _noFillRetry: boolean;
+    private _noFillRetry: boolean | undefined;
     private _retryCount: number = 2;
     private _retryDelay: number = 10000;
     private _baseURL: string;
     private _timeout: number | undefined;
     private _session: Session;
     private _url: string | null;
-    private _body: { [key: string]: unknown } | null;
+    private _body: IAuctionRequestBody | null;
     private _headers: [string, string][] = [];
+    private _privacy: IRequestPrivacy | undefined;
 
     private _requestStart: number;
     private _requestDuration: number = 0;
@@ -147,7 +199,8 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
-        if(this._coreConfig.getTestMode()) {
+        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy());
+        if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
             this._baseURL = RequestManager.getAuctionProtocol() === AuctionProtocol.V5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
@@ -196,7 +249,7 @@ export class AuctionRequest {
     }
 
     // Overrides the body used in the request.
-    public setBody(body: { [key: string]: unknown }) {
+    public setBody(body: IAuctionRequestBody) {
         this._body = body;
     }
 
@@ -286,7 +339,7 @@ export class AuctionRequest {
             url = Url.addParameters(url, {
                 forceSessionId: AuctionRequest.SessionId
             });
-}
+        }
 
         if (AuctionRequest.CampaignId) {
             url = Url.addParameters(url, {
@@ -324,8 +377,8 @@ export class AuctionRequest {
         });
     }
 
-    protected createPlacementRequest(): unknown {
-        const placementRequest: { [key: string]: unknown } = {};
+    protected createPlacementRequest(): { [key: string]: IPlacementRequestDTO } {
+        const placementRequest: { [key: string]: IPlacementRequestDTO } = {};
         Object.keys(this._placements).forEach((placementId) => {
             const placement = this._placements[placementId];
             placementRequest[placementId] = this.createPlacementDTO(placement);
@@ -333,7 +386,7 @@ export class AuctionRequest {
         return placementRequest;
     }
 
-    protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
+    protected createPlacementDTO(placement: Placement): IPlacementRequestDTO {
         return {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
@@ -349,32 +402,9 @@ export class AuctionRequest {
         });
     }
 
-    private getRequestBody(): Promise<unknown> {
+    private getRequestBody(): Promise<IAuctionRequestBody> {
         if (this._body) {
             return Promise.resolve(this._body);
-        }
-
-        const body: { [key: string]: unknown } = {
-            bundleVersion: this._clientInfo.getApplicationVersion(),
-            bundleId: this._clientInfo.getApplicationName(),
-            coppa: this._coreConfig.isCoppaCompliant(),
-            language: this._deviceInfo.getLanguage(),
-            gameSessionId: this._sessionManager.getGameSessionId(),
-            timeZone: this._deviceInfo.getTimeZone(),
-            simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
-            token: this._coreConfig.getToken()
-        };
-
-        if (this._previousPlacementID) {
-            body.previousPlacementId = this._previousPlacementID;
-        }
-
-        if (typeof navigator !== 'undefined' && navigator.userAgent && typeof navigator.userAgent === 'string') {
-            body.webviewUa = navigator.userAgent;
-        }
-
-        if (this._noFillRetry) {
-            body.nofillRetry = true;
         }
 
         return Promise.all([
@@ -392,56 +422,50 @@ export class AuctionRequest {
                 return signal.getDTO();
             })
         ]).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
-            body.deviceFreeSpace = freeSpace;
-            body.networkOperator = networkOperator;
-            body.networkOperatorName = networkOperatorName;
-            body.wiredHeadset = headset;
-            body.volume = volume;
-            body.requestSignal = requestSignal;
-            body.ext = optionalSignal;
-
-            if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
-                body.cachedCampaigns = fullyCachedCampaignIds;
-            }
-
-            if (versionCode) {
-                body.versionCode = versionCode;
-            }
-
             return Promise.all([
                 this._metaDataManager.fetch(MediationMetaData),
                 this._metaDataManager.fetch(FrameworkMetaData)
             ]).then(([mediation, framework]) => {
-                if (mediation) {
-                    body.mediationName = mediation.getName();
-                    body.mediationVersion = mediation.getVersion();
-                    if (mediation.getOrdinal()) {
-                        body.mediationOrdinal = mediation.getOrdinal();
-                    }
-                }
-
-                if (framework) {
-                    body.frameworkName = framework.getName();
-                    body.frameworkVersion = framework.getVersion();
-                }
-
-                const placementRequest = this.createPlacementRequest();
-
-                body.placements = placementRequest;
-                body.properties = this._coreConfig.getProperties();
-                body.sessionDepth = SdkStats.getAdRequestOrdinal();
-                body.projectId = this._coreConfig.getUnityProjectId();
-                body.gameSessionCounters = GameSessionCounters.getCurrentCounters();
-                body.gdprEnabled = this._adsConfig.isGDPREnabled();
-                body.optOutEnabled = this._adsConfig.isOptOutEnabled();
-                body.optOutRecorded = this._adsConfig.isOptOutRecorded();
-
-                const organizationId = this._coreConfig.getOrganizationId();
-                if (organizationId) {
-                    body.organizationId = organizationId;
-                }
-
-                return body;
+                return {
+                    bundleVersion: this._clientInfo.getApplicationVersion(),
+                    bundleId: this._clientInfo.getApplicationName(),
+                    coppa: this._coreConfig.isCoppaCompliant(),
+                    language: this._deviceInfo.getLanguage(),
+                    gameSessionId: this._sessionManager.getGameSessionId(),
+                    timeZone: this._deviceInfo.getTimeZone(),
+                    simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
+                    token: this._coreConfig.getToken(),
+                    previousPlacementId: this._previousPlacementID ? this._previousPlacementID : undefined,
+                    webviewUa: (typeof navigator !== 'undefined' && navigator.userAgent && typeof navigator.userAgent === 'string') ? navigator.userAgent : undefined,
+                    nofillRetry: this._noFillRetry,
+                    deviceFreeSpace: freeSpace,
+                    networkOperator: networkOperator,
+                    networkOperatorName: networkOperatorName,
+                    wiredHeadset: headset,
+                    volume: volume,
+                    requestSignal: requestSignal,
+                    ext: optionalSignal,
+                    isPromoCatalogAvailable: PurchasingUtilities.isCatalogAvailable(),
+                    cachedCampaigns: (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) ? fullyCachedCampaignIds : undefined,
+                    versionCode: versionCode,
+                    mediationName: mediation ? mediation.getName() : undefined,
+                    mediationVersion: mediation ? mediation.getVersion() : undefined,
+                    mediationOrdinal: mediation && mediation.getOrdinal() ? mediation.getOrdinal() : undefined,
+                    frameworkName: framework ? framework.getName() : undefined,
+                    frameworkVersion: framework ? framework.getVersion() : undefined,
+                    placements: this.createPlacementRequest(),
+                    properties: this._coreConfig.getProperties(),
+                    sessionDepth: SdkStats.getAdRequestOrdinal(),
+                    projectId: this._coreConfig.getUnityProjectId(),
+                    gameSessionCounters: GameSessionCounters.getCurrentCounters(),
+                    gdprEnabled: this._adsConfig.isGDPREnabled(),
+                    optOutEnabled: this._adsConfig.isOptOutEnabled(),
+                    optOutRecorded: this._adsConfig.isOptOutRecorded(),
+                    privacy: this._privacy,
+                    abGroup: this._coreConfig.getAbGroup(),
+                    organizationId: this._coreConfig.getOrganizationId(),
+                    isLoadEnabled: false // TODO: When this is used for anything other than banners, pass actual flag
+                };
             });
         });
     }

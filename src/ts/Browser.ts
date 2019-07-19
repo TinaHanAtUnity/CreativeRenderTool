@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
         const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
         const newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-        if(currentOrientation) {
-            if(currentOrientation !== newOrientation) {
+        if (currentOrientation) {
+            if (currentOrientation !== newOrientation) {
                 document.body.classList.remove(currentOrientation);
                 document.body.classList.add(newOrientation);
             }
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    if(window.parent !== window) {
+    if (window.parent !== window) {
         const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
         const campaignIdElement = <HTMLInputElement>window.parent.document.getElementById('campaignId');
         const countryElement = <HTMLInputElement>window.parent.document.getElementById('country');
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onUnityAdsReady: (placement: string) => {
                     console.log('onUnityAdsReady: ' + placement);
                     const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
-                    if(placementButton) {
+                    if (placementButton) {
                         const placementButtonlistener = (placementButtonEvent: Event) => {
                             placementButtonEvent.preventDefault();
                             placementButton.disabled = true;
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
             PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
 
-            switch(platformElement.value) {
+            switch (platformElement.value) {
                 case 'android':
                     UnityAds.setBackend(new Backend(Platform.ANDROID));
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // tslint:disable-next-line
-        if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+        if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         // tslint:disable-next-line
          } else if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD]()) {

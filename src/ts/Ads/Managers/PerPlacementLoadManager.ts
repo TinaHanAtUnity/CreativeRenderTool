@@ -11,22 +11,26 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export class PerPlacementLoadManager extends RefreshManager {
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _adsConfig: AdsConfiguration;
+    private _coreConfig: CoreConfiguration;
     private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
     private _pts: ProgrammaticTrackingService;
 
-    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
         this._core = core;
         this._ads = ads;
         this._adsConfig = adsConfig;
+        this._coreConfig = coreConfig;
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
@@ -44,7 +48,7 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     public getCampaign(placementId: string): Campaign | undefined {
         const placement = this._adsConfig.getPlacement(placementId);
-        if(placement) {
+        if (placement) {
             return placement.getCurrentCampaign();
         }
 
@@ -79,7 +83,7 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     public sendPlacementStateChanges(placementId: string): void {
         const placement = this._adsConfig.getPlacement(placementId);
-        if(placement.getPlacementStateChanged()) {
+        if (placement.getPlacementStateChanged()) {
             placement.setPlacementStateChanged(false);
             this._ads.Placement.setPlacementState(placementId, placement.getState());
             this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
@@ -97,6 +101,7 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     // count is the number of times load was called for a placementId before we could process it
     private loadPlacement(placementId: string, count: number) {
+        LoadCalledCounter.report(this._clientInfo.getGameId(), placementId, this._coreConfig.getCountry(), count, this._coreConfig.getAbGroup(), this._coreConfig.getOrganizationId());
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
@@ -138,13 +143,13 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private invalidateExpiredCampaigns() {
-        for(const placementId of this._adsConfig.getPlacementIds()) {
+        for (const placementId of this._adsConfig.getPlacementIds()) {
             const placement = this._adsConfig.getPlacement(placementId);
 
-            if(placement && placement.getState() === PlacementState.READY) {
+            if (placement && placement.getState() === PlacementState.READY) {
                 const campaign = placement.getCurrentCampaign();
 
-                if(campaign && campaign.isExpired()) {
+                if (campaign && campaign.isExpired()) {
                     placement.setCurrentCampaign(undefined);
                     this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                 }

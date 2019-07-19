@@ -17,7 +17,7 @@ export class SensorInfoApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'SensorInfo', ApiPackage.CORE);
 
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+        if (nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosSensorInfoApi(nativeBridge);
         } else {
             this.Android = new AndroidSensorInfoApi(nativeBridge);

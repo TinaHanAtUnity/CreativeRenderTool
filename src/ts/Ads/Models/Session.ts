@@ -53,7 +53,7 @@ export class Session extends Model<ISession> {
 
     public getEventSent(eventType: EventType) {
         const eventSent = this.get('eventSent');
-        if(!(eventType in eventSent)) {
+        if (!(eventType in eventSent)) {
             return false;
         }
         return eventSent[eventType];
@@ -61,7 +61,7 @@ export class Session extends Model<ISession> {
 
     public setEventSent(eventType: EventType) {
         const eventSent = this.get('eventSent');
-        if(!(eventType in eventSent)) {
+        if (!(eventType in eventSent)) {
             eventSent[eventType] = true;
         }
         this.set('eventSent', eventSent);

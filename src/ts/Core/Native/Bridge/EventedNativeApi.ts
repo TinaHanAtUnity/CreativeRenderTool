@@ -16,8 +16,8 @@ export abstract class EventedNativeApi<T extends object> extends NativeApi {
     }
 
     public removeEventHandler(handler: T): void {
-        if(this._handlers.length) {
-            if(typeof handler !== 'undefined') {
+        if (this._handlers.length) {
+            if (typeof handler !== 'undefined') {
                 this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
             } else {
                 this._handlers = [];

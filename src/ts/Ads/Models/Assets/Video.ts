@@ -78,7 +78,7 @@ export class Video extends Asset<IVideo> {
     public setPosition(position: number) {
         this.set('position', position);
         const duration = this.get('duration');
-        if(duration) {
+        if (duration) {
             this.set('quartile', Math.floor((this.get('position') * 4) / duration));
         }
     }
