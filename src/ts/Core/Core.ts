@@ -3,7 +3,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { ICore, ICoreApi } from 'Core/ICore';
-import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
@@ -123,9 +122,7 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const jaegerInitSpan = new JaegerSpan('Initialize'); // start a span
         return this.Api.Sdk.loadComplete().then((data) => {
-            jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
@@ -146,7 +143,6 @@ export class Core implements ICore {
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
-            this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
@@ -174,21 +170,14 @@ export class Core implements ICore {
                 this.FocusManager.setListenAndroidLifecycle(true);
             }
 
-            const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
             let configPromise: Promise<unknown>;
             if (TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
             } else {
-                configPromise = this.ConfigManager.getConfig(configSpan);
+                configPromise = this.ConfigManager.getConfig();
             }
-
-            configPromise.then(() => {
-                this.JaegerManager.stop(configSpan);
-            }).catch(() => {
-                this.JaegerManager.stop(configSpan);
-            });
 
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
@@ -200,11 +189,6 @@ export class Core implements ICore {
                 FilteredABTest.setup(this.ClientInfo.getGameId(), coreConfig.getOrganizationId());
 
                 return [configJson, coreConfig];
-            }).catch((error) => {
-                configSpan.addTag(JaegerTags.Error, 'true');
-                configSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                configSpan.addAnnotation(error.message);
-                throw new Error(error);
             });
 
             const cachePromise = this.CacheBookkeeping.cleanCache().catch(error => {
@@ -232,17 +216,8 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this, this.Store);
 
-            return this.Ads.initialize(jaegerInitSpan);
-        }).then(() => {
-            this.JaegerManager.stop(jaegerInitSpan);
+            return this.Ads.initialize();
         }).catch((error: { message: string; name: unknown }) => {
-            jaegerInitSpan.addAnnotation(error.message);
-            jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
-            if (this.JaegerManager) {
-                this.JaegerManager.stop(jaegerInitSpan);
-            }
-
             if (error instanceof ConfigError) {
                 // tslint:disable-next-line
                 error = { 'message': error.message, 'name': error.name };

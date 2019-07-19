@@ -1,8 +1,24 @@
 # Pending
 
+* Align CampaignManager and AuctionRequest and Add Tests [#10525](https://github.com/Applifier/unity-ads-webview/pull/10525)
+
+# Thu Jul 18 18:05:40 UTC 2019
+
+* Slider V2 [#10346](https://github.com/Applifier/unity-ads-webview/pull/10346)
+* Fixed the CTA button being visible before it should on larger devices [#10554](https://github.com/Applifier/unity-ads-webview/pull/10554)
+* Add color tinting experiment [#9842](https://github.com/Applifier/unity-ads-webview/pull/9842)
+
+# Tue Jul 16 21:49:48 UTC 2019
+
 * Enabling AppSheet for ios 12.1 and above [#10260](https://github.com/Applifier/unity-ads-webview/pull/10260)
 * Send Kafka Message to ads.load.counting Topic for Every Load Call [#10521](https://github.com/Applifier/unity-ads-webview/pull/10521)
 * Open Measurement - Update session client to match newest spec from Admob [#10518](https://github.com/Applifier/unity-ads-webview/pull/10518)
+* Fix CampaignRefreshManagerTest Name and XDescribe Tests [#10553](https://github.com/Applifier/unity-ads-webview/pull/10553)
+* Remove Sending SessionDiagnostics with AdPlans greater than 1MB [#10552](https://github.com/Applifier/unity-ads-webview/pull/10552)
+* Add Unit tests for GoogleStoreManager and AppleStoreManager [#10318](https://github.com/Applifier/unity-ads-webview/pull/10318)
+* Open Measurement - Add Support for more robust obstruction calculations [#10427](https://github.com/Applifier/unity-ads-webview/pull/10427)
+* Update Banner Refresh Rate from Configuration Dashboard [#8681](https://github.com/Applifier/unity-ads-webview/pull/8681)
+* Remove Jaeger from Initialization and Request paths - Refactor Part 1 [#10520](https://github.com/Applifier/unity-ads-webview/pull/10520)
 
 # Mon Jul 15 12:56:51 UTC 2019
 
