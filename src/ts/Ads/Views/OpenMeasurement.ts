@@ -76,6 +76,7 @@ enum OMState {
 
 export const OMID_P = 'Unity/1.2.10';
 export const SDK_APIS = '7';
+export const PARTNER_NAME = 'Unity3d';
 
 export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
@@ -335,14 +336,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
             adSessionType: AdSessionType.HTML,
             omidNativeInfo: {
-                partnerName: 'Unity',
+                partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             omidJsInfo: {
-                omidImplementor: 'Unity',
+                omidImplementor: PARTNER_NAME,
                 serviceVersion: this._clientInfo.getSdkVersionName(),
                 sessionClientVersion: OMID_P,
-                partnerName: 'Unity',
+                partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             app: {
