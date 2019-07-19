@@ -258,7 +258,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionResponse>(response.response);
@@ -918,6 +918,7 @@ export class CampaignManager {
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
+                body.isLoadEnabled = false; // TODO: Replace this with a correct value
 
                 const organizationId = this._coreConfig.getOrganizationId();
                 if (organizationId) {

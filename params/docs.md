@@ -90,6 +90,8 @@
 | isBackupCampaign | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | isPromoCatalogAvailable | boolean | Flag describing if the developer has set up a catalog for their IAP Promo Placement | SDK | all |
+| noFillRetry | boolean | Flag describing retry should be made upon nofilling | SDK | no |
+| isLoadEnabled | boolean | Flag describing if Auction Request was made using Load API | SDK | all |
 
 
 ### Configuration request
