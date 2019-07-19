@@ -1,6 +1,7 @@
 # Pending
 
 * Align CampaignManager and AuctionRequest and Add Tests [#10525](https://github.com/Applifier/unity-ads-webview/pull/10525)
+* Open Measurement - Fix om partner name [#10577](https://github.com/Applifier/unity-ads-webview/pull/10577)
 
 # Thu Jul 18 18:05:40 UTC 2019
 
