@@ -10,6 +10,7 @@ import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { MaterialIconTest } from 'Core/Models/ABGroup';
 
 export interface IEndScreenParameters {
     platform: Platform;
@@ -84,6 +85,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.campaign-container, .game-background, .btn.download'
             });
+        }
+
+        if (MaterialIconTest.isValid(this._abGroup)) {
+            document.documentElement.classList.add('material-icon-experiment');
         }
 
         this._privacy.render();
