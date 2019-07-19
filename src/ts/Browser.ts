@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         // tslint:disable-next-line
-         } else if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD]()) {
+         } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD]()) {
             loadModeElement.checked = true;
             initialize();
             UnityAds.load('rewardedVideo');

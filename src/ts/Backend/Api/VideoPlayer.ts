@@ -95,7 +95,7 @@ export class VideoPlayer extends BackendApi {
 
     public getVideoViewRectangle() {
         let videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
-        if(!videoView) {
+        if (!videoView) {
             videoView = this._videoView;
         }
 
