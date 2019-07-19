@@ -1,3 +1,7 @@
+# Pending
+
+* Align CampaignManager and AuctionRequest and Add Tests [#10525](https://github.com/Applifier/unity-ads-webview/pull/10525)
+
 # Thu Jul 18 18:05:40 UTC 2019
 
 * Slider V2 [#10346](https://github.com/Applifier/unity-ads-webview/pull/10346)
