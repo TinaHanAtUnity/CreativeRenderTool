@@ -29,7 +29,7 @@ export class VPAIDAdUnitFactory extends AbstractAdUnitFactory<VPAIDCampaign, IVP
         const overlayEventHandler = new VPAIDOverlayEventHandler(vpaidAdUnit, parameters);
         parameters.closer.addEventHandler(overlayEventHandler);
 
-        if(parameters.campaign.hasEndScreen() && parameters.endScreen) {
+        if (parameters.campaign.hasEndScreen() && parameters.endScreen) {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(vpaidAdUnit, parameters);
             parameters.endScreen.addEventHandler(endScreenEventHandler);
         }

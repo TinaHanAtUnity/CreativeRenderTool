@@ -10,17 +10,12 @@ import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { ZyngaLoadTest } from 'Core/Models/ABGroup';
 
 describe('AndroidIntegrationTest', () => {
     const sandbox = sinon.createSandbox();
 
     beforeEach(() => {
         fakeARUtils(sandbox);
-        // Force AB Test to return false to comply with hardcoded ABGroup 14 in FAB for reverse AB Test
-        sandbox.stub(ZyngaLoadTest, 'isValid').callsFake(() => {
-            return false;
-        });
     });
 
     afterEach(() => {
@@ -32,7 +27,7 @@ describe('AndroidIntegrationTest', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
+                if (++readyCount === 1) {
                     done();
                 }
             },
@@ -84,7 +79,7 @@ describe('AndroidIntegrationTest', () => {
             onUnityAdsReady: (placement: string) => {
                 readyPlacement = placement;
                 readyCount++;
-                if(promiseReadyResolve) {
+                if (promiseReadyResolve) {
                     promiseReadyResolve();
                     promiseReadyResolve = null;
                 }
@@ -119,7 +114,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -189,7 +183,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -280,7 +273,7 @@ describe('AndroidIntegrationTest', () => {
             onUnityAdsReady: (placement: string) => {
                 readyPlacement = placement;
                 readyCount++;
-                if(promiseReadyResolve) {
+                if (promiseReadyResolve) {
                     promiseReadyResolve();
                     promiseReadyResolve = null;
                 }
@@ -315,7 +308,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -389,7 +381,6 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
-        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');

@@ -11,7 +11,7 @@ describe('VastCampaignTest', () => {
         const campaign = TestFixtures.getEventVastCampaign();
         const willExpireAt = campaign.getWillExpireAt();
         assert.isDefined(willExpireAt, 'Will expire at should be defined');
-        if(willExpireAt) {
+        if (willExpireAt) {
             const timeDiff = willExpireAt - (Date.now() + 3600 * 1000);
             assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
         }
@@ -23,7 +23,7 @@ describe('VastCampaignTest', () => {
         const campaign = TestFixtures.getEventVastCampaign();
         const willExpireAt = campaign.getWillExpireAt();
         assert.isDefined(willExpireAt, 'Will expire at should be defined');
-        if(willExpireAt) {
+        if (willExpireAt) {
             const timeDiff = willExpireAt - (Date.now() + 3600 * 1000);
             assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
         }
@@ -33,7 +33,7 @@ describe('VastCampaignTest', () => {
         const campaign = TestFixtures.getEventVastCampaign();
         const willExpireAt = campaign.getWillExpireAt();
         assert.isDefined(willExpireAt, 'Will expire at should be defined');
-        if(willExpireAt) {
+        if (willExpireAt) {
             const timeDiff = willExpireAt - (Date.now() + 3600 * 1000);
             assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
         }

@@ -124,7 +124,7 @@ export class AndroidStoreApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case AndroidStoreEvent[AndroidStoreEvent.INITIALIZED]:
                 this.onInitialized.trigger();
                 break;

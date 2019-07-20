@@ -11,7 +11,7 @@ export class UnityAds {
 
     public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false, enablePerPlacementLoad: boolean = false): Promise<void> {
         let nativeBridge: NativeBridge;
-        switch(platform) {
+        switch (platform) {
             // Setting auto batching on does not work in a "single-threaded" environment due to callbacks and events
             // being triggered out of order. This could in theory be fixed by running the backend in a web worker?
             case Platform.ANDROID:

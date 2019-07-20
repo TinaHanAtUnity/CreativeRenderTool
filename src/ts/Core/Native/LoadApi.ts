@@ -16,7 +16,7 @@ export class LoadApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case LoadEvent[LoadEvent.LOAD_PLACEMENTS]:
                 this.handleLoadPlacements(<{[key: string]: number}>parameters[0]);
                 break;

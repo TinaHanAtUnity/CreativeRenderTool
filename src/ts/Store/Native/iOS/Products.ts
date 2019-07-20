@@ -76,7 +76,7 @@ export class ProductsApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case IosStoreEvent[IosStoreEvent.PRODUCT_REQUEST_COMPLETE]:
                 this.onProductRequestComplete.trigger(<number>parameters[0], <{ [productId: string]: IAppleProduct }>parameters[1]);
                 break;

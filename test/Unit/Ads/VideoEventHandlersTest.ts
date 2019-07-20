@@ -585,7 +585,7 @@ describe('Performance VideoEventHandlersTest', () => {
             performanceVideoEventHandler.onCompleted(video.getUrl());
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
         });
@@ -701,7 +701,7 @@ describe('Performance VideoEventHandlersTest', () => {
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
             sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
@@ -736,7 +736,7 @@ describe('Performance VideoEventHandlersTest', () => {
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
@@ -754,7 +754,7 @@ describe('Performance VideoEventHandlersTest', () => {
             assert.equal(performanceAdUnit.getFinishState(), FinishState.ERROR);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
-            if(adUnitOverlay) {
+            if (adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
 
