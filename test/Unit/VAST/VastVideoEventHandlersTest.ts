@@ -209,22 +209,43 @@ describe('VastVideoEventHandler tests', () => {
 
     describe('onVideoPrepared', () => {
 
-        beforeEach(() => {
-            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+        context('getVideoViewRectangle success', () => {
+            beforeEach(() => {
+                sandbox.stub(testAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([0, 0, 0, 0]));
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                return testAdUnit.getVideoViewRectangle();
+            });
+
+            it('initalizes moat', () => {
+                sinon.assert.called(<sinon.SinonStub>moat.init);
+            });
+
+            it('should call om session start on videoview receive success', () => {
+                sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
+            });
+
+            it('should set om setVideoViewRectangle receive success', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setVideoViewRectangle, [0, 0, 0, 0]);
+            });
+
+            it('should call om session start once', () => {
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement!.sessionStart);
+            });
         });
 
-        it('initalizes moat', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.init);
-        });
+        context('getVideoViewRectangle fail', () => {
+            beforeEach(() => {
+                sandbox.stub(testAdUnit, 'getVideoViewRectangle').returns(Promise.reject(new Error('video rect retrieval failed')));
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+            });
 
-        it('should call session start', () => {
-            sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
-        });
-
-        it('should call session start once', () => {
-            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
-            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
-            sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement!.sessionStart);
+            it('should call session start when getting video view fails', () => {
+                return testAdUnit.getVideoViewRectangle().catch(() => {
+                    sinon.assert.notCalled(<sinon.SinonStub>openMeasurement!.sessionStart);
+                });
+            });
         });
     });
 
