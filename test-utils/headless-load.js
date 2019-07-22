@@ -32,12 +32,8 @@ const FORBIDDEN_MESSAGES = [
         regexp: new RegExp(/warning/i),
         seen: 0,
         matchedMessages: []},
-    {description: "Placement State Changed incentivizedZone",
-        regexp:  new RegExp(/onUnityAdsPlacementStateChanged: incentivizedZone NOT_AVAILABLE -> WAITING/),
-        seen: 0,
-        matchedMessages: []},
-    {description: "Placement State Changed defaultVideoAndPictureZone",
-        regexp:  new RegExp(/onUnityAdsPlacementStateChanged: defaultVideoAndPictureZone NOT_AVAILABLE -> WAITING/),
+    {description: "Placement State Changed invalidPlacement",
+        regexp:  new RegExp(/onUnityAdsPlacementStateChanged: invalidPlacement NOT_AVAILABLE -> WAITING/),
         seen: 0,
         matchedMessages: []}];
 

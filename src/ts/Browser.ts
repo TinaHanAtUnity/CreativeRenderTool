@@ -249,8 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             loadButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();
-                UnityAds.load('defaultVideoAndPictureZone');
-                UnityAds.load('incentivizedZone');
+                UnityAds.load('invalidPlacement');
             }, false);
 
             // tslint:disable-next-line
