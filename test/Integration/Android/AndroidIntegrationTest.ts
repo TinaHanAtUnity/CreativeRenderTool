@@ -9,8 +9,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
-import { StorageType, StorageEvent } from 'Core/Native/Storage';
-import { ILoadEvent } from 'Ads/Managers/PerPlacementLoadManager';
+import { assert } from 'chai';
 
 describe('AndroidIntegrationTest', () => {
     const sandbox = sinon.createSandbox();
@@ -70,6 +69,7 @@ describe('AndroidIntegrationTest', () => {
     it('should handle happy path on Android with Load API', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
         let readyCount = 0;
+        let stateChangeCount = 0;
 
         let readyPlacement: string = '';
         let promiseReadyResolve: any = null;
@@ -97,6 +97,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -117,38 +118,39 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
-        const loadEvent: ILoadEvent = {
-            value: 'video',
-            ts: Date.now()
-        };
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1', loadEvent);
-
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
+            UnityAds.load('video');
+        }).catch(() => {
+            assert.fail('should not throw');
+        });
 
         return promiseReady.then(() => {
-            chai.assert.equal(readyCount, 1);
-            chai.assert.equal(readyPlacement, 'video');
-        }).then(() => UnityAds.getBackend().Api.Storage.getKeys(StorageType.PUBLIC, 'load', false)).then((keys) => {
-            chai.assert.equal(keys.length, 0);
+            assert.equal(stateChangeCount, 2);
+            assert.equal(readyCount, 1);
+            assert.equal(readyPlacement, 'video');
         });
     });
 
-    it('should handle happy path on Android with Load API, should ignore old requests', function(this: Mocha.ITestCallbackContext): Promise<any> {
+    it('should handle happy path on Android with Load API, ready called twice', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
-        let readyCount = 0;
 
-        let readyPlacement: string = '';
+        let stateChangeCount = 0;
+
+        let readyPlacement: string[] = [];
         let promiseReadyResolve: any = null;
         const promiseReady = new Promise(resolve => promiseReadyResolve = resolve);
 
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                readyPlacement = placement;
-                readyCount++;
-                if (promiseReadyResolve) {
-                    promiseReadyResolve();
-                    promiseReadyResolve = null;
+                readyPlacement = readyPlacement.concat(placement);
+                if (readyPlacement.length >= 2) {
+                    if (promiseReadyResolve) {
+                        promiseReadyResolve();
+                        promiseReadyResolve = null;
+                    }
                 }
             },
             onUnityAdsStart: (placement: string) => {
@@ -164,6 +166,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -184,44 +187,32 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
-        const loadEventPremium: ILoadEvent = {
-            value: 'premium',
-            ts: Date.now()
-        };
-        const loadEventVideo: ILoadEvent = {
-            value: 'video',
-            ts: Date.now() - 600000
-        };
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.1', loadEventPremium);
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.2', loadEventVideo);
-
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
+            UnityAds.load('rewardedVideo');
+            UnityAds.load('video');
+        }).catch(() => {
+            assert.fail('should not throw');
+        });
 
         return promiseReady.then(() => {
-            chai.assert.equal(readyCount, 1);
-            chai.assert.equal(readyPlacement, 'premium');
-        }).then(() => UnityAds.getBackend().Api.Storage.getKeys(StorageType.PUBLIC, 'load', false)).then((keys) => {
-            chai.assert.equal(keys.length, 0);
+            assert.equal(stateChangeCount, 4);
+            assert.equal(readyPlacement.length, 2);
+            assert.isTrue(readyPlacement.includes('rewardedVideo'));
+            assert.isTrue(readyPlacement.includes('video'));
         });
     });
 
     it('should handle happy path on Android with Load API, should do nothing', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
         let readyCount = 0;
-
-        let readyPlacement: string = '';
-        let promiseReadyResolve: any = null;
-        const promiseReady = new Promise(resolve => promiseReadyResolve = resolve);
+        let stateChangeCount = 0;
 
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                readyPlacement = placement;
                 readyCount++;
-                if (promiseReadyResolve) {
-                    promiseReadyResolve();
-                    promiseReadyResolve = null;
-                }
             },
             onUnityAdsStart: (placement: string) => {
                 return;
@@ -236,6 +227,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -252,24 +244,26 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
         UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
 
+        ConfigManager.setAbGroup(14);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
-
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad);
 
         return new Promise(resolve => setTimeout(resolve, 5000)).then(() => {
-            chai.assert.equal(readyCount, 0);
-        }).then(() => UnityAds.getBackend().Api.Storage.getKeys(StorageType.PUBLIC, 'load', false)).then((keys) => {
-            chai.assert.equal(keys.length, 0);
+            assert.equal(readyCount, 0);
+            assert.equal(stateChangeCount, 0);
         });
     });
 
-    it('should handle happy path on Android with Load API, request after init', function(this: Mocha.ITestCallbackContext): Promise<any> {
+    it('should handle happy path on Android with Load API, request before init', function(this: Mocha.ITestCallbackContext): Promise<any> {
         this.timeout(10000);
         let readyCount = 0;
+        let stateChangeCount = 0;
 
         let readyPlacement: string = '';
         let promiseReadyResolve: any = null;
@@ -297,6 +291,7 @@ describe('AndroidIntegrationTest', () => {
                 return;
             },
             onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
                 return;
             }
         };
@@ -317,22 +312,92 @@ describe('AndroidIntegrationTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-        UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'mediation.enable_metadata_load.value', true);
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
+            UnityAds.load('rewardedVideo');
+        }).catch(() => {
+            assert.fail('should not throw');
+        });
 
-        UnityAds.initialize(Platform.ANDROID, '2988443', listener, true);
+        return promiseReady.then(() => {
+            assert.equal(stateChangeCount, 2);
+            assert.equal(readyCount, 1);
+            assert.equal(readyPlacement, 'rewardedVideo');
+        });
+    });
 
-        return new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
-            const loadEvent: ILoadEvent = {
-                value: 'rewardedVideo',
-                ts: Date.now()
-            };
-            UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'load.test', loadEvent);
-            UnityAds.getBackend().sendEvent('STORAGE', StorageEvent[StorageEvent.SET], 'load', {load: {test: loadEvent}});
-        }).then(() => promiseReady).then(() => {
-            chai.assert.equal(readyCount, 1);
-            chai.assert.equal(readyPlacement, 'rewardedVideo');
-        }).then(() => UnityAds.getBackend().Api.Storage.getKeys(StorageType.PUBLIC, 'load', false)).then((keys) => {
-            chai.assert.equal(keys.length, 0);
+    it('should handle happy path on Android with Load API, ready called twice for same placement', function(this: Mocha.ITestCallbackContext): Promise<any> {
+        this.timeout(10000);
+
+        let stateChangeCount = 0;
+        let readyPlacement: string[] = [];
+        let promiseReadyResolve: any = null;
+        const promiseReady = new Promise(resolve => promiseReadyResolve = resolve);
+
+        const listener: IUnityAdsListener = {
+            onUnityAdsReady: (placement: string) => {
+                readyPlacement = readyPlacement.concat(placement);
+
+                if (readyPlacement.length === 1) {
+                    UnityAds.load('video');
+                }
+
+                if (readyPlacement.length >= 2) {
+                    if (promiseReadyResolve) {
+                        promiseReadyResolve();
+                        promiseReadyResolve = null;
+                    }
+                }
+            },
+            onUnityAdsStart: (placement: string) => {
+                return;
+            },
+            onUnityAdsFinish: (placement: string, state: string) => {
+                return;
+            },
+            onUnityAdsError: (error: string, message: string) => {
+                return;
+            },
+            onUnityAdsClick: (placement: string) => {
+                return;
+            },
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                stateChangeCount++;
+                return;
+            }
+        };
+
+        UnityAds.setBackend(new Backend(Platform.ANDROID));
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
+
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('LGE');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('Nexus 5');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('6.0.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
+        UnityAds.getBackend().Api.Sdk.setInitTimeStamp(Date.now());
+
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+
+        const gameId = '2988443';
+        const testMode = true;
+        const enablePerPlacementLoad = true;
+        UnityAds.initialize(Platform.ANDROID, gameId, listener, testMode, enablePerPlacementLoad).then(() => {
+            UnityAds.load('video');
+        }).catch(() => {
+            assert.fail('should not throw');
+        });
+
+        return promiseReady.then(() => {
+            assert.equal(stateChangeCount, 2);
+            assert.equal(readyPlacement.length, 2);
+            assert.isTrue(readyPlacement.includes('video'));
         });
     });
 
