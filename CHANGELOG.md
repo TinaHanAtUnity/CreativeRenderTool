@@ -3,6 +3,7 @@
 * Align CampaignManager and AuctionRequest and Add Tests [#10525](https://github.com/Applifier/unity-ads-webview/pull/10525)
 * Open Measurement - Fix om partner name [#10577](https://github.com/Applifier/unity-ads-webview/pull/10577)
 * Add New PTS Endpoints and Sample Metrics at 1% [#10551](https://github.com/Applifier/unity-ads-webview/pull/10551)
+* Revert "Enabling AppSheet for ios 12.1 and above" [#10631](https://github.com/Applifier/unity-ads-webview/pull/10631)
 
 # Thu Jul 18 18:05:40 UTC 2019
 
