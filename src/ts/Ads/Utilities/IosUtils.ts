@@ -1,13 +1,13 @@
 export class IosUtils {
 
     public static isAppSheetBroken(osVersion: string, model: string): boolean {
-        if(!model.match(/ipad/i) && osVersion.match(/^12\.[0-9]/)) {
+        if (!model.match(/ipad/i) && osVersion.match(/^12\.0/)) {
             return true;
-        } else if(!model.match(/ipad/i) && osVersion.match(/^11\.[0-2]/)) {
+        } else if (!model.match(/ipad/i) && osVersion.match(/^11\.[0-2]/)) {
             return true;
-        } else if(osVersion.match(/^8\.[0-3]/)) {
+        } else if (osVersion.match(/^8\.[0-3]/)) {
             return true;
-        } else if(osVersion.match(/^7\.[0-9]/)) {
+        } else if (osVersion.match(/^7\.[0-9]/)) {
             return true;
         } else {
             return false;
@@ -15,7 +15,7 @@ export class IosUtils {
     }
 
     public static hasVideoStallingApi(osVersion: string): boolean {
-        if(osVersion.match(/^1/)) {
+        if (osVersion.match(/^1/)) {
             return true;
         }
         return false;

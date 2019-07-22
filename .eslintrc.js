@@ -14,6 +14,7 @@ module.exports = {
     '@typescript-eslint/tslint/config': ['error', {
       'lintFile': './tslint.json'
     }],
+    'keyword-spacing': ['error'],
     'no-irregular-whitespace': ['error'],
     'semi': ['error', 'always'],
     'no-multiple-empty-lines': ['error', {'max': 1, 'maxEOF': 1}],

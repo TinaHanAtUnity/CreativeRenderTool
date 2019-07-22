@@ -27,10 +27,10 @@ export class FailedOperativeEventManager {
     }
 
     public storeFailedEvent(storageBridge: StorageBridge, data: { [key: string]: unknown }): Promise<void> {
-        if(this._eventId) {
+        if (this._eventId) {
             const operation = new StorageOperation(StorageType.PRIVATE);
 
-            if(data.url) {
+            if (data.url) {
                 let url: string = <string>data.url;
                 url = Url.addParameters(url, {
                     eventRetry: true
@@ -47,7 +47,7 @@ export class FailedOperativeEventManager {
     }
 
     public deleteFailedEvent(storageBridge: StorageBridge): Promise<void> {
-        if(this._eventId) {
+        if (this._eventId) {
             const operation = new StorageOperation(StorageType.PRIVATE);
             operation.delete(this.getEventStorageKey());
             storageBridge.queue(operation);
@@ -57,7 +57,7 @@ export class FailedOperativeEventManager {
     }
 
     public sendFailedEvent(request: RequestManager, storageBridge: StorageBridge): Promise<void> {
-        if(this._eventId) {
+        if (this._eventId) {
             return this._core.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
                 const url = <string>eventData.url;
                 const data = <string>eventData.data;

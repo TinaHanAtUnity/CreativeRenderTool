@@ -86,7 +86,7 @@ export class GoogleStore {
     }
 
     private onSkuDetailsResult(operationId: number, result: IGoogleSkuDetails[]) {
-        if(result && result.length === 1) {
+        if (result && result.length === 1) {
             this.finishSkuDetailsRequest(true, operationId, result[0]);
         } else {
             this.finishSkuDetailsRequest(false, operationId);
@@ -116,8 +116,8 @@ export class GoogleStore {
     private finishBillingSupportedRequest(success: boolean, operationId: number, result?: number) {
         const callback = this._billingSupportedCallbacks[operationId];
 
-        if(callback) {
-            if(success) {
+        if (callback) {
+            if (success) {
                 callback.resolve(result);
             } else {
                 callback.reject();
@@ -130,8 +130,8 @@ export class GoogleStore {
     private finishSkuDetailsRequest(success: boolean, operationId: number, result?: IGoogleSkuDetails) {
         const callback = this._skuDetailsCallbacks[operationId];
 
-        if(callback) {
-            if(success) {
+        if (callback) {
+            if (success) {
                 callback.resolve(result);
             } else {
                 callback.reject();
@@ -144,8 +144,8 @@ export class GoogleStore {
     private finishGetPurchasesRequest(success: boolean, operationId: number, result?: IGooglePurchases) {
         const callback = this._getPurchasesCallbacks[operationId];
 
-        if(callback) {
-            if(success) {
+        if (callback) {
+            if (success) {
                 callback.resolve(result);
             } else {
                 callback.reject();
@@ -158,8 +158,8 @@ export class GoogleStore {
     private finishPurchaseHistoryRequest(success: boolean, operationId: number, result?: IGooglePurchases) {
         const callback = this._purchaseHistoryCallbacks[operationId];
 
-        if(callback) {
-            if(success) {
+        if (callback) {
+            if (success) {
                 callback.resolve(result);
             } else {
                 callback.reject();

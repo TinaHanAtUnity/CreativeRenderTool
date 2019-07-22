@@ -107,7 +107,7 @@ export class VastParserStrict {
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
-            for(const element of parseErrors) {
+            for (const element of parseErrors) {
                 if (element.textContent) {
                     parseMessages.push(element.textContent);
                 }
@@ -231,7 +231,7 @@ export class VastParserStrict {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
-            if(ad && parsedAd) {
+            if (ad && parsedAd) {
                 for (const errorUrl of ad.getErrorURLTemplates()) {
                     parsedAd.addErrorURLTemplate(errorUrl);
                 }
@@ -326,18 +326,10 @@ export class VastParserStrict {
             }
             // ignore element as it is not of a type we support
             if (iframeResourceElement) {
-                const companionAd = this.parseCompanionAdIFrameResourceElement(element, urlProtocol);
-                if (companionAd.getIframeResourceURL()) {
-                    vastAd.setIframeCompanionAd(companionAd);
-                    vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
-                }
+                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
             }
-            if (htmlResourceElement && htmlResourceElement.innerHTML.length > 0) {
-                const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
-                if (companionAd.getHtmlResourceContent()) {
-                    vastAd.setHtmlCompanionAd(companionAd);
-                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
-                }
+            if (htmlResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
             }
         });
 

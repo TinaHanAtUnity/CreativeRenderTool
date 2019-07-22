@@ -157,13 +157,14 @@ import { IChinaApi } from 'China/IChina';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
-import { IStoreApi } from 'Store/IStore';
+import { IStoreApi, IStore } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { LoadApi } from 'Core/Native/LoadApi';
-import { IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { IAdMobCampaign, AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
+import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -182,7 +183,8 @@ export class TestFixtures {
             disableVideoControlsFade: false,
             refreshDelay: 1000,
             muteVideo: false,
-            adTypes: ['TEST']
+            adTypes: ['TEST'],
+            banner: { refreshRate: 30 }
         });
     }
 
@@ -248,12 +250,12 @@ export class TestFixtures {
             appDownloadUrl: json.appDownloadUrl
         };
 
-        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+        if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
             parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize, json.creativeId);
             parameters.streamingVideo = new Video(json.trailerStreaming, session, undefined, json.creativeId);
         }
 
-        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+        if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
             parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
             parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session, undefined, json.portraitCreativeId);
         }
@@ -284,12 +286,12 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls
         };
 
-        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+        if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
             parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
             parameters.streamingVideo = new Video(json.trailerStreaming, session);
         }
 
-        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+        if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
             parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
             parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
         }
@@ -401,13 +403,13 @@ export class TestFixtures {
         }
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
-        if(portraitUrl) {
+        if (portraitUrl) {
             portraitAsset = new Image(portraitUrl, session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
-        if(landscapeUrl) {
+        if (landscapeUrl) {
             landscapeAsset = new Image(landscapeUrl, session);
         }
 
@@ -816,6 +818,37 @@ export class TestFixtures {
         };
     }
 
+    public static getAdmobAdUnitParameters(platform: Platform, core: ICore, ads: IAds, store: IStore): IAdMobAdUnitParameters {
+        const campaign = new AdMobCampaign(TestFixtures.getAdmobCampaignBaseParams());
+        const privacy = TestFixtures.getPrivacy(platform, campaign);
+
+        return {
+            platform: platform,
+            core: core.Api,
+            ads: ads.Api,
+            store: core.Store.Api,
+            forceOrientation: Orientation.PORTRAIT,
+            focusManager: core.FocusManager,
+            container: ads.Container,
+            deviceInfo: core.DeviceInfo,
+            clientInfo: core.ClientInfo,
+            thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
+            operativeEventManager: TestFixtures.getOperativeEventManager(platform, core.Api, ads.Api, campaign),
+            placement: TestFixtures.getPlacement(),
+            campaign: campaign,
+            coreConfig: core.Config,
+            adsConfig: ads.Config,
+            request: core.RequestManager,
+            privacyManager: ads.PrivacyManager,
+            programmaticTrackingService: core.ProgrammaticTrackingService,
+            gameSessionId: ads.SessionManager.getGameSessionId(),
+            options: {},
+            privacy: privacy,
+            view: sinon.createStubInstance(AdMobView),
+            adMobSignalFactory: sinon.createStubInstance(AdMobSignalFactory)
+        };
+    }
+
     public static getXPromoAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): XPromoAdUnit {
         return new XPromoAdUnit(TestFixtures.getXPromoAdUnitParameters(platform, core, ads, store, ar, purchasing));
     }
@@ -882,7 +915,7 @@ export class TestFixtures {
     public static getOkNativeResponse(): INativeResponse {
         return {
             url: 'http://foo.url.com',
-            response: 'foo response',
+            response: '{}',
             responseCode: 200,
             headers: [['location', 'http://foobar.com']]
         };
@@ -951,7 +984,7 @@ export class TestFixtures {
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
-        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager);
+        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         return <IAds>ads;
     }
@@ -972,7 +1005,7 @@ export class TestFixtures {
         const banners: Partial<IBanners> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager),
             WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
             AdUnitFactory: new BannerAdUnitFactory()
         };

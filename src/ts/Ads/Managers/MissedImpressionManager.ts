@@ -19,7 +19,7 @@ export class MissedImpressionManager {
     }
 
     private onStorageSet(eventType: string, data: IMissedImpressionOrdinalData) {
-        if(data && data.mediation && data.mediation.missedImpressionOrdinal && data.mediation.missedImpressionOrdinal.value) {
+        if (data && data.mediation && data.mediation.missedImpressionOrdinal && data.mediation.missedImpressionOrdinal.value) {
             HttpKafka.sendEvent('ads.sdk2.events.missedimpression.json', KafkaCommonObjectType.ANONYMOUS, {
                 ordinal: data.mediation.missedImpressionOrdinal.value
             });
