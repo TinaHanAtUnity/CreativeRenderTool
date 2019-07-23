@@ -10,6 +10,7 @@ import { toAbGroup } from 'Core/Models/ABGroup';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { ICoreApi } from 'Core/ICore';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -153,6 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
 
+            AdsConfigurationParser.setBrowserTest(true);
+
             if (abGroupElement.value.length) {
                 ConfigManager.setAbGroup(toAbGroup(parseInt(abGroupElement.value, 10)));
             }
@@ -211,15 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
             PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
             PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
 
-            const isBrowserTesterInUse = true;
-
             switch (platformElement.value) {
                 case 'android':
                     UnityAds.setBackend(new Backend(Platform.ANDROID));
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setAndroidDeviceInfo();
-                    UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked, isBrowserTesterInUse);
+                    UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
                 case 'ios':
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setIosDeviceInfo();
-                    UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked, isBrowserTesterInUse);
+                    UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
                 default:

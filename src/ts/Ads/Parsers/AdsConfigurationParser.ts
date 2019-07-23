@@ -16,6 +16,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class AdsConfigurationParser {
     private static _updateUserPrivacyForIncident: boolean = false;
+    private static _isBrowserTest: boolean = false;
+
+    public static setBrowserTest(browserTest: boolean): void {
+        this._isBrowserTest = browserTest;
+    }
+
     public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
@@ -47,7 +53,7 @@ export class AdsConfigurationParser {
             this._updateUserPrivacyForIncident = true;
         }
 
-        const cacheMode = (clientInfo && clientInfo.isBrowserTesterInUse()) ? CacheMode.DISABLED : this.parseCacheMode(configJson);
+        const cacheMode = this._isBrowserTest ? CacheMode.DISABLED : this.parseCacheMode(configJson);
 
         const configurationParams: IAdsConfiguration = {
             cacheMode,
