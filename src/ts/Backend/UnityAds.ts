@@ -35,7 +35,6 @@ export class UnityAds {
         UnityAds._listener = listener;
 
         UnityAds._webView = new WebView(nativeBridge);
-
         return UnityAds._webView.initialize().then(() => {
             UnityAds._initialized = true;
             UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], ...UnityAds._loadRequests);
