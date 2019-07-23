@@ -16,10 +16,10 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class AdsConfigurationParser {
     private static _updateUserPrivacyForIncident: boolean = false;
-    private static _isBrowserTest: boolean = false;
+    private static _isBrowserBuild: boolean = false;
 
-    public static setBrowserTest(browserTest: boolean): void {
-        this._isBrowserTest = browserTest;
+    public static setIsBrowserBuild(isBrowserBuild: boolean): void {
+        this._isBrowserBuild = isBrowserBuild;
     }
 
     public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): AdsConfiguration {
@@ -53,7 +53,8 @@ export class AdsConfigurationParser {
             this._updateUserPrivacyForIncident = true;
         }
 
-        const cacheMode = this._isBrowserTest ? CacheMode.DISABLED : this.parseCacheMode(configJson);
+        // Browser Build Testing Requires CacheMode to be Disabled
+        const cacheMode = this._isBrowserBuild ? CacheMode.DISABLED : this.parseCacheMode(configJson);
 
         const configurationParams: IAdsConfiguration = {
             cacheMode,

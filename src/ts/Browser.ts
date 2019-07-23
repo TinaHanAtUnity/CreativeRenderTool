@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
 
-            AdsConfigurationParser.setBrowserTest(true);
+            AdsConfigurationParser.setIsBrowserBuild(true);
 
             if (abGroupElement.value.length) {
                 ConfigManager.setAbGroup(toAbGroup(parseInt(abGroupElement.value, 10)));
