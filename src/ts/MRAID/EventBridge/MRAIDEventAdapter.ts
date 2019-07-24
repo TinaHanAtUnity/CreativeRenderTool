@@ -22,6 +22,7 @@ export interface IMRAIDHandler {
     onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
     onBridgeAREvent(event: MessageEvent): void;
     onBridgeArReadyToShow(event: MessageEvent): void;
+    onBridgeDeviceOrientationSubscribe(): void;
 }
 
 export interface IMRAIDOrientationProperties {
@@ -40,7 +41,8 @@ export enum MRAIDEvents {
     SEND_STATS          = 'sendStats',
     AR                  = 'ar',
     AR_READY_SHOW       = 'arReadyShow',
-    CONSOLE_LOG         = 'consoleLog'
+    CONSOLE_LOG         = 'consoleLog',
+    DEVORIENTATION_SUB  = 'deviceorientationSubscribe'
 }
 
 export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
@@ -54,6 +56,7 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
 
         this._mraidHandlers[MRAIDEvents.LOADED] = () => this.handleLoaded();
         this._mraidHandlers[MRAIDEvents.CLOSE] = () => this.handleClose();
+        this._mraidHandlers[MRAIDEvents.DEVORIENTATION_SUB] = () => this.handleSubscribeDeviceOrientation();
     }
 
     public abstract connect(): void;
@@ -105,5 +108,9 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
 
     protected handleSendStats(totalTime: number, playTime: number, frameCount: number) {
         this._handler.onBridgeSendStats(totalTime, playTime, frameCount);
+    }
+
+    protected handleSubscribeDeviceOrientation() {
+        this._handler.onBridgeDeviceOrientationSubscribe();
     }
 }

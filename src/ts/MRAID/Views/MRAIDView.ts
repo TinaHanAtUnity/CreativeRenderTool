@@ -205,12 +205,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
                     container = container.replace('<script id=\"debug-js-console\"></script>', JsConsoleDebugScript);
                 }
 
-                // Only send the deviceorientation events if they are used in the ad
-                if(mraid.indexOf('deviceorientation') > -1) {
-                    this._deviceorientationListener = (event: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>event);
-                    window.addEventListener('deviceorientation', this._deviceorientationListener, false);
-                    container = container.replace('<script id=\"deviceorientation-support\"></script>', DeviceOrientationScript);
-                }
+                container = container.replace('<script id=\"deviceorientation-support\"></script>', DeviceOrientationScript);
 
                 mraid = mraid.replace(/\$/g, '$$$');
                 mraid = this.replaceMraidSources(mraid);
@@ -502,5 +497,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected handleDeviceOrientation(event: DeviceOrientationEvent) {
         this._mraidAdapterContainer.sendDeviceOrientationEvent(event);
+    }
+
+    public onBridgeDeviceOrientationSubscribe() {
+        // Defer subscribing to deviceorientation event here to only subscribe to the event when the creative needs the data
+        if(!this._deviceorientationListener) {
+            this._deviceorientationListener = (orientationEvent: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>orientationEvent);
+            window.addEventListener('deviceorientation', this._deviceorientationListener, false);
+        }
     }
 }

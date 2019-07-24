@@ -5,6 +5,9 @@
     window.addEventListener = function (event, listener, useCapture) {
         if(event === 'deviceorientation') {
             _iframeOrientationListeners.push(listener);
+            window.parent.postMessage({
+                type: 'deviceorientationSubscribe',
+            }, '*');
         } else {
             originalAddEventListener.apply(window, [event, listener, useCapture]);
         }

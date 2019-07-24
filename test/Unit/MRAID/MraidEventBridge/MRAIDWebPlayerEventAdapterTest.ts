@@ -47,7 +47,8 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 onBridgeResizeWebview: sinon.spy(),
                 onBridgeSendStats: sinon.spy(),
                 onBridgeAREvent: sinon.spy(),
-                onBridgeArReadyToShow: sinon.spy()
+                onBridgeArReadyToShow: sinon.spy(),
+                onBridgeDeviceOrientationSubscribe: sinon.spy()
             };
 
             mraidAdapterContainer = new MRAIDAdapterContainer(handler);
@@ -113,6 +114,11 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 event: MRAIDEvents.SEND_STATS,
                 data: [1, 3, 4],
                 verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSendStats, JSON.parse(data)[0], JSON.parse(data)[1], JSON.parse(data)[2])
+            },
+            {
+                event: MRAIDEvents.DEVORIENTATION_SUB,
+                data: [],
+                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>containerHandler.onBridgeDeviceOrientationSubscribe)
             }
             ];
 
