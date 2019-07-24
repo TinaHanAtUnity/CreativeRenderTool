@@ -107,6 +107,7 @@ interface IAuctionRequestBody {
     optOutRecorded: boolean;
     privacy: IRequestPrivacy | undefined;
     abGroup: ABGroup;
+    developerId: number | undefined;
     organizationId: string | undefined;
     isLoadEnabled: boolean;
 }
@@ -463,6 +464,7 @@ export class AuctionRequest {
                     optOutRecorded: this._adsConfig.isOptOutRecorded(),
                     privacy: this._privacy,
                     abGroup: this._coreConfig.getAbGroup(),
+                    developerId: this._coreConfig.getDeveloperId() ? this._coreConfig.getDeveloperId() : undefined,
                     organizationId: this._coreConfig.getOrganizationId(),
                     isLoadEnabled: false // TODO: When this is used for anything other than banners, pass actual flag
                 };

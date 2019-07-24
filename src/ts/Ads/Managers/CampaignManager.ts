@@ -924,6 +924,12 @@ export class CampaignManager {
                 if (organizationId) {
                     body.organizationId = organizationId;
                 }
+
+                const developerId = this._coreConfig.getDeveloperId();
+                if (developerId) {
+                    body.developerId = developerId;
+                }
+
                 return body;
             });
         });

@@ -79,6 +79,7 @@
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | string | Organization ID from Genesis' | Server | all |
+| developerId | number | Developer ID from Configuration Service | Server | all |
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
