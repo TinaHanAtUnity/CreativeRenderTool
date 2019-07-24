@@ -78,9 +78,9 @@ describe('CustomFeatures', () => {
         ];
 
         tests.forEach(t => {
-            const calculatedRandomPercent = t.randomCalculatedPercent / 100;
+            const correctlyFormattedReturnedPercent = t.randomCalculatedPercent / 100;
             it(`should return ${t.expectedOutcome} for ${t.givenPercentage}% when checked against Math.random() returning ${t.randomCalculatedPercent}%`, () => {
-                sinon.stub(Math, 'random').returns(calculatedRandomPercent);
+                sinon.stub(Math, 'random').returns(correctlyFormattedReturnedPercent);
                 assert.equal(CustomFeatures.sampleAtGivenPercent(t.givenPercentage), t.expectedOutcome);
             });
         });
