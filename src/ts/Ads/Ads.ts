@@ -303,7 +303,7 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        if (CustomFeatures.shouldSampleAtOnePercent()) {
+        if (CustomFeatures.sampleAtGivenPercent(1)) {
             Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
         }
 
@@ -521,7 +521,7 @@ export class Ads implements IAds {
 
     private shouldSkipShowAd(campaign: Campaign, logkey: MiscellaneousMetric): boolean {
         if (!this._core.FocusManager.isAppForeground()) {
-            if (CustomFeatures.shouldSampleAtTenPercent()) {
+            if (CustomFeatures.sampleAtGivenPercent(10)) {
                 Diagnostics.trigger(logkey, {
                     seatId: campaign.getSeatId(),
                     creativeId: campaign.getCreativeId(),
