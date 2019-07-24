@@ -1,7 +1,7 @@
 import OMID3p from 'html/omid/omid3p.html';
-import OMIDContainer from 'html/omid/container.html';
 import OMIDTemplate from 'html/OMID.html';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { View } from 'Core/Views/View';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -14,7 +14,6 @@ import { VerificationReasonCode, VastAdVerification } from 'VAST/Models/VastAdVe
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 interface IVerifationVendorMap {
@@ -82,13 +81,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
     private _core: ICoreApi;
     private _clientInfo: ClientInfo;
-    private _campaign: VastCampaign;
+    private _campaign: AdMobCampaign | VastCampaign;
     private _omBridge: OMIDEventBridge;
     private _request: RequestManager;
 
     private _verificationVendorMap: IVerifationVendorMap;
     private _vendorKeys: string[];
-    private _useOmidForWeb = false;
     private _state: OMState = OMState.STOPPED;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
@@ -97,9 +95,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _deviceVolume: number;
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
-    private _videoViewRectangle: number[];
+    private _videoViewRectangle: IRectangle;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications?: VastAdVerification[]) {
         super(platform, 'openMeasurement');
         this._template = new Template(OMIDTemplate);
         this._bindings = [];
@@ -111,7 +109,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._adVerifications = vastAdVerifications;
+        if (vastAdVerifications) {
+            this._adVerifications = vastAdVerifications;
+        }
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
         this._omBridge = new OMIDEventBridge(core, {
@@ -137,11 +137,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             onPopulateVendorKey: (vendorKey) => this.populateVendorKey(vendorKey),
             onEventProcessed: (eventType) => this.onEventProcessed(eventType)
         }, this._omIframe, this);
-
-        if (this._useOmidForWeb) {
-            this._omBridge.sendSDKVersion(this._clientInfo.getSdkVersionName());
-            this._omBridge.sendSessionId(this._omAdSessionId);
-        }
     }
 
     public addToViewHierarchy(): void {
@@ -176,7 +171,15 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this._omAdSessionId;
     }
 
-    public setVideoViewRectangle(rectangle: number[]) {
+    public getSDKVersion() {
+        return this._clientInfo.getSdkVersionName();
+    }
+
+    public getOmidBridge(): OMIDEventBridge {
+        return this._omBridge;
+    }
+
+    public setVideoViewRectangle(rectangle: IRectangle) {
         this._videoViewRectangle = rectangle;
     }
 
@@ -185,9 +188,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
         this._omIframe.srcdoc = OMID3p;
 
-        if (this._useOmidForWeb) {
-            this._omIframe.srcdoc += OMIDContainer;
-        }
         this._omBridge.setIframe(this._omIframe);
     }
 
@@ -412,21 +412,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      */
     public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], videoView?: IRectangle): IAdView {
 
-        let videoWidth;
-        let videoHeight;
-        let topLeftX;
-        let topLeftY;
+        // For integrations less than SDK 3.2.0
+        // TODO: Will be removed in subsequent refactor
+        let videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);
+        let videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);
+        let topLeftX = 0;
+        let topLeftY = this.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+
+        // For integrations SDK 3.2.0+
         if (this._videoViewRectangle) {
-            topLeftX = this._videoViewRectangle[0];
-            topLeftY = this._videoViewRectangle[1];
-            videoWidth = this._videoViewRectangle[2];
-            videoHeight = this._videoViewRectangle[3];
-        } else {
-            // These are the estimate values based on campaign data if we cannot get values from native
-            videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);
-            videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);
-            topLeftX = 0;
-            topLeftY = this.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+            topLeftX = this._videoViewRectangle.x;
+            topLeftY = this._videoViewRectangle.y;
+            videoWidth = this._videoViewRectangle.width;
+            videoHeight = this._videoViewRectangle.height;
         }
 
         const adView: IAdView = {
@@ -552,7 +550,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             });
 
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-                this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, true));
+                const measuringElementAvailable = true;
+                this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
             });
         }
 
@@ -589,7 +588,15 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         let videoWidth = screenWidth;
 
         const isLandscape = screenWidth > screenHeight;
-        const campaignVideoWidth = this._campaign.getVideo().getWidth();
+        let campaignVideoWidth = 0;
+
+        // TODO: Will be removed in subsequent refactor
+        // The campaign values are not to scale to device
+        // But we need a solution like this for fallback OM certification <3.2
+        if (this._campaign instanceof VastCampaign) {
+            campaignVideoWidth = this._campaign.getVideo().getWidth();
+        }
+
         if (!isLandscape && campaignVideoWidth > 0) {
             videoWidth = campaignVideoWidth;
         }
@@ -601,7 +608,15 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         let videoHeight = screenHeight;
 
         const isLandscape = screenWidth > screenHeight;
-        const campaignVideoHeight = this._campaign.getVideo().getHeight();
+        let campaignVideoHeight = 0;
+
+        // TODO: Will be removed in subsequent refactor
+        // The campaign values are not to scale to device
+        // But we need a solution like this for fallback OM certification <3.2
+        if (this._campaign instanceof VastCampaign) {
+            campaignVideoHeight = this._campaign.getVideo().getHeight();
+        }
+
         if (!isLandscape && campaignVideoHeight > 0) {
             videoHeight = campaignVideoHeight;
         }

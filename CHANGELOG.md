@@ -1,3 +1,7 @@
+# Pending
+
+* Open Measurement - Add OMID to Admob Path as DisabledABGroup [#10600](https://github.com/Applifier/unity-ads-webview/pull/10600)
+
 # Tue Jul 23 16:45:45 UTC 2019
 
 * Align CampaignManager and AuctionRequest and Add Tests [#10525](https://github.com/Applifier/unity-ads-webview/pull/10525)

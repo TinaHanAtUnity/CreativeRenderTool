@@ -205,7 +205,16 @@
             this._registerVideoEvents = function() {};
         }
 
-        window.omid3p = new OmidVerification();
-        Object.freeze(window.omid3p);
+        /**
+         * ActiveView attach to this:
+         * window.omid3p = new OmidVerification();
+         * Object.freeze(window.omid3p);
+         */
+
+        /**
+         * Generic Vast verification scripts attach to this:
+         */
+        window.OmidVerificationClient = {'omid3p': OmidVerification};
+        Object.freeze(window.OmidVerificationClient);
     })();
 </script>
