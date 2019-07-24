@@ -27,59 +27,60 @@ describe('CustomFeatures', () => {
     describe('sampleAtGivenPercentage', () => {
         const tests: {
             givenPercentage: number;
-            randomReturn: number;
+            randomCalculatedPercent: number;
             expectedOutcome: boolean;
         }[] = [
             {
                 givenPercentage: 0,
-                randomReturn: 0.99,
+                randomCalculatedPercent: 99,
                 expectedOutcome: false
             },
             {
                 givenPercentage: 1,
-                randomReturn: 0.2,
+                randomCalculatedPercent: 10,
                 expectedOutcome: false
             },
             {
                 givenPercentage: 1,
-                randomReturn: 0.009,
+                randomCalculatedPercent: 0.9,
                 expectedOutcome: true
             },
             {
                 givenPercentage: 5,
-                randomReturn: 0.04,
+                randomCalculatedPercent: 4,
                 expectedOutcome: true
             },
             {
                 givenPercentage: 5,
-                randomReturn: 0.06,
+                randomCalculatedPercent: 6,
                 expectedOutcome: false
             },
             {
                 givenPercentage: 100,
-                randomReturn: 0,
+                randomCalculatedPercent: 0,
                 expectedOutcome: true
             },
             {
                 givenPercentage: 100,
-                randomReturn: 1,
+                randomCalculatedPercent: 100,
                 expectedOutcome: true
             },
             {
                 givenPercentage: 101,
-                randomReturn: 0,
+                randomCalculatedPercent: 0,
                 expectedOutcome: true
             },
             {
                 givenPercentage: -1,
-                randomReturn: 1,
+                randomCalculatedPercent: 100,
                 expectedOutcome: false
             }
         ];
 
         tests.forEach(t => {
-            it(`should return ${t.expectedOutcome} for ${t.givenPercentage}% when Math.random() returns ${t.randomReturn}`, () => {
-                sinon.stub(Math, 'random').returns(t.randomReturn);
+            const calculatedRandomPercent = t.randomCalculatedPercent / 100;
+            it(`should return ${t.expectedOutcome} for ${t.givenPercentage}% when checked against Math.random() returning ${t.randomCalculatedPercent}%`, () => {
+                sinon.stub(Math, 'random').returns(calculatedRandomPercent);
                 assert.equal(CustomFeatures.sampleAtGivenPercent(t.givenPercentage), t.expectedOutcome);
             });
         });

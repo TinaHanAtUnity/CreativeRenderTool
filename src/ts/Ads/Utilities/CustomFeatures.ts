@@ -101,7 +101,7 @@ export class CustomFeatures {
         return gameIdList.indexOf(gameId) !== -1;
     }
 
-    public static sampleAtGivenPercent(givenPercentToSample: number) {
+    public static sampleAtGivenPercent(givenPercentToSample: number): boolean {
 
         if (givenPercentToSample <= 0) {
             return false;
@@ -111,7 +111,7 @@ export class CustomFeatures {
             return true;
         }
 
-        if (Math.floor(Math.random() * 100) <= givenPercentToSample) {
+        if (Math.floor(Math.random() * 100) < givenPercentToSample) {
             return true;
         }
 
