@@ -6,6 +6,8 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { AdMobView } from 'AdMob/Views/AdMobView';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { OpenMeasurementTest } from 'Core/Models/ABGroup';
 
 export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactory<AdMobCampaign, IAdMobAdUnitParameters> {
 
@@ -18,7 +20,15 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     protected createParameters(baseParams: IAdUnitParameters<AdMobCampaign>) {
         const showGDPRBanner = this.showGDPRBanner(baseParams);
-        const view = new AdMobView(baseParams.platform, baseParams.core, this._adMobSignalFactory, baseParams.container, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.clientInfo.getGameId(), baseParams.privacy, showGDPRBanner, baseParams.programmaticTrackingService);
+
+        let om;
+        const isOMEnabled = OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup());
+        if (isOMEnabled) {
+            om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
+            om.addToViewHierarchy();
+        }
+
+        const view = new AdMobView(baseParams.platform, baseParams.core, this._adMobSignalFactory, baseParams.container, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.clientInfo.getGameId(), baseParams.privacy, showGDPRBanner, baseParams.programmaticTrackingService, om);
 
         return {
             ... baseParams,

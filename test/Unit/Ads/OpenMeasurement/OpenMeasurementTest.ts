@@ -428,7 +428,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 });
 
                 it('should return the adview based on videoViewRectangle', () => {
-                    om.setVideoViewRectangle([0, 200, 300, 300]);
+                    om.setVideoViewRectangle(om.createRectangle(0, 200, 300, 300));
                     const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 200, 100, false, []);
 
                     const testAdView: IAdView = {

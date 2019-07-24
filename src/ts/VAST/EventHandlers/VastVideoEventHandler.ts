@@ -104,7 +104,8 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om && !this._omStartCalled) {
             this._adUnit.getVideoViewRectangle().then((rect) => {
                 if (this._om) {
-                    this._om.setVideoViewRectangle(rect);
+                    const view = this._om.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    this._om.setVideoViewRectangle(view);
                     this._om.sessionStart({
                         adSessionId: this._om.getOMAdSessionId(),
                         timestamp: Date.now(),

@@ -225,7 +225,7 @@ describe('VastVideoEventHandler tests', () => {
             });
 
             it('should set om setVideoViewRectangle receive success', () => {
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setVideoViewRectangle, [0, 0, 0, 0]);
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setVideoViewRectangle, openMeasurement!.createRectangle(0, 0, 0, 0));
             });
 
             it('should call om session start once', () => {
