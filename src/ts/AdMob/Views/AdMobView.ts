@@ -21,6 +21,8 @@ import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import OMIDSessionClient from 'html/omid/session-interface.html';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -53,8 +55,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _om: OpenMeasurement | undefined;
 
-    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: OpenMeasurement | undefined) {
         super(platform, 'admob');
 
         this._campaign = campaign;
@@ -64,6 +67,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
+        this._om = om;
 
         this._afmaBridge = new AFMABridge(core, {
             onAFMAClose: () => this.onClose(),
@@ -108,8 +112,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         super.render();
         this.setupIFrame();
 
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._gdprBanner = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement> this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -126,7 +130,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.disconnect();
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -168,10 +172,28 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private setupIFrame() {
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#admob-iframe');
         this._iframe = iframe;
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;
+
+            if (this._om) {
+                iframe.srcdoc += OMIDSessionClient;
+                this._om.getOmidBridge().setAdmobIframe(iframe);
+
+                iframe.onload = () => {
+                    if (iframe.contentWindow) {
+                        const videoEl = iframe.contentWindow.document.querySelector('video');
+                        if (videoEl) {
+                            const rect = videoEl.getBoundingClientRect();
+                            if (this._om) {
+                                const view = this._om.createRectangle(rect.left, rect.right, rect.width, rect.height);
+                                this._om.setVideoViewRectangle(view);
+                            }
+                        }
+                    }
+                };
+            }
         });
     }
 

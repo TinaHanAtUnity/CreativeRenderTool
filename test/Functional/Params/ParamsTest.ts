@@ -7,17 +7,14 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -31,6 +28,14 @@ import 'mocha';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AuctionRequest, IAuctionRequestParams } from 'Ads/Networking/AuctionRequest';
+import { RequestPrivacyFactory, IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
+import { Backend } from 'Backend/Backend';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICore } from 'Core/ICore';
+import { IAdsApi } from 'Ads/IAds';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 class SpecVerifier {
     private _platform: Platform;
@@ -42,10 +47,10 @@ class SpecVerifier {
         this._platform = platform;
         this._spec = spec;
         const parsedUrl: string[] = url.split('?');
-        if(parsedUrl.length > 1) {
+        if (parsedUrl.length > 1) {
             this._queryParams = parsedUrl[1].split('&');
         }
-        if(body) {
+        if (body) {
             this._bodyParams = JSON.parse(body);
         }
     }
@@ -56,8 +61,8 @@ class SpecVerifier {
     }
 
     private assertUnspecifiedParams(): void {
-        if(this._queryParams) {
-            for(const queryParam of this._queryParams) {
+        if (this._queryParams) {
+            for (const queryParam of this._queryParams) {
                 const paramName: string = queryParam.split('=')[0];
                 const paramValue: any = queryParam.split('=')[1];
 
@@ -68,9 +73,9 @@ class SpecVerifier {
             }
         }
 
-        if(this._bodyParams) {
-            for(const key in this._bodyParams) {
-                if(this._bodyParams.hasOwnProperty(key)) {
+        if (this._bodyParams) {
+            for (const key in this._bodyParams) {
+                if (this._bodyParams.hasOwnProperty(key)) {
                     assert.isDefined(this._spec[key], 'Unspecified body parameter: ' + key);
                     assert.isTrue(this._spec[key].body, 'Parameter should not be in request body: ' + key);
                     this.assertBodyParamType(key, this._bodyParams[key]);
@@ -80,15 +85,15 @@ class SpecVerifier {
     }
 
     private assertRequiredParams(): void {
-        for(const param in this._spec) {
-            if(this._spec.hasOwnProperty(param)) {
-                if(this.isRequired(this._spec[param].required)) {
-                    if(this._spec[param].queryString) {
+        for (const param in this._spec) {
+            if (this._spec.hasOwnProperty(param)) {
+                if (this.isRequired(this._spec[param].required)) {
+                    if (this._spec[param].queryString) {
                         let found: boolean = false;
 
-                        for(const queryParam of this._queryParams) {
+                        for (const queryParam of this._queryParams) {
                             const paramName: string = queryParam.split('=')[0];
-                            if(paramName === param) {
+                            if (paramName === param) {
                                 found = true;
                             }
                         }
@@ -96,7 +101,7 @@ class SpecVerifier {
                         assert.isTrue(found, 'Required parameter not found in query string: ' + param);
                     }
 
-                    if(this._spec[param].body) {
+                    if (this._spec[param].body) {
                         assert.isTrue(this._bodyParams.hasOwnProperty(param), 'Required parameter not found in body: ' + param);
                     }
                 }
@@ -105,11 +110,11 @@ class SpecVerifier {
     }
 
     private assertQueryParamType(name: string, value: string): void {
-        if(this._spec[name].type === 'boolean') {
+        if (this._spec[name].type === 'boolean') {
             assert.match(value, /(true|false)/i, 'Query parameter type mismatch: ' + name);
-        } else if(this._spec[name].type === 'number') {
+        } else if (this._spec[name].type === 'number') {
             assert.match(value, /[0-9]+/, 'Query parameter type mismatch: ' + name);
-        } else if(this._spec[name].type === 'string') {
+        } else if (this._spec[name].type === 'string') {
             // due to lack of better alternatives check that string has legal URL characters
             assert.match(value, /^([\!\#\$\&-\;\=\?-\[\]_a-z\~]|%[0-9a-fA-F]{2})+$/i, 'Query parameter type mismatch: ' + name);
         } else {
@@ -117,7 +122,7 @@ class SpecVerifier {
         }
     }
 
-    private assertBodyParamType(name: string, value: any): void {
+    private assertBodyParamType(name: string, value: unknown): void {
         assert.equal(this._spec[name].type, typeof value, 'Body parameter type mismatch: ' + name);
     }
 
@@ -139,9 +144,8 @@ describe('Event parameters should match specifications', () => {
             const response = TestFixtures.getOkNativeResponse();
             response.response = ConfigurationAuctionPlc;
             const requestSpy = sinon.stub(request, 'get').returns(Promise.resolve(response));
-            const span = sinon.createStubInstance(JaegerSpan);
             const configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), TestFixtures.getAndroidDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
-            return configManager.getConfig(span).then(() => {
+            return configManager.getConfig().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
                 verifier.assert();
@@ -158,9 +162,8 @@ describe('Event parameters should match specifications', () => {
             const response = TestFixtures.getOkNativeResponse();
             response.response = ConfigurationAuctionPlc;
             const requestSpy = sinon.stub(request, 'get').returns(Promise.resolve(response));
-            const span = sinon.createStubInstance(JaegerSpan);
             const configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
-            return configManager.getConfig(span).then(() => {
+            return configManager.getConfig().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);
@@ -179,6 +182,7 @@ describe('Event parameters should match specifications', () => {
         });
 
         it('on Android', () => {
+            const sandbox = sinon.createSandbox();
             const platform = Platform.ANDROID;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -188,24 +192,23 @@ describe('Event parameters should match specifications', () => {
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const requestSpy: any = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const requestSpy: any = sandbox.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
-            const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            const programmaticTrackingService: ProgrammaticTrackingService = sandbox.createStubInstance(ProgrammaticTrackingService);
             const wakeUpManager = new WakeUpManager(core);
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
             const campaignParserManager = new ContentTypeHandlerManager();
-            const jaegerManager = sinon.createStubInstance(JaegerManager);
-            jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
-            sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
-            sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
-            sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+            sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
+            sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+            sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+            sandbox.stub(RequestPrivacyFactory, 'create').returns(<IRequestPrivacy>{});
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -213,9 +216,10 @@ describe('Event parameters should match specifications', () => {
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
             });
-       });
+        });
 
         it('on iOS', () => {
+            const sandbox = sinon.createSandbox();
             const platform = Platform.IOS;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -225,30 +229,112 @@ describe('Event parameters should match specifications', () => {
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const requestSpy: any = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const requestSpy: any = sandbox.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
-            const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            const programmaticTrackingService: ProgrammaticTrackingService = sandbox.createStubInstance(ProgrammaticTrackingService);
             const wakeUpManager = new WakeUpManager(core);
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
             const campaignParserManager = new ContentTypeHandlerManager();
-            const jaegerManager = sinon.createStubInstance(JaegerManager);
-            jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
-            sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
-            sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
-            sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+            sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
+            sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+            sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getAdRequestParams(), url, body);
                 verifier.assert();
+            });
+        });
+    });
+
+    [Platform.ANDROID, Platform.IOS].forEach(platform => {
+
+        describe(`with ad request using AuctionRequest on ${Platform[platform]}`, () => {
+            let coreConfig: CoreConfiguration;
+            let adsConfig: AdsConfiguration;
+            let backend: Backend;
+            let nativeBridge: NativeBridge;
+            let core: ICore;
+            let ads: IAdsApi;
+            let storageBridge: StorageBridge;
+            let metaDataManager: MetaDataManager;
+            let requestManager: RequestManager;
+            let clientInfo: ClientInfo;
+            let deviceInfo: DeviceInfo;
+            let sessionManager: SessionManager;
+            let focusManager: FocusManager;
+            let adMobSignalFactory: AdMobSignalFactory;
+            let auctionRequestParams: IAuctionRequestParams;
+            let auctionRequest: AuctionRequest;
+
+            let requestStub: sinon.SinonStub;
+            let sandbox: sinon.SinonSandbox;
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                coreConfig = TestFixtures.getCoreConfiguration();
+                adsConfig = TestFixtures.getAdsConfiguration();
+                backend = TestFixtures.getBackend(platform);
+                nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+                core = TestFixtures.getCoreModule(nativeBridge);
+                ads = TestFixtures.getAdsApi(nativeBridge);
+                storageBridge = new StorageBridge(core.Api);
+                metaDataManager = new MetaDataManager(core.Api);
+                requestManager = new RequestManager(platform, core.Api, new WakeUpManager(core.Api));
+                requestStub = sandbox.stub(requestManager, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+                clientInfo = TestFixtures.getClientInfo(platform);
+                sessionManager = new SessionManager(core.Api, requestManager, storageBridge);
+                focusManager = new FocusManager(platform, core.Api);
+
+                if (platform === Platform.ANDROID) {
+                    deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
+                } else {
+                    deviceInfo = TestFixtures.getIosDeviceInfo(core.Api);
+                }
+
+                adMobSignalFactory = new AdMobSignalFactory(platform, core.Api, ads, clientInfo, deviceInfo, focusManager);
+
+                sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
+                sandbox.stub(core.Api.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+                sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+
+                sessionManager.setGameSessionId(1234);
+
+                auctionRequestParams = {
+                    platform: platform,
+                    core: core.Api,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
+                    adMobSignalFactory: adMobSignalFactory,
+                    metaDataManager: metaDataManager,
+                    request: requestManager,
+                    clientInfo: clientInfo,
+                    deviceInfo: deviceInfo,
+                    sessionManager: sessionManager,
+                    programmaticTrackingService: core.ProgrammaticTrackingService
+                };
+                auctionRequest = new AuctionRequest(auctionRequestParams);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should have the correct parameters', () => {
+                return auctionRequest.request().then(() => {
+                    const url: string = requestStub.getCall(0).args[0];
+                    const body: string = requestStub.getCall(0).args[1];
+                    const verifier: SpecVerifier = new SpecVerifier(platform, ParamsTestData.getAdRequestParams(), url, body);
+                    verifier.assert();
+                });
             });
         });
     });

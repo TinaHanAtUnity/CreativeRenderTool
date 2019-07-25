@@ -24,11 +24,9 @@ import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi, ICore } from 'Core/ICore';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -101,7 +99,7 @@ export class TestAdUnit extends AbstractAdUnit {
     }
 }
 
-describe('CampaignRefreshManager', () => {
+xdescribe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let vastParser: VastParserStrict;
@@ -130,7 +128,6 @@ describe('CampaignRefreshManager', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
-    let jaegerManager: JaegerManager;
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
@@ -210,16 +207,13 @@ describe('CampaignRefreshManager', () => {
         };
 
         RefreshManager.ParsingErrorRefillDelayInSeconds = 0; // prevent tests from hanging due to long retry timeouts
-        jaegerManager = sinon.createStubInstance(JaegerManager);
-        jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
-        jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
     });
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -620,7 +614,7 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 

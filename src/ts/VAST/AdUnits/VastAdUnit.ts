@@ -36,20 +36,20 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._moat = MoatViewabilityService.getMoat();
         this._om = parameters.om;
 
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
         }
 
-        if(parameters.platform === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             Promise.all([
                 parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
                 parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });
-        } else if(parameters.platform === Platform.IOS) {
+        } else if (parameters.platform === Platform.IOS) {
             parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
                 this.setVolume(volume);
             });
@@ -181,7 +181,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
                 if (this._om) {
                     const viewPort = this._om.calculateViewPort(width, height);
-                    const obstructionRectangle = this._om.calculateObstruction(0, 0, width, height);
+                    const obstructionRectangle = this._om.createRectangle(0, 0, width, height);
                     const adView = this._om.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
                     this._om.geometryChange(viewPort, adView);
                 }

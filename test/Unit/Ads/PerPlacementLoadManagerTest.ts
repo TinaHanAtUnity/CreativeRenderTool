@@ -1,12 +1,10 @@
-import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
-import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { ILoadEvent, ILoadStorageEvent, PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
+import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -20,7 +18,6 @@ import { ICore } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -35,6 +32,7 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 
 describe('PerPlacementLoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -58,7 +56,6 @@ describe('PerPlacementLoadManagerTest', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
-    let jaegerManager: JaegerManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let campaignParserManager: ContentTypeHandlerManager;
 
@@ -74,7 +71,6 @@ describe('PerPlacementLoadManagerTest', () => {
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
-        jaegerManager = sinon.createStubInstance(JaegerManager);
 
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
@@ -88,79 +84,8 @@ describe('PerPlacementLoadManagerTest', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core.Api);
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager);
-        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
-    });
-
-    describe('getStoredLoads', () => {
-        let sandbox: sinon.SinonSandbox;
-
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            sandbox.stub(core.Api.Storage, 'get');
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        it('should not call getStoredLoad at all', () => {
-            sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.resolve([]));
-            return loadManager.initialize().then((res) => {
-                sandbox.assert.notCalled((<sinon.SinonStub>core.Api.Storage.get));
-            });
-        });
-
-        it('should not call getStoredLoad at all', () => {
-            sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.reject());
-            return loadManager.initialize().then((res) => {
-                sandbox.assert.notCalled((<sinon.SinonStub>core.Api.Storage.get));
-            });
-        });
-
-        it('should ignore loads set more than 60 seconds prior to SDK initialization', () => {
-            const time = Date.now();
-            const loadEvent: ILoadEvent = {
-                value: 'scott',
-                ts: time - 600001
-            };
-            sandbox.stub(clientInfo, 'getInitTimestamp').returns(time);
-            sandbox.stub(campaignManager, 'loadCampaign');
-            sandbox.stub(core.Api.Storage, 'getKeys').returns(Promise.resolve({key: loadEvent}));
-            return loadManager.initialize().then((res) => {
-                sandbox.assert.notCalled((<sinon.SinonStub> campaignManager.loadCampaign));
-            });
-        });
-    });
-
-    describe('onStorageSet', () => {
-        let sandbox: sinon.SinonSandbox;
-
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            sandbox.stub(core.Api.Storage, 'delete').callsFake(() => {
-                return Promise.resolve();
-            });
-            sandbox.stub(core.Api.Storage, 'write').callsFake(() => {
-                return Promise.resolve();
-            });
-            (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
-            (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-        });
-
-        it('should correctly load placements and delete the load information onStorageSet', () => {
-            const loadStorageEvent: ILoadStorageEvent = {
-                load: {
-                    'key': {
-                        value: 'premium',
-                        ts: clientInfo.getInitTimestamp()
-                    }
-                }
-            };
-            core.Api.Storage.onSet.trigger('type', loadStorageEvent);
-            sinon.assert.called((<sinon.SinonStub>core.Api.Storage.delete));
-            sinon.assert.called((<sinon.SinonStub>core.Api.Storage.write));
-        });
+        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
+        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 
     describe('getCampaign and initialize', () => {
@@ -175,28 +100,24 @@ describe('PerPlacementLoadManagerTest', () => {
 
         describe('with loading placement IDs', () => {
             let placementId: string;
-            let loadEvent: ILoadEvent;
             let sandbox: sinon.SinonSandbox;
             let loadCampaignStub: sinon.SinonStub;
+            let sendReadyEventStub: sinon.SinonStub;
+            let loadCalledKafkaStub: sinon.SinonStub;
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
                 placementId = 'premium';
-                loadEvent = {
-                    value: placementId,
-                    ts: clientInfo.getInitTimestamp() + 1
-                };
                 loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
-                sandbox.stub(core.Api.Storage, 'get').callsFake(() => {
-                    return Promise.resolve(loadEvent);
-                });
-                sandbox.stub(core.Api.Storage, 'getKeys').callsFake(() => {
-                    return Promise.resolve(adsConfig.getPlacementIds());
+                sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
+                loadCalledKafkaStub = sandbox.stub(LoadCalledCounter, 'report').callsFake(() => {
+                    return Promise.resolve(<INativeResponse>{});
                 });
                 // To silence diagnostic messages
                 sandbox.stub(Diagnostics, 'trigger').callsFake(() => {
                     return Promise.resolve(<INativeResponse>{});
                 });
+                return loadManager.initialize();
             });
 
             afterEach(() => {
@@ -216,42 +137,61 @@ describe('PerPlacementLoadManagerTest', () => {
             }];
 
             tests.forEach((t) => {
-                it('should load/overwrite the correct campaign', () => {
+                it('should load/overwrite the correct campaign', (done) => {
                     loadCampaignStub.callsFake(() => {
                         return Promise.resolve(<ILoadedCampaign>{
                             campaign: t.expectedCampaign,
                             trackingUrls: {}
                         });
                     });
-                    return loadManager.initialize().then(() => {
-                        const testCampaign = loadManager.getCampaign(placementId);
-                        assert.instanceOf(testCampaign, Campaign, `Campaign with placementID '${placementId}' was not a defined Campaign`);
-                        assert.equal(testCampaign, t.expectedCampaign, 'Loaded campaign was not the correct campaign');
-                        assert.notEqual(testCampaign, t.unexpectedCampaign, 'Loaded campaign was not the correct campaign');
-                        assert.isUndefined(loadManager.getCampaign('banner'), 'Campaign with placementID \'banner\' was loaded incorrectly');
+                    const setPlacementStateStub = sandbox.stub(ads.Placement, 'setPlacementState');
+                    setPlacementStateStub.callsFake((id: string, state: PlacementState) => {
+                        if (placementId === id && state !== PlacementState.WAITING) {
+                            const testCampaign = loadManager.getCampaign(placementId);
+                            sinon.assert.called(loadCalledKafkaStub);
+                            assert.instanceOf(testCampaign, Campaign, `Campaign with placementID '${placementId}' was not a defined Campaign`);
+                            assert.equal(testCampaign, t.expectedCampaign, 'Loaded campaign was not the correct campaign');
+                            assert.notEqual(testCampaign, t.unexpectedCampaign, 'Loaded campaign was not the correct campaign');
+                            assert.isUndefined(loadManager.getCampaign('banner'), 'Campaign with placementID \'banner\' was loaded incorrectly');
+                            done();
+                        }
                     });
+                    const loadDict: {[key: string]: number} = {};
+                    loadDict[placementId] = 1;
+                    ads.LoadApi.onLoad.trigger(loadDict);
                 });
             });
 
-            it('should set the placement state to nofill', () => {
+            it('should set the placement state to nofill', (done) => {
                 loadCampaignStub.callsFake(() => {
                     return Promise.resolve(undefined);
                 });
-                sandbox.stub(ads.Placement, 'setPlacementState');
-                return loadManager.initialize().then(() => {
-                    const testCampaign = loadManager.getCampaign(placementId);
-                    assert.isUndefined(testCampaign, 'Loaded campaign was defined');
-                    sinon.assert.calledWith((<sinon.SinonStub>ads.Placement.setPlacementState), placementId, PlacementState.NO_FILL);
+                const setPlacementStateStub = sandbox.stub(ads.Placement, 'setPlacementState');
+                setPlacementStateStub.callsFake((id: string, state: PlacementState) => {
+                    if (placementId === id && state !== PlacementState.WAITING) {
+                        const testCampaign = loadManager.getCampaign(placementId);
+                        assert.isUndefined(testCampaign, 'Loaded campaign was defined');
+                        sinon.assert.calledWith(setPlacementStateStub, placementId, PlacementState.NO_FILL);
+                        done();
+                    }
                 });
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementId] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
             });
 
             it('should not attempt to load a campaign for a placement that\'s waiting', () => {
                 const placement = adsConfig.getPlacement(placementId);
                 placement.setState(PlacementState.WAITING);
-                return loadManager.initialize().then(() => {
-                    sinon.assert.notCalled(loadCampaignStub);
-                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
-                });
+
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementId] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
+
+                sinon.assert.called(loadCalledKafkaStub);
+                sinon.assert.notCalled(loadCampaignStub);
+                sinon.assert.notCalled(sendReadyEventStub);
+                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
             });
 
             it('should not attempt to load a campaign that\'s ready and not expired', () => {
@@ -260,10 +200,15 @@ describe('PerPlacementLoadManagerTest', () => {
                 campaign.set('willExpireAt', Date.now() + 100);
                 placement.setState(PlacementState.READY);
                 placement.setCurrentCampaign(campaign);
-                return loadManager.initialize().then(() => {
-                    sinon.assert.notCalled(loadCampaignStub);
-                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
-                });
+
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementId] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
+
+                sinon.assert.called(loadCalledKafkaStub);
+                sinon.assert.notCalled(loadCampaignStub);
+                sinon.assert.calledWith(sendReadyEventStub, placementId);
+                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetric, LoadMetric.LoadAuctionRequestBlocked);
             });
 
             it('should attempt to load a campaign that\'s ready and expired', () => {
@@ -271,14 +216,18 @@ describe('PerPlacementLoadManagerTest', () => {
                     return Promise.resolve(<ILoadedCampaign>{});
                 });
 
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementId] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
+
                 const campaign = TestFixtures.getCampaign();
                 const placement = adsConfig.getPlacement(placementId);
                 campaign.set('willExpireAt', Date.now() - 100);
                 placement.setState(PlacementState.READY);
                 placement.setCurrentCampaign(campaign);
-                return loadManager.initialize().then(() => {
-                    sinon.assert.called(loadCampaignStub);
-                });
+
+                sinon.assert.called(loadCalledKafkaStub);
+                sinon.assert.called(loadCampaignStub);
             });
 
             const stateTests: PlacementState[] = [PlacementState.NOT_AVAILABLE, PlacementState.NO_FILL];
@@ -287,9 +236,14 @@ describe('PerPlacementLoadManagerTest', () => {
                     loadCampaignStub.callsFake(() => {
                         return Promise.resolve(<ILoadedCampaign>{});
                     });
+                    const loadDict: {[key: string]: number} = {};
+                    loadDict[placementId] = 1;
+                    ads.LoadApi.onLoad.trigger(loadDict);
+
                     const placement = adsConfig.getPlacement(placementId);
                     placement.setState(state);
                     return loadManager.initialize().then(() => {
+                        sinon.assert.called(loadCalledKafkaStub);
                         sinon.assert.called(loadCampaignStub);
                     });
                 });

@@ -149,16 +149,16 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public render() {
         super.render();
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._closeElement = <HTMLElement> this._container.querySelector('.close-region');
+        this._gdprBanner = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement> this._container.querySelector('.privacy-button');
         this.choosePrivacyShown();
     }
 
     public hide() {
         this.setViewableState(false);
 
-        if(this._updateInterval) {
+        if (this._updateInterval) {
             clearInterval(this._updateInterval);
             this._updateInterval = undefined;
         }
@@ -195,13 +195,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         return this.fetchMRAID().then(mraid => {
             fetchingStopTimestamp = mraidParseTimestamp = Date.now();
-            if(mraid) {
+            if (mraid) {
                 const markup = this._campaign.getDynamicMarkup();
-                if(markup) {
+                if (markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
 
-                if(MRAIDView.DebugJsConsole) {
+                if (MRAIDView.DebugJsConsole) {
                     container = container.replace('<script id=\"debug-js-console\"></script>', JsConsoleDebugScript);
                 }
 
@@ -275,19 +275,19 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     protected prepareProgressCircle() {
-        if(this._placement.allowSkip()) {
+        if (this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = this._CLOSE_LENGTH;
             let skipRemaining = skipLength;
             this._updateInterval = window.setInterval(() => {
-                if(this._closeRemaining > 0) {
+                if (this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
-                if(skipRemaining > 0) {
+                if (skipRemaining > 0) {
                     skipRemaining--;
                     this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
                 }
-                if(skipRemaining <= 0) {
+                if (skipRemaining <= 0) {
                     this._canSkip = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
@@ -301,11 +301,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this._closeRemaining = this._CLOSE_LENGTH;
             this._updateInterval = window.setInterval(() => {
                 const progress = (this._CLOSE_LENGTH - this._closeRemaining) / this._CLOSE_LENGTH;
-                if(progress >= 0.75 && !this._didReward) {
+                if (progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());
                     this._didReward = true;
                 }
-                if(this._closeRemaining > 0) {
+                if (this._closeRemaining > 0) {
                     this._closeRemaining--;
                     this.updateProgressCircle(this._closeElement, progress);
                 }
@@ -322,7 +322,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
+        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
@@ -338,14 +338,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         const degrees = value * 360;
         leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
 
-        if(value >= 0.5) {
+        if (value >= 0.5) {
             wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
             rightCircleElement.style.webkitAnimationName = 'right-spin';
         }
     }
 
     protected setAnalyticsBackgroundTime(viewable: boolean) {
-        if(!viewable) {
+        if (!viewable) {
             this._backgroundTimestamp = Date.now();
         } else {
             if (this._backgroundTimestamp) {
@@ -366,13 +366,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         } else {
             dom = new DOMParser().parseFromString(mraid, 'text/html');
         }
-        if(!dom) {
+        if (!dom) {
             this._core.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
             return mraid;
         }
 
         const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
-        if(src && src.parentNode) {
+        if (src && src.parentNode) {
             src.parentNode.removeChild(src);
         }
 
@@ -381,12 +381,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl) {
+        if (resourceUrl) {
             if (this._platform === Platform.ANDROID) {
                 return XHRequest.get(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
-                if(fileId) {
+                if (fileId) {
                     return this._core.Cache.getFileContent(fileId, 'UTF-8');
                 } else {
                     return XHRequest.get(resourceUrl.getOriginalUrl());
@@ -399,7 +399,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected abstract onCloseEvent(event: Event): void;
 
     public onPrivacyClose(): void {
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.hide();
             this._privacyPanelOpen = false;
         }
@@ -464,8 +464,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeStateChange(customState: string) {
-        if(customState === 'completed') {
-            if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+        if (customState === 'completed') {
+            if (!this._placement.allowSkip() && this._closeRemaining > 5) {
                 this._closeRemaining = 5;
             }
         }
