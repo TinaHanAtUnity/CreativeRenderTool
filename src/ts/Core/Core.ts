@@ -247,7 +247,7 @@ export class Core implements ICore {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
-            if (TestEnvironment.get('abGroup')) {
+            if (TestEnvironment.get('abGroup') !== undefined) {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
