@@ -182,7 +182,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
 
-        if(this._deviceorientationListener) {
+        if (this._deviceorientationListener) {
             window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
             this._deviceorientationListener = undefined;
         }
@@ -501,7 +501,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeDeviceOrientationSubscribe() {
         // Defer subscribing to deviceorientation event here to only subscribe to the event when the creative needs the data
-        if(!this._deviceorientationListener) {
+        if (!this._deviceorientationListener) {
             this._deviceorientationListener = (orientationEvent: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>orientationEvent);
             window.addEventListener('deviceorientation', this._deviceorientationListener, false);
         }
