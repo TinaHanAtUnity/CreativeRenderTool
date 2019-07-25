@@ -7,6 +7,8 @@
 * Parse Developer ID from Configuration and Add Developer ID to Request Body [#10660](https://github.com/Applifier/unity-ads-webview/pull/10660)
 * Turn off auto logging for ab group 13 [#10664](https://github.com/Applifier/unity-ads-webview/pull/10664)
 * Open Measurement - Event Queue for SessionEvents called before dom injection [#10605](https://github.com/Applifier/unity-ads-webview/pull/10605)
+* Suspend Slider v2 Experiment [#10663](https://github.com/Applifier/unity-ads-webview/pull/10663)
+* Revert Color Tinting Experiment [#10662](https://github.com/Applifier/unity-ads-webview/pull/10662)
 
 # Tue Jul 23 16:45:45 UTC 2019
 
