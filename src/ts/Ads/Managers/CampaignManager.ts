@@ -114,6 +114,7 @@ export class CampaignManager {
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
     private _pts: ProgrammaticTrackingService;
+    private _isLoadEnabled: boolean = false;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager) {
         this._platform = platform;
@@ -135,6 +136,7 @@ export class CampaignManager {
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
+        this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
             return Promise.resolve();
@@ -203,7 +205,9 @@ export class CampaignManager {
         });
     }
 
-    public loadCampaign(placement: Placement, timeout: number): Promise<ILoadedCampaign | undefined> {
+    public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+        this._isLoadEnabled = true;
+
         // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
         this._assetManager.enableCaching();
 
@@ -223,7 +227,7 @@ export class CampaignManager {
                 retryDelay: 0,
                 followRedirects: false,
                 retryWithConnectionEvents: false,
-                timeout: timeout
+                timeout: 10000
             }).then(response => {
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy);
             }).then((loadedCampaign) => {
@@ -258,7 +262,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionResponse>(response.response);
@@ -918,11 +922,18 @@ export class CampaignManager {
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
+                body.isLoadEnabled = this._isLoadEnabled;
 
                 const organizationId = this._coreConfig.getOrganizationId();
                 if (organizationId) {
                     body.organizationId = organizationId;
                 }
+
+                const developerId = this._coreConfig.getDeveloperId();
+                if (developerId) {
+                    body.developerId = developerId;
+                }
+
                 return body;
             });
         });

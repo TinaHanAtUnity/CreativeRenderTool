@@ -1,5 +1,21 @@
 # Pending
 
+* Open Measurement - Add OMID to Admob Path as DisabledABGroup [#10600](https://github.com/Applifier/unity-ads-webview/pull/10600)
+* Pass Correct isLoadEnabled flag in Auction Request [#10636](https://github.com/Applifier/unity-ads-webview/pull/10636)
+* Suggestion for Disabling Caching for Testing Browser Builds [#10634](https://github.com/Applifier/unity-ads-webview/pull/10634)
+* Move Random Sampling Custom Feature to Generic Method [#10635](https://github.com/Applifier/unity-ads-webview/pull/10635)
+* Parse Developer ID from Configuration and Add Developer ID to Request Body [#10660](https://github.com/Applifier/unity-ads-webview/pull/10660)
+
+# Tue Jul 23 16:45:45 UTC 2019
+
+* Align CampaignManager and AuctionRequest and Add Tests [#10525](https://github.com/Applifier/unity-ads-webview/pull/10525)
+* Open Measurement - Fix om partner name [#10577](https://github.com/Applifier/unity-ads-webview/pull/10577)
+* Add New PTS Endpoints and Sample Metrics at 1% [#10551](https://github.com/Applifier/unity-ads-webview/pull/10551)
+* Revert "Enabling AppSheet for ios 12.1 and above" [#10631](https://github.com/Applifier/unity-ads-webview/pull/10631)
+* Merge 3.2.0 Changes to Master [#10630](https://github.com/Applifier/unity-ads-webview/pull/10630)
+
+# Thu Jul 18 18:05:40 UTC 2019
+
 * Slider V2 [#10346](https://github.com/Applifier/unity-ads-webview/pull/10346)
 * Fixed the CTA button being visible before it should on larger devices [#10554](https://github.com/Applifier/unity-ads-webview/pull/10554)
 * Add color tinting experiment [#9842](https://github.com/Applifier/unity-ads-webview/pull/9842)

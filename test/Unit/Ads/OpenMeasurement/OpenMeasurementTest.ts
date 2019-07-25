@@ -426,6 +426,32 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     };
                     assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
                 });
+
+                it('should return the adview based on videoViewRectangle', () => {
+                    om.setVideoViewRectangle(om.createRectangle(0, 200, 300, 300));
+                    const calculatedAdView: IAdView = om.calculateVastAdView(100, [], 200, 100, false, []);
+
+                    const testAdView: IAdView = {
+                        percentageInView: 100,
+                        geometry: {
+                            x: 0,
+                            y: 200,
+                            width: 300,
+                            height: 300
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 200,
+                            width: 300,
+                            height: 300,
+                            obstructions: []
+                        },
+                        measuringElement: false,
+                        reasons: []
+                    };
+
+                    assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
+                });
             });
         });
     });

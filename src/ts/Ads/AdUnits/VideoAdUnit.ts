@@ -267,6 +267,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         }
     }
 
+    public getVideoViewRectangle(): Promise<number[]> {
+        return this._ads.VideoPlayer.getVideoViewRectangle();
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }

@@ -476,6 +476,13 @@
     "platforms": "all"
   },
   {
+    "key": "developerId",
+    "type": "number",
+    "description": "Developer ID from Configuration",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "gdprEnabled",
     "type": "boolean",
     "description": "If GDPR is enabled",
