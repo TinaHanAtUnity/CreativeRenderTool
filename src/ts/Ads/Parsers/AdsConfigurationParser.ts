@@ -57,7 +57,7 @@ export class AdsConfigurationParser {
         const cacheMode = this._isBrowserBuild ? CacheMode.DISABLED : this.parseCacheMode(configJson);
 
         const configurationParams: IAdsConfiguration = {
-            cacheMode,
+            cacheMode: cacheMode,
             placements: placements,
             defaultPlacement: defaultPlacement,
             gdprEnabled: configJson.gdprEnabled,
