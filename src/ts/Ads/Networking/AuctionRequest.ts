@@ -464,7 +464,7 @@ export class AuctionRequest {
                     optOutRecorded: this._adsConfig.isOptOutRecorded(),
                     privacy: this._privacy,
                     abGroup: this._coreConfig.getAbGroup(),
-                    developerId: this._coreConfig.getDeveloperId() ? this._coreConfig.getDeveloperId() : undefined,
+                    developerId: this._coreConfig.getDeveloperId(),
                     organizationId: this._coreConfig.getOrganizationId(),
                     isLoadEnabled: false // TODO: When this is used for anything other than banners, pass actual flag
                 };
