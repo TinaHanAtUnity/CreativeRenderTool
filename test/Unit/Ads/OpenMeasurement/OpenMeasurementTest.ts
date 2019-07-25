@@ -87,6 +87,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         om.addMessageListener();
                         sinon.stub(om, 'populateVendorKey');
                         sinon.stub(om, 'injectAsString');
+                        sinon.stub(om.getOmidBridge(), 'sendQueuedEvents');
                         return om.injectAdVerifications();
                     });
 
@@ -98,6 +99,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         // need a more reliable way to check the dom
                         sinon.assert.calledTwice(<sinon.SinonStub>om.injectAsString);
                         sinon.assert.calledTwice(<sinon.SinonStub>om.populateVendorKey);
+                        sinon.assert.calledOnce(<sinon.SinonStub>om.getOmidBridge().sendQueuedEvents);
                     });
                 });
 

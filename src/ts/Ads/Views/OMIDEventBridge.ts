@@ -180,6 +180,12 @@ export interface ISessionEvent {
     data: {[key: string]: unknown};
 }
 
+export interface IVerificationEvent {
+    type: string;
+    adSessionId: string;
+    payload?: unknown;
+}
+
 export interface IVerificationScriptResource {
     resourceUrl: string;
     vendorKey: string;
@@ -195,6 +201,9 @@ export class OMIDEventBridge {
 
     private _iframe3p: HTMLIFrameElement;
     private _iframeSessionInterface: HTMLIFrameElement;
+
+    private _eventQueue: IVerificationEvent[] = [];
+    private _verificationsInjected = false;
 
     constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
         this._core = core;
@@ -257,25 +266,46 @@ export class OMIDEventBridge {
         this.postMessage(OMSessionInfo.SESSION_ID, sessionId);
     }
 
+    public setVerificationsInjected(verificationsInjected: boolean) {
+        this._verificationsInjected = verificationsInjected;
+    }
+
+    public sendQueuedEvents() {
+        while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
+            const event = this._eventQueue.shift();
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        }
+    }
+
     public triggerAdEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM ad event "' + type + '" with payload: ' + payload);
-        if (this._iframe3p.contentWindow) {
-            this._iframe3p.contentWindow.postMessage({
-                type: type,
-                adSessionId: this._openMeasurement.getOMAdSessionId(),
-                payload: payload
-            }, '*');
+
+        const event: IVerificationEvent = {
+            type: type,
+            adSessionId: this._openMeasurement.getOMAdSessionId(),
+            payload: payload
+        };
+
+        if (this._iframe3p.contentWindow && this._verificationsInjected) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        } else {
+            this._eventQueue.push(event);
         }
     }
 
     public triggerVideoEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM viewability event "' + type + '" with payload: ' + payload);
-        if (this._iframe3p.contentWindow) {
-            this._iframe3p.contentWindow.postMessage({
-                type: type,
-                adSessionId: this._openMeasurement.getOMAdSessionId(),
-                payload: payload
-            }, '*');
+
+        const event: IVerificationEvent = {
+            type: type,
+            adSessionId: this._openMeasurement.getOMAdSessionId(),
+            payload: payload
+        };
+
+        if (this._iframe3p.contentWindow && this._verificationsInjected) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        } else {
+            this._eventQueue.push(event);
         }
     }
 
