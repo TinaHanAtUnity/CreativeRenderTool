@@ -69,4 +69,3 @@ export const ConsentTest = new ABTest(9, 10);
 export const OpenMeasurementTest = new DisabledABTest();
 export const IAPAutoLoggingTest = new DisabledABTest();
 export const SliderEndCardExperiment = new ZyngaFilteredABTest(5, 6);
-export const ColorTintingTest = new ZyngaFilteredABTest(7, 8);
