@@ -173,16 +173,16 @@ describe('CustomFeatures', () => {
             });
         });
     });
-    // skip slider tests until further release
-    describe.skip('isSliderEndScreenEnabled', () => {
-        it('should return true for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+    // disabled slider tests (revert on the next release)
+    describe('isSliderEndScreenDisabled', () => {
+        it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
-            assert.isTrue(isEnabled);
+            assert.isFalse(isEnabled);
         });
 
-        it('should return true for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+        it('should return false for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.0', Platform.ANDROID);
-            assert.isTrue(isEnabled);
+            assert.isFalse(isEnabled);
         });
 
         it('should return false if ab group is 5 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
@@ -215,16 +215,16 @@ describe('CustomFeatures', () => {
             assert.isFalse(isEnabled);
         });
     });
-    // skip slider tests until further release
-    describe.skip('isSliderEndScreenEnabled', () => {
-        it('should return true for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+    // disabled slider tests (revert on the next release)
+    describe('isSliderEndScreenDisabled', () => {
+        it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
-            assert.isTrue(isEnabled);
+            assert.isFalse(isEnabled);
         });
 
-        it('should return true for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+        it('should return false for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.0', Platform.ANDROID);
-            assert.isTrue(isEnabled);
+            assert.isFalse(isEnabled);
         });
 
         it('should return false if ab group is 5 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
@@ -257,16 +257,16 @@ describe('CustomFeatures', () => {
             assert.isFalse(isEnabled);
         });
     });
-    // skip slider tests until further release
-    describe.skip('isSliderEndScreenEnabled', () => {
-        it('should return true for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+    // disabled slider tests (revert on the next release)
+    describe('isSliderEndScreenDisabled', () => {
+        it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
-            assert.isTrue(isEnabled);
+            assert.isFalse(isEnabled);
         });
 
-        it('should return true for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+        it('should return false for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.0', Platform.ANDROID);
-            assert.isTrue(isEnabled);
+            assert.isFalse(isEnabled);
         });
 
         it('should return false if ab group is 5 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
