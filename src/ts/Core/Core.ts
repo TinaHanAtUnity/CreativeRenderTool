@@ -247,9 +247,10 @@ export class Core implements ICore {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
-            if (TestEnvironment.get('abGroup') !== undefined) {
+            const abGroupMetaValue = TestEnvironment.get('abGroup');
+            if (abGroupMetaValue || abGroupMetaValue === 0) {
                 // needed in both due to placement level control support
-                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
+                const abGroupNumber: number = Number(abGroupMetaValue);
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
                     const abGroup = toAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
