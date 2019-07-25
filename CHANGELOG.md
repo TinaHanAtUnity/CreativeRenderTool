@@ -1,6 +1,10 @@
 # Pending
 
 * Open Measurement - Add OMID to Admob Path as DisabledABGroup [#10600](https://github.com/Applifier/unity-ads-webview/pull/10600)
+* Pass Correct isLoadEnabled flag in Auction Request [#10636](https://github.com/Applifier/unity-ads-webview/pull/10636)
+* Suggestion for Disabling Caching for Testing Browser Builds [#10634](https://github.com/Applifier/unity-ads-webview/pull/10634)
+* Move Random Sampling Custom Feature to Generic Method [#10635](https://github.com/Applifier/unity-ads-webview/pull/10635)
+* Parse Developer ID from Configuration and Add Developer ID to Request Body [#10660](https://github.com/Applifier/unity-ads-webview/pull/10660)
 
 # Tue Jul 23 16:45:45 UTC 2019
 
