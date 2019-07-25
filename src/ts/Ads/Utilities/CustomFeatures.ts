@@ -101,22 +101,21 @@ export class CustomFeatures {
         return gameIdList.indexOf(gameId) !== -1;
     }
 
-    public static shouldSampleAtOnePercent(): boolean {
-        // will only return true when Math.random returns 0
-        if (Math.floor(Math.random() * 100) % 100 === 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public static sampleAtGivenPercent(givenPercentToSample: number): boolean {
 
-    public static shouldSampleAtTenPercent(): boolean {
-        // will only return true when Math.random returns 1
-        if (Math.floor(Math.random() * 10) % 10 === 1) {
-            return true;
-        } else {
+        if (givenPercentToSample <= 0) {
             return false;
         }
+
+        if (givenPercentToSample >= 100) {
+            return true;
+        }
+
+        if (Math.floor(Math.random() * 100) < givenPercentToSample) {
+            return true;
+        }
+
+        return false;
     }
 
     public static isUnsupportedOMVendor(resourceUrl: string) {

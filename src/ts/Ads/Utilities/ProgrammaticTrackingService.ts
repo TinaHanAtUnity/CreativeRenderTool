@@ -155,7 +155,7 @@ export class ProgrammaticTrackingService {
         headers.push(['Content-Type', 'application/json']);
 
         return this._request.post(url, data, headers).then((res) => {
-            if (CustomFeatures.shouldSampleAtOnePercent()) {
+            if (CustomFeatures.sampleAtGivenPercent(1)) {
                 return this._request.post(ProgrammaticTrackingService.newProductionMetricServiceUrl, data, headers);
             }
             return res;

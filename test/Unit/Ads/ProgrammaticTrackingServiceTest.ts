@@ -49,7 +49,7 @@ describe('ProgrammaticTrackingService', () => {
         beforeEach(() => {
             osVersionStub.returns(osVersion);
             sdkVersionStub.returns(sdkVersion);
-            sinon.stub(CustomFeatures, 'shouldSampleAtOnePercent').returns(false);
+            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(false);
         });
 
         const tagBuilder = [

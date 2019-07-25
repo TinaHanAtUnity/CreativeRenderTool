@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { toAbGroup } from 'Core/Models/ABGroup';
 import { Platform } from 'Core/Constants/Platform';
+import * as sinon from 'sinon';
 
 describe('CustomFeatures', () => {
 
@@ -20,6 +21,68 @@ describe('CustomFeatures', () => {
         it('should return false if gameId is anything besides 14850 and 14851', () => {
             const value = CustomFeatures.isExampleGameId('14852');
             assert.isFalse(value);
+        });
+    });
+
+    describe('sampleAtGivenPercentage', () => {
+        const tests: {
+            givenPercentage: number;
+            randomCalculatedPercent: number;
+            expectedOutcome: boolean;
+        }[] = [
+            {
+                givenPercentage: 0,
+                randomCalculatedPercent: 99,
+                expectedOutcome: false
+            },
+            {
+                givenPercentage: 1,
+                randomCalculatedPercent: 10,
+                expectedOutcome: false
+            },
+            {
+                givenPercentage: 1,
+                randomCalculatedPercent: 0.9,
+                expectedOutcome: true
+            },
+            {
+                givenPercentage: 5,
+                randomCalculatedPercent: 4,
+                expectedOutcome: true
+            },
+            {
+                givenPercentage: 5,
+                randomCalculatedPercent: 6,
+                expectedOutcome: false
+            },
+            {
+                givenPercentage: 100,
+                randomCalculatedPercent: 0,
+                expectedOutcome: true
+            },
+            {
+                givenPercentage: 100,
+                randomCalculatedPercent: 100,
+                expectedOutcome: true
+            },
+            {
+                givenPercentage: 101,
+                randomCalculatedPercent: 0,
+                expectedOutcome: true
+            },
+            {
+                givenPercentage: -1,
+                randomCalculatedPercent: 100,
+                expectedOutcome: false
+            }
+        ];
+
+        tests.forEach(t => {
+            const correctlyFormattedReturnedPercent = t.randomCalculatedPercent / 100;
+            it(`should return ${t.expectedOutcome} for ${t.givenPercentage}% when checked against Math.random() returning ${t.randomCalculatedPercent}%`, () => {
+                sinon.stub(Math, 'random').returns(correctlyFormattedReturnedPercent);
+                assert.equal(CustomFeatures.sampleAtGivenPercent(t.givenPercentage), t.expectedOutcome);
+            });
         });
     });
 
