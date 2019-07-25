@@ -173,8 +173,8 @@ describe('CustomFeatures', () => {
             });
         });
     });
-
-    describe('isSliderEndScreenEnabled', () => {
+    // skip slider tests until further release
+    describe.skip('isSliderEndScreenEnabled', () => {
         it('should return true for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
             assert.isTrue(isEnabled);
@@ -215,8 +215,8 @@ describe('CustomFeatures', () => {
             assert.isFalse(isEnabled);
         });
     });
-
-    describe('isSliderEndScreenEnabled', () => {
+    // skip slider tests until further release
+    describe.skip('isSliderEndScreenEnabled', () => {
         it('should return true for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
             assert.isTrue(isEnabled);
@@ -257,8 +257,8 @@ describe('CustomFeatures', () => {
             assert.isFalse(isEnabled);
         });
     });
-
-    describe('isSliderEndScreenEnabled', () => {
+    // skip slider tests until further release
+    describe.skip('isSliderEndScreenEnabled', () => {
         it('should return true for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
             assert.isTrue(isEnabled);
