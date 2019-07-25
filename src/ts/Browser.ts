@@ -10,6 +10,7 @@ import { toAbGroup } from 'Core/Models/ABGroup';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { ICoreApi } from 'Core/ICore';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -152,6 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loadModeElement.disabled = true;
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
+
+            AdsConfigurationParser.setIsBrowserBuild(true);
 
             if (abGroupElement.value.length) {
                 ConfigManager.setAbGroup(toAbGroup(parseInt(abGroupElement.value, 10)));
