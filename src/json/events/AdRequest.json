@@ -314,6 +314,12 @@
       "body": true
     },
     {
+      "parameter": "developerId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "gdprEnabled",
       "required": "all",
       "queryString": false,

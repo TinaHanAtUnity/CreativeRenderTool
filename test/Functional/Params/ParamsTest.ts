@@ -122,7 +122,7 @@ class SpecVerifier {
         }
     }
 
-    private assertBodyParamType(name: string, value: any): void {
+    private assertBodyParamType(name: string, value: unknown): void {
         assert.equal(this._spec[name].type, typeof value, 'Body parameter type mismatch: ' + name);
     }
 
