@@ -105,7 +105,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
-            this._campaignManager.loadCampaign(placement, 10000).then(loadedCampaign => {
+            this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
                 if (loadedCampaign) {
                     placement.setCurrentCampaign(loadedCampaign.campaign);
                     placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
