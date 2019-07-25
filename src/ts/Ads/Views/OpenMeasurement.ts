@@ -664,11 +664,16 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]): Promise<void> {
+        const promises: Promise<void>[] = [];
         verificationResources.forEach((resource) => {
-            return this.injectResourceIntoDom(resource.resourceUrl, resource.vendorKey, resource.verificationParameters!);
+            promises.push(this.injectResourceIntoDom(resource.resourceUrl, resource.vendorKey, resource.verificationParameters!));
         });
 
-        return Promise.resolve();
+        return Promise.all(promises).then(() => {
+            const verificationScriptsInjected = true;
+            this._omBridge.setVerificationsInjected(verificationScriptsInjected);
+            this._omBridge.sendQueuedEvents();
+        });
     }
 
     private injectResourceIntoDom(resourceUrl: string, vendorKey: string, verificationParameters: string): Promise<void> {
