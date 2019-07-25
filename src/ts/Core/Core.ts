@@ -247,14 +247,10 @@ export class Core implements ICore {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
-            const abGroupMetaValue = TestEnvironment.get('abGroup');
-            if (abGroupMetaValue || abGroupMetaValue === 0) {
-                // needed in both due to placement level control support
-                const abGroupNumber: number = Number(abGroupMetaValue);
-                if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = toAbGroup(abGroupNumber);
-                    ConfigManager.setAbGroup(abGroup);
-                }
+            const abGroupNumber = parseInt(TestEnvironment.get('abGroup'), 10);
+            if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                const abGroup = toAbGroup(abGroupNumber);
+                ConfigManager.setAbGroup(abGroup);
             }
 
             if (TestEnvironment.get('forceAuthorization')) {
