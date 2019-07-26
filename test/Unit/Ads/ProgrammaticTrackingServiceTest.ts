@@ -68,6 +68,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'too_large_file',
+                        value: 1,
                         tags: [
                             'ads_sdk2_eevt:too_large_file',
                             ...tagBuilder
@@ -81,6 +83,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'banner_request_error',
+                        value: 1,
                         tags: [
                             'ads_sdk2_eevt:banner_request_error',
                             ...tagBuilder
@@ -94,7 +98,7 @@ describe('ProgrammaticTrackingService', () => {
                 const promise = programmaticTrackingService.reportError(t.input, adType, seatId);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;
@@ -111,6 +115,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'admob_used_cached_video',
+                        value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_cached_video'
                         ]
@@ -122,6 +128,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'admob_used_streamed_video',
+                        value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_streamed_video'
                         ]
@@ -134,7 +142,7 @@ describe('ProgrammaticTrackingService', () => {
                 const promise = programmaticTrackingService.reportMetric(t.input);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;
@@ -154,6 +162,8 @@ describe('ProgrammaticTrackingService', () => {
                 expected: {
                     metrics: [
                         {
+                            name: 'load_enabled_show',
+                            value: 1,
                             tags: [
                                 'ads_sdk2_mevt:load_enabled_show'
                             ]
@@ -165,7 +175,7 @@ describe('ProgrammaticTrackingService', () => {
             const promise = programmaticTrackingService.reportMetric(test.input);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);
-            assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+            assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
             assert.equal(postStub.firstCall.args[1], JSON.stringify(test.expected));
             assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
             return promise;
