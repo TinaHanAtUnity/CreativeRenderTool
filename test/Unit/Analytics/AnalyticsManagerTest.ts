@@ -141,7 +141,7 @@ class TestHelper {
                         let cdpPostCalls: number = 0;
                         postStub.getCalls().map((call) => {
                             const url = call.args[0];
-                            if(url === 'https://cdp.cloud.unity3d.com/v1/events') {
+                            if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
                                 cdpPostCalls++;
                             }
                         });
@@ -170,7 +170,7 @@ class TestHelper {
                                 let cdpPostCalls: number = 0;
                                 postStub.getCalls().map((call) => {
                                     const url = call.args[0];
-                                    if(url === 'https://cdp.cloud.unity3d.com/v1/events') {
+                                    if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
                                         cdpPostCalls++;
                                     }
                                 });

@@ -37,13 +37,13 @@ export class Tap {
     private onTouchMove(event: TouchEvent) {
         const x = event.touches[0].clientX;
         const y = event.touches[0].clientY;
-        if(Math.abs(x - this._startX) > Tap._moveTolerance || Math.abs(y - this._startY) > Tap._moveTolerance) {
+        if (Math.abs(x - this._startX) > Tap._moveTolerance || Math.abs(y - this._startY) > Tap._moveTolerance) {
             this._moved = true;
         }
     }
 
     private onTouchEnd(event: TouchEvent) {
-        if(this._onTouchMoveListener && this._onTouchEndListener && this._onTouchCancelListener) {
+        if (this._onTouchMoveListener && this._onTouchEndListener && this._onTouchCancelListener) {
             this._element.removeEventListener('touchmove', this._onTouchMoveListener, false);
             this._element.removeEventListener('touchend', this._onTouchEndListener, false);
             this._element.removeEventListener('touchcancel', this._onTouchCancelListener, false);
@@ -52,7 +52,7 @@ export class Tap {
         this._onTouchEndListener = undefined;
         this._onTouchCancelListener = undefined;
 
-        if(!this._moved) {
+        if (!this._moved) {
             const fakeEvent = new MouseEvent('click', {
                 view: window,
                 bubbles: true,
@@ -60,7 +60,7 @@ export class Tap {
             });
 
             event.stopPropagation();
-            if(event.target && !event.target.dispatchEvent(fakeEvent)) {
+            if (event.target && !event.target.dispatchEvent(fakeEvent)) {
                 event.preventDefault();
             }
         }

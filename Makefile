@@ -125,6 +125,7 @@ test-browser:
 else
 test-browser: start-server build-browser
 	node test-utils/headless.js
+	node test-utils/headless-load.js
 endif
 
 # VPaths

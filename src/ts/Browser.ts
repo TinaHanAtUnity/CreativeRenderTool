@@ -10,13 +10,14 @@ import { toAbGroup } from 'Core/Models/ABGroup';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { ICoreApi } from 'Core/ICore';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
         const currentOrientation = document.body.classList.contains('landscape') ? 'landscape' : document.body.classList.contains('portrait') ? 'portrait' : null;
         const newOrientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-        if(currentOrientation) {
-            if(currentOrientation !== newOrientation) {
+        if (currentOrientation) {
+            if (currentOrientation !== newOrientation) {
                 document.body.classList.remove(currentOrientation);
                 document.body.classList.add(newOrientation);
             }
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toInt = (element: HTMLInputElement): number => parseInt(element.value, 10);
     const toBoolean = (element: HTMLInputElement): boolean => element.checked;
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
+    const JS_FUNC_NAME_GET_HEADLESS_LOAD = 'getHeadlessLoad';
 
     const setClientInfo = () => {
         const fields: [string, string, ((element: HTMLInputElement) => unknown) | undefined][] = [
@@ -127,15 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    if(window.parent !== window) {
+    if (window.parent !== window) {
         const abGroupElement = <HTMLInputElement>window.parent.document.getElementById('abGroup');
         const campaignIdElement = <HTMLInputElement>window.parent.document.getElementById('campaignId');
         const countryElement = <HTMLInputElement>window.parent.document.getElementById('country');
         const platformElement = <HTMLInputElement>window.parent.document.getElementById('platform');
         const gameIdElement = <HTMLInputElement>window.parent.document.getElementById('gameId');
         const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
+        const loadModeElement = <HTMLInputElement>window.parent.document.getElementById('loadMode');
         const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
         const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
+        const loadButton = <HTMLButtonElement>window.parent.document.getElementById('load');
         const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
         const initialize = () => {
@@ -145,8 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
             platformElement.disabled = true;
             gameIdElement.disabled = true;
             testModeElement.disabled = true;
+            loadButton.disabled = !loadModeElement.checked;
+            loadModeElement.disabled = true;
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
+
+            AdsConfigurationParser.setIsBrowserBuild(true);
 
             if (abGroupElement.value.length) {
                 ConfigManager.setAbGroup(toAbGroup(parseInt(abGroupElement.value, 10)));
@@ -173,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onUnityAdsReady: (placement: string) => {
                     console.log('onUnityAdsReady: ' + placement);
                     const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
-                    if(placementButton) {
+                    if (placementButton) {
                         const placementButtonlistener = (placementButtonEvent: Event) => {
                             placementButtonEvent.preventDefault();
                             placementButton.disabled = true;
@@ -206,13 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
             PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
             PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
 
-            switch(platformElement.value) {
+            switch (platformElement.value) {
                 case 'android':
                     UnityAds.setBackend(new Backend(Platform.ANDROID));
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setAndroidDeviceInfo();
-                    UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked);
+                    UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
                 case 'ios':
@@ -220,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setIosDeviceInfo();
-                    UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked);
+                    UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
                 default:
@@ -229,15 +237,27 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // tslint:disable-next-line
-        if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+        if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
+        // tslint:disable-next-line
+         } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD]()) {
+            loadModeElement.checked = true;
+            initialize();
+            UnityAds.load('rewardedVideo');
         } else {
             initializeButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();
                 initialize();
             }, false);
+
+            loadButton.addEventListener('click', (event: Event) => {
+                event.preventDefault();
+                UnityAds.load('invalidPlacement');
+            }, false);
+
             // tslint:disable-next-line
             (<any>window).parent.document.getElementById('initialize').disabled = false;
+            loadButton.disabled = true;
         }
     }
 });

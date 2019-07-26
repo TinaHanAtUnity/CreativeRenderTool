@@ -2,7 +2,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
-import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroup } from 'Core/Models/ABGroup';
@@ -51,8 +50,8 @@ export class ConfigManager {
         this._request = request;
     }
 
-    public getConfig(jaegerSpan: JaegerSpan): Promise<unknown> {
-        if(this._rawConfig) {
+    public getConfig(): Promise<unknown> {
+        if (this._rawConfig) {
             return Promise.resolve(this._rawConfig);
         } else {
             return Promise.all([
@@ -62,16 +61,15 @@ export class ConfigManager {
             ]).then(([framework, adapter, storedGamerToken]) => {
                 let gamerToken: string | undefined;
 
-                if(this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
+                if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
                     // only use stored gamerToken for iOS when ad tracking is limited
                     gamerToken = storedGamerToken;
-                } else if(storedGamerToken) {
+                } else if (storedGamerToken) {
                     // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
                     this.deleteGamerToken();
                 }
 
                 const url: string = this.createConfigUrl(framework, adapter, gamerToken);
-                jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -79,11 +77,10 @@ export class ConfigManager {
                     followRedirects: false,
                     retryWithConnectionEvents: true
                 }).then(response => {
-                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                     try {
                         this._rawConfig = JsonParser.parse(response.response);
                         return this._rawConfig;
-                    } catch(error) {
+                    } catch (error) {
                         Diagnostics.trigger('config_parsing_failed', {
                             configUrl: url,
                             configResponse: response.response
@@ -93,12 +90,9 @@ export class ConfigManager {
                     }
                 }).catch(error => {
                     let modifiedError = error;
-                    if(modifiedError instanceof RequestError) {
+                    if (modifiedError instanceof RequestError) {
                         const requestError = modifiedError;
-                        if(requestError.nativeResponse && requestError.nativeResponse.responseCode) {
-                            jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
-                        }
-                        if(requestError.nativeResponse && requestError.nativeResponse.response) {
+                        if (requestError.nativeResponse && requestError.nativeResponse.response) {
                             const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
                             modifiedError = new ConfigError((new Error(responseObj.error)));
                         }
@@ -137,20 +131,20 @@ export class ConfigManager {
             forceAbGroup: abGroup
         });
 
-        if(this._platform === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: (<AndroidDeviceInfo>this._deviceInfo).getManufacturer()
+                deviceMake: (<AndroidDeviceInfo> this._deviceInfo).getManufacturer()
             });
         }
 
         const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
         url = Url.addParameters(url, trackingIDs);
 
-        if(framework) {
+        if (framework) {
             url = Url.addParameters(url, framework.getDTO());
         }
 
-        if(adapter) {
+        if (adapter) {
             url = Url.addParameters(url, adapter.getDTO());
         }
 

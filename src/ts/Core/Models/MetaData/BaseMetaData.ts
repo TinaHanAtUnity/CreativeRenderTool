@@ -59,11 +59,11 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         const returnObject: { [key: string]: unknown } = {};
         const metaData: MetaData = new MetaData(core);
         return metaData.hasCategory(this.getCategory()).then(exists => {
-            if(!exists) {
+            if (!exists) {
                 return Promise.resolve([]);
             }
             return Promise.all(keys.map((key) => metaData.get<unknown>(this.getCategory() + '.' + key, false).then(([found, value]) => {
-                if(found) {
+                if (found) {
                     returnObject[key] = value;
                 }
             })));

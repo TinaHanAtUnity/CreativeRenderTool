@@ -47,17 +47,14 @@ export class HttpKafka {
         });
 
         return HttpKafka.createCommonObject(objectType, this._platform, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
-            if(commonObject) {
+            if (commonObject) {
                 messages.unshift(commonObject);
             }
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-            if(HttpKafka._request) {
+            if (HttpKafka._request) {
                 return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
             } else {
-                // tslint:disable:no-console
-                console.log(JSON.stringify(data));
-                // tslint:enable:no-console
                 return Promise.resolve(<INativeResponse>{});
             }
         });
@@ -76,7 +73,7 @@ export class HttpKafka {
     private static _deviceInfoUpdating: boolean = false;
 
     private static createCommonObject(objectType: KafkaCommonObjectType, platform?: Platform, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<unknown> {
-        if(objectType === KafkaCommonObjectType.EMPTY) {
+        if (objectType === KafkaCommonObjectType.EMPTY) {
             const emptyCommon: unknown = {
                 'common': {
                     'client': null,
@@ -94,15 +91,15 @@ export class HttpKafka {
                 }
             };
 
-            if(common.common.client) {
+            if (common.common.client) {
                 common.common.client.platform = typeof platform !== 'undefined' ? Platform[platform].toLowerCase() : null;
             }
 
-            if(deviceInfo && !HttpKafka._deviceInfoUpdating) {
+            if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
                 HttpKafka._deviceInfoUpdating = true;
-                if(objectType === KafkaCommonObjectType.PERSONAL) {
+                if (objectType === KafkaCommonObjectType.PERSONAL) {
                     return deviceInfo.getDTO().then(deviceInfoDTO => {
-                        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+                        if (typeof navigator !== 'undefined' && navigator.userAgent) {
                             deviceInfoDTO.userAgent = navigator.userAgent;
                         }
                         HttpKafka._deviceInfoUpdating = false;
@@ -115,7 +112,7 @@ export class HttpKafka {
                     });
                 } else {
                     return deviceInfo.getAnonymousDTO().then(deviceInfoDTO => {
-                        if(typeof navigator !== 'undefined' && navigator.userAgent) {
+                        if (typeof navigator !== 'undefined' && navigator.userAgent) {
                             deviceInfoDTO.userAgent = navigator.userAgent;
                         }
                         HttpKafka._deviceInfoUpdating = false;
@@ -128,8 +125,8 @@ export class HttpKafka {
                     });
                 }
             } else {
-                if(deviceInfo) {
-                    if(objectType === KafkaCommonObjectType.PERSONAL) {
+                if (deviceInfo) {
+                    if (objectType === KafkaCommonObjectType.PERSONAL) {
                         common.common.device = deviceInfo.getStaticDTO();
                     } else {
                         common.common.device = deviceInfo.getAnonymousStaticDTO();

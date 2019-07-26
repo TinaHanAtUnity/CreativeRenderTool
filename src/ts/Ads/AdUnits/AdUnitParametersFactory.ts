@@ -42,8 +42,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected _placement: Placement;
     protected _orientation: Orientation;
 
-    private _platform: Platform;
-    private _core: ICoreApi;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _osVersion: string;
     private _ads: IAdsApi;
     private _store: IStoreApi;
     private _focusManager: FocusManager;
@@ -89,6 +90,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
+        this._osVersion = core.DeviceInfo.getOsVersion();
     }
 
     public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2 {
@@ -187,7 +189,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     protected getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
         const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
-        if(!video) {
+        if (!video) {
             throw new WebViewError('Unable to select an oriented video');
         }
         return video;

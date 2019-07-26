@@ -7,12 +7,11 @@ import { IAds } from 'Ads/IAds';
 import { Backend } from 'Backend/Backend';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import 'mocha';
-import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { HTMLBannerAdUnit } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { asStub } from 'TestHelpers/Functions';
-import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
+import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
 
 [
     Platform.IOS,
@@ -105,6 +104,28 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
                     clock.tick(31 * 1000);
                     return Promise.resolve().then(() => {
                         sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
+                    });
+                });
+            });
+
+            context('if banner refresh delay is overwritten from the dashboard', () => {
+                it('should not refresh after 30 seconds when overwritten by the dashboard', () => {
+                    banners.PlacementManager.getPlacement(placementId)!.set('bannerRefreshRate', 40);
+                    banners.Api.Banner.onBannerOpened.trigger();
+                    clock.tick(31 * 1000);
+                    return Promise.resolve().then(() => {
+                        sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
+                    });
+                });
+            });
+
+            context('if banner refresh delay is overwritten from the dashboard', () => {
+                it('should refresh after 5 seconds when overwritten by the dashboard', () => {
+                    banners.PlacementManager.getPlacement(placementId)!.set('bannerRefreshRate', 5);
+                    banners.Api.Banner.onBannerOpened.trigger();
+                    clock.tick(6 * 1000);
+                    return Promise.resolve().then(() => {
+                        sinon.assert.calledTwice(asStub(banners.CampaignManager.request));
                     });
                 });
             });

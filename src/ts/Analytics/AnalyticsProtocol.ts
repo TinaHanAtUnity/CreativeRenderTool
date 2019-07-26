@@ -217,7 +217,7 @@ export class AnalyticsProtocol {
     }
 
     public static getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return 'iOS ' + deviceInfo.getOsVersion();
         } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();

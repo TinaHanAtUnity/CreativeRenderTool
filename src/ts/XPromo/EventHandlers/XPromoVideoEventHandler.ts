@@ -36,7 +36,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         if (overlay) {
             overlay.setCallButtonVisible(true);
 
-            if(TestEnvironment.get('debugOverlayEnabled')) {
+            if (TestEnvironment.get('debugOverlayEnabled')) {
                 overlay.setDebugMessage('XPromo');
             }
         }

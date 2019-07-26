@@ -76,7 +76,7 @@ export class AnalyticsManager {
     private _canSendEvents: boolean; // flag indicating that events should be sent
 
     public static getPurchasingFailureReason(reason: string): PurchasingFailureReason {
-        switch(reason) {
+        switch (reason) {
             case 'NOT_SUPPORTED':
                 return PurchasingFailureReason.ProductUnavailable;
             case 'ITEM_UNAVAILABLE':
@@ -116,7 +116,7 @@ export class AnalyticsManager {
     }
 
     public init(): Promise<void> {
-        if(this._clientInfo.isReinitialized()) {
+        if (this._clientInfo.isReinitialized()) {
             return Promise.all([
                 this._storage.getUserId(),
                 this._storage.getSessionId(this._clientInfo.isReinitialized())
@@ -139,7 +139,7 @@ export class AnalyticsManager {
                 this.sendNewSession();
 
                 let updateDeviceInfo: boolean = false;
-                if(appVersion) {
+                if (appVersion) {
                     if (this._clientInfo.getApplicationVersion() !== appVersion) {
                         this.sendAppUpdate();
                         updateDeviceInfo = true;
@@ -149,13 +149,13 @@ export class AnalyticsManager {
                     updateDeviceInfo = true;
                 }
 
-                if(osVersion) {
+                if (osVersion) {
                     if (this._deviceInfo.getOsVersion() !== osVersion) {
                         updateDeviceInfo = true;
                     }
                 }
 
-                if(updateDeviceInfo) {
+                if (updateDeviceInfo) {
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
 
@@ -274,7 +274,7 @@ export class AnalyticsManager {
     }
 
     private onAppForeground(): void {
-        if(this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._analyticsSessionId = sessionId;
                 this._storage.setIds(this._analyticsUserId, this._analyticsSessionId);
@@ -289,7 +289,7 @@ export class AnalyticsManager {
     }
 
     private onActivityResumed(activity: string): void {
-        if(this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._analyticsSessionId = sessionId;
                 this._storage.setIds(this._analyticsUserId, this._analyticsSessionId);
@@ -301,12 +301,12 @@ export class AnalyticsManager {
     }
 
     private onActivityPaused(activity: string): void {
-        if(this._topActivity === activity || !this._topActivity) {
+        if (this._topActivity === activity || !this._topActivity) {
             this._bgTimestamp = Date.now();
             this.sendAppRunning();
         }
 
-        if(!this._topActivity) {
+        if (!this._topActivity) {
             this._topActivity = activity;
         }
     }
@@ -414,7 +414,7 @@ export class AnalyticsManager {
                 this._core.Sdk.logError('parseAnalyticsEvent was not able to parse event');
                 return Promise.resolve(null);
             }
-        } catch(error) {
+        } catch (error) {
             this._core.Sdk.logError(error);
             return Promise.resolve(null);
         }

@@ -40,7 +40,7 @@ export class PurchasingApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case PurchasingEvent[PurchasingEvent.COMMAND]:
                 this.onCommandResult.trigger(<string>parameters[0]);
                 break;

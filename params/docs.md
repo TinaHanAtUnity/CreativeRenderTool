@@ -79,6 +79,7 @@
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | string | Organization ID from Genesis' | Server | all |
+| developerId | number | Developer ID from Configuration Service | Server | all |
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
@@ -90,6 +91,8 @@
 | isBackupCampaign | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | isPromoCatalogAvailable | boolean | Flag describing if the developer has set up a catalog for their IAP Promo Placement | SDK | all |
+| noFillRetry | boolean | Flag describing retry should be made upon nofilling | SDK | no |
+| isLoadEnabled | boolean | Flag describing if Auction Request was made using Load API | SDK | all |
 
 
 ### Configuration request

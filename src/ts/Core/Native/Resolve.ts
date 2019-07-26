@@ -22,7 +22,7 @@ export class ResolveApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case ResolveEvent[ResolveEvent.COMPLETE]:
                 this.onComplete.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2]);
                 break;

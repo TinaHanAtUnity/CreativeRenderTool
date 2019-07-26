@@ -17,10 +17,10 @@ export class ProgrammaticMraidParser extends CampaignParser {
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = <IRawMRAIDCampaign>response.getJsonContent();
 
-        if(!jsonMraid) {
+        if (!jsonMraid) {
             throw new Error('Corrupted mraid content');
         }
-        if(!jsonMraid.markup) {
+        if (!jsonMraid.markup) {
             const MRAIDError = new DiagnosticError(
                 new Error('MRAID Campaign missing markup'),
                 {mraid: jsonMraid}
@@ -43,7 +43,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 

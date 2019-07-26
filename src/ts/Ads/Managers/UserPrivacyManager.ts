@@ -181,7 +181,7 @@ export class UserPrivacyManager {
             permissions: permissions
         };
 
-        if (CustomFeatures.shouldSampleAtOnePercent()) {
+        if (CustomFeatures.sampleAtGivenPercent(1)) {
             Diagnostics.trigger('consent_send_event', {
                 adsConfig: JSON.stringify(this._adsConfig.getDTO()),
                 permissions: JSON.stringify(permissions)
@@ -276,7 +276,7 @@ export class UserPrivacyManager {
     private getConsent(): Promise<boolean> {
         return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: unknown) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
-            if(typeof(value) !== 'undefined') {
+            if (typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
             } else {
                 throw new Error('gdpr.consent.value is undefined');
@@ -289,26 +289,24 @@ export class UserPrivacyManager {
         this._adsConfig.setOptOutRecorded(true);
 
         const gamePrivacy = this._adsConfig.getGamePrivacy();
-        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-            const userPrivacy = this._adsConfig.getUserPrivacy();
-            userPrivacy.update({
-                method: gamePrivacy.getMethod(),
-                version: gamePrivacy.getVersion(),
-                permissions: {
-                    profiling: consent
-                }
-            });
-        }
+        gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+        const userPrivacy = this._adsConfig.getUserPrivacy();
+        userPrivacy.update({
+            method: gamePrivacy.getMethod(),
+            version: gamePrivacy.getVersion(),
+            permissions: {
+                profiling: consent
+            }
+        });
     }
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
-            if(data && data.gdpr && data.gdpr.consent) {
+            if (data && data.gdpr && data.gdpr.consent) {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
-                if(typeof(value) !== 'undefined') {
+                if (typeof(value) !== 'undefined') {
                     this.updateConfigurationWithConsent(value);
                     this.pushConsent(value);
                 }
@@ -320,12 +318,12 @@ export class UserPrivacyManager {
     // with Android Java native layer method that takes Object as value
     // this hack allows anyone use both booleans and string "true" and "false" values
     private getConsentTypeHack(value: unknown): boolean | undefined {
-        if(typeof(value) === 'boolean') {
+        if (typeof(value) === 'boolean') {
             return value;
-        } else if(typeof(value) === 'string') {
-            if(value === 'true') {
+        } else if (typeof(value) === 'string') {
+            if (value === 'true') {
                 return true;
-            } else if(value === 'false') {
+            } else if (value === 'false') {
                 return false;
             }
         }

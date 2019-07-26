@@ -50,7 +50,7 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     }
 
     public setFadeEnabled(value: boolean) {
-        if(this._fadeEnabled !== value) {
+        if (this._fadeEnabled !== value) {
             this._fadeEnabled = value;
         }
     }

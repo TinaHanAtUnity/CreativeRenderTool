@@ -223,7 +223,7 @@ export class PurchasingUtilities {
     private static updateCatalog(products: IProduct[]) {
         try {
             this._catalog = new PurchasingCatalog(products);
-        } catch(e) {
+        } catch (e) {
             this._core.Sdk.logInfo('Error, cannot create catalog: ' + JSON.stringify(e));
         }
     }

@@ -36,9 +36,9 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer', ApiPackage.ADS, EventCategory.VIDEOPLAYER);
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+        if (nativeBridge.getPlatform() === Platform.IOS) {
             this.iOS = new IosVideoPlayerApi(nativeBridge);
-        } else if(nativeBridge.getPlatform() === Platform.ANDROID) {
+        } else if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidVideoPlayerApi(nativeBridge);
         }
     }
@@ -87,8 +87,12 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
     }
 
+    public getVideoViewRectangle(): Promise<number[]> {
+        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getVideoViewRectangle');
+    }
+
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
                 this._handlers.forEach(handler => handler.onProgress(<number>parameters[0]));
                 break;
@@ -122,9 +126,9 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
                 break;
 
             default:
-                if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                if (this._nativeBridge.getPlatform() === Platform.IOS) {
                     this.iOS!.handleEvent(event, parameters);
-                } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this.Android!.handleEvent(event, parameters);
                 }
         }

@@ -476,6 +476,13 @@
     "platforms": "all"
   },
   {
+    "key": "developerId",
+    "type": "number",
+    "description": "Developer ID from Configuration",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "gdprEnabled",
     "type": "boolean",
     "description": "If GDPR is enabled",
@@ -528,13 +535,6 @@
     "key": "analyticsSessionId",
     "type": "string",
     "description": "Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit",
-    "provider": "SDK",
-    "platforms": "all"
-  },
-  {
-    "key": "isBackupCampaign",
-    "type": "boolean",
-    "description": "Flag describing if the campaign was loaded from server or from backup stored on device",
     "provider": "SDK",
     "platforms": "all"
   },

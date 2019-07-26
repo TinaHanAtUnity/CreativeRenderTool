@@ -1,6 +1,14 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { CurrentUnityConsentVersion, GamePrivacy, IProfilingPermissions, IGranularPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import {
+    CurrentUnityConsentVersion,
+    GamePrivacy,
+    IProfilingPermissions,
+    IGranularPermissions,
+    PrivacyMethod,
+    UserPrivacy,
+    IAllPermissions
+} from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -8,6 +16,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class AdsConfigurationParser {
     private static _updateUserPrivacyForIncident: boolean = false;
+    private static _isBrowserBuild: boolean = false;
+
+    public static setIsBrowserBuild(isBrowserBuild: boolean): void {
+        this._isBrowserBuild = isBrowserBuild;
+    }
+
     public static parse(configJson: IRawAdsConfiguration, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
@@ -39,8 +53,11 @@ export class AdsConfigurationParser {
             this._updateUserPrivacyForIncident = true;
         }
 
+        // Browser Build Testing Requires CacheMode to be Disabled
+        const cacheMode = this._isBrowserBuild ? CacheMode.DISABLED : this.parseCacheMode(configJson);
+
         const configurationParams: IAdsConfiguration = {
-            cacheMode: this.parseCacheMode(configJson),
+            cacheMode: cacheMode,
             placements: placements,
             defaultPlacement: defaultPlacement,
             gdprEnabled: configJson.gdprEnabled,
@@ -83,6 +100,9 @@ export class AdsConfigurationParser {
         }
 
         let adsAllowed = false;
+        if (uPP.hasOwnProperty('all')) {
+            adsAllowed = (<IAllPermissions>uPP).all;
+        }
         if (uPP.hasOwnProperty('profiling')) {
             adsAllowed = (<IProfilingPermissions>uPP).profiling;
         }
@@ -90,6 +110,7 @@ export class AdsConfigurationParser {
             adsAllowed = (<IGranularPermissions>uPP).ads;
         }
         if (adsAllowed === false && configJson.optOutEnabled === false) {
+            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(configJson));
             return true;
         }
         return false;
@@ -150,7 +171,7 @@ export class AdsConfigurationParser {
     }
 
     private static parseCacheMode(configJson: IRawAdsConfiguration): CacheMode {
-        switch(configJson.assetCaching) {
+        switch (configJson.assetCaching) {
             case 'forced':
                 return CacheMode.FORCED;
             case 'allowed':

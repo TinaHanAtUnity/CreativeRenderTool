@@ -18,17 +18,25 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+
+const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
+    private _abGroup: ABGroup;
+    private _core: ICore;
     private _requestManager: RequestManager;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._requestManager = core.RequestManager;
+        this._abGroup = core.Config.getAbGroup();
+        this._core = core;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -36,7 +44,7 @@ export class CometCampaignParser extends CampaignParser {
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
-        switch(campaignStore) {
+        switch (campaignStore) {
             case 'apple':
                 storeName = StoreName.APPLE;
                 break;
@@ -65,11 +73,10 @@ export class CometCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false,
             isLoadEnabled: false
         };
 
-        if(json && json.mraidUrl) {
+        if (json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
@@ -133,27 +140,42 @@ export class CometCampaignParser extends CampaignParser {
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
-            if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+            if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
                 parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, json.creativeId);
                 parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session, undefined, json.creativeId);
             }
 
-            if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+            if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
                 parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
-            if(json.appDownloadUrl) {
+            if (json.appDownloadUrl) {
                 parameters.appDownloadUrl = json.appDownloadUrl;
             }
-            return Promise.resolve(new PerformanceCampaign(parameters));
+
+            const osVersion = this._core.DeviceInfo.getOsVersion();
+            const platform = this._core.NativeBridge.getPlatform();
+
+            if (!CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
+                return Promise.resolve(new PerformanceCampaign(parameters));
+            }
+
+            const orientation = CustomFeatures.getSliderEndScreenImageOrientation(parameters.appStoreId);
+            parameters.screenshotsOrientation = orientation;
+            parameters.screenshots = Array.from([1, 2, 3], i => {
+                const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
+                return new Image(url, session);
+            });
+
+            return Promise.resolve(new SliderPerformanceCampaign(parameters));
         }
     }
 
     private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
+        if (urls && urls !== null) {
+            for (const urlKey in urls) {
+                if (urls.hasOwnProperty(urlKey)) {
                     urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
                 }
             }
@@ -166,7 +188,7 @@ export class CometCampaignParser extends CampaignParser {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
-        } catch(error) {
+        } catch (error) {
             // do nothing
         }
         return adUnitStyle;

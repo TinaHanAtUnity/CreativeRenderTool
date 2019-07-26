@@ -57,7 +57,7 @@ export class StorageApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case StorageEvent[StorageEvent.SET]:
                 this.onSet.trigger(<string>parameters[0], <object>parameters[1]);
                 break;

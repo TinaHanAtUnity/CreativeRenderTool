@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
+import { AuctionRequest, IAuctionRequestParams, IAuctionResponse, IPlacementRequestDTO } from 'Ads/Networking/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
 import { BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
@@ -9,7 +9,7 @@ export class BannerAuctionRequest extends AuctionRequest {
         return new BannerAuctionRequest(params);
     }
 
-    protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
+    protected createPlacementDTO(placement: Placement): IPlacementRequestDTO {
         const placementRequest = super.createPlacementDTO(placement);
         placementRequest.dimensions = BannerSize.getPlatformDimensions(this._platform, this._deviceInfo);
         return placementRequest;

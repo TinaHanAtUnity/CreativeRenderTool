@@ -67,7 +67,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 setFileIdSpy.restore();
             });
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 describe('on Android', () => {
 
                     beforeEach(() => {
@@ -117,7 +117,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 });
             }
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 describe('on iOS', () => {
 
                     beforeEach(() => {

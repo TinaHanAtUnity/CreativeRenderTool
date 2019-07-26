@@ -65,7 +65,7 @@ const onChangeOrientation = () => {
     }
 
     let iosOrientation = '';
-    switch(window.orientation) {
+    switch (window.orientation) {
         case 180:
             iosOrientation = 'ios-portrait-upside-down';
             break;
@@ -81,7 +81,7 @@ const onChangeOrientation = () => {
 
     document.body.classList.remove(...['ios-portrait', 'ios-landscape-left', 'ios-landscape-right', 'ios-portrait-upside-down']);
 
-    if(iosOrientation) {
+    if (iosOrientation) {
         document.body.classList.add(iosOrientation);
     }
 };
@@ -89,15 +89,15 @@ const onChangeOrientation = () => {
 document.addEventListener('DOMContentLoaded', onChangeOrientation, false);
 window.addEventListener('orientationchange', onChangeOrientation, false);
 
-if(typeof location !== 'undefined') {
+if (typeof location !== 'undefined') {
     let nativeBridge: NativeBridge;
-    switch(platform) {
+    switch (platform) {
         case 'android':
             nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
             break;
 
         case 'ios':
-            if(window.webkit) {
+            if (window.webkit) {
                 nativeBridge = new NativeBridge(new WKWebViewBridge(), Platform.IOS);
             } else {
                 nativeBridge = new NativeBridge(new UIWebViewBridge(), Platform.IOS);

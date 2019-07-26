@@ -1,6 +1,7 @@
 import { Session } from 'Ads/Models/Session';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IKafkaObject {
     [key: string]: unknown;
@@ -11,17 +12,29 @@ export interface IKafkaObject {
 
 export class SessionDiagnostics {
     public static trigger(type: string, error: unknown, session: Session): Promise<INativeResponse> {
+
         // ElasticSearch schema generation can result in dropping errors if root values are not the same type across errors
-        if(!error || typeof error !== 'object' || Array.isArray(error)) {
+        if (!error || typeof error !== 'object' || Array.isArray(error)) {
             error = {
                 value: error
             };
         }
 
+        const adPlan = session.getAdPlan();
+        // Don't send kafka messages greater than 1MB
+        const slightlyLessThanOneMegaByte = 1038576;
+        if (adPlan && adPlan.length > slightlyLessThanOneMegaByte) {
+            const errorWithOldDiagnosticType = {
+                error,
+                type
+            };
+            return Diagnostics.trigger('adplan_too_large', errorWithOldDiagnosticType);
+        }
+
         const kafkaObject: IKafkaObject = {
             type,
             timestamp: Date.now(),
-            adPlan: session.getAdPlan() ? session.getAdPlan() : undefined
+            adPlan: adPlan
         };
         kafkaObject[type] = error;
 

@@ -140,11 +140,11 @@ export class ThirdPartyEventManager {
                 protocol: urlParts.protocol,
                 auctionProtocol: auctionProtocol
             };
-            if(error instanceof RequestError) {
+            if (error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), diagnosticData);
             }
             // Auction V5 start dip investigation
-            if (CustomFeatures.shouldSampleAtTenPercent()) {
+            if (CustomFeatures.sampleAtGivenPercent(10)) {
                 if (event === TrackingEvent.START || event === TrackingEvent.IMPRESSION) {
                     Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
                 }

@@ -3,6 +3,20 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
+import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
+import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
+import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+
+const JsonStringObjectParser = (json: string): { [index: string]: number } => {
+    try {
+        return JSON.parse(json);
+    } catch {
+        return {};
+    }
+};
+
+const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
@@ -87,26 +101,41 @@ export class CustomFeatures {
         return gameIdList.indexOf(gameId) !== -1;
     }
 
-    public static shouldSampleAtOnePercent(): boolean {
-        // will only return true when Math.random returns 0
-        if (Math.floor(Math.random() * 100) % 100 === 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public static sampleAtGivenPercent(givenPercentToSample: number): boolean {
 
-    public static shouldSampleAtTenPercent(): boolean {
-        // will only return true when Math.random returns 1
-        if (Math.floor(Math.random() * 10) % 10 === 1) {
-            return true;
-        } else {
+        if (givenPercentToSample <= 0) {
             return false;
         }
+
+        if (givenPercentToSample >= 100) {
+            return true;
+        }
+
+        if (Math.floor(Math.random() * 100) < givenPercentToSample) {
+            return true;
+        }
+
+        return false;
     }
 
     public static isUnsupportedOMVendor(resourceUrl: string) {
         return false;
+    }
+
+    public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string, osVersion: string, platform: Platform): boolean {
+        const isAndroid4 = platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, osVersion);
+        const isIOS7 = platform === Platform.IOS && VersionMatchers.matchesMajorOSVersion(7, osVersion);
+
+        // Exclude Android 4 and iOS 7 devices from the test because of layout issues
+        if (isAndroid4 || isIOS7) {
+            return false;
+        }
+
+        return SliderEndCardExperiment.isValid(abGroup) && SliderEndScreenImages[targetGameAppStoreId] !== undefined;
+    }
+
+    public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
+        return SliderEndScreenImages[targetGameAppStoreId];
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {

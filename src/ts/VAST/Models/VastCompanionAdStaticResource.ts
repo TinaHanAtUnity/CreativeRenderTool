@@ -39,7 +39,7 @@ export class VastCompanionAdStaticResource extends Model<IVastCompanionAdStaticR
         this.set('companionClickThroughURLTemplate', url);
     }
 
-    public setStaticResourceURL(url: string | null) {
+    public setStaticResourceURL(url: string) {
         this.set('staticResourceURL', url);
     }
 
