@@ -69,11 +69,10 @@ export class AnalyticsManager {
     private _cdpEndpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
-    private _analyticsEventQueue: {[key: string]: IAnalyticsEventWrapper};
+    private _analyticsEventQueue: { [key: string]: IAnalyticsEventWrapper };
 
     private _adsAnalyticsSessionId: string;
     private _latestAppStartTime: number;
-    private _canSendEvents: boolean; // flag indicating that events should be sent
 
     public static getPurchasingFailureReason(reason: string): PurchasingFailureReason {
         switch (reason) {
@@ -112,7 +111,6 @@ export class AnalyticsManager {
             'unity_monetization_extras': JSON.stringify(this.buildMonetizationExtras())
         });
         this._adsAnalyticsSessionId = JaegerUtilities.uuidv4();
-        this._canSendEvents = this._configuration.isAnalyticsEnabled();
     }
 
     public init(): Promise<void> {
@@ -170,40 +168,34 @@ export class AnalyticsManager {
 
     // add IapTransaction to queue manually. Here for purchasing logic.
     public onIapTransaction(productId: string, receipt: string, currency: string, price: number): Promise<void[]> {
-        if (this._canSendEvents) {
-            const event: AnalyticsIapTransactionEvent | undefined = this.createIapTransactionEvent(productId, receipt, currency, price);
-            if (event) {
-                const analyticsEvent: IAnalyticsEventWrapper = {
-                    identifier: JaegerUtilities.uuidv4(),
-                    event: event,
-                    posting: false
-                };
-                this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
-                return this.flushEvents();
-            } else {
-                this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`);
-                return Promise.reject(new Error(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`));
-            }
+        const event: AnalyticsIapTransactionEvent | undefined = this.createIapTransactionEvent(productId, receipt, currency, price);
+        if (event) {
+            const analyticsEvent: IAnalyticsEventWrapper = {
+                identifier: JaegerUtilities.uuidv4(),
+                event: event,
+                posting: false
+            };
+            this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
+            return this.flushEvents();
         } else {
-            return Promise.resolve([]);
+            this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`);
+            return Promise.reject(new Error(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`));
         }
     }
 
-    public onPurchaseFailed(productId: string, reason: string, price: number | undefined, currency: string | undefined) {
-        if (this._canSendEvents) {
-            const failReason: PurchasingFailureReason = AnalyticsManager.getPurchasingFailureReason(reason);
-            const event: AnalyticsIapPurchaseFailedEvent | undefined = this.createIapPurchaseFailedEvent(productId, failReason, price, currency);
-            if (event) {
-                const analyticsEvent: IAnalyticsEventWrapper = {
-                    identifier: JaegerUtilities.uuidv4(),
-                    event: event,
-                    posting: false
-                };
-                this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
-                this.flushEvents();
-            } else {
-                this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapFailedEvent with fields : productId: ${productId} : reason: ${reason} : currency: ${currency} : price: ${price}`);
-            }
+    public onPurchaseFailed(productId: string, reason: string, price: number | undefined, currency: string | undefined): void {
+        const failReason: PurchasingFailureReason = AnalyticsManager.getPurchasingFailureReason(reason);
+        const event: AnalyticsIapPurchaseFailedEvent | undefined = this.createIapPurchaseFailedEvent(productId, failReason, price, currency);
+        if (event) {
+            const analyticsEvent: IAnalyticsEventWrapper = {
+                identifier: JaegerUtilities.uuidv4(),
+                event: event,
+                posting: false
+            };
+            this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
+            this.flushEvents();
+        } else {
+            this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapFailedEvent with fields : productId: ${productId} : reason: ${reason} : currency: ${currency} : price: ${price}`);
         }
     }
 
@@ -311,40 +303,34 @@ export class AnalyticsManager {
         }
     }
 
-    private onPostEvent(events: AnalyticsGenericEvent[]) {
-        if (this._canSendEvents) {
-            const operations: Promise<void>[] = [];
-            for (const event of events) {
-                const parsePromise = this.parseAnalyticsEvent(event).then((parsedEvent: AnalyticsGenericEvent | null) => {
-                    if (parsedEvent) {
-                        const analyticsEvent: IAnalyticsEventWrapper = {
-                            identifier: JaegerUtilities.uuidv4(),
-                            event: parsedEvent,
-                            posting: false
-                        };
-                        this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
-                    }
-                });
-                operations.push(parsePromise);
-            }
-            // TODO when es6 is enabled use .finally
-            Promise.all(operations).then(() => {
-                this.flushEvents();
-            }).catch(() => {
-                this.flushEvents();
+    protected onPostEvent(events: AnalyticsGenericEvent[]) {
+        const operations: Promise<void>[] = [];
+        for (const event of events) {
+            const parsePromise = this.parseAnalyticsEvent(event).then((parsedEvent: AnalyticsGenericEvent | null) => {
+                if (parsedEvent) {
+                    const analyticsEvent: IAnalyticsEventWrapper = {
+                        identifier: JaegerUtilities.uuidv4(),
+                        event: parsedEvent,
+                        posting: false
+                    };
+                    this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
+                }
             });
+            operations.push(parsePromise);
         }
+        // TODO when es6 is enabled use .finally
+        Promise.all(operations).then(() => {
+            this.flushEvents();
+        }).catch(() => {
+            this.flushEvents();
+        });
     }
 
-    private send<T>(event: IAnalyticsObject<T>): Promise<void> {
-        if (this._canSendEvents) {
-            const common: IAnalyticsCommonObjectV1 = AnalyticsProtocol.getCommonObject(this._platform, this._adsAnalyticsSessionId, this._analyticsUserId, this._analyticsSessionId, this._clientInfo, this._deviceInfo, this._configuration, this._adsConfiguration);
-            const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
+    protected send<T>(event: IAnalyticsObject<T>): Promise<void> {
+        const common: IAnalyticsCommonObjectV1 = AnalyticsProtocol.getCommonObject(this._platform, this._adsAnalyticsSessionId, this._analyticsUserId, this._analyticsSessionId, this._clientInfo, this._deviceInfo, this._configuration, this._adsConfiguration);
+        const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
-            return Promises.voidResult(this._request.post(this._endpoint, data));
-        } else {
-            return Promise.resolve();
-        }
+        return Promises.voidResult(this._request.post(this._endpoint, data));
     }
 
     private sendEvents(events: IAnalyticsEventWrapper[]): Promise<void> {
@@ -368,7 +354,7 @@ export class AnalyticsManager {
     }
 
     private flushEvents(): Promise<void[]> {
-        let batch: IAnalyticsEventWrapper[]  = [];
+        let batch: IAnalyticsEventWrapper[] = [];
         const batchSize = 10;
         const promises: Promise<void>[] = [];
         for (const key of Object.keys(this._analyticsEventQueue)) {
@@ -402,14 +388,14 @@ export class AnalyticsManager {
                 return this.buildItemAcquired(<AnalyticsItemAcquiredEvent>event);
             } else if (this.isItemSpent(<AnalyticsItemSpentEvent>event)) {
                 return this.buildItemSpent(<AnalyticsItemSpentEvent>event);
-            } else if (this.isLevelFailed(<AnalyticsLevelFailedEvent> event)) {
-                return this.buildLevelFailed(<AnalyticsLevelFailedEvent> event);
-            } else if (this.isLevelUp(<AnalyticsLevelUpEvent> event)) {
-                return this.buildLevelUp(<AnalyticsLevelUpEvent> event);
-            } else if (this.isAdComplete(<AnalyticsAdCompleteEvent> event)) {
-                return this.buildAdComplete(<AnalyticsAdCompleteEvent> event);
-            } else if (this.isIapTransaction(<AnalyticsIapTransactionEvent> event)) {
-                return this.buildIapTransaction(<AnalyticsIapTransactionEvent> event);
+            } else if (this.isLevelFailed(<AnalyticsLevelFailedEvent>event)) {
+                return this.buildLevelFailed(<AnalyticsLevelFailedEvent>event);
+            } else if (this.isLevelUp(<AnalyticsLevelUpEvent>event)) {
+                return this.buildLevelUp(<AnalyticsLevelUpEvent>event);
+            } else if (this.isAdComplete(<AnalyticsAdCompleteEvent>event)) {
+                return this.buildAdComplete(<AnalyticsAdCompleteEvent>event);
+            } else if (this.isIapTransaction(<AnalyticsIapTransactionEvent>event)) {
+                return this.buildIapTransaction(<AnalyticsIapTransactionEvent>event);
             } else {
                 this._core.Sdk.logError('parseAnalyticsEvent was not able to parse event');
                 return Promise.resolve(null);

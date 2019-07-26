@@ -4,6 +4,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalytics, IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { ICore } from 'Core/ICore';
+import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 export class Analytics implements IAnalytics {
@@ -23,7 +24,11 @@ export class Analytics implements IAnalytics {
         };
 
         this.AnalyticsStorage = new AnalyticsStorage(core.Api);
-        this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, adsConfiguration, core.FocusManager, this.AnalyticsStorage);
+        if (core.Config.isAnalyticsEnabled()) {
+            this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, adsConfiguration, core.FocusManager, this.AnalyticsStorage);
+        } else {
+            this.AnalyticsManager = new SilentAnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, adsConfiguration, core.FocusManager, this.AnalyticsStorage);
+        }
     }
 
     public initialize(): Promise<number> {

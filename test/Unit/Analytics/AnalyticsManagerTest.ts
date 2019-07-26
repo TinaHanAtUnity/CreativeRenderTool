@@ -17,6 +17,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 
 class TestHelper {
     public static getEventType<T>(data: string) {
@@ -61,11 +62,10 @@ class TestHelper {
             analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
         });
 
-        describe('Analytics Disabled', () => {
+        describe('SilentAnalyticsManager (Analytics Disabled)', () => {
 
             beforeEach(() => {
-                configuration.set('analytics', false);
-                analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
+                analyticsManager = new SilentAnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
             });
 
             it('should not send session start event', () => {
