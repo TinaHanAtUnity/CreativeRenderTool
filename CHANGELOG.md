@@ -1,4 +1,4 @@
-# Pending
+# Thu Jul 25 23:03:39 UTC 2019
 
 * Open Measurement - Add OMID to Admob Path as DisabledABGroup [#10600](https://github.com/Applifier/unity-ads-webview/pull/10600)
 * Pass Correct isLoadEnabled flag in Auction Request [#10636](https://github.com/Applifier/unity-ads-webview/pull/10636)
