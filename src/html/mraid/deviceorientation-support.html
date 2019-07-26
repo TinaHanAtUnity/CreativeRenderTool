@@ -2,14 +2,24 @@
   (function() {
     var _iframeOrientationListeners = [];
     var originalAddEventListener = window.addEventListener;
-    window.addEventListener = function (event, listener, useCapture) {
-        if(event === 'deviceorientation') {
+    var originalRemoveEventListener = window.removeEventListener;
+    window.addEventListener = function (event, listener, opts) {
+        if (event === 'deviceorientation') {
             _iframeOrientationListeners.push(listener);
             window.parent.postMessage({
                 type: 'deviceorientationSubscribe',
             }, '*');
         } else {
-            originalAddEventListener.apply(window, [event, listener, useCapture]);
+            originalAddEventListener.apply(window, [event, listener, opts]);
+        }
+    }
+    window.removeEventListener = function(event, listener, opts) {
+        if (event === 'deviceorientation') {
+            if ((index = _iframeOrientationListeners.indexOf(listener)) > -1) {
+                _iframeOrientationListeners.splice(index, 1);
+            }
+        } else {
+            originalRemoveEventListener.apply(window, [event, listener, opts]);
         }
     }
 
