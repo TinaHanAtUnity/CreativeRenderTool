@@ -66,19 +66,24 @@ export enum PurchasingMetric {
     PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
+export enum WebviewLifeCycleMetric {
+    WebviewInitializationTimeTaken = 'webview_initialization_time_taken'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric | WebviewLifeCycleMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
 }
 
 interface IProgrammaticTrackingMetric {
+    name: string;
+    value: number;
     tags: string[];
 }
 
 export class ProgrammaticTrackingService {
     private static newProductionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
-    private static productionMetricServiceUrl: string = 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric';
     private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics';
 
     private _platform: Platform;
@@ -112,6 +117,8 @@ export class ProgrammaticTrackingService {
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
+                    name: error,
+                    value: 1,
                     tags: [
                         this.createErrorTag(error),
                         this.createAdsSdkTag('plt', Platform[platform]),
@@ -123,7 +130,7 @@ export class ProgrammaticTrackingService {
                 }
             ]
         };
-        const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
+        const url: string = ProgrammaticTrackingService.newProductionMetricServiceUrl;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
 
@@ -132,8 +139,7 @@ export class ProgrammaticTrackingService {
         return this._request.post(url, data, headers);
     }
 
-    public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
-
+    public reportMetricWithTags(event: ProgrammaticTrackingMetric, value: number, tags: string[]): Promise<INativeResponse> {
         const isLoadMetric = Object.values(LoadMetric).includes(event);
         const isZyngaFreeCellSolitareUsingLoad = CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId());
         if (isLoadMetric && !isZyngaFreeCellSolitareUsingLoad) {
@@ -142,13 +148,13 @@ export class ProgrammaticTrackingService {
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
-                    tags: [
-                        this.createMetricTag(event)
-                    ]
+                    name: event,
+                    value: value,
+                    tags: tags
                 }
             ]
         };
-        const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
+        const url: string = ProgrammaticTrackingService.newProductionMetricServiceUrl;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
 
@@ -160,6 +166,10 @@ export class ProgrammaticTrackingService {
             }
             return res;
         });
+    }
+
+    public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
+        return this.reportMetricWithTags(event, 1, [this.createMetricTag(event)]);
     }
 
 }

@@ -50,7 +50,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, WebviewLifeCycleMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class Core implements ICore {
 
@@ -217,6 +217,7 @@ export class Core implements ICore {
 
             return this.Ads.initialize();
         }).then(() => {
+            this.ProgrammaticTrackingService.reportMetricWithTags(WebviewLifeCycleMetric.WebviewInitializationTimeTaken, (Date.now() - this.ClientInfo.getInitTimestamp()), [`ads_sdk2_mevt:${WebviewLifeCycleMetric.WebviewInitializationTimeTaken}`]);
             return this.Api.Sdk.initComplete();
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
