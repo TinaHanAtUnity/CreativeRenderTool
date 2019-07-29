@@ -5,12 +5,7 @@ import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi, ICore } from 'Core/ICore';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ICore } from 'Core/ICore';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
@@ -31,7 +26,6 @@ class TestHelper {
     describe(`AnalyticsManagerTest for ${Platform[platform]}`, () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
-        let core: ICoreApi;
         let analytics: IAnalyticsApi;
         let adsConfiguration: AdsConfiguration;
         let analyticsManager: AnalyticsManager;
@@ -41,21 +35,15 @@ class TestHelper {
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            core = TestFixtures.getCoreApi(nativeBridge);
             coreModule = TestFixtures.getCoreModule(nativeBridge);
             analytics = TestFixtures.getAnalyticsApi(nativeBridge);
-            coreModule.FocusManager = new FocusManager(platform, core);
-            coreModule.RequestManager = sinon.createStubInstance(RequestManager);
-            coreModule.ClientInfo = TestFixtures.getClientInfo();
-            coreModule.DeviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-            coreModule.Config = TestFixtures.getCoreConfiguration();
             coreModule.Config.set('analytics', true);
             adsConfiguration = TestFixtures.getAdsConfiguration();
 
-            sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
-            (<sinon.SinonStub>coreModule.RequestManager.post).returns(Promise.resolve());
+            sinon.stub(coreModule.Api.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
+            sinon.stub(coreModule.RequestManager, 'post').returns(Promise.resolve());
 
-            analyticsStorage = new AnalyticsStorage(core);
+            analyticsStorage = new AnalyticsStorage(coreModule.Api);
             analyticsManager = new AnalyticsManager(coreModule, analytics, adsConfiguration, analyticsStorage);
         });
 
