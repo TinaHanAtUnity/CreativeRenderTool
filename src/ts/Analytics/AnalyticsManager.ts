@@ -24,7 +24,6 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { Promises } from 'Core/Utilities/Promises';
 
 interface IAnalyticsEventWrapper {
