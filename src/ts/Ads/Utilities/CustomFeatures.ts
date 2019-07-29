@@ -161,7 +161,8 @@ export class CustomFeatures {
                gameId === '3238964' ||  // Admob test ID            : Android
                gameId === '3238970' ||  // Mopub test ID            : iOS
                gameId === '3238971' ||  // Mopub test ID            : Android
-               gameId === '2988495';    
+               gameId === '3238972' ||  // IronSource test ID       : iOS
+               gameId === '3238973';    // IronSource test ID       : Android
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
