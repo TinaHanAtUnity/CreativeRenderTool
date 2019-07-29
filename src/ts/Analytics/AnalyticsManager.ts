@@ -16,6 +16,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { ICore } from 'Core/ICore';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -90,15 +91,15 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
-        this._platform = platform;
-        this._core = core;
+    constructor(core: ICore, analytics: IAnalyticsApi, adsConfiguration: AdsConfiguration, analyticsStorage: AnalyticsStorage) {
+        this._platform = core.NativeBridge.getPlatform();
+        this._core = core.Api;
         this._analytics = analytics;
-        this._focusManager = focusManager;
-        this._request = request;
-        this._clientInfo = clientInfo;
-        this._deviceInfo = deviceInfo;
-        this._configuration = configuration;
+        this._focusManager = core.FocusManager;
+        this._request = core.RequestManager;
+        this._clientInfo = core.ClientInfo;
+        this._deviceInfo = core.DeviceInfo;
+        this._configuration = core.Config;
         this._adsConfiguration = adsConfiguration;
         this._storage = analyticsStorage;
 
