@@ -15,8 +15,7 @@ import {
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { ICore } from 'Core/ICore';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
