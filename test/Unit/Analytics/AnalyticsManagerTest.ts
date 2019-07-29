@@ -5,12 +5,7 @@ import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ICore } from 'Core/ICore';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
@@ -31,45 +26,35 @@ class TestHelper {
     describe(`AnalyticsManagerTest for ${Platform[platform]}`, () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
-        let core: ICoreApi;
         let analytics: IAnalyticsApi;
-        let request: RequestManager;
-        let clientInfo: ClientInfo;
-        let deviceInfo: DeviceInfo;
-        let configuration: CoreConfiguration;
         let adsConfiguration: AdsConfiguration;
         let analyticsManager: AnalyticsManager;
         let analyticsStorage: AnalyticsStorage;
-        let focusManager: FocusManager;
+        let coreModule: ICore;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            core = TestFixtures.getCoreApi(nativeBridge);
+            coreModule = TestFixtures.getCoreModule(nativeBridge);
             analytics = TestFixtures.getAnalyticsApi(nativeBridge);
-            focusManager = new FocusManager(platform, core);
-            request = sinon.createStubInstance(RequestManager);
-            clientInfo = TestFixtures.getClientInfo();
-            deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-            configuration = TestFixtures.getCoreConfiguration();
-            configuration.set('analytics', true);
+            coreModule.Config.set('analytics', true);
             adsConfiguration = TestFixtures.getAdsConfiguration();
 
-            sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
-            (<sinon.SinonStub>request.post).returns(Promise.resolve());
+            sinon.stub(coreModule.Api.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
+            sinon.stub(coreModule.RequestManager, 'post').returns(Promise.resolve());
 
-            analyticsStorage = new AnalyticsStorage(core);
-            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
+            analyticsStorage = new AnalyticsStorage(coreModule.Api);
+            analyticsManager = new AnalyticsManager(coreModule, analytics, adsConfiguration, analyticsStorage);
         });
 
         describe('SilentAnalyticsManager (Analytics Disabled)', () => {
 
             beforeEach(() => {
-                analyticsManager = new SilentAnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, adsConfiguration, focusManager, analyticsStorage);
+                analyticsManager = new SilentAnalyticsManager(coreModule, analytics, adsConfiguration, analyticsStorage);
             });
 
             it('should not send session start event', () => {
-                const requestSpy = <sinon.SinonStub>request.post;
+                const requestSpy = <sinon.SinonStub>coreModule.RequestManager.post;
 
                 return analyticsManager.init().then(() => {
                     sinon.assert.notCalled(requestSpy);
@@ -78,10 +63,10 @@ class TestHelper {
 
             it('should not send session running event', () => {
                 return analyticsManager.init().then(() => {
-                    const requestSpy = <sinon.SinonStub>request.post;
+                    const requestSpy = <sinon.SinonStub>coreModule.RequestManager.post;
                     requestSpy.resetHistory();
 
-                    focusManager.onActivityPaused.trigger('com.test.activity');
+                    coreModule.FocusManager.onActivityPaused.trigger('com.test.activity');
 
                     sinon.assert.notCalled(requestSpy);
                 });
@@ -91,7 +76,7 @@ class TestHelper {
         describe('Analytics Enabled', () => {
 
             it('should send session start event', () => {
-                const requestSpy = <sinon.SinonStub>request.post;
+                const requestSpy = <sinon.SinonStub>coreModule.RequestManager.post;
 
                 return analyticsManager.init().then(() => {
                     sinon.assert.called(requestSpy);
@@ -101,10 +86,10 @@ class TestHelper {
 
             it('should send session running event', () => {
                 return analyticsManager.init().then(() => {
-                    const requestSpy = <sinon.SinonStub>request.post;
+                    const requestSpy = <sinon.SinonStub>coreModule.RequestManager.post;
                     requestSpy.resetHistory();
 
-                    focusManager.onActivityPaused.trigger('com.test.activity');
+                    coreModule.FocusManager.onActivityPaused.trigger('com.test.activity');
 
                     sinon.assert.called(requestSpy);
                     assert.equal(TestHelper.getEventType<IAnalyticsAppRunningEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.appRunning.v1');
@@ -128,7 +113,7 @@ class TestHelper {
                 // tslint:disable:no-string-literal
                 return analyticsManager.init().then(() => {
                     const eventQueue: any = analyticsManager['_analyticsEventQueue'];
-                    const postStub = <sinon.SinonStub>request.post;
+                    const postStub = <sinon.SinonStub>coreModule.RequestManager.post;
                     postStub.resetHistory();
                     const first = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).catch((error) => {
                         assert.fail(error);
@@ -157,7 +142,7 @@ class TestHelper {
                 // tslint:disable:no-string-literal
                 return analyticsManager.init().then(() => {
                     const eventQueue: any = analyticsManager['_analyticsEventQueue'];
-                    const postStub = <sinon.SinonStub>request.post;
+                    const postStub = <sinon.SinonStub>coreModule.RequestManager.post;
                     postStub.resetHistory();
                     postStub.rejects();
                     return analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {

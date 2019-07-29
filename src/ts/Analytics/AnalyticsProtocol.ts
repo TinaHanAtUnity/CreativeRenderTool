@@ -4,8 +4,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { StoreTransaction } from 'Store/Models/StoreTransaction';
-import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 // tslint:disable-next-line
 export interface IAnalyticsMessage {}

@@ -25,9 +25,9 @@ export class Analytics implements IAnalytics {
 
         this.AnalyticsStorage = new AnalyticsStorage(core.Api);
         if (core.Config.isAnalyticsEnabled()) {
-            this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, adsConfiguration, core.FocusManager, this.AnalyticsStorage);
+            this.AnalyticsManager = new AnalyticsManager(core, this.Api, adsConfiguration, this.AnalyticsStorage);
         } else {
-            this.AnalyticsManager = new SilentAnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, adsConfiguration, core.FocusManager, this.AnalyticsStorage);
+            this.AnalyticsManager = new SilentAnalyticsManager(core, this.Api, adsConfiguration, this.AnalyticsStorage);
         }
     }
 
