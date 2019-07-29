@@ -50,7 +50,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         let endScreen: PerformanceEndScreen;
 
         if (QueryCTATest.isValid(abGroup)) {
-            if (baseParams.campaign.getSquare() !== undefined) {
+            if (baseParams.campaign.getSquare() === undefined) {
                 endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             } else {
                 endScreen = new PerformanceEndScreenQueryCTASquare(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
