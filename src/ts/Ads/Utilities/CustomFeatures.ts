@@ -8,16 +8,6 @@ import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.js
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 
-const JsonStringObjectParser = (json: string): { [index: string]: number } => {
-    try {
-        return JSON.parse(json);
-    } catch {
-        return {};
-    }
-};
-
-const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
-
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -117,11 +107,11 @@ export class CustomFeatures {
             return false;
         }
 
-        return SliderEndCardExperiment.isValid(abGroup) && SliderEndScreenImages[targetGameAppStoreId] !== undefined;
+        return SliderEndCardExperiment.isValid(abGroup) && SliderEndScreenImagesJson[targetGameAppStoreId] !== undefined;
     }
 
     public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
-        return SliderEndScreenImages[targetGameAppStoreId];
+        return SliderEndScreenImagesJson[targetGameAppStoreId];
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
