@@ -7,14 +7,14 @@ import {
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import 'mocha';
 import * as sinon from 'sinon';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
-describe('Ads/Utilities', () => {
+describe('ProgrammaticTrackingService', () => {
 
     let programmaticTrackingService: ProgrammaticTrackingService;
     let osVersionStub: sinon.SinonStub;
@@ -49,6 +49,7 @@ describe('Ads/Utilities', () => {
         beforeEach(() => {
             osVersionStub.returns(osVersion);
             sdkVersionStub.returns(sdkVersion);
+            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(false);
         });
 
         const tagBuilder = [

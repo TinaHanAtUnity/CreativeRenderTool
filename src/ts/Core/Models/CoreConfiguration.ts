@@ -20,6 +20,7 @@ export interface ICoreConfiguration {
     token: string;
     jaegerTracing: boolean;
     organizationId: string | undefined;
+    developerId: number | undefined;
 }
 
 export class CoreConfiguration extends Model<ICoreConfiguration> {
@@ -34,7 +35,8 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         projectId: ['string'],
         token: ['string'],
         jaegerTracing: ['boolean'],
-        organizationId: ['string', 'undefined']
+        organizationId: ['string', 'undefined'],
+        developerId: ['number', 'undefined']
     };
 
     constructor(data: ICoreConfiguration) {
@@ -77,6 +79,18 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         return this.get('projectId');
     }
 
+    public getTestMode(): boolean {
+        return this.get('test');
+    }
+
+    public getOrganizationId(): string | undefined {
+        return this.get('organizationId');
+    }
+
+    public getDeveloperId(): number | undefined {
+        return this.get('developerId');
+    }
+
     public getDTO(): { [key: string]: unknown } {
         return {
             'enabled': this.isEnabled(),
@@ -84,15 +98,10 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
             'coppaCompliant': this.isCoppaCompliant(),
             'abGroup': this.getAbGroup(),
             'gamerToken': this.getToken(),
-            'projectId': this.getUnityProjectId()
+            'projectId': this.getUnityProjectId(),
+            'testMode': this.getTestMode(),
+            'organizationId': this.getOrganizationId(),
+            'developerId': this.getDeveloperId()
         };
-    }
-
-    public getTestMode(): boolean {
-       return this.get('test');
-    }
-
-    public getOrganizationId(): string | undefined {
-        return this.get('organizationId');
     }
 }

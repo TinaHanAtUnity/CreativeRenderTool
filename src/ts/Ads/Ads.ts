@@ -77,6 +77,7 @@ import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
@@ -139,7 +140,8 @@ export class Ads implements IAds {
             iOS: platform === Platform.IOS ? {
                 AdUnit: new IosAdUnitApi(core.NativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(core.NativeBridge)
-            } : undefined
+            } : undefined,
+            LoadApi: new LoadApi(core.NativeBridge)
         };
 
         this.AdMobSignalFactory = new AdMobSignalFactory(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.ClientInfo, this._core.DeviceInfo, this._core.FocusManager);
@@ -179,16 +181,14 @@ export class Ads implements IAds {
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            const promises = [];
             if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
-                promises.push(this.setupLoadApi());
+                this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
             }
-            promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+
+            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
-            }));
-
-            return Promise.all(promises);
+            });
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
@@ -303,7 +303,7 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        if (CustomFeatures.shouldSampleAtOnePercent()) {
+        if (CustomFeatures.sampleAtGivenPercent(1)) {
             Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
         }
 
@@ -521,7 +521,7 @@ export class Ads implements IAds {
 
     private shouldSkipShowAd(campaign: Campaign, logkey: MiscellaneousMetric): boolean {
         if (!this._core.FocusManager.isAppForeground()) {
-            if (CustomFeatures.shouldSampleAtTenPercent()) {
+            if (CustomFeatures.sampleAtGivenPercent(10)) {
                 Diagnostics.trigger(logkey, {
                     seatId: campaign.getSeatId(),
                     creativeId: campaign.getCreativeId(),
@@ -555,22 +555,6 @@ export class Ads implements IAds {
 
     private onAdUnitClose(): void {
         this._showing = false;
-    }
-
-    private setupLoadApi(): Promise<void> {
-        this._loadApiEnabled = false;
-
-        return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-            if (mediation) {
-                const loadEnabled = mediation.isMetaDataLoadEnabled();
-                if (loadEnabled) {
-                    this._loadApiEnabled = true;
-                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationSuccess);
-                } else {
-                    this._core.ProgrammaticTrackingService.reportMetric(LoadMetric.LoadEnabledInitializationFailure);
-                }
-            }
-        });
     }
 
     private setupTestEnvironment(): void {

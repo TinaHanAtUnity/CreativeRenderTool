@@ -161,6 +161,7 @@ import { IStoreApi, IStore } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { LoadApi } from 'Core/Native/LoadApi';
 import { IAdMobCampaign, AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
 import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
@@ -898,6 +899,7 @@ export class TestFixtures {
             null,
             '2.0.0-webview',
             123456,
+            false,
             false
         ]);
     }
@@ -913,7 +915,7 @@ export class TestFixtures {
     public static getOkNativeResponse(): INativeResponse {
         return {
             url: 'http://foo.url.com',
-            response: 'foo response',
+            response: '{}',
             responseCode: 200,
             headers: [['location', 'http://foobar.com']]
         };
@@ -1062,7 +1064,8 @@ export class TestFixtures {
             iOS: platform === Platform.IOS ? {
                 AdUnit: new IosAdUnitApi(nativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(nativeBridge)
-            } : undefined
+            } : undefined,
+            LoadApi: new LoadApi(nativeBridge)
         };
     }
 

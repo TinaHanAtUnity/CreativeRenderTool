@@ -77,7 +77,9 @@ interface IProgrammaticTrackingMetric {
 }
 
 export class ProgrammaticTrackingService {
+    private static newProductionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
     private static productionMetricServiceUrl: string = 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric';
+    private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics';
 
     private _platform: Platform;
     private _request: RequestManager;
@@ -152,7 +154,12 @@ export class ProgrammaticTrackingService {
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this._request.post(url, data, headers);
+        return this._request.post(url, data, headers).then((res) => {
+            if (CustomFeatures.sampleAtGivenPercent(1)) {
+                return this._request.post(ProgrammaticTrackingService.newProductionMetricServiceUrl, data, headers);
+            }
+            return res;
+        });
     }
 
 }
