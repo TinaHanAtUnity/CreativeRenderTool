@@ -48,7 +48,6 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const abGroup = baseParams.coreConfig.getAbGroup();
         let endScreen: PerformanceEndScreen;
 
-        const abGroup = baseParams.coreConfig.getAbGroup();
         if (AnimatedDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (baseParams.campaign instanceof SliderPerformanceCampaign) {
