@@ -18,20 +18,6 @@ const JsonStringObjectParser = (json: string): { [index: string]: number } => {
 
 const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
 
-const JsonStringArrayParser = (gameIdJson: string): string[] => {
-    let gameIds: string[];
-    try {
-        gameIds = JSON.parse(gameIdJson);
-    } catch {
-        gameIds = [];
-    }
-    return gameIds;
-};
-const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
-const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
-const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
-const LionStudiosGameIds = JsonStringArrayParser(LionStudiosGamesJson);
-
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -82,9 +68,9 @@ export class CustomFeatures {
         // Android back button enabled on video overlays for skipping the video ads
         // This is also applied to games by Bitmango and Game7 who requested to toggle same features as Cheetah
         // this should be cleaned once there is proper backend support for these features
-        return this.existsInList(CheetahGameIds, gameId)
-            || this.existsInList(BitmangoGameIds, gameId)
-            || this.existsInList(Game7GameIds, gameId);
+        return this.existsInList(CheetahGamesJson, gameId)
+            || this.existsInList(BitmangoGamesJson, gameId)
+            || this.existsInList(Game7GamesJson, gameId);
 
     }
 
@@ -139,7 +125,7 @@ export class CustomFeatures {
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return this.existsInList(LionStudiosGameIds, gameId);
+        return this.existsInList(LionStudiosGamesJson, gameId);
     }
 
     /**

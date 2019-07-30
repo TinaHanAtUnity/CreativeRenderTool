@@ -7,14 +7,23 @@
     "type": "git",
     "url": "https://github.com/Applifier/unity-ads-webview.git"
   },
+  "scripts": {
+    "start": "webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/config.dev.js",
+    "build": "ANALYZE=true npm run build:release",
+    "build:release": "rimraf ./dist && NODE_ENV=production webpack --config tools/webpack/config.release.js"
+  },
   "license": "Apache-2.0",
   "dependencies": {
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.5",
     "@types/sinon": "4.3.3",
+    "@typescript-eslint/eslint-plugin": "1.7.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^1.9.0",
+    "@typescript-eslint/parser": "1.7.0",
     "autoprefixer-stylus": "0.14.0",
     "chai": "4.2.0",
     "chokidar": "2.1.0",
+    "eslint": "5.16.0",
     "google-closure-compiler": "20190121.0.0",
     "html-minifier": "3.5.21",
     "inline-source-cli": "1.2.0",
@@ -41,10 +50,33 @@
     "tslib": "1.9.3",
     "tslint": "5.12.1",
     "tslint-microsoft-contrib": "6.0.0",
-    "typescript": "3.3.3",
-    "eslint": "5.16.0",
-    "@typescript-eslint/parser": "1.7.0",
-    "@typescript-eslint/eslint-plugin": "1.7.0",
-    "@typescript-eslint/eslint-plugin-tslint": "^1.9.0"
+    "typescript": "3.3.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/polyfill": "^7.4.4",
+    "babel-loader": "^8.0.6",
+    "base64-inline-loader": "^1.1.1",
+    "css-loader": "^3.1.0",
+    "eslint-loader": "^2.2.1",
+    "html-loader": "^0.5.5",
+    "html-webpack-inline-source-plugin": "^0.0.10",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "proto-loader": "^0.2.0",
+    "raw-loader": "^3.1.0",
+    "rimraf": "^2.6.3",
+    "string-loader": "^0.0.1",
+    "style-loader": "^0.23.1",
+    "stylus-loader": "^3.0.2",
+    "to-string-loader": "^1.1.5",
+    "ts-loader": "^6.0.4",
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
+    "url-loader": "^2.1.0",
+    "webpack": "^4.38.0",
+    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2",
+    "webpack-merge": "^4.2.1"
   }
 }

@@ -111,94 +111,94 @@ export class Localization {
 
     private static _languageMap: ILanguageMap = {
         'en.*': {
-            'endscreen': JSON.parse(EnglishEndscreen),
-            'overlay': JSON.parse(EnglishOverlay),
-            'loadingscreen': JSON.parse(EnglishLoadingScreen),
-            'consent': JSON.parse(EnglishConsent)
+            'endscreen': EnglishEndscreen,
+            'overlay': EnglishOverlay,
+            'loadingscreen': EnglishLoadingScreen,
+            'consent': EnglishConsent
         },
         'ru.*': {
-            'endscreen': JSON.parse(RussianEndscreen),
-            'overlay': JSON.parse(RussianOverlay),
-            'loadingscreen': JSON.parse(RussianLoadingScreen),
-            'consent': JSON.parse(RussianConsent)
+            'endscreen': RussianEndscreen,
+            'overlay': RussianOverlay,
+            'loadingscreen': RussianLoadingScreen,
+            'consent': RussianConsent
         },
         'ja.*': {
-            'endscreen': JSON.parse(JapaneseEndscreen),
-            'overlay': JSON.parse(JapaneseOverlay)
+            'endscreen': JapaneseEndscreen,
+            'overlay': JapaneseOverlay
         },
         'ko.*': {
-            'endscreen': JSON.parse(KoreanEndscreen),
-            'overlay': JSON.parse(KoreanOverlay)
+            'endscreen': KoreanEndscreen,
+            'overlay': KoreanOverlay
         },
         'it.*': {
-            'endscreen': JSON.parse(ItalianEndscreen),
-            'overlay': JSON.parse(ItalianOverlay),
-            'loadingscreen': JSON.parse(ItalianLoadingScreen),
-            'consent': JSON.parse(ItalianConsent)
+            'endscreen': ItalianEndscreen,
+            'overlay': ItalianOverlay,
+            'loadingscreen': ItalianLoadingScreen,
+            'consent': ItalianConsent
         },
         'de.*': {
-            'endscreen': JSON.parse(GermanEndscreen),
-            'overlay': JSON.parse(GermanOverlay),
-            'loadingscreen': JSON.parse(GermanLoadingScreen),
-            'consent': JSON.parse(GermanConsent)
+            'endscreen': GermanEndscreen,
+            'overlay': GermanOverlay,
+            'loadingscreen': GermanLoadingScreen,
+            'consent': GermanConsent
         },
         'zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$': {
-            'endscreen': JSON.parse(ChineseTraditionalEndscreen),
-            'overlay': JSON.parse(ChineseTraditionalOverlay),
-            'loadingscreen': JSON.parse(ChineseTraditionalLoadingScreen)
+            'endscreen': ChineseTraditionalEndscreen,
+            'overlay': ChineseTraditionalOverlay,
+            'loadingscreen': ChineseTraditionalLoadingScreen
         },
         'zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$': {
-            'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
-            'overlay': JSON.parse(ChineseSimplifiedOverlay),
-            'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen)
+            'endscreen': ChineseSimplifiedEndscreen,
+            'overlay': ChineseSimplifiedOverlay,
+            'loadingscreen': ChineseSimplifiedLoadingScreen
         },
         'fi.*': {
-            'endscreen': JSON.parse(FinnishEndscreen),
-            'overlay': JSON.parse(FinnishOverlay),
-            'loadingscreen': JSON.parse(FinnishLoadingScreen)
+            'endscreen': FinnishEndscreen,
+            'overlay': FinnishOverlay,
+            'loadingscreen': FinnishLoadingScreen
         },
         'es.*': {
-            'endscreen': JSON.parse(SpanishEndscreen),
-            'overlay': JSON.parse(SpanishOverlay),
-            'loadingscreen': JSON.parse(SpanishLoadingScreen),
-            'consent': JSON.parse(SpanishConsent)
+            'endscreen': SpanishEndscreen,
+            'overlay': SpanishOverlay,
+            'loadingscreen': SpanishLoadingScreen,
+            'consent': SpanishConsent
 
         },
         'fr.*': {
-            'endscreen': JSON.parse(FrenchEndscreen),
-            'overlay': JSON.parse(FrenchOverlay),
-            'loadingscreen': JSON.parse(FrenchLoadingScreen),
-            'consent': JSON.parse(FrenchConsent)
+            'endscreen': FrenchEndscreen,
+            'overlay': FrenchOverlay,
+            'loadingscreen': FrenchLoadingScreen,
+            'consent': FrenchConsent
         },
         'tr.*': {
-            'endscreen': JSON.parse(TurkishEndscreen),
-            'overlay': JSON.parse(TurkishOverlay)
+            'endscreen': TurkishEndscreen,
+            'overlay': TurkishOverlay
         },
         'da_DK': {
-            'endscreen': JSON.parse(DanishEndscreen),
-            'overlay': JSON.parse(DanishOverlay)
+            'endscreen': DanishEndscreen,
+            'overlay': DanishOverlay
         },
         'nb.*': {
-            'endscreen': JSON.parse(NorwegianEndscreen),
-            'overlay': JSON.parse(NorwegianOverlay)
+            'endscreen': NorwegianEndscreen,
+            'overlay': NorwegianOverlay
         },
         'lt.*': {
-            'endscreen': JSON.parse(LithuanianEndscreen),
-            'overlay': JSON.parse(LithuanianOverlay)
+            'endscreen': LithuanianEndscreen,
+            'overlay': LithuanianOverlay
         },
         'is.*': {
-            'endscreen': JSON.parse(IcelandicEndscreen),
-            'overlay': JSON.parse(IcelandicOverlay)
+            'endscreen': IcelandicEndscreen,
+            'overlay': IcelandicOverlay
         },
         'ro.*': {
-            'endscreen': JSON.parse(RomanianEndscreen),
-            'overlay': JSON.parse(RomanianOverlay)
+            'endscreen': RomanianEndscreen,
+            'overlay': RomanianOverlay
         },
         'pt.*': {
-            'endscreen': JSON.parse(PortugueseEndscreen),
-            'overlay': JSON.parse(PortugueseOverlay),
-            'loadingscreen': JSON.parse(PortugueseLoadingScreen),
-            'consent': JSON.parse(PortugueseConsent)
+            'endscreen': PortugueseEndscreen,
+            'overlay': PortugueseOverlay,
+            'loadingscreen': PortugueseLoadingScreen,
+            'consent': PortugueseConsent
         }
     };
 

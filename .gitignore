@@ -31,3 +31,6 @@ gcs_credentials.json
 
 # Chromium
 .chromium_user_prefs.json
+
+# Webpack build
+dist/
