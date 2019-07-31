@@ -68,7 +68,7 @@ const production = {
                 parallel: true,
                 terserOptions: {
                     mangle: {
-                        properties: true,
+                        // properties: true,
                     },
                 }
             }),

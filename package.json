@@ -8,8 +8,8 @@
     "url": "https://github.com/Applifier/unity-ads-webview.git"
   },
   "scripts": {
-    "start": "webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/config.dev.js",
-    "start:release": "yarn build:release && webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/config.release.js",
+    "start": "rimraf ./dist && webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/server.dev.js",
+    "start:release": "rimraf ./dist && NODE_ENV=production webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/server.release.js",
     "build": "ANALYZE=true npm run build:release",
     "build:release": "rimraf ./dist && NODE_ENV=production webpack --config tools/webpack/config.release.js",
     "config:release": "node "
