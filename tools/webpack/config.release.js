@@ -66,11 +66,6 @@ const production = {
         minimizer: [
             new TerserJSPlugin({
                 parallel: true,
-                terserOptions: {
-                    mangle: {
-                        // properties: true,
-                    },
-                }
             }),
             new OptimizeCSSAssetsPlugin({})
         ],
