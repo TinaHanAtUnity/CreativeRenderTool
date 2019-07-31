@@ -1,10 +1,10 @@
 import 'mocha';
-import { assert } from 'chai';
+import {assert} from 'chai';
 import * as sinon from 'sinon';
 
-import { CurrentUnityConsentVersion, GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import {CurrentUnityConsentVersion, GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Ads/Models/Privacy';
+import {AdsConfigurationParser} from 'Ads/Parsers/AdsConfigurationParser';
+import {Diagnostics} from 'Core/Utilities/Diagnostics';
 
 describe('GamePrivacyTests', () => {
     it('should be disabled if PrivacyMethod.DEFAULT', () => {
@@ -23,6 +23,44 @@ describe('GamePrivacyTests', () => {
         assert.isTrue(gamePrivacy.isEnabled());
         assert.equal(gamePrivacy.getMethod(), PrivacyMethod.UNITY_CONSENT);
         assert.equal(gamePrivacy.getVersion(), 20181106);
+    });
+});
+
+context('UserPrivacyTests', () => {
+    it('should create unrecorded user privacy', () => {
+        const userPrivacy = UserPrivacy.createUnrecorded();
+        assert.isFalse(userPrivacy.isRecorded());
+        assert.equal(userPrivacy.getVersion(), 0);
+    });
+
+    context('creating UserPrivacy from legacy opt-out fields', () => {
+        const tests = [
+            { method: PrivacyMethod.LEGITIMATE_INTEREST, optOutEnabled: false, permissions: <IPermissions>{ ads: true }},
+            { method: PrivacyMethod.LEGITIMATE_INTEREST, optOutEnabled: true, permissions: <IPermissions>{ ads: false }}
+        ];
+        tests.forEach(({method, optOutEnabled, permissions }) => {
+            it(`should create user with ${method} and optOutEnabled:${optOutEnabled}`, () => {
+                const userPrivacy = UserPrivacy.createFromLegacy(method, optOutEnabled);
+                assert.isTrue(userPrivacy.isRecorded());
+                assert.equal(userPrivacy.getMethod(), method);
+                assert.include(<any>userPrivacy.getPermissions(), permissions);
+            });
+        });
+
+        it('should create unrecorded user for DEVELOPER_CONSENT', () => {
+            // see UserPrivacy.createFromLegacy for reasoning.
+            const userPrivacy = UserPrivacy.createFromLegacy(PrivacyMethod.DEVELOPER_CONSENT, false);
+            assert.isFalse(userPrivacy.isRecorded());
+            assert.equal(userPrivacy.getVersion(), 0);
+        });
+
+        const nonLegacyMethods = [PrivacyMethod.DEFAULT, PrivacyMethod.UNITY_CONSENT];
+        nonLegacyMethods.forEach((method) => {
+            it('should fail if PrivacyMethod is ' + method, () => {
+                const unsupportedCreation = UserPrivacy.createFromLegacy.bind(UserPrivacy, method, false);
+                assert.throws(unsupportedCreation);
+            });
+        });
     });
 });
 

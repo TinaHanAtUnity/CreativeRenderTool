@@ -145,27 +145,14 @@ export class AdsConfigurationParser {
                 }
             });
         }
+
         if (!configJson.gamePrivacy || !configJson.userPrivacy) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
-                    all: false,
-                    gameExp: false,
-                    ads: false,
-                    external: false
-            }});
+            return UserPrivacy.createUnrecorded();
         }
 
         if (configJson.gamePrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST ||
             configJson.gamePrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
-                return new UserPrivacy({
-                    method: configJson.gamePrivacy.method,
-                    version: 0,
-                    permissions: {
-                        all: false,
-                        gameExp: false,
-                        ads: !configJson.optOutEnabled,
-                        external: false
-                    }
-                });
+            return UserPrivacy.createFromLegacy(configJson.gamePrivacy.method, configJson.optOutEnabled);
         }
         return new UserPrivacy(configJson.userPrivacy);
     }

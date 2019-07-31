@@ -295,7 +295,10 @@ export class UserPrivacyManager {
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
             permissions: {
-                profiling: consent
+                all: false,
+                gameExp: false,
+                ads: consent,
+                external: consent
             }
         });
     }

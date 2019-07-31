@@ -1,50 +1,67 @@
-import { assert } from 'chai';
+import {assert} from 'chai';
 import 'mocha';
-import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
-import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import {ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory} from 'Ads/Models/RequestPrivacy';
+import {GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Ads/Models/Privacy';
 
 describe('RequestPrivacyFactoryTests', () => {
     let userPrivacy: UserPrivacy;
     let gamePrivacy: GamePrivacy;
 
-    context('when no previous user privacy is recorded', () => {
+    const consentMethods = [PrivacyMethod.UNITY_CONSENT, PrivacyMethod.DEVELOPER_CONSENT];
+
+    consentMethods.forEach((method) => {
+        context('for a game using ' + method, () => {
+            context('when no previous user privacy is recorded', () => {
+                let result: IRequestPrivacy | undefined;
+                beforeEach(() => {
+                    userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false } });
+                    gamePrivacy = new GamePrivacy({ method: method });
+                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                });
+                it('should set firstRequest as true', () => assert.equal(result!.firstRequest, true));
+                it('should set privacy method as ' + method, () => assert.equal(result!.method, method));
+                it('should set permissions as empty', () => assert.deepEqual(result!.permissions, {}));
+            });
+
+            context('when a recorded user privacy exists', () => {
+                let result: IRequestPrivacy | undefined;
+                const expectedPermissions = { gameExp: false, ads: true, external: true };
+                beforeEach(() => {
+                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: expectedPermissions });
+                    gamePrivacy = new GamePrivacy({ method: method });
+                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                });
+                it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
+                it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
+                it('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
+            });
+
+            context('if game privacy method has changed since last privacy store', () => {
+                let result: IRequestPrivacy | undefined;
+                const anyPermissions = <IPermissions>{};
+                beforeEach(() => {
+                    userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
+                    gamePrivacy = new GamePrivacy({ method: method });
+                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                });
+                it('should not affect set privacy method', () => assert.notEqual(result!.method, method));
+            });
+        });
+    });
+
+    context('when all permission is set', () => {
         let result: IRequestPrivacy | undefined;
+        const expectedPermissions = { gameExp: true, ads: true, external: true };
         beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: { all: true} });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should set firstRequest as true', () => assert.equal(result!.firstRequest, true));
-        it('should use privacy method set to the game', () => assert.equal(result!.method, PrivacyMethod.UNITY_CONSENT));
-        it('should set permissions as empty', () => assert.deepEqual(result!.permissions, {}));
+        it('should strip away all:true and replace with granular permissions',
+            () => assert.deepEqual(result!.permissions, expectedPermissions));
     });
 
-    context('when a recorded user privacy exists', () => {
-        let result: IRequestPrivacy | undefined;
-        const expectedPermissions = { gameExp: false, ads: true, external: false };
-        beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 20190101, permissions: expectedPermissions });
-            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
-            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
-        });
-        it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
-        it('should set recorded privacy method', () => assert.equal(result!.method, PrivacyMethod.UNITY_CONSENT));
-        it('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
-    });
-
-    context('if game privacy method has changed since last privacy store', () => {
-        let result: IRequestPrivacy | undefined;
-        const newGameMethod = PrivacyMethod.UNITY_CONSENT;
-        const anyPermissions = <IPermissions>{};
-        beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
-            gamePrivacy = new GamePrivacy({ method: newGameMethod });
-            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
-        });
-        it('should not affect set privacy method', () => assert.notEqual(result!.method, newGameMethod));
-    });
-
-    context('if game privacy method is something else than PrivacyMethod.UNITY_CONSENT', () => {
+    context('if game privacy method is PrivacyMethod.LEGITIMATE_INTEREST', () => {
         let result: IRequestPrivacy | undefined;
         const anyPermissions = <IPermissions>{};
         beforeEach(() => {

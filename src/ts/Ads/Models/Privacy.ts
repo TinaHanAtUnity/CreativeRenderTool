@@ -93,6 +93,38 @@ interface IUserPrivacy {
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
+    public static createFromLegacy(method: PrivacyMethod, optOutEnabled: boolean): UserPrivacy {
+        switch (method) {
+            case PrivacyMethod.DEVELOPER_CONSENT:
+                // it's unknown if user actually gave a consent (i.e. was game using developer_consent during that session)
+                // or an opt-out therefore the optOutEnabled value is ambiguous
+                return this.createUnrecorded();
+            case PrivacyMethod.LEGITIMATE_INTEREST:
+                return new UserPrivacy({
+                    method: PrivacyMethod.LEGITIMATE_INTEREST,
+                    version: 0,
+                    permissions: {
+                        gameExp: false,
+                        ads: !optOutEnabled,
+                        external: false
+                    }
+                });
+            default:
+                throw new Error('Unsupported privacy method');
+        }
+    }
+
+    public static createUnrecorded(): UserPrivacy {
+        return new UserPrivacy({
+            method: PrivacyMethod.DEFAULT,
+            version: 0,
+            permissions: {
+                gameExp: false,
+                ads: false,
+                external: false
+            }
+        });
+    }
 
     constructor(data: IRawUserPrivacy) {
         super('UserPrivacy', {

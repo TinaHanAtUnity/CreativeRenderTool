@@ -1,27 +1,18 @@
-import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert } from 'chai';
-import { Platform } from 'Core/Constants/Platform';
 
-import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import 'mocha';
-import * as sinon from 'sinon';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-describe('configurationParserTest', () => {
+describe('CoreConfigurationParserTest', () => {
 
     let coreConfig: CoreConfiguration;
-    let adsConfig: AdsConfiguration;
 
     describe('Parsing json to configuration', () => {
         beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationJson));
         });
 
         it('should have enabled parameter from configuration', () => {
@@ -44,10 +35,6 @@ describe('configurationParserTest', () => {
             assert.equal(coreConfig.getProperties(), 'abcdefgh12345678');
         });
 
-        it('should have forced cache mode', () => {
-            assert.equal(adsConfig.getCacheMode(), CacheMode.FORCED);
-        });
-
         it('should have projectId parameter from configuration', () => {
             assert.equal(coreConfig.getUnityProjectId(), 'abcd-1234');
         });
@@ -60,22 +47,6 @@ describe('configurationParserTest', () => {
             assert.equal(coreConfig.getOrganizationId(), '5552368');
         });
 
-        it('should have gdprEnabled parameter from configuration', () => {
-            assert.equal(adsConfig.isGDPREnabled(), false);
-        });
-
-        it('should have optOutRecorded parameter from configuration', () => {
-            assert.equal(adsConfig.isOptOutRecorded(), false);
-        });
-
-        it('should have optOutEnabled parameter from configuration', () => {
-            assert.equal(adsConfig.isOptOutEnabled(), false);
-        });
-
-        it('should have game privacy method parameter from configuration', () => {
-            assert.equal(adsConfig.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
-        });
-
         it('should have server side test mode false when undefined in config', () => {
             assert.equal(coreConfig.getTestMode(), false);
         });
@@ -83,68 +54,6 @@ describe('configurationParserTest', () => {
         it('should have server side test mode true when defined in config', () => {
             coreConfig.set('test', true);
             assert.equal(coreConfig.getTestMode(), true);
-        });
-
-        describe('parsing placements', () => {
-            it('should get all placements', () => {
-                assert.property(adsConfig.getPlacements(), 'premium');
-                assert.property(adsConfig.getPlacements(), 'video');
-                assert.property(adsConfig.getPlacements(), 'mraid');
-                assert.property(adsConfig.getPlacements(), 'rewardedVideoZone');
-            });
-
-            it('should pick default', () => {
-                assert.equal(adsConfig.getDefaultPlacement().getId(), 'video');
-            });
-
-            it('should return placement by id', () => {
-                assert.equal(adsConfig.getPlacement('premium').getName(), 'Premium placement');
-            });
-        });
-
-        describe('Parsing GamePrivacy', () => {
-            let configJson: IRawAdsConfiguration;
-            beforeEach(() => {
-                configJson = JSON.parse(ConfigurationJson);
-            });
-
-            describe('when game privacy method is undefined', () => {
-                beforeEach(() => configJson.gamePrivacy!.method = undefined);
-
-                it('should set to DEFAULT if GDPR not enabled', () => {
-                    configJson.gdprEnabled = false;
-                    const config = AdsConfigurationParser.parse(configJson);
-                    assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
-                    assert.equal(config.getGamePrivacy().isEnabled(), false);
-                });
-
-                it('should set to LEGITIMATE_INTEREST if GDPR enabled', () => {
-                    configJson.gdprEnabled = true;
-                    const config = AdsConfigurationParser.parse(configJson);
-                    assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
-                    assert.equal(config.getGamePrivacy().isEnabled(), false);
-                });
-            });
-
-            it('should set to UNITY_CONSENT', () => {
-                configJson.gamePrivacy!.method = 'unity_consent';
-                const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
-                assert.equal(config.getGamePrivacy().isEnabled(), true);
-            });
-        });
-
-        describe('Parsing UserPrivacy', () => {
-            let configJson: IRawAdsConfiguration;
-            beforeEach(() => {
-                configJson = JSON.parse(ConfigurationJson);
-            });
-
-            it('should mark as not recorded if userPrivacy is undefined', () => {
-                configJson.userPrivacy = undefined;
-                const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getUserPrivacy().isRecorded(), false);
-            });
         });
     });
 });
