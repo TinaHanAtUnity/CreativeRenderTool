@@ -45,13 +45,21 @@ module.exports = {
             },
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true
+                        }
+                    }
+                ],
                 exclude: [/node_modules/, /test/]
             },
             {
                 test: /\.js$/,
                 exclude: [/node_modules/, /dist/],
                 use: [
+                    { loader: 'thread-loader' },
                     { loader: 'babel-loader' },
                 ],
             },

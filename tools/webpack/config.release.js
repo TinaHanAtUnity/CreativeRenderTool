@@ -1,6 +1,8 @@
 const path = require('path');
 const merge = require('webpack-merge');
+const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const HtmlWebPackPlugin = require('html-webpack-plugin');
@@ -20,8 +22,8 @@ const plugins = [
         inject: 'body',
         inlineSource: '.(js|css)$',
     }),
-    new HtmlWebpackInlineSourcePlugin()
-    // runBundleAnalyzer && new BundleAnalyzerPlugin(),
+    new HtmlWebpackInlineSourcePlugin(),
+    runBundleAnalyzer && new BundleAnalyzerPlugin(),
 ].filter(truthy => truthy);
 
 const production = {
@@ -61,8 +63,20 @@ const production = {
                 },
             },
         },
+        minimizer: [
+            new TerserJSPlugin({
+                parallel: true,
+                terserOptions: {
+                    mangle: {
+                        properties: true,
+                    },
+                }
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ],
     },
     stats: 'errors-only',
+
 };
 
 module.exports = merge(common, production);
