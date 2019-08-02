@@ -1,3 +1,10 @@
+# Pending
+
+* Update Analytics Standard Event Protocol [#10669](https://github.com/Applifier/unity-ads-webview/pull/10669)
+* Add Click Listener Event to Vast Endscreens [#10677](https://github.com/Applifier/unity-ads-webview/pull/10677)
+* Fix Forcing ABGroup 0 When Set in TestEnvironment Metadata [#10661](https://github.com/Applifier/unity-ads-webview/pull/10661)
+* Add Animated Download Button Test on ABGroup 5 and 6 [#10464](https://github.com/Applifier/unity-ads-webview/pull/10464)
+
 # Thu Aug  1 16:02:31 UTC 2019
 
 * Disable AppSheet for iOS 11.3 and 11.4 [#10676](https://github.com/Applifier/unity-ads-webview/pull/10676)
