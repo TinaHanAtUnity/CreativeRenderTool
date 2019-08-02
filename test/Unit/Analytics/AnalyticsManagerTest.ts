@@ -13,6 +13,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 class TestHelper {
     public static getEventType<T>(data: string) {
@@ -28,7 +29,7 @@ class TestHelper {
         let nativeBridge: NativeBridge;
         let analytics: IAnalyticsApi;
         let adsConfiguration: AdsConfiguration;
-        let analyticsManager: AnalyticsManager;
+        let analyticsManager: IAnalyticsManager;
         let analyticsStorage: AnalyticsStorage;
         let coreModule: ICore;
 
@@ -50,7 +51,7 @@ class TestHelper {
         describe('SilentAnalyticsManager (Analytics Disabled)', () => {
 
             beforeEach(() => {
-                analyticsManager = new SilentAnalyticsManager(coreModule, analytics, adsConfiguration, analyticsStorage);
+                analyticsManager = new SilentAnalyticsManager();
             });
 
             it('should not send session start event', () => {
@@ -99,7 +100,7 @@ class TestHelper {
             it('should clear queue after event is sent', () => {
                 // tslint:disable:no-string-literal
                 return analyticsManager.init().then(() => {
-                    const eventQueue: any = analyticsManager['_analyticsEventQueue'];
+                    const eventQueue: any = (<AnalyticsManager>analyticsManager)['_analyticsEventQueue'];
                     const promise = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {
                         assert.equal(Object.keys(eventQueue).length, 0);
                     });
@@ -112,7 +113,7 @@ class TestHelper {
             it('should clear queue after multiple events are sent', () => {
                 // tslint:disable:no-string-literal
                 return analyticsManager.init().then(() => {
-                    const eventQueue: any = analyticsManager['_analyticsEventQueue'];
+                    const eventQueue: any = (<AnalyticsManager>analyticsManager)['_analyticsEventQueue'];
                     const postStub = <sinon.SinonStub>coreModule.RequestManager.post;
                     postStub.resetHistory();
                     const first = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).catch((error) => {
@@ -141,7 +142,7 @@ class TestHelper {
             it('should clear queue when first send fails and second succeeds', () => {
                 // tslint:disable:no-string-literal
                 return analyticsManager.init().then(() => {
-                    const eventQueue: any = analyticsManager['_analyticsEventQueue'];
+                    const eventQueue: any = (<AnalyticsManager>analyticsManager)['_analyticsEventQueue'];
                     const postStub = <sinon.SinonStub>coreModule.RequestManager.post;
                     postStub.resetHistory();
                     postStub.rejects();

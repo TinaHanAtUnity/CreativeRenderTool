@@ -6,12 +6,13 @@ import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { ICore } from 'Core/ICore';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export class Analytics implements IAnalytics {
 
     public readonly Api: Readonly<IAnalyticsApi>;
 
-    public AnalyticsManager: AnalyticsManager;
+    public AnalyticsManager: IAnalyticsManager;
     public AnalyticsStorage: AnalyticsStorage;
 
     private _core: ICore;
@@ -27,7 +28,7 @@ export class Analytics implements IAnalytics {
         if (core.Config.isAnalyticsEnabled()) {
             this.AnalyticsManager = new AnalyticsManager(core, this.Api, adsConfiguration, this.AnalyticsStorage);
         } else {
-            this.AnalyticsManager = new SilentAnalyticsManager(core, this.Api, adsConfiguration, this.AnalyticsStorage);
+            this.AnalyticsManager = new SilentAnalyticsManager();
         }
     }
 

@@ -13,6 +13,7 @@ import {
     IAnalyticsCommonObjectV1
 } from 'Analytics/AnalyticsProtocol';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi, ICore } from 'Core/ICore';
@@ -44,7 +45,7 @@ enum NativeAnalyticsTopic {
     Transaction = 'analytics.transaction.v1'
 }
 
-export class AnalyticsManager {
+export class AnalyticsManager implements IAnalyticsManager {
 
     private static storageAnalyticsQueueKey: string = 'analytics.event.queue';
 

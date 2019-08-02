@@ -1,7 +1,7 @@
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsGenericEvent, IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
-export class SilentAnalyticsManager extends AnalyticsManager {
+export class SilentAnalyticsManager implements IAnalyticsManager {
 
     public onIapTransaction(productId: string, receipt: string, currency: string, price: number): Promise<void[]> {
         return Promise.resolve([]);
@@ -11,11 +11,10 @@ export class SilentAnalyticsManager extends AnalyticsManager {
         // Do nothing
     }
 
-    protected onPostEvent(events: AnalyticsGenericEvent[]): void {
-        // Do nothing
-    }
-
-    protected send<T>(event: IAnalyticsObject<T>): Promise<void> {
+    public init(): Promise<void> {
         return Promise.resolve();
+    }
+    public getGameSessionId(): number {
+        return 0;
     }
 }
