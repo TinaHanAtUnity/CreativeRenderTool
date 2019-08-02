@@ -285,6 +285,10 @@ export class UserPrivacyManager {
     }
 
     private updateConfigurationWithConsent(consent: boolean) {
+        if (this._deviceInfo.getLimitAdTracking()) {
+            consent = false;
+        }
+
         this._adsConfig.setOptOutEnabled(!consent);
         this._adsConfig.setOptOutRecorded(true);
 
