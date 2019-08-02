@@ -111,7 +111,7 @@ export class ConfigManager {
         ].join('/');
 
         let abGroup;
-        if (ConfigManager.AbGroup) {
+        if (ConfigManager.AbGroup !== undefined) {
             abGroup = ConfigManager.AbGroup;
         }
 
