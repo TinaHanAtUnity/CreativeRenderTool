@@ -205,7 +205,7 @@ export class AnalyticsProtocol {
         const currentTime = Date.now();
         const appRunningEvent: IAnalyticsAppRunningEventV1 = {
             ts: currentTime,
-            timeSinceStart: appStartTime - currentTime,
+            timeSinceStart: currentTime - appStartTime,
             localTimeOffset: new Date().getTimezoneOffset() * -1 * 60 * 1000
         };
         return {

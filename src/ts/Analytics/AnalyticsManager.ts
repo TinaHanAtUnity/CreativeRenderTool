@@ -61,12 +61,12 @@ export class AnalyticsManager {
     private _storage: AnalyticsStorage;
     private _focusManager: FocusManager;
 
-    private _bgTimestamp: number;
+    private _backgroundTimestamp: number;
     private _topActivity: string;
 
-    private _endpoint: string;
-    private _cdpEndpoint: string;
-    private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
+    private _endpoint: string = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
+    private _cdpEndpoint: string = 'https://cdp.cloud.unity3d.com/v1/events';
+    private _newSessionThreshold: number = 1800000; // 30 minutes in milliseconds
 
     private _analyticsEventQueue: { [key: string]: IAnalyticsEventWrapper };
 
@@ -100,9 +100,6 @@ export class AnalyticsManager {
         this._configuration = core.Config;
         this._adsConfiguration = adsConfiguration;
         this._storage = analyticsStorage;
-
-        this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
-        this._cdpEndpoint = 'https://cdp.cloud.unity3d.com/v1/events';
 
         this._analyticsEventQueue = {};
         this._analytics.Analytics.onPostEvent.subscribe((eventData) => this.onPostEvent(eventData));
@@ -265,7 +262,7 @@ export class AnalyticsManager {
     }
 
     private onAppForeground(): void {
-        if (this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._backgroundTimestamp && Date.now() - this._backgroundTimestamp > this._newSessionThreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._analyticsSessionId = sessionId;
                 this._storage.setIds(this._analyticsUserId, this._analyticsSessionId);
@@ -275,12 +272,12 @@ export class AnalyticsManager {
     }
 
     private onAppBackground(): void {
-        this._bgTimestamp = Date.now();
+        this._backgroundTimestamp = Date.now();
         this.sendAppRunning();
     }
 
     private onActivityResumed(activity: string): void {
-        if (this._topActivity === activity && this._bgTimestamp && Date.now() - this._bgTimestamp > this._newSessionTreshold) {
+        if (this._topActivity === activity && this._backgroundTimestamp && Date.now() - this._backgroundTimestamp > this._newSessionThreshold) {
             this._storage.getSessionId(false).then(sessionId => {
                 this._analyticsSessionId = sessionId;
                 this._storage.setIds(this._analyticsUserId, this._analyticsSessionId);
@@ -293,7 +290,7 @@ export class AnalyticsManager {
 
     private onActivityPaused(activity: string): void {
         if (this._topActivity === activity || !this._topActivity) {
-            this._bgTimestamp = Date.now();
+            this._backgroundTimestamp = Date.now();
             this.sendAppRunning();
         }
 
