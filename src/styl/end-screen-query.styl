@@ -1,0 +1,67 @@
+@import "vars.styl";
+
+#end-screen {
+  .download-query {
+    padding-top: $endscreen-default-size * .7;
+    padding-bottom: $endscreen-default-size * .5;
+
+    .download-query-text {
+      color: $end-screen-game-name-color;
+      font-size: 80%;
+    }
+  }
+  
+  .download-container-query {
+    display: block;
+    padding-top: 0;
+    background-color: transparent;
+
+    .download-button {
+      padding: $endscreen-default-size * .6 0;
+      border-radius: $endscreen-default-size * .6;
+    }
+
+    .download-yes {
+      float: right;
+      width: 60%;
+      background: $blue;
+    }
+
+    .download-no {
+      float: left;
+      width: 35%;
+      background: $light-gray;
+    }
+  }
+}
+
+body {
+  &.portrait #end-screen {
+    .end-screen-info {
+      .download-container-query {
+        margin-top: 0;
+      }
+    }
+  }
+
+  &.ios {
+    #end-screen .end-screen-info {
+      .download-container-query {
+        border-radius: 2.25 * $endscreen-default-size;
+      }
+    }
+  }
+
+  &.landscape #end-screen {
+    .end-screen-info {
+      .download-container-query {
+        margin-top: 0;
+      }
+    }
+
+    .download-query {
+      padding-top: $endscreen-default-size * 1;
+      padding-bottom: $endscreen-default-size * .5;
+    }
+  }
+}
