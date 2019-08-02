@@ -1,3 +1,9 @@
+# Thu Aug  1 16:02:31 UTC 2019
+
+* Disable AppSheet for iOS 11.3 and 11.4 [#10676](https://github.com/Applifier/unity-ads-webview/pull/10676)
+* Query CTA on End Screen [#10052](https://github.com/Applifier/unity-ads-webview/pull/10052)
+* Load API Whitelist update 7 29 2019 [#10673](https://github.com/Applifier/unity-ads-webview/pull/10673)
+
 # Thu Jul 25 23:03:39 UTC 2019
 
 * Open Measurement - Add OMID to Admob Path as DisabledABGroup [#10600](https://github.com/Applifier/unity-ads-webview/pull/10600)
