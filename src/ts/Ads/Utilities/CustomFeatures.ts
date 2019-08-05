@@ -3,12 +3,13 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
+import { SliderEndCardExperiment, ParallaxEndScreenExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import ParallaxEndScreenImagesJson from 'json/experiments/ParallaxEndScreenImages.json';
 
-const JsonStringObjectParser = (json: string): { [index: string]: number } => {
+const JsonStringObjectParser = <T>(json: string): { [index: string]: T } => {
     try {
         return JSON.parse(json);
     } catch {
@@ -16,7 +17,8 @@ const JsonStringObjectParser = (json: string): { [index: string]: number } => {
     }
 };
 
-const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
+const ParallaxEndScreenImages = JsonStringObjectParser<number[][]>(ParallaxEndScreenImagesJson);
+const SliderEndScreenImages = JsonStringObjectParser<number>(SliderEndScreenImagesJson);
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
@@ -136,6 +138,15 @@ export class CustomFeatures {
 
     public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
         return SliderEndScreenImages[targetGameAppStoreId];
+    }
+
+    public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string) {
+        // return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages[targetGameAppStoreId] !== undefined;
+        return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages['com.unity3d.genericremote'] !== undefined;
+    }
+
+    public static getParallaxEndScreenData(targetGameAppStoreId: string): number[][] {
+        return ParallaxEndScreenImages[targetGameAppStoreId];
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
