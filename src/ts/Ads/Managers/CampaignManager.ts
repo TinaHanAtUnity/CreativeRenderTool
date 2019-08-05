@@ -618,6 +618,9 @@ export class CampaignManager {
             } else {
                 throw error;
             }
+        }).catch((error) => {
+            this.reportToCreativeBlockingService(error, parser.creativeID, parser.seatID, parser.campaignID);
+            throw error;
         }).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for (const placement of response.getPlacements()) {
@@ -627,13 +630,20 @@ export class CampaignManager {
             campaign.setMediaId(response.getMediaId());
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
-        }).catch((error) => {
-            CreativeBlocking.report(parser.creativeID, parser.seatID, parser.campaignID, BlockingReason.VIDEO_PARSE_FAILURE, {
-                errorCode: error.errorCode || undefined,
-                message: error.message || undefined
-            });
-            throw error;
         });
+    }
+
+    private reportToCreativeBlockingService(error: unknown, creativeId: string | undefined, seatId: number | undefined, campaignId: string): void {
+        let errorMessage = {};
+
+        if (error instanceof CampaignError) {
+            errorMessage = {
+                message: error.message,
+                errorCode: error.errorCode,
+                subCampaignErrors: error.getAllCampaignErrors()
+            };
+        }
+        CreativeBlocking.report(creativeId, seatId, campaignId, BlockingReason.VIDEO_PARSE_FAILURE, errorMessage);
     }
 
     private setupCampaignAssets(placements: AuctionPlacement[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
