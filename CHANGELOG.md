@@ -1,4 +1,4 @@
-# Pending
+# Mon Aug  5 18:13:14 UTC 2019
 
 * Update Analytics Standard Event Protocol [#10669](https://github.com/Applifier/unity-ads-webview/pull/10669)
 * Add Click Listener Event to Vast Endscreens [#10677](https://github.com/Applifier/unity-ads-webview/pull/10677)
