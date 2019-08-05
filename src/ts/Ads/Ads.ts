@@ -189,6 +189,9 @@ export class Ads implements IAds {
                 // error happens when consent value is undefined
             });
         }).then(() => {
+            return this._core.Api.Sdk.initComplete();
+        }).then(() => {
+
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
