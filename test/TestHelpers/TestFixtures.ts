@@ -16,7 +16,7 @@ import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
-import { WebPlayerApi, WebPlayerViewId } from 'Ads/Native/WebPlayer';
+import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';

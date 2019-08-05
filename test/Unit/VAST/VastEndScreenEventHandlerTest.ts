@@ -33,7 +33,6 @@ import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEvent
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
-import EventTestVast from 'xml/EventTestVast.xml';
 import { IStoreApi } from 'Store/IStore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -169,11 +168,12 @@ import { IStoreApi } from 'Store/IStore';
             let campaign: VastCampaign;
             let vastEndScreen: VastEndScreen;
             let vastEndScreenEventHandler: VastEndScreenEventHandler;
+            let clickListenerStub: sinon.SinonStub;
 
             beforeEach(() => {
-
                 video = new Video('', TestFixtures.getSession());
                 campaign = TestFixtures.getEventVastCampaign();
+                clickListenerStub = sinon.stub(ads.Listener, 'sendClickEvent');
 
                 vastAdUnitParameters.video = video;
                 vastAdUnitParameters.campaign = campaign;
@@ -197,6 +197,7 @@ import { IStoreApi } from 'Store/IStore';
                 it('should send a tracking event for vast video end card click', () => {
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                        sinon.assert.calledOnce(clickListenerStub);
                         sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
                         sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendCompanionClickTrackingEvent);
                     });
@@ -205,6 +206,7 @@ import { IStoreApi } from 'Store/IStore';
                 it('should send second tracking event for vast video end card click after processing the first', () => {
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                        sinon.assert.calledOnce(clickListenerStub);
                         return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                             sinon.assert.calledTwice(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
                             sinon.assert.calledTwice(<sinon.SinonSpy>vastAdUnit.sendCompanionClickTrackingEvent);
@@ -217,6 +219,7 @@ import { IStoreApi } from 'Store/IStore';
                     const expectationEndScreen = sinon.mock(vastEndScreen).expects('setCallButtonEnabled').twice();
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
                     vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                        sinon.assert.calledOnce(clickListenerStub);
                         mockEndScreen.verify();
                         assert.equal(expectationEndScreen.getCall(0).args[0], false, 'Should disable end screen CTA while processing click event');
                         assert.equal(expectationEndScreen.getCall(1).args[0], true, 'Should enable end screen CTA after processing click event');
@@ -228,6 +231,7 @@ import { IStoreApi } from 'Store/IStore';
                     sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns(null);
                     sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('https://bar.com');
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                        sinon.assert.calledOnce(clickListenerStub);
                         sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, 'https://bar.com');
                     });
                 });
@@ -236,6 +240,7 @@ import { IStoreApi } from 'Store/IStore';
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
                     sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                        sinon.assert.calledOnce(clickListenerStub);
                         sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, 'https://foo.com');
                     });
                 });
@@ -247,6 +252,7 @@ import { IStoreApi } from 'Store/IStore';
                     sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                        sinon.assert.calledOnce(clickListenerStub);
                         sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
                             'action': 'android.intent.action.VIEW',
                             'uri': 'https://foo.com'
