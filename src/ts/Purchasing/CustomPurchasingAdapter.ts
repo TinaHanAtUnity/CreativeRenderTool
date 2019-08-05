@@ -14,20 +14,21 @@ import {
     ITransactionDetails,
     ITransactionErrorDetails
 } from 'Purchasing/PurchasingAdapter';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export class CustomPurchasingAdapter implements IPurchasingAdapter {
     public readonly onCatalogRefreshed = new Observable1<IProduct[]>();
 
     private _core: ICoreApi;
     private _purchasing: IPurchasingApi;
-    private _analyticsManager?: AnalyticsManager;
+    private _analyticsManager?: IAnalyticsManager;
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
 
     private static purchasePathRegex = new RegExp('events\/v1\/purchase');
     private static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
 
-    constructor(core: ICoreApi, purchasing: IPurchasingApi, promoEvents: PromoEvents, request: RequestManager, analyticsManager?: AnalyticsManager) {
+    constructor(core: ICoreApi, purchasing: IPurchasingApi, promoEvents: PromoEvents, request: RequestManager, analyticsManager?: IAnalyticsManager) {
         this._core = core;
         this._purchasing = purchasing;
         this._analyticsManager = analyticsManager;
