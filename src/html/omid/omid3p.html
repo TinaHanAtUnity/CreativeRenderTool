@@ -49,7 +49,7 @@
                                 listener(parameters);
                             });
 
-                            var notAdEvent = (eventType !== 'geometryChange' && eventType !== 'impression');
+                            const notAdEvent = (eventType !== 'geometryChange' && eventType !== 'impression');
                             if (videoListeners['video'].length > 0 && notAdEvent) {
                                 videoListeners['video'].forEach(function(listener) {
                                     listener(parameters);
