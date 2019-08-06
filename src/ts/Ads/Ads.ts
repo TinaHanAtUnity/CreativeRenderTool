@@ -189,9 +189,6 @@ export class Ads implements IAds {
                 // error happens when consent value is undefined
             });
         }).then(() => {
-            return this._core.Api.Sdk.initComplete();
-        }).then(() => {
-
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
@@ -268,10 +265,12 @@ export class Ads implements IAds {
                 }
             });
 
-            return this.RefreshManager.initialize().then((resp) => {
-                return resp;
-            }).catch((error) => {
-                throw error;
+            return this._core.Api.Sdk.initComplete().then(() => {
+                return this.RefreshManager.initialize().then((resp) => {
+                    return resp;
+                }).catch((error) => {
+                    throw error;
+                });
             });
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
