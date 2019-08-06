@@ -3,6 +3,9 @@
 * Send CampaignError Information to CreativeBlocking Service [#10750](https://github.com/Applifier/unity-ads-webview/pull/10750)
 * Open Measurement - Change verification injection functions [#10747](https://github.com/Applifier/unity-ads-webview/pull/10747)
 * Revert Query CTA on End Screen Experiement [#10751](https://github.com/Applifier/unity-ads-webview/pull/10751)
+* Change CreativeBlocking Payload Naming to be More Descriptive [#10776](https://github.com/Applifier/unity-ads-webview/pull/10776)
+* Add game ids to load custom feature [#10752](https://github.com/Applifier/unity-ads-webview/pull/10752)
+* Open Measurement - Adjust Geometry Overlap Calculations [#10670](https://github.com/Applifier/unity-ads-webview/pull/10670)
 
 # Mon Aug  5 18:13:14 UTC 2019
 
