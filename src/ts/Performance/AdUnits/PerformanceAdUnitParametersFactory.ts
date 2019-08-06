@@ -17,9 +17,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { AnimatedDownloadButtonTest, QueryCTATest } from 'Core/Models/ABGroup';
-import { PerformanceEndScreenQueryCTASquare } from 'Performance/Views/PerformanceEndScreenQueryCTASquare';
-import { PerformanceEndScreenQueryCTA } from 'Performance/Views/PerformanceEndScreenQueryCTA';
+import { AnimatedDownloadButtonTest } from 'Core/Models/ABGroup';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -52,12 +50,6 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
         if (AnimatedDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (QueryCTATest.isValid(abGroup)) {
-            if (baseParams.campaign.getSquare() === undefined) {
-                endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-            } else {
-                endScreen = new PerformanceEndScreenQueryCTASquare(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-            }
         } else if (baseParams.campaign instanceof SliderPerformanceCampaign) {
             endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
