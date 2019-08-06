@@ -714,10 +714,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public injectAsString(resourceUrl: string, vendorKey: string) {
-        let scriptTag = `<script id='verificationScript#${vendorKey}' src='${resourceUrl}' onerror='window.omid3p.postback("onEventProcessed", {
-            eventType: "loadError"
-        })'><`;
-        scriptTag += '/script>';  // prevents needing escape char
-        this._omIframe.srcdoc += scriptTag;
+        const dom = new DOMParser().parseFromString(this._omIframe.srcdoc, 'text/html');
+        const scriptEl = dom.createElement('script');
+        dom.head.appendChild(scriptEl);
+        scriptEl.id = `verificationScript#${vendorKey}`;
+        scriptEl.setAttribute('onerror', 'window.omid3p.postback(\'onEventProcessed\', {eventType: \'loadError\'})');
+        scriptEl.setAttribute('type', 'text/javascript');
+        scriptEl.setAttribute('src', resourceUrl);
+        this._omIframe.setAttribute('srcdoc', dom.documentElement.outerHTML);
     }
 }
