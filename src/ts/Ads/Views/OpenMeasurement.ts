@@ -15,6 +15,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
@@ -427,6 +428,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             videoHeight = this._videoViewRectangle.height;
         }
 
+        if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
+            topLeftX = 0;
+            topLeftY = 0;
+            videoWidth = 0;
+            videoHeight = 0;
+        }
+
         const adView: IAdView = {
             percentageInView: percentInView,
             geometry: {
@@ -467,6 +475,17 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         return adView;
+    }
+
+    public getScreenDensity(): number {
+        if (this._platform === Platform.ANDROID) {
+            return (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity();
+        }
+        return 0;
+    }
+
+    public getAndroidViewSize(size: number, density: number): number {
+        return size * (density / 160);
     }
 
     public calculatePercentageInView(videoRectangle: IRectangle, obstruction: IRectangle, screenRectangle: IRectangle) {
@@ -578,7 +597,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (accessMode === AccessMode.LIMITED) {
             impressionObject.viewPort = this.calculateViewPort(screenWidth, screenHeight);
-            impressionObject.adView = this.calculateVastAdView(100, [], screenWidth, screenHeight, measuringElementAvailable, []);
+            const screenRectangle = this.createRectangle(0, 0, screenWidth, screenHeight);
+
+            const percentageInView = this.calculateObstructionOverlapPercentage(this._videoViewRectangle, screenRectangle);
+            const obstructionReasons: ObstructionReasons[] = [];
+            if (percentageInView < 100) {
+                obstructionReasons.push(ObstructionReasons.HIDDEN);
+            }
+            impressionObject.adView = this.calculateVastAdView(percentageInView, obstructionReasons, screenWidth, screenHeight, measuringElementAvailable, []);
         }
 
         return impressionObject;

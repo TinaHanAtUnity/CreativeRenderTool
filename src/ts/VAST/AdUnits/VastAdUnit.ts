@@ -198,10 +198,18 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._om) {
             this._om.resume();
 
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
                 if (this._om) {
                     const viewPort = this._om.calculateViewPort(width, height);
-                    const adView = this._om.calculateVastAdView(100, [], width, height, true, []);
+                    const screenView = this._om.createRectangle(0, 0, width, height);
+                    const videoView = this._om.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+
+                    const percentInView = this._om.calculateObstructionOverlapPercentage(videoView, screenView);
+                    const obstructionReasons: ObstructionReasons[] = [];
+                    if (percentInView < 100) {
+                        obstructionReasons.push(ObstructionReasons.HIDDEN);
+                    }
+                    const adView = this._om.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
                     this._om.geometryChange(viewPort, adView);
                 }
             });
