@@ -634,16 +634,16 @@ export class CampaignManager {
     }
 
     private reportToCreativeBlockingService(error: unknown, creativeId: string | undefined, seatId: number | undefined, campaignId: string): void {
-        let errorMessage = {};
+        let parseErrorPayload = {};
 
         if (error instanceof CampaignError) {
-            errorMessage = {
-                message: error.message,
-                errorCode: error.errorCode,
-                subCampaignErrors: error.getAllCampaignErrors()
+            parseErrorPayload = {
+                parsingFailureReason: error.message,
+                vastErrorCode: error.errorCode,
+                additionalCampaignErrors: error.getAllCampaignErrors()
             };
         }
-        CreativeBlocking.report(creativeId, seatId, campaignId, BlockingReason.VIDEO_PARSE_FAILURE, errorMessage);
+        CreativeBlocking.report(creativeId, seatId, campaignId, BlockingReason.VIDEO_PARSE_FAILURE, parseErrorPayload);
     }
 
     private setupCampaignAssets(placements: AuctionPlacement[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
