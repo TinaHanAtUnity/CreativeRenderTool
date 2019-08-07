@@ -26,6 +26,7 @@
                         volumeChange: [],
                         playerStateChange: [],
                         adUserInteraction: [],
+                        video: [],
         
                         /* 
                         * Common Ad Event Types
@@ -47,6 +48,12 @@
                             videoListeners[event].forEach(function(listener) {
                                 listener(parameters);
                             });
+
+                            if (event !== 'geometryChange' && event !== 'impression' && event !== 'video') {
+                                videoListeners['video'].forEach(function(listener) {
+                                    listener(parameters);
+                                });
+                            }
                         }
                     };
         
@@ -190,10 +197,6 @@
                     }
         
                     this.addEventListener = function(type, listener) {
-                        if (type === 'video') {
-                            this._registerVideoEvents();
-                        }
-        
                         if(type in videoListeners && videoListeners[type] !== listener) {
                             videoListeners[type].push(listener);
                         }
@@ -204,7 +207,6 @@
                     this.setClearTimeout = function() {}
                     this.setInterval = function() {}
                     this.clearInterval = function() {}
-                    this._registerVideoEvents = function() {};
                 }
         
                 /**
