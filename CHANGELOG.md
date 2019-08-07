@@ -1,3 +1,25 @@
+# Pending
+
+* Send CampaignError Information to CreativeBlocking Service [#10750](https://github.com/Applifier/unity-ads-webview/pull/10750)
+* Open Measurement - Change verification injection functions [#10747](https://github.com/Applifier/unity-ads-webview/pull/10747)
+* Revert Query CTA on End Screen Experiement [#10751](https://github.com/Applifier/unity-ads-webview/pull/10751)
+* Change CreativeBlocking Payload Naming to be More Descriptive [#10776](https://github.com/Applifier/unity-ads-webview/pull/10776)
+* Add game ids to load custom feature [#10752](https://github.com/Applifier/unity-ads-webview/pull/10752)
+* Open Measurement - Adjust Geometry Overlap Calculations [#10670](https://github.com/Applifier/unity-ads-webview/pull/10670)
+
+# Mon Aug  5 18:13:14 UTC 2019
+
+* Update Analytics Standard Event Protocol [#10669](https://github.com/Applifier/unity-ads-webview/pull/10669)
+* Add Click Listener Event to Vast Endscreens [#10677](https://github.com/Applifier/unity-ads-webview/pull/10677)
+* Fix Forcing ABGroup 0 When Set in TestEnvironment Metadata [#10661](https://github.com/Applifier/unity-ads-webview/pull/10661)
+* Add Animated Download Button Test on ABGroup 5 and 6 [#10464](https://github.com/Applifier/unity-ads-webview/pull/10464)
+
+# Thu Aug  1 16:02:31 UTC 2019
+
+* Disable AppSheet for iOS 11.3 and 11.4 [#10676](https://github.com/Applifier/unity-ads-webview/pull/10676)
+* Query CTA on End Screen [#10052](https://github.com/Applifier/unity-ads-webview/pull/10052)
+* Load API Whitelist update 7 29 2019 [#10673](https://github.com/Applifier/unity-ads-webview/pull/10673)
+
 # Thu Jul 25 23:03:39 UTC 2019
 
 * Open Measurement - Add OMID to Admob Path as DisabledABGroup [#10600](https://github.com/Applifier/unity-ads-webview/pull/10600)

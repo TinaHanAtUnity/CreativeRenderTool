@@ -59,19 +59,33 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 return Promise.resolve();
             }
 
-            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this._vastAdUnit.getVideoViewRectangle()]).then(([screenWidth, screenHeight, rectangle]) => {
                 if (this._om) {
-                    this._viewPort = this._om.calculateViewPort(screenWidth, screenHeight);
-                    const obstructionRectangle = {
-                        x: x,
-                        y: y,
-                        width: width,
-                        height: height
-                    };
-                    const percentCoverage = (width / screenWidth) + (height / screenHeight);
-                    const percentInView = (1 - percentCoverage) * 100;
 
-                    this._obstructedAdView = this._om.calculateVastAdView(percentInView, [ObstructionReasons.OBSTRUCTED], screenWidth, screenHeight, true, [obstructionRectangle]);
+                    // TODO: Move to internal function
+                    this._viewPort = this._om.calculateViewPort(screenWidth, screenHeight);
+                    let obstructionRectangle = this._om.createRectangle(x, y, width, height);
+
+                    if (this._platform === Platform.ANDROID) {
+                        const adjustedx = this._om.getAndroidViewSize(x, this._om.getScreenDensity());
+                        const adjustedy = this._om.getAndroidViewSize(y, this._om.getScreenDensity());
+                        const adjustedwidth = this._om.getAndroidViewSize(width, this._om.getScreenDensity());
+                        const adjustedheight = this._om.getAndroidViewSize(height, this._om.getScreenDensity());
+                        obstructionRectangle = this._om.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
+                    }
+
+                    const screenView = this._om.createRectangle(0, 0, screenWidth, screenHeight);
+                    const videoView = this._om.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+                    const obstructionReasons: ObstructionReasons[] = [];
+
+                    if (this._om.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
+                        obstructionReasons.push(ObstructionReasons.HIDDEN);
+                    }
+
+                    const percentInView = this._om.calculatePercentageInView(videoView, obstructionRectangle, screenView);
+                    obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
+
+                    this._obstructedAdView = this._om.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
                     this._om.geometryChange(this._viewPort, this._obstructedAdView);
                 }
             });
@@ -89,10 +103,21 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 return Promise.resolve();
             }
 
-            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this._vastAdUnit.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
                 if (this._om) {
+
+                    // TODO: Move to internal function
+                    const screenView = this._om.createRectangle(0, 0, width, height);
+                    const videoView = this._om.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+
+                    const percentInView = this._om.calculateObstructionOverlapPercentage(videoView, screenView);
+                    const obstructionReasons: ObstructionReasons[] = [];
+                    if (percentInView < 100) {
+                        obstructionReasons.push(ObstructionReasons.HIDDEN);
+                    }
+
                     this._viewPort = this._om.calculateViewPort(width, height);
-                    this._unObstructedAdView = this._om.calculateVastAdView(100, [], width, height, true, []);
+                    this._unObstructedAdView = this._om.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
                     this._om.geometryChange(this._viewPort, this._unObstructedAdView);
                 }
             });

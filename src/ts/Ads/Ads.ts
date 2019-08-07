@@ -80,7 +80,6 @@ import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFac
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Analytics } from 'Analytics/Analytics';
 import { Promises } from 'Core/Utilities/Promises';
 
