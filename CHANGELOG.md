@@ -2,6 +2,7 @@
 
 * Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)
 * Move Backgrounded Ads Check Before Showing Consent Unit [#10779](https://github.com/Applifier/unity-ads-webview/pull/10779)
+* Fix .styl Lint Warnings [#10780](https://github.com/Applifier/unity-ads-webview/pull/10780)
 
 # Wed Aug  7 20:18:35 UTC 2019
 
