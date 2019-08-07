@@ -157,6 +157,7 @@
     from {
       transform: rotate(0deg);
     }
+
     to {
       transform: rotate(360deg);
     }
@@ -222,10 +223,13 @@
   .progress-wrapper,
   .circle-left,
   .circle-right {
-    animation-duration: .01s;
-    animation-iteration-count: 1;
-    animation-fill-mode: forwards;
     animation-timing-function: linear;
+
+    animation-fill-mode: forwards;
+
+    animation-iteration-count: 1;
+
+    animation-duration: .01s;
   }
 
   .gdpr-pop-up {
