@@ -35,8 +35,10 @@ context('UserPrivacyTests', () => {
 
     context('creating UserPrivacy from legacy opt-out fields', () => {
         const tests = [
-            { method: PrivacyMethod.LEGITIMATE_INTEREST, optOutEnabled: false, permissions: <IPermissions>{ ads: true }},
-            { method: PrivacyMethod.LEGITIMATE_INTEREST, optOutEnabled: true, permissions: <IPermissions>{ ads: false }}
+            { method: PrivacyMethod.LEGITIMATE_INTEREST, optOutEnabled: false, permissions: <IPermissions>{ ads: true, external: false }},
+            { method: PrivacyMethod.LEGITIMATE_INTEREST, optOutEnabled: true, permissions: <IPermissions>{ ads: false, external: false }},
+            { method: PrivacyMethod.DEVELOPER_CONSENT, optOutEnabled: false, permissions: <IPermissions>{ ads: true, external: false  }},
+            { method: PrivacyMethod.DEVELOPER_CONSENT, optOutEnabled: true, permissions: <IPermissions>{ ads: false, external: false  }}
         ];
         tests.forEach(({method, optOutEnabled, permissions }) => {
             it(`should create user with ${method} and optOutEnabled:${optOutEnabled}`, () => {
@@ -45,13 +47,6 @@ context('UserPrivacyTests', () => {
                 assert.equal(userPrivacy.getMethod(), method);
                 assert.include(<any>userPrivacy.getPermissions(), permissions);
             });
-        });
-
-        it('should create unrecorded user for DEVELOPER_CONSENT', () => {
-            // see UserPrivacy.createFromLegacy for reasoning.
-            const userPrivacy = UserPrivacy.createFromLegacy(PrivacyMethod.DEVELOPER_CONSENT, false);
-            assert.isFalse(userPrivacy.isRecorded());
-            assert.equal(userPrivacy.getVersion(), 0);
         });
 
         const nonLegacyMethods = [PrivacyMethod.DEFAULT, PrivacyMethod.UNITY_CONSENT];

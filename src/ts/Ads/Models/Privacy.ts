@@ -96,14 +96,14 @@ export class UserPrivacy extends Model<IUserPrivacy> {
     public static createFromLegacy(method: PrivacyMethod, optOutEnabled: boolean): UserPrivacy {
         switch (method) {
             case PrivacyMethod.DEVELOPER_CONSENT:
-                // it's unknown if user actually gave a consent (i.e. was game using developer_consent during that session)
-                // or an opt-out therefore the optOutEnabled value is ambiguous
-                return this.createUnrecorded();
             case PrivacyMethod.LEGITIMATE_INTEREST:
+                // it's unknown if user actually gave a consent (i.e. was game using developer_consent during that session)
+                // or an opt-out therefore the optOutEnabled value is ambiguous. Therefore `external` can't be set to !optOutEnabled.
                 return new UserPrivacy({
-                    method: PrivacyMethod.LEGITIMATE_INTEREST,
+                    method: method,
                     version: 0,
                     permissions: {
+                        all: false,
                         gameExp: false,
                         ads: !optOutEnabled,
                         external: false
