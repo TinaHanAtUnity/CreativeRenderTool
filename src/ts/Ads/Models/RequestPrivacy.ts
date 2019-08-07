@@ -59,7 +59,12 @@ export class RequestPrivacyFactory {
             };
         }
 
-        return <IGranularPermissions>permissions;
+        const { ads = false, external = false, gameExp = false} = <IGranularPermissions>permissions;
+        return {
+            gameExp,
+            ads,
+            external
+        };
     }
 
     public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {

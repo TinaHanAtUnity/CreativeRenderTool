@@ -27,7 +27,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 let result: IRequestPrivacy | undefined;
                 const expectedPermissions = { gameExp: false, ads: true, external: true };
                 beforeEach(() => {
-                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: expectedPermissions });
+                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: {all: false, ...expectedPermissions} });
                     gamePrivacy = new GamePrivacy({ method: method });
                     result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
                 });
