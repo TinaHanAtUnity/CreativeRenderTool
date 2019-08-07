@@ -265,9 +265,10 @@ export class Ads implements IAds {
                 }
             });
 
-            return this._core.Api.Sdk.initComplete().then(() => {
-                return this.RefreshManager.initialize();
-            });
+        }).then(() => {
+            return this._core.Api.Sdk.initComplete();
+        }).then(() => {
+            return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         });
