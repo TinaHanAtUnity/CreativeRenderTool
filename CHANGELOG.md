@@ -1,3 +1,8 @@
+# Pending
+
+* Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)
+* Move Backgrounded Ads Check Before Showing Consent Unit [#10779](https://github.com/Applifier/unity-ads-webview/pull/10779)
+
 # Wed Aug  7 20:18:35 UTC 2019
 
 * Move initComplete Callback Before Requesting Ads for Legacy Behavior [#10749](https://github.com/Applifier/unity-ads-webview/pull/10749)
