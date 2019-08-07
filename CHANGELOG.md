@@ -1,5 +1,6 @@
 # Pending
 
+* Move initComplete Callback Before Requesting Ads for Legacy Behavior [#10749](https://github.com/Applifier/unity-ads-webview/pull/10749)
 * Send CampaignError Information to CreativeBlocking Service [#10750](https://github.com/Applifier/unity-ads-webview/pull/10750)
 * Open Measurement - Change verification injection functions [#10747](https://github.com/Applifier/unity-ads-webview/pull/10747)
 * Revert Query CTA on End Screen Experiement [#10751](https://github.com/Applifier/unity-ads-webview/pull/10751)
