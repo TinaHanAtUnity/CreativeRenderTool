@@ -459,6 +459,10 @@ export class DeviceInfo extends BackendApi {
         return this._adbEnabled;
     }
 
+    public isMadeWithUnity() {
+        return this._isMadeWithUnity;
+    }
+
     private _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
     private _limitAdTrackingFlag: boolean = true;
     private _osVersion: string = '10.1.1';
@@ -515,6 +519,7 @@ export class DeviceInfo extends BackendApi {
     private _adbEnabled = false;
     private _deviceId: string;
     private _imei: string;
+    private _isMadeWithUnity: false;
 
     private getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {

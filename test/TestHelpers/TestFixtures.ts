@@ -1181,6 +1181,7 @@ export class TestFixtures {
             getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
             getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
             getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+            isMadeWithUnity: sinon.stub().returns(Promise.resolve(false)),
             getModel: sinon.stub().returns(Promise.resolve('testModel')),
             getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
             getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
