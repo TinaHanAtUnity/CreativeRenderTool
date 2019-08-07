@@ -42,17 +42,22 @@ context('UserPrivacyTests', () => {
         ];
         tests.forEach(({method, optOutEnabled, permissions }) => {
             it(`should create user with ${method} and optOutEnabled:${optOutEnabled}`, () => {
-                const userPrivacy = UserPrivacy.createFromLegacy(method, optOutEnabled);
+                const userPrivacy = UserPrivacy.createFromLegacy(method, true, optOutEnabled);
                 assert.isTrue(userPrivacy.isRecorded());
                 assert.equal(userPrivacy.getMethod(), method);
                 assert.include(<any>userPrivacy.getPermissions(), permissions);
             });
         });
 
+        it('should create unrecorded user when optOutRecorded:false', () => {
+            const userPrivacy = UserPrivacy.createFromLegacy(PrivacyMethod.DEVELOPER_CONSENT, false, false);
+            assert.isFalse(userPrivacy.isRecorded());
+        });
+
         const nonLegacyMethods = [PrivacyMethod.DEFAULT, PrivacyMethod.UNITY_CONSENT];
         nonLegacyMethods.forEach((method) => {
             it('should fail if PrivacyMethod is ' + method, () => {
-                const unsupportedCreation = UserPrivacy.createFromLegacy.bind(UserPrivacy, method, false);
+                const unsupportedCreation = UserPrivacy.createFromLegacy.bind(UserPrivacy, method, true, true);
                 assert.throws(unsupportedCreation);
             });
         });

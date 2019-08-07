@@ -93,7 +93,11 @@ interface IUserPrivacy {
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
-    public static createFromLegacy(method: PrivacyMethod, optOutEnabled: boolean): UserPrivacy {
+    public static createFromLegacy(method: PrivacyMethod, optOutRecorded: boolean, optOutEnabled: boolean): UserPrivacy {
+        if (!optOutRecorded) {
+            return this.createUnrecorded();
+        }
+
         switch (method) {
             case PrivacyMethod.DEVELOPER_CONSENT:
             case PrivacyMethod.LEGITIMATE_INTEREST:

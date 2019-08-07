@@ -152,7 +152,7 @@ export class AdsConfigurationParser {
 
         if (configJson.gamePrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST ||
             configJson.gamePrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
-            return UserPrivacy.createFromLegacy(configJson.gamePrivacy.method, configJson.optOutEnabled);
+            return UserPrivacy.createFromLegacy(configJson.gamePrivacy.method, configJson.optOutRecorded, configJson.optOutEnabled);
         }
         return new UserPrivacy(configJson.userPrivacy);
     }
