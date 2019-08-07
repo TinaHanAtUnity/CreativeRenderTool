@@ -46,7 +46,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
 
-        this._landingPage = ConsentPage.HOMESCREEN;
+        this._landingPage = ConsentPage.AGE_GATE;
 
         let consentABTest: boolean = false;
         if (ConsentTest.isValid(parameters.abGroup) && parameters.deviceInfo.getLanguage().match('en.*')) {
@@ -148,6 +148,16 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 this.onContainerDestroy();
             }
         });
+    }
+
+    // IConsentViewHandler
+    public onAgeGateDisagree(): void {
+        const permissions: IPermissions = {
+            gameExp: false,
+            ads: false,
+            external: false
+        };
+        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE);
     }
 
     public onPrivacy(url: string): void {

@@ -32,7 +32,8 @@ export interface IConsentViewParameters {
 export enum ConsentPage {
     HOMESCREEN = 'homescreen',
     MY_CHOICES = 'mychoices',
-    HOMEPAGE = 'homepage'
+    HOMEPAGE = 'homepage',
+    AGE_GATE = 'agegate'
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -131,6 +132,16 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onHomepageAcceptAllEvent(event),
                 selector: '.homepage-accept-all'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.on13OrOlderEvent(event),
+                selector: '.age-gate-over'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.on12OrUnderEvent(event),
+                selector: '.age-gate-under'
             }
         ];
 
@@ -168,11 +179,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             if (this._osVersion.match(/^8/) || this._osVersion.match(/^7/)) {
                 this._container.classList.add('android4-ios7-ios8');
             }
-        }
-
-        if (this._landingPage === ConsentPage.HOMESCREEN || this._landingPage === ConsentPage.HOMEPAGE) {
-            const myChoicesElement = (<HTMLElement> this._container.querySelector('#consent-my-choices'));
-            myChoicesElement.classList.add('show-back-button');
         }
 
         this.showPage(this._landingPage);
@@ -219,7 +225,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        const states = [ConsentPage.HOMESCREEN, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE];
+        const states = [ConsentPage.HOMESCREEN, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE, ConsentPage.AGE_GATE];
         states.forEach(state => {
             if (state === page) {
                 this.container().classList.add(page);
@@ -339,5 +345,18 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._pts.reportMetric(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
+    }
+
+    private on13OrOlderEvent(event: Event): void {
+        // todo: use correct consent page
+        this.showPage(ConsentPage.HOMEPAGE);
+    }
+
+    private on12OrUnderEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onAgeGateDisagree());
+        const element = (<HTMLElement> this._container.querySelector('.disagree'));
+
+        this.closeWithAnimation(element);
     }
 }

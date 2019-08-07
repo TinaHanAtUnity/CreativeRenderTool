@@ -17,7 +17,29 @@
     pointer-events: none;
   }
 
-  &:not(.homepage) {
+  &.agegate {
+    #age-gate {
+      display: flex;
+    }
+
+    #consent-my-choices {
+      display: none;
+    }
+
+    #consent-homepage {
+      display: none;
+    }
+
+    #consent-homescreen {
+      display: none;
+    }
+  }
+
+  &.mychoices {
+    #age-gate {
+      display: none;
+    }
+
     #consent-my-choices {
       display: flex;
     }
@@ -32,6 +54,10 @@
   }
 
   &.homescreen {
+    #age-gate {
+      display: none;
+    }
+
     #consent-my-choices {
       display: none;
     }
@@ -46,6 +72,10 @@
   }
 
   &.homepage {
+    #age-gate {
+      display: none;
+    }
+
     #consent-my-choices {
       display: none;
     }
@@ -104,6 +134,73 @@
   }
 }
 
+#age-gate {
+  position: relative;
+  max-height: 100%;
+  border-radius: .5 * $default-size;
+  background: $white;
+  text-align: center;
+
+  .text-container {
+    position: relative;
+    flex: 1 1 auto;
+    overflow: scroll;
+    border-radius: .5 * $default-size;
+    background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
+    padding: 1.5 * $default-size;
+  }
+
+  .title {
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $consent-text-font-size;
+  }
+
+  .main-text {
+    color: $consent-text-font-color;
+    font-weight: $privacy-text-font-weight;
+    font-size: $privacy-text-font-size;
+    line-height: $default-size;
+  }
+
+  .empty-block {
+    height: 6 * $default-size;
+  }
+
+  .homepage-button-container {
+    // use absolute position to ensure that buttons are always visible
+    position: absolute;
+    right:0;
+    bottom: 0;
+    left:0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: .75 * $default-size $default-size;
+    border-bottom-right-radius: .5 * $default-size;
+    border-bottom-left-radius: .5 * $default-size;
+    background: $white;
+  }
+
+  .consent-button {
+    position: relative;
+    margin-top: .75 * $default-size;
+    padding: .75 * $default-size .75 * $default-size;
+    border: 1px solid $consent-border-gray;
+    border-radius: 2 * $default-size;
+    text-align: center;
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-heading-font-size;
+  }
+
+  .consent-button {
+    &.click-animation {
+      $click-animation();
+    }
+  }
+}
+
 #consent-my-choices {
   position: relative;
   display: flex;
@@ -117,13 +214,6 @@
     position: absolute;
     top: 0;
     left: 0;
-    display: none;
-  }
-
-  &.show-back-button {
-    .back-button {
-      display: block;
-    }
   }
 
   .consent-settings {
@@ -463,7 +553,8 @@
 &.landscape {
   #consent {
     #consent-my-choices,
-    #consent-homepage {
+    #consent-homepage,
+    #age-gate {
       left: 15%;
       width: 70%;
     }

@@ -178,7 +178,8 @@ export class UserPrivacyManager {
             version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
             bundleId: this._clientInfo.getApplicationName(),
-            permissions: permissions
+            permissions: permissions,
+            agreedOver13: layout === ConsentPage.AGE_GATE ? false : undefined
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
