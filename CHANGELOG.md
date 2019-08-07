@@ -1,4 +1,4 @@
-# Pending
+# Wed Aug  7 20:18:35 UTC 2019
 
 * Move initComplete Callback Before Requesting Ads for Legacy Behavior [#10749](https://github.com/Applifier/unity-ads-webview/pull/10749)
 * Send CampaignError Information to CreativeBlocking Service [#10750](https://github.com/Applifier/unity-ads-webview/pull/10750)
