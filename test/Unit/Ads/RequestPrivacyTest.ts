@@ -2,7 +2,7 @@ import {assert} from 'chai';
 import 'mocha';
 import {ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory} from 'Ads/Models/RequestPrivacy';
 import {GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Ads/Models/Privacy';
-import {toAbGroup} from "Core/Models/ABGroup";
+import {toAbGroup} from 'Core/Models/ABGroup';
 
 describe('RequestPrivacyFactoryTests', () => {
     let userPrivacy: UserPrivacy;
