@@ -60,8 +60,9 @@
                     var DEFAULT_VENDOR_KEY = '';
                     var sessionObserversMap = {DEFAULT_VENDOR_KEY: []};
                     var sessionStartData = {};
-                    var VASTVendorKeys = [];
-                    var omid3pVendorKeys = [];
+                    var sessionStartCalled = false;
+                    var startCalledFromCreative = false;
+                    var registerCalled = false;
         
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
@@ -124,9 +125,7 @@
                     var stripEventString = function(eventType) {
                         return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
                     }
-        
-                    var sessionStartCalled = false;
-        
+                
                     var eventHandlers = {};
                     eventHandlers['omidImpression'] = (e) => trigger('impression', e);
                     eventHandlers['omidGeometryChange'] = (e) => trigger('geometryChange', e);
@@ -169,13 +168,22 @@
                         */
                         switch(event.data.type) {
                             case 'sessionStart':
+                                startCalledFromCreative = true;
                                 const data = event.data.data;
-                                VASTVendorKeys.push(data.vendorkey);
+
+                                // if vendor key matches - start the session
                                 if (sessionObserversMap[data.vendorkey] && !sessionStartCalled) {
                                     sessionStartData[data.vendorkey] = event.data;
                                     sendSessionStartIfReady(data.vendorkey);
                                 } else {
-                                    sessionStartData[data.vendorkey] = event.data;
+                                    // just start the session with default -> vendor key does not matter here
+                                    if (!data.verificationParameters && registerCalled) {
+                                        sessionStartData[DEFAULT_VENDOR_KEY] = event.data;
+                                        sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
+                                    } else {
+                                        // if registration has not happened, store the data
+                                        sessionStartData[data.vendorkey] = event.data;
+                                    }
                                 }
                                 break;
                             case 'sessionFinish':
@@ -212,36 +220,31 @@
                     };
         
                     /*
-                    * This method registers events and signals that the verification script has loaded and is ready to receive events,
-                    * and should be called upon initialization.
+                    * This method registers events and signals that the verification script has loaded and is ready to receive events
+                    * Should be called upon initialization.
                     */
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
                         if (vendorKey) {
                             sessionObserversMap[vendorKey] = functionToExecute;
+                            // if we've stored data for the vendor, start the session
                             if (!sessionStartCalled && sessionStartData[vendorKey]) {
                                 sendSessionStartIfReady(vendorKey);
+                            } 
+                            // if we've already called start from the creative and have not stored vendor data, start the session with default key
+                            if (startCalledFromCreative && !sessionStartData[vendorKey]) {
+                                if (!sessionStartCalled && sessionStartData[DEFAULT_VENDOR_KEY]) {
+                                    sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
+                                }
                             }
-                            omid3pVendorKeys.push(vendorKey);
                         } else {
                             sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
-                            if (!sessionStartCalled && sessionStartData[vendorKey]) {
+                            // if we've stored data for default vendor, start the session
+                            if (!sessionStartCalled && sessionStartData[DEFAULT_VENDOR_KEY]) {
                                 sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
                             }
                         }
 
-                        /*
-                        * According to the spec:
-                        * VendorKeys between the VAST AdVerification and registerSessionObserver MUST match
-                        * Final Case: 
-                        * 
-                            // if vendorkey is not set by vast, just store the key as default
-                            if (!VASTVendorKeys.includes(vendorkey)) {
-                                sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
-                                if (!sessionStartCalled && sessionStartData[vendorKey]) {
-                                    sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
-                                }
-                            }
-                        */
+                        registerCalled = true;
                     }
 
                     this.addEventListener = function(type, listener) {
