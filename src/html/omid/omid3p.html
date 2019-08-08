@@ -57,14 +57,21 @@
                         }
                     };
         
-                    var sessionObserversMap = {};
+                    var DEFAULT_VENDOR_KEY = '';
+                    var sessionObserversMap = {DEFAULT_VENDOR_KEY: []};
                     var sessionStartData = {};
+                    var VASTVendorKeys = [];
+                    var omid3pVendorKeys = [];
         
-                    var triggerAllSessionObservers = function(eventData) {
-                        const sessionObservers = Object.keys(sessionObserversMap).map(function(vendorKey) {
+                    /**
+                     * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
+                     * @param {Object} eventData structured data to indicate type for observer to fire
+                     */
+                    var triggerSessionObserver = function(eventData) {
+                        const observerList = Object.keys(sessionObserversMap).map(function(vendorKey) {
                             return sessionObserversMap[vendorKey];
                         });
-        
+                        const sessionObservers = [].concat.apply([], observerList);
                         sessionObservers.forEach(function(sessionObserver) {
                             sessionObserver(eventData);
                         });
@@ -82,6 +89,33 @@
                             data: data
                         }, '*');
                     };
+
+                    /**
+                     * Calls SessionListener for unique verificationScript observer of specified vendorkey
+                     * @param {function} observer
+                     * @param {string} vendorkey
+                     */
+                    var sendSessionStart = function(observer, vendorkey) {
+                        observer(sessionStartData[vendorKey]);
+                    }
+
+                    /**
+                     * Calls SessionListener for specified vendorkey
+                     * @param {string} key
+                     */
+                    var sendSessionStartIfReady = function(key) {
+                        if (key === DEFAULT_VENDOR_KEY) {
+                            sessionObserversMap[key].forEach((sessionObserver) => {
+                                sendSessionStart(sessionObserver, key);
+                            });
+                        } else {
+                            sendSessionStart(sessionObserversMap[key], key);
+                        }
+                        postMessageCallback('onEventProcessed', {
+                            eventType: 'sessionStart'
+                        });
+                        sessionStartCalled = true;
+                    }
         
                     /**
                      * Strips 'omid' from string to be passed to vendor
@@ -136,19 +170,17 @@
                         switch(event.data.type) {
                             case 'sessionStart':
                                 const data = event.data.data;
+                                VASTVendorKeys.push(data.vendorKey);
+
                                 if (sessionObserversMap[data.vendorkey] && !sessionStartCalled) {
-                                    sessionObserversMap[data.vendorkey](event.data);
-                                    postMessageCallback('onEventProcessed', {
-                                        eventType: 'sessionStart'
-                                    });
-                                    sessionStartCalled = true;
+                                    sessionStartData[data.vendorkey] = event.data;
+                                    sendSessionStartIfReady(data.vendorKey);
                                 } else {
                                     sessionStartData[data.vendorkey] = event.data;
                                 }
                                 break;
                             case 'sessionFinish':
-                                triggerAllSessionObservers(event.data);
-        
+                                triggerSessionObserver(event.data);
                                 for (var listener in videoListeners) { 
                                     delete videoListeners[listener]; 
                                 }
@@ -158,7 +190,7 @@
                                 });
                                 break;
                             case 'sessionError': 
-                                triggerAllSessionObservers(event.data);
+                                triggerSessionObserver(event.data);
                                 break;
                             default:
                                 break;
@@ -185,17 +217,34 @@
                     * and should be called upon initialization.
                     */
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
-                        sessionObserversMap[vendorKey] = functionToExecute;
-        
-                        if (!sessionStartCalled && sessionStartData[vendorKey]) {
-                            sessionObserversMap[vendorKey](sessionStartData[vendorKey]);
-                            postMessageCallback('onEventProcessed', {
-                                eventType: 'sessionStart'
-                            });
-                            sessionStartCalled = true;
+                        if (vendorKey) {
+                            sessionObserversMap[vendorKey] = functionToExecute;
+                            if (!sessionStartCalled && sessionStartData[vendorKey]) {
+                                sendSessionStartIfReady(vendorKey);
+                            }
+                            omid3pVendorKeys.push(vendorKey);
+                        } else {
+                            sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
+                            if (!sessionStartCalled && sessionStartData[vendorKey]) {
+                                sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
+                            }
                         }
+
+                        /*
+                        * According to the spec:
+                        * VendorKeys between the VAST AdVerification and registerSessionObserver MUST match
+                        * Final Case: 
+                        * 
+                            // if vendorkey is not set by vast, just store the key as default
+                            if (!VASTVendorKeys.includes(vendorkey)) {
+                                sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
+                                if (!sessionStartCalled && sessionStartData[vendorKey]) {
+                                    sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
+                                }
+                            }
+                        */
                     }
-        
+
                     this.addEventListener = function(type, listener) {
                         if(type in videoListeners && videoListeners[type] !== listener) {
                             videoListeners[type].push(listener);
