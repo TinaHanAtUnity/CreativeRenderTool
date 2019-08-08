@@ -96,7 +96,7 @@
                      * @param {string} vendorkey
                      */
                     var sendSessionStart = function(observer, vendorkey) {
-                        observer(sessionStartData[vendorKey]);
+                        observer(sessionStartData[vendorkey]);
                     }
 
                     /**
@@ -170,11 +170,10 @@
                         switch(event.data.type) {
                             case 'sessionStart':
                                 const data = event.data.data;
-                                VASTVendorKeys.push(data.vendorKey);
-
+                                VASTVendorKeys.push(data.vendorkey);
                                 if (sessionObserversMap[data.vendorkey] && !sessionStartCalled) {
                                     sessionStartData[data.vendorkey] = event.data;
-                                    sendSessionStartIfReady(data.vendorKey);
+                                    sendSessionStartIfReady(data.vendorkey);
                                 } else {
                                     sessionStartData[data.vendorkey] = event.data;
                                 }
@@ -261,14 +260,15 @@
                 /**
                  * Generic Vast verification scripts attach to this:
                  */
-                window.omid3p = new OmidVerification();
-                Object.freeze(window.omid3p);
+                // window.omid3p = new OmidVerification();
+                // Object.freeze(window.omid3p);
         
                 /**
                  * Used for IAB test:
                  * window.OmidVerificationClient = {'omid3p': OmidVerification};
                  * Object.freeze(window.OmidVerificationClient);
                  */
+                window.OmidVerificationClient = {'omid3p': OmidVerification};
             })();
         </script>
     </head>
