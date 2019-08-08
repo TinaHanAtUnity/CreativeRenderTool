@@ -169,7 +169,7 @@ export class ParallaxScreen {
     }
 
     private transformLayers(x: number): void {
-        this._currentX += (x - this._currentX) / 60;
+        this._currentX += (x - this._currentX) / 30;
         this._layers.forEach(l => l.transform(this._currentX));
     }
 
