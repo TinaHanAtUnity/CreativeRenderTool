@@ -47,8 +47,8 @@ export class RequestPrivacyFactory {
     }
 
     private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup | undefined) {
-        const developerConsentAbTest: boolean = !!abGroup && ConsentTest.isValid(abGroup);
-        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || (developerConsentAbTest && gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT);
+        const developerConsentAbTest: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT && (!!abGroup && ConsentTest.isValid(abGroup));
+        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || developerConsentAbTest;
     }
 
     private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
