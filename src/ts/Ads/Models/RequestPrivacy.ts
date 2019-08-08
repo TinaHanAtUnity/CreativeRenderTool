@@ -46,7 +46,7 @@ export class RequestPrivacyFactory {
         };
     }
 
-    private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup | undefined) {
+    private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup | undefined): boolean {
         const developerConsentAbTest: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT && (!!abGroup && ConsentTest.isValid(abGroup));
         return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || developerConsentAbTest;
     }
