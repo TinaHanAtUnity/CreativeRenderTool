@@ -2,6 +2,7 @@ import {assert} from 'chai';
 import 'mocha';
 import {ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory} from 'Ads/Models/RequestPrivacy';
 import {GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Ads/Models/Privacy';
+import {toAbGroup} from "Core/Models/ABGroup";
 
 describe('RequestPrivacyFactoryTests', () => {
     let userPrivacy: UserPrivacy;
@@ -16,7 +17,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false } });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, 9);
                 });
                 it('should set firstRequest as true', () => assert.equal(result!.firstRequest, true));
                 it('should set privacy method as ' + method, () => assert.equal(result!.method, method));
@@ -29,7 +30,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: {all: false, ...expectedPermissions} });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, 9);
                 });
                 it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
                 it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
@@ -42,10 +43,27 @@ describe('RequestPrivacyFactoryTests', () => {
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, 9);
                 });
                 it('should not affect set privacy method', () => assert.notEqual(result!.method, method));
             });
+        });
+    });
+
+    [...Array(20).keys()].forEach(group => {
+        context('Developer Consent A/B test', () => {
+            let result: IRequestPrivacy | undefined;
+            const anyPermissions = <IPermissions>{};
+            beforeEach(() => {
+                userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT, version: 0, permissions: anyPermissions });
+                gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT });
+                result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, toAbGroup(group));
+            });
+            if ([9, 10].includes(group)) {
+                it('should set privacy method as PrivacyMethod.DEVELOPER_CONSENT for group ' + group, () => assert.equal(result!.method, PrivacyMethod.DEVELOPER_CONSENT));
+            } else {
+                it('should return undefined for group ' + group, () => assert.isUndefined(result));
+            }
         });
     });
 
