@@ -25,6 +25,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { TimeUtils } from 'Ads/Utilities/TimeUtils';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 
 export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
@@ -207,6 +208,19 @@ export class CampaignRefreshManager extends RefreshManager {
             const productID = (<PromoCampaign>campaign).getIapProductId();
             this._core.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productID} available`);
             this.onNoFill(placementId);
+            PromoErrorService.report(this._request, {
+                auctionID: campaign.getSession().getId(),
+                corrID: campaign.getCorrelationId(),
+                country: this._coreConfig.getCountry(),
+                projectID: this._coreConfig.getUnityProjectId(),
+                gameID: this._clientInfo.getGameId(),
+                placementID: placementId,
+                productID: productID,
+                platform: this._platform,
+                gamerToken: this._coreConfig.getToken(),
+                errorCode: 102,
+                errorMessage: 'placement missing productId'
+            });
         } else {
             this.setPlacementReady(placementId, campaign, trackingUrls);
         }
