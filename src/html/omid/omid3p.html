@@ -121,7 +121,7 @@
 
                     var handleSessionStart = function(data) {
                         // If passed vendor matches a registered vendor
-                        if (sessionObserversMap[data.vendorkey] && data.vendorkey !== DEFAULT_VENDOR_KEY) {
+                        if (sessionObserversMap[data.vendorkey]) {
                             sessionStartData[data.vendorkey] = event.data;
                             if (!sessionStartCalled) {
                                 sendSessionStartForKey(data.vendorkey);
