@@ -57,12 +57,10 @@
                         }
                     };
         
-                    var DEFAULT_VENDOR_KEY = '';
-                    var sessionObserversMap = {DEFAULT_VENDOR_KEY: []};
+                    var DEFAULT_VENDOR_KEY = 'default_key';
+                    var sessionObserversMap = {'default_key': []};
                     var sessionStartData = {};
                     var sessionStartCalled = false;
-                    var startCalledFromCreative = false;
-                    var registerCalled = false;
         
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
@@ -98,23 +96,51 @@
                      */
                     var sendSessionStart = function(observer, vendorkey) {
                         observer(sessionStartData[vendorkey]);
+                        postMessageCallback('onEventProcessed', {
+                            eventType: 'sessionStart'
+                        });
                     }
 
                     /**
                      * Calls SessionListener for specified vendorkey
                      * @param {string} key
                      */
-                    var sendSessionStartIfReady = function(key) {
+                    var sendSessionStartForKey = function(key) {
                         if (key === DEFAULT_VENDOR_KEY) {
-                            sessionObserversMap[key].forEach((sessionObserver) => {
-                                sendSessionStart(sessionObserver, key);
-                            });
+                            if (sessionObserversMap[key].length > 0) {
+                                sessionObserversMap[key].forEach((sessionObserver) => {
+                                    sendSessionStart(sessionObserver, key);
+                                });
+                            }
                         } else {
-                            sendSessionStart(sessionObserversMap[key], key);
+                            if (sessionObserversMap[key]) {
+                                sendSessionStart(sessionObserversMap[key], key);
+                            }
                         }
-                        postMessageCallback('onEventProcessed', {
-                            eventType: 'sessionStart'
-                        });
+                    }
+
+                    var handleSessionStart = function(data) {
+                        // If passed vendor matches a registered vendor
+                        if (sessionObserversMap[data.vendorkey]) {
+                            sessionStartData[data.vendorkey] = event.data;
+                            if (!sessionStartCalled) {
+                                sendSessionStartForKey(data.vendorkey);
+                            }
+                        } else {
+                            // it is possible session start was called before a vendor registers so we must always store the data
+                            sessionStartData[data.vendorkey] = event.data;
+
+                            if (!data.verificationParameters) {
+                                // if we've already stored data for a default key
+                                if (sessionStartData[DEFAULT_VENDOR_KEY]) {
+                                    sendSessionStartForKey(DEFAULT_VENDOR_KEY);
+                                } else {
+                                    postMessageCallback('onEventProcessed', {
+                                        eventType: 'vendorkeyMismatch'
+                                    });
+                                }
+                            }
+                        }
                         sessionStartCalled = true;
                     }
         
@@ -168,30 +194,14 @@
                         */
                         switch(event.data.type) {
                             case 'sessionStart':
-                                startCalledFromCreative = true;
                                 const data = event.data.data;
-
-                                // if vendor key matches - start the session
-                                if (sessionObserversMap[data.vendorkey] && !sessionStartCalled) {
-                                    sessionStartData[data.vendorkey] = event.data;
-                                    sendSessionStartIfReady(data.vendorkey);
-                                } else {
-                                    // just start the session with default -> vendor key does not matter here
-                                    if (!data.verificationParameters && registerCalled) {
-                                        sessionStartData[DEFAULT_VENDOR_KEY] = event.data;
-                                        sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
-                                    } else {
-                                        // if registration has not happened, store the data
-                                        sessionStartData[data.vendorkey] = event.data;
-                                    }
-                                }
+                                handleSessionStart(data);
                                 break;
                             case 'sessionFinish':
                                 triggerSessionObserver(event.data);
                                 for (var listener in videoListeners) { 
                                     delete videoListeners[listener]; 
                                 }
-        
                                 postMessageCallback('onEventProcessed', {
                                     eventType: 'sessionFinish'
                                 });
@@ -226,25 +236,22 @@
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
                         if (vendorKey) {
                             sessionObserversMap[vendorKey] = functionToExecute;
-                            // if we've stored data for the vendor, start the session
+
+                            // also register a default key just in case they are dumbasses
+                            sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
+
+                            // If start has been called from OM, send the start event immediately after registration
                             if (!sessionStartCalled && sessionStartData[vendorKey]) {
-                                sendSessionStartIfReady(vendorKey);
+                                sendSessionStartForKey(vendorKey);
                             } 
-                            // if we've already called start from the creative and have not stored vendor data, start the session with default key
-                            if (startCalledFromCreative && !sessionStartData[vendorKey]) {
-                                if (!sessionStartCalled && sessionStartData[DEFAULT_VENDOR_KEY]) {
-                                    sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
-                                }
-                            }
                         } else {
                             sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
-                            // if we've stored data for default vendor, start the session
+                
+                            // If start has been called from OM, send the start event immediately after registration
                             if (!sessionStartCalled && sessionStartData[DEFAULT_VENDOR_KEY]) {
-                                sendSessionStartIfReady(DEFAULT_VENDOR_KEY);
+                                sendSessionStartForKey(DEFAULT_VENDOR_KEY);
                             }
                         }
-
-                        registerCalled = true;
                     }
 
                     this.addEventListener = function(type, listener) {

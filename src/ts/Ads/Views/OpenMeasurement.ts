@@ -583,6 +583,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (eventType === 'loadError') {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
         }
+
+        if (eventType === 'vendorkeyMismatch') {
+            console.log('vendorkeyMismatch');
+            this._core.Sdk.logDebug('vendor attribute was either never registered or vendor attribute does not match registered key');
+        }
     }
 
     private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
