@@ -1,4 +1,4 @@
-# Pending
+# Thu Aug  8 17:07:34 UTC 2019
 
 * Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)
 * Move Backgrounded Ads Check Before Showing Consent Unit [#10779](https://github.com/Applifier/unity-ads-webview/pull/10779)
