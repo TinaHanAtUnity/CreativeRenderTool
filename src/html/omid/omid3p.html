@@ -121,7 +121,7 @@
 
                     var handleSessionStart = function(data) {
                         // If passed vendor matches a registered vendor
-                        if (sessionObserversMap[data.vendorkey]) {
+                        if (sessionObserversMap[data.vendorkey] && data.vendorkey !== DEFAULT_VENDOR_KEY) {
                             sessionStartData[data.vendorkey] = event.data;
                             if (!sessionStartCalled) {
                                 sendSessionStartForKey(data.vendorkey);
@@ -229,16 +229,14 @@
                         }, '*');
                     };
         
-                    /*
-                    * This method registers events and signals that the verification script has loaded and is ready to receive events
-                    * Should be called upon initialization.
-                    */
+                   /**
+                     * Registers session events for the given vendor key
+                     * @param {function} functionToExecute sessionObserver for given vendor
+                     * @param {function} vendorKey optional param to attribute given vendor key to sessionObserver
+                     */
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
                         if (vendorKey) {
                             sessionObserversMap[vendorKey] = functionToExecute;
-
-                            // also register a default key just in case they are dumbasses
-                            sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
 
                             // If start has been called from OM, send the start event immediately after registration
                             if (!sessionStartCalled && sessionStartData[vendorKey]) {
