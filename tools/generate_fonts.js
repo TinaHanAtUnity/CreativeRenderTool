@@ -1,12 +1,6 @@
 const fs = require('fs');
+const promisedFs = require('fs').promises;
 const webfont = require("webfont").default;
-
-const writeFile = (path, data) => {
-  return new Promise(async (resolve, reject) => {
-    await fs.writeFile(path, data, reject);
-    resolve();
-  });
-};
 
 const headerStyleTemplate = (fontPath, fontName) => `
 @font-face {
@@ -62,13 +56,13 @@ const createFont = async (path, fontName, startUnicodeIndex) => {
     fs.mkdirSync(`${path}/generated`);
   }
 
-  await writeFile(`${path}/generated/${fontName}.svg`, result.svg);
-  await writeFile(`${path}/generated/${fontName}.ttf`, result.ttf);
-  await writeFile(`${path}/generated/${fontName}.woff`, result.woff);
+  await promisedFs.writeFile(`${path}/generated/${fontName}.svg`, result.svg);
+  await promisedFs.writeFile(`${path}/generated/${fontName}.ttf`, result.ttf);
+  await promisedFs.writeFile(`${path}/generated/${fontName}.woff`, result.woff);
 
   // in this experiment, let's save the .styl into the same folder with generated fonts
   // and copy the content of .styl manually into existing icon .styl files, e.g., icons.styl
-  await writeFile(`${path}/generated/${fontName}.styl`, stylesheet);
+  await promisedFs.writeFile(`${path}/generated/${fontName}.styl`, stylesheet);
 
   return glyphsCount;
 };
