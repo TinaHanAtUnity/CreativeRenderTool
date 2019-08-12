@@ -148,7 +148,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public removeFromViewHieararchy(): void {
         this.removeMessageListener();
-        document.body.removeChild(this.container());
+        if (this.container().parentElement) {
+            document.body.removeChild(this.container());
+        }
     }
 
     public addMessageListener() {

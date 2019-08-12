@@ -1,3 +1,7 @@
+# Pending
+
+* Open Measurement - remove OM from hierarchy [#10809](https://jira.hq.unity3d.com/browse/UADSDK-129)
+
 # Thu Aug  8 17:07:34 UTC 2019
 
 * Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)

@@ -335,6 +335,16 @@ describe('VastAdUnitTest', () => {
         });
     });
 
+    it('should hide and then remove om on hide', () => {
+        return vastAdUnit.hide().then(() => {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>openMeasurement.removeFromViewHieararchy);
+            });
+        });
+    });
+
     // TODO: Better stubs for viewport and adview
     describe('viewability', () => {
         describe('onContainerBackground', () => {
