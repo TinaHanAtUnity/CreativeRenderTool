@@ -27,7 +27,7 @@ function isProfilingPermissions(permissions: IPermissions | { [key: string]: nev
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy, abGroup?: ABGroup): IRequestPrivacy | undefined {
+    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy, abGroup: ABGroup): IRequestPrivacy | undefined {
         if (this.GameUsesConsent(gamePrivacy, abGroup) === false) {
             return undefined;
         }
@@ -46,9 +46,9 @@ export class RequestPrivacyFactory {
         };
     }
 
-    private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup | undefined): boolean {
-        const developerConsentAbTest: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT && (!!abGroup && ConsentTest.isValid(abGroup));
-        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || developerConsentAbTest;
+    private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup): boolean {
+        const isInDeveloperConsentTreatment: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT && ConsentTest.isValid(abGroup);
+        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isInDeveloperConsentTreatment;
     }
 
     private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {

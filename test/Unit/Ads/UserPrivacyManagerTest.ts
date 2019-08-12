@@ -367,9 +367,11 @@ describe('UserPrivacyManagerTest', () => {
 
         describe('when limitAdTracking is enabled', () => {
             beforeEach(() => {
+                let gamePrivacyMethod = PrivacyMethod.DEFAULT;
                 isGDPREnabled = true;
                 gamePrivacy.isEnabled.returns(true);
-                gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
+                gamePrivacy.getMethod.callsFake(() => gamePrivacyMethod);
+                gamePrivacy.setMethod.callsFake((value) => gamePrivacyMethod = value);
                 gamePrivacy.getVersion.returns(0);
                 (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(true);
             });

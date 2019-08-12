@@ -123,6 +123,7 @@ export class UserPrivacy extends Model<IUserPrivacy> {
             method: PrivacyMethod.DEFAULT,
             version: 0,
             permissions: {
+                all: false,
                 gameExp: false,
                 ads: false,
                 external: false

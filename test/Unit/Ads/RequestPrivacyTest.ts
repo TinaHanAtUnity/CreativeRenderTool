@@ -15,7 +15,7 @@ describe('RequestPrivacyFactoryTests', () => {
             context('when no previous user privacy is recorded', () => {
                 let result: IRequestPrivacy | undefined;
                 beforeEach(() => {
-                    userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false } });
+                    userPrivacy = UserPrivacy.createUnrecorded();
                     gamePrivacy = new GamePrivacy({ method: method });
                     result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, 9);
                 });
@@ -73,7 +73,7 @@ describe('RequestPrivacyFactoryTests', () => {
         beforeEach(() => {
             userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: { all: true} });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
-            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, 99);
         });
         it('should strip away all:true and replace with granular permissions',
             () => assert.deepEqual(result!.permissions, expectedPermissions));
@@ -85,7 +85,7 @@ describe('RequestPrivacyFactoryTests', () => {
         beforeEach(() => {
             userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
-            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy, 99);
         });
         it('should return undefined', () => assert.isUndefined(result));
     });
