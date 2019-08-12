@@ -1,4 +1,9 @@
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+// import { HTML } from 'Ads/Models/Assets/HTML';
+// import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
+// import { clearImmediate } from 'timers';
+// import { TLSSocket } from 'tls';
+// import { createVerify } from 'crypto';
 
 export interface ISliderOptions {
     startIndex: number;
@@ -70,7 +75,7 @@ export class Slider {
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${this._imageUrls[0]})`
         });
-        this._rootElement.appendChild(blurredBackground);
+        // this._rootElement.appendChild(blurredBackground);
         this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
@@ -103,6 +108,8 @@ export class Slider {
         this.prepareIndicators('slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
         this.updateIndicators();
         this.initializeTouchEvents();
+        const firstSlide = <HTMLElement> this._slides[0];
+        firstSlide.classList.add('active-slide');
     }
 
     private prepareIndicators(wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string): void {
@@ -209,6 +216,40 @@ export class Slider {
         this.updateIndicators();
     }
 
+    private animateSlides(): void {
+        let targetSlideIndex: number;
+        const direction = this.swipeDirection();
+        if (direction === 'left') {
+            targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex + this.getSlideCount());
+        } else {
+            targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
+        }
+
+        const swipeRatio = this._drag.swipeLength;
+        let positionRatio = swipeRatio / 100;
+        if (positionRatio >= 1) {
+            positionRatio = 1;
+        } else if (positionRatio <= 0.8) {
+            positionRatio = 0.8;
+        }
+
+        const blurAmount: number = 5 ;
+        let blurRatio = blurAmount - swipeRatio * blurAmount / 100;
+        if (blurRatio >= 5) {
+            blurRatio = 5;
+        } else if (blurRatio <= 0) {
+            blurRatio = 0;
+        }
+        console.log(targetSlideIndex);
+        const targetSlide = <HTMLElement> document.querySelector(`[slide-index='${targetSlideIndex}']`);
+        targetSlide.style.transform =  'scale(' + positionRatio + ')';
+        targetSlide.style.filter =  'blur(' + blurRatio + ')';
+
+        console.log(positionRatio);
+        const invertedPositionRatio = positionRatio - swipeRatio * positionRatio / 100;
+        console.log(invertedPositionRatio, 'inverted');
+    }
+
     private getSlideCount(): number {
         let swipedSlide;
 
@@ -287,7 +328,7 @@ export class Slider {
         if (!this._isDragging || touches && touches.length !== 1) {
             return;
         }
-
+        this.animateSlides();
         this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
         this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
         this._drag.swipeLength = Math.round(Math.sqrt(Math.pow(this._drag.curX - this._drag.startX, 2)));
@@ -301,6 +342,7 @@ export class Slider {
         }
 
         const sliderOffsetLeftWithDrag = this.getCurrentSliderOffsetLeftWithDrag();
+        // console.log(sliderOffsetLeftWithDrag, this._drag.curX, this._drag.swipeLength);
         this.setTransition(sliderOffsetLeftWithDrag);
     }
 
@@ -367,7 +409,27 @@ export class Slider {
             this._onSlideCallback({ automatic });
             this.postSlide();
         });
+        this.setActiveSlide();
         this.updateIndicators();
+    }
+
+    private setActiveSlide(): void {
+        const currentSlide = this._slides[this._currentSlideIndex];
+
+        for (let i = 0; i < this._slidesContainer.children.length; i++) {
+            const slide = <HTMLElement> this._slidesContainer.children[i];
+            if (slide && slide !== currentSlide) {
+                slide.classList.remove('active-slide');
+                slide.style.transform =  'scale(0.8)';
+                slide.style.filter = 'blur(5px)';
+            }
+        }
+
+        if (currentSlide) {
+            currentSlide.style.transform =  'scale(1)';
+            currentSlide.style.filter = 'blur(0px)';
+            currentSlide.classList.add('active-slide');
+        }
     }
 
     private postSlide(): void {
@@ -449,6 +511,7 @@ export class Slider {
 
     public show(): boolean {
         // If this._ready has already resolved and set to null, slider was ready
+
         if (this._ready === null) {
             this._isPaused = false;
             this.setPosition();
