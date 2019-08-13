@@ -22,6 +22,7 @@ import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { Analytics } from 'Analytics/Analytics';
 
@@ -39,6 +40,7 @@ export interface IAdsApi extends IModuleApi {
         AdUnit: IosAdUnitApi;
         VideoPlayer: IosVideoPlayerApi;
     };
+    LoadApi: LoadApi;
 }
 
 export interface IAds extends IApiModule {

@@ -11,6 +11,7 @@ releases="$webviewdir/tools/release-scripts/releases.txt"
 
 while IFS= read -r release
 do
+    git checkout $release
     git checkout staging/$release
     git merge master
     if [ "$?" -eq "1" ]; then

@@ -59,6 +59,7 @@
   "projectId": "abcd-1234",
   "token": "abcd.1234.5678",
   "organizationId": "5552368",
+  "developerId": 1234,
   "gdprEnabled": false,
   "optOutRecorded": false,
   "optOutEnabled": false,

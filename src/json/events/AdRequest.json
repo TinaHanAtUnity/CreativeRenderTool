@@ -105,13 +105,19 @@
     },
     {
       "parameter": "stores",
-      "required": "yes",
+      "required": "all",
       "queryString": true,
       "body": false
     },
     {
       "parameter": "bundleVersion",
       "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "nofillRetry",
+      "required": "no",
       "queryString": false,
       "body": true
     },
@@ -308,6 +314,12 @@
       "body": true
     },
     {
+      "parameter": "developerId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "gdprEnabled",
       "required": "all",
       "queryString": false,
@@ -333,13 +345,19 @@
     },
     {
       "parameter": "privacy",
-      "required": "yes",
+      "required": "all",
       "queryString": false,
       "body": true
     },
     {
       "parameter": "isPromoCatalogAvailable",
-      "required": "yes",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "isLoadEnabled",
+      "required": "all",
       "queryString": false,
       "body": true
     }

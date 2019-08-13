@@ -1288,7 +1288,6 @@ describe('CampaignManager', () => {
 
         it('should handle a response to a loaded campaign', () => {
             const placement = TestFixtures.getPlacement();
-            const loadManagerTimeout = 10000;
 
             mockRequest.expects('post').returns(Promise.resolve({
                 response: LoadedCampaignResponse
@@ -1296,7 +1295,7 @@ describe('CampaignManager', () => {
 
             sinon.stub(assetManager, 'enableCaching');
 
-            return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
+            return campaignManager.loadCampaign(placement).then((loadedCampaign) => {
                 mockRequest.verify();
                 sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
 
@@ -1316,7 +1315,6 @@ describe('CampaignManager', () => {
 
         it('should resolve with undefined with an empty media Id', () => {
             const placement = TestFixtures.getPlacement();
-            const loadManagerTimeout = 10000;
             const mediaId = '5be40c5f602f4510ec583881';
 
             mockRequest.expects('post').returns(Promise.resolve({
@@ -1325,7 +1323,7 @@ describe('CampaignManager', () => {
 
             sinon.stub(assetManager, 'enableCaching');
 
-            return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
+            return campaignManager.loadCampaign(placement).then((loadedCampaign) => {
                 mockRequest.verify();
                 sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
                 sinon.assert.calledWith((<sinon.SinonStub>Diagnostics.trigger), 'load_campaign_response_failure', {});
@@ -1339,7 +1337,6 @@ describe('CampaignManager', () => {
 
         it('should return undefined without an auction Id', () => {
             const placement = TestFixtures.getPlacement();
-            const loadManagerTimeout = 10000;
             const auctionId = 'd301fd4c-4a9e-48e4-82aa-ad8b07977ca5';
 
             mockRequest.expects('post').returns(Promise.resolve({
@@ -1348,7 +1345,7 @@ describe('CampaignManager', () => {
 
             sinon.stub(assetManager, 'enableCaching');
 
-            return campaignManager.loadCampaign(placement, loadManagerTimeout).then((loadedCampaign) => {
+            return campaignManager.loadCampaign(placement).then((loadedCampaign) => {
                 mockRequest.verify();
                 sinon.assert.called((<sinon.SinonStub>assetManager.enableCaching));
                 sinon.assert.calledWith((<sinon.SinonStub>Diagnostics.trigger), 'load_campaign_auction_id_missing', {});

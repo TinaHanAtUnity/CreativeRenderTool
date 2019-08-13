@@ -35,7 +35,7 @@ import { ListenerApi } from 'Core/Native/Listener';
 import { PermissionsApi } from 'Core/Native/Permissions';
 import { RequestApi } from 'Core/Native/Request';
 import { ResolveApi } from 'Core/Native/Resolve';
-import { SdkApi } from 'Core/Native/Sdk';
+import { SdkApi, InitErrorCode } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
@@ -159,7 +159,6 @@ export class Core implements ICore {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this._initialized = true;
             this._initializedAt = Date.now();
-            this.Api.Sdk.initComplete();
 
             this.WakeUpManager.setListenConnectivity(true);
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
@@ -226,7 +225,8 @@ export class Core implements ICore {
                 return;
             }
 
-            this.Api.Sdk.logError(JSON.stringify(error));
+            this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
+            this.Api.Sdk.logError(`Initialization error: ${error.message}`);
             Diagnostics.trigger('initialization_error', error);
         });
     }
@@ -245,13 +245,10 @@ export class Core implements ICore {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
-            if (TestEnvironment.get('abGroup')) {
-                // needed in both due to placement level control support
-                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
-                if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = toAbGroup(abGroupNumber);
-                    ConfigManager.setAbGroup(abGroup);
-                }
+            const abGroupNumber = parseInt(TestEnvironment.get('abGroup'), 10);
+            if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                const abGroup = toAbGroup(abGroupNumber);
+                ConfigManager.setAbGroup(abGroup);
             }
 
             if (TestEnvironment.get('forceAuthorization')) {
