@@ -1,4 +1,4 @@
-# Pending
+# Tue Aug 13 13:49:40 UTC 2019
 
 * Enable new ad request privacy protocol for Developer Consent [#10675](https://github.com/Applifier/unity-ads-webview/pull/10675)
 * Open Measurement - remove OM from hierarchy [#10809](https://github.com/Applifier/unity-ads-webview/pull/10809)
