@@ -37,7 +37,8 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 onBridgeResizeWebview: sinon.spy(),
                 onBridgeSendStats: sinon.spy(),
                 onBridgeAREvent: sinon.spy(),
-                onBridgeArReadyToShow: sinon.spy()
+                onBridgeArReadyToShow: sinon.spy(),
+                onBridgeDeviceOrientationSubscribe: sinon.spy()
             };
 
             mraidAdapterContainer = new MRAIDAdapterContainer(handler);
@@ -201,6 +202,24 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'landscape'}));
                 it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE);
+                });
+            });
+
+            describe(`${MRAIDEvents.DEVORIENTATION_SUB} MRAID event`, () => {
+                const sendEvent = (e: string, data?: any) => {
+                    return () => {
+                        return new Promise((res) => {
+                            window.postMessage({
+                                type: e,
+                                properties: data
+                            }, '*');
+                            setTimeout(res);
+                        });
+                    };
+                };
+                beforeEach(sendEvent(MRAIDEvents.DEVORIENTATION_SUB, {}));
+                it(`should handle the ${MRAIDEvents.DEVORIENTATION_SUB} event`, () => {
+                    sinon.assert.called(<sinon.SinonSpy>containerHandler.onBridgeDeviceOrientationSubscribe);
                 });
             });
         });
