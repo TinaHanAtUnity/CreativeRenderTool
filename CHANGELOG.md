@@ -1,5 +1,34 @@
 # Pending
 
+* Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
+* Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
+
+# Tue Aug 13 13:49:40 UTC 2019
+
+* Enable new ad request privacy protocol for Developer Consent [#10675](https://github.com/Applifier/unity-ads-webview/pull/10675)
+* Open Measurement - remove OM from hierarchy [#10809](https://github.com/Applifier/unity-ads-webview/pull/10809)
+* Extract AdsConfigurationParser Tests [#10811](https://github.com/Applifier/unity-ads-webview/pull/10811)
+* Revert animated button experiment [#10812](https://github.com/Applifier/unity-ads-webview/pull/10812)
+
+# Thu Aug  8 17:07:34 UTC 2019
+
+* Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)
+* Move Backgrounded Ads Check Before Showing Consent Unit [#10779](https://github.com/Applifier/unity-ads-webview/pull/10779)
+* Fix .styl Lint Warnings [#10780](https://github.com/Applifier/unity-ads-webview/pull/10780)
+* Add Ironsource Internal Test GameIDs to Load Whitelist [#10781](https://github.com/Applifier/unity-ads-webview/pull/10781)
+
+# Wed Aug  7 20:18:35 UTC 2019
+
+* Move initComplete Callback Before Requesting Ads for Legacy Behavior [#10749](https://github.com/Applifier/unity-ads-webview/pull/10749)
+* Send CampaignError Information to CreativeBlocking Service [#10750](https://github.com/Applifier/unity-ads-webview/pull/10750)
+* Open Measurement - Change verification injection functions [#10747](https://github.com/Applifier/unity-ads-webview/pull/10747)
+* Revert Query CTA on End Screen Experiement [#10751](https://github.com/Applifier/unity-ads-webview/pull/10751)
+* Change CreativeBlocking Payload Naming to be More Descriptive [#10776](https://github.com/Applifier/unity-ads-webview/pull/10776)
+* Add game ids to load custom feature [#10752](https://github.com/Applifier/unity-ads-webview/pull/10752)
+* Open Measurement - Adjust Geometry Overlap Calculations [#10670](https://github.com/Applifier/unity-ads-webview/pull/10670)
+
+# Mon Aug  5 18:13:14 UTC 2019
+
 * Update Analytics Standard Event Protocol [#10669](https://github.com/Applifier/unity-ads-webview/pull/10669)
 * Add Click Listener Event to Vast Endscreens [#10677](https://github.com/Applifier/unity-ads-webview/pull/10677)
 * Fix Forcing ABGroup 0 When Set in TestEnvironment Metadata [#10661](https://github.com/Applifier/unity-ads-webview/pull/10661)

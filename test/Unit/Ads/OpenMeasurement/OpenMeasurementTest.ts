@@ -68,6 +68,13 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p);
                 });
 
+                it('should not call the remove child function if om does not exist in dom', () => {
+                    om.render();
+                    om.removeFromViewHieararchy();
+                    sinon.stub(document.body, 'removeChild');
+                    sinon.assert.notCalled(<sinon.SinonSpy>document.body.removeChild);
+                });
+
                 afterEach(() => {
                     om.removeMessageListener();
                 });

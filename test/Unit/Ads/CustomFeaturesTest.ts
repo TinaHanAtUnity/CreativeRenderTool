@@ -177,6 +177,33 @@ describe('CustomFeatures', () => {
         }, {
             gameId: 'scott',
             expected: false
+        }, {
+            gameId: '1793545',
+            expected: true
+        }, {
+            gameId: '1793539',
+            expected: true
+        }, {
+            gameId: '3239343',
+            expected: true
+        }, {
+            gameId: '3239342',
+            expected: true
+        }, {
+            gameId: '3095066',
+            expected: true
+        }, {
+            gameId: '3095067',
+            expected: true
+        }, {
+            gameId: '2988442',
+            expected: true
+        }, {
+            gameId: '3248965',
+            expected: true
+        }, {
+            gameId: '3248964',
+            expected: true
         }];
 
         tests.forEach(t => {
