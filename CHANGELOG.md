@@ -1,5 +1,6 @@
 # Pending
 
+* Enable new ad request privacy protocol for Developer Consent [#10675](https://github.com/Applifier/unity-ads-webview/pull/10675)
 * Open Measurement - remove OM from hierarchy [#10809](https://github.com/Applifier/unity-ads-webview/pull/10809)
 * Extract AdsConfigurationParser Tests [#10811](https://github.com/Applifier/unity-ads-webview/pull/10811)
 * Revert animated button experiment [#10812](https://github.com/Applifier/unity-ads-webview/pull/10812)
