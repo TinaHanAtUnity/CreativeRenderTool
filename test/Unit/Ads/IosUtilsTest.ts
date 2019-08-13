@@ -12,9 +12,9 @@ const unknownVersion = ['8', '8..1', '8!1', '8.!1', '8.', '8.4', 'scott'];
 const unsupportedVersions = [version7, version8];
 const supportedVersions = [version11, version12, unknownVersion];
 
-const iPhone = 'iPhone8,1'
-const iPad = 'iPad6,7'
-    
+const iPhone = 'iPhone8,1';
+const iPad = 'iPad6,7';
+
 describe('IosUtilsTest', () => {
     it('isAppSheetBroken should only return true for invalid iOS versions or iPhone + PORTRAIT mode', () => {
 
@@ -23,7 +23,7 @@ describe('IosUtilsTest', () => {
                 assert.isFalse(IosUtils.isAppSheetBroken(vString, iPhone, Orientation.PORTRAIT), 'Should return false for valid versions on iphone in PORTRAIT');
                 assert.isFalse(IosUtils.isAppSheetBroken(vString, iPad, Orientation.PORTRAIT), 'Should return false for valid versions on iPad in PORTRAIT');
                 assert.isFalse(IosUtils.isAppSheetBroken(vString, iPad, Orientation.LANDSCAPE), 'Should return false for valid versions on iPad in LANDSCAPE');
-                
+
                 //iphone in LANDSCAPE not supported
                 assert.isTrue(IosUtils.isAppSheetBroken(vString, iPhone, Orientation.LANDSCAPE), 'Should return true for valid versions on iphone in LANDSCAPE');
             });
