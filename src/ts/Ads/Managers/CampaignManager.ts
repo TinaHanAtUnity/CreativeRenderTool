@@ -600,10 +600,6 @@ export class CampaignManager {
                 return undefined;
             });
         } else {
-            Diagnostics.trigger('load_campaign_no_fill', {
-                mediaId: mediaId,
-                trackingUrls: trackingUrls
-            });
             return Promise.resolve(undefined);
         }
     }
