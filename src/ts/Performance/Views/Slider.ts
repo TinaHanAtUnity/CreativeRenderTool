@@ -240,14 +240,6 @@ export class Slider {
         } else if (blurRatio <= 0) {
             blurRatio = 0;
         }
-        console.log(targetSlideIndex);
-        const targetSlide = <HTMLElement> document.querySelector(`[slide-index='${targetSlideIndex}']`);
-        targetSlide.style.transform =  'scale(' + positionRatio + ')';
-        targetSlide.style.filter =  'blur(' + blurRatio + ')';
-
-        console.log(positionRatio);
-        const invertedPositionRatio = positionRatio - swipeRatio * positionRatio / 100;
-        console.log(invertedPositionRatio, 'inverted');
     }
 
     private getSlideCount(): number {
@@ -342,7 +334,6 @@ export class Slider {
         }
 
         const sliderOffsetLeftWithDrag = this.getCurrentSliderOffsetLeftWithDrag();
-        // console.log(sliderOffsetLeftWithDrag, this._drag.curX, this._drag.swipeLength);
         this.setTransition(sliderOffsetLeftWithDrag);
     }
 
@@ -403,32 +394,25 @@ export class Slider {
         } else {
             this._currentSlideIndex = targetSlideIndex;
         }
-
         this.animateSlide(targetTransitionPosition, () => {
             // slide calback
+            this.setActiveSlide();
             this._onSlideCallback({ automatic });
             this.postSlide();
         });
-        this.setActiveSlide();
         this.updateIndicators();
     }
 
     private setActiveSlide(): void {
         const currentSlide = this._slides[this._currentSlideIndex];
 
-        for (let i = 0; i < this._slidesContainer.children.length; i++) {
-            const slide = <HTMLElement> this._slidesContainer.children[i];
-            if (slide && slide !== currentSlide) {
+        for (const children of this._slidesContainer.children) {
+            const slide = <HTMLElement>children;
+            if (slide && slide === currentSlide) {
+                slide.classList.add('active-slide');
+            } else if (slide) {
                 slide.classList.remove('active-slide');
-                slide.style.transform =  'scale(0.8)';
-                slide.style.filter = 'blur(5px)';
             }
-        }
-
-        if (currentSlide) {
-            currentSlide.style.transform =  'scale(1)';
-            currentSlide.style.filter = 'blur(0px)';
-            currentSlide.classList.add('active-slide');
         }
     }
 
