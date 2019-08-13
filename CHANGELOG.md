@@ -2,6 +2,8 @@
 
 * Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
 * Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
+* Send Analytics Messages to CDP for Example GameIDs [#10864](https://github.com/Applifier/unity-ads-webview/pull/10864)
+* Add deviceorientation Event Support for MRAID Playables [#10453](https://github.com/Applifier/unity-ads-webview/pull/10453)
 
 # Tue Aug 13 13:49:40 UTC 2019
 
