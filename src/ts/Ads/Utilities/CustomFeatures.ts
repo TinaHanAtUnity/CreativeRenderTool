@@ -150,9 +150,28 @@ export class CustomFeatures {
     }
 
     public static isWhiteListedForLoadApi(gameId: string) {
-        return gameId === '2988443' ||  // Zynga Solitaire          : Android
+        return gameId === '2988442' ||  // Zynga Solitaire          : iOS
+               gameId === '2988443' ||  // Zynga Solitaire          : Android
                gameId === '2988494' ||  // Zynga Freecell           : iOS
-               gameId === '2988495';    // Zynga Freecell Solitaire : Android
+               gameId === '2988495' ||  // Zynga Freecell Solitaire : Android
+               gameId === '3054609' ||  // Unity Test App           : iOS
+               gameId === '3054608' ||  // Unity Test App           : Android
+               gameId === '3083498' ||  // Max test ID              : iOS
+               gameId === '3083499' ||  // Max test ID              : Android
+               gameId === '3238965' ||  // Admob test ID            : iOS
+               gameId === '3238964' ||  // Admob test ID            : Android
+               gameId === '3238970' ||  // Mopub test ID            : iOS
+               gameId === '3238971' ||  // Mopub test ID            : Android
+               gameId === '3238972' ||  // Unity-Ironsource ID      : iOS
+               gameId === '3238973' ||  // Unity-Ironsource ID      : Android
+               gameId === '1793545' ||  // Sniper Strike            : iOS
+               gameId === '1793539' ||  // Sniper Strike            : Android
+               gameId === '3239343' ||  // China Unity Support App  : iOS
+               gameId === '3239342' ||  // China Unity Support App  : Android
+               gameId === '3095066' ||  // Double Win Vegas         : iOS
+               gameId === '3095067' ||  // Double Win Vegas         : Android
+               gameId === '3248965' ||  // Ironsource Internal ID   : iOS
+               gameId === '3248964';    // Ironsource Internal ID   : Android
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

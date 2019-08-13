@@ -43,7 +43,6 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        const abGroup = baseParams.coreConfig.getAbGroup();
         let endScreen: PerformanceEndScreen;
 
         if (baseParams.campaign instanceof SliderPerformanceCampaign) {

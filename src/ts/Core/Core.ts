@@ -218,7 +218,6 @@ export class Core implements ICore {
             return this.Ads.initialize();
         }).then(() => {
             this.ProgrammaticTrackingService.reportMetricWithTags(WebviewLifeCycleMetric.WebviewInitializationTimeTaken, (Date.now() - this.ClientInfo.getInitTimestamp()), [`ads_sdk2_mevt:${WebviewLifeCycleMetric.WebviewInitializationTimeTaken}`]);
-            return this.Api.Sdk.initComplete();
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
                 // tslint:disable-next-line
@@ -248,13 +247,10 @@ export class Core implements ICore {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
-            if (TestEnvironment.get('abGroup')) {
-                // needed in both due to placement level control support
-                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
-                if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = toAbGroup(abGroupNumber);
-                    ConfigManager.setAbGroup(abGroup);
-                }
+            const abGroupNumber = parseInt(TestEnvironment.get('abGroup'), 10);
+            if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                const abGroup = toAbGroup(abGroupNumber);
+                ConfigManager.setAbGroup(abGroup);
             }
 
             if (TestEnvironment.get('forceAuthorization')) {

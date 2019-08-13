@@ -144,7 +144,7 @@ export class CampaignManager {
 
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy(), this._coreConfig.getAbGroup());
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -215,7 +215,7 @@ export class CampaignManager {
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy(), this._coreConfig.getAbGroup());
 
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
@@ -618,6 +618,9 @@ export class CampaignManager {
             } else {
                 throw error;
             }
+        }).catch((error) => {
+            this.reportToCreativeBlockingService(error, parser.creativeID, parser.seatID, parser.campaignID);
+            throw error;
         }).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for (const placement of response.getPlacements()) {
@@ -627,13 +630,20 @@ export class CampaignManager {
             campaign.setMediaId(response.getMediaId());
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
-        }).catch((error) => {
-            CreativeBlocking.report(parser.creativeID, parser.seatID, parser.campaignID, BlockingReason.VIDEO_PARSE_FAILURE, {
-                errorCode: error.errorCode || undefined,
-                message: error.message || undefined
-            });
-            throw error;
         });
+    }
+
+    private reportToCreativeBlockingService(error: unknown, creativeId: string | undefined, seatId: number | undefined, campaignId: string): void {
+        let parseErrorPayload = {};
+
+        if (error instanceof CampaignError) {
+            parseErrorPayload = {
+                parsingFailureReason: error.message,
+                vastErrorCode: error.errorCode,
+                additionalCampaignErrors: error.getAllCampaignErrors()
+            };
+        }
+        CreativeBlocking.report(creativeId, seatId, campaignId, BlockingReason.VIDEO_PARSE_FAILURE, parseErrorPayload);
     }
 
     private setupCampaignAssets(placements: AuctionPlacement[], campaign: Campaign, contentType: string, session: Session): Promise<void> {

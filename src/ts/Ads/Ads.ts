@@ -80,7 +80,6 @@ import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFac
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Analytics } from 'Analytics/Analytics';
 import { Promises } from 'Core/Utilities/Promises';
 
@@ -266,11 +265,10 @@ export class Ads implements IAds {
                 }
             });
 
-            return this.RefreshManager.initialize().then((resp) => {
-                return resp;
-            }).catch((error) => {
-                throw error;
-            });
+        }).then(() => {
+            return this._core.Api.Sdk.initComplete();
+        }).then(() => {
+            return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         });
@@ -332,6 +330,11 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
+
+        if (this.isAttemptingToShowInBackground()) {
+            this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedShowInBackground);
+            return;
+        }
 
         const campaign = this.RefreshManager.getCampaign(placementId);
         if (!campaign) {
@@ -439,9 +442,6 @@ export class Ads implements IAds {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
-        if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAttemptedToShowAdInBackground)) {
-            return;
-        }
 
         this._showing = true;
 
@@ -504,10 +504,6 @@ export class Ads implements IAds {
                 }
             }
 
-            if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAboutToShowAdInBackground)) {
-                return;
-            }
-
             OperativeEventManager.setPreviousPlacementId(this.CampaignManager.getPreviousPlacementId());
             this.CampaignManager.setPreviousPlacementId(placement.getId());
 
@@ -519,25 +515,10 @@ export class Ads implements IAds {
         });
     }
 
-    private shouldSkipShowAd(campaign: Campaign, logkey: MiscellaneousMetric): boolean {
-        if (!this._core.FocusManager.isAppForeground()) {
-            if (CustomFeatures.sampleAtGivenPercent(10)) {
-                Diagnostics.trigger(logkey, {
-                    seatId: campaign.getSeatId(),
-                    creativeId: campaign.getCreativeId(),
-                    contentType: campaign.getContentType()
-                });
-            }
-
-            this._core.ProgrammaticTrackingService.reportMetric(logkey);
-
-            if (CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId())) {
-                return false;
-            }
-            return true;
-        } else {
-            return false;
-        }
+    private isAttemptingToShowInBackground(): boolean {
+        const isAppBackgrounded = !this._core.FocusManager.isAppForeground();
+        const isAppWhitelistedToShowInBackground = CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId());
+        return isAppBackgrounded && !isAppWhitelistedToShowInBackground;
     }
 
     private getAdUnitFactory(campaign: Campaign) {

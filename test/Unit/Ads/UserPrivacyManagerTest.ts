@@ -365,6 +365,37 @@ describe('UserPrivacyManagerTest', () => {
             });
         });
 
+        describe('when limitAdTracking is enabled', () => {
+            beforeEach(() => {
+                let gamePrivacyMethod = PrivacyMethod.DEFAULT;
+                isGDPREnabled = true;
+                gamePrivacy.isEnabled.returns(true);
+                gamePrivacy.getMethod.callsFake(() => gamePrivacyMethod);
+                gamePrivacy.setMethod.callsFake((value) => gamePrivacyMethod = value);
+                gamePrivacy.getVersion.returns(0);
+                (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(true);
+            });
+
+            it('should override the configuration with no consent', () => {
+                consent = true;
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                    sinon.assert.calledWith(gamePrivacy.setMethod, PrivacyMethod.DEVELOPER_CONSENT);
+                    sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutEnabled, true);
+                    sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutRecorded, true);
+                    sinon.assert.calledWith(userPrivacy.update, {
+                        method: PrivacyMethod.DEVELOPER_CONSENT,
+                        version: 0,
+                        permissions: {
+                            all: false,
+                            gameExp: false,
+                            ads: false,
+                            external: false
+                        }
+                    });
+                });
+            });
+        });
+
         describe('when game uses UNITY_CONSENT', () => {
             beforeEach(() => {
                 isGDPREnabled = true;
