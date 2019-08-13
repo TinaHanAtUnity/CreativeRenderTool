@@ -4,7 +4,7 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup, MaterialIconTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
@@ -84,10 +84,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.campaign-container, .game-background, .btn.download'
             });
-        }
-
-        if (MaterialIconTest.isValid(this._abGroup)) {
-            document.documentElement.classList.add('material-icon-experiment');
         }
 
         this._privacy.render();
