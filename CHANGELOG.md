@@ -1,3 +1,8 @@
+# Pending
+
+* Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
+* Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
+
 # Tue Aug 13 13:49:40 UTC 2019
 
 * Enable new ad request privacy protocol for Developer Consent [#10675](https://github.com/Applifier/unity-ads-webview/pull/10675)
