@@ -1,9 +1,4 @@
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
-// import { HTML } from 'Ads/Models/Assets/HTML';
-// import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
-// import { clearImmediate } from 'timers';
-// import { TLSSocket } from 'tls';
-// import { createVerify } from 'crypto';
 
 export interface ISliderOptions {
     startIndex: number;
@@ -75,7 +70,6 @@ export class Slider {
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${this._imageUrls[0]})`
         });
-        // this._rootElement.appendChild(blurredBackground);
         this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
@@ -495,7 +489,6 @@ export class Slider {
 
     public show(): boolean {
         // If this._ready has already resolved and set to null, slider was ready
-
         if (this._ready === null) {
             this._isPaused = false;
             this.setPosition();
