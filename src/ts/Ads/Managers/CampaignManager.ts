@@ -48,6 +48,8 @@ import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -342,6 +344,22 @@ export class CampaignManager {
                             if (error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if (error === CacheStatus.FAILED) {
+                                if (auctionResponse.getContentType() === PromoCampaignParser.ContentType) {
+                                    const placementIds = fill[mediaId].map(placement => placement.getPlacementId()).join();
+                                    PromoErrorService.report(this._request, {
+                                        auctionID: session ? session.getId() : undefined,
+                                        corrID: auctionResponse.getCorrelationId(),
+                                        country: this._coreConfig.getCountry(),
+                                        projectID: this._coreConfig.getUnityProjectId(),
+                                        gameID: this._clientInfo.getGameId(),
+                                        placementID: placementIds,
+                                        productID: undefined,
+                                        platform: this._platform,
+                                        gamerToken: this._coreConfig.getToken(),
+                                        errorCode: 104,
+                                        errorMessage: 'Unable to retrieve and cache asset'
+                                    });
+                                }
                                 return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if (error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
@@ -582,10 +600,6 @@ export class CampaignManager {
                 return undefined;
             });
         } else {
-            Diagnostics.trigger('load_campaign_no_fill', {
-                mediaId: mediaId,
-                trackingUrls: trackingUrls
-            });
             return Promise.resolve(undefined);
         }
     }
@@ -718,6 +732,22 @@ export class CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: AuctionPlacement[], session?: Session): Promise<void> {
+        if (contentType === PromoCampaignParser.ContentType) {
+            const placementIds = placements.map(placement => placement.getPlacementId()).join();
+            PromoErrorService.report(this._request, {
+                auctionID: session ? session.getId() : undefined,
+                corrID: undefined,
+                country: this._coreConfig.getCountry(),
+                projectID: this._coreConfig.getUnityProjectId(),
+                gameID: this._clientInfo.getGameId(),
+                placementID: placementIds,
+                productID: undefined,
+                platform: this._platform,
+                gamerToken: this._coreConfig.getToken(),
+                errorCode: 103,
+                errorMessage: campaignError.errorMessage
+            });
+        }
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
         return this.handlePlacementError(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
