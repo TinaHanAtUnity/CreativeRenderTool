@@ -22,10 +22,10 @@ describe('StoreTest', () => {
             core = TestFixtures.getCoreModule(nativeBridge);
         });
 
-        it('should init with AppleStoreManager in ab group 13', () => {
+        it('should not init with AppleStoreManager in ab group 13', () => {
             sinon.stub(core.Config, 'getAbGroup').returns(toAbGroup(13));
             const store = new Store(core);
-            assert.instanceOf(store.StoreManager, AppleStoreManager);
+            assert.instanceOf(store.StoreManager, NullStoreManager);
         });
 
         it('should not init with AppleStoreManager', () => {
@@ -43,10 +43,10 @@ describe('StoreTest', () => {
             core = TestFixtures.getCoreModule(nativeBridge);
         });
 
-        it('should init with GoogleStoreManager in ab group 13', () => {
+        it('should not init with GoogleStoreManager in ab group 13', () => {
             sinon.stub(core.Config, 'getAbGroup').returns(toAbGroup(13));
             const store = new Store(core);
-            assert.instanceOf(store.StoreManager, GoogleStoreManager);
+            assert.instanceOf(store.StoreManager, NullStoreManager);
         });
 
         it('should not init with GoogleStoreManager', () => {

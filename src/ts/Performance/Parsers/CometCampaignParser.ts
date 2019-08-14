@@ -28,9 +28,9 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
-    protected _abGroup: ABGroup;
-    protected _core: ICore;
-    protected _requestManager: RequestManager;
+    private _abGroup: ABGroup;
+    private _core: ICore;
+    private _requestManager: RequestManager;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -172,7 +172,7 @@ export class CometCampaignParser extends CampaignParser {
         }
     }
 
-    protected validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
+    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
         if (urls && urls !== null) {
             for (const urlKey in urls) {
                 if (urls.hasOwnProperty(urlKey)) {
@@ -184,7 +184,7 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    protected parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
+    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);

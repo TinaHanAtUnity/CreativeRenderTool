@@ -318,7 +318,7 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch((error) => {
-            if (CustomFeatures.shouldSampleAtTenPercent()) {
+            if (CustomFeatures.sampleAtGivenPercent(10)) {
                 const diagnosticData = {
                     request: error.nativeRequest,
                     event: event,
