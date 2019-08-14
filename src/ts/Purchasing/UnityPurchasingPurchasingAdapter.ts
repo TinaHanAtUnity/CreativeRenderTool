@@ -129,7 +129,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private validatePromoJSON(promoCatalogJSON: string): Promise<void> {
         if (promoCatalogJSON === 'NULL' || promoCatalogJSON === null || promoCatalogJSON === undefined) {
-            return Promise.reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
+            return Promise.reject(this.logIssue('Promo catalog JSON is null'));
         } else if (promoCatalogJSON === '') {
             return Promise.reject(this.logIssue('Promo catalog JSON is empty'));
         }

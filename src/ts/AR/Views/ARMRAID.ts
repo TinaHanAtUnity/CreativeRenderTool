@@ -38,7 +38,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _iframeLoaded = false;
 
-    private _deviceorientationListener: EventListener;
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
 
@@ -156,8 +155,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 if (this._platform === Platform.ANDROID) {
                     this._arAndroidEnumsReceivedObserver = this._ar.AR.Android.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
                 }
-                this._deviceorientationListener = (event: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>event);
-                window.addEventListener('deviceorientation', this._deviceorientationListener, false);
             }).catch((err) => {
                 this._core.Sdk.logError('failed to create mraid: ' + err);
 
@@ -205,7 +202,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             if (this._platform === Platform.ANDROID) {
                 this._ar.AR.Android.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
             }
-            window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
         }
 
         if (this._loadingScreenTimeout) {
@@ -352,20 +348,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private handleAREvent(event: string, parameters: string) {
         if (this._iframeLoaded) {
             this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
-        }
-    }
-
-    private handleDeviceOrientation(event: DeviceOrientationEvent) {
-        if (this._iframeLoaded) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'deviceorientation',
-                event: {
-                    alpha: event.alpha,
-                    beta: event.beta,
-                    gamma: event.gamma,
-                    absolute: event.absolute
-                }
-            }, '*');
         }
     }
 

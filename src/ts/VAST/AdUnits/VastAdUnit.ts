@@ -75,6 +75,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 endScreen.remove();
             }
 
+            if (this._om) {
+                this._om.removeFromViewHieararchy();
+            }
+
             if (this._moat) {
                 this._moat.removeMessageListener();
                 const moatContainer = this._moat.container();

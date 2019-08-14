@@ -1,3 +1,17 @@
+# Pending
+
+* Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
+* Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
+* Send Analytics Messages to CDP for Example GameIDs [#10864](https://github.com/Applifier/unity-ads-webview/pull/10864)
+* Add deviceorientation Event Support for MRAID Playables [#10453](https://github.com/Applifier/unity-ads-webview/pull/10453)
+
+# Tue Aug 13 13:49:40 UTC 2019
+
+* Enable new ad request privacy protocol for Developer Consent [#10675](https://github.com/Applifier/unity-ads-webview/pull/10675)
+* Open Measurement - remove OM from hierarchy [#10809](https://github.com/Applifier/unity-ads-webview/pull/10809)
+* Extract AdsConfigurationParser Tests [#10811](https://github.com/Applifier/unity-ads-webview/pull/10811)
+* Revert animated button experiment [#10812](https://github.com/Applifier/unity-ads-webview/pull/10812)
+
 # Thu Aug  8 17:07:34 UTC 2019
 
 * Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)
