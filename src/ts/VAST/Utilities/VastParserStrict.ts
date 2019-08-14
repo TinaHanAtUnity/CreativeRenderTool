@@ -16,6 +16,7 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
+import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -355,8 +356,7 @@ export class VastParserStrict {
         const vastAdVerifications: VastAdVerification[] = [];
         this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION).forEach((element: HTMLElement) => {
             const vastVerificationResources: VastVerificationResource[] = [];
-            const default_key = 'default_key';
-            const vendor = element.getAttribute(VastAttributeNames.VENDOR) || default_key;
+            const vendor = element.getAttribute(VastAttributeNames.VENDOR) || DEFAULT_VENDOR_KEY;
             this.getNodesWithName(element, VastNodeName.JS_RESOURCE).forEach((jsElement: HTMLElement) => {
                 const resourceUrl = this.parseVastUrl(this.parseNodeText(jsElement), urlProtocol);
                 const apiFramework = jsElement.getAttribute(VastAttributeNames.API_FRAMEWORK);

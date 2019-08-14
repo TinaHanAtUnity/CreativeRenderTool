@@ -77,6 +77,7 @@ enum OMState {
 export const OMID_P = 'Unity/1.2.10';
 export const SDK_APIS = '7';
 export const PARTNER_NAME = 'Unity3d';
+export const DEFAULT_VENDOR_KEY = 'default_key';
 
 export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
@@ -189,7 +190,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public render(): void {
         super.render();
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = OMID3p;
+        this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
 
         this._omBridge.setIframe(this._omIframe);
     }
