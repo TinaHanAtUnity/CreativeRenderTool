@@ -30,11 +30,7 @@ $slider-experiment-dot-margin = 5px;
   }
 }
 
-#end-screen .slider-experiment {
-  overflow: hidden;
-}
-
-.portrait {
+.portrait.slider-experiment {
   .game-icon {
     position: fixed;
     top: 58vh;
@@ -49,7 +45,8 @@ $slider-experiment-dot-margin = 5px;
     content: "";
   }
   #end-screen {
-    .campaign-container.slider-experiment {
+    overflow: hidden;
+    .campaign-container {
       .game-background-container {
         height: 63%;
       }
@@ -71,7 +68,7 @@ $slider-experiment-dot-margin = 5px;
   }
 }
 
-.landscape {
+.landscape.slider-experiment {
   .end-screen-info-background:before {
     position: absolute;
     bottom: 0;
@@ -82,7 +79,7 @@ $slider-experiment-dot-margin = 5px;
     content: "";
   }
   #end-screen {
-    .campaign-container.slider-experiment {
+    .campaign-container {
       .game-background-container {
         width: 60%;
       }
@@ -97,13 +94,6 @@ $slider-experiment-dot-margin = 5px;
     }
   }
 }
-
-
-
-.slider-experiment {
-  overflow: hidden;
-}
-
 
 #slider-root-container {
   overflow: hidden;
