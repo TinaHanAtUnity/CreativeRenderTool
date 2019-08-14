@@ -219,21 +219,16 @@ export class Slider {
             targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
         }
 
-        const swipeRatio = this._drag.swipeLength;
-        let positionRatio = swipeRatio / 100;
-        if (positionRatio >= 1) {
-            positionRatio = 1;
-        } else if (positionRatio <= 0.8) {
-            positionRatio = 0.8;
-        }
+        const swipeLength = this._drag.swipeLength;
+        let positionRatio = swipeLength / 100;
+        const maxPositionRatio: number = 1;
+        const minPositionRatio: number = 0.8;
+        positionRatio = Math.min(Math.max(positionRatio, minPositionRatio), maxPositionRatio);
 
-        const blurAmount: number = 5 ;
-        let blurRatio = blurAmount - swipeRatio * blurAmount / 100;
-        if (blurRatio >= 5) {
-            blurRatio = 5;
-        } else if (blurRatio <= 0) {
-            blurRatio = 0;
-        }
+        const maxBlurAmount: number = 5;
+        const minBlurAmount: number = 0;
+        let blurAmount = maxBlurAmount - swipeLength * maxBlurAmount / 100;
+        blurAmount = Math.min(Math.max(blurAmount, minBlurAmount), maxBlurAmount);
     }
 
     private getSlideCount(): number {
@@ -400,13 +395,11 @@ export class Slider {
     private setActiveSlide(): void {
         const currentSlide = this._slides[this._currentSlideIndex];
 
-        for (const children of this._slidesContainer.children) {
-            const slide = <HTMLElement>children;
-            if (slide && slide === currentSlide) {
-                slide.classList.add('active-slide');
-            } else if (slide) {
-                slide.classList.remove('active-slide');
-            }
+        for (const child of this._slidesContainer.children) {
+            const slide = <HTMLElement>child;
+            slide === currentSlide
+                ? slide.classList.add('active-slide')
+                : slide.classList.remove('active-slide');
         }
     }
 
