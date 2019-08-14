@@ -12,7 +12,7 @@
     "start:release": "rimraf ./dist && NODE_ENV=production webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/server.release.js",
     "build": "ANALYZE=true npm run build:release",
     "build:release": "rimraf ./dist && NODE_ENV=production webpack --config tools/webpack/config.release.js",
-    "config:release": "node "
+    "test": "jest"
   },
   "license": "Apache-2.0",
   "dependencies": {
@@ -57,13 +57,16 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/polyfill": "^7.4.4",
+    "@types/jest": "^24.0.17",
     "babel-loader": "^8.0.6",
     "base64-inline-loader": "^1.1.1",
     "css-loader": "^3.1.0",
     "eslint-loader": "^2.2.1",
     "html-loader": "^0.5.5",
+    "html-loader-jest": "^0.2.1",
     "html-webpack-inline-source-plugin": "^0.0.10",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^24.8.0",
     "mini-css-extract-plugin": "^0.8.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "proto-loader": "^0.2.0",
@@ -75,6 +78,7 @@
     "terser-webpack-plugin": "^1.4.1",
     "thread-loader": "^2.1.2",
     "to-string-loader": "^1.1.5",
+    "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "url-loader": "^2.1.0",
