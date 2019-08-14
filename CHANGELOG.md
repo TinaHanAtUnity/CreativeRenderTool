@@ -1,4 +1,4 @@
-# Pending
+# Wed Aug 14 18:17:15 UTC 2019
 
 * Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
 * Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
