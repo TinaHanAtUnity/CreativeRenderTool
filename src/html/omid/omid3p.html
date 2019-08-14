@@ -58,7 +58,7 @@
                     };
         
                     var DEFAULT_VENDOR_KEY = 'default_key';
-                    var sessionObserversMap = {'default_key': []};
+                    var sessionObserversMap = {};
                     var sessionStartData = {};
                     var sessionStartCalled = false;
         
@@ -106,17 +106,9 @@
                      * @param {string} key
                      */
                     var sendSessionStartForKey = function(key) {
-                        if (key === DEFAULT_VENDOR_KEY) {
-                            if (sessionObserversMap[key].length > 0) {
-                                sessionObserversMap[key].forEach((sessionObserver) => {
-                                    sendSessionStart(sessionObserver, key);
-                                });
-                            }
-                        } else {
-                            if (sessionObserversMap[key]) {
-                                sendSessionStart(sessionObserversMap[key], key);
-                            }
-                        }
+                        sessionObserversMap[key].forEach((sessionObserver) => {
+                            sendSessionStart(sessionObserver, key);
+                        });
                     }
 
                     var handleSessionStart = function(data) {
@@ -127,18 +119,24 @@
                                 sendSessionStartForKey(data.vendorkey);
                             }
                         } else {
-                            // it is possible session start was called before a vendor registers so we must always store the data
+                            // It is possible session start was called before a vendor registers so we must always store the data
                             sessionStartData[data.vendorkey] = event.data;
 
                             if (!data.verificationParameters) {
-                                // if we've already stored data for a default key
+                                // If we've already stored data for a default key, we can send SessionStart since the params do not matter
                                 if (sessionStartData[DEFAULT_VENDOR_KEY]) {
                                     sendSessionStartForKey(DEFAULT_VENDOR_KEY);
                                 } else {
+                                    // Log even if registration will happen later
                                     postMessageCallback('onEventProcessed', {
                                         eventType: 'vendorkeyMismatch'
                                     });
                                 }
+                            } else {
+                                // Log even if registration will happen later
+                                postMessageCallback('onEventProcessed', {
+                                    eventType: 'vendorkeyMismatch'
+                                });
                             }
                         }
                         sessionStartCalled = true;
@@ -235,20 +233,19 @@
                      * @param {function} vendorKey optional param to attribute given vendor key to sessionObserver
                      */
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
-                        if (vendorKey) {
-                            sessionObserversMap[vendorKey] = functionToExecute;
+                        if (!vendorKey) {
+                            vendorKey = DEFAULT_VENDOR_KEY;
+                        }
 
-                            // If start has been called from OM, send the start event immediately after registration
-                            if (!sessionStartCalled && sessionStartData[vendorKey]) {
-                                sendSessionStartForKey(vendorKey);
-                            } 
-                        } else {
-                            sessionObserversMap[DEFAULT_VENDOR_KEY].push(functionToExecute);
-                
-                            // If start has been called from OM, send the start event immediately after registration
-                            if (!sessionStartCalled && sessionStartData[DEFAULT_VENDOR_KEY]) {
-                                sendSessionStartForKey(DEFAULT_VENDOR_KEY);
-                            }
+                        if (!sessionObserversMap[vendorKey]) {
+                            sessionObserversMap[vendorKey] = [];
+                        }
+
+                        sessionObserversMap[vendorKey].push(functionToExecute);
+
+                        // If start has been called from OM, send the start event immediately after registration
+                        if (!sessionStartCalled && sessionStartData[vendorKey]) {
+                            sendSessionStartForKey(vendorKey);
                         }
                     }
 

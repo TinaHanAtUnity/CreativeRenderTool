@@ -587,7 +587,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'vendorkeyMismatch') {
-            this._core.Sdk.logDebug('vendor attribute was either never registered or vendor attribute does not match registered key');
+            this._core.Sdk.logDebug('Vendor attribute was either never registered or vendor attribute does not match registered key. SessionStart not called.');
         }
     }
 

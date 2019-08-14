@@ -355,8 +355,8 @@ export class VastParserStrict {
         const vastAdVerifications: VastAdVerification[] = [];
         this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION).forEach((element: HTMLElement) => {
             const vastVerificationResources: VastVerificationResource[] = [];
-            const defualt_key = 'default_key';
-            const vendor = element.getAttribute(VastAttributeNames.VENDOR) || defualt_key;
+            const default_key = 'default_key';
+            const vendor = element.getAttribute(VastAttributeNames.VENDOR) || default_key;
             this.getNodesWithName(element, VastNodeName.JS_RESOURCE).forEach((jsElement: HTMLElement) => {
                 const resourceUrl = this.parseVastUrl(this.parseNodeText(jsElement), urlProtocol);
                 const apiFramework = jsElement.getAttribute(VastAttributeNames.API_FRAMEWORK);
