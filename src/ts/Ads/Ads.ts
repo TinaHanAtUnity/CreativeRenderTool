@@ -180,10 +180,7 @@ export class Ads implements IAds {
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
-
-            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
-                this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
-            }
+            this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
 
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
