@@ -19,13 +19,13 @@ export class RequestApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Request', ApiPackage.CORE, EventCategory.REQUEST);
 
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidRequestApi(nativeBridge);
         }
     }
 
     public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'get', [id, url, headers, connectTimeout]);
         } else {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'get', [id, url, headers, connectTimeout, readTimeout]);
@@ -33,7 +33,7 @@ export class RequestApi extends NativeApi {
     }
 
     public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'post', [id, url, requestBody, headers, connectTimeout]);
         } else {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'post', [id, url, requestBody, headers, connectTimeout, readTimeout]);
@@ -41,7 +41,7 @@ export class RequestApi extends NativeApi {
     }
 
     public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'head', [id, url, headers, connectTimeout]);
         } else {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'head', [id, url, headers, connectTimeout, readTimeout]);
@@ -69,7 +69,7 @@ export class RequestApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case RequestEvent[RequestEvent.COMPLETE]:
                 this.onComplete.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2], <number>parameters[3], <[string, string][]>parameters[4]);
                 break;

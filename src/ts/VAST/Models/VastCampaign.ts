@@ -8,7 +8,7 @@ import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
     video: Video;
-    hasEndscreen: boolean;
+    hasStaticEndscreen: boolean;
     portrait: Image | undefined;
     landscape: Image | undefined;
     appCategory: string | undefined;
@@ -27,7 +27,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             ... ProgrammaticCampaign.Schema,
             vast: ['object'],
             video: ['object'],
-            hasEndscreen: ['boolean'],
+            hasStaticEndscreen: ['boolean'],
             portrait: ['object', 'undefined'],
             landscape: ['object', 'undefined'],
             appCategory: ['string', 'undefined'],
@@ -48,7 +48,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     }
 
     public getVideo() {
-        if(!this.get('video')) {
+        if (!this.get('video')) {
             this.set('video', new Video(this.get('vast').getVideoUrl(), this.getSession()));
         }
         return this.get('video');
@@ -64,8 +64,8 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return [];
     }
 
-    public hasEndscreen(): boolean {
-        return this.get('hasEndscreen');
+    public hasStaticEndscreen(): boolean {
+        return this.get('hasStaticEndscreen');
     }
 
     public getLandscape(): Asset | undefined {
@@ -134,7 +134,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             'campaign': super.getDTO(),
             'vast': this.getVast().getDTO(),
             'video': this.getVast().getDTO(),
-            'hasEndscreen': this.hasEndscreen(),
+            'hasStaticEndscreen': this.hasStaticEndscreen(),
             'portrait': portrait,
             'landscape': landscape
         };

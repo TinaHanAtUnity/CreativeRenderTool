@@ -20,7 +20,7 @@ export class Url {
         if (url) {
             let encodedUrl = '';
             let i = 0;
-            while(i < url.length) {
+            while (i < url.length) {
                 // Skip already encoded URL characters
                 if (url[i] === '%' && (url.length - i) >= 3 && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
                     encodedUrl += url[i++];
@@ -95,7 +95,7 @@ export class Url {
         }
 
         const pairs: string[] = [];
-        for(const key in parameters) {
+        for (const key in parameters) {
             if (parameters.hasOwnProperty(key)) {
                 const value = <string>parameters[key];
                 if (value !== undefined) {
@@ -114,7 +114,7 @@ export class Url {
         }
         const queryString: string[] = locationString.split('?')[1].split('&');
 
-        for(const entryPair of queryString) {
+        for (const entryPair of queryString) {
             const queryParam = entryPair.split('=');
             if (queryParam[0] === parameter) {
                 return queryParam[1];

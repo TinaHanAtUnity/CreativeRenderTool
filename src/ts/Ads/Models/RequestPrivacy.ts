@@ -8,6 +8,8 @@ import {
     UserPrivacy
 } from 'Ads/Models/Privacy';
 
+import { ABGroup, ConsentTest } from 'Core/Models/ABGroup';
+
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
@@ -25,7 +27,11 @@ function isProfilingPermissions(permissions: IPermissions | { [key: string]: nev
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy {
+    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy, abGroup: ABGroup): IRequestPrivacy | undefined {
+        if (this.GameUsesConsent(gamePrivacy, abGroup) === false) {
+            return undefined;
+        }
+
         if (!userPrivacy.isRecorded()) {
             return {
                 method: gamePrivacy.getMethod(),
@@ -40,11 +46,12 @@ export class RequestPrivacyFactory {
         };
     }
 
+    private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup): boolean {
+        const isInDeveloperConsentTreatment: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT && ConsentTest.isValid(abGroup);
+        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isInDeveloperConsentTreatment;
+    }
+
     private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
-        //TODO: Add other methods after hotfix is working
-        if (userPrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
-            return <IGranularPermissions>{};
-        }
         const permissions = userPrivacy.getPermissions();
 
         if ((<IAllPermissions>permissions).all === true) {
@@ -55,7 +62,12 @@ export class RequestPrivacyFactory {
             };
         }
 
-        return <IGranularPermissions>permissions;
+        const { ads = false, external = false, gameExp = false} = <IGranularPermissions>permissions;
+        return {
+            gameExp,
+            ads,
+            external
+        };
     }
 
     public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {

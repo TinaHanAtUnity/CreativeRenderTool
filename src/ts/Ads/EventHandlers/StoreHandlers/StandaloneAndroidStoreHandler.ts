@@ -76,7 +76,7 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
         }
 
         const deviceIdPromise = new Promise<void> ((resolve, reject) => {
-            if (this._deviceIdManager && !(<AndroidDeviceInfo>this._deviceInfo).getDeviceId1()) {
+            if (this._deviceIdManager && !(<AndroidDeviceInfo> this._deviceInfo).getDeviceId1()) {
                 this._deviceIdManager.getDeviceIdsWithPermissionRequest().then(resolve).catch(reject);
             } else {
                 resolve();
@@ -90,9 +90,9 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
                 return;
             }
 
-            const title = (<PerformanceCampaign>this._campaign).getGameName();
+            const title = (<PerformanceCampaign> this._campaign).getGameName();
             const description = title;
-            const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit>this._adUnit;
+            const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit> this._adUnit;
 
             perfAdUnit.disableDownloadButton();
             perfAdUnit.setDownloadStatusMessage('');
@@ -126,7 +126,7 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
             return;
         }
 
-        const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit>this._adUnit;
+        const perfAdUnit: PerformanceAdUnit = <PerformanceAdUnit> this._adUnit;
         switch (status) {
             case DownloadStatus.RUNNING:
                 const runningMessage = `${this._localization.translate(DownloadMessage.DOWNLOADING)} (${update}%) - ${this._localization.translate(DownloadMessage.DOWNLOADING_REMINDER)}`;

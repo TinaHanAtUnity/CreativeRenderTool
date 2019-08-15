@@ -4,6 +4,7 @@ interface IMediationMetaData extends IMetaData {
     name: string | undefined;
     version: string | undefined;
     ordinal: number | undefined;
+    enable_metadata_load: boolean | undefined;
 }
 
 export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
@@ -13,11 +14,12 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
             ... BaseMetaData.Schema,
             name: ['string', 'undefined'],
             version: ['string', 'undefined'],
-            ordinal: ['number', 'undefined']
+            ordinal: ['number', 'undefined'],
+            enable_metadata_load: ['boolean', 'undefined']
         });
 
         this.set('category', 'mediation');
-        this.set('keys', ['name', 'version', 'ordinal']);
+        this.set('keys', ['name', 'version', 'ordinal', 'enable_metadata_load']);
     }
 
     public getName(): string | undefined {
@@ -34,6 +36,11 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
 
     public getOrdinal(): number | undefined {
         return this.get('ordinal');
+    }
+
+    public isMetaDataLoadEnabled(): boolean {
+        const enableMetadataLoad: boolean | undefined = this.get('enable_metadata_load');
+        return enableMetadataLoad ? enableMetadataLoad : false;
     }
 
     public getDTO(): { [key: string]: unknown } {

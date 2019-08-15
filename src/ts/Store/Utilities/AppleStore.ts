@@ -35,7 +35,7 @@ export class AppleStore {
     private onProductRequestComplete(requestId: number, products: { [productId: string]: IAppleProduct }) {
         const productId = this._productRequests[requestId];
 
-        if(productId && products[productId]) {
+        if (productId && products[productId]) {
             this.finishProductRequest(true, requestId, products[productId]);
         }
 
@@ -53,8 +53,8 @@ export class AppleStore {
     private finishProductRequest(success: boolean, requestId: number, result?: IAppleProduct) {
         const callback = this._callbacks[requestId];
 
-        if(callback) {
-            if(success) {
+        if (callback) {
+            if (success) {
                 callback.resolve(result);
             } else {
                 callback.reject();
@@ -63,7 +63,7 @@ export class AppleStore {
             delete this._callbacks[requestId];
         }
 
-        if(this._productRequests[requestId]) {
+        if (this._productRequests[requestId]) {
             delete this._productRequests[requestId];
         }
     }

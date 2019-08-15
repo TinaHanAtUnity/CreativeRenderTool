@@ -60,14 +60,14 @@ export abstract class BaseVideoEventHandler {
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
         const overlay = this._adUnit.getOverlay();
-        if(overlay) {
+        if (overlay) {
             overlay.hide();
         }
         this._adUnit.onFinish.trigger();
     }
 
     protected handleVideoError(errorType: string, errorData: unknown) {
-        if(this._adUnit.getVideoState() !== VideoState.ERRORED) {
+        if (this._adUnit.getVideoState() !== VideoState.ERRORED) {
             const previousState = this._adUnit.getVideoState();
             this._adUnit.setVideoState(VideoState.ERRORED);
 
@@ -78,14 +78,14 @@ export abstract class BaseVideoEventHandler {
             this.updateViewsOnVideoError();
 
             const overlay = this._adUnit.getOverlay();
-            if(overlay) {
+            if (overlay) {
                 overlay.hide();
             }
 
             this._adUnit.onError.trigger();
             this._adUnit.onFinish.trigger();
 
-            if(previousState === VideoState.NOT_READY || previousState === VideoState.PREPARING) {
+            if (previousState === VideoState.NOT_READY || previousState === VideoState.PREPARING) {
                 this._adUnit.hide();
                 this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
             } else {

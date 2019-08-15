@@ -14,15 +14,15 @@ export interface ITemplateData {
 export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
-        if(binding.event === 'swipe') {
+        if (binding.event === 'swipe') {
             binding.swipe = new HorizontalSwipe(element);
         }
 
-        if(binding.event === 'swipedown') {
+        if (binding.event === 'swipedown') {
             binding.swipe = new DownSwipe(element);
         }
 
-        if(attachTap && binding.event === 'click') {
+        if (attachTap && binding.event === 'click') {
             binding.tap = new Tap(element);
         }
         element.addEventListener(binding.event, binding.listener, false);
@@ -56,8 +56,8 @@ export abstract class View<T extends object> {
     }
 
     public removeEventHandler(handler: T): void {
-        if(this._handlers.length) {
-            if(typeof handler !== 'undefined') {
+        if (this._handlers.length) {
+            if (typeof handler !== 'undefined') {
                 this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
             } else {
                 this._handlers = [];
@@ -71,10 +71,10 @@ export abstract class View<T extends object> {
         container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
         this._bindings.forEach((binding: IViewBinding) => {
-            if(binding.selector) {
+            if (binding.selector) {
                 const elements: NodeList = container.querySelectorAll(binding.selector);
                 // tslint:disable:prefer-for-of
-                for(let i = 0; i < elements.length; ++i) {
+                for (let i = 0; i < elements.length; ++i) {
                     const element = elements[i];
                     View.addEventListener(binding, <HTMLElement>element, this._attachTap);
                 }
@@ -90,13 +90,13 @@ export abstract class View<T extends object> {
     }
 
     public show(): void {
-        if(this._container) {
+        if (this._container) {
             this._container.style.visibility = 'visible';
         }
     }
 
     public hide(): void {
-        if(this._container) {
+        if (this._container) {
             this._container.style.visibility = 'hidden';
         }
     }

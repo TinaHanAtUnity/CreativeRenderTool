@@ -254,12 +254,6 @@
       "body": true
     },
     {
-      "parameter": "isBackupCampaign",
-      "required": "all",
-      "queryString": false,
-      "body": true
-    },
-    {
       "parameter": "privacy",
       "required": "yes",
       "queryString": false,
@@ -268,6 +262,12 @@
     {
       "parameter": "deviceFreeSpace",
       "required": "yes",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "isLoadEnabled",
+      "required": "all",
       "queryString": false,
       "body": true
     }

@@ -28,6 +28,7 @@ export interface IRawPlacement {
     refreshDelay: number;
     position?: string;
     auctionType?: string;
+    banner?: { refreshRate?: number };
 }
 
 export interface IPlacement {
@@ -47,7 +48,6 @@ export interface IPlacement {
     useCloseIconInsteadOfSkipIcon: boolean | undefined;
 
     adTypes: string[] | undefined;
-    realtimeData: string | undefined;
 
     state: PlacementState;
     previousState: PlacementState;
@@ -57,6 +57,7 @@ export interface IPlacement {
     refreshDelay: number | undefined;
     position: string | undefined;
     auctionType: PlacementAuctionType;
+    bannerRefreshRate: number | undefined;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -74,7 +75,6 @@ export class Placement extends Model<IPlacement> {
             disableVideoControlsFade: ['boolean', 'undefined'],
             useCloseIconInsteadOfSkipIcon: ['boolean', 'undefined'],
             adTypes: ['array', 'undefined'],
-            realtimeData: ['string', 'undefined'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
@@ -82,7 +82,8 @@ export class Placement extends Model<IPlacement> {
             currentTrackingUrls: ['object', 'undefined'],
             refreshDelay: ['number', 'undefined'],
             position: ['string', 'undefined'],
-            auctionType: ['string']
+            auctionType: ['string'],
+            bannerRefreshRate: ['number', 'undefined']
         });
 
         this.set('id', data.id);
@@ -112,6 +113,10 @@ export class Placement extends Model<IPlacement> {
         this.set('refreshDelay', data.refreshDelay);
         this.set('position', data.position || 'bottomcenter');
         this.set('auctionType', <PlacementAuctionType>data.auctionType || DefaultPlacementAuctionType);
+
+        if (data.banner) {
+            this.set('bannerRefreshRate', data.banner.refreshRate);
+        }
     }
 
     public getId(): string {
@@ -202,16 +207,12 @@ export class Placement extends Model<IPlacement> {
         this.set('currentTrackingUrls', trackingUrls);
     }
 
-    public getRealtimeData(): string | undefined {
-        return this.get('realtimeData');
-    }
-
-    public setRealtimeData(value: string | undefined) {
-        this.set('realtimeData', value);
-    }
-
     public getRefreshDelay(): number | undefined {
         return this.get('refreshDelay');
+    }
+
+    public getBannerRefreshRate(): number | undefined {
+        return this.get('bannerRefreshRate');
     }
 
     public getBannerStyle(): string | undefined {

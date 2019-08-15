@@ -16,6 +16,7 @@ interface IClientInfo {
     initTimestamp: number;
     reinitialized: boolean;
     monetizationInUse: boolean;
+    usePerPlacementLoad: boolean;
 }
 
 export class ClientInfo extends Model<IClientInfo> {
@@ -35,7 +36,8 @@ export class ClientInfo extends Model<IClientInfo> {
             webviewVersion: ['string', 'null'],
             initTimestamp: ['number'],
             reinitialized: ['boolean'],
-            monetizationInUse: ['boolean']
+            monetizationInUse: ['boolean'],
+            usePerPlacementLoad: ['boolean']
         });
 
         this.set('gameId', data[0]);
@@ -51,6 +53,7 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('webviewVersion', data[10]);
         this.set('initTimestamp', data[11]);
         this.set('reinitialized', data[12]);
+        this.set('usePerPlacementLoad', !!data[13]);
         this.set('monetizationInUse', false);
     }
 
@@ -102,6 +105,10 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('initTimestamp');
     }
 
+    public getUsePerPlacementLoad(): boolean {
+        return this.get('usePerPlacementLoad');
+    }
+
     public isReinitialized(): boolean {
         return this.get('reinitialized');
     }
@@ -129,7 +136,8 @@ export class ClientInfo extends Model<IClientInfo> {
             'webviewVersion': this.getWebviewVersion(),
             'initTimestamp': this.getInitTimestamp(),
             'reinitialized': this.isReinitialized(),
-            'monetizationInUse': this.isMonetizationInUse()
+            'monetizationInUse': this.isMonetizationInUse(),
+            'usePerPlacementLoad': this.getUsePerPlacementLoad()
         };
     }
 }

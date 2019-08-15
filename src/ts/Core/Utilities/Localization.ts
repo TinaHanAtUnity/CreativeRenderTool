@@ -71,12 +71,12 @@ export class Localization {
 
     public static getLanguageMap(language: string, namespace: string): { [key: string]: string } | undefined {
         const languageMap = Localization._languageMap[language];
-        if(languageMap) {
+        if (languageMap) {
             return languageMap[namespace];
         }
-        for(const key in Localization._languageMap) {
-            if(Localization._languageMap.hasOwnProperty(key)) {
-                if(language.match(key)) {
+        for (const key in Localization._languageMap) {
+            if (Localization._languageMap.hasOwnProperty(key)) {
+                if (language.match(key)) {
                     return Localization._languageMap[key][namespace];
                 }
             }
@@ -85,10 +85,10 @@ export class Localization {
     }
 
     public static setLanguageMap(language: string, namespace: string, map: { [key: string]: string }) {
-        if(!Localization._languageMap) {
+        if (!Localization._languageMap) {
             Localization._languageMap = {};
         }
-        if(!Localization._languageMap[language]) {
+        if (!Localization._languageMap[language]) {
             Localization._languageMap[language] = {};
         }
         Localization._languageMap[language][namespace] = map;
@@ -96,12 +96,12 @@ export class Localization {
 
     public static getLocalizedAbbreviations(language: string): { thousand: string; million: string } | undefined {
         const localizedAbbreviations = Localization._localizedAbbreviations[language];
-        if(localizedAbbreviations) {
+        if (localizedAbbreviations) {
             return localizedAbbreviations;
         }
-        for(const key in Localization._localizedAbbreviations) {
-            if(Localization._localizedAbbreviations.hasOwnProperty(key)) {
-                if(language.match(key)) {
+        for (const key in Localization._localizedAbbreviations) {
+            if (Localization._localizedAbbreviations.hasOwnProperty(key)) {
+                if (language.match(key)) {
                     return Localization._localizedAbbreviations[key];
                 }
             }
@@ -227,7 +227,7 @@ export class Localization {
 
     public translate(phrase: string): string {
         const languageMap = Localization.getLanguageMap(this._language, this._namespace);
-        if(!languageMap || !(phrase in languageMap)) {
+        if (!languageMap || !(phrase in languageMap)) {
             return phrase;
         }
         return languageMap[phrase];

@@ -38,7 +38,7 @@ export abstract class NativeApi {
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
         this._fullApiClassName = this.getFullApiClassName();
-        if(typeof eventCategory !== 'undefined') {
+        if (typeof eventCategory !== 'undefined') {
             nativeBridge.addEventHandler(eventCategory, this);
         }
     }
@@ -48,7 +48,7 @@ export abstract class NativeApi {
     }
 
     protected getFullApiClassName(): string {
-        switch(this._nativeBridge.getPlatform()) {
+        switch (this._nativeBridge.getPlatform()) {
             case Platform.ANDROID:
                 return NativeApi._apiPackageMapping[this._apiPackage].android + '.' + this._apiClass;
 

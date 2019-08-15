@@ -149,7 +149,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAUserSeeked)
             }];
 
-            for(const test of tests) {
+            for (const test of tests) {
                 describe(`${test.event} AFMA event`, () => {
                     beforeEach(sendEvent(test.event, test.data));
                     it(`should handle the ${test.event} event`, () => test.verify(test.data));

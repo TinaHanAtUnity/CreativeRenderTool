@@ -32,7 +32,7 @@ export class BroadcastApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        if(event === BroadcastEvent[BroadcastEvent.ACTION]) {
+        if (event === BroadcastEvent[BroadcastEvent.ACTION]) {
             this.onBroadcastAction.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2], parameters[3]);
         } else {
             super.handleEvent(event, parameters);

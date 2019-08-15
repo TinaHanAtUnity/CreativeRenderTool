@@ -36,20 +36,20 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._moat = MoatViewabilityService.getMoat();
         this._om = parameters.om;
 
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
         }
 
-        if(parameters.platform === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             Promise.all([
                 parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
                 parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });
-        } else if(parameters.platform === Platform.IOS) {
+        } else if (parameters.platform === Platform.IOS) {
             parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
                 this.setVolume(volume);
             });
@@ -73,6 +73,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             if (endScreen) {
                 endScreen.hide();
                 endScreen.remove();
+            }
+
+            if (this._om) {
+                this._om.removeFromViewHieararchy();
             }
 
             if (this._moat) {
@@ -99,9 +103,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getVolume() {
-        if(this._muted) {
-            return 0;
-        }
         return this._volume;
     }
 
@@ -109,11 +110,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._volume = volume;
     }
 
-    public setMuted(muted: boolean) {
+    public setVideoPlayerMuted(muted: boolean) {
         this._muted = muted;
     }
 
-    public getMuted() {
+    public getVideoPlayerMuted() {
         return this._muted;
     }
 
@@ -184,7 +185,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
                 if (this._om) {
                     const viewPort = this._om.calculateViewPort(width, height);
-                    const obstructionRectangle = this._om.calculateObstruction(0, 0, width, height);
+                    const obstructionRectangle = this._om.createRectangle(0, 0, width, height);
                     const adView = this._om.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
                     this._om.geometryChange(viewPort, adView);
                 }
@@ -201,10 +202,18 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._om) {
             this._om.resume();
 
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
                 if (this._om) {
                     const viewPort = this._om.calculateViewPort(width, height);
-                    const adView = this._om.calculateVastAdView(100, [], width, height, true, []);
+                    const screenView = this._om.createRectangle(0, 0, width, height);
+                    const videoView = this._om.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+
+                    const percentInView = this._om.calculateObstructionOverlapPercentage(videoView, screenView);
+                    const obstructionReasons: ObstructionReasons[] = [];
+                    if (percentInView < 100) {
+                        obstructionReasons.push(ObstructionReasons.HIDDEN);
+                    }
+                    const adView = this._om.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
                     this._om.geometryChange(viewPort, adView);
                 }
             });
@@ -213,7 +222,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public onVideoError(): void {
         const endScreen = this.getEndScreen();
-        if(endScreen) {
+        if (endScreen && this.hasImpressionOccurred()) {
             endScreen.show();
         } else {
             this.hide();

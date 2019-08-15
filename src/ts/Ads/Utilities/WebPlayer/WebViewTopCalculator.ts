@@ -59,12 +59,12 @@ export class WebViewTopCalculator {
     }
 
     private getScreenDensity(): number {
-        return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
+        return (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity();
     }
 
     private isIPhoneX(height: number): boolean {
         let isIPhonex = false;
-        switch(height) {
+        switch (height) {
             case 812:
                 // X and Xs pixel-ratio -> 3
                 isIPhonex = true;

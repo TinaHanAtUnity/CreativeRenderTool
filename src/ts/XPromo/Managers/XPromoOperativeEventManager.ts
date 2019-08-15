@@ -26,7 +26,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
     public sendStart(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.START)) {
+        if (session.getEventSent(EventType.START)) {
             return Promise.resolve();
         }
 
@@ -38,7 +38,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
     public sendView(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.VIEW)) {
+        if (session.getEventSent(EventType.VIEW)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.VIEW);
@@ -53,7 +53,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
     public sendClick(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
-        if(session.getEventSent(EventType.CLICK)) {
+        if (session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.CLICK);

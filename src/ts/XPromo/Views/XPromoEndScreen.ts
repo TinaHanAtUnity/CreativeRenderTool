@@ -7,12 +7,14 @@ const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class XPromoEndScreen extends EndScreen {
     private _campaign: XPromoCampaign;
+    private _country: string | undefined;
 
-    constructor(parameters: IEndScreenParameters, campaign: XPromoCampaign) {
+    constructor(parameters: IEndScreenParameters, campaign: XPromoCampaign, country?: string) {
         parameters.targetGameName = campaign.getGameName();
         super(parameters);
 
         this._campaign = campaign;
+        this._country = country;
         this._template = new Template(this.getTemplate(), this._localization);
 
         const portraitImage = campaign.getPortrait();
@@ -42,6 +44,18 @@ export class XPromoEndScreen extends EndScreen {
             store: this._campaign.getStore()
         }));
     }
+
+    public render(): void {
+        super.render();
+
+        document.documentElement.classList.add('performance-end-screen');
+
+        const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.china-advertisement');
+        if (this._country === 'CN' && chinaAdvertisementElement) {
+            chinaAdvertisementElement.style.display = 'block';
+        }
+    }
+
     protected getEndscreenAlt(): string | undefined {
         if (this._campaign.getSquare()) {
             return SQUARE_END_SCREEN;

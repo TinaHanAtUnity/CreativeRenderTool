@@ -83,8 +83,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandlerView {
 
     public render() {
         super.render();
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._GDPRPopupElement = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement> this._container.querySelector('.privacy-button');
     }
 
     public update(progress: number, total: number) {
@@ -132,14 +132,14 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandlerView {
     }
 
     private updateCircle(fraction: number) {
-        const wrapperElement = <HTMLElement>this._container.querySelector('.progress-wrapper');
-        const leftCircleElement = <HTMLElement>this._container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>this._container.querySelector('.circle-right');
+        const wrapperElement = <HTMLElement> this._container.querySelector('.progress-wrapper');
+        const leftCircleElement = <HTMLElement> this._container.querySelector('.circle-left');
+        const rightCircleElement = <HTMLElement> this._container.querySelector('.circle-right');
 
         const degrees = fraction * 360;
         leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
 
-        if(fraction >= 0.5) {
+        if (fraction >= 0.5) {
             wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
             rightCircleElement.style.webkitAnimationName = 'right-spin';
         }

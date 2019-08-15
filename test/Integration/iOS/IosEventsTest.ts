@@ -23,7 +23,7 @@ describe('IosEventsTest V4', () => {
     const findEventCount = (requestLog: string[], regexp: string) => {
         let count = 0;
         requestLog.forEach(log => {
-            if(log.match(regexp)) {
+            if (log.match(regexp)) {
                 ++count;
             }
         });
@@ -34,8 +34,8 @@ describe('IosEventsTest V4', () => {
         assert.equal(findEventCount(requestLog, '/games/\\d+/configuration'), 1, 'Did not find a configuration request');
         assert.equal(findEventCount(requestLog, '/v\\d+/games/\\d+/requests'), 3, 'Did not find 3 fill requests');
 
-        for(const regexp of validationRegexps) {
-            for(const eventName of videoEvents) {
+        for (const regexp of validationRegexps) {
+            for (const eventName of videoEvents) {
                 let eventRegexp = regexp.replace('{EVENT_NAME}', eventName);
                 eventRegexp = eventRegexp.replace('{GAME_ID}', currentGameId.toString());
                 assert.equal(findEventCount(requestLog, eventRegexp), 1, 'Did not find a ' + eventName + ' event');
@@ -89,11 +89,11 @@ describe('IosEventsTest V4', () => {
         let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(placement === 'video' || placement === 'defaultVideoAndPictureZone') {
-                    if(++readyCount === 1) {
+                if (placement === 'video' || placement === 'defaultVideoAndPictureZone') {
+                    if (++readyCount === 1) {
                         UnityAds.show(placement);
                     }
-                    if(startCount === 1) {
+                    if (startCount === 1) {
                         UnityAds.show(placement);
                     }
                 }
@@ -102,8 +102,8 @@ describe('IosEventsTest V4', () => {
                 ++startCount;
             },
             onUnityAdsFinish: (placement: string, state: string) => {
-                if(state === FinishState[FinishState.COMPLETED]) {
-                    if(startCount === 2) {
+                if (state === FinishState[FinishState.COMPLETED]) {
+                    if (startCount === 2) {
                         setTimeout(() => {
                             validateRequestLog(UnityAds.getBackend().Api.Request.getLog(), validationRegexps);
                             assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');

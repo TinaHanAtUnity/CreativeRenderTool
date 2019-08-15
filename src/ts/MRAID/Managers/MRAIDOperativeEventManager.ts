@@ -15,7 +15,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
 
     protected createVideoEventUrl(type: string): string | undefined {
         const url = this._mraidCampaign.getVideoEventUrl(type);
-        if(url) {
+        if (url) {
             return url;
         }
 
@@ -24,7 +24,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
 
     protected createClickEventUrl(): string | undefined {
         const clickUrl = this._mraidCampaign.getClickUrl();
-        if(clickUrl) {
+        if (clickUrl) {
             return Url.addParameters(clickUrl, { redirect: false });
         }
 
@@ -33,7 +33,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
 
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, IInfoJson]> {
         return super.getInfoJson(params, eventId, gameSession, previousPlacementId).then(([id, infoJson]: [string, IPerformanceInfoJson]) => {
-            if(params.asset) {
+            if (params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }
             return <[string, IPerformanceInfoJson]>[eventId, infoJson];

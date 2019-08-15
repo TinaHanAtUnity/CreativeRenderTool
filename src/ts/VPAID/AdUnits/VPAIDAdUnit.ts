@@ -308,7 +308,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private getScreenDensity(): number {
         if (this._platform === Platform.ANDROID) {
-            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
+            return (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity();
         }
         return 0;
     }

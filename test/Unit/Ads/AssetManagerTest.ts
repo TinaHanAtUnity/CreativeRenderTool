@@ -1,6 +1,5 @@
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
@@ -61,7 +60,6 @@ describe('AssetManagerTest', () => {
     let focusManager: FocusManager;
     let cacheBookkeeping: CacheBookkeepingManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let backupCampaignManager: BackupCampaignManager;
     let storageBridge: StorageBridge;
 
     beforeEach(() => {
@@ -78,12 +76,11 @@ describe('AssetManagerTest', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         storageBridge = new StorageBridge(core);
-        backupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo, clientInfo);
     });
 
     it('should not cache anything when cache mode is disabled', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const spy = sinon.spy(cache, 'cache');
@@ -94,7 +91,7 @@ describe('AssetManagerTest', () => {
 
     it('should cache required assets', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const spy = sinon.spy(cache, 'cache');
@@ -106,7 +103,7 @@ describe('AssetManagerTest', () => {
 
     it('should cache optional assets', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([], [asset]);
         const spy = sinon.spy(cache, 'cache');
@@ -120,7 +117,7 @@ describe('AssetManagerTest', () => {
 
     it('should not wait for optional assets when cache mode is allowed', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([], [asset]);
         return assetManager.setup(campaign).then(() => {
@@ -130,7 +127,7 @@ describe('AssetManagerTest', () => {
 
     it('should swallow optional errors when cache mode is allowed', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, {retries: 0, retryDelay: 1});
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([], [asset]);
         backend.Api.Cache.setInternet(false);
@@ -141,7 +138,7 @@ describe('AssetManagerTest', () => {
 
     it('should not swallow errors when cache mode is forced', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, {retries: 0, retryDelay: 1});
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         backend.Api.Cache.setInternet(false);
@@ -154,7 +151,7 @@ describe('AssetManagerTest', () => {
 
     it('should cache two campaigns', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const asset2 = new HTML('https:/www.google.fi/2', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
@@ -167,7 +164,7 @@ describe('AssetManagerTest', () => {
 
     it('should stop caching', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const promise = assetManager.setup(campaign);
@@ -181,7 +178,7 @@ describe('AssetManagerTest', () => {
 
     it('should act like cache mode disabled when there is less than 20 MB of free space', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const spy = sinon.spy(cache, 'cache');
@@ -196,7 +193,7 @@ describe('AssetManagerTest', () => {
 
     it('should cache in a normal way when there is more than 20 MB of free space', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const spy = sinon.spy(cache, 'cache');

@@ -8,7 +8,7 @@ export class ResolveManager {
 
     private static onResolveComplete(id: string, host: string, ip: string): void {
         const callbackObject = ResolveManager._callbacks[id];
-        if(callbackObject) {
+        if (callbackObject) {
             callbackObject.resolve([id, host, ip]);
             delete ResolveManager._callbacks[id];
         }
@@ -16,7 +16,7 @@ export class ResolveManager {
 
     private static onResolveFailed(id: string, host: string, error: string, message: string): void {
         const callbackObject = ResolveManager._callbacks[id];
-        if(callbackObject) {
+        if (callbackObject) {
             callbackObject.reject([error, message]);
             delete ResolveManager._callbacks[id];
         }

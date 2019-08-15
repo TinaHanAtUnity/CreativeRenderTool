@@ -209,22 +209,43 @@ describe('VastVideoEventHandler tests', () => {
 
     describe('onVideoPrepared', () => {
 
-        beforeEach(() => {
-            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+        context('getVideoViewRectangle success', () => {
+            beforeEach(() => {
+                sandbox.stub(testAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([0, 0, 0, 0]));
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                return testAdUnit.getVideoViewRectangle();
+            });
+
+            it('initalizes moat', () => {
+                sinon.assert.called(<sinon.SinonStub>moat.init);
+            });
+
+            it('should call om session start on videoview receive success', () => {
+                sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
+            });
+
+            it('should set om setVideoViewRectangle receive success', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setVideoViewRectangle, openMeasurement!.createRectangle(0, 0, 0, 0));
+            });
+
+            it('should call om session start once', () => {
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement!.sessionStart);
+            });
         });
 
-        it('initalizes moat', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.init);
-        });
+        context('getVideoViewRectangle fail', () => {
+            beforeEach(() => {
+                sandbox.stub(testAdUnit, 'getVideoViewRectangle').returns(Promise.reject(new Error('video rect retrieval failed')));
+                vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+            });
 
-        it('should call session start', () => {
-            sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
-        });
-
-        it('should call session start once', () => {
-            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
-            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
-            sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement!.sessionStart);
+            it('should call session start when getting video view fails', () => {
+                return testAdUnit.getVideoViewRectangle().catch(() => {
+                    sinon.assert.notCalled(<sinon.SinonStub>openMeasurement!.sessionStart);
+                });
+            });
         });
     });
 
@@ -372,13 +393,22 @@ describe('VastVideoEventHandler tests', () => {
     });
 
     describe('onVolumeChange', () => {
-        beforeEach(() => {
+        it ('should call moat volumeChange event', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
         });
 
-        it ('should call viewability volumeChange events', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
-            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0.1);
+        it('should call om volumeChange event with arguments if videoPlayer unmuted', () => {
+            vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setDeviceVolume, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 1);
+        });
+
+        it('should call om volumeChange event with arguments if videoPlayer muted', () => {
+            testAdUnit.setVideoPlayerMuted(true);
+            vastVideoEventHandler.onVolumeChange(1, 10);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setDeviceVolume, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0);
         });
     });
 
@@ -427,7 +457,7 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it('should show end screen when onVideoCompleted', () => {
+        it('should not show end screen when onVideoCompleted without an impression event sent', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
 
             // Endscreen is not shown if the impression never occurs
@@ -436,11 +466,22 @@ describe('VastVideoEventHandler tests', () => {
         });
 
         it('should show end screen when onVideoError', () => {
+            vastAdUnit.setImpressionOccurred();
+
             // Cause an error by giving too large duration
             vastAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+            sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
+        });
+
+        it('should not show end screen when onVideoError', () => {
+            // Cause an error by giving too large duration
+            vastAdUnit.setVideoState(VideoState.PREPARING);
+            vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
         });
     });

@@ -16,28 +16,28 @@ export enum VideoType {
 
 export class CampaignAssetInfo {
     public static isCached(campaign: Campaign): boolean {
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const landscapeVideo = campaign.getVideo();
             const portraitVideo = campaign.getPortraitVideo();
-            if((landscapeVideo && landscapeVideo.isCached()) || (portraitVideo && portraitVideo.isCached())) {
+            if ((landscapeVideo && landscapeVideo.isCached()) || (portraitVideo && portraitVideo.isCached())) {
                 return true;
             }
-        } else if(campaign instanceof VastCampaign) {
+        } else if (campaign instanceof VastCampaign) {
             return campaign.getVideo().isCached();
-        } else if(campaign instanceof MRAIDCampaign) {
+        } else if (campaign instanceof MRAIDCampaign) {
             const resourceUrl = campaign.getResourceUrl();
-            if((resourceUrl && resourceUrl.isCached()) || campaign.getResource()) {
+            if ((resourceUrl && resourceUrl.isCached()) || campaign.getResource()) {
                 return true;
             }
-        } else if(campaign instanceof PromoCampaign) {
+        } else if (campaign instanceof PromoCampaign) {
             const resourceList = campaign.getRequiredAssets();
             for (const resource of resourceList) {
-                if(resource.isCached()) {
+                if (resource.isCached()) {
                     return false;
                 }
             }
             return true;
-        } else if(campaign instanceof AdMobCampaign) {
+        } else if (campaign instanceof AdMobCampaign) {
             const video = campaign.getVideo();
             if (video && video.getVideo() && video.getVideo().isCached()) {
                 return true;
@@ -48,17 +48,17 @@ export class CampaignAssetInfo {
     }
 
     public static getCachedVideoOrientation(campaign: Campaign): 'landscape' | 'portrait' | undefined {
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const landscapeVideo = campaign.getVideo();
             const portraitVideo = campaign.getPortraitVideo();
-            if((landscapeVideo && landscapeVideo.isCached())) {
+            if ((landscapeVideo && landscapeVideo.isCached())) {
                 return 'landscape';
-            } else if((portraitVideo && portraitVideo.isCached())) {
+            } else if ((portraitVideo && portraitVideo.isCached())) {
                 return 'portrait';
             }
-        } else if(campaign instanceof VastCampaign) {
+        } else if (campaign instanceof VastCampaign) {
             const video = campaign.getVideo();
-            if(video && video.isCached()) {
+            if (video && video.isCached()) {
                 return 'landscape';
             }
         }
@@ -67,24 +67,24 @@ export class CampaignAssetInfo {
     }
 
     public static getOrientedVideo(campaign: Campaign, forceOrientation: Orientation, videoType?: VideoType): Video | undefined {
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
             const landscapeVideo = CampaignAssetInfo.getLandscapeVideo(campaign, videoType);
             const portraitVideo = CampaignAssetInfo.getPortraitVideo(campaign, videoType);
 
-            if(forceOrientation === Orientation.LANDSCAPE) {
-                if(landscapeVideo) {
+            if (forceOrientation === Orientation.LANDSCAPE) {
+                if (landscapeVideo) {
                     return landscapeVideo;
                 }
-                if(portraitVideo) {
+                if (portraitVideo) {
                     return portraitVideo;
                 }
             }
 
-            if(forceOrientation === Orientation.PORTRAIT) {
-                if(portraitVideo) {
+            if (forceOrientation === Orientation.PORTRAIT) {
+                if (portraitVideo) {
                     return portraitVideo;
                 }
-                if(landscapeVideo) {
+                if (landscapeVideo) {
                     return landscapeVideo;
                 }
             }
@@ -94,18 +94,18 @@ export class CampaignAssetInfo {
     }
 
     public static getLandscapeVideo(campaign: Campaign, videoType?: VideoType): Video | undefined {
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const video = campaign.getVideo();
             const streaming = campaign.getStreamingVideo();
-            if(video && video.isCached() && videoType !== VideoType.STREAM) {
+            if (video && video.isCached() && videoType !== VideoType.STREAM) {
                 return video;
             }
-            if(streaming && videoType !== VideoType.CACHE) {
+            if (streaming && videoType !== VideoType.CACHE) {
                 return streaming;
             }
-        } else if(campaign instanceof VastCampaign) {
+        } else if (campaign instanceof VastCampaign) {
             const video = campaign.getVideo();
-            if(videoType === VideoType.CACHE && !video.isCached()) {
+            if (videoType === VideoType.CACHE && !video.isCached()) {
                 return undefined;
             }
 
@@ -116,13 +116,13 @@ export class CampaignAssetInfo {
     }
 
     public static getPortraitVideo(campaign: Campaign, videoType?: VideoType): Video | undefined {
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const video = campaign.getPortraitVideo();
             const streaming = campaign.getStreamingPortraitVideo();
-            if(video && video.isCached() && videoType !== VideoType.STREAM) {
+            if (video && video.isCached() && videoType !== VideoType.STREAM) {
                 return video;
             }
-            if(streaming && videoType !== VideoType.CACHE) {
+            if (streaming && videoType !== VideoType.CACHE) {
                 return streaming;
             }
         }
@@ -131,11 +131,11 @@ export class CampaignAssetInfo {
     }
 
     public static getCachedAsset(campaign: Campaign): Asset | undefined {
-        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
             return CampaignAssetInfo.getOrientedVideo(campaign, Orientation.LANDSCAPE, VideoType.CACHE);
-        } else if(campaign instanceof MRAIDCampaign) {
+        } else if (campaign instanceof MRAIDCampaign) {
             const resource = campaign.getResourceUrl();
-            if(resource && resource.isCached()) {
+            if (resource && resource.isCached()) {
                 return resource;
             }
         }

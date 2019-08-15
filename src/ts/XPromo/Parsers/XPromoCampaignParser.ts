@@ -4,9 +4,6 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { IRawPerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
@@ -19,7 +16,7 @@ export class XPromoCampaignParser extends CampaignParser {
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
-        switch(campaignStore) {
+        switch (campaignStore) {
             case 'apple':
                 storeName = StoreName.APPLE;
                 break;
@@ -47,7 +44,7 @@ export class XPromoCampaignParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {},
-            backupCampaign: false
+            isLoadEnabled: false
         };
 
         const parameters: IXPromoCampaign = {
@@ -69,12 +66,12 @@ export class XPromoCampaignParser extends CampaignParser {
             store: storeName
         };
 
-        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+        if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
             parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize);
             parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session);
         }
 
-        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+        if (json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
             parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize);
             parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session);
         }
@@ -83,9 +80,9 @@ export class XPromoCampaignParser extends CampaignParser {
     }
 
     private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
+        if (urls && urls !== null) {
+            for (const urlKey in urls) {
+                if (urls.hasOwnProperty(urlKey)) {
                     urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
                 }
             }

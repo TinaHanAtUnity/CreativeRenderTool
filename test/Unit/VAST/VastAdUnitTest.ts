@@ -104,7 +104,7 @@ describe('VastAdUnitTest', () => {
         const adsConfig = TestFixtures.getAdsConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
-        if(duration) {
+        if (duration) {
             duration = duration * 1000;
             video.setDuration(duration);
         }
@@ -331,6 +331,16 @@ describe('VastAdUnitTest', () => {
             }).then(() => {
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
+        });
+    });
+
+    it('should hide and then remove om on hide', () => {
+        return vastAdUnit.hide().then(() => {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>openMeasurement.removeFromViewHieararchy);
             });
         });
     });

@@ -3,16 +3,22 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { ProgressBarAndSkipTest } from 'Core/Models/ABGroup';
-import { Placement } from 'Ads/Models/Placement';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
+import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
+import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 
-const CheetahGameIds = setGameIds(CheetahGamesJson);
-const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const Game7GameIds = setGameIds(Game7GamesJson);
-const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
+const JsonStringObjectParser = (json: string): { [index: string]: number } => {
+    try {
+        return JSON.parse(json);
+    } catch {
+        return {};
+    }
+};
 
-function setGameIds(gameIdJson: string): string[] {
+const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
+
+const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
     try {
         gameIds = JSON.parse(gameIdJson);
@@ -20,7 +26,11 @@ function setGameIds(gameIdJson: string): string[] {
         gameIds = [];
     }
     return gameIds;
-}
+};
+const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
+const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
+const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
+const LionStudiosGameIds = JsonStringArrayParser(LionStudiosGamesJson);
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -29,6 +39,10 @@ export class CustomFeatures {
 
     public static isTimehopApp(gameId: string): boolean {
         return gameId === '1300023' || gameId === '1300024';
+    }
+
+    public static isWhitelistedToShowInBackground(gameId: string) {
+        return gameId === '3016669';    // anipang2 from Korea dev
     }
 
     public static isNestedIframePlayable(creativeId: string | undefined) {
@@ -87,33 +101,104 @@ export class CustomFeatures {
         return gameIdList.indexOf(gameId) !== -1;
     }
 
-    public static shouldSampleAtOnePercent(): boolean {
-        // will only return true when Math.random returns 0
-        if (Math.floor(Math.random() * 100) % 100 === 0) {
-            return true;
-        } else {
+    public static sampleAtGivenPercent(givenPercentToSample: number): boolean {
+
+        if (givenPercentToSample <= 0) {
             return false;
         }
-    }
 
-    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
-        return ProgressBarAndSkipTest.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
-    }
-
-    public static shouldSampleAtTenPercent(): boolean {
-        // will only return true when Math.random returns 1
-        if (Math.floor(Math.random() * 10) % 10 === 1) {
+        if (givenPercentToSample >= 100) {
             return true;
-        } else {
-            return false;
         }
+
+        if (Math.floor(Math.random() * 100) < givenPercentToSample) {
+            return true;
+        }
+
+        return false;
     }
 
     public static isUnsupportedOMVendor(resourceUrl: string) {
         return false;
     }
 
+    public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string, osVersion: string, platform: Platform): boolean {
+        const isAndroid4 = platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, osVersion);
+        const isIOS7 = platform === Platform.IOS && VersionMatchers.matchesMajorOSVersion(7, osVersion);
+
+        // Exclude Android 4 and iOS 7 devices from the test because of layout issues
+        if (isAndroid4 || isIOS7) {
+            return false;
+        }
+
+        return SliderEndCardExperiment.isValid(abGroup) && SliderEndScreenImages[targetGameAppStoreId] !== undefined;
+    }
+
+    public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
+        return SliderEndScreenImages[targetGameAppStoreId];
+    }
+
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
         return this.existsInList(LionStudiosGameIds, gameId);
+    }
+
+    /**
+     *  Method used for gating PTS metrics for this specific Zynga Game using Load API
+     */
+    public static isTrackedGameUsingLoadApi(gameId: string) {
+        return gameId === '2988443';
+    }
+
+    public static isWhiteListedForLoadApi(gameId: string) {
+        return gameId === '2988442' ||  // Zynga Solitaire          : iOS
+               gameId === '2988443' ||  // Zynga Solitaire          : Android
+               gameId === '2988494' ||  // Zynga Freecell           : iOS
+               gameId === '2988495' ||  // Zynga Freecell Solitaire : Android
+               gameId === '3054609' ||  // Unity Test App           : iOS
+               gameId === '3054608' ||  // Unity Test App           : Android
+               gameId === '3083498' ||  // Max test ID              : iOS
+               gameId === '3083499' ||  // Max test ID              : Android
+               gameId === '3238965' ||  // Admob test ID            : iOS
+               gameId === '3238964' ||  // Admob test ID            : Android
+               gameId === '3238970' ||  // Mopub test ID            : iOS
+               gameId === '3238971' ||  // Mopub test ID            : Android
+               gameId === '3238972' ||  // Unity-Ironsource ID      : iOS
+               gameId === '3238973' ||  // Unity-Ironsource ID      : Android
+               gameId === '1793545' ||  // Sniper Strike            : iOS
+               gameId === '1793539' ||  // Sniper Strike            : Android
+               gameId === '3239343' ||  // China Unity Support App  : iOS
+               gameId === '3239342' ||  // China Unity Support App  : Android
+               gameId === '3095066' ||  // Double Win Vegas         : iOS
+               gameId === '3095067' ||  // Double Win Vegas         : Android
+               gameId === '3248965' ||  // Ironsource Internal ID   : iOS
+               gameId === '3248964';    // Ironsource Internal ID   : Android
+    }
+
+    public static shouldDisableBannerRefresh(gameId: string): boolean {
+        if (gameId === '2962474') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static isWebPlayerTestProjects(gameId: string, creativeId: string | undefined) {
+        return this.isMRAIDWebPlayerAndroidGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
+    }
+
+    private static isMRAIDWebPlayerAndroidGamesTest(gameId: string) {
+        return gameId === '1789727' ||      // ru.iprado.spot
+               gameId === '1373394' ||      // pl.idreams.Dino
+               gameId === '2950248' ||      // com.game5mobile.lineandwater
+               gameId === '2950184' ||      // com.game5mobile.popular
+               gameId === '2639270' ||      // com.ohmgames.paperplane
+               gameId === '1300959';        // com.sadpuppy.lemmings
+    }
+
+    private static isMRAIDWebPlayerCreativesTest(creativeId: string | undefined) {
+        return creativeId === 'futur_idlec_p1.1' ||
+               creativeId === 'lions_hooke_p1'   ||
+               creativeId === 'gg_bounzy'        ||
+               creativeId === 'social_dc';
     }
 }

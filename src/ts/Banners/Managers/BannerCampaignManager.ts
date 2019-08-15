@@ -8,11 +8,9 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
-import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
+import { BannerAuctionRequest } from 'Banners/Networking/BannerAuctionRequest';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -38,7 +36,6 @@ export interface IRawBannerV5Response {
     auctionId: string;
     correlationId: string;
     placements: { [key: string]: { mediaId: string; trackingId: string } };
-    realtimeData?: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls };
 }
@@ -55,12 +52,11 @@ export class BannerCampaignManager {
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _jaegerManager: JaegerManager;
     private _pts: ProgrammaticTrackingService;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -71,7 +67,6 @@ export class BannerCampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
-        this._jaegerManager = jaegerManager;
         this._pts = pts;
     }
 
@@ -82,10 +77,6 @@ export class BannerCampaignManager {
         }
 
         GameSessionCounters.addAdRequest();
-
-        const jaegerSpan = this._jaegerManager.startSpan('BannerCampaignManagerRequest');
-        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-
         const request = BannerAuctionRequest.create({
             platform: this._platform,
             core: this._core,
@@ -107,9 +98,6 @@ export class BannerCampaignManager {
                 this._promise = null;
                 const nativeResponse = request.getNativeResponse();
                 if (nativeResponse) {
-                    if (nativeResponse.responseCode) {
-                        jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
-                    }
                     if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
@@ -122,15 +110,7 @@ export class BannerCampaignManager {
                 return this.handleError(e, 'banner_auction_request_failed');
             })
             .then((campaign) => {
-                this._jaegerManager.stop(jaegerSpan);
                 return campaign;
-            })
-            .catch((e) => {
-                jaegerSpan.addTag(JaegerTags.Error, 'true');
-                jaegerSpan.addTag(JaegerTags.ErrorMessage, e.message);
-                jaegerSpan.addAnnotation(e.message);
-                this._jaegerManager.stop(jaegerSpan);
-                throw e;
             });
 
         return this._promise;
@@ -165,7 +145,7 @@ export class BannerCampaignManager {
                 return Promise.reject(e);
             }
         } else {
-            const e = new Error('No placements found in realtime campaign json.');
+            const e = new Error('No placements found');
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }
@@ -227,7 +207,7 @@ export class BannerCampaignManager {
                 return Promise.reject(e);
             }
         } else {
-            const e = new Error('No placements found in realtime V5 campaign json.');
+            const e = new Error('No placements found in V5 campaign json.');
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }

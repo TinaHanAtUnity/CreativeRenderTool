@@ -27,7 +27,7 @@ export class Request extends BackendApi {
     }
 
     public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
-        if(this._passthrough) {
+        if (this._passthrough) {
             this._requestLog.push({
                 method: 'GET',
                 url: url
@@ -41,28 +41,28 @@ export class Request extends BackendApi {
             return;
         }
 
-        if(url.indexOf('/success') !== -1) {
+        if (url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
-        } else if(url.indexOf('/fail') !== -1) {
+        } else if (url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
-        } else if(url.indexOf('/forwardheader') !== -1) {
-            if(headers[0][0] === 'X-Test') {
+        } else if (url.indexOf('/forwardheader') !== -1) {
+            if (headers[0][0] === 'X-Test') {
                 this.sendSuccessResponse(id, url, headers[0][1], 200, []);
             } else {
                 this.sendFailResponse(id, url, 'No X-Test header found');
             }
-        } else if(url.indexOf('/retry') !== -1) {
-            if(this._retryCount === 3) {
+        } else if (url.indexOf('/retry') !== -1) {
+            if (this._retryCount === 3) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
             } else {
                 this.sendFailResponse(id, url, 'Must continue retrying');
             }
 
             this._retryCount++;
-        } else if(url.indexOf('/alwaysRetry') !== -1) {
+        } else if (url.indexOf('/alwaysRetry') !== -1) {
             this.sendFailResponse(id, url, 'This URL always fails');
-        } else if(url.indexOf('/toggle') !== -1) {
-            if(this._toggleUrl) {
+        } else if (url.indexOf('/toggle') !== -1) {
+            if (this._toggleUrl) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
             } else {
                 this.sendFailResponse(id, url, 'URL toggled off');
@@ -87,7 +87,7 @@ export class Request extends BackendApi {
     }
 
     public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
-        if(this._passthrough) {
+        if (this._passthrough) {
             this._requestLog.push({
                 method: 'HEAD',
                 url: url
@@ -117,7 +117,7 @@ export class Request extends BackendApi {
     }
 
     public post(id: string, url: string, body: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
-        if(this._passthrough) {
+        if (this._passthrough) {
             this._requestLog.push({
                 method: 'POST',
                 url: url
@@ -132,20 +132,20 @@ export class Request extends BackendApi {
             return;
         }
 
-        if(url.indexOf('/success') !== -1) {
+        if (url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
-        } else if(url.indexOf('/fail') !== -1) {
+        } else if (url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
-        } else if(url.indexOf('/forwardheader') !== -1) {
-            if(headers[0][0] === 'X-Test') {
+        } else if (url.indexOf('/forwardheader') !== -1) {
+            if (headers[0][0] === 'X-Test') {
                 this.sendSuccessResponse(id, url, headers[0][1], 200, []);
             } else {
                 this.sendFailResponse(id, url, 'No X-Test header found');
             }
-        } else if(url.indexOf('/forwardbody') !== -1) {
+        } else if (url.indexOf('/forwardbody') !== -1) {
             this.sendSuccessResponse(id, url, body, 200, []);
-        } else if(url.indexOf('/retry')) {
-            if(this._retryCount === 3) {
+        } else if (url.indexOf('/retry')) {
+            if (this._retryCount === 3) {
                 this.sendSuccessResponse(id, url, 'Success response', 200, []);
             } else {
                 this.sendFailResponse(id, url, 'Must continue retrying');

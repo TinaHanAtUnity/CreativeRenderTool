@@ -15,7 +15,7 @@ export enum DownloadState {
     ENQUEUING
 }
 
-export const DownloadMessage : {[key: string] : string} = {
+export const DownloadMessage: {[key: string]: string} = {
     ALREADY_ENQUEUED : 'Download already enqueued',
     ENQUEUING_IN_PROGRESS : 'Enqueuing is in progress',
     PERMISSION_ERROR : 'Permission error',
@@ -109,7 +109,7 @@ export class DownloadManager {
      * but the this.enqueuedDownloads hasn't been updated yet
      *
      */
-    private checkDownloadId(url: string) : Promise<number|undefined> {
+    private checkDownloadId(url: string): Promise<number|undefined> {
         // if the url is not in enqueuedDownloads, then it is not pending
         if (!this.enqueuedDownloads[url]) {
             return Promise.resolve(undefined);
@@ -134,7 +134,7 @@ export class DownloadManager {
      * @returns Returns true iff we can get all the permissions
      */
 
-    private checkPermission() : Promise<boolean> {
+    private checkPermission(): Promise<boolean> {
         return PermissionsUtil.checkPermissions(Platform.ANDROID, this._core, PermissionTypes.WRITE_EXTERNAL_STORAGE)
             .then((result) => {
                 if (result === CurrentPermission.ACCEPTED) {
@@ -154,7 +154,7 @@ export class DownloadManager {
             });
     }
 
-    private askPermission() : Promise<boolean> {
+    private askPermission(): Promise<boolean> {
         Diagnostics.trigger('download_permission', 'Permission requested');
         return this.handlePermissionRequest(PermissionTypes.WRITE_EXTERNAL_STORAGE)
             .then(() => {
@@ -250,7 +250,7 @@ export class DownloadManager {
         });
     }
 
-    private isError(permission : string): boolean {
+    private isError(permission: string): boolean {
         for (const pt in PermissionTypes) {
             if (PermissionTypes[pt] === permission) {
                 return false;
@@ -308,7 +308,7 @@ export class DownloadManager {
     }
 
     private getUrlByDownloadId(downloadId: number): string | null {
-        let downloadUrl : string | null = null;
+        let downloadUrl: string | null = null;
         Object.keys(this.enqueuedDownloads).forEach((url) => {
             if (this.enqueuedDownloads[url] === downloadId) {
                 downloadUrl = url;

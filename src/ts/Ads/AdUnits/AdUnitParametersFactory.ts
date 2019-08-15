@@ -26,11 +26,6 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { VideoOverlayCTAV2 } from 'Ads/Views/VideoOverlayCTAV2';
-import { CTAV2Test, ProgressBarAndSkipTest, ABGroup } from 'Core/Models/ABGroup';
-import { ProgressBarAndSkipVideoOverlay } from 'Ads/Views/ProgressBarAndSkipVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { IStoreApi } from 'Store/IStore';
@@ -47,8 +42,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected _placement: Placement;
     protected _orientation: Orientation;
 
-    private _platform: Platform;
-    private _core: ICoreApi;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _osVersion: string;
     private _ads: IAdsApi;
     private _store: IStoreApi;
     private _focusManager: FocusManager;
@@ -91,9 +87,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._coreConfig = core.Config;
         this._sessionManager = ads.SessionManager;
         this._privacyManager = ads.PrivacyManager;
-        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
+        this._osVersion = core.DeviceInfo.getOsVersion();
     }
 
     public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2 {
@@ -192,7 +189,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     protected getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
         const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
-        if(!video) {
+        if (!video) {
             throw new WebViewError('Unable to select an oriented video');
         }
         return video;
@@ -213,22 +210,5 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             campaignId: undefined,
             osVersion: undefined
         };
-    }
-    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
-        let overlay: VideoOverlay;
-        const abGroup = parameters.coreConfig.getAbGroup();
-        if (CTAV2Test.isValid(abGroup)) {
-            overlay = new VideoOverlayCTAV2(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else if (ProgressBarAndSkipTest.isValid(abGroup)) {
-            overlay = new ProgressBarAndSkipVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        } else {
-            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        }
-
-        if (parameters.placement.disableVideoControlsFade()) {
-            overlay.setFadeEnabled(false);
-        }
-
-        return overlay;
     }
 }

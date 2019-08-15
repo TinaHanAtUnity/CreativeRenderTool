@@ -133,6 +133,7 @@
     height: 100%;
     border-radius: .5 * $default-size;
     background: $white;
+
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
   }
@@ -287,8 +288,10 @@
     overflow: scroll;
     border-radius: .5 * $default-size;
     background: $white;
+
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
+
     padding: 1.5 * $default-size;
   }
 
@@ -416,12 +419,14 @@
     border: 1px solid $blue;
     background-color: $blue;
     color: $white;
+    font-size: $default-font-size * .75;
   }
 
   .show-choices {
     border: 1px solid $privacy-light-gray;
     background-color: $white;
-    color: $consent-text-font-color;
+    color: $consent-disagree-button-color;
+    font-size: $privacy-heading-font-size;
   }
 
   .consent-button {
@@ -429,8 +434,7 @@
     padding: .75 * $default-size $default-size;
     border-radius: $default-size * 4;
     text-align: center;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-heading-font-size;
+    font-weight: $privacy-main-title-font-weight;
 
   }
 

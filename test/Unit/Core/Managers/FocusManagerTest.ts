@@ -25,7 +25,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             wakeUpManager = new WakeUpManager(core);
         });
 
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             it('should start listening to screen broadcasts', () => {
                 const spy = sinon.spy(core.Android!.Broadcast, 'addBroadcastListener');
                 return focusManager.setListenScreen(true).then(() => {
@@ -42,7 +42,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         }
 
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             it('should start listening to app foreground events', () => {
                 const spy = sinon.spy(core.iOS!.Notification, 'addNotificationObserver');
                 return focusManager.setListenAppForeground(true).then(() => {
@@ -78,7 +78,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         }
 
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             it('should start listening to Android lifecycle events', () => {
                 const spy = sinon.spy(core.Android!.Lifecycle, 'register');
                 return focusManager.setListenAndroidLifecycle(true).then(() => {
@@ -107,14 +107,14 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             const spy = sinon.spy();
             wakeUpManager.onNetworkConnected.subscribe(spy);
 
-            for(let i: number = 0; i < 20; i++) {
+            for (let i: number = 0; i < 20; i++) {
                 core.Connectivity.handleEvent('CONNECTED', [true, 0]);
             }
 
             sinon.assert.callCount(spy, 10);
         });
 
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             it('should trigger onScreenOn', () => {
                 const spy = sinon.spy();
                 focusManager.onScreenOn.subscribe(spy);
@@ -124,7 +124,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         }
 
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             it('should trigger onAppForeground', () => {
                 const spy = sinon.spy();
                 focusManager.onAppForeground.subscribe(spy);
@@ -142,7 +142,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         }
 
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             it('should trigger onActivityResumed', () => {
                 const spy = sinon.spy();
                 focusManager.onActivityResumed.subscribe(spy);
@@ -164,7 +164,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             assert.isTrue(focusManager.isAppForeground(), 'appForeground was false after FocusManager was initialized');
         });
 
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             it('should handle app foreground status after going to background (on iOS)', () => {
                 core.iOS!.Notification.handleEvent('ACTION', ['UIApplicationWillResignActiveNotification', {}]);
                 assert.isFalse(focusManager.isAppForeground(), 'appForeground was true after going to background (on iOS)');
@@ -177,7 +177,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         }
 
-        if(platform === Platform.ANDROID) {
+        if (platform === Platform.ANDROID) {
             it('should handle app foreground status after going to background (on Android)', () => {
                 core.Android!.Lifecycle.handleEvent('PAUSED', ['com.test.activity']);
                 assert.isFalse(focusManager.isAppForeground(), 'appForeground was true after going to background (on Android)');

@@ -126,7 +126,7 @@ export abstract class AbstractAdUnit implements IAdUnit {
     }
 
     public setFinishState(finishState: FinishState) {
-        if(this._finishState !== FinishState.COMPLETED) {
+        if (this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
         }
     }

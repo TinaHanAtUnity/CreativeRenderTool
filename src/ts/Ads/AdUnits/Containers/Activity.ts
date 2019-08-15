@@ -62,7 +62,7 @@ export class Activity extends AdUnitContainer {
         this._androidOptions = options;
 
         let nativeViews: string[] = views;
-        if(nativeViews.length === 0) {
+        if (nativeViews.length === 0) {
             nativeViews = ['webview'];
         }
 
@@ -74,7 +74,7 @@ export class Activity extends AdUnitContainer {
         }
 
         let keyEvents: KeyCode[] = [];
-        if(disableBackbutton) {
+        if (disableBackbutton) {
             keyEvents = [KeyCode.BACK];
         }
 
@@ -87,7 +87,7 @@ export class Activity extends AdUnitContainer {
         return this._ads.Android!.AdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent).catch(error => {
             // if opening transparent activity fails, cleanly fall back to non-transparent activity
             // this may happen if developer is missing transparent activity in app Android manifest
-            if(isTransparent) {
+            if (isTransparent) {
                 return this._ads.Android!.AdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, false);
             }
 
@@ -96,7 +96,7 @@ export class Activity extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
-        if(!this._currentActivityFinished) {
+        if (!this._currentActivityFinished) {
             this._currentActivityFinished = true;
             this._ads.Android!.AdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
             this._ads.Android!.AdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
@@ -152,8 +152,8 @@ export class Activity extends AdUnitContainer {
 
     private getOrientation(allowRotation: boolean, forceOrientation: Orientation, options: IAndroidOptions) {
         let orientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR;
-        if(allowRotation) {
-            if(forceOrientation === Orientation.PORTRAIT) {
+        if (allowRotation) {
+            if (forceOrientation === Orientation.PORTRAIT) {
                 if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT) {
                     orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
                 } else if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
@@ -165,7 +165,7 @@ export class Activity extends AdUnitContainer {
                 } else {
                     orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
                 }
-            } else if(forceOrientation === Orientation.LANDSCAPE) {
+            } else if (forceOrientation === Orientation.LANDSCAPE) {
                 if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE) {
                     orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
                 } else if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
@@ -179,9 +179,9 @@ export class Activity extends AdUnitContainer {
                 }
             }
         } else {
-            if(forceOrientation === Orientation.PORTRAIT) {
+            if (forceOrientation === Orientation.PORTRAIT) {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
-            } else if(forceOrientation === Orientation.LANDSCAPE) {
+            } else if (forceOrientation === Orientation.LANDSCAPE) {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
             } else {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_LOCKED;
@@ -192,21 +192,21 @@ export class Activity extends AdUnitContainer {
 
     private onCreate(activityId: number): void {
         this._paused = false;
-        if(activityId === this._activityId) {
+        if (activityId === this._activityId) {
             this._handlers.forEach(handler => handler.onContainerShow());
         }
     }
 
     private onRestore(activityId: number): void {
         this._paused = false;
-        if(activityId === this._activityId) {
+        if (activityId === this._activityId) {
             this._handlers.forEach(handler => handler.onContainerShow());
         }
     }
 
     private onResume(activityId: number): void {
         this._paused = false;
-        if(activityId === this._activityId) {
+        if (activityId === this._activityId) {
             this._handlers.forEach(handler => handler.onContainerForeground());
         }
     }
@@ -214,8 +214,8 @@ export class Activity extends AdUnitContainer {
     private onPause(finishing: boolean, activityId: number): void {
         this._paused = true;
         this._handlers.forEach(handler => handler.onContainerBackground());
-        if(finishing && activityId === this._activityId) {
-            if(!this._currentActivityFinished) {
+        if (finishing && activityId === this._activityId) {
+            if (!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
                 this._handlers.forEach(handler => handler.onContainerDestroy());
             }
@@ -223,8 +223,8 @@ export class Activity extends AdUnitContainer {
     }
 
     private onDestroy(finishing: boolean, activityId: number): void {
-        if(finishing && activityId === this._activityId) {
-            if(!this._currentActivityFinished) {
+        if (finishing && activityId === this._activityId) {
+            if (!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
                 this._handlers.forEach(handler => handler.onContainerDestroy());
             }
@@ -242,7 +242,7 @@ export class Activity extends AdUnitContainer {
     }
 
     private isHardwareAccelerationAllowed(): boolean {
-        if(this._deviceInfo.getApiLevel() < 18) {
+        if (this._deviceInfo.getApiLevel() < 18) {
             // hardware acceleration does not work reliably on Android 4.0 and 4.1
             // since there have been at least two reports from Android 4.2 devices being broken, it's also disabled on Android 4.2
             return false;
@@ -252,25 +252,25 @@ export class Activity extends AdUnitContainer {
     }
 
     private getNaturalRotation(display: IDisplay): Rotation {
-        switch(display.rotation) {
+        switch (display.rotation) {
             case Rotation.ROTATION_0:
-                if(display.width > display.height) {
+                if (display.width > display.height) {
                     // the natural orientation (Rotation_0) is landscape on some Android tablets
                     return Rotation.ROTATION_90;
                 }
                 return Rotation.ROTATION_0;
             case Rotation.ROTATION_90:
-                if(display.width < display.height) {
+                if (display.width < display.height) {
                     return Rotation.ROTATION_180;
                 }
                 return Rotation.ROTATION_90;
             case Rotation.ROTATION_180:
-                if(display.width > display.height) {
+                if (display.width > display.height) {
                     return Rotation.ROTATION_270;
                 }
                 return Rotation.ROTATION_180;
             case Rotation.ROTATION_270:
-                if(display.width < display.height) {
+                if (display.width < display.height) {
                     return Rotation.ROTATION_180;
                 }
                 return Rotation.ROTATION_270;

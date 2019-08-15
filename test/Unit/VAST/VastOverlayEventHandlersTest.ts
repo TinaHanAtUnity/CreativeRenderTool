@@ -35,7 +35,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
-import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
+import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OMIDEventBridge';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -85,10 +85,10 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
             clientInfo = TestFixtures.getClientInfo(platform);
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
                 container = new Activity(core, ads, <AndroidDeviceInfo>deviceInfo);
-            } else if(platform === Platform.IOS) {
+            } else if (platform === Platform.IOS) {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
                 container = new ViewController(core, ads, <IosDeviceInfo>deviceInfo, focusManager, clientInfo);
             }
@@ -198,24 +198,42 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 });
             });
 
-            describe('When ad unit has an endscreen', () => {
-                it('should hide endcard', () => {
-                    vastAdUnit.setShowing(true);
-                    return vastAdUnit.hide().then(() => {
-                        const vastEndScreenParameters: IVastEndscreenParameters = {
-                            campaign: vastAdUnitParameters.campaign,
-                            clientInfo: vastAdUnitParameters.clientInfo,
-                            country: vastAdUnitParameters.coreConfig.getCountry()
-                        };
-                        const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
-                        sinon.spy(vastEndScreen, 'show');
-                        vastAdUnitParameters.endScreen = vastEndScreen;
-                        vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                        sinon.spy(vastAdUnit, 'hide');
-                        vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
-                        vastOverlayEventHandler.onOverlaySkip(1);
-                        sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
-                    });
+            it('should show endcard', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    const vastEndScreenParameters: IVastEndscreenParameters = {
+                        campaign: vastAdUnitParameters.campaign,
+                        clientInfo: vastAdUnitParameters.clientInfo,
+                        country: vastAdUnitParameters.coreConfig.getCountry()
+                    };
+                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    sinon.spy(vastEndScreen, 'show');
+                    vastAdUnitParameters.endScreen = vastEndScreen;
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setImpressionOccurred();
+                    sinon.spy(vastAdUnit, 'hide');
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+                });
+            });
+
+            it('should not show endcard if the impression has not occurred', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    const vastEndScreenParameters: IVastEndscreenParameters = {
+                        campaign: vastAdUnitParameters.campaign,
+                        clientInfo: vastAdUnitParameters.clientInfo,
+                        country: vastAdUnitParameters.coreConfig.getCountry()
+                    };
+                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    sinon.spy(vastEndScreen, 'show');
+                    vastAdUnitParameters.endScreen = vastEndScreen;
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    sinon.spy(vastAdUnit, 'hide');
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.notCalled(<sinon.SinonSpy>vastEndScreen.show);
                 });
             });
         });
@@ -226,6 +244,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastAdUnit.setVolume(1);
                     vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
                 });
             });
@@ -255,14 +274,22 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 
             it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 0);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
                 sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
             it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
-                sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
-                sinon.assert.called(<sinon.SinonStub>om!.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.setPlayerVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 1);
+                sinon.assert.callOrder(<sinon.SinonSpy>moat.setPlayerVolume, <sinon.SinonSpy>moat.volumeChange);
+
+                sinon.assert.calledWith(<sinon.SinonStub>om!.setDeviceVolume, 1);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 1);
             });
         });
 
@@ -279,7 +306,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 });
             });
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 it('should call video click through tracking url', () => {
                     sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
@@ -297,7 +324,7 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 it('should open click trough link in Android web browser when call button is clicked', () => {
                     sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
                     sinon.stub(core.Android!.Intent, 'launch').resolves();
@@ -315,18 +342,14 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
             beforeEach(() => {
                 sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
                 sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+                sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
 
                 return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
             });
 
             it ('should fire geometry change as a percentage of the adview', () => {
                 sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
-                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 11.82291666666666, [ObstructionReasons.OBSTRUCTED], 1280, 768, true, [{
-                    x: 20,
-                    y: 20,
-                    width: 517,
-                    height: 367
-                }]);
+                sinon.assert.called(<sinon.SinonStub>om!.calculateVastAdView);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });
@@ -335,13 +358,14 @@ import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
             beforeEach(() => {
                 sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
                 sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+                sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
 
                 return vastOverlayEventHandler.onClosePrivacyPopUp();
             });
 
             it ('should fire geometry change as a percentage of the adview', () => {
                 sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
-                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView, 100, [], 1280, 768, true, []);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });

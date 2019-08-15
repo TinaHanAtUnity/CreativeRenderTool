@@ -52,7 +52,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
-    protected _timerElement: HTMLElement;
+    private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
@@ -361,13 +361,13 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     private setupElementReferences(): void {
-        this._skipButtonElement = <HTMLElement>this._container.querySelector('.skip-button');
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
-        this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
+        this._skipButtonElement = <HTMLElement> this._container.querySelector('.skip-button');
+        this._spinnerElement = <HTMLElement> this._container.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement> this._container.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement> this._container.querySelector('.call-button');
+        this._timerElement = <HTMLElement> this._container.querySelector('.timer');
+        this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
 
     private showSkipButton() {

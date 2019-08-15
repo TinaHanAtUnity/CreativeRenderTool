@@ -59,7 +59,7 @@ export class AdMobSignalFactory {
             this.logFailure('batteryStatus');
         }));
 
-        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+        if (this._deviceInfo instanceof AndroidDeviceInfo) {
             promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
                 signal.setIsNetworkMetered(isNetworkMetered);
             }).catch(() => {
@@ -164,11 +164,11 @@ export class AdMobSignalFactory {
             signal.setTouchCancelTotal(touchInfo.counts.cancel);
             signal.setTimeOnScreen(adUnit.getTimeOnScreen());
 
-            if(signal.getScreenWidth() && signal.getScreenHeight()) {
-                if(this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
+            if (signal.getScreenWidth() && signal.getScreenHeight()) {
+                if (this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
                     signal.setAdViewWidth(this.getIosViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenScale()));
                     signal.setAdViewHeight(this.getIosViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenScale()));
-                } else if(this._deviceInfo instanceof AndroidDeviceInfo && this._deviceInfo.getScreenDensity()) {
+                } else if (this._deviceInfo instanceof AndroidDeviceInfo && this._deviceInfo.getScreenDensity()) {
                     signal.setAdViewWidth(this.getAndroidViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenDensity()));
                     signal.setAdViewHeight(this.getAndroidViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenDensity()));
                 }
@@ -181,7 +181,7 @@ export class AdMobSignalFactory {
             const promises = [];
 
             promises.push(this._core.SensorInfo.getAccelerometerData().then(data => {
-                if(this._platform === Platform.IOS) {
+                if (this._platform === Platform.IOS) {
                     signal.setAccelerometerX(data.x);
                     signal.setAccelerometerY(data.y);
                     signal.setAccelerometerZ(data.z);
@@ -195,13 +195,13 @@ export class AdMobSignalFactory {
                 this.logFailure('accelerometer');
             }));
 
-            if(this._platform === Platform.ANDROID) {
+            if (this._platform === Platform.ANDROID) {
                 promises.push(this._ads.Android!.AdUnit.getMotionEventCount([MotionEventAction.ACTION_DOWN, MotionEventAction.ACTION_UP, MotionEventAction.ACTION_MOVE, MotionEventAction.ACTION_CANCEL]).then(results => {
-                    if(results[MotionEventAction[MotionEventAction.ACTION_DOWN]]) {
+                    if (results[MotionEventAction[MotionEventAction.ACTION_DOWN]]) {
                         const downIndex: number = results[MotionEventAction[MotionEventAction.ACTION_DOWN]];
 
                         return this._ads.Android!.AdUnit.getMotionEventData({ '0': [downIndex] }).then(motionData => {
-                            if(motionData['0'] && motionData['0'][downIndex.toString()]) {
+                            if (motionData['0'] && motionData['0'][downIndex.toString()]) {
                                 const motionEvent: IMotionEvent = motionData['0'][downIndex.toString()];
                                 signal.setAndroidTouchObscured(motionEvent.isObscured);
                                 signal.setTouchToolType(motionEvent.toolType);
@@ -273,20 +273,20 @@ export class AdMobSignalFactory {
             this.logFailure('cpucount');
         }));
 
-        if(this._platform === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             if (this._packageInstaller && this._packageVersionCode) {
                 signal.setAppInstaller(this._packageInstaller);
                 signal.setAppVersionCode(this._packageVersionCode);
             } else {
                 promises.push(this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
-                    if(packageInfo.installer) {
+                    if (packageInfo.installer) {
                         signal.setAppInstaller(packageInfo.installer);
                         this._packageInstaller = packageInfo.installer;
                     } else {
                         signal.setAppInstaller('unknown');
                     }
 
-                    if(packageInfo.versionCode) {
+                    if (packageInfo.versionCode) {
                         signal.setAppVersionCode(packageInfo.versionCode);
                         this._packageVersionCode = packageInfo.versionCode;
                     }
@@ -303,7 +303,7 @@ export class AdMobSignalFactory {
             }));
 
             // this should only be added to 2.2.1 and above
-            if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (this._deviceInfo instanceof AndroidDeviceInfo) {
                 signal.setApkHash(this._deviceInfo.getApkDigest());
             }
 
@@ -333,7 +333,7 @@ export class AdMobSignalFactory {
             }));
         }
 
-        if(this._platform === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             promises.push(this.getAndroidRooted(this._deviceInfo).then(rooted => {
                 signal.setRooted(rooted);
             }).catch(() => {
@@ -359,7 +359,7 @@ export class AdMobSignalFactory {
     }
 
     private getSdkVersion(platform: Platform, clientInfo: ClientInfo): string {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return 'unity-ios-v' + this._clientInfo.getSdkVersionName();
         } else {
             return 'unity-android-v' + this._clientInfo.getSdkVersionName();
@@ -367,9 +367,9 @@ export class AdMobSignalFactory {
     }
 
     private getNetworkType(type: string): number {
-        if(type === 'wifi') {
+        if (type === 'wifi') {
             return 1;
-        } else if(type === 'cellular') {
+        } else if (type === 'cellular') {
             return 0;
         } else {
             return -1;
@@ -377,7 +377,7 @@ export class AdMobSignalFactory {
     }
 
     private getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             const model = deviceInfo.getModel().split(' ')[0];
             return model.replace(/[0-9]+,[0-9]+$/, '') + ' ' + deviceInfo.getOsVersion();
         } else {
@@ -399,9 +399,9 @@ export class AdMobSignalFactory {
     }
 
     private getIosRooted(deviceInfo: DeviceInfo): number {
-        if(deviceInfo instanceof IosDeviceInfo && deviceInfo.isSimulator()) { // not available on Android
+        if (deviceInfo instanceof IosDeviceInfo && deviceInfo.isSimulator()) { // not available on Android
             return 2;
-        } else if(deviceInfo.isRooted()) {
+        } else if (deviceInfo.isRooted()) {
             return 1;
         } else {
             return 0;
@@ -410,9 +410,9 @@ export class AdMobSignalFactory {
 
     private getAndroidRooted(deviceInfo: DeviceInfo): Promise<number> {
         return this._core.DeviceInfo.Android!.getFingerprint().then(fingerprint => {
-            if(fingerprint.indexOf('generic') >= 0) {
+            if (fingerprint.indexOf('generic') >= 0) {
                 return 2; // simulator
-            } else if(deviceInfo.isRooted()) {
+            } else if (deviceInfo.isRooted()) {
                 return 1;
             } else {
                 return 0;
@@ -437,10 +437,10 @@ export class AdMobSignalFactory {
     }
 
     private getBatteryStatus(platform: Platform, status: number): number {
-        if(platform === Platform.IOS) {
+        if (platform === Platform.IOS) {
             return status;
         } else {
-            switch(status) {
+            switch (status) {
                 case 1: // BATTERY_STATUS_UNKNOWN
                     return 0; // unknown
                 case 2: // BATTERY_STATUS_CHARGING
@@ -458,9 +458,9 @@ export class AdMobSignalFactory {
     }
 
     private getDeviceScreenOrientation(width: number, height: number): number {
-        if(width === height) {
+        if (width === height) {
             return 20; // square
-        } else if(width > height) {
+        } else if (width > height) {
             return 3; // landscape left
         } else {
             return 1; // portrait

@@ -4,7 +4,7 @@ import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener'
 import { DownloadManager } from 'China/Managers/DownloadManager';
 
 export interface IChinaApi extends IModuleApi {
-    Android : {
+    Android: {
         Download: AndroidDownloadApi;
         InstallListener: AndroidInstallListenerApi;
     };

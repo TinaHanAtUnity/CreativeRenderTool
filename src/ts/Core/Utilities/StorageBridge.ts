@@ -23,7 +23,7 @@ export class StorageBridge {
             commands: []
         };
 
-        if(interval) {
+        if (interval) {
             this._storageBatchInterval = interval;
         }
     }
@@ -33,17 +33,17 @@ export class StorageBridge {
         const batch = operation.getBatch();
 
         // empty batches are valid, just cleanly ignore them
-        if(batch.commands.length === 0) {
+        if (batch.commands.length === 0) {
             return;
         }
 
-        if(type === StorageType.PUBLIC) {
+        if (type === StorageType.PUBLIC) {
             this._publicStorageQueue.commands = this._publicStorageQueue.commands.concat(batch.commands);
         } else {
             this._privateStorageQueue.commands = this._privateStorageQueue.commands.concat(batch.commands);
         }
 
-        if(!this._storageBatchTimer) {
+        if (!this._storageBatchTimer) {
             this._storageBatchTimer = window.setTimeout(() => {
                 this.executeBatch(StorageType.PUBLIC, this._publicStorageQueue);
                 this.executeBatch(StorageType.PRIVATE, this._privateStorageQueue);
@@ -57,22 +57,22 @@ export class StorageBridge {
     }
 
     private executeBatch(type: StorageType, batch: IStorageBatch) {
-        if(batch.commands.length === 0) {
+        if (batch.commands.length === 0) {
             return;
         }
 
         let command: IStorageCommand;
-        for(command of batch.commands) {
-            if(command.type === StorageCommandType.SET) {
+        for (command of batch.commands) {
+            if (command.type === StorageCommandType.SET) {
                 this._core.Storage.set(type, command.key, command.value);
-            } else if(command.type === StorageCommandType.DELETE) {
+            } else if (command.type === StorageCommandType.DELETE) {
                 this._core.Storage.delete(type, command.key);
             }
         }
 
         this._core.Storage.write(type);
 
-        if(type === StorageType.PUBLIC) {
+        if (type === StorageType.PUBLIC) {
             this._publicStorageQueue = {
                 commands: []
             };

@@ -51,14 +51,14 @@ export class PlacementManager {
     }
 
     public setAllPlacementStates(newState: PlacementState) {
-        for(const placementId of this._configuration.getPlacementIds()) {
+        for (const placementId of this._configuration.getPlacementIds()) {
             this.setPlacementState(placementId, newState);
         }
     }
 
     public setPlacementReady(placementId: string, campaign: Campaign): void {
         const placement = this._configuration.getPlacement(placementId);
-        if(placement) {
+        if (placement) {
             this.setPlacementState(placementId, PlacementState.READY);
             placement.setCurrentCampaign(campaign);
         }
@@ -66,14 +66,14 @@ export class PlacementManager {
 
     public setCampaign(placementId: string, campaign: Campaign | undefined) {
         const placement = this._configuration.getPlacement(placementId);
-        if(placement) {
+        if (placement) {
             placement.setCurrentCampaign(campaign);
         }
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
         const placement = this._configuration.getPlacement(placementId);
-        if(placement) {
+        if (placement) {
             return placement.getCurrentCampaign();
         }
 
@@ -81,17 +81,17 @@ export class PlacementManager {
     }
 
     public clearCampaigns(): void {
-        for(const placementId of this._configuration.getPlacementIds()) {
+        for (const placementId of this._configuration.getPlacementIds()) {
             this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
         }
     }
 
     private sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState) {
-        if(oldState !== newState) {
+        if (oldState !== newState) {
             this._ads.Placement.setPlacementState(placementId, newState);
             this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
 
-            if(newState === PlacementState.READY) {
+            if (newState === PlacementState.READY) {
                 this._ads.Listener.sendReadyEvent(placementId);
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);

@@ -22,7 +22,7 @@ export class AnalyticsApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case AnalyticsEvent[AnalyticsEvent.POSTEVENT]:
                 this.onPostEvent.trigger(JSON.parse(<string>parameters[0]));
                 break;

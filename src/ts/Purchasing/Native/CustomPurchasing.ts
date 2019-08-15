@@ -51,7 +51,7 @@ export class CustomPurchasingApi extends NativeApi {
 
     private translateStore(store: string): string {
         if (store) {
-            switch(store) {
+            switch (store) {
                 case 'NOT_SPECIFIED':
                     return 'NotSpecified';
                 case 'GOOGLE_PLAY':

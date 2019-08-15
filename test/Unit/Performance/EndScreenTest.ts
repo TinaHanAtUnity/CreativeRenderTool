@@ -35,11 +35,11 @@ describe('EndScreenTest', () => {
         configuration = TestFixtures.getCoreConfiguration();
     });
 
-    const createEndScreen = (language : string) : PerformanceEndScreen => {
+    const createEndScreen = (language: string): PerformanceEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false);
-        const params : IEndScreenParameters = {
+        const params: IEndScreenParameters = {
             platform,
             core,
             language,

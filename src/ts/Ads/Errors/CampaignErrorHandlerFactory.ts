@@ -11,7 +11,7 @@ export interface ICampaignErrorHandler {
 
 export class CampaignErrorHandlerFactory {
     public static getCampaignErrorHandler(contentType: string, core: ICoreApi, request: RequestManager): ICampaignErrorHandler {
-        switch(contentType) {
+        switch (contentType) {
             case CampaignContentTypes.ProgrammaticVast:
                 return new VastCampaignErrorHandler(core, request);
             default:

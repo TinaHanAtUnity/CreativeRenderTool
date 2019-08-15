@@ -30,7 +30,7 @@ describe('MRAIDCampaign', () => {
             assert.equal(campaign.getUseWebViewUserAgentForTracking(), media.useWebViewUserAgentForTracking);
             const willExpireAt = campaign.getWillExpireAt();
             assert.isDefined(willExpireAt, 'Will expire at should be defined');
-            if(willExpireAt) {
+            if (willExpireAt) {
                 const timeDiff = willExpireAt - (Date.now() + media.cacheTTL * 1000);
                 assert.isTrue(Math.abs(timeDiff) < 50, 'Expected difference of willExpireAt and calculated willExpireAt to be less than 50ms');
             }

@@ -45,7 +45,7 @@ export abstract class CampaignParser {
     }
 
     protected validateAndEncodeUrl(url: string, session: Session): string {
-        if(Url.isValid(url)) {
+        if (Url.isValid(url)) {
             return Url.encode(url);
         }
 
@@ -67,13 +67,13 @@ export abstract class CampaignParser {
     }
 
     protected validateAndEncodeTrackingUrls(urls: { [eventName: string]: string[] }, session: Session): { [eventName: string]: string[] } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
+        if (urls && urls !== null) {
+            for (const urlKey in urls) {
+                if (urls.hasOwnProperty(urlKey)) {
                     const urlArray = urls[urlKey];
                     const newUrlArray: string[] = [];
 
-                    for(const url of urlArray) {
+                    for (const url of urlArray) {
                         newUrlArray.push(this.validateAndEncodeUrl(url, session));
                     }
 

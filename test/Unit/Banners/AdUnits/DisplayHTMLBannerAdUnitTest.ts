@@ -55,10 +55,10 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 core.Android!.Intent = sinon.createStubInstance(IntentApi);
             }
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
             }
 
@@ -106,7 +106,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
         describe('load', () => {
             describe('setting up the banner player', () => {
                 describe('setting banner settings', () => {
-                    if(platform === Platform.ANDROID) {
+                    if (platform === Platform.ANDROID) {
                         describe('on android', () => {
                             it('should set the proper settings', () => {
                                 return adUnit.onLoad().then(() => {
@@ -127,7 +127,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                             });
                         });
                     }
-                    if(platform === Platform.IOS) {
+                    if (platform === Platform.IOS) {
                         describe('on iOS', () => {
                             it('should set the proper settings', () => {
                                 return adUnit.onLoad().then(() => {
@@ -162,7 +162,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                 });
 
                 describe('when the page has finished', () => {
-                    if(platform === Platform.ANDROID) {
+                    if (platform === Platform.ANDROID) {
                         describe('on android', () => {
                             it('should set up banner events with allowing the shouldOverrideUrlLoading event', () => {
                                 return adUnit.onLoad().then(() => {
@@ -175,7 +175,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                         });
                     }
 
-                    if(platform === Platform.IOS) {
+                    if (platform === Platform.IOS) {
                         describe('on ios', () => {
                             it('should set up banner events with allowing the onCreateWindow event', () => {
                                 return adUnit.onLoad().then(() => {
@@ -192,7 +192,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
         });
 
         describe('when the banner is clicked', () => {
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 describe('on iOS', () => {
                     it('should open the URL', () => {
                         return adUnit.onLoad().then(() => {
@@ -205,7 +205,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 describe('on Android', () => {
                     it('should launch an intent with the given URL', () => {
                         return adUnit.onLoad().then(() => {

@@ -26,10 +26,10 @@ export abstract class Model<T extends object> {
     }
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
-        if(!(key in this._schema)) {
+        if (!(key in this._schema)) {
             this.handleError(new WebViewError('model: ' + this._name + ' key:' + key + ' not in schema', 'SchemaError'));
         }
-        if(this.checkValue(value, this._schema[key])) {
+        if (this.checkValue(value, this._schema[key])) {
             this._data[key] = value;
         } else {
             this.handleError(new WebViewError('model: ' + this._name + ' key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
@@ -37,8 +37,8 @@ export abstract class Model<T extends object> {
     }
 
     public setModelValues(values: T) {
-        for(const key in values) {
-            if(values.hasOwnProperty(key)) {
+        for (const key in values) {
+            if (values.hasOwnProperty(key)) {
                 this.set(key, values[key]);
             }
         }
@@ -63,7 +63,7 @@ export abstract class Model<T extends object> {
             valueType = 'array';
         } else if (value === null) {
             valueType = 'null';
-        } else if(valueType === 'number' && Number.isInteger(<number>value)) {
+        } else if (valueType === 'number' && Number.isInteger(<number>value)) {
             valueType = 'integer';
         }
 
@@ -71,9 +71,9 @@ export abstract class Model<T extends object> {
     }
 
     private checkValue(value: unknown, allowedTypes: SchemaType[]): boolean {
-        for(const currentType of allowedTypes) {
+        for (const currentType of allowedTypes) {
             const valueType = this.getTypeOf(value);
-            if(valueType === currentType || (currentType === 'number' && valueType === 'integer')) {
+            if (valueType === currentType || (currentType === 'number' && valueType === 'integer')) {
                 return true;
             }
         }

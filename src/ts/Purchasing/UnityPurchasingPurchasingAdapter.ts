@@ -113,7 +113,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
                     try {
                         const products: IProduct[] = JSON.parse(promoCatalogJSON);
                         resolve(products);
-                    } catch(err) {
+                    } catch (err) {
                         reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_malformatted'));
                     }
                 }).catch((e) => {
@@ -129,7 +129,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private validatePromoJSON(promoCatalogJSON: string): Promise<void> {
         if (promoCatalogJSON === 'NULL' || promoCatalogJSON === null || promoCatalogJSON === undefined) {
-            return Promise.reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
+            return Promise.reject(this.logIssue('Promo catalog JSON is null'));
         } else if (promoCatalogJSON === '') {
             return Promise.reject(this.logIssue('Promo catalog JSON is empty'));
         }
@@ -141,7 +141,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         if (errorType) {
             Diagnostics.trigger(errorType, { message: errorMessage });
         }
-        this._core.Sdk.logError(errorMessage);
+        this._core.Sdk.logDebug(errorMessage);
         return new Error(errorMessage);
     }
 
@@ -195,7 +195,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private checkPromoVersion(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const observer = Observables.once1(this._promo.Purchasing.onGetPromoVersion, (promoVersion) => {
-                if(!this.isPromoVersionSupported(promoVersion)) {
+                if (!this.isPromoVersionSupported(promoVersion)) {
                     reject(this.logIssue(`Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`));
                 } else {
                     resolve();

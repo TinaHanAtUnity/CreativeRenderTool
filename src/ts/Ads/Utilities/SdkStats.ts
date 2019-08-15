@@ -88,7 +88,7 @@ export class SdkStats {
 
         cache.onFinish.subscribe((event) => SdkStats.setCachingFinishTimestamp(event.fileId));
         cache.onStart.subscribe((event, size) => {
-            if(size === 0) {
+            if (size === 0) {
                 SdkStats.setCachingStartTimestamp(event.fileId);
             }
         });
@@ -97,7 +97,7 @@ export class SdkStats {
     }
 
     public static sendReadyEvent(placementId: string): void {
-        if(SdkStats._initialized && SdkStats.isTestActive()) {
+        if (SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('ready', placementId).then(event => {
                 HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObjectType.ANONYMOUS, event);
             });
@@ -105,7 +105,7 @@ export class SdkStats {
     }
 
     public static sendShowEvent(placementId: string): void {
-        if(SdkStats._initialized && SdkStats.isTestActive()) {
+        if (SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('show', placementId).then(event => {
                 HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObjectType.ANONYMOUS, event);
             });
@@ -193,7 +193,7 @@ export class SdkStats {
     private static isTestActive(): boolean {
         const gameSessionId = SdkStats._sessionManager.getGameSessionId();
 
-        if(typeof gameSessionId === 'number' && gameSessionId % 1000 === 0) {
+        if (typeof gameSessionId === 'number' && gameSessionId % 1000 === 0) {
             return true;
         }
 
@@ -236,7 +236,7 @@ export class SdkStats {
             };
 
             let mediationInfo: IMediationInfo | undefined;
-            if(mediationMetaData) {
+            if (mediationMetaData) {
                 mediationInfo = {
                     mediationName: mediationMetaData.getName(),
                     mediationVersion: mediationMetaData.getVersion(),
@@ -255,7 +255,7 @@ export class SdkStats {
                 reinitializedSDK: SdkStats._clientInfo.isReinitialized()
             };
 
-            if(eventType === 'show') {
+            if (eventType === 'show') {
                 eventInfo.delayReadyToShow = eventTimestamp - SdkStats._readyEventSent[placementId];
                 eventInfo.delayInitToShow = eventTimestamp - SdkStats._initTimestamp;
             }
@@ -274,15 +274,15 @@ export class SdkStats {
 
     // todo: fragile method that breaks when we add new campaign types
     private static getCampaignType(campaign: Campaign): string {
-        if(campaign instanceof PerformanceCampaign) {
+        if (campaign instanceof PerformanceCampaign) {
             return 'perf';
-        } else if(campaign instanceof VastCampaign) {
+        } else if (campaign instanceof VastCampaign) {
             return 'vast';
-        } else if(campaign instanceof MRAIDCampaign) {
+        } else if (campaign instanceof MRAIDCampaign) {
             return 'mraid';
-        } else if(campaign instanceof DisplayInterstitialCampaign) {
+        } else if (campaign instanceof DisplayInterstitialCampaign) {
             return 'display';
-        } else if(campaign instanceof VPAIDCampaign) {
+        } else if (campaign instanceof VPAIDCampaign) {
             return 'vpaid';
         } else {
             return 'unknown';
@@ -291,19 +291,19 @@ export class SdkStats {
 
     private static isCampaignCached(campaign: Campaign): boolean {
         const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
-        if(asset && asset.isCached()) {
+        if (asset && asset.isCached()) {
             return true;
         }
         return false;
     }
 
     private static getAssetSize(campaign: Campaign): Promise<number> {
-        if(SdkStats.isCampaignCached(campaign)) {
+        if (SdkStats.isCampaignCached(campaign)) {
             const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
-            if(asset) {
+            if (asset) {
                 return SdkStats._core.Cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
-                    if(fileInfo.found) {
+                    if (fileInfo.found) {
                         return fileInfo.size;
                     } else {
                         return 0;
@@ -322,11 +322,11 @@ export class SdkStats {
     private static getCachedMsAgo(campaign: Campaign): number | undefined {
         const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
-        if(asset) {
+        if (asset) {
             const fileId: string | undefined = asset.getFileId();
-            if(fileId) {
+            if (fileId) {
                 // check that asset was fully cached within this game session (not resumed from earlier sessions)
-                if(SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
+                if (SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
                     return Date.now() - SdkStats._cachingFinished[fileId];
                 }
             }
@@ -338,11 +338,11 @@ export class SdkStats {
     private static getCachingDuration(campaign: Campaign): number | undefined {
         const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
-        if(asset) {
+        if (asset) {
             const fileId: string | undefined = asset.getFileId();
-            if(fileId) {
+            if (fileId) {
                 // check that asset was fully cached within this game session (not resumed from earlier sessions)
-                if(SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
+                if (SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
                     return SdkStats._cachingFinished[fileId] - SdkStats._cachingStarted[fileId];
                 }
             }

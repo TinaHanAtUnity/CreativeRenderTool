@@ -4,8 +4,8 @@ import * as sinon from 'sinon';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
-describe('Creative Blocking', () => {
-    let httpKafkaStub: sinon.SinonSpy;
+describe('CreativeBlockingTest', () => {
+    let httpKafkaStub: sinon.SinonStub;
 
     const tests: {
         blockingReason: BlockingReason;
@@ -38,7 +38,7 @@ describe('Creative Blocking', () => {
     });
 
     afterEach(() => {
-        httpKafkaStub.resetHistory();
+        httpKafkaStub.reset();
     });
 
     describe('Sending with correct fields ', () => {
@@ -49,7 +49,7 @@ describe('Creative Blocking', () => {
         tests.forEach((t) => {
             it(`should send matching payload when blockingReason is "${t.blockingReason}"`, () => {
                 CreativeBlocking.report(creativeId, seatId, campaignId, t.blockingReason, t.extraFields);
-                httpKafkaStub.calledWithExactly('ads.creative.blocking', KafkaCommonObjectType.EMPTY, {
+                sinon.assert.calledWith(httpKafkaStub, 'ads.creative.blocking', KafkaCommonObjectType.EMPTY, {
                     ...t.extraFields,
                     type: t.blockingReason,
                     creativeId: creativeId,

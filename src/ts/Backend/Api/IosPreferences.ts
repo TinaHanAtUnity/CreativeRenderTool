@@ -8,10 +8,10 @@ export class IosPreferences extends BackendApi {
     }
 
     public getString(key: string): string {
-        if(this._unityEngineRunning) {
-            if(key === 'unity.cloud_userid') {
+        if (this._unityEngineRunning) {
+            if (key === 'unity.cloud_userid') {
                 return '123456acbdef';
-            } else if(key === 'unity.player_sessionid') {
+            } else if (key === 'unity.player_sessionid') {
                 return '12345';
             }
         }

@@ -17,7 +17,7 @@ export class NativeBridge implements INativeBridge {
     private static _doubleRegExp: RegExp = /"(\d+\.\d+)=double"/g;
 
     private static convertStatus(status: string): CallbackStatus {
-        switch(status) {
+        switch (status) {
             case CallbackStatus[CallbackStatus.OK]:
                 return CallbackStatus.OK;
             case CallbackStatus[CallbackStatus.ERROR]:
@@ -52,8 +52,8 @@ export class NativeBridge implements INativeBridge {
     }
 
     public invoke<T>(className: string, methodName: string, parameters?: unknown[]): Promise<T> {
-        if(this._autoBatchEnabled) {
-            if(this._autoBatch) {
+        if (this._autoBatchEnabled) {
+            if (this._autoBatch) {
                 return this._autoBatch.queue<T>(className, methodName, parameters);
             } else {
                 this._autoBatch = new BatchInvocation(this);
@@ -71,14 +71,14 @@ export class NativeBridge implements INativeBridge {
             const status = NativeBridge.convertStatus(<string>result.shift());
             let parameters = <unknown[]>result.shift();
             const callbackObject = this._callbackTable[id];
-            if(!callbackObject) {
+            if (!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
-            if(parameters.length === 1) {
+            if (parameters.length === 1) {
                 // @ts-ignore
                 parameters = parameters[0];
             }
-            switch(status) {
+            switch (status) {
                 case CallbackStatus.OK:
                     callbackObject.resolve(parameters);
                     break;
@@ -90,8 +90,8 @@ export class NativeBridge implements INativeBridge {
             }
             delete this._callbackTable[id];
         });
-        if(this._autoBatchEnabled) {
-            if(this._autoBatch && this._autoBatch.getBatch().length > 0) {
+        if (this._autoBatchEnabled) {
+            if (this._autoBatch && this._autoBatch.getBatch().length > 0) {
                 this.invokeBatch(this._autoBatch);
             }
             delete this._autoBatch;
@@ -99,7 +99,7 @@ export class NativeBridge implements INativeBridge {
     }
 
     public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {
-        if(!(EventCategory[eventCategory] in this._eventHandlers)) {
+        if (!(EventCategory[eventCategory] in this._eventHandlers)) {
             this._eventHandlers[EventCategory[eventCategory]] = nativeApi;
         }
     }
@@ -107,7 +107,7 @@ export class NativeBridge implements INativeBridge {
     public handleEvent(parameters: unknown[]): void {
         const category = <string>parameters.shift();
         const event = <string>parameters.shift();
-        if(category && category in this._eventHandlers) {
+        if (category && category in this._eventHandlers) {
             this._eventHandlers[category].handleEvent(event, parameters);
         } else {
             throw new Error('Unknown event category: ' + category);

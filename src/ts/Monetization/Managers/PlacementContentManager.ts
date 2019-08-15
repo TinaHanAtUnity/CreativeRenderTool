@@ -31,7 +31,7 @@ export interface IPlacementContentParams {
     payouts?: IRawProductInfo[];
     costs?: IRawProductInfo[];
     offerDuration?: number;
-    impressionDate?: Date;
+    impressionDate?: number;
 }
 
 export class PlacementContentManager {
@@ -134,7 +134,7 @@ export class PlacementContentManager {
             result.offerDuration = limitedTimeOffer.getDuration();
             const firstImpression = limitedTimeOffer.getFirstImpression();
             if (firstImpression) {
-                result.impressionDate = firstImpression;
+                result.impressionDate = firstImpression.getTime();
             }
         }
         return result;

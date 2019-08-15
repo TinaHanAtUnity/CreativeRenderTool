@@ -4,11 +4,13 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
 const chai = require('chai');
+const URL = require('url');
 
 const testUrl = process.env.TEST_URL;
 const testList = process.env.TEST_LIST;
 const testFilter = process.env.TEST_FILTER;
 
+const enableLogs = process.env.ENABLE_LOGS;
 const coverage = process.env.COVERAGE;
 const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
@@ -55,7 +57,17 @@ const runTest = async (browser, isolated, testFilter) => {
         });
     });
 
-    await page.goto(testUrl + (testFilter ? '?grep=' + testFilter : ''), {
+    const url = new URL.URL(testUrl);
+
+    if (testFilter) {
+        url.searchParams.append('grep', testFilter);
+    }
+
+    if (enableLogs) {
+        url.searchParams.append('enableLogs', enableLogs);
+    }
+
+    await page.goto(url.href, {
         waitUntil: 'domcontentloaded'
     });
 

@@ -3,6 +3,7 @@ import { BackendApi } from 'Backend/BackendApi';
 export class Sdk extends BackendApi {
 
     public loadComplete() {
+        this._enableLogs = window.location.href.includes('enableLogs');
         return [
             this._gameId,
             this._testMode,
@@ -16,7 +17,8 @@ export class Sdk extends BackendApi {
             this._webViewHash,
             this._webViewVersion,
             this._initTimeStamp,
-            this._reinitialized
+            this._reinitialized,
+            this._usePerPlacementLoad
         ];
     }
 
@@ -25,27 +27,35 @@ export class Sdk extends BackendApi {
     }
 
     public logError(message: string) {
-        // tslint:disable:no-console
-        console.error(message);
-        // tslint:enable:no-console
+        if (this._enableLogs) {
+            // tslint:disable:no-console
+            console.error(message);
+            // tslint:enable:no-console
+        }
     }
 
     public logWarning(message: string) {
-        // tslint:disable:no-console
-        console.warn(message);
-        // tslint:enable:no-console
+        if (this._enableLogs) {
+            // tslint:disable:no-console
+            console.warn(message);
+            // tslint:enable:no-console
+        }
     }
 
     public logInfo(message: string) {
-        // tslint:disable:no-console
-        console.info(message);
-        // tslint:enable:no-console
+        if (this._enableLogs) {
+            // tslint:disable:no-console
+            console.info(message);
+            // tslint:enable:no-console
+        }
     }
 
     public logDebug(message: string) {
-        // tslint:disable:no-console
-        console.log(message);
-        // tslint:enable:no-console
+        if (this._enableLogs) {
+            // tslint:disable:no-console
+            console.log(message);
+            // tslint:enable:no-console
+        }
     }
 
     public setGameId(gameId: string) {
@@ -100,6 +110,10 @@ export class Sdk extends BackendApi {
         this._reinitialized = reinitialized;
     }
 
+    public setUsePerPlacementLoad(usePerPlacementLoad: boolean) {
+        this._usePerPlacementLoad = usePerPlacementLoad;
+    }
+
     private _gameId: string = '345';
     private _testMode: boolean = true;
     private _appName: string = 'com.test.app.name';
@@ -113,4 +127,6 @@ export class Sdk extends BackendApi {
     private _webViewVersion: string = '2.0.0.-webviewversion';
     private _initTimeStamp: number = 12345;
     private _reinitialized: boolean = false;
+    private _usePerPlacementLoad: boolean = false;
+    private _enableLogs: boolean = false;
 }

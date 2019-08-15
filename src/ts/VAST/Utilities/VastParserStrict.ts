@@ -1,9 +1,7 @@
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
@@ -15,6 +13,9 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
+import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
+import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -32,6 +33,8 @@ enum VastNodeName {
     MEDIA_FILE = 'MediaFile',
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
+    HTML_RESOURCE = 'HTMLResource',
+    IFRAME_RESOURCE = 'IFrameResource',
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
     COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
@@ -104,7 +107,7 @@ export class VastParserStrict {
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
-            for(const element of parseErrors) {
+            for (const element of parseErrors) {
                 if (element.textContent) {
                     parseMessages.push(element.textContent);
                 }
@@ -228,7 +231,7 @@ export class VastParserStrict {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
-            if(ad && parsedAd) {
+            if (ad && parsedAd) {
                 for (const errorUrl of ad.getErrorURLTemplates()) {
                     parsedAd.addErrorURLTemplate(errorUrl);
                 }
@@ -299,6 +302,8 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
             const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
+            const iframeResourceElement = this.getFirstNodeWithName(element, VastNodeName.IFRAME_RESOURCE);
+            const htmlResourceElement = this.getFirstNodeWithName(element, VastNodeName.HTML_RESOURCE);
             if (staticResourceElement) {
                 const companionAd = this.parseCompanionAdStaticResourceElement(element, urlProtocol);
                 const companionAdErrors = new VastCompanionAdStaticResourceValidator(companionAd).getErrors();
@@ -314,13 +319,17 @@ export class VastParserStrict {
                     }
                 }
                 if (isWarningLevel) {
-                    vastAd.addCompanionAd(companionAd);
+                    vastAd.addStaticCompanionAd(companionAd);
                 } else {
-                    vastAd.addUnsupportedCompanionAd(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
+                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
-            } else {
-                // ignore element as it is not of a type we support
-                vastAd.addUnsupportedCompanionAd(element.outerHTML);
+            }
+            // ignore element as it is not of a type we support
+            if (iframeResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+            }
+            if (htmlResourceElement) {
+                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
             }
         });
 
@@ -503,6 +512,38 @@ export class VastParserStrict {
         return companionAd;
     }
 
+    private parseCompanionAdIFrameResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdIframeResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdIframeResource(id, height, width);
+
+        const iframeResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.IFRAME_RESOURCE);
+        if (iframeResource) {
+            const iframeUrl = this.parseVastUrl(this.parseNodeText(iframeResource), urlProtocol);
+            if (iframeUrl) {
+                companionAd.setIframeResourceURL(iframeUrl);
+            }
+        }
+        return companionAd;
+    }
+
+    private parseCompanionAdHTMLResourceElement(companionAdElement: HTMLElement, urlProtocol: string): VastCompanionAdHTMLResource {
+        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
+        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
+        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
+        const companionAd = new VastCompanionAdHTMLResource(id, height, width);
+
+        const htmlResource = this.getFirstNodeWithName(companionAdElement, VastNodeName.HTML_RESOURCE);
+        if (htmlResource) {
+            const htmlContent = this.parseNodeText(htmlResource);
+            if (htmlContent.length > 0) {
+                companionAd.setHtmlResourceContent(htmlContent);
+            }
+        }
+        return companionAd;
+    }
+
     private parseVastUrl(maybeUrl: string, urlProtocol: string): string | undefined {
         let url: string = maybeUrl;
         // check if relative url ex: '//www.google.com/hello'
@@ -544,5 +585,4 @@ export class VastParserStrict {
 
         return hours + minutes + seconds;
     }
-
 }

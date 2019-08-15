@@ -60,7 +60,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
 
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.render();
             this._endScreen.hide();
             document.body.appendChild(this._endScreen.container());
@@ -107,7 +107,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowing()) {
+        if (!this.isShowing()) {
             return Promise.resolve();
         }
         this.setShowing(false);
@@ -167,7 +167,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerShow(): void {
         this._mraid.setViewableState(true);
 
-        if(AbstractAdUnit.getAutoClose()) {
+        if (AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
                 this.hide();
@@ -176,17 +176,17 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this._mraid.setViewableState(false);
 
-            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            if (CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
                 this.setFinishState(FinishState.SKIPPED);
                 this.hide();
             }
@@ -194,7 +194,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this._mraid.setViewableState(true);
         }
     }
@@ -221,7 +221,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     protected removeEndScreenContainer() {
-        if(this._endScreen) {
+        if (this._endScreen) {
             this._endScreen.hide();
 
             const endScreenContainer = this._endScreen.container();
@@ -253,17 +253,17 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const operativeEventParams = this.getOperativeEventParams();
         const finishState = this.getFinishState();
 
-        if(finishState === FinishState.COMPLETED) {
-            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+        if (finishState === FinishState.COMPLETED) {
+            if (!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
                 this._operativeEventManager.sendThirdQuartile(operativeEventParams);
             }
 
-            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+            if (!this._campaign.getSession().getEventSent(EventType.VIEW)) {
                 this._operativeEventManager.sendView(operativeEventParams);
             }
 
             this.sendTrackingEvent(TrackingEvent.COMPLETE);
-        } else if(finishState === FinishState.SKIPPED) {
+        } else if (finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }
     }

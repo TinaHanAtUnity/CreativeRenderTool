@@ -2,24 +2,38 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
     AdmobTestHttpError = 'admob_video_http_error',
-    VastClickWithoutImpressionError = 'vast_click_without_impression'
+    VastClickWithoutImpressionError = 'vast_click_without_impression',
+    AdUnitAlreadyShowing = 'ad_unit_already_showing',
+    PlacementWithIdDoesNotExist = 'placement_with_id_does_not_exist',
+    PromoWithoutCreatives = 'promo_without_creatives',
+    CampaignExpired = 'campaign_expired',
+    NoConnectionWhenNeeded = 'no_connection_when_needed',
+    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show'
 }
 
 export enum AdmobMetric {
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
-    AdmobUserVideoSeeked = 'admob_user_video_seeked'
+    AdmobUserVideoSeeked = 'admob_user_video_seeked',
+    AdmobRewardedVideoStart = 'admob_rewarded_video_start',
+    AdmobUserWasRewarded = 'admob_user_was_rewarded',
+    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video'
 }
 
 export enum BannerMetric {
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
+}
+
+export enum CachingMetric {
+    CachingModeForcedToDisabled = 'caching_mode_forced_to_disabled' // Occurs when user has less than 20mb of freespace in cache directory
 }
 
 export enum ChinaMetric {
@@ -35,10 +49,27 @@ export enum VastMetric {
 }
 
 export enum MiscellaneousMetric {
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+    CampaignNotFound = 'campaign_not_found',
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
+    CampaignAttemptedShowInBackground = 'ad_attempted_show_background'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric;
+export enum LoadMetric {
+    LoadEnabledAuctionRequest = 'load_enabled_auction_request',
+    LoadEnabledFill = 'load_enabled_fill',
+    LoadEnabledNoFill = 'load_enabled_no_fill',
+    LoadEnabledShow = 'load_enabled_show',
+    LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
+    LoadEnabledInitializationFailure = 'load_enabled_initialization_failure',
+    LoadAuctionRequestBlocked = 'load_auction_request_blocked'
+}
+
+export enum PurchasingMetric {
+    PurchasingAppleStoreStarted = 'purchasing_apple_store_started',
+    PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
+}
+
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
@@ -49,7 +80,9 @@ interface IProgrammaticTrackingMetric {
 }
 
 export class ProgrammaticTrackingService {
+    private static newProductionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
     private static productionMetricServiceUrl: string = 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric';
+    private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics';
 
     private _platform: Platform;
     private _request: RequestManager;
@@ -103,6 +136,12 @@ export class ProgrammaticTrackingService {
     }
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
+
+        const isLoadMetric = Object.values(LoadMetric).includes(event);
+        const isZyngaFreeCellSolitareUsingLoad = CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId());
+        if (isLoadMetric && !isZyngaFreeCellSolitareUsingLoad) {
+            return Promise.resolve(<INativeResponse>{});
+        }
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
@@ -118,7 +157,12 @@ export class ProgrammaticTrackingService {
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this._request.post(url, data, headers);
+        return this._request.post(url, data, headers).then((res) => {
+            if (CustomFeatures.sampleAtGivenPercent(1)) {
+                return this._request.post(ProgrammaticTrackingService.newProductionMetricServiceUrl, data, headers);
+            }
+            return res;
+        });
     }
 
 }

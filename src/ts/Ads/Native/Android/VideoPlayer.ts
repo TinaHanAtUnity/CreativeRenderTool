@@ -36,7 +36,7 @@ export class AndroidVideoPlayerApi extends EventedNativeApi<IAndroidVideoEventHa
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case AndroidVideoPlayerEvent[AndroidVideoPlayerEvent.INFO]:
                 this._handlers.forEach(handler => handler.onInfo(<string>parameters[0], <number>parameters[1], <number>parameters[2]));
                 break;

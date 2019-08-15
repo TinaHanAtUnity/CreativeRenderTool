@@ -47,9 +47,9 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     public render(): void {
         super.render();
 
-        this._personalizedExpSwitch = <HTMLInputElement>this._container.querySelector('#personalized-experience-switch');
-        this._personalizedAdsSwitch = <HTMLInputElement>this._container.querySelector('#personalized-ads-switch');
-        this._personalized3rdPartySwitch = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party-switch');
+        this._personalizedExpSwitch = <HTMLInputElement> this._container.querySelector('#personalized-experience-switch');
+        this._personalizedAdsSwitch = <HTMLInputElement> this._container.querySelector('#personalized-ads-switch');
+        this._personalized3rdPartySwitch = <HTMLInputElement> this._container.querySelector('#personalized-ads-3rd-party-switch');
     }
 
     public show(): void {

@@ -37,7 +37,7 @@ export class TrackingIdentifierFilter {
                     advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
                     limitAdTracking: deviceInfo.getLimitAdTracking()
                 };
-            } else if(platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+            } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
                 trackingIdentifiers = {
                     androidId: deviceInfo.getAndroidId()
                 };

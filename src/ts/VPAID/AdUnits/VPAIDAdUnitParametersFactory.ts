@@ -30,7 +30,7 @@ export class VPAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             webPlayerContainer: this._webPlayerContainer
         };
 
-        if(baseParams.campaign.hasEndScreen()) {
+        if (baseParams.campaign.hasEndScreen()) {
             endScreen = new VPAIDEndScreen(baseParams.platform, baseParams.campaign, baseParams.clientInfo.getGameId());
             vpaidAdUnitParameters.endScreen = endScreen;
         }

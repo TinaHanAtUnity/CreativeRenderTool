@@ -7,15 +7,15 @@ export class WebView {
     private readonly _core: Core;
 
     constructor(nativeBridge: NativeBridge) {
-        if(window && window.addEventListener) {
+        if (window && window.addEventListener) {
             window.addEventListener('error', (event) => this.onError(event), false);
         }
 
         this._core = new Core(nativeBridge);
     }
 
-    public initialize() {
-        this._core.initialize();
+    public initialize(): Promise<void> {
+        return this._core.initialize();
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
@@ -31,7 +31,7 @@ export class WebView {
     }
 
     private onError(event: ErrorEvent): boolean {
-        if(event.lineno && typeof event.lineno === 'number' && event.lineno > 1) {
+        if (event.lineno && typeof event.lineno === 'number' && event.lineno > 1) {
             Diagnostics.trigger('js_error', {
                 'message': event.message,
                 'url': event.filename,

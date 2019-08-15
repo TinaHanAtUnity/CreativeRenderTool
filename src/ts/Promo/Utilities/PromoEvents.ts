@@ -115,7 +115,7 @@ export class PromoEvents {
                 if (data && data.Store) {
                     return data.Store;
                 }
-            } catch(error) {
+            } catch (error) {
                 // log the error
                 this._core.Sdk.logError('PromoEvents.getAppStoreFromReceipt failed to parse json');
             }
@@ -285,7 +285,7 @@ export class PromoEvents {
     }
 
     private getPPI(): number {
-        return this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity() : (<IosDeviceInfo>this._deviceInfo).getScreenScale();
+        return this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity() : (<IosDeviceInfo> this._deviceInfo).getScreenScale();
     }
 
     private getOrientation(width: number, height: number): string {

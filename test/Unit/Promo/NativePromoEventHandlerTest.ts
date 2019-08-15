@@ -14,7 +14,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ThirdPartyEventManager, ThirdPartyEventMacro, TemplateValueMap } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro, ITemplateValueMap } from 'Ads/Managers/ThirdPartyEventManager';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 describe('NativePromoEventHandlerTest', () => {
@@ -31,7 +31,7 @@ describe('NativePromoEventHandlerTest', () => {
     let wakeUpManager: WakeUpManager;
     let metadataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let templateValues: TemplateValueMap;
+    let templateValues: ITemplateValueMap;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
@@ -53,7 +53,7 @@ describe('NativePromoEventHandlerTest', () => {
         (<sinon.SinonStub>metadataManager.fetch).resolves(playerMetaData);
 
         nativePromoEventHandler = new NativePromoEventHandler(core, ads, purchasing, clientInfo, {
-            create: (_templateValues: TemplateValueMap) => {
+            create: (_templateValues: ITemplateValueMap) => {
                 templateValues = _templateValues;
                 thirdPartyEventManager = new ThirdPartyEventManager(core, request, _templateValues);
                 sinon.stub(thirdPartyEventManager, 'sendWithGet');

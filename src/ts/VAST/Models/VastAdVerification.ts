@@ -58,7 +58,7 @@ export class VastAdVerification extends Model<IVastAdVerification> {
         this.set('verificationTrackingEvent', trackingUrl);
     }
 
-    public getDTO() : { [key: string]: unknown } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'verificationVendor': this.getVerificationVendor(),
             'verificationResources': this.getVerficationResources(),

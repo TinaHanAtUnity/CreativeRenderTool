@@ -8,7 +8,7 @@ export enum PrivacyMethod {
 }
 
 export interface IAllPermissions {
-    all: true;
+    all: boolean;
 }
 
 export interface IGranularPermissions {
@@ -32,7 +32,7 @@ export interface IProfilingPermissions {
 
 export type IPermissions = IUnityConsentPermissions | IProfilingPermissions;
 
-const CurrentUnityConsentVersion = 20181106;
+export const CurrentUnityConsentVersion = 20181106;
 
 export interface IRawGamePrivacy {
     method: string | undefined;
@@ -93,6 +93,43 @@ interface IUserPrivacy {
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
+    public static createFromLegacy(method: PrivacyMethod, optOutRecorded: boolean, optOutEnabled: boolean): UserPrivacy {
+        if (!optOutRecorded) {
+            return this.createUnrecorded();
+        }
+
+        switch (method) {
+            case PrivacyMethod.DEVELOPER_CONSENT:
+            case PrivacyMethod.LEGITIMATE_INTEREST:
+                // it's unknown if user actually gave a consent (i.e. was game using developer_consent during that session)
+                // or an opt-out therefore the optOutEnabled value is ambiguous. Therefore `external` can't be set to !optOutEnabled.
+                return new UserPrivacy({
+                    method: method,
+                    version: 0,
+                    permissions: {
+                        all: false,
+                        gameExp: false,
+                        ads: !optOutEnabled,
+                        external: false
+                    }
+                });
+            default:
+                throw new Error('Unsupported privacy method');
+        }
+    }
+
+    public static createUnrecorded(): UserPrivacy {
+        return new UserPrivacy({
+            method: PrivacyMethod.DEFAULT,
+            version: 0,
+            permissions: {
+                all: false,
+                gameExp: false,
+                ads: false,
+                external: false
+            }
+        });
+    }
 
     constructor(data: IRawUserPrivacy) {
         super('UserPrivacy', {

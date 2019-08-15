@@ -1,4 +1,5 @@
 import { ICoreApi } from 'Core/ICore';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 export enum OMEvents {
     IMPRESSION_OCCURED = 'impressionOccured',
@@ -179,6 +180,12 @@ export interface ISessionEvent {
     data: {[key: string]: unknown};
 }
 
+export interface IVerificationEvent {
+    type: string;
+    adSessionId: string;
+    payload?: unknown;
+}
+
 export interface IVerificationScriptResource {
     resourceUrl: string;
     vendorKey: string;
@@ -190,16 +197,21 @@ export class OMIDEventBridge {
     private _messageListener: (e: Event) => void;
     private _handler: IOMIDHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
-    private _iframe: HTMLIFrameElement;
-    private _sessionId: string;
+    private _openMeasurement: OpenMeasurement;
 
-    constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, sessionId: string) {
+    private _iframe3p: HTMLIFrameElement;
+    private _iframeSessionInterface: HTMLIFrameElement;
+
+    private _eventQueue: IVerificationEvent[] = [];
+    private _verificationsInjected = false;
+
+    constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._omidHandlers = {};
         this._handler = handler;
-        this._iframe = iframe;
-        this._sessionId = sessionId;
+        this._iframe3p = iframe;
+        this._openMeasurement = openMeasurement;
 
         this._omidHandlers = {};
         this._omidHandlers[OMEvents.IMPRESSION_OCCURED] = (msg) => this._handler.onImpression(<IImpressionValues>msg.data);
@@ -225,6 +237,9 @@ export class OMIDEventBridge {
         this._omidHandlers[OMID3pEvents.VERIFICATION_RESOURCES] = (msg) => this._handler.onInjectVerificationResources(<IVerificationScriptResource[]>msg.data);
         this._omidHandlers[OMID3pEvents.POPULATE_VENDOR_KEY] = (msg) => this._handler.onPopulateVendorKey(<string>msg.data.vendorkey);
         this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType);
+
+        this._omidHandlers[OMSessionInfo.SDK_VERSION] = (msg) => this.sendSDKVersion(openMeasurement.getSDKVersion());
+        this._omidHandlers[OMSessionInfo.SESSION_ID] = (msg) => this.sendSessionId(openMeasurement.getOMAdSessionId());
     }
 
     public connect() {
@@ -236,43 +251,68 @@ export class OMIDEventBridge {
     }
 
     public setIframe(iframe: HTMLIFrameElement) {
-        this._iframe = iframe;
+        this._iframe3p = iframe;
     }
 
-    public sendSDKVersion(sdkVersion: String) {
+    public setAdmobIframe(iframe: HTMLIFrameElement) {
+        this._iframeSessionInterface = iframe;
+    }
+
+    public sendSDKVersion(sdkVersion: string) {
         this.postMessage(OMSessionInfo.SDK_VERSION, sdkVersion);
     }
 
-    public sendSessionId(sessionId: String) {
+    public sendSessionId(sessionId: string) {
         this.postMessage(OMSessionInfo.SESSION_ID, sessionId);
+    }
+
+    public setVerificationsInjected(verificationsInjected: boolean) {
+        this._verificationsInjected = verificationsInjected;
+    }
+
+    public sendQueuedEvents() {
+        while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
+            const event = this._eventQueue.shift();
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        }
     }
 
     public triggerAdEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM ad event "' + type + '" with payload: ' + payload);
-        if (this._iframe.contentWindow) {
-            this._iframe.contentWindow.postMessage({
-                type: type,
-                sessionId: this._sessionId,
-                payload: payload
-            }, '*');
+
+        const event: IVerificationEvent = {
+            type: type,
+            adSessionId: this._openMeasurement.getOMAdSessionId(),
+            payload: payload
+        };
+
+        if (this._iframe3p.contentWindow && this._verificationsInjected) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        } else {
+            this._eventQueue.push(event);
         }
     }
 
     public triggerVideoEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM viewability event "' + type + '" with payload: ' + payload);
-        if (this._iframe.contentWindow) {
-            this._iframe.contentWindow.postMessage({
-                type: type,
-                sessionId: this._sessionId,
-                payload: payload
-            }, '*');
+
+        const event: IVerificationEvent = {
+            type: type,
+            adSessionId: this._openMeasurement.getOMAdSessionId(),
+            payload: payload
+        };
+
+        if (this._iframe3p.contentWindow && this._verificationsInjected) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        } else {
+            this._eventQueue.push(event);
         }
     }
 
     public triggerSessionEvent(event: ISessionEvent) {
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
-        if (this._iframe.contentWindow) {
-            this._iframe.contentWindow.postMessage(event, '*');
+        if (this._iframe3p.contentWindow) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
         }
     }
 
@@ -288,8 +328,8 @@ export class OMIDEventBridge {
     }
 
     private postMessage(event: string, data?: unknown) {
-        if (this._iframe && this._iframe.contentWindow) {
-            this._iframe.contentWindow.postMessage({
+        if (this._iframeSessionInterface && this._iframeSessionInterface.contentWindow) {
+            this._iframeSessionInterface.contentWindow.postMessage({
                 type: event,
                 value: data
             }, '*');

@@ -7,10 +7,14 @@ const VPAIDApiFramework = 'VPAID';
 const VPAIDJavascriptType = 'application/javascript';
 
 export class VPAIDParser {
-    private vastParser: VastParserStrict = new VastParserStrict();
+    private _vastParser: VastParserStrict;
+
+    constructor() {
+        this._vastParser = new VastParserStrict();
+    }
 
     public parse(dom: string): VPAID {
-        const vast = this.vastParser.parseVast(dom);
+        const vast = this._vastParser.parseVast(dom);
         const mediaFile = this.getSupportedMediaFile(vast);
         if (mediaFile) {
             return this.parseFromVast(vast, mediaFile);

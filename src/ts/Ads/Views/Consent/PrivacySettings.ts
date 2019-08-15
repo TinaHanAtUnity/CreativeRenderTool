@@ -116,17 +116,17 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         super.render();
 
         this._privacyRowItemContainer.render();
-        (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._privacyRowItemContainer.container());
+        (<HTMLElement> this._container.querySelector('.info-container')).appendChild(this._privacyRowItemContainer.container());
 
         this._personalizationSwitchGroup.render();
-        (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationSwitchGroup.container());
+        (<HTMLElement> this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationSwitchGroup.container());
 
         this.showView(ViewState.INITIAL);
     }
 
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => {
-            if(handler.onPrivacy) {
+            if (handler.onPrivacy) {
                 handler.onPrivacy(url);
             }
         });
@@ -135,7 +135,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     public hide(): void {
         super.hide();
 
-        if(this._currentViewState === ViewState.PERSONALIZATION) {
+        if (this._currentViewState === ViewState.PERSONALIZATION) {
             this.triggerPersonalizedConsent();
         }
     }
@@ -149,7 +149,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => {
-            if(handler.onPrivacy) {
+            if (handler.onPrivacy) {
                 handler.onPrivacy((<HTMLLinkElement>event.target).href);
             }
         });
@@ -191,7 +191,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     private onReportAdEvent(event: Event): void {
         event.preventDefault();
         if (!this._reportSent) {
-            const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
+            const checkedReportButton = <HTMLElement> this._container.querySelector('.report-choice-radio:checked');
             const reportText = this._container.querySelector('.report-confirmed-text');
             if (checkedReportButton && checkedReportButton.id) {
                 this._reportSent = true;
@@ -225,7 +225,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         };
 
         this._handlers.forEach(handler => {
-            if(handler.onPersonalizedConsent) {
+            if (handler.onPersonalizedConsent) {
                 handler.onPersonalizedConsent(consent);
             }
         });
@@ -272,13 +272,13 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     private onDeleteYourDataLinkEvent(event: Event): void {
         event.preventDefault();
-        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.add('active');
+        (<HTMLElement> this._container.querySelector('.delete-data-container')).classList.add('active');
     }
 
     private onDataDeletionConfirmationEvent(event: Event): void {
         event.preventDefault();
 
-        const dataDeletionContainer = (<HTMLElement>this._container.querySelector('.delete-data-container'));
+        const dataDeletionContainer = (<HTMLElement> this._container.querySelector('.delete-data-container'));
         dataDeletionContainer.classList.remove('active');
         dataDeletionContainer.classList.add('data-deletion-confirmed');
 
@@ -288,7 +288,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     private onDataDeletionCancelEvent(event: Event): void {
         event.preventDefault();
-        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
+        (<HTMLElement> this._container.querySelector('.delete-data-container')).classList.remove('active');
     }
 
     private onViewContainerEvent(event: Event): void {

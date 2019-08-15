@@ -72,7 +72,7 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
                 onEventProcessed: sinon.spy()
             };
 
-            omidEventBridge = new OMIDEventBridge(core, handler, iframe, campaign.getSession().getId());
+            omidEventBridge = new OMIDEventBridge(core, handler, iframe, omInstance);
             omidEventBridge.connect();
         });
 
@@ -235,7 +235,7 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
                     verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onEventProcessed, data.eventType)
                 }
             ];
-            for(const test of tests) {
+            for (const test of tests) {
                 describe(`${test.event} OMID event`, () => {
                     beforeEach(sendEvent(test.event, test.data));
                     it(`should handle the ${test.event} event`, () => test.verify(test.data));

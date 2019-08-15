@@ -75,7 +75,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.completed();
             this._om.sessionFinish({
-                adSessionId: this._campaign.getSession().getId(),
+                adSessionId: this._om.getOMAdSessionId(),
                 timestamp: Date.now(),
                 type: 'sessionFinish',
                 data: {}
@@ -102,14 +102,29 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         if (this._om && !this._omStartCalled) {
-            this._om.sessionStart({
-                adSessionId: this._campaign.getSession().getId(),
-                timestamp: Date.now(),
-                type: 'sessionStart',
-                data: {}
+            this._adUnit.getVideoViewRectangle().then((rect) => {
+                if (this._om) {
+                    const view = this._om.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    this._om.setVideoViewRectangle(view);
+                    this._om.sessionStart({
+                        adSessionId: this._om.getOMAdSessionId(),
+                        timestamp: Date.now(),
+                        type: 'sessionStart',
+                        data: {}
+                    });
+                    this._omStartCalled = true;
+                }
+            }).catch((e) => {
+                if (this._om) {
+                    this._om.sessionStart({
+                        adSessionId: this._om.getOMAdSessionId(),
+                        timestamp: Date.now(),
+                        type: 'sessionStart',
+                        data: {}
+                    });
+                    this._omStartCalled = true;
+                }
             });
-
-            this._omStartCalled = true;
         }
     }
 
@@ -121,7 +136,8 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         if (this._om) {
             this._om.resume();
-            this._om.start(this._vastCampaign.getVideo().getDuration(), this._vastAdUnit.getVolume());
+            this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+            this._om.start(this._vastCampaign.getVideo().getDuration());
             this._om.playerStateChanged(VideoPlayerState.FULLSCREEN);
         }
 
@@ -174,7 +190,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         if (this._om) {
             this._vastAdUnit.setVolume(volume / maxVolume);
-            this._om.volumeChange(this._vastAdUnit.getVolume());
+            this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+            if (this._vastAdUnit.getVideoPlayerMuted()) {
+                this._om.volumeChange(0);
+            } else {
+                this._om.volumeChange(1);
+            }
         }
     }
 

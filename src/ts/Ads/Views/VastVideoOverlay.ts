@@ -11,7 +11,7 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
         super(parameters, privacy, showGDPRBanner, true);
 
         this._seatId = parameters.campaign.getSeatId();
-        this._hasEndcard = parameters.campaign.hasEndscreen();
+        this._hasEndcard = parameters.campaign.hasStaticEndscreen();
     }
 
     protected cleanUpPrivacy() {

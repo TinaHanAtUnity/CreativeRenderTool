@@ -210,7 +210,7 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
                 this.onPageStarted.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;

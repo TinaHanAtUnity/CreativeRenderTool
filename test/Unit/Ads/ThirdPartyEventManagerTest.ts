@@ -58,8 +58,8 @@ describe('ThirdPartyEventManagerTest', () => {
         return thirdPartyEventManager.sendWithGet('click', 'abcde-12345', url, true).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
             let userAgentHeaderExists = false;
-            for(const header of requestSpy.getCall(0).args[1]) {
-                if(header[0] === 'User-Agent') {
+            for (const header of requestSpy.getCall(0).args[1]) {
+                if (header[0] === 'User-Agent') {
                     userAgentHeaderExists = true;
                 }
             }

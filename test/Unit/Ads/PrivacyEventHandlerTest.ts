@@ -79,7 +79,7 @@ import { IStoreApi } from 'Store/IStore';
         describe('on onPrivacy', () => {
             const url = 'http://example.com';
 
-            if(platform === Platform.IOS) {
+            if (platform === Platform.IOS) {
                 it('should open url iOS', () => {
                     const spy = sinon.spy(core.iOS!.UrlScheme, 'open');
                     privacyEventHandler.onPrivacy('http://example.com');
@@ -87,7 +87,7 @@ import { IStoreApi } from 'Store/IStore';
                 });
             }
 
-            if(platform === Platform.ANDROID) {
+            if (platform === Platform.ANDROID) {
                 it('should open url Android', () => {
                     const spy = sinon.spy(core.Android!.Intent, 'launch');
                     privacyEventHandler.onPrivacy(url);

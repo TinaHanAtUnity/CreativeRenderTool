@@ -1,11 +1,11 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ICoreApi } from 'Core/ICore';
-import { IntentData } from 'Core/Native/Android/Intent';
+import { IIntentData } from 'Core/Native/Android/Intent';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IOpenableIntentsRequest {
     id: string;
-    intents: IntentData[];
+    intents: IIntentData[];
 }
 
 export interface IOpenableIntentsResponse {

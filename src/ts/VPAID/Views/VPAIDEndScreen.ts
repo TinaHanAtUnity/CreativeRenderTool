@@ -21,7 +21,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
         this._template = new Template(VastEndScreenTemplate);
 
-        if(campaign) {
+        if (campaign) {
             const landscape = campaign.getCompanionLandscapeUrl();
             const portrait = campaign.getCompanionPortraitUrl();
 
@@ -44,7 +44,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
             }
         ];
 
-        if(CustomFeatures.isTimehopApp(gameId)) {
+        if (CustomFeatures.isTimehopApp(gameId)) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({
@@ -57,12 +57,12 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
     public render(): void {
         super.render();
-        (<HTMLElement>this._container.querySelector('.game-background-portrait')).style.backgroundSize = '100%';
-        (<HTMLElement>this._container.querySelector('.game-background-landscape')).style.backgroundSize = '100%';
+        (<HTMLElement> this._container.querySelector('.game-background-portrait')).style.backgroundSize = '100%';
+        (<HTMLElement> this._container.querySelector('.game-background-landscape')).style.backgroundSize = '100%';
         this._container.style.zIndex = '2';
 
-        if(this._isSwipeToCloseEnabled) {
-            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        if (this._isSwipeToCloseEnabled) {
+            (<HTMLElement> this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
     }
 
@@ -72,7 +72,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
         this._handlers.forEach(handler => handler.onVPAIDEndScreenShow());
 
-        if(AbstractAdUnit.getAutoClose()) {
+        if (AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this._handlers.forEach(handler => handler.onVPAIDEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());

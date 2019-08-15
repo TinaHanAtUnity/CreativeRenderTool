@@ -75,11 +75,11 @@
 | adUnitStyle | object | Style of the ad unit | SDK | all |
 | sessionDepth | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
 | token | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
-| realtimeData | object | If the placement contains data to show a realtime placement | Server | all |
 | projectId | string | Unity project ID | Server | all |
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | string | Organization ID from Genesis' | Server | all |
+| developerId | number | Developer ID from Configuration Service | Server | all |
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
@@ -91,6 +91,10 @@
 | isBackupCampaign | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | isPromoCatalogAvailable | boolean | Flag describing if the developer has set up a catalog for their IAP Promo Placement | SDK | all |
+| noFillRetry | boolean | Flag describing retry should be made upon nofilling | SDK | no |
+| isLoadEnabled | boolean | Flag describing if Auction Request was made using Load API | SDK | all |
+| omidPartnerName | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
+| omidJSVersion | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 
 
 ### Configuration request
@@ -181,7 +185,8 @@
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | isPromoCatalogAvailable | yes | False | True | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
-
+| omidPartnerName | yes | False | True | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
+| omidJSVersion | yes | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 
 
 ### Video events

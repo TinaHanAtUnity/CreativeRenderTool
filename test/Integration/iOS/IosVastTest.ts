@@ -28,7 +28,7 @@ describe('IosVastTest V4', () => {
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
+                if (++readyCount === 1) {
                     done();
                 }
             },

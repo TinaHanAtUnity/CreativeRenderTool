@@ -64,8 +64,8 @@ export abstract class AdUnitContainer {
     }
 
     public removeEventHandler(handler: IAdUnitContainerListener): void {
-        if(this._handlers.length) {
-            if(typeof handler !== 'undefined') {
+        if (this._handlers.length) {
+            if (typeof handler !== 'undefined') {
                 this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
             } else {
                 this._handlers = [];

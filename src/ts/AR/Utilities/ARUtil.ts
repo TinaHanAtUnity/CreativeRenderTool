@@ -56,7 +56,7 @@ export class ARUtil {
         let dstWidth = frameInfo.drawableSize.width;
         let dstHeight = frameInfo.drawableSize.height;
 
-        if(drawableAspectRatio > videoAspectRatio) {
+        if (drawableAspectRatio > videoAspectRatio) {
             dstHeight *= drawableAspectRatio * (1 / videoAspectRatio);
         } else {
             dstWidth *= (1 / drawableAspectRatio) * videoAspectRatio;

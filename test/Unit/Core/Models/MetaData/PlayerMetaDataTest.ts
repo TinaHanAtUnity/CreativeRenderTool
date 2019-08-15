@@ -37,7 +37,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             const metaDataManager = new MetaDataManager(core);
             return metaDataManager.fetch(PlayerMetaData, false).then(metaData => {
-                if(metaData) {
+                if (metaData) {
                     assert.equal(metaData.getServerId(), 'test_sid', 'PlayerMetaData.getServerId() did not pass through correctly');
                     assert.deepEqual(metaData.getDTO(), {
                         sid: 'test_sid'

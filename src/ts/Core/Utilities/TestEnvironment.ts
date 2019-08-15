@@ -6,14 +6,14 @@ export class TestEnvironment {
         const getKeysPromise = metaData.getKeys('test');
         return Promise.all([clearMetaDataPromise, getKeysPromise]).then(([[clearKeyFound, clearKeyValue], keys]) => {
             let deleteValue = false;
-            if(clearKeyFound && typeof clearKeyValue === 'boolean') {
+            if (clearKeyFound && typeof clearKeyValue === 'boolean') {
                 deleteValue = clearKeyValue;
             }
 
             const promises: Promise<void>[] = [];
             keys.forEach((key) => {
                 promises.push(metaData.get('test.' + key, deleteValue).then(([found, value]) => {
-                    if(found) {
+                    if (found) {
                         this._testEnvironment[key] = value;
                     }
                 }));

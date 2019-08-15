@@ -38,7 +38,7 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
     public onContainerShow(): void {
         this._mraid.setViewableState(true);
 
-        if(AbstractAdUnit.getAutoClose()) {
+        if (AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
                 this.hide();

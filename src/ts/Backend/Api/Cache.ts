@@ -19,13 +19,13 @@ export class Cache extends BackendApi {
         const duration: number = 6789;
         const responseCode: number = 200;
 
-        if(this._currentFile !== undefined) {
+        if (this._currentFile !== undefined) {
             return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
         }
 
         this.addFile(fileId, 123, 1445875);
 
-        if(this._internet) {
+        if (this._internet) {
             this._currentFile = url;
             setTimeout(() => {
                 delete this._currentFile;
@@ -42,7 +42,7 @@ export class Cache extends BackendApi {
     }
 
     public getFilePath(fileId: string): Promise<string> {
-        if(fileId in this._files) {
+        if (fileId in this._files) {
             return Promise.resolve(this._filePrefix + fileId);
         }
         return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
@@ -50,8 +50,8 @@ export class Cache extends BackendApi {
 
     public getFiles(): Promise<IFileInfo[]> {
         const files: IFileInfo[] = [];
-        for(const key in this._files) {
-            if(this._files.hasOwnProperty(key)) {
+        for (const key in this._files) {
+            if (this._files.hasOwnProperty(key)) {
                 files.push(this._files[key]);
             }
         }
@@ -59,7 +59,7 @@ export class Cache extends BackendApi {
     }
 
     public getFileInfo(fileId: string): Promise<IFileInfo> {
-        if(fileId in this._files) {
+        if (fileId in this._files) {
             return Promise.resolve(this._files[fileId]);
         }
         return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
@@ -71,10 +71,10 @@ export class Cache extends BackendApi {
 
     public getHashDirect(value: string): string {
         let hash = 0;
-        if(!value.length) {
+        if (!value.length) {
             return hash.toString();
         }
-        for(let i = 0; i < value.length; i++) {
+        for (let i = 0; i < value.length; i++) {
             const char = value.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash;
@@ -98,7 +98,7 @@ export class Cache extends BackendApi {
     public getExtension(url: string): string {
         const splittedUrl = url.split('.');
         let extension: string = '';
-        if(splittedUrl.length > 1) {
+        if (splittedUrl.length > 1) {
             extension = splittedUrl[splittedUrl.length - 1];
         }
         return extension;
@@ -110,8 +110,8 @@ export class Cache extends BackendApi {
 
     public getDownloadedFilesCount(): number {
         let fileCount = 0;
-        for(const key in this._files) {
-            if(this._files.hasOwnProperty(key)) {
+        for (const key in this._files) {
+            if (this._files.hasOwnProperty(key)) {
                 ++fileCount;
             }
         }
@@ -133,8 +133,8 @@ export class Cache extends BackendApi {
     public getMetaData(fileId: string, metadatas: number[]) {
         const retValue = [];
 
-        for(const metadata of metadatas) {
-            switch(metadata) {
+        for (const metadata of metadatas) {
+            switch (metadata) {
                 case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
                     retValue.push([VideoMetadata.METADATA_KEY_VIDEO_WIDTH, 640]);
                     break;

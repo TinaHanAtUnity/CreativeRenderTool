@@ -24,7 +24,7 @@ export class IosVideoPlayerApi extends EventedNativeApi<IIosVideoEventHandler> {
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
-        switch(event) {
+        switch (event) {
             case IosVideoPlayerEvent[IosVideoPlayerEvent.LIKELY_TO_KEEP_UP]:
                 this._handlers.forEach(handler => handler.onLikelyToKeepUp(<string>parameters[0], <boolean>parameters[1]));
                 break;

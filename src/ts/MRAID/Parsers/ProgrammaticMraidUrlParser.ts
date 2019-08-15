@@ -3,10 +3,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
@@ -21,10 +18,10 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = <IRawMraidUrlCampaign>response.getJsonContent();
 
-        if(!jsonMraidUrl) {
+        if (!jsonMraidUrl) {
             throw new Error('Corrupted mraid-url content');
         }
-        if(!jsonMraidUrl.inlinedUrl) {
+        if (!jsonMraidUrl.inlinedUrl) {
             const MRAIDError = new DiagnosticError(
                 new Error('MRAID Campaign missing inlinedUrl'),
                 {mraid: jsonMraidUrl}
@@ -46,7 +43,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId(),
             trackingUrls: response.getTrackingUrls() || {},
-            backupCampaign: false
+            isLoadEnabled: false
         };
 
         const parameters: IMRAIDCampaign = {
@@ -68,7 +65,8 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             bypassAppSheet: undefined,
             store: undefined,
             appStoreId: undefined,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

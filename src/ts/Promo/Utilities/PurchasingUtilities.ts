@@ -3,7 +3,6 @@ import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -21,6 +20,7 @@ import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurc
 import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -41,7 +41,7 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager?: AnalyticsManager) {
+    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager?: IAnalyticsManager) {
         this._core = core;
         this._promo = promo;
         this._purchasing = purchasing;
@@ -67,7 +67,9 @@ export class PurchasingUtilities {
         }).then(() => {
             this._isInitialized = true;
             if (this.configurationIncludesPromoPlacement()) {
-                this._purchasingAdapter.refreshCatalog();
+                this._purchasingAdapter.refreshCatalog().catch(() => {
+                    this._core.Sdk.logDebug('Purchasing Catalog failed to refresh');
+                });
             }
         });
     }
@@ -180,7 +182,7 @@ export class PurchasingUtilities {
     private static _nativeBridge: NativeBridge;
     private static _placementManager: PlacementManager;
     private static _purchasingAdapter: IPurchasingAdapter;
-    private static _analyticsManager: AnalyticsManager | undefined;
+    private static _analyticsManager: IAnalyticsManager | undefined;
     private static _promoEvents: PromoEvents;
     private static _request: RequestManager;
     private static _isInitialized = false;
@@ -200,7 +202,7 @@ export class PurchasingUtilities {
         }
     }
 
-    private static getPurchasingAdapter() : Promise<IPurchasingAdapter> {
+    private static getPurchasingAdapter(): Promise<IPurchasingAdapter> {
         if (this._coreConfig.getTestMode()) {
             return Promise.resolve().then(() => {
                 this._core.Sdk.logInfo('TestMode delegate is set');
@@ -209,10 +211,8 @@ export class PurchasingUtilities {
         }
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             if (isAvailable) {
-                this._core.Sdk.logInfo('CustomPurchasing delegate is set');
                 return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
-                this._core.Sdk.logInfo('UnityPurchasing delegate is set');
                 return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
             }
         }).catch(() => {
@@ -223,7 +223,7 @@ export class PurchasingUtilities {
     private static updateCatalog(products: IProduct[]) {
         try {
             this._catalog = new PurchasingCatalog(products);
-        } catch(e) {
+        } catch (e) {
             this._core.Sdk.logInfo('Error, cannot create catalog: ' + JSON.stringify(e));
         }
     }

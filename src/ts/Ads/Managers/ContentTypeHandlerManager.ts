@@ -10,7 +10,7 @@ export class ContentTypeHandlerManager {
     private _factories: { [key: string]: AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>> } = {};
 
     public addHandler(contentType: string, handler: IContentTypeHandler) {
-        if(!(contentType in this._parsers) && !(contentType in this._factories)) {
+        if (!(contentType in this._parsers) && !(contentType in this._factories)) {
             this._parsers[contentType] = handler.parser;
             this._factories[contentType] = handler.factory;
         } else {
@@ -19,14 +19,14 @@ export class ContentTypeHandlerManager {
     }
 
     public getParser(contentType: string): CampaignParser {
-        if(contentType in this._parsers) {
+        if (contentType in this._parsers) {
             return this._parsers[contentType];
         }
         throw new Error(`Unsupported content-type: ${contentType}`);
     }
 
     public getFactory(contentType: string): AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>> {
-        if(contentType in this._factories) {
+        if (contentType in this._factories) {
             return this._factories[contentType];
         }
         throw new Error(`Unsupported content-type: ${contentType}`);

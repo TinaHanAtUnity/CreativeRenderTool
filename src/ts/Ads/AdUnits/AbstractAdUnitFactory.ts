@@ -44,7 +44,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
 
         if (params.platform === Platform.ANDROID) {
             this.prepareAndroidVideoPlayer(params);
-        } else if(params.platform === Platform.IOS) {
+        } else if (params.platform === Platform.IOS) {
             this.prepareIosVideoPlayer(params);
         }
 

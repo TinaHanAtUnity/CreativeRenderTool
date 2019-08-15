@@ -57,7 +57,7 @@ export class RequestManager {
     public static ErrorResponseCodes = new RegExp('[4-5][0-9]{2}');
 
     public static getHeader(headers: [string, string][], headerName: string): string | null {
-        for(const header of headers) {
+        for (const header of headers) {
             const key = header[0];
             const value = header[1];
             if (key && key.match(new RegExp(headerName, 'i'))) {
@@ -121,7 +121,7 @@ export class RequestManager {
                 return;
             }
 
-            if(TestEnvironment.get('creativeUrl')) {
+            if (TestEnvironment.get('creativeUrl')) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
@@ -185,7 +185,7 @@ export class RequestManager {
         // note: Emergency hack to prevent file URLs from crashing Android native SDK.
         // File URLs should not get this far and they should be rejected earlier.
         // Once validation is fixed, this hack should probably be removed.
-        if(url.substring(0, 7) === 'file://') {
+        if (url.substring(0, 7) === 'file://') {
             Diagnostics.trigger('rejected_get_file_url', {
                 url: url
             });
@@ -208,7 +208,7 @@ export class RequestManager {
         // note: Emergency hack to prevent file URLs from crashing Android native SDK.
         // File URLs should not get this far and they should be rejected earlier.
         // Once validation is fixed, this hack should probably be removed.
-        if(url.substring(0, 7) === 'file://') {
+        if (url.substring(0, 7) === 'file://') {
             Diagnostics.trigger('rejected_post_file_url', {
                 url: url
             });
@@ -234,7 +234,7 @@ export class RequestManager {
         // note: Emergency hack to prevent file URLs from crashing Android native SDK.
         // File URLs should not get this far and they should be rejected earlier.
         // Once validation is fixed, this hack should probably be removed.
-        if(url.substring(0, 7) === 'file://') {
+        if (url.substring(0, 7) === 'file://') {
             Diagnostics.trigger('rejected_head_file_url', {
                 url: url
             });
@@ -242,7 +242,7 @@ export class RequestManager {
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
-        if(this._platform === Platform.ANDROID && this._deviceInfo!.getApiLevel() < 16) {
+        if (this._platform === Platform.ANDROID && this._deviceInfo!.getApiLevel() < 16) {
             headers.push(['Accept-Encoding', '']);
         }
 
@@ -321,13 +321,13 @@ export class RequestManager {
     private invokeRequest(id: number, nativeRequest: INativeRequest): Promise<string> {
         let connectTimeout = RequestManager._connectTimeout;
         let readTimeout = RequestManager._readTimeout;
-        if(nativeRequest.options.timeout) {
+        if (nativeRequest.options.timeout) {
             connectTimeout = nativeRequest.options.timeout;
             readTimeout = nativeRequest.options.timeout;
         }
 
         RequestManager._requests[id] = nativeRequest;
-        switch(nativeRequest.method) {
+        switch (nativeRequest.method) {
             case RequestMethod.GET:
                 return this._core.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
@@ -344,8 +344,8 @@ export class RequestManager {
 
     private finishRequest(id: number, status: RequestStatus, response: INativeResponse | RequestError) {
         const callbackObject = RequestManager._callbacks[id];
-        if(callbackObject) {
-            if(status === RequestStatus.COMPLETE) {
+        if (callbackObject) {
+            if (status === RequestStatus.COMPLETE) {
                 callbackObject.resolve(<INativeResponse>response);
             } else {
                 callbackObject.reject(<RequestError>response);
@@ -356,13 +356,13 @@ export class RequestManager {
     }
 
     private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string, nativeResponse?: INativeResponse): void {
-        if(nativeRequest.retryCount < nativeRequest.options.retries) {
+        if (nativeRequest.retryCount < nativeRequest.options.retries) {
             nativeRequest.retryCount++;
             setTimeout(() => {
                 this.invokeRequest(id, nativeRequest);
             }, nativeRequest.options.retryDelay);
         } else {
-            if(!nativeRequest.options.retryWithConnectionEvents) {
+            if (!nativeRequest.options.retryWithConnectionEvents) {
                 this.finishRequest(id, RequestStatus.FAILED, new RequestError(errorMessage, nativeRequest, nativeResponse));
             }
         }
@@ -378,16 +378,16 @@ export class RequestManager {
         };
         const nativeRequest = RequestManager._requests[id];
 
-        if(!nativeRequest) {
+        if (!nativeRequest) {
             // ignore events without matching id, might happen when webview reinits
             return;
         }
-        if(RequestManager.AllowedResponseCodes.exec(responseCode.toString())) {
+        if (RequestManager.AllowedResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
-        } else if(RequestManager.RedirectResponseCodes.exec(responseCode.toString())) {
-            if(nativeRequest.options.followRedirects) {
+        } else if (RequestManager.RedirectResponseCodes.exec(responseCode.toString())) {
+            if (nativeRequest.options.followRedirects) {
                 const location = RequestManager.getHeader(headers, 'location');
-                if(location && this.followRedirects(location)) {
+                if (location && this.followRedirects(location)) {
                     nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
                 } else {
@@ -396,7 +396,7 @@ export class RequestManager {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
-        } else if(RequestManager.ErrorResponseCodes.exec(responseCode.toString())) {
+        } else if (RequestManager.ErrorResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
         } else {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
@@ -404,7 +404,7 @@ export class RequestManager {
     }
 
     private followRedirects(location: string) {
-        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/\.apk$/i)) {
+        if (location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/\.apk$/i)) {
             return true;
         } else {
             return false;
@@ -415,7 +415,7 @@ export class RequestManager {
         const id = parseInt(rawId, 10);
         const nativeRequest = RequestManager._requests[id];
 
-        if(!nativeRequest) {
+        if (!nativeRequest) {
             // ignore events without matching id, might happen when webview reinits
             return;
         }
@@ -424,10 +424,10 @@ export class RequestManager {
     }
 
     private onNetworkConnected(): void {
-        for(const id in RequestManager._requests) {
-            if(RequestManager._requests.hasOwnProperty(id)) {
+        for (const id in RequestManager._requests) {
+            if (RequestManager._requests.hasOwnProperty(id)) {
                 const request: INativeRequest = RequestManager._requests[id];
-                if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
+                if (request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
                     this.invokeRequest(parseInt(id, 10), request);
                 }
             }

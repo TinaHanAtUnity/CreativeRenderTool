@@ -38,7 +38,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _iframeLoaded = false;
 
-    private _deviceorientationListener: EventListener;
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
 
@@ -121,13 +120,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public render(): void {
         super.render();
 
-        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen-ar');
+        this._loadingScreen = <HTMLElement> this._container.querySelector('.loading-screen-ar');
 
-        this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
-        this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
-        this._arAvailableButton = <HTMLElement>this._container.querySelector('.ar-available-button');
+        this._cameraPermissionPanel = <HTMLElement> this._container.querySelector('.camera-permission-panel');
+        this._permissionLearnMorePanel = <HTMLElement> this._container.querySelector('.permissions-learn-more');
+        this._arAvailableButton = <HTMLElement> this._container.querySelector('.ar-available-button');
 
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#mraid-iframe');
 
         ARUtil.isARSupported(this._ar).then(arSupported => {
             let container = MRAIDContainer;
@@ -156,8 +155,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 if (this._platform === Platform.ANDROID) {
                     this._arAndroidEnumsReceivedObserver = this._ar.AR.Android.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
                 }
-                this._deviceorientationListener = (event: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>event);
-                window.addEventListener('deviceorientation', this._deviceorientationListener, false);
             }).catch((err) => {
                 this._core.Sdk.logError('failed to create mraid: ' + err);
 
@@ -171,7 +168,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public setViewableState(viewable: boolean): void {
-        if(this._iframeLoaded && !this._loadingScreenTimeout) {
+        if (this._iframeLoaded && !this._loadingScreenTimeout) {
             this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
 
@@ -205,15 +202,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             if (this._platform === Platform.ANDROID) {
                 this._ar.AR.Android.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
             }
-            window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
         }
 
-        if(this._loadingScreenTimeout) {
+        if (this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
         }
 
-        if(this._prepareTimeout) {
+        if (this._prepareTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
         }
@@ -225,7 +221,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
         this._loadingScreenTimeout = window.setTimeout(() => {
-            if(this._iframeLoaded) {
+            if (this._iframeLoaded) {
                 this.onShowFallback();
             } else {
                 // start the prepare timeout and wait for the onload event
@@ -249,23 +245,23 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showMRAIDAd() {
         // do not start timer if already running, may happen when switching between fallback and AR modes
-        if(this._updateInterval) {
+        if (this._updateInterval) {
             return;
         }
 
-        if(this._placement.allowSkip()) {
+        if (this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = ARMRAID.CloseLength;
             let skipRemaining = skipLength;
             this._updateInterval = window.setInterval(() => {
-                if(this._closeRemaining > 0) {
+                if (this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
-                if(skipRemaining > 0) {
+                if (skipRemaining > 0) {
                     skipRemaining--;
                     this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
                 }
-                if(skipRemaining <= 0) {
+                if (skipRemaining <= 0) {
                     this._canSkip = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
@@ -279,11 +275,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._closeRemaining = ARMRAID.CloseLength;
             this._updateInterval = window.setInterval(() => {
                 const progress = (ARMRAID.CloseLength - this._closeRemaining) / ARMRAID.CloseLength;
-                if(progress >= 0.75 && !this._didReward) {
+                if (progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());
                     this._didReward = true;
                 }
-                if(this._closeRemaining > 0) {
+                if (this._closeRemaining > 0) {
                     this._closeRemaining--;
                     this.updateProgressCircle(this._closeElement, progress);
                 }
@@ -332,7 +328,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onIframeLoaded() {
         this._iframeLoaded = true;
 
-        if(!this._loadingScreenTimeout) {
+        if (!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
             this.onShowFallback();
@@ -352,20 +348,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private handleAREvent(event: string, parameters: string) {
         if (this._iframeLoaded) {
             this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
-        }
-    }
-
-    private handleDeviceOrientation(event: DeviceOrientationEvent) {
-        if (this._iframeLoaded) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'deviceorientation',
-                event: {
-                    alpha: event.alpha,
-                    beta: event.beta,
-                    gamma: event.gamma,
-                    absolute: event.absolute
-                }
-            }, '*');
         }
     }
 
@@ -473,10 +455,10 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onShowAr() {
         const observer = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
-            if(permission === PermissionTypes.CAMERA) {
+            if (permission === PermissionTypes.CAMERA) {
                 this._core.Permissions.onPermissionsResult.unsubscribe(observer);
 
-                if(granted) {
+                if (granted) {
                     // send event only if permission is granted, otherwise would reload fallback scene
                     this.sendMraidAnalyticsEvent('permission_dialog_ar_mode', undefined);
                     this.onCameraPermissionEvent(true);
@@ -496,7 +478,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private hideLoadingScreen() {
         ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
-            if(this._loadingScreen.style.display === 'none') {
+            if (this._loadingScreen.style.display === 'none') {
                 return;
             }
 

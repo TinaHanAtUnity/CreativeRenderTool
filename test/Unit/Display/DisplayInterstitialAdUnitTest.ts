@@ -58,10 +58,6 @@ import { IStoreApi } from 'Store/IStore';
         let webPlayerContainer: WebPlayerContainer;
         let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
 
-        describe('On static-interstial campaign', () => {
-            adUnitTests();
-        });
-
         function adUnitTests(): void {
             beforeEach(() => {
                 campaign = TestFixtures.getDisplayInterstitialCampaign();
@@ -82,11 +78,11 @@ import { IStoreApi } from 'Store/IStore';
                 const coreConfig = TestFixtures.getCoreConfiguration();
                 const adsConfig = TestFixtures.getAdsConfiguration();
                 clientInfo = TestFixtures.getClientInfo(platform);
-                if(platform === Platform.ANDROID) {
+                if (platform === Platform.ANDROID) {
                     container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
                     deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
                 }
-                if(platform === Platform.IOS) {
+                if (platform === Platform.IOS) {
                     container = new ViewController(core, ads, TestFixtures.getIosDeviceInfo(core), focusManager, clientInfo);
                     deviceInfo = TestFixtures.getIosDeviceInfo(core);
                 }
@@ -193,5 +189,9 @@ import { IStoreApi } from 'Store/IStore';
                 });
             });
         }
+
+        describe('On static-interstial campaign', () => {
+            adUnitTests();
+        });
     });
 });

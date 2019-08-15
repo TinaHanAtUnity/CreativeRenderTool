@@ -8,7 +8,7 @@ describe('GameSessionCountersTest', () => {
 
     const videoCampaign = TestFixtures.getCampaign();
     const cometPlayableCampaign = TestFixtures.getExtendedMRAIDCampaign();
-    let clock : sinon.SinonFakeTimers;
+    let clock: sinon.SinonFakeTimers;
 
     beforeEach(() => {
         clock = sinon.useFakeTimers();

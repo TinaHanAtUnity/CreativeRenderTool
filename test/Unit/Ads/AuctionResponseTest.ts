@@ -15,8 +15,8 @@ describe('AuctionResponse', () => {
             const statusCode = json.statusCode;
             const placements: AuctionPlacement[] = [];
 
-            for(const placement in json.placements) {
-                if(json.placements.hasOwnProperty(placement)) {
+            for (const placement in json.placements) {
+                if (json.placements.hasOwnProperty(placement)) {
                     const auctionPlacement = new AuctionPlacement(placement, mediaId);
                     placements.push(auctionPlacement);
                 }

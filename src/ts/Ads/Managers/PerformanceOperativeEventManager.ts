@@ -30,7 +30,7 @@ export class PerformanceOperativeEventManager extends OperativeEventManager {
 
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, previousPlacementId?: string): Promise<[string, IPerformanceInfoJson]> {
         return super.getInfoJson(params, eventId, gameSession, previousPlacementId).then(([id, infoJson]: [string, IPerformanceInfoJson]) => {
-            if(params.asset) {
+            if (params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }
             return <[string, IInfoJson]>[eventId, infoJson];

@@ -12,7 +12,7 @@ export class FileInfo {
     public static isCached(cache: CacheApi, cacheBookkeeping: CacheBookkeepingManager, url: string): Promise<boolean> {
         return FileId.getFileId(url, cache).then(fileId => {
             return this.getFileInfo(cache, fileId).then(fileInfo => {
-                if(fileInfo && fileInfo.found && fileInfo.size > 0) {
+                if (fileInfo && fileInfo.found && fileInfo.size > 0) {
                     return cacheBookkeeping.getFileInfo(fileId).then(cacheResponse => {
                         return cacheResponse.fullyDownloaded;
                     }).catch(() => {
