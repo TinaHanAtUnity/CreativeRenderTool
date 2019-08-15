@@ -140,13 +140,28 @@ export class CustomFeatures {
         return SliderEndScreenImages[targetGameAppStoreId];
     }
 
-    public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string) {
-        // return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages[targetGameAppStoreId] !== undefined;
-        return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages['com.unity3d.genericremote'] !== undefined;
+    public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameId: number) {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        if ((width === 0 || height === 0) && window.screen !== undefined) {
+            width = window.screen.width;
+            height = window.screen.height;
+        }
+
+        if (width <= 0 || height <= 0) {
+            return false;
+        }
+
+        // Endcard and parallax backgrounds have the same aspect ratio in landscape on iPads, which will prevent us from moving the background.
+        // Prevent parallax effect from running on devices with aspect ratio similar to iPads
+        const aspectRatio = height / width;
+        const isValidAspectRatio = aspectRatio > 4 / 3 || aspectRatio < 3 / 4;
+
+        return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages[targetGameId] !== undefined && isValidAspectRatio;
     }
 
-    public static getParallaxEndScreenData(targetGameAppStoreId: string): number[][] {
-        return ParallaxEndScreenImages[targetGameAppStoreId];
+    public static getParallaxEndScreenData(targetGameId: number): number[][] {
+        return ParallaxEndScreenImages[targetGameId];
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {

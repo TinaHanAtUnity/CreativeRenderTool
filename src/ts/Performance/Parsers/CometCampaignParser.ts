@@ -23,7 +23,7 @@ import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceC
 import { ParallaxPerformanceCampaign } from 'Performance/Models/ParallaxPerformanceCampaign';
 
 const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
-const PARALLAX_SCREENSHOT_BASE_URL = 'http://10.35.33.144:8081/parallax/';
+const PARALLAX_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/parallax/';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
@@ -159,13 +159,13 @@ export class CometCampaignParser extends CampaignParser {
             const osVersion = this._core.DeviceInfo.getOsVersion();
             const platform = this._core.NativeBridge.getPlatform();
 
-            if (CustomFeatures.isParallaxEndScreenEnabled(this._abGroup, parameters.appStoreId)) {
-                const getParallaxEndScreenData = CustomFeatures.getParallaxEndScreenData(parameters.appStoreId);
+            if (CustomFeatures.isParallaxEndScreenEnabled(this._abGroup, parameters.gameId)) {
+                const getParallaxEndScreenData = CustomFeatures.getParallaxEndScreenData(parameters.gameId);
                 if (getParallaxEndScreenData && getParallaxEndScreenData.length > 0) {
                     const screenshots = [];
 
                     for (let i = 0; i < getParallaxEndScreenData.length; i++) {
-                        const url = this.validateAndEncodeUrl(`${PARALLAX_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
+                        const url = this.validateAndEncodeUrl(`${PARALLAX_SCREENSHOT_BASE_URL}${parameters.gameId}/${i}.png`, session);
                         screenshots.push(new Image(url, session));
                     }
 
