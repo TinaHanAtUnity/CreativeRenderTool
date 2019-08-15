@@ -12,9 +12,6 @@ export class IosUtils {
         } else {
             return false;
         }
-
-        // to disable iOS 12: osVersion.match(/^12\.[0-9]/)
-        // to disable iOS 11: osVersion.match(/^11\.[0-4]/)
     }
 
     public static hasVideoStallingApi(osVersion: string): boolean {
