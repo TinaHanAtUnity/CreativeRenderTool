@@ -35,6 +35,10 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
         this.postMessage('viewable', viewable);
     }
 
+    public sendURLEvent(url: string) {
+        this.postMessage('url', url);
+    }
+
     public sendDeviceOrientationEvent(event: DeviceOrientationEvent): void {
         this.postMessage('deviceorientation_unity_v1', {
             alpha: event.alpha,

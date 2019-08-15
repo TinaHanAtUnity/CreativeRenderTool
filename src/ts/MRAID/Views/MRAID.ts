@@ -134,6 +134,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._playableStartTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_start');
+
+        const htmlResource = this._campaign.getResourceUrl();
+        if (htmlResource) {
+            this._mraidAdapterContainer.sendURLEvent(htmlResource.getOriginalUrl());
+        }
     }
 
     protected onOpen(url: string) {

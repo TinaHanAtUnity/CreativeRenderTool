@@ -44,16 +44,33 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
             mraidAdapterContainer = new MRAIDAdapterContainer(handler);
             containerHandler = mraidAdapterContainer.getHandler();
 
-            iframe = document.createElement('iframe');
-            document.body.appendChild(iframe);
+            iframe = sinon.createStubInstance(HTMLIFrameElement);
+            Object.defineProperty(iframe, 'contentWindow', {
+                value: {
+                    postMessage: sinon.spy()
+                }
+            });
 
             mraidAdapter = new MRAIDIFrameEventAdapter(core, mraidAdapterContainer, iframe);
             mraidAdapter.connect();
         });
 
         afterEach(() => {
-            document.body.removeChild(iframe);
             mraidAdapter.disconnect();
+        });
+
+        describe('send MRAID events', () => {
+            it('should send viewable event via postmessage', () => {
+                const expected = true;
+                mraidAdapter.sendViewableEvent(true);
+                sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage, { type: 'viewable', value: expected });
+            });
+
+            it('should send url event via postmessage', () => {
+                const expected = 'https://www.unity3d.com';
+                mraidAdapter.sendURLEvent('https://www.unity3d.com');
+                sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage, { type: 'url', value: expected });
+            });
         });
 
         describe('receiving MRAID events', () => {
