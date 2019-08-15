@@ -31,6 +31,10 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
         this._eventAdapter.sendViewableEvent(viewable);
     }
 
+    public sendURLEvent(url: string) {
+        this._eventAdapter.sendURLEvent(url);
+    }
+
     public sendDeviceOrientationEvent(event: DeviceOrientationEvent) {
         this._eventAdapter.sendDeviceOrientationEvent(event);
     }
