@@ -32,7 +32,7 @@ export class PerformanceParallaxEndScreen extends PerformanceEndScreen {
 
         const screenshots = campaign.getScreenshots().map(s => s.getUrl());
         const screenshotLayout = campaign.getScreenshotLayout();
-        this._parallaxScreen = new ParallaxScreen(screenshots, screenshotLayout);
+        this._parallaxScreen = new ParallaxScreen(screenshots, screenshotLayout, this.onDownloadCallback);
     }
 
     public show(): void {
@@ -44,8 +44,6 @@ export class PerformanceParallaxEndScreen extends PerformanceEndScreen {
             this._parallaxEventParameters.parallaxReadyWhenShown = parallaxWasReady;
         }
     }
-
-    private onDownloadCallback = (event: Event) => this.onDownloadEvent(event);
 
     public hide(): void {
         super.hide();
@@ -66,6 +64,23 @@ export class PerformanceParallaxEndScreen extends PerformanceEndScreen {
 
     protected getTemplate() {
         return ParallaxEndScreenTemplate;
+    }
+
+    private onDownloadCallback = (event: Event) => this.onDownloadEvent(event);
+
+    protected onDownloadEvent(event: Event): void {
+        event.preventDefault();
+        this._parallaxEventParameters.downloadClicked = true;
+        this.sendParallaxUsageDataEventToKafka();
+        this._handlers.forEach(handler => handler.onEndScreenDownload({
+            clickAttributionUrl: this._campaign.getClickAttributionUrl(),
+            clickAttributionUrlFollowsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
+            bypassAppSheet: this._campaign.getBypassAppSheet(),
+            appStoreId: this._campaign.getAppStoreId(),
+            store: this._campaign.getStore(),
+            appDownloadUrl: this._campaign.getAppDownloadUrl(),
+            adUnitStyle: this._adUnitStyle
+        }));
     }
 
     private sendParallaxUsageDataEventToKafka() {

@@ -1,4 +1,6 @@
 
+type OnDownloadCallback = (event: Event) => void;
+
 export interface IParallaxLayerParams {
   xOffset: number;
   yOffset: number;
@@ -32,7 +34,7 @@ export class ParallaxLayer {
         }
     }
 
-    public loadImage(url: string): Promise<ParallaxLayer> {
+    public loadImage(url: string, onDownloadCallback: OnDownloadCallback): Promise<ParallaxLayer> {
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = (event: Event) => {
@@ -44,6 +46,7 @@ export class ParallaxLayer {
                 resolve(this);
             };
             img.src = url;
+            img.addEventListener('click', onDownloadCallback);
         });
     }
 

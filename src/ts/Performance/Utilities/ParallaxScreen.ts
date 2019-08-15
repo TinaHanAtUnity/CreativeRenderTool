@@ -1,6 +1,8 @@
 import { ParallaxCamera } from 'Performance/Utilities/ParallaxCamera';
 import { ParallaxLayer } from 'Performance/Utilities/ParallaxLayer';
 
+type OnDownloadCallback = (event: Event) => void;
+
 const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 const cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame;
 
@@ -15,7 +17,7 @@ export class ParallaxScreen {
     private _landscape: boolean;
     private _currentX: number;
 
-    constructor(screenshots: string[], parallaxLayerParams: number[][]) {
+    constructor(screenshots: string[], parallaxLayerParams: number[][], onDownloadCallback: OnDownloadCallback) {
         this._ready = false;
         this._layers = [];
         this._parallaxCamera = new ParallaxCamera(MAX_DEVICE_ROTATION);
@@ -31,7 +33,7 @@ export class ParallaxScreen {
                 transformOffset: screenshotPosition[3],
             };
             const layer = new ParallaxLayer(params);
-            return layer.loadImage(url);
+            return layer.loadImage(url, onDownloadCallback);
         });
 
         Promise.all(layerPromises).then((layers) => {
