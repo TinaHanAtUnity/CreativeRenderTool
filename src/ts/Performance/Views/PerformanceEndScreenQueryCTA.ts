@@ -20,7 +20,7 @@ export class PerformanceEndScreenQueryCTA extends PerformanceEndScreen {
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.download-no'
+                selector: '.download-no, .btn-close-region'
             },
             {
                 event: 'click',
