@@ -50,6 +50,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -963,6 +964,8 @@ export class CampaignManager {
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
                 body.isLoadEnabled = this._isLoadEnabled;
+                body.omidPartnerName = PARTNER_NAME;
+                body.omidJSVersion = OM_JS_VERSION;
 
                 const organizationId = this._coreConfig.getOrganizationId();
                 if (organizationId) {
