@@ -3,6 +3,7 @@
 * Open Measurement - Add OMID support params to auction request body [#10865](https://github.com/Applifier/unity-ads-webview/pull/10865)
 * Reintroduce Query CTA on End Screen with X Button Experiment [#10867](https://github.com/Applifier/unity-ads-webview/pull/10806)
 * Open Measurement - Handle UnMatched VendorKey [#10806](https://github.com/Applifier/unity-ads-webview/pull/10806)
+* add getCreativeURL api for Mraid container[#10813](https://github.com/Applifier/unity-ads-webview/pull/10813)
 
 # Wed Aug 14 18:17:15 UTC 2019
 
