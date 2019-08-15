@@ -5,6 +5,8 @@
 * Open Measurement - Handle UnMatched VendorKey [#10806](https://github.com/Applifier/unity-ads-webview/pull/10806)
 * add getCreativeURL api for Mraid container[#10813](https://github.com/Applifier/unity-ads-webview/pull/10813)
 * Open Measurement - Clean up session interface for admob [#10840](https://github.com/Applifier/unity-ads-webview/pull/10840)
+* Reintroduce Appsheet for Supported Apple Devices in Portrait Mode [#10805](https://github.com/Applifier/unity-ads-webview/pull/10805)
+* Fix URL Validation Bug for http URLs [#10866](https://github.com/Applifier/unity-ads-webview/pull/10866)
 
 # Wed Aug 14 18:17:15 UTC 2019
 
