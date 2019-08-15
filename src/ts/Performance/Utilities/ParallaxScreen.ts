@@ -11,7 +11,7 @@ export class ParallaxScreen {
     private _raf: number;
     private _parallaxCamera: ParallaxCamera;
     private _ready: boolean;
-    private _root: HTMLElement;
+    private _rootElement: HTMLElement;
     private _landscape: boolean;
     private _currentX: number;
 
@@ -41,57 +41,48 @@ export class ParallaxScreen {
     }
 
     private resizeHandler(): void {
-        setTimeout(() => this.setPosition(), 100);
+        setTimeout(() => this.resizeLayers(), 100);
     }
 
-    setPosition = () => {
-        if (this._ready && this._root && this._root.parentElement) {
-            const background = this._layers[0];
-            const [width, height] = background.getSize();
-
-            const rootStyle = window.getComputedStyle(this._root.parentElement);
-            const rootHeight = parseInt(rootStyle.getPropertyValue('height'));
-            const rootWidth = parseInt(rootStyle.getPropertyValue('width'));
-
-            if (!rootHeight || !rootWidth) {
-              return false;
-            }
-
-            const scale = rootHeight / height;
-            const xOffset = (1 / 2) * (width * scale - rootWidth);
-            this._layers.forEach((layer) => layer.scale(scale, rootWidth, rootHeight, xOffset, width));
-
-            this._landscape = rootWidth < rootHeight;
+    resizeLayers = (): boolean => {
+        if(!this._ready || !this._rootElement || !this._rootElement.parentElement) {
+            return false;
         }
+
+        const background = this._layers[0];
+        const [width, height] = background.getSize();
+
+        const rootStyle = window.getComputedStyle(this._rootElement.parentElement);
+        const rootHeight = parseInt(rootStyle.getPropertyValue('height'));
+        const rootWidth = parseInt(rootStyle.getPropertyValue('width'));
+
+        if (!rootHeight || !rootWidth) {
+            return false;
+        }
+
+        const scale = rootHeight / height;
+        const xOffset = (1 / 2) * (width * scale - rootWidth);
+        this._layers.forEach((layer) => layer.scale(scale, rootWidth, rootHeight, xOffset, width));
+
+        this._landscape = rootWidth < rootHeight;
+        return true;
     }
 
     public show(): boolean {
-        if (this._ready && this._root && this._root.parentElement) {
-            window.addEventListener('resize', (this.resizeHandler).bind(this));
-            const background = this._layers[0];
-            const [width, height] = background.getSize();
-
-            const rootStyle = window.getComputedStyle(this._root.parentElement);
-            const rootHeight = parseInt(rootStyle.getPropertyValue('height'));
-            const rootWidth = parseInt(rootStyle.getPropertyValue('width'));
-
-            if (!rootHeight || !rootWidth) {
-              return false;
-            }
-
-            const scale = rootHeight / height;
-            const xOffset = (1 / 2) * (width * scale - rootWidth);
-            this._layers.forEach((layer) => {
-              layer.scale(scale, rootWidth, rootHeight, xOffset, width);
-              layer.attachTo(this._root);
-            });
-            this._parallaxCamera.load();
-            this._raf = requestAnimationFrame(this.update);
-
-            this._landscape = rootWidth < rootHeight;
-            return true;
+        if(!this._ready || !this._rootElement || !this._rootElement.parentElement) {
+            return false;
         }
-        return false;
+
+        window.addEventListener('resize', (this.resizeHandler).bind(this));
+
+        if (!this.resizeLayers()) {
+            return false;
+        }
+
+        this._layers.forEach((layer) => layer.attachTo(this._rootElement));
+        this._parallaxCamera.load();
+        this._raf = requestAnimationFrame(this.update);
+        return true;
     }
 
     public hide(): void {
@@ -99,7 +90,7 @@ export class ParallaxScreen {
     }
 
     public attachTo(element: HTMLElement): void {
-      this._root = element;
+      this._rootElement = element;
     }
 
     private transformLayers(x: number): void {
