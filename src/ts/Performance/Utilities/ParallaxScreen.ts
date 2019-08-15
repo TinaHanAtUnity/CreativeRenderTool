@@ -30,7 +30,7 @@ export class ParallaxScreen {
                 xOffset: screenshotPosition[0],
                 yOffset: screenshotPosition[1],
                 distance: screenshotPosition[2],
-                transformOffset: screenshotPosition[3],
+                transformOffset: screenshotPosition[3]
             };
             const layer = new ParallaxLayer(params);
             return layer.loadImage(url, onDownloadCallback);
@@ -46,8 +46,8 @@ export class ParallaxScreen {
         setTimeout(() => this.resizeLayers(), 100);
     }
 
-    resizeLayers = (): boolean => {
-        if(!this._ready || !this._rootElement || !this._rootElement.parentElement) {
+    private resizeLayers = (): boolean => {
+        if (!this._ready || !this._rootElement || !this._rootElement.parentElement) {
             return false;
         }
 
@@ -55,8 +55,8 @@ export class ParallaxScreen {
         const [width, height] = background.getSize();
 
         const rootStyle = window.getComputedStyle(this._rootElement.parentElement);
-        const rootHeight = parseInt(rootStyle.getPropertyValue('height'));
-        const rootWidth = parseInt(rootStyle.getPropertyValue('width'));
+        const rootHeight = parseInt(rootStyle.getPropertyValue('height'), 10);
+        const rootWidth = parseInt(rootStyle.getPropertyValue('width'), 10);
 
         if (!rootHeight || !rootWidth) {
             return false;
@@ -71,7 +71,7 @@ export class ParallaxScreen {
     }
 
     public show(): boolean {
-        if(!this._ready || !this._rootElement || !this._rootElement.parentElement) {
+        if (!this._ready || !this._rootElement || !this._rootElement.parentElement) {
             return false;
         }
 
