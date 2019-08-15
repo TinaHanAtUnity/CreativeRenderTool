@@ -558,5 +558,19 @@
     "description": "Flag describing if the campaign was loaded using Load API or from Precached Initialization",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "omidPartnerName",
+    "type": "string",
+    "description": "Flag describing the omid partner name indicating omid is supported",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "omidJSVersion",
+    "type": "string",
+    "description": "Flag describing the omid js implementation version indicating omid is supported",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

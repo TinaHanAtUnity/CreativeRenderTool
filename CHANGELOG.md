@@ -1,3 +1,7 @@
+# Pending
+
+* Open Measurement - Add OMID support params to auction request body [#10865](https://github.com/Applifier/unity-ads-webview/pull/10865)
+
 # Wed Aug 14 18:17:15 UTC 2019
 
 * Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
