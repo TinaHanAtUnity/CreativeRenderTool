@@ -4,6 +4,8 @@ import { ParallaxLayer } from 'Performance/Utilities/ParallaxLayer';
 const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 const cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame;
 
+const MAX_DEVICE_ROTATION = Math.PI / 6;
+
 export class ParallaxScreen {
     private _layers: ParallaxLayer[];
     private _raf: number;
@@ -16,8 +18,7 @@ export class ParallaxScreen {
     constructor(screenshots: string[], parallaxLayerParams: number[][]) {
         this._ready = false;
         this._layers = [];
-        const maxAngle = Math.PI / 6;
-        this._parallaxCamera = new ParallaxCamera(maxAngle);
+        this._parallaxCamera = new ParallaxCamera(MAX_DEVICE_ROTATION);
         this._landscape = false;
         this._currentX = 0;
 
