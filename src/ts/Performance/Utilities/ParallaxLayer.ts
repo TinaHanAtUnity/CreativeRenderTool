@@ -6,7 +6,7 @@ export interface IParallaxLayerParams {
   yOffset: number;
   distance: number;
   transformOffset: number;
-};
+}
 
 export class ParallaxLayer {
     private _xOffset: number;
@@ -66,6 +66,6 @@ export class ParallaxLayer {
       this._img.style.top = `${this._params.yOffset * scale}px`;
       this._xMaximum = xRootOffset;
       this._xOffset = this._params.xOffset * scale - xRootOffset * this._params.transformOffset;
-      this._img.style.left = `${this._xOffset}px`
+      this._img.style.left = `${this._xOffset}px`;
     }
 }

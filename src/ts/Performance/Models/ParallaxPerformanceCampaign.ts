@@ -14,6 +14,6 @@ export class ParallaxPerformanceCampaign extends PerformanceCampaign {
     }
 
     public getScreenshotLayout() {
-      return this.get('screenshotLayout') || [];
+      return this.get('screenshotLayout') || [];
     }
 }

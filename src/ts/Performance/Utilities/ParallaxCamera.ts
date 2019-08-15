@@ -1,5 +1,5 @@
-import { Quaternion } from "Performance/Utilities/Quaternion";
-import { Vector3 } from "Performance/Utilities/Vector3";
+import { Quaternion } from 'Performance/Utilities/Quaternion';
+import { Vector3 } from 'Performance/Utilities/Vector3';
 
 export class ParallaxCamera {
     private _initialAlpha: number;

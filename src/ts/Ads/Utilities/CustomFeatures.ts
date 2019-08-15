@@ -143,7 +143,7 @@ export class CustomFeatures {
     public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameId: number) {
         let width = window.innerWidth;
         let height = window.innerHeight;
-        if ((width === 0 || height === 0) && window.screen !== undefined) {
+        if ((width === 0 || height === 0) && window.screen !== undefined) {
             width = window.screen.width;
             height = window.screen.height;
         }
