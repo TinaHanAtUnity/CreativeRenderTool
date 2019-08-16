@@ -31,7 +31,7 @@ export class Vector3 {
         return this.x * vector.x + this.y * vector.y + this.z * vector.z;
     }
 
-    // p' = qpq*
+    // Use formula p' = qpq* to calculate new vector p' from vector p rotated by a quaternion q, where q* is quoternion conjugate
     public applyQuaternion(q: Quaternion): void {
         //tslint:disable-next-line:no-this-assignment
         const { x, y, z } = this;
