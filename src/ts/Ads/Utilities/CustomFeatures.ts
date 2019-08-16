@@ -149,12 +149,6 @@ export class CustomFeatures {
         return gameId === '2988443';
     }
 
-    public static isWhiteListedForLoadApi(gameId: string) {
-        return gameId === '2988443' ||  // Zynga Solitaire          : Android
-               gameId === '2988494' ||  // Zynga Freecell           : iOS
-               gameId === '2988495';    // Zynga Freecell Solitaire : Android
-    }
-
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;
