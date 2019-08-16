@@ -16,6 +16,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { QueryCTATest } from 'Core/Models/ABGroup';
+import { PerformanceEndScreenQueryCTASquare } from 'Performance/Views/PerformanceEndScreenQueryCTASquare';
+import { PerformanceEndScreenQueryCTA } from 'Performance/Views/PerformanceEndScreenQueryCTA';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -43,10 +46,17 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
+        const abGroup = baseParams.coreConfig.getAbGroup();
         let endScreen: PerformanceEndScreen;
 
         if (baseParams.campaign instanceof SliderPerformanceCampaign) {
             endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (QueryCTATest.isValid(abGroup)) {
+            if (baseParams.campaign.getSquare() === undefined) {
+                endScreen = new PerformanceEndScreenQueryCTA(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            } else {
+                endScreen = new PerformanceEndScreenQueryCTASquare(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            }
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

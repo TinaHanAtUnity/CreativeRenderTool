@@ -37,22 +37,40 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 onBridgeResizeWebview: sinon.spy(),
                 onBridgeSendStats: sinon.spy(),
                 onBridgeAREvent: sinon.spy(),
-                onBridgeArReadyToShow: sinon.spy()
+                onBridgeArReadyToShow: sinon.spy(),
+                onBridgeDeviceOrientationSubscribe: sinon.spy()
             };
 
             mraidAdapterContainer = new MRAIDAdapterContainer(handler);
             containerHandler = mraidAdapterContainer.getHandler();
 
-            iframe = document.createElement('iframe');
-            document.body.appendChild(iframe);
+            iframe = sinon.createStubInstance(HTMLIFrameElement);
+            Object.defineProperty(iframe, 'contentWindow', {
+                value: {
+                    postMessage: sinon.spy()
+                }
+            });
 
             mraidAdapter = new MRAIDIFrameEventAdapter(core, mraidAdapterContainer, iframe);
             mraidAdapter.connect();
         });
 
         afterEach(() => {
-            document.body.removeChild(iframe);
             mraidAdapter.disconnect();
+        });
+
+        describe('send MRAID events', () => {
+            it('should send viewable event via postmessage', () => {
+                const expected = true;
+                mraidAdapter.sendViewableEvent(true);
+                sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage, { type: 'viewable', value: expected });
+            });
+
+            it('should send url event via postmessage', () => {
+                const expected = 'https://www.unity3d.com';
+                mraidAdapter.sendURLEvent('https://www.unity3d.com');
+                sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage, { type: 'url', value: expected });
+            });
         });
 
         describe('receiving MRAID events', () => {
@@ -201,6 +219,24 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'landscape'}));
                 it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE);
+                });
+            });
+
+            describe(`${MRAIDEvents.DEVORIENTATION_SUB} MRAID event`, () => {
+                const sendEvent = (e: string, data?: any) => {
+                    return () => {
+                        return new Promise((res) => {
+                            window.postMessage({
+                                type: e,
+                                properties: data
+                            }, '*');
+                            setTimeout(res);
+                        });
+                    };
+                };
+                beforeEach(sendEvent(MRAIDEvents.DEVORIENTATION_SUB, {}));
+                it(`should handle the ${MRAIDEvents.DEVORIENTATION_SUB} event`, () => {
+                    sinon.assert.called(<sinon.SinonSpy>containerHandler.onBridgeDeviceOrientationSubscribe);
                 });
             });
         });

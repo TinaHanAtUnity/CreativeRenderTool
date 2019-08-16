@@ -26,6 +26,7 @@
                 };
 
                 var viewable = false;
+                var creativeUrl = 'none';
 
                 var orientationProperties = {
                     allowOrientationChange: true,
@@ -94,6 +95,11 @@
                             trigger('permissionChange', [event.data.value.type, event.data.value.status]);
                             triggerExperienceType(event.data.value.type, event.data.value.status);
                             break;
+
+                        case 'url':
+                            creativeUrl = event.data.value;
+                            break;
+
                         default:
                             break;
                     }
@@ -200,6 +206,10 @@
                     return viewable;
                 };
 
+                this.getCreativeURL = function() {
+                    return creativeUrl;
+                };
+
                 this.open = function(url) {
                     window.parent.postMessage({
                         type: 'open',
@@ -278,6 +288,7 @@
             window.mraid = new MRAID();
         })();
     </script>
+    <script id="deviceorientation-support"></script>
     <script id="debug-js-console"></script>
     <script id="webar"></script>
 </head>

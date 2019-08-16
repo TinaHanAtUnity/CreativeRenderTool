@@ -48,6 +48,9 @@ import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -144,7 +147,7 @@ export class CampaignManager {
 
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy(), this._coreConfig.getAbGroup());
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -215,7 +218,7 @@ export class CampaignManager {
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy(), this._coreConfig.getAbGroup());
 
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
@@ -342,6 +345,22 @@ export class CampaignManager {
                             if (error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if (error === CacheStatus.FAILED) {
+                                if (auctionResponse.getContentType() === PromoCampaignParser.ContentType) {
+                                    const placementIds = fill[mediaId].map(placement => placement.getPlacementId()).join();
+                                    PromoErrorService.report(this._request, {
+                                        auctionID: session ? session.getId() : undefined,
+                                        corrID: auctionResponse.getCorrelationId(),
+                                        country: this._coreConfig.getCountry(),
+                                        projectID: this._coreConfig.getUnityProjectId(),
+                                        gameID: this._clientInfo.getGameId(),
+                                        placementID: placementIds,
+                                        productID: undefined,
+                                        platform: this._platform,
+                                        gamerToken: this._coreConfig.getToken(),
+                                        errorCode: 104,
+                                        errorMessage: 'Unable to retrieve and cache asset'
+                                    });
+                                }
                                 return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if (error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
@@ -582,10 +601,6 @@ export class CampaignManager {
                 return undefined;
             });
         } else {
-            Diagnostics.trigger('load_campaign_no_fill', {
-                mediaId: mediaId,
-                trackingUrls: trackingUrls
-            });
             return Promise.resolve(undefined);
         }
     }
@@ -718,6 +733,22 @@ export class CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: AuctionPlacement[], session?: Session): Promise<void> {
+        if (contentType === PromoCampaignParser.ContentType) {
+            const placementIds = placements.map(placement => placement.getPlacementId()).join();
+            PromoErrorService.report(this._request, {
+                auctionID: session ? session.getId() : undefined,
+                corrID: undefined,
+                country: this._coreConfig.getCountry(),
+                projectID: this._coreConfig.getUnityProjectId(),
+                gameID: this._clientInfo.getGameId(),
+                placementID: placementIds,
+                productID: undefined,
+                platform: this._platform,
+                gamerToken: this._coreConfig.getToken(),
+                errorCode: 103,
+                errorMessage: campaignError.errorMessage
+            });
+        }
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
         return this.handlePlacementError(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
@@ -933,6 +964,8 @@ export class CampaignManager {
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
                 body.isLoadEnabled = this._isLoadEnabled;
+                body.omidPartnerName = PARTNER_NAME;
+                body.omidJSVersion = OM_JS_VERSION;
 
                 const organizationId = this._coreConfig.getOrganizationId();
                 if (organizationId) {
