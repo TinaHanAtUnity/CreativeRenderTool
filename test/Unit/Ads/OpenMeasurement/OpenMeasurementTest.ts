@@ -65,7 +65,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p);
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {

@@ -6,6 +6,7 @@ import {
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export class AppleStoreHandler extends StoreHandler {
 
@@ -21,8 +22,8 @@ export class AppleStoreHandler extends StoreHandler {
 
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
         super.onDownload(parameters);
-
-        const isAppSheetBroken = IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel());
+        const orientation = this._deviceInfo.get('screenWidth') >= this._deviceInfo.get('screenHeight') ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+        const isAppSheetBroken = IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel(), orientation);
         if (parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
             if (!parameters.clickAttributionUrlFollowsRedirects) {
