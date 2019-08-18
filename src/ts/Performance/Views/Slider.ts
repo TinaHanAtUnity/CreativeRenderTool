@@ -126,11 +126,15 @@ export class Slider {
         this._rootElement.appendChild(indicatorContainer);
     }
 
+    private modulo (num: number, div: number): number {
+        return ((num % div) + div) % div;
+    }
+
     private updateIndicators(): void {
         for (const indicator of this._indicators) {
             indicator.classList.remove('active');
         }
-        this._indicators[this._currentSlideIndex].classList.add('active');
+        this._indicators[this.modulo(this._currentSlideIndex, this._slides.length)].classList.add('active');
     }
 
     private initializeTouchEvents(): void {
@@ -200,7 +204,6 @@ export class Slider {
             } else {
                 targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
             }
-
             this.slideHandler(targetSlideIndex);
             this._drag = this.clearDrag();
         } else if (this._drag.startX !== this._drag.curX) {
@@ -218,17 +221,6 @@ export class Slider {
         } else {
             targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
         }
-
-        const swipeLength = this._drag.swipeLength;
-        let positionRatio = swipeLength / 100;
-        const maxPositionRatio: number = 1;
-        const minPositionRatio: number = 0.8;
-        positionRatio = Math.min(Math.max(positionRatio, minPositionRatio), maxPositionRatio);
-
-        const maxBlurAmount: number = 5;
-        const minBlurAmount: number = 0;
-        let blurAmount = maxBlurAmount - swipeLength * maxBlurAmount / 100;
-        blurAmount = Math.min(Math.max(blurAmount, minBlurAmount), maxBlurAmount);
     }
 
     private getSlideCount(): number {
@@ -376,28 +368,36 @@ export class Slider {
 
         this._isAnimating = true;
 
-        if (targetSlideIndex < 0) {
+        if (targetSlideIndex < -1) {
             this._currentSlideIndex = this._slideCount + targetSlideIndex;
-        } else if (targetSlideIndex >= this._slideCount) {
+        } else if (targetSlideIndex >= (this._slideCount + 1)) {
             this._currentSlideIndex = targetSlideIndex - this._slideCount;
         } else {
             this._currentSlideIndex = targetSlideIndex;
         }
+        this.setActiveSlide();
         this.animateSlide(targetTransitionPosition, () => {
             // slide calback
-            this.setActiveSlide();
             this._onSlideCallback({ automatic });
             this.postSlide();
         });
         this.updateIndicators();
     }
 
-    private setActiveSlide(): void {
-        const currentSlide = this._slides[this._currentSlideIndex];
-
+    private setActiveSlide(instant?: boolean): void {
         for (const child of this._slidesContainer.children) {
             const slide = <HTMLElement>child;
-            slide === currentSlide
+            const index = parseInt(slide.getAttribute('slide-index')!, 10);
+            if (instant && index === this._currentSlideIndex) {
+                slide.style.transform = 'scale(1)';
+                slide.style.filter = 'blur(0)';
+                slide.style.transition = 'all 0s';
+            } else {
+                slide.style.transform = '';
+                slide.style.filter = '';
+                slide.style.transition = '';
+            }
+            index === this._currentSlideIndex && !instant
                 ? slide.classList.add('active-slide')
                 : slide.classList.remove('active-slide');
         }
@@ -405,6 +405,14 @@ export class Slider {
 
     private postSlide(): void {
         this._isAnimating = false;
+        if (this._currentSlideIndex === this._slides.length) {
+            this._currentSlideIndex = 0;
+            this.setActiveSlide(true);
+        }
+        if (this._currentSlideIndex === -1) {
+            this._currentSlideIndex = this._slides.length - 1;
+            this.setActiveSlide(true);
+        }
         this.setPosition();
         this.autoplay();
     }
