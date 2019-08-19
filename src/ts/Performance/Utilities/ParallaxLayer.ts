@@ -53,6 +53,7 @@ export class ParallaxLayer {
     public transform(x: number): void {
         const xPos = x * this._distance * this._xMaximum;
         this._img.style.transform = `translate3d(${xPos}px, 0, 0)`;
+        this._img.style.webkitTransform = `translate3d(${xPos}px, 0, 0)`;
     }
 
     public getSize(): number[] {
