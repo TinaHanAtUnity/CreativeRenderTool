@@ -55,7 +55,9 @@ export class ParallaxCamera {
             this._initialAlpha = this._alpha;
         }
         this._alpha -= this._initialAlpha;
-
+        if (this._alpha < 0) {
+            this._alpha += 360;
+        }
         this._orientationUpdated = true;
     }
 
