@@ -3,8 +3,8 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 
 export class ParallaxPerformanceCampaign extends PerformanceCampaign {
     public getOptionalAssets() {
-        const assets: Asset[] = super.getOptionalAssets();
-        assets.push(...this.getScreenshots());
+        const assets: Asset[] = [];
+        assets.push(this.getGameIcon());
 
         return assets;
     }
