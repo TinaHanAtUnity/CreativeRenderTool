@@ -89,6 +89,7 @@ export class ParallaxScreen {
 
     public hide(): void {
         this._parallaxCamera.unload();
+        cancelAnimationFrame(this._raf);
     }
 
     public attachTo(element: HTMLElement): void {
