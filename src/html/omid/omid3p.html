@@ -175,14 +175,14 @@
                         /*
                         * AD AND VIDEO EVENTS:
                         */
-                        payload = event.data.payload;
-                        const eventData = {
-                                adSessionId: event.data.adSessionId,
-                                timestamp: Date.now(),
-                                type: stripEventString(event.data.type),
-                                data: payload
-                        }
                         if (event.data.type in eventHandlers) {
+                            payload = event.data.payload;
+                            const eventData = {
+                                    adSessionId: event.data.adSessionId,
+                                    timestamp: Date.now(),
+                                    type: stripEventString(event.data.type),
+                                    data: payload
+                            }
                             var handler = eventHandlers[event.data.type];
                             handler(eventData);
                         }
