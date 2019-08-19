@@ -74,9 +74,11 @@ enum OMState {
     STOPPED
 }
 
-export const OMID_P = 'Unity/1.2.10';
-export const SDK_APIS = '7';
 export const PARTNER_NAME = 'Unity3d';
+export const DEFAULT_VENDOR_KEY = 'default_key';
+export const OM_JS_VERSION = '1.2.10';
+export const OMID_P = `${PARTNER_NAME}/${OM_JS_VERSION}`;
+export const SDK_APIS = '7';
 
 export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
@@ -189,7 +191,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public render(): void {
         super.render();
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = OMID3p;
+        this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
 
         this._omBridge.setIframe(this._omIframe);
     }
@@ -584,6 +586,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (eventType === 'loadError') {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
+        }
+
+        if (eventType === 'vendorkeyMismatch') {
+            this._core.Sdk.logDebug('Vendor attribute was either never registered or vendor attribute does not match registered key. SessionStart not called.');
         }
     }
 
