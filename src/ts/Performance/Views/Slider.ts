@@ -61,7 +61,7 @@ export class Slider {
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
         this._transitionPropertyName = typeof document.documentElement.style.transition === 'string' ? 'transition' : 'webkitTransition';
         this._isInterrupted = false;
-        this._slideSpeed = 300;
+        this._slideSpeed = 400;
         this._minimalSwipeLength = 60;
         this._swipableIndexes = [];
         this._imageUrls = slideImageUrls;
@@ -385,7 +385,7 @@ export class Slider {
     }
 
     private setActiveSlide(instant?: boolean): void {
-        for (const child of this._slidesContainer.children) {
+        for (const child of this._slidesContainer.childNodes) {
             const slide = <HTMLElement>child;
             const index = parseInt(slide.getAttribute('slide-index')!, 10);
             if (instant && index === this._currentSlideIndex) {
