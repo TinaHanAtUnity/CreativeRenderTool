@@ -141,6 +141,12 @@ export class CustomFeatures {
     }
 
     public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameId: number) {
+        // Filter out old samsung devices since they give odd deviceorientation values
+        const isOldSamsung = navigator.userAgent.match(/Android.*(SM-A500|SM-A300|SM-N91|SM-G1|SM-G85|SM-G530|SM-G3|SM-G90|GT-I|GT-S)/i);
+        if (isOldSamsung) {
+            return false;
+        }
+
         let width = window.innerWidth;
         let height = window.innerHeight;
         if ((width === 0 || height === 0) && window.screen !== undefined) {
