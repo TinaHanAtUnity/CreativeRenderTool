@@ -65,6 +65,8 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
 
     public abstract sendViewableEvent(viewable: boolean): void;
 
+    public abstract sendURLEvent(url: string): void;
+
     public abstract sendDeviceOrientationEvent(event: DeviceOrientationEvent): void;
 
     protected handleSetOrientationProperties(properties: IMRAIDOrientationProperties) {

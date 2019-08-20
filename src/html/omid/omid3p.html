@@ -57,14 +57,20 @@
                         }
                     };
         
+                    var DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
                     var sessionObserversMap = {};
                     var sessionStartData = {};
+                    var sessionStartCalled = false;
         
-                    var triggerAllSessionObservers = function(eventData) {
-                        const sessionObservers = Object.keys(sessionObserversMap).map(function(vendorKey) {
+                    /**
+                     * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
+                     * @param {Object} eventData structured data to indicate type for observer to fire
+                     */
+                    var triggerSessionObserver = function(eventData) {
+                        const observerList = Object.keys(sessionObserversMap).map(function(vendorKey) {
                             return sessionObserversMap[vendorKey];
                         });
-        
+                        const sessionObservers = [].concat.apply([], observerList);
                         sessionObservers.forEach(function(sessionObserver) {
                             sessionObserver(eventData);
                         });
@@ -82,6 +88,59 @@
                             data: data
                         }, '*');
                     };
+
+                    /**
+                     * Calls SessionListener for unique verificationScript observer of specified vendorkey
+                     * @param {function} observer
+                     * @param {string} vendorkey
+                     */
+                    var sendSessionStart = function(observer, vendorkey) {
+                        observer(sessionStartData[vendorkey]);
+                        postMessageCallback('onEventProcessed', {
+                            eventType: 'sessionStart'
+                        });
+                    }
+
+                    /**
+                     * Calls SessionListener for specified vendorkey
+                     * @param {string} key
+                     */
+                    var sendSessionStartForKey = function(key) {
+                        sessionObserversMap[key].forEach((sessionObserver) => {
+                            sendSessionStart(sessionObserver, key);
+                        });
+                    }
+
+                    var handleSessionStart = function(data) {
+                        // If passed vendor matches a registered vendor
+                        if (sessionObserversMap[data.vendorkey]) {
+                            sessionStartData[data.vendorkey] = event.data;
+                            if (!sessionStartCalled) {
+                                sendSessionStartForKey(data.vendorkey);
+                            }
+                        } else {
+                            // It is possible session start was called before a vendor registers so we must always store the data
+                            sessionStartData[data.vendorkey] = event.data;
+
+                            if (!data.verificationParameters) {
+                                // If we've already stored data for a default key, we can send SessionStart since the params do not matter
+                                if (sessionStartData[DEFAULT_VENDOR_KEY]) {
+                                    sendSessionStartForKey(DEFAULT_VENDOR_KEY);
+                                } else {
+                                    // Log even if registration will happen later
+                                    postMessageCallback('onEventProcessed', {
+                                        eventType: 'vendorkeyMismatch'
+                                    });
+                                }
+                            } else {
+                                // Log even if registration will happen later
+                                postMessageCallback('onEventProcessed', {
+                                    eventType: 'vendorkeyMismatch'
+                                });
+                            }
+                        }
+                        sessionStartCalled = true;
+                    }
         
                     /**
                      * Strips 'omid' from string to be passed to vendor
@@ -90,9 +149,7 @@
                     var stripEventString = function(eventType) {
                         return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
                     }
-        
-                    var sessionStartCalled = false;
-        
+                
                     var eventHandlers = {};
                     eventHandlers['omidImpression'] = (e) => trigger('impression', e);
                     eventHandlers['omidGeometryChange'] = (e) => trigger('geometryChange', e);
@@ -118,14 +175,14 @@
                         /*
                         * AD AND VIDEO EVENTS:
                         */
-                        payload = event.data.payload;
-                        const eventData = {
-                                adSessionId: event.data.adSessionId,
-                                timestamp: Date.now(),
-                                type: stripEventString(event.data.type),
-                                data: payload
-                        }
                         if (event.data.type in eventHandlers) {
+                            payload = event.data.payload;
+                            const eventData = {
+                                    adSessionId: event.data.adSessionId,
+                                    timestamp: Date.now(),
+                                    type: stripEventString(event.data.type),
+                                    data: payload
+                            }
                             var handler = eventHandlers[event.data.type];
                             handler(eventData);
                         }
@@ -136,29 +193,19 @@
                         switch(event.data.type) {
                             case 'sessionStart':
                                 const data = event.data.data;
-                                if (sessionObserversMap[data.vendorkey] && !sessionStartCalled) {
-                                    sessionObserversMap[data.vendorkey](event.data);
-                                    postMessageCallback('onEventProcessed', {
-                                        eventType: 'sessionStart'
-                                    });
-                                    sessionStartCalled = true;
-                                } else {
-                                    sessionStartData[data.vendorkey] = event.data;
-                                }
+                                handleSessionStart(data);
                                 break;
                             case 'sessionFinish':
-                                triggerAllSessionObservers(event.data);
-        
+                                triggerSessionObserver(event.data);
                                 for (var listener in videoListeners) { 
                                     delete videoListeners[listener]; 
                                 }
-        
                                 postMessageCallback('onEventProcessed', {
                                     eventType: 'sessionFinish'
                                 });
                                 break;
                             case 'sessionError': 
-                                triggerAllSessionObservers(event.data);
+                                triggerSessionObserver(event.data);
                                 break;
                             default:
                                 break;
@@ -180,22 +227,28 @@
                         }, '*');
                     };
         
-                    /*
-                    * This method registers events and signals that the verification script has loaded and is ready to receive events,
-                    * and should be called upon initialization.
-                    */
+                   /**
+                     * Registers session events for the given vendor key
+                     * @param {function} functionToExecute sessionObserver for given vendor
+                     * @param {function} vendorKey optional param to attribute given vendor key to sessionObserver
+                     */
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
-                        sessionObserversMap[vendorKey] = functionToExecute;
-        
+                        if (!vendorKey) {
+                            vendorKey = DEFAULT_VENDOR_KEY;
+                        }
+
+                        if (!sessionObserversMap[vendorKey]) {
+                            sessionObserversMap[vendorKey] = [];
+                        }
+
+                        sessionObserversMap[vendorKey].push(functionToExecute);
+
+                        // If start has been called from OM, send the start event immediately after registration
                         if (!sessionStartCalled && sessionStartData[vendorKey]) {
-                            sessionObserversMap[vendorKey](sessionStartData[vendorKey]);
-                            postMessageCallback('onEventProcessed', {
-                                eventType: 'sessionStart'
-                            });
-                            sessionStartCalled = true;
+                            sendSessionStartForKey(vendorKey);
                         }
                     }
-        
+
                     this.addEventListener = function(type, listener) {
                         if(type in videoListeners && videoListeners[type] !== listener) {
                             videoListeners[type].push(listener);
