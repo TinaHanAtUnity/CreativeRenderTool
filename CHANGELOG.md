@@ -1,3 +1,9 @@
+# Pending
+
+* Fix norwegian translation for 'Install Now` [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+* Open Measurement - Fix stripping data type that isnt OMID [#10893](https://github.com/Applifier/unity-ads-webview/pull/10893)
+* Remove the query cta with close button experiment [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+
 # Fri Aug 16 17:17:28 UTC 2019
 
 * Open Measurement - Add OMID support params to auction request body [#10865](https://github.com/Applifier/unity-ads-webview/pull/10865)
