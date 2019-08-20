@@ -8,7 +8,6 @@ import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
-// import { fakeARUtils } from 'TestHelpers/FakeARUtils2';
 import * as sinon from 'sinon';
 
 import { Observable1, Observable2, Observable3 } from 'Core/Utilities/Observable';
@@ -140,7 +139,7 @@ describe('AndroidAUIEssentialsTest', () => {
     };
 
     const showAdWhenReady = (placement: string) => {
-        if(UnityAds.isReady(placement)) {
+        if (UnityAds.isReady(placement)) {
             UnityAds.show(placement);
         } else {
             window.setTimeout(showAdWhenReady, 20, placement);
