@@ -30,7 +30,20 @@ $slider-experiment-dot-margin = 5px;
   }
 }
 
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  .portrait.slider-experiment #end-screen.show-gdpr-banner .gdpr-pop-up {
+    padding-bottom: .6em;
+  }
+}
+
+
 .portrait.slider-experiment {
+  #end-screen.show-gdpr-banner .gdpr-pop-up {
+    opacity: .9;
+    bottom: 0;
+    position: fixed;
+  }
   #end-screen .game-icon {
     margin-top: -18vh;
   }
