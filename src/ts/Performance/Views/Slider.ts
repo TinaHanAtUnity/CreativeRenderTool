@@ -67,9 +67,6 @@ export class Slider {
         this._imageUrls = slideImageUrls;
 
         const allSlidesCreatedPromise: Promise<HTMLElement | null>[] = [];
-        const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
-            'background-image': `url(${this._imageUrls[0]})`
-        });
         this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
@@ -213,16 +210,6 @@ export class Slider {
         this.updateIndicators();
     }
 
-    private animateSlides(): void {
-        let targetSlideIndex: number;
-        const direction = this.swipeDirection();
-        if (direction === 'left') {
-            targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex + this.getSlideCount());
-        } else {
-            targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
-        }
-    }
-
     private getSlideCount(): number {
         let swipedSlide;
 
@@ -301,7 +288,6 @@ export class Slider {
         if (!this._isDragging || touches && touches.length !== 1) {
             return;
         }
-        this.animateSlides();
         this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
         this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
         this._drag.swipeLength = Math.round(Math.sqrt(Math.pow(this._drag.curX - this._drag.startX, 2)));
