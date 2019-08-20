@@ -14,14 +14,12 @@ export class ParallaxScreen {
     private _parallaxCamera: ParallaxCamera;
     private _ready: boolean;
     private _rootElement: HTMLElement;
-    private _landscape: boolean;
     private _currentX: number;
 
     constructor(screenshots: string[], parallaxLayerParams: number[][], onDownloadCallback: OnDownloadCallback) {
         this._ready = false;
         this._layers = [];
         this._parallaxCamera = new ParallaxCamera(MAX_DEVICE_ROTATION);
-        this._landscape = false;
         this._currentX = 0;
 
         const layerPromises = screenshots.map((url: string, i: number) => {
@@ -65,8 +63,6 @@ export class ParallaxScreen {
         const scale = rootHeight / height;
         const xOffset = (1 / 2) * (width * scale - rootWidth);
         this._layers.forEach((layer) => layer.scale(scale, rootWidth, rootHeight, xOffset, width));
-
-        this._landscape = rootWidth < rootHeight;
         return true;
     }
 
