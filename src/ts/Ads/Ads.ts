@@ -82,6 +82,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { Analytics } from 'Analytics/Analytics';
 import { Promises } from 'Core/Utilities/Promises';
+import { MaterialIconTest } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -157,6 +158,11 @@ export class Ads implements IAds {
             }
             this.Container = new ViewController(this._core.Api, this.Api, <IosDeviceInfo> this._core.DeviceInfo, this._core.FocusManager, this._core.ClientInfo);
         }
+
+        if (MaterialIconTest.isValid(this._core.Config.getAbGroup())) {
+            document.documentElement.classList.add('material-icon-experiment');
+        }
+
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
