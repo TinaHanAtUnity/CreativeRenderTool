@@ -125,6 +125,29 @@ describe('CustomFeatures', () => {
         });
     });
 
+    describe('isPartOfPhaseTwoRollout', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '2895988', // WWF
+            expected: true
+        }, {
+            gameId: '2988443', // Zynga Solitaire
+            expected: true
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isPartOfPhaseTwoLoadRollout(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
+
     describe('isWhiteListedForLoadApi', () => {
         const tests: {
             gameId: string;
@@ -278,6 +301,8 @@ describe('CustomFeatures', () => {
             assert.isFalse(isEnabled);
         });
     });
+
+
 
     describe('isSliderEndScreenEnabled', () => {
         it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {

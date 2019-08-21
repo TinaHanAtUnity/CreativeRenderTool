@@ -182,8 +182,9 @@ export class Ads implements IAds {
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            this.setupLoadApiEnabled();
-
+        }).then(() => {
+             return this.setupLoadApiEnabled();
+        }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
@@ -654,17 +655,22 @@ export class Ads implements IAds {
         }
     }
 
-    private setupLoadApiEnabled(): void {
+    private setupLoadApiEnabled(): Promise<void> {
         if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) || CustomFeatures.isPartOfPhaseTwoLoadRollout(this._core.ClientInfo.getGameId())) {
             this._loadApiEnabled = true;
+            return Promise.resolve();
         } else {
-            this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation) {
                     const mediationName = mediation.getName() || '';
                     if (mediationName.toLowerCase() === 'mopub' && PhaseTwoLoadRolloutExperiment.isValid(this._core.Config.getAbGroup())) {
                         this._loadApiEnabled = true;
                     }
                 }
+                // Use .finally() when supported
+                return Promise.resolve();
+            }).catch(() => {
+                return Promise.resolve();
             });
         }
     }
