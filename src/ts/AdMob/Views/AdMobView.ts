@@ -340,17 +340,11 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         const gdprRectwidth = gdprRect.width;
         const gdprRectheight = gdprRect.height;
 
-        const videoRect = om.getAdmobVideoElementBounds();
-        const videoRectx = videoRect.x;
-        const videoRecty = videoRect.y;
-        const videoRectwidth = videoRect.width;
-        const videoRectheight = videoRect.height;
-
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const viewPort = om.calculateViewPort(screenWidth, screenHeight);
 
             let obstructionRectangle = om.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
-            const videoView =  om.createRectangle(videoRectx, videoRecty, videoRectwidth, videoRectheight);
+            const videoView =  om.getAdmobVideoElementBounds();
 
             if (this._platform === Platform.ANDROID) {
                 const adjustedx = om.getAndroidViewSize(gdprRectx, om.getScreenDensity());
