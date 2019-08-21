@@ -302,8 +302,6 @@ describe('CustomFeatures', () => {
         });
     });
 
-
-
     describe('isSliderEndScreenEnabled', () => {
         it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
