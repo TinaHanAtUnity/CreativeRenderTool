@@ -16,16 +16,17 @@ export class Analytics implements IAnalytics {
     public AnalyticsStorage: AnalyticsStorage;
 
     private _core: ICore;
+    private _analyticsEnabled: boolean;
 
     constructor(core: ICore, adsConfiguration: AdsConfiguration) {
         this._core = core;
-
+        this._analyticsEnabled = core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId());
         this.Api = {
             Analytics: new AnalyticsApi(core.NativeBridge)
         };
 
         this.AnalyticsStorage = new AnalyticsStorage(core.Api);
-        if (core.Config.isAnalyticsEnabled()) {
+        if (this._analyticsEnabled) {
             this.AnalyticsManager = new AnalyticsManager(core, this.Api, adsConfiguration, this.AnalyticsStorage);
         } else {
             this.AnalyticsManager = new SilentAnalyticsManager();
@@ -33,7 +34,7 @@ export class Analytics implements IAnalytics {
     }
 
     public initialize(): Promise<number> {
-        if (this._core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId())) {
+        if (this._analyticsEnabled) {
             return this.AnalyticsManager.init().then(() => {
                 return this.AnalyticsManager.getGameSessionId();
             });

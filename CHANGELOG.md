@@ -1,3 +1,51 @@
+# Pending
+
+* Fix norwegian translation for 'Install Now` [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+* Open Measurement - Fix stripping data type that isnt OMID [#10893](https://github.com/Applifier/unity-ads-webview/pull/10893)
+* Remove the query cta with close button experiment [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+* Begin Material Font Experiment on ABGroups 7 and 8 [#10633](https://github.com/Applifier/unity-ads-webview/pull/10633)
+
+# Fri Aug 16 17:17:28 UTC 2019
+
+* Open Measurement - Add OMID support params to auction request body [#10865](https://github.com/Applifier/unity-ads-webview/pull/10865)
+* Reintroduce Query CTA on End Screen with X Button Experiment [#10867](https://github.com/Applifier/unity-ads-webview/pull/10806)
+* Open Measurement - Handle UnMatched VendorKey [#10806](https://github.com/Applifier/unity-ads-webview/pull/10806)
+* Add getCreativeURL API for MRAID container [#10813](https://github.com/Applifier/unity-ads-webview/pull/10813)
+* Open Measurement - Clean up session interface for admob [#10840](https://github.com/Applifier/unity-ads-webview/pull/10840)
+* Reintroduce Appsheet for Supported Apple Devices in Portrait Mode [#10805](https://github.com/Applifier/unity-ads-webview/pull/10805)
+* Fix URL Validation Bug for http URLs [#10866](https://github.com/Applifier/unity-ads-webview/pull/10866)
+
+# Wed Aug 14 18:17:15 UTC 2019
+
+* Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
+* Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
+* Send Analytics Messages to CDP for Example GameIDs [#10864](https://github.com/Applifier/unity-ads-webview/pull/10864)
+* Add deviceorientation Event Support for MRAID Playables [#10453](https://github.com/Applifier/unity-ads-webview/pull/10453)
+
+# Tue Aug 13 13:49:40 UTC 2019
+
+* Enable new ad request privacy protocol for Developer Consent [#10675](https://github.com/Applifier/unity-ads-webview/pull/10675)
+* Open Measurement - remove OM from hierarchy [#10809](https://github.com/Applifier/unity-ads-webview/pull/10809)
+* Extract AdsConfigurationParser Tests [#10811](https://github.com/Applifier/unity-ads-webview/pull/10811)
+* Revert animated button experiment [#10812](https://github.com/Applifier/unity-ads-webview/pull/10812)
+
+# Thu Aug  8 17:07:34 UTC 2019
+
+* Open Measurement - Handle video event registration [#10778](https://github.com/Applifier/unity-ads-webview/pull/10778)
+* Move Backgrounded Ads Check Before Showing Consent Unit [#10779](https://github.com/Applifier/unity-ads-webview/pull/10779)
+* Fix .styl Lint Warnings [#10780](https://github.com/Applifier/unity-ads-webview/pull/10780)
+* Add Ironsource Internal Test GameIDs to Load Whitelist [#10781](https://github.com/Applifier/unity-ads-webview/pull/10781)
+
+# Wed Aug  7 20:18:35 UTC 2019
+
+* Move initComplete Callback Before Requesting Ads for Legacy Behavior [#10749](https://github.com/Applifier/unity-ads-webview/pull/10749)
+* Send CampaignError Information to CreativeBlocking Service [#10750](https://github.com/Applifier/unity-ads-webview/pull/10750)
+* Open Measurement - Change verification injection functions [#10747](https://github.com/Applifier/unity-ads-webview/pull/10747)
+* Revert Query CTA on End Screen Experiement [#10751](https://github.com/Applifier/unity-ads-webview/pull/10751)
+* Change CreativeBlocking Payload Naming to be More Descriptive [#10776](https://github.com/Applifier/unity-ads-webview/pull/10776)
+* Add game ids to load custom feature [#10752](https://github.com/Applifier/unity-ads-webview/pull/10752)
+* Open Measurement - Adjust Geometry Overlap Calculations [#10670](https://github.com/Applifier/unity-ads-webview/pull/10670)
+
 # Mon Aug  5 18:13:14 UTC 2019
 
 * Update Analytics Standard Event Protocol [#10669](https://github.com/Applifier/unity-ads-webview/pull/10669)

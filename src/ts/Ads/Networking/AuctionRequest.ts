@@ -24,6 +24,7 @@ import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivac
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -110,6 +111,8 @@ interface IAuctionRequestBody {
     developerId: number | undefined;
     organizationId: string | undefined;
     isLoadEnabled: boolean;
+    omidPartnerName: string;
+    omidJSVersion: string;
 }
 
 /**
@@ -200,7 +203,7 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
-        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy());
+        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy(), this._coreConfig.getAbGroup());
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
@@ -466,7 +469,9 @@ export class AuctionRequest {
                     abGroup: this._coreConfig.getAbGroup(),
                     developerId: this._coreConfig.getDeveloperId(),
                     organizationId: this._coreConfig.getOrganizationId(),
-                    isLoadEnabled: false // TODO: When this is used for anything other than banners, pass actual flag
+                    isLoadEnabled: false, // TODO: When this is used for anything other than banners, pass actual flag
+                    omidPartnerName: PARTNER_NAME,
+                    omidJSVersion: OM_JS_VERSION
                 };
             });
         });
