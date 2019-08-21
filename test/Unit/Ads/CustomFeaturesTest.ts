@@ -238,18 +238,18 @@ describe('CustomFeatures', () => {
     });
 
     describe('isSliderEndScreenEnabled', () => {
-        it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
+        it('should return false for iOS 9.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '9.0', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
-        it('should return false for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.0', Platform.ANDROID);
+        it('should return false for Android 7.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.0', Platform.ANDROID);
             assert.isFalse(isEnabled);
         });
 
-        it('should return false if ab group is 5 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '-1', '9.0', Platform.IOS);
+        it('should return false if ab group is 7 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '-1', '9.0', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
@@ -264,12 +264,12 @@ describe('CustomFeatures', () => {
         });
 
         it('should return false if on Android and os version is 4.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '4.8', Platform.ANDROID);
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '4.8', Platform.ANDROID);
             assert.isFalse(isEnabled);
         });
 
         it('should return false if on iOS and os version is 7.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.11', Platform.IOS);
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.11', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
@@ -280,18 +280,18 @@ describe('CustomFeatures', () => {
     });
 
     describe('isSliderEndScreenEnabled', () => {
-        it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
+        it('should return false for iOS 9.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '9.0', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
-        it('should return false for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.0', Platform.ANDROID);
+        it('should return false for Android 7.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.0', Platform.ANDROID);
             assert.isFalse(isEnabled);
         });
 
-        it('should return false if ab group is 5 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '-1', '9.0', Platform.IOS);
+        it('should return false if ab group is 7 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '-1', '9.0', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
@@ -306,12 +306,12 @@ describe('CustomFeatures', () => {
         });
 
         it('should return false if on Android and os version is 4.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '4.8', Platform.ANDROID);
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '4.8', Platform.ANDROID);
             assert.isFalse(isEnabled);
         });
 
         it('should return false if on iOS and os version is 7.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.11', Platform.IOS);
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.11', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
@@ -322,18 +322,18 @@ describe('CustomFeatures', () => {
     });
 
     describe('isSliderEndScreenEnabled', () => {
-        it('should return false for iOS 9.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '9.0', Platform.IOS);
+        it('should return false for iOS 9.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '9.0', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
-        it('should return false for Android 7.0 if ab group is 5 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.0', Platform.ANDROID);
+        it('should return false for Android 7.0 if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.0', Platform.ANDROID);
             assert.isFalse(isEnabled);
         });
 
-        it('should return false if ab group is 5 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '-1', '9.0', Platform.IOS);
+        it('should return false if ab group is 7 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '-1', '9.0', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
@@ -348,12 +348,12 @@ describe('CustomFeatures', () => {
         });
 
         it('should return false if on Android and os version is 4.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '4.8', Platform.ANDROID);
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '4.8', Platform.ANDROID);
             assert.isFalse(isEnabled);
         });
 
         it('should return false if on iOS and os version is 7.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(5), '547145938', '7.11', Platform.IOS);
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938', '7.11', Platform.IOS);
             assert.isFalse(isEnabled);
         });
 
