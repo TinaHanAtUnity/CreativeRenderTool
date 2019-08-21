@@ -30,11 +30,25 @@ $slider-experiment-dot-margin = 5px;
   }
 }
 
-/* iPhone X & iPhone XS */
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+$iphone-x-slider-styles() {
   .portrait.slider-experiment #end-screen.show-gdpr-banner .gdpr-pop-up {
     padding-bottom: .6em;
   }
+}
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  $iphone-x-slider-styles();
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  $iphone-x-slider-styles();
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  $iphone-x-slider-styles();
 }
 
 .slider-experiment {
