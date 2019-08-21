@@ -50,15 +50,6 @@ describe('PolyfillerTest', () => {
             key2: 2,
             key3: 3
         },
-        valuesToTest: [1, 2, 3],
-        expectedOutcome: true
-    }, {
-        testCase: 'With a populated map and multiple correct values',
-        map: {
-            key: 1,
-            key2: 2,
-            key3: 3
-        },
         valuesToTest: [1, 2, 3], // Unfortunately, deepEqual requires a certain order, so moving values out of order breaks the test
         expectedOutcome: true
     }, {
