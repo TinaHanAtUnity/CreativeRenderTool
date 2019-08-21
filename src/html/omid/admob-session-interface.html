@@ -19,21 +19,9 @@
             AD_USER_INTERACTION = 'adUserInteraction',
             GEOMETRY_CHANGE = 'geometryChange';
 
-            /** 
-             * setSlotElement: 
-             * Sets the slot element for a display creative for measurement. Currently dont support display
-             * @param slotElement
-             * Implementation Pending
-             */
-            this.setSlotElement = function(slotElement) {};
-
-            /**
-            * setElementBounds:
-            * Only relevant to display ad slot elements. Called at beginning of playback and sessionfinish
-            * @param (omidSessionInterface.Rectangle) elementBounds
-            * Implementation Pending
-            */
-            this.setElementBounds = function(elementBounds) {};
+            var VIDEO_ELEMENT = 'videoElement',
+            SLOT_ELEMENT = 'slotElement',
+            ELEMENT_BOUNDS = 'elementBounds';
 
             /**
              * Sets the creative type for the active ad session, or the next one if there is no
@@ -312,8 +300,37 @@
                 postMessage('verificationResources', verificationScriptResources);
             };
 
-            this.setVideoElement = function(el) {
-                videoElement = el;
+            /**
+             * setVideoElement:
+             * Sets the slot element for a video creative for measurement
+             * @param videoElement
+             */
+            this.setVideoElement = function(videoElement) {
+                postMessage(VIDEO_ELEMENT, {
+                    videoElement: `${videoElement}`
+                });
+            };
+
+            /**
+             * setSlotElement:
+             * Sets the slot element for a display creative for measurement. Currently dont support display
+             * @param slotElement
+             */
+            this.setSlotElement = function(slotElement) {
+                postMessage(SLOT_ELEMENT, {
+                    slotElement: `${slotElement}`
+                });
+            };
+
+            /**
+            * setElementBounds:
+            * Only relevant to display ad slot elements. Called at beginning of playback and sessionfinish
+            * @param (omidSessionInterface.Rectangle) elementBounds
+            */
+            this.setElementBounds = function(elementBounds) {
+                postMessage(ELEMENT_BOUNDS, {
+                    elementBounds: elementBounds
+                });
             };
 
             this.adEvents = {};
