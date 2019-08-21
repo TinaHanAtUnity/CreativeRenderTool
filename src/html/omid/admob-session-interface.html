@@ -51,6 +51,7 @@
             this.setImpressionType = function(impressionType) {};
 
             var postMessage = function(event, data) {
+                console.log(data);
                 window.parent.postMessage({
                     type: 'omid',
                     event: event,
@@ -337,15 +338,18 @@
 
 
             this.registerAdEvents = function() {
+                console.log('unity registerAdEvents');
                 adEventsRegistered = true;
             };
 
             // We will support video events until OMID 1.3 is released. Then this will be removed.
             this.registerVideoEvents = function() {
+                console.log('unity registerVideoEvents');
                 mediaEventsRegistered = true;
             }
 
             this.registerMediaEvents = function() {
+                console.log('unity registerMediaEvents');
                 mediaEventsRegistered = true;
             };
 
