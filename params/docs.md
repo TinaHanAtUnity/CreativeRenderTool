@@ -93,6 +93,8 @@
 | isPromoCatalogAvailable | boolean | Flag describing if the developer has set up a catalog for their IAP Promo Placement | SDK | all |
 | noFillRetry | boolean | Flag describing retry should be made upon nofilling | SDK | no |
 | isLoadEnabled | boolean | Flag describing if Auction Request was made using Load API | SDK | all |
+| omidPartnerName | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
+| omidJSVersion | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 
 
 ### Configuration request
@@ -183,7 +185,8 @@
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | isPromoCatalogAvailable | yes | False | True | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
-
+| omidPartnerName | yes | False | True | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
+| omidJSVersion | yes | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 
 
 ### Video events

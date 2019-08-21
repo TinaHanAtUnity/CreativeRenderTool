@@ -21,8 +21,8 @@ import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import OMIDSessionClient from 'html/omid/session-interface.html';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import OMIDSessionClient from 'html/omid/admob-session-interface.html';
+import { OpenMeasurement, PARTNER_NAME, OMID_P } from 'Ads/Views/OpenMeasurement';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -39,6 +39,8 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
+const OMIDImplementorMacro = '{{ OMID_IMPLEMENTOR }}';
+const OMIDApiVersionMacro = '{{ OMID_API_VERSION }}';
 
 export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandlerView {
 
@@ -178,7 +180,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             iframe.srcdoc = markup;
 
             if (this._om) {
-                iframe.srcdoc += OMIDSessionClient;
+                iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OMID_P);
                 this._om.getOmidBridge().setAdmobIframe(iframe);
 
                 iframe.onload = () => {

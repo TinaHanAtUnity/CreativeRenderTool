@@ -1,5 +1,22 @@
 # Pending
 
+* Fix norwegian translation for 'Install Now` [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+* Open Measurement - Fix stripping data type that isnt OMID [#10893](https://github.com/Applifier/unity-ads-webview/pull/10893)
+* Remove the query cta with close button experiment [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+* Begin Material Font Experiment on ABGroups 7 and 8 [#10633](https://github.com/Applifier/unity-ads-webview/pull/10633)
+
+# Fri Aug 16 17:17:28 UTC 2019
+
+* Open Measurement - Add OMID support params to auction request body [#10865](https://github.com/Applifier/unity-ads-webview/pull/10865)
+* Reintroduce Query CTA on End Screen with X Button Experiment [#10867](https://github.com/Applifier/unity-ads-webview/pull/10806)
+* Open Measurement - Handle UnMatched VendorKey [#10806](https://github.com/Applifier/unity-ads-webview/pull/10806)
+* Add getCreativeURL API for MRAID container [#10813](https://github.com/Applifier/unity-ads-webview/pull/10813)
+* Open Measurement - Clean up session interface for admob [#10840](https://github.com/Applifier/unity-ads-webview/pull/10840)
+* Reintroduce Appsheet for Supported Apple Devices in Portrait Mode [#10805](https://github.com/Applifier/unity-ads-webview/pull/10805)
+* Fix URL Validation Bug for http URLs [#10866](https://github.com/Applifier/unity-ads-webview/pull/10866)
+
+# Wed Aug 14 18:17:15 UTC 2019
+
 * Add PromoErrorService to Collect information for PP Decline [#10810](https://github.com/Applifier/unity-ads-webview/pull/10810)
 * Remove and Replace Some Kibana Diagnostics with Metrics [#10837](https://github.com/Applifier/unity-ads-webview/pull/10837)
 * Send Analytics Messages to CDP for Example GameIDs [#10864](https://github.com/Applifier/unity-ads-webview/pull/10864)
