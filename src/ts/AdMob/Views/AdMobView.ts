@@ -136,6 +136,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.disconnect();
         super.hide();
 
+        if (this._om) {
+            this._om.removeFromViewHieararchy();
+        }
+
         if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
@@ -336,10 +340,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         const gdprRectwidth = gdprRect.width;
         const gdprRectheight = gdprRect.height;
 
-        const videoElement = <HTMLElement>document.querySelector('video');
-        const videoRect = videoElement.getBoundingClientRect();
-        const videoRectx = videoRect.left;
-        const videoRecty = videoRect.top;
+        const videoRect = om.getAdmobVideoElementBounds();
+        const videoRectx = videoRect.x;
+        const videoRecty = videoRect.y;
         const videoRectwidth = videoRect.width;
         const videoRectheight = videoRect.height;
 

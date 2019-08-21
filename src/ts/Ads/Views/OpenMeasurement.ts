@@ -94,6 +94,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
     private _omAdSessionId: string;
+    private _admobSlotElement: HTMLElement;
+    private _admobVideoElement: HTMLElement;
+    private _admobElementBounds: IRectangle;
 
     private _deviceVolume: number;
     private _sessionStartCalled = false;
@@ -138,7 +141,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             onSessionFinish: (sessionEvent) => this.sessionFinish(sessionEvent),
             onInjectVerificationResources: (verifcationResources) => this.injectVerificationResources(verifcationResources),
             onPopulateVendorKey: (vendorKey) => this.populateVendorKey(vendorKey),
-            onEventProcessed: (eventType) => this.onEventProcessed(eventType)
+            onEventProcessed: (eventType) => this.onEventProcessed(eventType),
+            onSlotElement: (element) => { this._admobSlotElement = element; },
+            onVideoElement: (element) => { this._admobVideoElement = element; },
+            onElementBounds: (elementBounds) => { this._admobElementBounds = elementBounds; }
         }, this._omIframe, this);
     }
 
@@ -170,6 +176,18 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public injectAdVerifications(): Promise<void> {
         const verificationResources: IVerificationScriptResource[] = this.setUpVerificationResources(this._adVerifications);
         return this.injectVerificationResources(verificationResources);
+    }
+
+    public getSlotElement(): HTMLElement {
+        return this._admobSlotElement;
+    }
+
+    public getVideoElement(): HTMLElement {
+        return this._admobVideoElement;
+    }
+
+    public getAdmobVideoElementBounds(): IRectangle {
+        return this._admobElementBounds;
     }
 
     public getOMAdSessionId() {
