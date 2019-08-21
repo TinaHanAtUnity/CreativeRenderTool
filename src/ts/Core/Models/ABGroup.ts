@@ -70,3 +70,5 @@ export const OpenMeasurementTest = new DisabledABTest();
 export const IAPAutoLoggingTest = new DisabledABTest();
 export const SliderEndCardExperiment = new DisabledABTest();
 export const MaterialIconTest = new ZyngaFilteredABTest(7, 8);
+export const ConsentUXTest = new ABTest(18, 19);
+
