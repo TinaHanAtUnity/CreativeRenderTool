@@ -53,7 +53,7 @@ describe('PolyfillerTest', () => {
         valuesToTest: [1, 2, 3], // Unfortunately, deepEqual requires a certain order, so moving values out of order breaks the test
         expectedOutcome: true
     }, {
-        testCase: 'With a populated map and multiple corrrect values of complex types',
+        testCase: 'With a populated map and multiple correct values of complex types',
         map: {
             key: {
                 nestedKey: 1
@@ -69,6 +69,23 @@ describe('PolyfillerTest', () => {
         },
         valuesToTest: [{nestedKey: 1}, {nestedKey2: '1'}, {nestedKey3: {'doublyNestedKey': 1}}],
         expectedOutcome: true
+    }, {
+        testCase: 'With a populated map and multiple values of complex types with a single incorrect field',
+        map: {
+            key: {
+                nestedKey: 1
+            },
+            key2: {
+                nestedKey2: '1'
+            },
+            key3: {
+                nestedKey3: {
+                    'doublyNestedKey': 'BAD KEY TO TEST'
+                }
+            }
+        },
+        valuesToTest: [{nestedKey: 1}, {nestedKey2: '1'}, {nestedKey3: {'doublyNestedKey': 'SHOULD FAIL BECAUSE OF THIS'}}],
+        expectedOutcome: false
     }];
 
     describe('Object.values()', () => {
