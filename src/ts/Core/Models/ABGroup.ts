@@ -71,3 +71,4 @@ export const IAPAutoLoggingTest = new DisabledABTest();
 export const SliderEndCardExperiment = new DisabledABTest();
 export const PhaseTwoLoadRolloutExperiment = new ABTest(15, 16);
 export const MaterialIconTest = new ZyngaFilteredABTest(7, 8);
+export const ConsentUXTest = new ABTest(18, 19);
