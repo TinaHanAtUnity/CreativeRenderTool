@@ -22,7 +22,10 @@ export enum OMEvents {
 
 export enum OMSessionInfo {
     SDK_VERSION = 'sdkVersion',
-    SESSION_ID = 'sessionId'
+    SESSION_ID = 'sessionId',
+    VIDEO_ELEMENT = 'videoElement',
+    SLOT_ELEMENT = 'slotElement',
+    ELEMENT_BOUNDS = 'elementBounds'
 }
 
 export enum SESSIONEvents {
@@ -166,6 +169,9 @@ export interface IOMIDHandler {
     onSessionFinish(event: ISessionEvent): void;
     onPopulateVendorKey(vendorKey: string): void;
     onEventProcessed(eventType: string): void;
+    onSlotElement(element: HTMLElement): void;
+    onVideoElement(element: HTMLElement): void;
+    onElementBounds(elementBounds: IRectangle): void;
 }
 
 export interface IOMIDMessage {
@@ -240,6 +246,10 @@ export class OMIDEventBridge {
 
         this._omidHandlers[OMSessionInfo.SDK_VERSION] = (msg) => this.sendSDKVersion(openMeasurement.getSDKVersion());
         this._omidHandlers[OMSessionInfo.SESSION_ID] = (msg) => this.sendSessionId(openMeasurement.getOMAdSessionId());
+
+        this._omidHandlers[OMSessionInfo.VIDEO_ELEMENT] = (msg) => this._handler.onSlotElement(<HTMLElement>msg.data.videoElement);
+        this._omidHandlers[OMSessionInfo.SLOT_ELEMENT] = (msg) => this._handler.onVideoElement(<HTMLElement>msg.data.slotElement);
+        this._omidHandlers[OMSessionInfo.ELEMENT_BOUNDS] = (msg) => this._handler.onElementBounds(<IRectangle>msg.data.elementBounds);
     }
 
     public connect() {
