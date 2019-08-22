@@ -50,19 +50,6 @@ describe('RequestPrivacyFactoryTests', () => {
         });
     });
 
-    [...Array(20).keys()].forEach(group => {
-        context('Developer Consent A/B test', () => {
-            let result: IRequestPrivacy | undefined;
-            const anyPermissions = <IPermissions>{};
-            beforeEach(() => {
-                userPrivacy = new UserPrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT, version: 0, permissions: anyPermissions });
-                gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT });
-                result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
-            });
-            it('should set privacy method as PrivacyMethod.DEVELOPER_CONSENT for group ' + group, () => assert.equal(result!.method, PrivacyMethod.DEVELOPER_CONSENT));
-        });
-    });
-
     context('when all permission is set', () => {
         let result: IRequestPrivacy | undefined;
         const expectedPermissions = { gameExp: true, ads: true, external: true };
