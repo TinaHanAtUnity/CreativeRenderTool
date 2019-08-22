@@ -203,7 +203,7 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
-        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy(), this._coreConfig.getAbGroup());
+        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy());
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
