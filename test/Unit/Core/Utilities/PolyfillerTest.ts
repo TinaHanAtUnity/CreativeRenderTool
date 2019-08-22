@@ -88,9 +88,9 @@ describe('PolyfillerTest', () => {
         expectedOutcome: false
     }];
 
-    describe('Object.values()', () => {
+    describe('getObjectValuesFunction', () => {
         tests.forEach((t) => {
-            it(`should verify if the function for the case: ${t.testCase}`, () => {
+            it(`${t.testCase}`, () => {
                 const assumedValues = Polyfiller.getObjectValuesFunction()(t.map);
                 if (t.expectedOutcome) {
                     assert.deepEqual(t.valuesToTest, assumedValues);
