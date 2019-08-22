@@ -66,16 +66,19 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
             }
         }
+        const gamePrivacy = this._configuration.getGamePrivacy();
         const userPrivacy = this._configuration.getUserPrivacy();
         if (userPrivacy) {
             userPrivacy.update({
-                method: PrivacyMethod.LEGITIMATE_INTEREST,
+                method: gamePrivacy.getMethod(),
                 version: 0,
                 permissions: {
                     all: false,
                     ads: !optOutEnabled,
-                    external: false,
-                    gameExp: false}});
+                    external: gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT ? !optOutEnabled : false,
+                    gameExp: false
+                }
+            });
         }
     }
 
