@@ -1,9 +1,13 @@
-# Pending
+# Thu Aug 22 00:06:09 UTC 2019
 
-* Fix norwegian translation for 'Install Now` [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
+* Add DisabledABTest for Phase 2 of Load API Rollout [#10923](https://github.com/Applifier/unity-ads-webview/pull/10923)
+* Start Phase 2 Load Rollout AB Test [#10925](https://github.com/Applifier/unity-ads-webview/pull/10925)
+* Fix Norwegian Translation for 'Install Now` [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
 * Open Measurement - Fix stripping data type that isnt OMID [#10893](https://github.com/Applifier/unity-ads-webview/pull/10893)
 * Remove the query cta with close button experiment [#10897](https://github.com/Applifier/unity-ads-webview/pull/10897)
 * Begin Material Font Experiment on ABGroups 7 and 8 [#10633](https://github.com/Applifier/unity-ads-webview/pull/10633)
+* Open Measurement - Admob geometry change and dom removal [#10924](https://github.com/Applifier/unity-ads-webview/pull/10924)
+* Pass MRAID Creative Url using String Replacement [#10895](https://github.com/Applifier/unity-ads-webview/pull/10895)
 
 # Fri Aug 16 17:17:28 UTC 2019
 
