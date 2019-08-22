@@ -1,3 +1,7 @@
+# Staged
+
+* Consent A/B Test: Add Unity Ads Icon to below CTAs [#10928](https://github.com/Applifier/unity-ads-webview/pull/10928)
+
 # Thu Aug 22 00:06:09 UTC 2019
 
 * Add DisabledABTest for Phase 2 of Load API Rollout [#10923](https://github.com/Applifier/unity-ads-webview/pull/10923)
