@@ -1,4 +1,4 @@
-# Pending
+# Thu Aug 22 00:06:09 UTC 2019
 
 * Add DisabledABTest for Phase 2 of Load API Rollout [#10923](https://github.com/Applifier/unity-ads-webview/pull/10923)
 * Start Phase 2 Load Rollout AB Test [#10925](https://github.com/Applifier/unity-ads-webview/pull/10925)
