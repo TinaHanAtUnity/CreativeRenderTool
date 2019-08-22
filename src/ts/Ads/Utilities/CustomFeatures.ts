@@ -181,7 +181,18 @@ export class CustomFeatures {
         return gameId === '2988443';
     }
 
-    public static isWhiteListedForLoadApi(gameId: string) {
+    /**
+     * Rollout plan can be found here: https://docs.google.com/document/d/1QI-bjyTZrwNgx4D6X8_oq5FW_57ikPKBcwbY_MQ_v4g/edit?ts=5d5713ce#
+     * Lists are split out to easily handle the rollout plan
+     */
+    public static isPartOfPhaseTwoLoadRollout(gameId: string): boolean {
+        const wordsWithFriends = ['2895988', '2895998', '2796593', '2895987', '2896000', '2796594'];
+        const zyngaSolitaire = ['2988443', '2988442', '2988495', '2988494'];
+
+        return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
+    }
+
+    public static isWhiteListedForLoadApi(gameId: string): boolean {
         return gameId === '2988442' ||  // Zynga Solitaire          : iOS
                gameId === '2988443' ||  // Zynga Solitaire          : Android
                gameId === '2988494' ||  // Zynga Freecell           : iOS

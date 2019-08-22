@@ -82,7 +82,8 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { Analytics } from 'Analytics/Analytics';
 import { Promises } from 'Core/Utilities/Promises';
-import { MaterialIconTest } from 'Core/Models/ABGroup';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { MaterialIconTest, PhaseTwoLoadRolloutExperiment } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -186,10 +187,9 @@ export class Ads implements IAds {
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
-                this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
-            }
-
+        }).then(() => {
+             return this.setupLoadApiEnabled();
+        }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
@@ -657,6 +657,26 @@ export class Ads implements IAds {
         const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
         if (chineseLanguage && chineseTimeZone) {
             this._core.ProgrammaticTrackingService.reportMetric(metric);
+        }
+    }
+
+    private setupLoadApiEnabled(): Promise<void> {
+        if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) || CustomFeatures.isPartOfPhaseTwoLoadRollout(this._core.ClientInfo.getGameId())) {
+            this._loadApiEnabled = true;
+            return Promise.resolve();
+        } else {
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation) {
+                    const mediationName = mediation.getName() || '';
+                    if (mediationName.toLowerCase() === 'mopub' && PhaseTwoLoadRolloutExperiment.isValid(this._core.Config.getAbGroup())) {
+                        this._loadApiEnabled = true;
+                    }
+                }
+                // Use .finally() when supported
+                return Promise.resolve();
+            }).catch(() => {
+                return Promise.resolve();
+            });
         }
     }
 }

@@ -65,12 +65,6 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 mraidAdapter.sendViewableEvent(true);
                 sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage, { type: 'viewable', value: expected });
             });
-
-            it('should send url event via postmessage', () => {
-                const expected = 'https://www.unity3d.com';
-                mraidAdapter.sendURLEvent('https://www.unity3d.com');
-                sinon.assert.calledWith(<sinon.SinonSpy>iframe.contentWindow!.postMessage, { type: 'url', value: expected });
-            });
         });
 
         describe('receiving MRAID events', () => {

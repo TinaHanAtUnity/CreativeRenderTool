@@ -26,7 +26,6 @@
                 };
 
                 var viewable = false;
-                var creativeUrl = 'none';
 
                 var orientationProperties = {
                     allowOrientationChange: true,
@@ -94,10 +93,6 @@
                             permissions[event.data.value.type] = event.data.value.status;
                             trigger('permissionChange', [event.data.value.type, event.data.value.status]);
                             triggerExperienceType(event.data.value.type, event.data.value.status);
-                            break;
-
-                        case 'url':
-                            creativeUrl = event.data.value;
                             break;
 
                         default:
@@ -207,7 +202,7 @@
                 };
 
                 this.getCreativeURL = function() {
-                    return creativeUrl;
+                    return '{{ CREATIVE_URL }}';
                 };
 
                 this.open = function(url) {
