@@ -1,3 +1,15 @@
+# Pending
+
+* Add integration test for metadata & functionality used by AUI Test App [#9890](https://github.com/Applifier/unity-ads-webview/pull/9890)
+* Add Polyfiller Utility and Object.values Tests [#10927](https://github.com/Applifier/unity-ads-webview/pull/10927)
+
+# Thu Aug 22 23:02:42 UTC 2019
+
+* Remove unused AB test definition [#10954](https://github.com/Applifier/unity-ads-webview/pull/10954)
+* Remove AB group check to enable new ad request privacy protocol for developer consent in the entire network [#10929](https://github.com/Applifier/unity-ads-webview/pull/10929)
+* Use right privacy method if permissions are modified through old Privacy view [#10953](https://github.com/Applifier/unity-ads-webview/pull/10953)
+* Consent A/B Test: Add Unity Ads Icon to below CTAs [#10928](https://github.com/Applifier/unity-ads-webview/pull/10928)
+
 # Thu Aug 22 00:06:09 UTC 2019
 
 * Add DisabledABTest for Phase 2 of Load API Rollout [#10923](https://github.com/Applifier/unity-ads-webview/pull/10923)
