@@ -9,7 +9,7 @@ import {CacheMode} from 'Core/Models/CoreConfiguration';
 describe('AdsConfigurationParserTest', () => {
     context('Parsing json to configuration', () => {
         let adsConfig: AdsConfiguration;
-        beforeEach(() => adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationJson)));
+        beforeEach(() => adsConfig = AdsConfigurationParser.parse(ConfigurationJson));
 
         it('should have forced cache mode', () => {
             assert.equal(adsConfig.getCacheMode(), CacheMode.FORCED);
@@ -36,7 +36,7 @@ describe('AdsConfigurationParserTest', () => {
     context('Privacy', () => {
         let configJson: IRawAdsConfiguration;
         beforeEach(() => {
-            configJson = JSON.parse(ConfigurationJson);
+            configJson = ConfigurationJson;
         });
 
         context('with original GDPR opt-out fields', () => {

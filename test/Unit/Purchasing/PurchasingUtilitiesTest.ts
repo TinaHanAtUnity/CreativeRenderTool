@@ -66,7 +66,7 @@ describe('PurchasingUtilitiesTest', () => {
         clientInfo = sinon.createStubInstance(ClientInfo);
         sandbox = sinon.createSandbox();
 
-        promoCatalog = JSON.stringify(JSON.parse(IapPromoCatalog));
+        promoCatalog = JSON.stringify(IapPromoCatalog);
         (<any>purchasing).onInitialize = new Observable1<string>();
         (<any>purchasing).onCommandResult = new Observable1<string>();
         (<any>purchasing).onGetPromoVersion = new Observable1<string>();
@@ -101,7 +101,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('without Promo Placements', () => {
         beforeEach(() => {
-            return initWithConfiguration(JSON.parse(ConfigurationAuctionPlc));
+            return initWithConfiguration(ConfigurationAuctionPlc)
         });
 
         afterEach(() => {
@@ -118,7 +118,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('with Promo Placements', () => {
         beforeEach(() => {
-            return initWithConfiguration(JSON.parse(ConfigurationPromoPlacements));
+            return initWithConfiguration(ConfigurationPromoPlacements)
         });
 
         afterEach(() => {

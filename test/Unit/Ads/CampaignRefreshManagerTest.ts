@@ -210,9 +210,9 @@ xdescribe('CampaignRefreshManager', () => {
     });
 
     describe('PLC campaigns', () => {
-        beforeEach(() => {
-            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        beforeEach(async () => {
+            coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
+            adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
             campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
@@ -221,7 +221,7 @@ xdescribe('CampaignRefreshManager', () => {
             assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
         });
 
-        it('get campaign should return a campaign (Performance)', () => {
+        it('get campaign should return a campaign (Performance)', async () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 return Promise.resolve();
@@ -248,7 +248,7 @@ xdescribe('CampaignRefreshManager', () => {
             });
         });
 
-        it('get campaign should return a campaign (XPromo)', () => {
+        it('get campaign should return a campaign (XPromo)', async () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getXPromoCampaign(), undefined);
                 return Promise.resolve();
@@ -562,7 +562,7 @@ xdescribe('CampaignRefreshManager', () => {
             });
 
             sinon.stub(request, 'post').callsFake(() => {
-                const json = JSON.parse(OnCometVideoPlcCampaign);
+                const json = OnCometVideoPlcCampaign;
                 json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 'wrong/contentType';
                 return Promise.resolve(<INativeResponse> {
                     response: JSON.stringify(json),
@@ -589,7 +589,7 @@ xdescribe('CampaignRefreshManager', () => {
             });
 
             sinon.stub(request, 'post').callsFake(() => {
-                const json = JSON.parse(OnCometVideoPlcCampaign);
+                const json = OnCometVideoPlcCampaign;
                 json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 1;
                 return Promise.resolve(<INativeResponse> {
                     response: JSON.stringify(json),
@@ -612,8 +612,8 @@ xdescribe('CampaignRefreshManager', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
-            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
+            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
             campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });

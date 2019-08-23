@@ -12,7 +12,7 @@ describe('CoreConfigurationParserTest', () => {
 
     describe('Parsing json to configuration', () => {
         beforeEach(() => {
-            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
+            coreConfig = CoreConfigurationParser.parse(ConfigurationJson)
         });
 
         it('should have enabled parameter from configuration', () => {

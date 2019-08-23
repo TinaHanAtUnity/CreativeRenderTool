@@ -72,6 +72,7 @@
     "proto-loader": "^0.2.0",
     "raw-loader": "^3.1.0",
     "rimraf": "^2.6.3",
+    "rollup-plugin-json": "^4.0.0",
     "string-loader": "^0.0.1",
     "style-loader": "^0.23.1",
     "stylus-loader": "^3.0.2",
@@ -81,13 +82,13 @@
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
+    "typescript": "3.3.3",
     "url-loader": "^2.1.0",
+    "webfont": "^9.0.0",
     "webpack": "^4.38.0",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
-    "webpack-merge": "^4.2.1",
-    "typescript": "3.3.3",
-    "webfont": "^9.0.0"
+    "webpack-merge": "^4.2.1"
   }
 }

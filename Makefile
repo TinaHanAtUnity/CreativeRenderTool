@@ -42,7 +42,7 @@ IP_ADDRESS := $(shell node -p '[].concat.apply([], Object.values(os.networkInter
 
 # Sources
 
-SOURCES := $(shell find $(SOURCE_DIR) -mindepth 2 -type f -not -name '*.d.ts')
+SOURCES := $(shell find $(SOURCE_DIR) -mindepth 2 -type f -not -name '*.d.ts' | grep -v __mocks__ | grep -v .spec.ts)
 TS_SOURCES := $(filter %.ts, $(SOURCES))
 STYL_MAIN_SOURCE := $(SOURCE_DIR)/styl/main.styl
 STYL_SOURCES := $(filter %.styl, $(SOURCES))
@@ -244,7 +244,7 @@ $(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(H
 clean:
 	rm -rf $(BUILD_DIR)/*
 
-lint-ts: 
+lint-ts:
 	$(TSLINT) --project tsconfig.json $(TS_SOURCES)
 
 lint-es:
@@ -295,7 +295,7 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 		"watchman-make -p $(TEST_BUILD_DIR)/UnitBundle.js -t test-unit" \
 		"watchman-make -p $(TEST_BUILD_DIR)/IntegrationBundle.js -t test-integration"
 
-start-server: 
+start-server:
 	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || ([ -z "$$CI" ] && (open tools/serverLauncher.command || gnome-open tools/serverLauncher.command || xdg-open tools/serverLauncher.command) || python3 -m http.server 8000 >/dev/null 2>&1 &)
 
 deploy:

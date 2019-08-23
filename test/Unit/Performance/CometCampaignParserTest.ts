@@ -105,7 +105,7 @@ describe('CometCampaignParser', () => {
 
         describe('when it is an mraid campaign', () => {
             beforeEach(() => {
-                return parse(JSON.parse(OnCometMraidPlcCampaign));
+                return parse(OnCometMraidPlcCampaign)
             });
 
             it('should parse and return an mraid campaign', () => {
@@ -113,7 +113,7 @@ describe('CometCampaignParser', () => {
                 assert.isTrue(campaign instanceof MRAIDCampaign, 'Campaign was not an MRAIDCampaign');
 
                 const mraidCampaign = <MRAIDCampaign>campaign;
-                const json = JSON.parse(OnCometMraidPlcCampaign);
+                const json = { ... OnCometMraidPlcCampaign };
                 const content = JSON.parse(json.content);
 
                 assertBaseCampaign(content);
@@ -125,7 +125,7 @@ describe('CometCampaignParser', () => {
 
         describe('when it is a performance campaign', () => {
             beforeEach(() => {
-                return parse(JSON.parse(OnCometVideoPlcCampaign));
+                return parse(OnCometVideoPlcCampaign)
             });
 
             it('should parse and return a performance campaign', () => {
@@ -133,7 +133,7 @@ describe('CometCampaignParser', () => {
                 assert.isTrue(campaign instanceof PerformanceCampaign, 'Campaign was not an MRAIDCampaign');
 
                 const perfCampaign = <PerformanceCampaign>campaign;
-                const json = JSON.parse(OnCometVideoPlcCampaign);
+                const json = { ... OnCometVideoPlcCampaign };
                 const content = JSON.parse(json.content);
 
                 assertBaseCampaign(content);
@@ -164,7 +164,7 @@ describe('CometCampaignParser', () => {
                 beforeEach(() => {
                     sandbox = sinon.createSandbox();
                     sandbox.stub(SessionDiagnostics, 'trigger');
-                    campaignJSON = JSON.parse(OnCometVideoPlcCampaign);
+                    campaignJSON = { ... OnCometVideoPlcCampaign };
                     campaignJSON.content = JSON.parse(campaignJSON.content);
                 });
 
@@ -255,7 +255,7 @@ describe('CometCampaignParser', () => {
 
         describe('when it is a performance campaign with square end screen asset', () => {
             beforeEach(() => {
-                return parse(JSON.parse(OnCometVideoPlcCampaignSquareEndScreenAsset));
+                return parse(OnCometVideoPlcCampaignSquareEndScreenAsset)
             });
 
             it('should parse and return a performance campaign with square end screen asset', () => {
@@ -263,7 +263,7 @@ describe('CometCampaignParser', () => {
                 assert.isTrue(campaign instanceof PerformanceCampaign, 'Campaign was not an MRAIDCampaign');
 
                 const perfCampaign = <PerformanceCampaign>campaign;
-                const json = JSON.parse(OnCometVideoPlcCampaignSquareEndScreenAsset);
+                const json = OnCometVideoPlcCampaignSquareEndScreenAsset
                 const content = JSON.parse(json.content);
 
                 assertBaseCampaign(content);
