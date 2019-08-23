@@ -1,3 +1,8 @@
+# Pending
+
+* Add integration test for metadata & functionality used by AUI Test App [#9890](https://github.com/Applifier/unity-ads-webview/pull/9890)
+* Add Polyfiller Utility and Object.values Tests [#10927](https://github.com/Applifier/unity-ads-webview/pull/10927)
+
 # Thu Aug 22 23:02:42 UTC 2019
 
 * Remove unused AB test definition [#10954](https://github.com/Applifier/unity-ads-webview/pull/10954)
