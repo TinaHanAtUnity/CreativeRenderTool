@@ -394,8 +394,8 @@ describe('CustomFeatures', () => {
             height: 5
         };
 
-        let innerHeight: number;
-        let innerWidth: number;
+        let newInnerHeight: number;
+        let newInnerWidth: number;
         let userAgent: string;
 
         let oldInnerHeight: number;
@@ -409,12 +409,12 @@ describe('CustomFeatures', () => {
 
             // use valid useragent and screensize by default
             userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/76.0.253539693 Mobile/16F203 Safari/604.1';
-            innerHeight = validScreenSize.height;
-            innerWidth = validScreenSize.width;
+            newInnerHeight = validScreenSize.height;
+            newInnerWidth = validScreenSize.width;
 
             (<any>navigator).__defineGetter__('userAgent', () => userAgent);
-            (<any>window).__defineGetter__('innerWidth', () => innerWidth);
-            (<any>window).__defineGetter__('innerHeight', () => innerHeight);
+            (<any>window).__defineGetter__('innerWidth', () => newInnerWidth);
+            (<any>window).__defineGetter__('innerHeight', () => newInnerHeight);
         });
 
         afterEach(() => {
@@ -472,22 +472,22 @@ describe('CustomFeatures', () => {
 
         describe('Aspect ratio', () => {
             it('should return false if aspect ratio is 4:3', () => {
-                innerHeight = 4;
-                innerWidth = 3;
+                newInnerHeight = 4;
+                newInnerWidth = 3;
                 const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
                 assert.isFalse(isEnabled);
             });
 
             it('should return false if aspect ratio is smaller than 4:3', () => {
-                innerHeight = 3.5;
-                innerWidth = 3;
+                newInnerHeight = 3.5;
+                newInnerWidth = 3;
                 const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
                 assert.isFalse(isEnabled);
             });
 
             it('should return true if aspect ratio is bigger than 4:3', () => {
-                innerHeight = 5;
-                innerWidth = 3;
+                newInnerHeight = 5;
+                newInnerWidth = 3;
                 const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
                 assert.isTrue(isEnabled);
             });
