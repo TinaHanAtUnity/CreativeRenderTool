@@ -2,10 +2,10 @@
 type OnDownloadCallback = (event: Event) => void;
 
 export interface IParallaxLayerParams {
-  xOffset: number;
-  yOffset: number;
-  distance: number;
-  transformOffset: number;
+    xOffset: number;
+    yOffset: number;
+    distance: number;
+    transformOffset: number;
 }
 
 export class ParallaxLayer {
@@ -57,16 +57,16 @@ export class ParallaxLayer {
     }
 
     public getSize(): number[] {
-      return [this._width, this._height];
+        return [this._width, this._height];
     }
 
     public scale(scale: number, width: number, height: number, xRootOffset: number, parentWidth: number): void {
-      this._img.style.width = `${this._width * scale / width * 100}%`;
-      this._img.style.height = `${this._height * scale / height * 100}%`;
+        this._img.style.width = `${this._width * scale / width * 100}%`;
+        this._img.style.height = `${this._height * scale / height * 100}%`;
 
-      this._img.style.top = `${this._params.yOffset * scale}px`;
-      this._xMaximum = xRootOffset;
-      this._xOffset = this._params.xOffset * scale - xRootOffset * this._params.transformOffset;
-      this._img.style.left = `${this._xOffset}px`;
+        this._img.style.top = `${this._params.yOffset * scale}px`;
+        this._xMaximum = xRootOffset;
+        this._xOffset = this._params.xOffset * scale - xRootOffset * this._params.transformOffset;
+        this._img.style.left = `${this._xOffset}px`;
     }
 }
