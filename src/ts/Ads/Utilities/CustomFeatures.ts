@@ -182,7 +182,24 @@ export class CustomFeatures {
                gameId === '3095066' ||  // Double Win Vegas         : iOS
                gameId === '3095067' ||  // Double Win Vegas         : Android
                gameId === '3248965' ||  // Ironsource Internal ID   : iOS
-               gameId === '3248964';    // Ironsource Internal ID   : Android
+               gameId === '3248964' ||  // Ironsource Internal ID   : Android
+               gameId === '1580822' ||  // SimCity BuildIt China    : iOS
+               gameId === '1047241' ||  // Solitaire Deluxe 2       : iOS
+               gameId === '1047242' ||  // Solitaire Deluxe 2       : Android
+               gameId === '3131831' ||  // Bus Simulator: Ultimate  : iOS
+               gameId === '3131830' ||  // Bus Simulator: Ultimate  : Android
+               gameId === '3089601' ||  // Always Sunny: GG Mobile  : iOS
+               gameId === '3089600' ||  // Always Sunny: GG Mobile  : Android
+               gameId === '3112525' ||  // Solitaire Infinite       : iOS
+               gameId === '3112524' ||  // Solitaire Infinite       : Android
+               gameId === '108057'  ||  // Crossword Quiz           : iOS
+               gameId === '105361'  ||  // Crossword Quiz           : Android
+               gameId === '20721'   ||  // Trivia Crack             : iOS
+               gameId === '20723'   ||  // Trivia Crack             : Android
+               gameId === '112873'  ||  // Infinite Word Search     : iOS
+               gameId === '113115'  ||  // Infinite Word Search     : Android
+               gameId === '2784703' ||  // Bitlife                  : iOS
+               gameId === '3179966';    // Lucky Money              : Android
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
