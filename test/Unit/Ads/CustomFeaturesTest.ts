@@ -398,29 +398,25 @@ describe('CustomFeatures', () => {
         let newInnerWidth: number;
         let userAgent: string;
 
-        let oldInnerHeight: number;
-        let oldInnerWidth: number;
-        let oldUserAgent: string;
+        let navigatorStub: any;
+        let innerWidthStub: any;
+        let innerHeightStub: any;
 
         beforeEach(() => {
-            oldUserAgent = navigator.userAgent;
-            oldInnerWidth = window.innerWidth;
-            oldInnerHeight = window.innerHeight;
-
             // use valid useragent and screensize by default
             userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/76.0.253539693 Mobile/16F203 Safari/604.1';
             newInnerHeight = validScreenSize.height;
             newInnerWidth = validScreenSize.width;
 
-            (<any>navigator).__defineGetter__('userAgent', () => userAgent);
-            (<any>window).__defineGetter__('innerWidth', () => newInnerWidth);
-            (<any>window).__defineGetter__('innerHeight', () => newInnerHeight);
+            navigatorStub = sinon.stub(navigator, 'userAgent').get(() => userAgent);
+            innerWidthStub = sinon.stub(window, 'innerWidth').get(() => newInnerWidth);
+            innerHeightStub = sinon.stub(window, 'innerHeight').get(() => newInnerHeight);
         });
 
         afterEach(() => {
-            (<any>navigator).__defineGetter__('userAgent', () => oldUserAgent);
-            (<any>window).__defineGetter__('innerWidth', () => oldInnerWidth);
-            (<any>window).__defineGetter__('innerHeight', () => oldInnerHeight);
+            navigatorStub.restore();
+            innerWidthStub.restore();
+            innerHeightStub.restore();
         });
 
         describe('Device model', () => {
