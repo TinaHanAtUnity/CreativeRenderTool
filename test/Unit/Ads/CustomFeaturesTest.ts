@@ -227,6 +227,60 @@ describe('CustomFeatures', () => {
         }, {
             gameId: '3248964',
             expected: true
+        }, {
+            gameId: '3248964',
+            expected: true
+        }, {
+            gameId: '1580822',
+            expected: true
+        }, {
+            gameId: '1047242',
+            expected: true
+        }, {
+            gameId: '1047241',
+            expected: true
+        }, {
+            gameId: '3131831',
+            expected: true
+        }, {
+            gameId: '3131830',
+            expected: true
+        }, {
+            gameId: '3089601',
+            expected: true
+        }, {
+            gameId: '3089600',
+            expected: true
+        }, {
+            gameId: '3112525',
+            expected: true
+        }, {
+            gameId: '3112524',
+            expected: true
+        }, {
+            gameId: '108057',
+            expected: true
+        }, {
+            gameId: '105361',
+            expected: true
+        }, {
+            gameId: '20721',
+            expected: true
+        }, {
+            gameId: '20723',
+            expected: true
+        }, {
+            gameId: '112873',
+            expected: true
+        }, {
+            gameId: '113115',
+            expected: true
+        }, {
+            gameId: '2784703',
+            expected: true
+        }, {
+            gameId: '3179966',
+            expected: true
         }];
 
         tests.forEach(t => {
