@@ -386,7 +386,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe.only('isParallaxEndScreenEnabled', () => {
+    describe('isParallaxEndScreenEnabled', () => {
         const existingGameId = 500010005;
         const enabledAbGroups = [toAbGroup(5), toAbGroup(6)];
         const validScreenSize = {
@@ -412,15 +412,15 @@ describe('CustomFeatures', () => {
             innerHeight = validScreenSize.height;
             innerWidth = validScreenSize.width;
 
-            (<any>navigator)['__defineGetter__']('userAgent', () => userAgent);
-            (<any>window)['__defineGetter__']('innerWidth', () => innerWidth);
-            (<any>window)['__defineGetter__']('innerHeight', () => innerHeight);
+            (<any>navigator).__defineGetter__('userAgent', () => userAgent);
+            (<any>window).__defineGetter__('innerWidth', () => innerWidth);
+            (<any>window).__defineGetter__('innerHeight', () => innerHeight);
         });
 
         afterEach(() => {
-            (<any>navigator)['__defineGetter__']('userAgent', () => oldUserAgent);
-            (<any>window)['__defineGetter__']('innerWidth', () => oldInnerWidth);
-            (<any>window)['__defineGetter__']('innerHeight', () => oldInnerHeight);
+            (<any>navigator).__defineGetter__('userAgent', () => oldUserAgent);
+            (<any>window).__defineGetter__('innerWidth', () => oldInnerWidth);
+            (<any>window).__defineGetter__('innerHeight', () => oldInnerHeight);
         });
 
         describe('Device model', () => {
