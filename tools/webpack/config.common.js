@@ -17,7 +17,9 @@ const postCssLoaderOptions = {
 module.exports = {
     resolve: {
         plugins: [
-            new TsconfigPathsPlugin({}),
+            new TsconfigPathsPlugin({
+                configFile: './tsconfig.webpack.json'
+            }),
         ],
         extensions: [
             '.ts',
@@ -49,6 +51,7 @@ module.exports = {
                     {
                         loader: 'ts-loader',
                         options: {
+
                             transpileOnly: true
                         }
                     }

@@ -10,4 +10,9 @@ module.exports = {
     "^.+\\.jsx?$": "babel-jest",
     "^.+\\.(html|xml)?$": "html-loader-jest",
   },
+  globals: {
+    'ts-jest': {
+      tsConfig: 'tsconfig.webpack.json'
+    }
+  }
 };
