@@ -1,6 +1,8 @@
-# pending
+# Pending
 
-* Parallax end card experiment [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
+* Begin Parallax Endcard Experiment on ABGroups 5 and 6 [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
+* Fix Ads SDK 3.2 usePerPlacementLoad Bug [#10986](https://github.com/Applifier/unity-ads-webview/pull/10986)
+* Add CDN Purge HTTP Status Code for Failures [#10987](https://github.com/Applifier/unity-ads-webview/pull/10987)
 
 # Fri Aug 23 22:21:31 UTC 2019
 
