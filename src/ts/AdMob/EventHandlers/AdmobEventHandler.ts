@@ -4,7 +4,7 @@ import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { IAdMobEventHandler } from 'AdMob/Views/AdMobView';
-import { IOpenableIntentsRequest, ITouchInfo } from 'AdMob/Views/AFMABridge';
+import { IOpenableIntentsRequest, ITouchInfo} from 'AdMob/Views/AFMABridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
@@ -157,6 +157,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
             };
             this._adUnit.sendClickSignalResponse(response);
         });
+    }
+
+    public onMuteChange(mute: boolean) {
+        this._adUnit.sendMuteChange(mute);
     }
 
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
