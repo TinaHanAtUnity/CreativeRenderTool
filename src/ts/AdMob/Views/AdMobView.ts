@@ -23,6 +23,7 @@ import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import OMIDSessionClient from 'html/omid/session-interface.html';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -56,8 +57,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _om: OpenMeasurement | undefined;
+    private _deviceInfo: DeviceInfo;
 
-    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: OpenMeasurement | undefined) {
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: OpenMeasurement | undefined) {
         super(platform, 'admob');
 
         this._campaign = campaign;
@@ -68,6 +70,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._om = om;
+        this._deviceInfo = deviceInfo;
 
         this._afmaBridge = new AFMABridge(core, {
             onAFMAClose: () => this.onClose(),
