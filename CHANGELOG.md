@@ -1,3 +1,7 @@
+# pending
+
+* Parallax end card experiment [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
+
 # Fri Aug 23 22:21:31 UTC 2019
 
 * Add integration test for metadata & functionality used by AUI Test App [#9890](https://github.com/Applifier/unity-ads-webview/pull/9890)
