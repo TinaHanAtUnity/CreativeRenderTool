@@ -123,15 +123,12 @@ export class Slider {
         this._rootElement.appendChild(indicatorContainer);
     }
 
-    private modulo (num: number, div: number): number {
-        return ((num % div) + div) % div;
-    }
-
     private updateIndicators(): void {
         for (const indicator of this._indicators) {
             indicator.classList.remove('active');
         }
-        this._indicators[this.modulo(this._currentSlideIndex, this._slides.length)].classList.add('active');
+        const clampIndicator = Math.abs(this._currentSlideIndex) % this._slides.length;
+        this._indicators[clampIndicator].classList.add('active');
     }
 
     private initializeTouchEvents(): void {
@@ -373,16 +370,15 @@ export class Slider {
     private setActiveSlide(instant?: boolean): void {
         for (const child of this._slidesContainer.childNodes) {
             const slide = <HTMLElement>child;
-            const index = parseInt(slide.getAttribute('slide-index')!, 10);
-            if (instant && index === this._currentSlideIndex) {
-                slide.style.transform = 'scale(1)';
-                slide.style.filter = 'blur(0)';
-                slide.style.transition = 'all 0s';
-            } else {
-                slide.style.transform = '';
-                slide.style.filter = '';
-                slide.style.transition = '';
+            if (!slide) {
+                return;
             }
+            const index = parseInt(slide.getAttribute('slide-index')!, 10);
+
+            instant && index === this._currentSlideIndex
+                ? slide.classList.add('slide-instant')
+                : slide.classList.remove('slide-instant');
+
             index === this._currentSlideIndex && !instant
                 ? slide.classList.add('active-slide')
                 : slide.classList.remove('active-slide');
