@@ -199,8 +199,6 @@ export class CustomFeatures {
                gameId === '2988495' ||  // Zynga Freecell Solitaire : Android
                gameId === '3054609' ||  // Unity Test App           : iOS
                gameId === '3054608' ||  // Unity Test App           : Android
-               gameId === '3083498' ||  // Max test ID              : iOS
-               gameId === '3083499' ||  // Max test ID              : Android
                gameId === '3238965' ||  // Admob test ID            : iOS
                gameId === '3238964' ||  // Admob test ID            : Android
                gameId === '3238970' ||  // Mopub test ID            : iOS
