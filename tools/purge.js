@@ -135,7 +135,7 @@ let purgeAkamai = (urlRoot) => {
         body: JSON.stringify(body)
     }, 5, 5000).then(res => {
         if(res.status !== 201) {
-            throw new Error('Akamai purge request failed');
+            throw new Error(`Akamai purge request failed with HTTP code: ${res.status}`);
         }
         return res.text();
     }).then(body => {
@@ -206,7 +206,7 @@ let purgeChinaNetCenter = (urlRoot) => {
 
     return fetchRetry(endpoint, {}, 5, 5000).then(res => {
         if(res.status !== 200) {
-            throw new Error('ChinaNetCenter purge request failed');
+            throw new Error(`ChinaNetCenter purge request failed with HTTP code: ${res.status}`);
         }
         return res.text();
     }).then(body => {
@@ -274,7 +274,7 @@ let purgeAliBabaCloud = (urlRoot) => {
     return Promise.all(getUrls(urls).map((url) => {
         return fetchRetry(url, {}, 5, 5000).then(res => {
             if(res.status !== 200) {
-                throw new Error('AliBabaCloud purge request failed');
+                throw new Error(`AliBabaCloud purge request failed with HTTP code: ${res.status}`);
             }
             return res.text();
         }).then(body => {
