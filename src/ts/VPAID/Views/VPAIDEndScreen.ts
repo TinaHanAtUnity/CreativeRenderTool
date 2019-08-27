@@ -4,7 +4,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 
 import { View } from 'Core/Views/View';
-import VastEndScreenTemplate from 'html/VastEndScreen.html';
+import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
 export interface IVPAIDEndScreenHandler {
@@ -19,7 +19,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     constructor(platform: Platform, campaign: VPAIDCampaign, gameId: string) {
         super(platform, 'end-screen');
 
-        this._template = new Template(VastEndScreenTemplate);
+        this._template = new Template(VastStaticEndScreenTemplate);
 
         if (campaign) {
             const landscape = campaign.getCompanionLandscapeUrl();

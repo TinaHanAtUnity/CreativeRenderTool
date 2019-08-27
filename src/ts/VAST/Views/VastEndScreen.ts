@@ -5,7 +5,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
-import VastEndScreenTemplate from 'html/VastEndScreen.html';
+import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
+import VastIframeEndScreenTemplate from 'html/VastIframeEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export interface IVastEndScreenHandler {
@@ -33,18 +34,25 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         super(platform, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
-        this._template = new Template(VastEndScreenTemplate);
         this._country = parameters.country;
         this._privacy = privacy;
 
-        if (this._campaign) {
-            const landscape = this._campaign.getLandscape();
-            const portrait = this._campaign.getPortrait();
+        if (this._campaign.hasIframeEndscreen()) {
+            this._template = new Template(VastIframeEndScreenTemplate);
+            this._templateData = {
+                'endScreenurl': (this._campaign.getVast().getIframeCompanionResourceUrl() ? this._campaign.getVast().getIframeCompanionResourceUrl() : undefined)
+            };
+        } else if (this._campaign.hasStaticEndscreen()) {
+            this._template = new Template(VastStaticEndScreenTemplate);
+            const landscape = this._campaign.getStaticLandscape();
+            const portrait = this._campaign.getStaticPortrait();
 
             this._templateData = {
                 'endScreenLandscape': (landscape ? landscape.getUrl() : (portrait ? portrait.getUrl() : undefined)),
                 'endScreenPortrait': (portrait ? portrait.getUrl() : (landscape ? landscape.getUrl() : undefined))
             };
+        } else {
+            this._template = new Template(VastStaticEndScreenTemplate);
         }
 
         this._bindings = [
