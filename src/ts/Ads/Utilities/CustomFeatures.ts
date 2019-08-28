@@ -3,12 +3,13 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
+import { SliderEndCardExperiment, ParallaxEndScreenExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
+import ParallaxEndScreenImagesJson from 'json/experiments/ParallaxEndScreenImages.json';
 
-const JsonStringObjectParser = (json: string): { [index: string]: number } => {
+const JsonStringObjectParser = <T>(json: string): { [index: string]: T } => {
     try {
         return JSON.parse(json);
     } catch {
@@ -16,7 +17,8 @@ const JsonStringObjectParser = (json: string): { [index: string]: number } => {
     }
 };
 
-const SliderEndScreenImages = JsonStringObjectParser(SliderEndScreenImagesJson);
+const ParallaxEndScreenImages = JsonStringObjectParser<number[][]>(ParallaxEndScreenImagesJson);
+const SliderEndScreenImages = JsonStringObjectParser<number>(SliderEndScreenImagesJson);
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
@@ -138,6 +140,36 @@ export class CustomFeatures {
         return SliderEndScreenImages[targetGameAppStoreId];
     }
 
+    public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameId: number) {
+        // Filter out old samsung devices since they give odd deviceorientation values
+        const isOldSamsung = navigator.userAgent.match(/Android.*(SM-A500|SM-A300|SM-A310|SM-N91|SM-G1|SM-G85|G530|SM-G3|SM-G90|GT-I|GT-S)/i);
+        if (isOldSamsung) {
+            return false;
+        }
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        if ((width === 0 || height === 0) && window.screen !== undefined) {
+            width = window.screen.width;
+            height = window.screen.height;
+        }
+
+        if (width <= 0 || height <= 0) {
+            return false;
+        }
+
+        // Endcard and parallax backgrounds have the same aspect ratio in landscape on iPads, which will prevent us from moving the background.
+        // Prevent parallax effect from running on devices with aspect ratio similar to iPads
+        const aspectRatio = height / width;
+        const isValidAspectRatio = aspectRatio > 4 / 3 || aspectRatio < 3 / 4;
+
+        return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages[targetGameId] !== undefined && isValidAspectRatio;
+    }
+
+    public static getParallaxEndScreenData(targetGameId: number): number[][] {
+        return ParallaxEndScreenImages[targetGameId];
+    }
+
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
         return this.existsInList(LionStudiosGameIds, gameId);
     }
@@ -149,20 +181,55 @@ export class CustomFeatures {
         return gameId === '2988443';
     }
 
-    public static isWhiteListedForLoadApi(gameId: string) {
-        return gameId === '2988443' ||  // Zynga Solitaire          : Android
+    /**
+     * Rollout plan can be found here: https://docs.google.com/document/d/1QI-bjyTZrwNgx4D6X8_oq5FW_57ikPKBcwbY_MQ_v4g/edit?ts=5d5713ce#
+     * Lists are split out to easily handle the rollout plan
+     */
+    public static isPartOfPhaseTwoLoadRollout(gameId: string): boolean {
+        const wordsWithFriends = ['2895988', '2895998', '2796593', '2895987', '2896000', '2796594'];
+        const zyngaSolitaire = ['2988443', '2988442', '2988495', '2988494'];
+
+        return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
+    }
+
+    public static isWhiteListedForLoadApi(gameId: string): boolean {
+        return gameId === '2988442' ||  // Zynga Solitaire          : iOS
+               gameId === '2988443' ||  // Zynga Solitaire          : Android
                gameId === '2988494' ||  // Zynga Freecell           : iOS
                gameId === '2988495' ||  // Zynga Freecell Solitaire : Android
                gameId === '3054609' ||  // Unity Test App           : iOS
                gameId === '3054608' ||  // Unity Test App           : Android
-               gameId === '3083498' ||  // Max test ID              : iOS
-               gameId === '3083499' ||  // Max test ID              : Android
                gameId === '3238965' ||  // Admob test ID            : iOS
                gameId === '3238964' ||  // Admob test ID            : Android
                gameId === '3238970' ||  // Mopub test ID            : iOS
                gameId === '3238971' ||  // Mopub test ID            : Android
-               gameId === '3238972' ||  // IronSource test ID       : iOS
-               gameId === '3238973';    // IronSource test ID       : Android
+               gameId === '3238972' ||  // Unity-Ironsource ID      : iOS
+               gameId === '3238973' ||  // Unity-Ironsource ID      : Android
+               gameId === '1793545' ||  // Sniper Strike            : iOS
+               gameId === '1793539' ||  // Sniper Strike            : Android
+               gameId === '3239343' ||  // China Unity Support App  : iOS
+               gameId === '3239342' ||  // China Unity Support App  : Android
+               gameId === '3095066' ||  // Double Win Vegas         : iOS
+               gameId === '3095067' ||  // Double Win Vegas         : Android
+               gameId === '3248965' ||  // Ironsource Internal ID   : iOS
+               gameId === '3248964' ||  // Ironsource Internal ID   : Android
+               gameId === '1580822' ||  // SimCity BuildIt China    : iOS
+               gameId === '1047241' ||  // Solitaire Deluxe 2       : iOS
+               gameId === '1047242' ||  // Solitaire Deluxe 2       : Android
+               gameId === '3131831' ||  // Bus Simulator: Ultimate  : iOS
+               gameId === '3131830' ||  // Bus Simulator: Ultimate  : Android
+               gameId === '3089601' ||  // Always Sunny: GG Mobile  : iOS
+               gameId === '3089600' ||  // Always Sunny: GG Mobile  : Android
+               gameId === '3112525' ||  // Solitaire Infinite       : iOS
+               gameId === '3112524' ||  // Solitaire Infinite       : Android
+               gameId === '108057'  ||  // Crossword Quiz           : iOS
+               gameId === '105361'  ||  // Crossword Quiz           : Android
+               gameId === '20721'   ||  // Trivia Crack             : iOS
+               gameId === '20723'   ||  // Trivia Crack             : Android
+               gameId === '112873'  ||  // Infinite Word Search     : iOS
+               gameId === '113115'  ||  // Infinite Word Search     : Android
+               gameId === '2784703' ||  // Bitlife                  : iOS
+               gameId === '3179966';    // Lucky Money              : Android
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

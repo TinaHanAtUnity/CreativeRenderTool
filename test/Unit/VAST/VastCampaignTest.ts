@@ -40,14 +40,24 @@ describe('VastCampaignTest', () => {
     });
 
     describe('when VAST has a companion ad', () => {
-        it('should have an endscreen when VAST has portrait or landscape url', () => {
-            const vastCampaign = TestFixtures.getCompanionVastCampaign();
+        it('should have an static endscreen when VAST has portrait or landscape url', () => {
+            const vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
             assert.equal(vastCampaign.hasStaticEndscreen(), true);
         });
 
-        it('should not have an endscreen when both portrait and landscape urls missing', () => {
+        it('should not have an static endscreen when both portrait and landscape urls missing', () => {
             const vastCampaign = TestFixtures.getCompanionVastCampaignWithoutImages();
             assert.equal(vastCampaign.hasStaticEndscreen(), false);
+        });
+        // enable these tests if abgroup is enabled
+        xit('should have an iframe endscreen when VAST has iframe url', () => {
+            const vastCampaign = TestFixtures.getCompanionIframeVastCampaign();
+            assert.equal(vastCampaign.hasIframeEndscreen(), true);
+        });
+
+        xit('should not have an iframe endscreen when VAST has no iframe', () => {
+            const vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
+            assert.equal(vastCampaign.hasIframeEndscreen(), false);
         });
     });
 });

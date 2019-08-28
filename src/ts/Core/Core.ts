@@ -216,8 +216,6 @@ export class Core implements ICore {
             this.Ads = new Ads(configJson, this, this.Store);
 
             return this.Ads.initialize();
-        }).then(() => {
-            return this.Api.Sdk.initComplete();
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
                 // tslint:disable-next-line

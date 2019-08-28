@@ -77,7 +77,7 @@ import { IStoreApi } from 'Store/IStore';
                 return Promise.resolve(url);
             });
 
-            const campaign = TestFixtures.getCompanionVastCampaign();
+            const campaign = TestFixtures.getCompanionStaticVastCampaign();
             const thirdPartyEventManager = new ThirdPartyEventManager(core, request);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();

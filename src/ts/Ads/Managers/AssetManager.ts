@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, ProgrammaticTrackingService, CachingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -205,10 +205,7 @@ export class AssetManager {
             // disable caching if there is less than 20 megabytes free space in cache directory
             if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
-
-                Diagnostics.trigger('caching_disabled', {
-                    freeCacheSpace: freeSpace
-                });
+                this._pts.reportMetric(CachingMetric.CachingModeForcedToDisabled);
             }
 
             return;

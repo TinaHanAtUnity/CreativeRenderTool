@@ -17,6 +17,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 
 export class ProgrammaticVastParser extends CampaignParser {
 
@@ -34,13 +35,15 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _requestManager: RequestManager;
     protected _deviceInfo: DeviceInfo;
     protected _vastParserStrict: VastParserStrict;
+    protected _coreConfig: CoreConfiguration;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
-        this._vastParserStrict = new VastParserStrict();
         this._deviceInfo = core.DeviceInfo;
         this._coreApi = core.Api;
         this._requestManager = core.RequestManager;
+        this._coreConfig = core.Config;
+        this._vastParserStrict = new VastParserStrict(undefined, undefined, this._coreConfig);
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -99,17 +102,21 @@ export class ProgrammaticVastParser extends CampaignParser {
             }
         }
 
-        const portraitUrl = vast.getCompanionPortraitUrl();
-        let portraitAsset;
-        if (portraitUrl) {
-            portraitAsset = new Image(Url.encode(portraitUrl), session);
+        let hasStaticEndscreenFlag = false;
+        const staticPortraitUrl = vast.getStaticCompanionPortraitUrl();
+        const staticLandscapeUrl = vast.getStaticCompanionLandscapeUrl();
+        let staticPortraitAsset;
+        let staticLandscapeAsset;
+        if (staticPortraitUrl) {
+            hasStaticEndscreenFlag = true;
+            staticPortraitAsset = new Image(Url.encode(staticPortraitUrl), session);
+        }
+        if (staticLandscapeUrl) {
+            hasStaticEndscreenFlag = true;
+            staticLandscapeAsset = new Image(Url.encode(staticLandscapeUrl), session);
         }
 
-        const landscapeUrl = vast.getCompanionLandscapeUrl();
-        let landscapeAsset;
-        if (landscapeUrl) {
-            landscapeAsset = new Image(Url.encode(landscapeUrl), session);
-        }
+        const hasIframeEndscreenFlag = !!vast.getIframeCompanionResourceUrl();
 
         const mediaVideo = VastMediaSelector.getOptimizedVastMediaFile(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideo) {
@@ -135,9 +142,10 @@ export class ProgrammaticVastParser extends CampaignParser {
             ... baseCampaignParams,
             vast: vast,
             video: new Video(mediaVideoUrl, session, undefined, response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
-            hasStaticEndscreen: !!portraitAsset || !!landscapeAsset,
-            portrait: portraitAsset,
-            landscape: landscapeAsset,
+            hasStaticEndscreen: hasStaticEndscreenFlag,
+            hasIframeEndscreen: hasIframeEndscreenFlag,
+            staticPortrait: staticPortraitAsset,
+            staticLandscape: staticLandscapeAsset,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
             buyerId: response.getBuyerId() || undefined,
             appCategory: response.getCategory() || undefined,

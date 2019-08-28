@@ -32,6 +32,10 @@ export enum BannerMetric {
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
 }
 
+export enum CachingMetric {
+    CachingModeForcedToDisabled = 'caching_mode_forced_to_disabled' // Occurs when user has less than 20mb of freespace in cache directory
+}
+
 export enum ChinaMetric {
     ChineseUserInitialized = 'chinese_user_intialized',
     ChineseUserIdentifiedCorrectlyByNetworkOperator = 'chinese_user_identified_correctly_by_network_operator',
@@ -47,8 +51,7 @@ export enum VastMetric {
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-    CampaignAttemptedToShowAdInBackground = 'ad_attempted_showad_background',
-    CampaignAboutToShowAdInBackground = 'ad_aboutto_showad_background'
+    CampaignAttemptedShowInBackground = 'ad_attempted_show_background'
 }
 
 export enum LoadMetric {
@@ -66,7 +69,7 @@ export enum PurchasingMetric {
     PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;

@@ -96,7 +96,8 @@ import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import EventTestVast from 'xml/EventTestVast.xml';
-import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastStaticCompanionXml from 'xml/VastCompanionAd.xml';
+import VastIframeCompanionXml from 'xml/VastCompanionAdIFrame.xml';
 import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
@@ -401,26 +402,31 @@ export class TestFixtures {
         if (!session) {
             session = this.getSession();
         }
-        const portraitUrl = vast.getCompanionPortraitUrl();
-        let portraitAsset;
-        if (portraitUrl) {
-            portraitAsset = new Image(portraitUrl, session);
+        let hasStaticEndscreenFlag = false;
+        const staticPortraitUrl = vast.getStaticCompanionPortraitUrl();
+        const staticLandscapeUrl = vast.getStaticCompanionLandscapeUrl();
+        let staticPortraitAsset;
+        let staticLandscapeAsset;
+        if (staticPortraitUrl) {
+            hasStaticEndscreenFlag = true;
+            staticPortraitAsset = new Image(staticPortraitUrl, session);
+        }
+        if (staticLandscapeUrl) {
+            hasStaticEndscreenFlag = true;
+            staticLandscapeAsset = new Image(staticLandscapeUrl, session);
         }
 
-        const landscapeUrl = vast.getCompanionLandscapeUrl();
-        let landscapeAsset;
-        if (landscapeUrl) {
-            landscapeAsset = new Image(landscapeUrl, session);
-        }
+        const hasIframeEndscreenFlag = !!vast.getIframeCompanionResourceUrl();
 
         return {
             ... this.getVASTCampaignBaseParams(session, campaignId),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             vast: vast,
             video: new Video(vast.getVideoUrl(), session),
-            hasStaticEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
-            portrait: portraitAsset,
-            landscape: landscapeAsset,
+            hasStaticEndscreen: hasStaticEndscreenFlag,
+            hasIframeEndscreen: hasIframeEndscreenFlag,
+            staticPortrait: staticPortraitAsset,
+            staticLandscape: staticLandscapeAsset,
             appCategory: 'appCategory',
             appSubcategory: 'appSubCategory',
             advertiserDomain: 'advertiserDomain',
@@ -606,9 +612,15 @@ export class TestFixtures {
         return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
-    public static getCompanionVastCampaign(): VastCampaign {
+    public static getCompanionStaticVastCampaign(): VastCampaign {
         const vastParser = TestFixtures.getVastParserStrict();
-        const vast = vastParser.parseVast(VastCompanionXml);
+        const vast = vastParser.parseVast(VastStaticCompanionXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+     public static getCompanionIframeVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParserStrict();
+        const vast = vastParser.parseVast(VastIframeCompanionXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 

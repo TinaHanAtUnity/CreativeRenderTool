@@ -269,7 +269,7 @@ describe('VastAdUnitTest', () => {
                 };
 
                 const video = new Video('', TestFixtures.getSession());
-                vastCampaign = TestFixtures.getCompanionVastCampaign();
+                vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
                 sinon.stub(vastCampaign, 'getVideo').returns(video);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
                 const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
@@ -331,6 +331,16 @@ describe('VastAdUnitTest', () => {
             }).then(() => {
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
+        });
+    });
+
+    it('should hide and then remove om on hide', () => {
+        return vastAdUnit.hide().then(() => {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>openMeasurement.removeFromViewHieararchy);
             });
         });
     });

@@ -15,6 +15,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
@@ -73,9 +74,11 @@ enum OMState {
     STOPPED
 }
 
-export const OMID_P = 'Unity/1.2.10';
-export const SDK_APIS = '7';
 export const PARTNER_NAME = 'Unity3d';
+export const DEFAULT_VENDOR_KEY = 'default_key';
+export const OM_JS_VERSION = '1.2.10';
+export const OMID_P = `${PARTNER_NAME}/${OM_JS_VERSION}`;
+export const SDK_APIS = '7';
 
 export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
@@ -91,6 +94,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
     private _omAdSessionId: string;
+    private _admobSlotElement: HTMLElement;
+    private _admobVideoElement: HTMLElement;
+    private _admobElementBounds: IRectangle;
 
     private _deviceVolume: number;
     private _sessionStartCalled = false;
@@ -135,7 +141,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             onSessionFinish: (sessionEvent) => this.sessionFinish(sessionEvent),
             onInjectVerificationResources: (verifcationResources) => this.injectVerificationResources(verifcationResources),
             onPopulateVendorKey: (vendorKey) => this.populateVendorKey(vendorKey),
-            onEventProcessed: (eventType) => this.onEventProcessed(eventType)
+            onEventProcessed: (eventType) => this.onEventProcessed(eventType),
+            onSlotElement: (element) => { this._admobSlotElement = element; },
+            onVideoElement: (element) => { this._admobVideoElement = element; },
+            onElementBounds: (elementBounds) => { this._admobElementBounds = elementBounds; }
         }, this._omIframe, this);
     }
 
@@ -147,7 +156,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public removeFromViewHieararchy(): void {
         this.removeMessageListener();
-        document.body.removeChild(this.container());
+        if (this.container().parentElement) {
+            document.body.removeChild(this.container());
+        }
     }
 
     public addMessageListener() {
@@ -165,6 +176,18 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public injectAdVerifications(): Promise<void> {
         const verificationResources: IVerificationScriptResource[] = this.setUpVerificationResources(this._adVerifications);
         return this.injectVerificationResources(verificationResources);
+    }
+
+    public getSlotElement(): HTMLElement {
+        return this._admobSlotElement;
+    }
+
+    public getVideoElement(): HTMLElement {
+        return this._admobVideoElement;
+    }
+
+    public getAdmobVideoElementBounds(): IRectangle {
+        return this._admobElementBounds;
     }
 
     public getOMAdSessionId() {
@@ -186,7 +209,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public render(): void {
         super.render();
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = OMID3p;
+        this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
 
         this._omBridge.setIframe(this._omIframe);
     }
@@ -427,6 +450,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             videoHeight = this._videoViewRectangle.height;
         }
 
+        if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
+            topLeftX = 0;
+            topLeftY = 0;
+            videoWidth = 0;
+            videoHeight = 0;
+        }
+
         const adView: IAdView = {
             percentageInView: percentInView,
             geometry: {
@@ -467,6 +497,17 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         return adView;
+    }
+
+    public getScreenDensity(): number {
+        if (this._platform === Platform.ANDROID) {
+            return (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity();
+        }
+        return 0;
+    }
+
+    public getAndroidViewSize(size: number, density: number): number {
+        return size * (density / 160);
     }
 
     public calculatePercentageInView(videoRectangle: IRectangle, obstruction: IRectangle, screenRectangle: IRectangle) {
@@ -564,6 +605,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (eventType === 'loadError') {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
         }
+
+        if (eventType === 'vendorkeyMismatch') {
+            this._core.Sdk.logDebug('Vendor attribute was either never registered or vendor attribute does not match registered key. SessionStart not called.');
+        }
     }
 
     private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
@@ -578,7 +623,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (accessMode === AccessMode.LIMITED) {
             impressionObject.viewPort = this.calculateViewPort(screenWidth, screenHeight);
-            impressionObject.adView = this.calculateVastAdView(100, [], screenWidth, screenHeight, measuringElementAvailable, []);
+            const screenRectangle = this.createRectangle(0, 0, screenWidth, screenHeight);
+
+            const percentageInView = this.calculateObstructionOverlapPercentage(this._videoViewRectangle, screenRectangle);
+            const obstructionReasons: ObstructionReasons[] = [];
+            if (percentageInView < 100) {
+                obstructionReasons.push(ObstructionReasons.HIDDEN);
+            }
+            impressionObject.adView = this.calculateVastAdView(percentageInView, obstructionReasons, screenWidth, screenHeight, measuringElementAvailable, []);
         }
 
         return impressionObject;
@@ -714,10 +766,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public injectAsString(resourceUrl: string, vendorKey: string) {
-        let scriptTag = `<script id='verificationScript#${vendorKey}' src='${resourceUrl}' onerror='window.omid3p.postback("onEventProcessed", {
-            eventType: "loadError"
-        })'><`;
-        scriptTag += '/script>';  // prevents needing escape char
-        this._omIframe.srcdoc += scriptTag;
+        const dom = new DOMParser().parseFromString(this._omIframe.srcdoc, 'text/html');
+        const scriptEl = dom.createElement('script');
+        dom.head.appendChild(scriptEl);
+        scriptEl.id = `verificationScript#${vendorKey}`;
+        scriptEl.setAttribute('onerror', 'window.omid3p.postback(\'onEventProcessed\', {eventType: \'loadError\'})');
+        scriptEl.setAttribute('type', 'text/javascript');
+        scriptEl.setAttribute('src', resourceUrl);
+        this._omIframe.setAttribute('srcdoc', dom.documentElement.outerHTML);
     }
 }
