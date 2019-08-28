@@ -277,7 +277,7 @@ xdescribe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (Vast)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionVastCampaign(), undefined);
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionStaticVastCampaign(), undefined);
                 return Promise.resolve();
             });
 
@@ -294,7 +294,7 @@ xdescribe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign(), undefined);
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionStaticVastCampaign(), undefined);
 
                 assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof VastCampaign);

@@ -9,8 +9,9 @@ export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
     video: Video;
     hasStaticEndscreen: boolean;
-    portrait: Image | undefined;
-    landscape: Image | undefined;
+    hasIframeEndscreen: boolean;
+    staticPortrait: Image | undefined;
+    staticLandscape: Image | undefined;
     appCategory: string | undefined;
     appSubcategory: string | undefined;
     advertiserDomain: string | undefined;
@@ -28,8 +29,9 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             vast: ['object'],
             video: ['object'],
             hasStaticEndscreen: ['boolean'],
-            portrait: ['object', 'undefined'],
-            landscape: ['object', 'undefined'],
+            hasIframeEndscreen: ['boolean'],
+            staticPortrait: ['object', 'undefined'],
+            staticLandscape: ['object', 'undefined'],
             appCategory: ['string', 'undefined'],
             appSubcategory: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
@@ -68,12 +70,16 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return this.get('hasStaticEndscreen');
     }
 
-    public getLandscape(): Asset | undefined {
-        return this.get('landscape');
+    public hasIframeEndscreen(): boolean {
+        return this.get('hasIframeEndscreen');
     }
 
-    public getPortrait(): Asset | undefined {
-        return this.get('portrait');
+    public getStaticLandscape(): Asset | undefined {
+        return this.get('staticLandscape');
+    }
+
+    public getStaticPortrait(): Asset | undefined {
+        return this.get('staticPortrait');
     }
 
     public isConnectionNeeded(): boolean {
@@ -118,16 +124,16 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     }
 
     public getDTO(): { [key: string]: unknown } {
-        let portrait;
-        const portraitAsset = this.get('portrait');
-        if (portraitAsset) {
-            portrait = portraitAsset.getDTO();
+        let staticPortrait;
+        const staticPortraitAsset = this.get('staticPortrait');
+        if (staticPortraitAsset) {
+            staticPortrait = staticPortraitAsset.getDTO();
         }
 
-        let landscape;
-        const landscapeAsset = this.get('landscape');
-        if (landscapeAsset) {
-            landscape = landscapeAsset.getDTO();
+        let staticLandscape;
+        const staticLandscapeAsset = this.get('staticLandscape');
+        if (staticLandscapeAsset) {
+            staticLandscape = staticLandscapeAsset.getDTO();
         }
 
         return {
@@ -135,8 +141,9 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             'vast': this.getVast().getDTO(),
             'video': this.getVast().getDTO(),
             'hasStaticEndscreen': this.hasStaticEndscreen(),
-            'portrait': portrait,
-            'landscape': landscape
+            'hasIframeEndscreen': this.hasIframeEndscreen(),
+            'staticPortrait': staticPortrait,
+            'staticLandscape': staticLandscape
         };
     }
 

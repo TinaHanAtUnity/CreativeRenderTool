@@ -269,7 +269,7 @@ describe('VastAdUnitTest', () => {
                 };
 
                 const video = new Video('', TestFixtures.getSession());
-                vastCampaign = TestFixtures.getCompanionVastCampaign();
+                vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
                 sinon.stub(vastCampaign, 'getVideo').returns(video);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
                 const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);

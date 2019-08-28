@@ -381,7 +381,7 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('getCompanionPortraitUrl', () => {
+            describe('getStaticCompanionPortraitUrl', () => {
                 const tests: {
                     message: string;
                     inputXml: string;
@@ -412,7 +412,7 @@ describe('VastParserStrict', () => {
                 tests.forEach((test) => {
                     it(test.message, () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
-                        assert.equal(vast.getCompanionPortraitUrl(), test.expectedValue);
+                        assert.equal(vast.getStaticCompanionPortraitUrl(), test.expectedValue);
                     });
                 });
             });
@@ -430,7 +430,7 @@ describe('VastParserStrict', () => {
             });
 
             describe('StaticResource Companion Ad', () => {
-                describe('getCompanionLandscapeUrl from StaticResource type CompanionAd', () => {
+                describe('getStaticCompanionLandscapeUrl from StaticResource type CompanionAd', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
@@ -461,7 +461,7 @@ describe('VastParserStrict', () => {
                     tests.forEach((test) => {
                         it(test.message, () => {
                             const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
-                            assert.equal(vast.getCompanionLandscapeUrl(), test.expectedValue);
+                            assert.equal(vast.getStaticCompanionLandscapeUrl(), test.expectedValue);
                         });
                     });
                 });
@@ -514,7 +514,7 @@ describe('VastParserStrict', () => {
                     });
                 });
             });
-
+            // enable these tests if abgroup is enabled
             xdescribe('IFrameResource Companion Ad', () => {
                 describe('getIframeResourceURL from IFrameResource type CompanionAd', () => {
                     const tests: {
@@ -570,9 +570,9 @@ describe('VastParserStrict', () => {
                     });
                 });
             });
-
+            // enable these tests if abgroup is enabled
             describe('Unsupported Companion Ad', () => {
-                describe('add into unsupported companion ads list for unsupported companion ads', () => {
+                xdescribe('add into unsupported companion ads list for unsupported companion ads', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
@@ -584,14 +584,14 @@ describe('VastParserStrict', () => {
                                 expectedVal: 0
                             },
                             {
-                                message: 'should have added into unsupported companion ads for iframeResource',
+                                message: 'should have not added into unsupported companion ads for iframeResource',
                                 inputXml: VastCompanionAdIFrameXml,
-                                expectedVal: 1
+                                expectedVal: 0
                             },
                             {
                                 message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
                                 inputXml: VastCompanionAdHTMLXml,
-                                expectedVal: 2
+                                expectedVal: 1
                             },
                             {
                                 message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',

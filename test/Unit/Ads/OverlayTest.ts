@@ -98,7 +98,7 @@ describe('OverlayTest', () => {
     });
 
     it('should render VastCampaign with VAST call to action button', () => {
-        videoOverlayParameters.campaign = TestFixtures.getCompanionVastCampaign();
+        videoOverlayParameters.campaign = TestFixtures.getCompanionStaticVastCampaign();
         const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
         overlay.render();
         assert.isNotNull(overlay.container().querySelector('.vast-button'));
