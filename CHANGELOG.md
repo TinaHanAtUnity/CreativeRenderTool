@@ -5,6 +5,7 @@
 * Add CDN Purge HTTP Status Code for Failures [#10987](https://github.com/Applifier/unity-ads-webview/pull/10987)
 * Remove Max Ads from Load Whitelist [#10983](https://github.com/Applifier/unity-ads-webview/pull/10983)
 * add vast iframe endcard support [#10926](https://github.com/Applifier/unity-ads-webview/pull/10926)
+* add vast iframe endcard support fix [#11015](https://github.com/Applifier/unity-ads-webview/pull/11015)
 
 # Fri Aug 23 22:21:31 UTC 2019
 
