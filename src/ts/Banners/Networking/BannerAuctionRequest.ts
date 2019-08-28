@@ -1,17 +1,28 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AuctionRequest, IAuctionRequestParams, IAuctionResponse, IPlacementRequestDTO } from 'Ads/Networking/AuctionRequest';
-import { BannerSize } from 'Banners/Utilities/BannerSize';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AuctionRequest, IAuctionRequestParams, IAuctionResponse, IPlacementRequestDTO } from 'Ads/Networking/AuctionRequest';
+
+export interface IBannerAuctionRequestParams extends IAuctionRequestParams {
+    bannerSize: IBannerDimensions;
+}
 
 export class BannerAuctionRequest extends AuctionRequest {
 
-    public static create(params: IAuctionRequestParams): BannerAuctionRequest {
+    private _bannerSize: IBannerDimensions;
+
+    public static create(params: IBannerAuctionRequestParams): BannerAuctionRequest {
         return new BannerAuctionRequest(params);
     }
 
+    public constructor(params: IBannerAuctionRequestParams) {
+        super(params);
+        this._bannerSize = params.bannerSize;
+    }
+
     protected createPlacementDTO(placement: Placement): IPlacementRequestDTO {
-        const placementRequest = super.createPlacementDTO(placement);
-        placementRequest.dimensions = BannerSize.getPlatformDimensions(this._platform, this._deviceInfo);
+        const placementRequest: IPlacementRequestDTO = super.createPlacementDTO(placement);
+        placementRequest.dimensions = this._bannerSize;
         return placementRequest;
     }
 

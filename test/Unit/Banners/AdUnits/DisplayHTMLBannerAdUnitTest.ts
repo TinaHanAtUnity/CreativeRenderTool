@@ -4,7 +4,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Backend } from 'Backend/Backend';
 
 import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit';
-import { IBannersApi } from 'Banners/IBanners';
+import { IBannerNativeApi } from 'Banners/IBannerModule';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -24,6 +24,7 @@ import { IntentApi } from 'Core/Native/Android/Intent';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
+import { BannerViewType } from 'Banners/Native/BannerApi';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('DisplayHTMLBannerAdUnit', () => {
@@ -32,7 +33,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
-        let bannersApi: IBannersApi;
+        let bannerNativeApi: IBannerNativeApi;
         let campaign: BannerCampaign;
         let thirdPartyEventManager: ThirdPartyEventManager;
         let webPlayerContainer: WebPlayerContainer;
@@ -49,6 +50,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
         };
 
         const placementId = 'unity-test-banner-placement-id';
+        const bannerAdViewId = 'unity-test-banner-id';
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -62,15 +64,15 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
             }
 
-            bannersApi = TestFixtures.getBannersApi(nativeBridge);
-            (<any>bannersApi.Banner).onBannerAttachedState = new Observable1<boolean>();
-            (<any>bannersApi.Banner).onBannerLoaded = new Observable0();
-            (<any>bannersApi.Banner).onBannerOpened = new Observable0();
-            sinon.stub(bannersApi.Banner, 'load').callsFake(() => {
-                return Promise.resolve().then(() => bannersApi.Banner.onBannerLoaded.trigger());
+            bannerNativeApi = TestFixtures.getBannerNativeApi(nativeBridge);
+            (<any>bannerNativeApi.BannerApi).onBannerAttachedState = new Observable1<boolean>();
+            (<any>bannerNativeApi.BannerApi).onBannerLoaded = new Observable0();
+            (<any>bannerNativeApi.BannerApi).onBannerOpened = new Observable0();
+            sinon.stub(bannerNativeApi.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, _bannerAdViewId: string) => {
+                return Promise.resolve().then(() => bannerNativeApi.BannerApi.onBannerLoaded.trigger(_bannerAdViewId));
             });
 
-            sinon.spy(bannersApi.Listener, 'sendClickEvent');
+            sinon.spy(bannerNativeApi.BannerListenerApi, 'sendClickEvent');
 
             campaign = new BannerCampaign(getBannerCampaign(TestFixtures.getSession()));
 
@@ -96,8 +98,9 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                 webPlayerContainer,
                 thirdPartyEventManager,
                 programmaticTrackingService,
-                bannersApi,
-                placementId
+                bannerNativeApi: bannerNativeApi,
+                placementId,
+                bannerAdViewId: bannerAdViewId
             };
 
             adUnit = new DisplayHTMLBannerAdUnit(bannerAdUnitParameters);
@@ -199,7 +202,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                             const url = 'http://unity3d.com';
                             webPlayerContainer.onCreateWebView.trigger(url);
                             sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
-                            sinon.assert.calledWith(<sinon.SinonSpy>bannersApi.Listener.sendClickEvent, placementId);
+                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, placementId);
                         });
                     });
                 });
@@ -215,7 +218,7 @@ import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
                                 'action': 'android.intent.action.VIEW',
                                 'uri': url
                             });
-                            sinon.assert.calledWith(<sinon.SinonSpy>bannersApi.Listener.sendClickEvent, placementId);
+                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, placementId);
                         });
                     });
                 });

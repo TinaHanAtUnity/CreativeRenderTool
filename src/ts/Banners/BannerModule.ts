@@ -1,41 +1,36 @@
-import { BannerWebPlayerContainer } from 'Ads//Utilities/WebPlayer/BannerWebPlayerContainer';
 import { IAds } from 'Ads/IAds';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
-import { BannerApi } from 'Banners/Native/Banner';
+import { BannerApi } from 'Banners/Native/BannerApi';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { ICore } from 'Core/ICore';
-import { IBanners, IBannersApi } from 'Banners/IBanners';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { IBannerModule, IBannerNativeApi } from 'Banners/IBannerModule';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
+import { BannerAdContextManager } from 'Banners/Managers/BannerAdContextManager';
 
-export class Banners implements IBanners {
+export class BannerModule implements IBannerModule {
 
-    public readonly Api: Readonly<IBannersApi>;
-
-    public BannerAdContext: BannerAdContext;
-    public AdContext: BannerAdContext;
+    public readonly Api: Readonly<IBannerNativeApi>;
     public AdUnitParametersFactory: BannerAdUnitParametersFactory;
     public CampaignManager: BannerCampaignManager;
     public PlacementManager: BannerPlacementManager;
-    public WebPlayerContainer: WebPlayerContainer;
     public AdUnitFactory: BannerAdUnitFactory;
+    public BannerAdContextManager: BannerAdContextManager;
 
     constructor(core: ICore, ads: IAds) {
         this.Api = {
-            Banner: new BannerApi(core.NativeBridge),
-            Listener: new BannerListenerApi(core.NativeBridge)
+            BannerApi: new BannerApi(core.NativeBridge),
+            BannerListenerApi: new BannerListenerApi(core.NativeBridge)
         };
 
-        this.PlacementManager = new BannerPlacementManager(ads.Api, ads.Config);
+        this.PlacementManager = new BannerPlacementManager(ads.Api, ads.Config, this.Api);
         this.PlacementManager.sendBannersReady();
 
         this.AdUnitFactory = new BannerAdUnitFactory();
         this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager);
-        this.WebPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api);
         this.AdUnitParametersFactory = new BannerAdUnitParametersFactory(this, ads, core);
-        this.BannerAdContext = new BannerAdContext(this, ads, core);
+        this.BannerAdContextManager = new BannerAdContextManager(core, ads, this);
     }
 }

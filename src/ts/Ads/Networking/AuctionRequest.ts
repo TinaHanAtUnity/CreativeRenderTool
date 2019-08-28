@@ -23,7 +23,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 
 export interface IAuctionResponse {
     correlationId: string;

@@ -8,26 +8,30 @@ export class BannerListenerApi extends NativeApi {
     }
 
     // Potentially change to send the position of banner rectangle
-    public sendShowEvent(placementId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendShowEvent', [placementId]);
+    public sendShowEvent(placementId: string, bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendShowEvent', [placementId, bannerAdViewId]);
     }
 
-    public sendLoadEvent(placementId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendLoadEvent', [placementId]);
+    public sendLoadEvent(placementId: string, bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendLoadEvent', [placementId, bannerAdViewId]);
     }
 
-    public sendClickEvent(placementId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendClickEvent', [placementId]);
+    public sendNoFillEvent(bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendNoFillEvent', [bannerAdViewId]);
     }
 
-    public sendHideEvent(placementId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendHideEvent', [placementId]);
+    public sendClickEvent(placementId: string, bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendClickEvent', [placementId, bannerAdViewId]);
     }
 
-    public sendErrorEvent(error: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [error]);
+    public sendHideEvent(placementId: string, bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendHideEvent', [placementId, bannerAdViewId]);
     }
-    public sendUnloadEvent(placementId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendUnloadEvent', [placementId]);
+
+    public sendErrorEvent(error: string, bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [error, bannerAdViewId]);
+    }
+    public sendUnloadEvent(placementId: string, bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendUnloadEvent', [placementId, bannerAdViewId]);
     }
 }
