@@ -32,7 +32,6 @@ export class Slider {
     private _slideCount: number;
     private _rootElement: HTMLElement;
     private _ready: Promise<void> | null;
-    private _autoplayTimeoutId: number | null;
     private _onDownloadCallback: OnDownloadCallback;
     private _slides: (HTMLElement | null)[];
     private _currentSlideIndex: number;
@@ -324,12 +323,12 @@ export class Slider {
 
     private autoplay(): void {
         this.autoPlayClear();
-        this._autoPlayTimer = setInterval((this.autoPlayIterator).bind(this), 2000);
+        this._autoPlayTimer = setTimeout((this.autoPlayIterator).bind(this), 2000);
     }
 
     private autoPlayClear(): void {
         if (this._autoPlayTimer) {
-            clearInterval(this._autoPlayTimer);
+            clearTimeout(this._autoPlayTimer);
         }
     }
 
@@ -482,9 +481,7 @@ export class Slider {
     }
 
     public hide(): void {
-        if (this._autoplayTimeoutId) {
-            clearTimeout(this._autoplayTimeoutId);
-        }
+        this.autoPlayClear();
     }
 
     private createSlide(url: string): Promise<HTMLElement> {
