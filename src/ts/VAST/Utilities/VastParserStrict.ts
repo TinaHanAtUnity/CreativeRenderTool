@@ -332,27 +332,29 @@ export class VastParserStrict {
                 }
             }
 
-            if (this._coreConfig && iframeResourceElement && IframeEndcardTest.isValid(this._coreConfig.getAbGroup())) {
-                const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
-                const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
-                let isWarningLevel = true;
-                for (const adError of companionAdErrors) {
-                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
-                        if (adError.errorTrackingUrls.length === 0) {
-                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+            if (iframeResourceElement) {
+                if (this._coreConfig && IframeEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                    const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
+                    const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
+                    let isWarningLevel = true;
+                    for (const adError of companionAdErrors) {
+                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                            if (adError.errorTrackingUrls.length === 0) {
+                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                            }
+                            this._compiledCampaignErrors.push(adError);
+                            isWarningLevel = false;
+                            break;
                         }
-                        this._compiledCampaignErrors.push(adError);
-                        isWarningLevel = false;
-                        break;
                     }
-                }
-                if (isWarningLevel) {
-                    vastAd.addIframeCompanionAd(companionAd);
+                    if (isWarningLevel) {
+                        vastAd.addIframeCompanionAd(companionAd);
+                    } else {
+                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    }
                 } else {
-                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
                 }
-            } else {
-                vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
             }
 
             // ignore element as it is not of a type we support
