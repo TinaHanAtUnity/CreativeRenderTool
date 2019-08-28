@@ -1,4 +1,4 @@
-# Pending
+# Wed Aug 28 19:42:50 UTC 2019
 
 * Begin Parallax Endcard Experiment on ABGroups 5 and 6 [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
 * Fix Ads SDK 3.2 usePerPlacementLoad Bug [#10986](https://github.com/Applifier/unity-ads-webview/pull/10986)
