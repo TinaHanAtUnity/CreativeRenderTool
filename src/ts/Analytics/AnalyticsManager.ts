@@ -315,10 +315,8 @@ export class AnalyticsManager implements IAnalyticsManager {
             });
             operations.push(parsePromise);
         }
-        // TODO when es6 is enabled use .finally
-        Promise.all(operations).then(() => {
-            this.flushEvents();
-        }).catch(() => {
+
+        Promise.all(operations).finally(() => {
             this.flushEvents();
         });
     }

@@ -649,9 +649,7 @@ export class Ads implements IAds {
                         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
                     }
                 }
-                // Use .finally() when supported
-                return Promise.resolve();
-            }).catch(() => {
+            }).finally(() => {
                 return Promise.resolve();
             });
         }
