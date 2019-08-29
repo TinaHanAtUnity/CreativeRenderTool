@@ -1,3 +1,7 @@
+# Pending
+
+* Add Initial Privacy SDK Refactor [#11013](https://github.com/Applifier/unity-ads-webview/pull/11013)
+
 # Wed Aug 28 19:42:50 UTC 2019
 
 * Begin Parallax Endcard Experiment on ABGroups 5 and 6 [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
