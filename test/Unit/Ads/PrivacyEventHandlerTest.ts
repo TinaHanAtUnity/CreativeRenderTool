@@ -28,6 +28,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEventHandlerTest', () => {
@@ -70,7 +71,8 @@ import { IStoreApi } from 'Store/IStore';
                 video: sinon.createStubInstance(Video),
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
-                programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+                programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
+                privacySDK: sinon.createStubInstance(PrivacySDK)
             };
 
             privacyEventHandler = new PrivacyEventHandler(adUnitParameters);

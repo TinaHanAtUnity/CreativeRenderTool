@@ -7,7 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { PersonalizationSwitchGroup } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
-import { IPermissions } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Privacy/Privacy';
 import { Localization } from 'Core/Utilities/Localization';
 
 enum ViewState {

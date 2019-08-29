@@ -24,6 +24,7 @@ import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivac
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
 
 export interface IAuctionResponse {
@@ -63,6 +64,7 @@ export interface IAuctionRequestParams {
     deviceInfo: DeviceInfo;
     sessionManager: SessionManager;
     programmaticTrackingService: ProgrammaticTrackingService;
+    privacySDK: PrivacySDK;
 }
 
 export interface IPlacementRequestDTO {
@@ -203,7 +205,7 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
-        this._privacy = RequestPrivacyFactory.create(params.adsConfig.getUserPrivacy(), params.adsConfig.getGamePrivacy());
+        this._privacy = RequestPrivacyFactory.create(params.privacySDK.getUserPrivacy(), params.privacySDK.getGamePrivacy());
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {

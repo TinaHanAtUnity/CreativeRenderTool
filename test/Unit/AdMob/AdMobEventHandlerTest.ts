@@ -26,6 +26,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { unity_proto } from 'unity_proto';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -48,6 +49,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
         let coreConfig;
         let adsConfig;
         let privacyManager;
+        let privacySDK;
 
         beforeEach(() => {
             adUnit = sinon.createStubInstance(AdMobAdUnit);
@@ -71,6 +73,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             clientInfo = sinon.createStubInstance(ClientInfo);
+            privacySDK = sinon.createStubInstance(PrivacySDK);
 
             AdMobEventHandler.setLoadTimeout(testTimeout);
             admobEventHandler = new AdMobEventHandler({
@@ -85,7 +88,8 @@ const resolveAfter = (timeout: number): Promise<void> => {
                 clientInfo: clientInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
-                privacyManager: privacyManager
+                privacyManager: privacyManager,
+                privacySDK: privacySDK
             });
         });
 

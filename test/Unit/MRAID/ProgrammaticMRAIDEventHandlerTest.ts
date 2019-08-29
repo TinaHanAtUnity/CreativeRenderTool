@@ -38,6 +38,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IStoreApi } from 'Store/IStore';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
@@ -62,6 +63,7 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
         let programmaticMraidCampaign: MRAIDCampaign;
         let privacyManager: UserPrivacyManager;
         let programmaticTrackingService: ProgrammaticTrackingService;
+        let privacySDK: PrivacySDK;
 
         describe('with Programmatic MRAID', () => {
             let programmaticMraidAdUnitParams: IMRAIDAdUnitParameters;
@@ -110,6 +112,7 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
                 privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
                 mraidView = new MRAID(platform, core, deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
+                privacySDK = sinon.createStubInstance(PrivacySDK);
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                     platform,
@@ -124,7 +127,8 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
                     adsConfig: adsConfig,
                     storageBridge: storageBridge,
                     campaign: programmaticMraidCampaign,
-                    playerMetadataServerId: 'test-gamerSid'
+                    playerMetadataServerId: 'test-gamerSid',
+                    privacySDK: privacySDK
                 });
 
                 programmaticMraidAdUnitParams = {
@@ -151,7 +155,8 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
                     privacy: privacy,
                     privacyManager: privacyManager,
                     programmaticTrackingService: programmaticTrackingService,
-                    webPlayerContainer: webPlayerContainer
+                    webPlayerContainer: webPlayerContainer,
+                    privacySDK: privacySDK
                 };
 
                 programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);

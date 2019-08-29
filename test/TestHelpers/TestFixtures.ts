@@ -167,6 +167,8 @@ import { IAdMobCampaign, AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
 import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -705,7 +707,8 @@ export class TestFixtures {
             adsConfig: TestFixtures.getAdsConfiguration(),
             storageBridge: storageBridge,
             campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         });
 
         if (campaign instanceof XPromoCampaign) {
@@ -793,7 +796,8 @@ export class TestFixtures {
             video: new Video('', TestFixtures.getSession()),
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
 
@@ -826,7 +830,8 @@ export class TestFixtures {
             video: new Video('', TestFixtures.getSession()),
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
 
@@ -857,7 +862,8 @@ export class TestFixtures {
             options: {},
             privacy: privacy,
             view: sinon.createStubInstance(AdMobView),
-            adMobSignalFactory: sinon.createStubInstance(AdMobSignalFactory)
+            adMobSignalFactory: sinon.createStubInstance(AdMobSignalFactory),
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
 
@@ -982,6 +988,7 @@ export class TestFixtures {
     public static getAdsModule(core: ICore): IAds {
         const platform = core.NativeBridge.getPlatform();
         const api = this.getAdsApi(core.NativeBridge);
+        const privacySDK = this.getPrivacySDK(core.Api);
         const ads: Partial<IAds> = {
             Api: api,
             AdMobSignalFactory: new AdMobSignalFactory(platform, core.Api, api, core.ClientInfo, core.DeviceInfo, core.FocusManager),
@@ -993,10 +1000,10 @@ export class TestFixtures {
             Container: TestFixtures.getTestContainer(core, api),
             ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager)
         };
-        ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
+        ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager, privacySDK);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
-        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!);
+        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         return <IAds>ads;
     }
@@ -1017,7 +1024,7 @@ export class TestFixtures {
         const banners: Partial<IBanners> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK),
             WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
             AdUnitFactory: new BannerAdUnitFactory()
         };
@@ -1156,6 +1163,13 @@ export class TestFixtures {
     public static getAdsConfiguration(): AdsConfiguration {
         const json = JSON.parse(ConfigurationAuctionPlc);
         return AdsConfigurationParser.parse(json);
+    }
+
+    public static getPrivacySDK(core: ICoreApi): PrivacySDK {
+        const json = JSON.parse(ConfigurationAuctionPlc);
+        const clientInfo = this.getClientInfo();
+        const deviceInfo = this.getAndroidDeviceInfo(core);
+        return PrivacyParser.parse(json, clientInfo, deviceInfo);
     }
 
     public static getCacheDiagnostics(): ICacheDiagnostics {

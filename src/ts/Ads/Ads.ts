@@ -72,7 +72,7 @@ import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { PrivacyMethod } from 'Privacy/Privacy';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -81,6 +81,8 @@ import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { Analytics } from 'Analytics/Analytics';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MaterialIconTest, PhaseTwoLoadRolloutExperiment } from 'Core/Models/ABGroup';
@@ -99,6 +101,7 @@ export class Ads implements IAds {
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
+    public PrivacySDK: PrivacySDK;
     public PrivacyManager: UserPrivacyManager;
     public PlacementManager: PlacementManager;
     public AssetManager: AssetManager;
@@ -121,7 +124,8 @@ export class Ads implements IAds {
     public Analytics: Analytics;
 
     constructor(config: unknown, core: ICore, store: IStore) {
-        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
+        this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
+        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
         this._store = store;
 
@@ -179,9 +183,9 @@ export class Ads implements IAds {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
 
-            if (AdsConfigurationParser.isUpdateUserPrivacyForIncidentNeeded()) {
+            if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
                 this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.SANITIZATION);
             }
 
@@ -255,7 +259,7 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK);
             if (this._loadApiEnabled) {
                 this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else {
@@ -280,30 +284,8 @@ export class Ads implements IAds {
         });
     }
 
-    private isConsentShowRequired(): boolean {
-        if (Ads._forcedConsentUnit) {
-            return true;
-        }
-
-        const gamePrivacy = this.Config.getGamePrivacy();
-        const userPrivacy = this.Config.getUserPrivacy();
-
-        if (!gamePrivacy.isEnabled() && gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
-            return false;
-        }
-
-        if (!userPrivacy.isRecorded()) {
-            return true;
-        }
-
-        const methodChangedSinceConsent = gamePrivacy.getMethod() !== userPrivacy.getMethod();
-        const versionUpdatedSinceConsent = gamePrivacy.getVersion() > userPrivacy.getVersion();
-
-        return methodChangedSinceConsent || versionUpdatedSinceConsent;
-    }
-
     private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.isConsentShowRequired()) {
+        if (!this.PrivacySDK.isConsentShowRequired()) {
             return Promise.resolve();
         }
 
@@ -421,8 +403,8 @@ export class Ads implements IAds {
     }
 
     private resetOutdatedUserPrivacy() {
-        const gamePrivacy = this.Config.getGamePrivacy();
-        const userPrivacy = this.Config.getUserPrivacy();
+        const gamePrivacy = this.PrivacySDK.getGamePrivacy();
+        const userPrivacy = this.PrivacySDK.getUserPrivacy();
         const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
         const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
         if (gdprApplies && methodHasChanged) {
