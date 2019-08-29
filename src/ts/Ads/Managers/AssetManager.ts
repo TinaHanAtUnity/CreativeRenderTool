@@ -394,7 +394,7 @@ export class AssetManager {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            this._pts.reportError(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            this._pts.reportMetric(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
         }
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {

@@ -39,7 +39,7 @@ describe('ProgrammaticTrackingService', () => {
         });
     });
 
-    describe('reportError', () => {
+    describe('reportMetric with ProgrammaticTrackingError', () => {
 
         const osVersion = '11.2.1';
         const sdkVersion = '2.3.0';
@@ -49,7 +49,6 @@ describe('ProgrammaticTrackingService', () => {
         beforeEach(() => {
             osVersionStub.returns(osVersion);
             sdkVersionStub.returns(sdkVersion);
-            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(false);
         });
 
         const tagBuilder = [
@@ -91,10 +90,10 @@ describe('ProgrammaticTrackingService', () => {
         }];
         tests.forEach((t) => {
             it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportError(t.input, adType, seatId);
+                const promise = programmaticTrackingService.reportMetric(t.input, adType, seatId);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;
@@ -134,7 +133,7 @@ describe('ProgrammaticTrackingService', () => {
                 const promise = programmaticTrackingService.reportMetric(t.input);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;
@@ -165,7 +164,7 @@ describe('ProgrammaticTrackingService', () => {
             const promise = programmaticTrackingService.reportMetric(test.input);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);
-            assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+            assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
             assert.equal(postStub.firstCall.args[1], JSON.stringify(test.expected));
             assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
             return promise;
