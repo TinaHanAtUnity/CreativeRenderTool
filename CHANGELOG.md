@@ -1,11 +1,14 @@
-# Pending
+# Wed Aug 28 19:42:50 UTC 2019
 
 * Begin Parallax Endcard Experiment on ABGroups 5 and 6 [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
 * Fix Ads SDK 3.2 usePerPlacementLoad Bug [#10986](https://github.com/Applifier/unity-ads-webview/pull/10986)
 * Add CDN Purge HTTP Status Code for Failures [#10987](https://github.com/Applifier/unity-ads-webview/pull/10987)
 * Remove Max Ads from Load Whitelist [#10983](https://github.com/Applifier/unity-ads-webview/pull/10983)
-* add vast iframe endcard support [#10926](https://github.com/Applifier/unity-ads-webview/pull/10926)
-* add vast iframe endcard support fix [#11015](https://github.com/Applifier/unity-ads-webview/pull/11015)
+* Add Vast IFrame Endcard support [#10926](https://github.com/Applifier/unity-ads-webview/pull/10926)
+* Add Small Fix for Vast IFrame Endcard [#11015](https://github.com/Applifier/unity-ads-webview/pull/11015)
+* Align Operative and Internal Third Party Tracking Events Retry Logic [#10959](https://github.com/Applifier/unity-ads-webview/pull/10959)
+* Add sdkVersion and gamerToken to LoadCalledCounter [#11014](https://github.com/Applifier/unity-ads-webview/pull/11014)
+* Fix Parallax Endscreen Hybrid Test Failure [#11016](https://github.com/Applifier/unity-ads-webview/pull/11016)
 
 # Fri Aug 23 22:21:31 UTC 2019
 

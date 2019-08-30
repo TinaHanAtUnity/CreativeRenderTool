@@ -438,37 +438,12 @@ describe('CustomFeatures', () => {
     });
 
     describe('isParallaxEndScreenEnabled', () => {
+
         const existingGameId = 500010005;
         const enabledAbGroups = [toAbGroup(5), toAbGroup(6)];
-        const validScreenSize = {
-            width: 3,
-            height: 5
-        };
-
-        let newInnerHeight: number;
-        let newInnerWidth: number;
-        let userAgent: string;
-
-        let navigatorStub: any;
-        let innerWidthStub: any;
-        let innerHeightStub: any;
-
-        beforeEach(() => {
-            // use valid useragent and screensize by default
-            userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/76.0.253539693 Mobile/16F203 Safari/604.1';
-            newInnerHeight = validScreenSize.height;
-            newInnerWidth = validScreenSize.width;
-
-            navigatorStub = sinon.stub(navigator, 'userAgent').get(() => userAgent);
-            innerWidthStub = sinon.stub(window, 'innerWidth').get(() => newInnerWidth);
-            innerHeightStub = sinon.stub(window, 'innerHeight').get(() => newInnerHeight);
-        });
-
-        afterEach(() => {
-            navigatorStub.restore();
-            innerWidthStub.restore();
-            innerHeightStub.restore();
-        });
+        const defaultInnerHeight = 5;
+        const defaultInnerWidth = 3;
+        const defaultUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/76.0.253539693 Mobile/16F203 Safari/604.1';
 
         describe('Device model', () => {
             it('should return false on older Samsung devices', () => {
@@ -488,8 +463,7 @@ describe('CustomFeatures', () => {
                 ];
 
                 deviceUserAgents.forEach(deviceUserAgent => {
-                    userAgent = deviceUserAgent;
-                    const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
+                    const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId, deviceUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                     assert.isFalse(isEnabled);
                 });
             });
@@ -504,51 +478,57 @@ describe('CustomFeatures', () => {
                 ];
 
                 deviceUserAgents.forEach(deviceUserAgent => {
-                    userAgent = deviceUserAgent;
-                    const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
+                    const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId, deviceUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                     assert.isTrue(isEnabled);
                 });
             });
 
             it('should return true if device is iPhone', () => {
-                userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/76.0.253539693 Mobile/16F203 Safari/604.1';
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
+                const iosUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/76.0.253539693 Mobile/16F203 Safari/604.1';
+                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId, iosUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                 assert.isTrue(isEnabled);
             });
         });
 
         describe('Aspect ratio', () => {
-            it('should return false if aspect ratio is 4:3', () => {
-                newInnerHeight = 4;
-                newInnerWidth = 3;
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
-                assert.isFalse(isEnabled);
-            });
+            const tests: {
+                testCase: string;
+                innerHeight: number;
+                innerWidth: number;
+                expectedOutcome: boolean;
+            }[] = [{
+                testCase: 'should return false is aspect ratio is 4:3',
+                innerHeight: 4,
+                innerWidth: 3,
+                expectedOutcome: false
+            }, {
+                testCase: 'should return false if aspect ratio is smaller than 4:3',
+                innerHeight: 3.5,
+                innerWidth: 3,
+                expectedOutcome: false
+            }, {
+                testCase: 'should return true is aspect ratio is bigger than 4:3',
+                innerHeight: 5,
+                innerWidth: 3,
+                expectedOutcome: true
+            }];
 
-            it('should return false if aspect ratio is smaller than 4:3', () => {
-                newInnerHeight = 3.5;
-                newInnerWidth = 3;
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
-                assert.isFalse(isEnabled);
-            });
-
-            it('should return true if aspect ratio is bigger than 4:3', () => {
-                newInnerHeight = 5;
-                newInnerWidth = 3;
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
-                assert.isTrue(isEnabled);
+            tests.forEach((t) => {
+                it(t.testCase, () => {
+                    assert.equal(CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId, defaultUserAgent, t.innerWidth, t.innerHeight, undefined), t.expectedOutcome);
+                });
             });
         });
 
         describe('Game ID', () => {
             it('should return false if there are no assets for the given game ID', () => {
                 const nonExistingGameId = -1;
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], nonExistingGameId);
+                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], nonExistingGameId, defaultUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                 assert.isFalse(isEnabled);
             });
 
             it('should return true if there are assets for the given game ID', () => {
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId);
+                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(enabledAbGroups[0], existingGameId, defaultUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                 assert.isTrue(isEnabled);
             });
         });
@@ -556,14 +536,14 @@ describe('CustomFeatures', () => {
         describe('AB group', () => {
             it('should return true if experiment is enabled for the given AB group', () => {
                 enabledAbGroups.forEach(abGroup => {
-                    const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(abGroup, existingGameId);
+                    const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(abGroup, existingGameId, defaultUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                     assert.isTrue(isEnabled);
                 });
             });
 
             it('should return false if experiment is disabled for the given AB group', () => {
                 const disabledGroup = toAbGroup(16);
-                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(disabledGroup, existingGameId);
+                const isEnabled = CustomFeatures.isParallaxEndScreenEnabled(disabledGroup, existingGameId, defaultUserAgent, defaultInnerWidth, defaultInnerHeight, undefined);
                 assert.isFalse(isEnabled);
             });
         });

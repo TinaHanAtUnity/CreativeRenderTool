@@ -67,6 +67,23 @@ describe('ThirdPartyEventManagerTest', () => {
         });
     });
 
+    it('should overwrite the options of an internal pts tracking url', () => {
+        const url: string = 'https://tracking.prd.mz.internal.unity3d.com/third_party_event';
+        const requestOptionsToTest = {
+            retries: 2,
+            retryDelay: 10000,
+            followRedirects: true,
+            retryWithConnectionEvents: false
+        };
+
+        const requestStub = <sinon.SinonStub>request.get;
+
+        thirdPartyEventManager.sendWithGet('click', 'abcde-12345', url);
+        assert(requestStub.calledOnce);
+        assert.equal(url, requestStub.getCall(0).args[0]);
+        assert.deepEqual(requestOptionsToTest, requestStub.getCall(0).args[2], 'Internal tracking options were not overwritten');
+    });
+
     it('should replace "%ZONE%" in the url with the placement id', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%ZONE%/123';

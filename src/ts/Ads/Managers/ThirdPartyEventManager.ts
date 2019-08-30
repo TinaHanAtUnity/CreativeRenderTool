@@ -118,6 +118,12 @@ export class ThirdPartyEventManager {
             followRedirects: true,
             retryWithConnectionEvents: false
         };
+
+        if (Url.isInternalPTSTrackingProtocol(url)) {
+            options.retries = 2;
+            options.retryDelay = 10000;
+        }
+
         let request: Promise<INativeResponse>;
         switch (method) {
             case ThirdPartyEventMethod.POST:
