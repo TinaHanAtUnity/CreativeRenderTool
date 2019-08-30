@@ -47,7 +47,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._ads.Listener.sendClickEvent(this._placement.getId());
 
         if (!this._vastAdUnit.hasImpressionOccurred()) {
-            this._pts.reportError(ProgrammaticTrackingError.VastClickWithoutImpressionError, this._vastAdUnit.description());
+            this._pts.reportMetric(ProgrammaticTrackingError.VastClickWithoutImpressionError, this._vastAdUnit.description());
         }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();

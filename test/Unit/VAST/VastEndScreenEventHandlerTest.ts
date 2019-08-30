@@ -34,6 +34,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastEndScreenEventHandlerTest', () => {
@@ -82,6 +83,7 @@ import { IStoreApi } from 'Store/IStore';
             const sessionManager = new SessionManager(core, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
             const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -95,7 +97,8 @@ import { IStoreApi } from 'Store/IStore';
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, false, false);
@@ -137,6 +140,7 @@ import { IStoreApi } from 'Store/IStore';
                 video: video,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
+                privacySDK: privacySDK,
                 privacy
             };
 

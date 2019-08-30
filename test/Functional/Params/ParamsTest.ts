@@ -32,10 +32,11 @@ import { AuctionRequest, IAuctionRequestParams } from 'Ads/Networking/AuctionReq
 import { RequestPrivacyFactory, IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 import { Backend } from 'Backend/Backend';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ICore } from 'Core/ICore';
+import {ICore, ICoreApi} from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 class SpecVerifier {
     private _platform: Platform;
@@ -139,6 +140,7 @@ describe('Event parameters should match specifications', () => {
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const core = TestFixtures.getCoreApi(nativeBridge);
+            const privacySDK = TestFixtures.getPrivacySDK(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
             const response = TestFixtures.getOkNativeResponse();
@@ -188,6 +190,7 @@ describe('Event parameters should match specifications', () => {
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const coreModule = TestFixtures.getCoreModule(nativeBridge);
             const core = coreModule.Api;
+            const privacySDK = TestFixtures.getPrivacySDK(core);
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -208,7 +211,7 @@ describe('Event parameters should match specifications', () => {
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sandbox.stub(RequestPrivacyFactory, 'create').returns(<IRequestPrivacy>{});
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -225,6 +228,7 @@ describe('Event parameters should match specifications', () => {
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const coreModule = TestFixtures.getCoreModule(nativeBridge);
             const core = coreModule.Api;
+            const privacySDK = TestFixtures.getPrivacySDK(core);
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -244,7 +248,7 @@ describe('Event parameters should match specifications', () => {
             sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -274,6 +278,8 @@ describe('Event parameters should match specifications', () => {
             let adMobSignalFactory: AdMobSignalFactory;
             let auctionRequestParams: IAuctionRequestParams;
             let auctionRequest: AuctionRequest;
+            let privacySDK: PrivacySDK;
+            let coreApi: ICoreApi;
 
             let requestStub: sinon.SinonStub;
             let sandbox: sinon.SinonSandbox;
@@ -285,6 +291,8 @@ describe('Event parameters should match specifications', () => {
                 backend = TestFixtures.getBackend(platform);
                 nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 core = TestFixtures.getCoreModule(nativeBridge);
+                coreApi = core.Api;
+                privacySDK = TestFixtures.getPrivacySDK(coreApi);
                 ads = TestFixtures.getAdsApi(nativeBridge);
                 storageBridge = new StorageBridge(core.Api);
                 metaDataManager = new MetaDataManager(core.Api);
@@ -319,7 +327,8 @@ describe('Event parameters should match specifications', () => {
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
                     sessionManager: sessionManager,
-                    programmaticTrackingService: core.ProgrammaticTrackingService
+                    programmaticTrackingService: core.ProgrammaticTrackingService,
+                    privacySDK: privacySDK
                 };
                 auctionRequest = new AuctionRequest(auctionRequestParams);
             });
@@ -345,6 +354,8 @@ describe('Event parameters should match specifications', () => {
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const core = TestFixtures.getCoreApi(nativeBridge);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const privacySDK = TestFixtures.getPrivacySDK(core);
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -368,7 +379,8 @@ describe('Event parameters should match specifications', () => {
                 adsConfig: TestFixtures.getAdsConfiguration(),
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -393,6 +405,8 @@ describe('Event parameters should match specifications', () => {
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const core = TestFixtures.getCoreApi(nativeBridge);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const privacySDK = TestFixtures.getPrivacySDK(core);
             const ads = TestFixtures.getAdsApi(nativeBridge);
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
@@ -416,7 +430,8 @@ describe('Event parameters should match specifications', () => {
                 adsConfig: TestFixtures.getAdsConfiguration(),
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -448,6 +463,8 @@ describe('Event parameters should match specifications', () => {
                 const backend = TestFixtures.getBackend(platform);
                 const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 const core = TestFixtures.getCoreApi(nativeBridge);
+                const coreModule = TestFixtures.getCoreModule(nativeBridge);
+                const privacySDK = TestFixtures.getPrivacySDK(core);
                 const ads = TestFixtures.getAdsApi(nativeBridge);
                 const storageBridge = new StorageBridge(core);
                 const metaDataManager = new MetaDataManager(core);
@@ -471,7 +488,8 @@ describe('Event parameters should match specifications', () => {
                     adsConfig: TestFixtures.getAdsConfiguration(),
                     storageBridge: storageBridge,
                     campaign: campaign,
-                    playerMetadataServerId: 'test-gamerSid'
+                    playerMetadataServerId: 'test-gamerSid',
+                    privacySDK: privacySDK
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -541,6 +559,8 @@ describe('Event parameters should match specifications', () => {
                 const backend = TestFixtures.getBackend(platform);
                 const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 const core = TestFixtures.getCoreApi(nativeBridge);
+                const coreModule = TestFixtures.getCoreModule(nativeBridge);
+                const privacySDK = TestFixtures.getPrivacySDK(core);
                 const ads = TestFixtures.getAdsApi(nativeBridge);
                 const storageBridge = new StorageBridge(core);
                 const metaDataManager = new MetaDataManager(core);
@@ -564,7 +584,8 @@ describe('Event parameters should match specifications', () => {
                     adsConfig: TestFixtures.getAdsConfiguration(),
                     storageBridge: storageBridge,
                     campaign: campaign,
-                    playerMetadataServerId: 'test-gamerSid'
+                    playerMetadataServerId: 'test-gamerSid',
+                    privacySDK: privacySDK
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());

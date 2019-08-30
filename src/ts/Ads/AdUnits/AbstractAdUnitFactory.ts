@@ -14,7 +14,7 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Placement } from 'Ads/Models/Placement';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { PrivacyMethod } from 'Privacy/Privacy';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private _adUnitParametersFactory: IAbstractAdUnitParametersFactory<T, Params>;

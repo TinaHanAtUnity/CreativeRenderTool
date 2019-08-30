@@ -145,7 +145,7 @@ export class BannerAdContext {
     }
 
     private handleBannerRequestError(e: Error): Promise<void> {
-        this._programmaticTrackingService.reportError(ProgrammaticTrackingError.BannerRequestError, 'banner');
+        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingError.BannerRequestError, 'banner');
         return Promise.reject(e);
     }
 

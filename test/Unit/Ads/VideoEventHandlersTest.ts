@@ -55,6 +55,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('Vast VideoEventHandlersTest', () => {
 
@@ -85,6 +86,7 @@ describe('Vast VideoEventHandlersTest', () => {
     let videoEventHandlerParams: IVideoEventHandlerParams<VastAdUnit, VastCampaign>;
     let vastVideoEventHandler: VastVideoEventHandler;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -110,6 +112,7 @@ describe('Vast VideoEventHandlersTest', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         vastCampaign = TestFixtures.getEventVastCampaign();
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
 
         operativeEventManagerParams = {
             platform,
@@ -124,7 +127,8 @@ describe('Vast VideoEventHandlersTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: vastCampaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
@@ -173,7 +177,8 @@ describe('Vast VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacySDK: privacySDK
         };
 
         vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -315,6 +320,7 @@ describe('Performance VideoEventHandlersTest', () => {
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -340,6 +346,7 @@ describe('Performance VideoEventHandlersTest', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         performanceCampaign = TestFixtures.getCampaign();
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
 
         operativeEventManagerParams = {
             platform,
@@ -354,7 +361,8 @@ describe('Performance VideoEventHandlersTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: performanceCampaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
@@ -409,7 +417,8 @@ describe('Performance VideoEventHandlersTest', () => {
             video: video,
             privacy: privacy,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacySDK: privacySDK
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
@@ -795,6 +804,7 @@ describe('xpromo VideoEventHandlersTest', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let xPromoAdUnit: XPromoAdUnit;
     let xPromoVideoEventHandler: XPromoVideoEventHandler;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -820,6 +830,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         xPromoCampaign = TestFixtures.getXPromoCampaign();
+        privacySDK = sinon.createStubInstance(PrivacySDK);
 
         operativeEventManagerParams = {
             platform,
@@ -834,7 +845,8 @@ describe('xpromo VideoEventHandlersTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: xPromoCampaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         };
 
         operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
@@ -888,7 +900,8 @@ describe('xpromo VideoEventHandlersTest', () => {
             video: video,
             privacy: xpromoPrivacy,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacySDK: privacySDK
         };
 
         xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);

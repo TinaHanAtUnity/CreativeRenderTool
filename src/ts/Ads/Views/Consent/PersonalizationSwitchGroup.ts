@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import SwitchGroupTemplate from 'html/consent/personalization-switch-group.html';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { IGranularPermissions } from 'Ads/Models/Privacy';
+import { IGranularPermissions } from 'Privacy/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Localization } from 'Core/Utilities/Localization';
 

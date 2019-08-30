@@ -1,5 +1,5 @@
 import { IRawPlacement, Placement } from 'Ads/Models/Placement';
-import { IRawGamePrivacy, GamePrivacy, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
+import { IRawGamePrivacy, IRawUserPrivacy } from 'Privacy/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -23,8 +23,6 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
-    gamePrivacy: GamePrivacy;
-    userPrivacy: UserPrivacy;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -35,9 +33,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
-        defaultBannerPlacement: ['string', 'undefined'],
-        gamePrivacy: ['object'],
-        userPrivacy: ['object']
+        defaultBannerPlacement: ['string', 'undefined']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -122,14 +118,6 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         this.set('optOutEnabled', optOutEnabled);
     }
 
-    public getGamePrivacy(): GamePrivacy {
-        return this.get('gamePrivacy');
-    }
-
-    public getUserPrivacy(): UserPrivacy {
-        return this.get('userPrivacy');
-    }
-
     public getDTO(): { [key: string]: unknown } {
         const placements = [];
         for (const placement in this.getPlacements()) {
@@ -147,8 +135,6 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
             'defaultPlacement': defaultPlacementId,
-            'gamePrivacy': this.getGamePrivacy().getDTO(),
-            'userPrivacy': this.getUserPrivacy().getDTO(),
             'optOutEnabled': this.isOptOutEnabled(),
             'optOutRecorded': this.isOptOutEnabled()
         };
