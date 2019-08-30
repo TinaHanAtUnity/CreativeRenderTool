@@ -151,7 +151,6 @@ $iphone-x-slider-styles() {
     transition: all .3s;
     img {
       max-height: 100%;
-      backface-visibility: hidden;
     }
     &.active-slide {
       opacity: 1;
@@ -161,10 +160,11 @@ $iphone-x-slider-styles() {
         animation-fill-mode: both;
       }
     }
-    &.slide-instant {
-      opacity: 1;
-      transform: scale(1);
-      transition: all 0s;
+    &.active-slide.no-animation {
+      transition: none;
+      img {
+        animation: none;
+      }
     }
   }
 
