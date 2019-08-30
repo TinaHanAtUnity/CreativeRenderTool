@@ -1,7 +1,6 @@
 # Pending
 
 * Consent A/B test: Make CTAs more compact [#11070](https://github.com/Applifier/unity-ads-webview/pull/11070)
-* Change CTA text based on the positive A/B test result [#11069](https://github.com/Applifier/unity-ads-webview/pull/11069)
 * Fix Support for APK Campaigns on Xiaomi Devices [#10957](https://github.com/Applifier/unity-ads-webview/pull/10957)
 * Migrate Fully to New PTS Endpoint and Add Error Metric Support [#11019](https://github.com/Applifier/unity-ads-webview/pull/11019)
 * End and Revert Material Font Experiment [#10985](https://github.com/Applifier/unity-ads-webview/pull/10985)
