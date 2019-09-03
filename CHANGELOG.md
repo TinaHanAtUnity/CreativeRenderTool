@@ -1,13 +1,12 @@
 # Pending
 
+* Revert Polyfill Changes and New Polyfill Function Uses [#11074](https://github.com/Applifier/unity-ads-webview/pull/11074)
 * Consent A/B test: Make CTAs more compact [#11070](https://github.com/Applifier/unity-ads-webview/pull/11070)
 * Fix Support for APK Campaigns on Xiaomi Devices [#10957](https://github.com/Applifier/unity-ads-webview/pull/10957)
 * Migrate Fully to New PTS Endpoint and Add Error Metric Support [#11019](https://github.com/Applifier/unity-ads-webview/pull/11019)
 * End and Revert Material Font Experiment [#10985](https://github.com/Applifier/unity-ads-webview/pull/10985)
 * Add Creative URL for Extended MRAIDs [#10955](https://github.com/Applifier/unity-ads-webview/pull/10955)
 * Small refactor for asset manager [#10839](https://github.com/Applifier/unity-ads-webview/pull/10839)
-* Add Google Closure Compiler Polyfill Tests [#11044](https://github.com/Applifier/unity-ads-webview/pull/11044)
-* Utilize Promise.finally [#11045](https://github.com/Applifier/unity-ads-webview/pull/11045)
 
 # Thu Aug 29 21:30:40 UTC 2019
 
