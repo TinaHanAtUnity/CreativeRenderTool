@@ -264,14 +264,19 @@ export class AssetManager {
                     cacheDiagnostics = new CacheDiagnostics(this._cache, currentAsset.diagnostics);
                 }
                 this._cache.cache(asset.url).then(([fileId, fileUrl]) => {
-                    asset.resolve([fileId, fileUrl]);
-                }).catch(error => {
-                    asset.reject(error);
-                }).finally(() => {
                     this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
                     if (cacheDiagnostics) {
                         cacheDiagnostics.stop();
                     }
+                    asset.resolve([fileId, fileUrl]);
+                    this._caching = false;
+                    this.executeAssetQueue(campaign);
+                }).catch(error => {
+                    this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
+                    if (cacheDiagnostics) {
+                        cacheDiagnostics.stop();
+                    }
+                    asset.reject(error);
                     this._caching = false;
                     this.executeAssetQueue(campaign);
                 });

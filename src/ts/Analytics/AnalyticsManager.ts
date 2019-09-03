@@ -316,7 +316,9 @@ export class AnalyticsManager implements IAnalyticsManager {
             operations.push(parsePromise);
         }
 
-        Promise.all(operations).finally(() => {
+        Promise.all(operations).then(() => {
+            this.flushEvents();
+        }).catch(() => {
             this.flushEvents();
         });
     }
