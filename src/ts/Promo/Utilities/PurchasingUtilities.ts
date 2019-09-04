@@ -93,8 +93,12 @@ export class PurchasingUtilities {
             this._refreshPromise = this._purchasingAdapter.refreshCatalog()
                 .then((products) => this.updateCatalog(products))
                 .then(() => this.setProductPlacementStates())
-                .catch((e) => { throw e; })
-                .finally(() => { this._refreshPromise = null; });
+                // TODO clean me up when finally is supported.
+                .then(() => { this._refreshPromise = null; })
+                .catch((e) => {
+                    this._refreshPromise = null;
+                    throw e;
+                });
             return this._refreshPromise;
         }
     }
