@@ -101,7 +101,7 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
         describe('receiving OMID events', () => {
             const tests = [
                 {
-                    event: OMEvents.IMPRESSION_OCCURED,
+                    event: OMEvents.IMPRESSION_OCCURRED,
                     data: {
                         mediaType: MediaType.VIDEO,
                         videoEventAdaptorType: 'test',

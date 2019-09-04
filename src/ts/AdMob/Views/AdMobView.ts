@@ -22,7 +22,7 @@ import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import OMIDSessionClient from 'html/omid/admob-session-interface.html';
-import { OpenMeasurement, PARTNER_NAME, OMID_P } from 'Ads/Views/OpenMeasurement';
+import { OpenMeasurement, PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
 import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
@@ -136,10 +136,6 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.disconnect();
         super.hide();
 
-        if (this._om) {
-            this._om.removeFromViewHieararchy();
-        }
-
         if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
@@ -188,7 +184,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             iframe.srcdoc = markup;
 
             if (this._om) {
-                iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OMID_P);
+                iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
                 this._om.getOmidBridge().setAdmobIframe(iframe);
 
                 iframe.onload = () => {
@@ -270,7 +266,17 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onClose() {
-        this._handlers.forEach((h) => h.onClose());
+        if (this._om) {
+            this._om.sessionFinish({
+                adSessionId: this._om.getOMAdSessionId(),
+                timestamp: Date.now(),
+                type: 'sessionFinish',
+                data: {}
+            });
+            setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
+        }
+        // Added a timeout for admob session interface to receive session finish before removing the dom element
+        setTimeout(() => this._handlers.forEach((h) => h.onClose()), 1);
     }
 
     private onAttribution(url: string, touchInfo: ITouchInfo) {
