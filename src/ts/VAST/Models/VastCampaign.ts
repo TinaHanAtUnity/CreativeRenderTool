@@ -10,6 +10,7 @@ export interface IVastCampaign extends IProgrammaticCampaign {
     video: Video;
     hasStaticEndscreen: boolean;
     hasIframeEndscreen: boolean;
+    hasHtmlEndscreen: boolean;
     staticPortrait: Image | undefined;
     staticLandscape: Image | undefined;
     appCategory: string | undefined;
@@ -30,6 +31,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             video: ['object'],
             hasStaticEndscreen: ['boolean'],
             hasIframeEndscreen: ['boolean'],
+            hasHtmlEndscreen: ['boolean'],
             staticPortrait: ['object', 'undefined'],
             staticLandscape: ['object', 'undefined'],
             appCategory: ['string', 'undefined'],
@@ -72,6 +74,10 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
 
     public hasIframeEndscreen(): boolean {
         return this.get('hasIframeEndscreen');
+    }
+
+    public hasHtmlEndscreen(): boolean {
+        return this.get('hasHtmlEndscreen');
     }
 
     public getStaticLandscape(): Asset | undefined {
@@ -142,6 +148,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             'video': this.getVast().getDTO(),
             'hasStaticEndscreen': this.hasStaticEndscreen(),
             'hasIframeEndscreen': this.hasIframeEndscreen(),
+            'hasHtmlEndscreen': this.hasHtmlEndscreen(),
             'staticPortrait': staticPortrait,
             'staticLandscape': staticLandscape
         };

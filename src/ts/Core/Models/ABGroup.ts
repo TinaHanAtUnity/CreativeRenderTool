@@ -67,6 +67,7 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 // Add actual A/B tests below
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
+export const HtmlEndcardTest = new DisabledABTest();
 export const IAPAutoLoggingTest = new DisabledABTest();
 export const SliderEndCardExperiment = new DisabledABTest();
 export const ParallaxEndScreenExperiment = new ZyngaFilteredABTest(5, 6);

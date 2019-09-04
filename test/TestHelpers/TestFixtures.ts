@@ -98,6 +98,7 @@ import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastStaticCompanionXml from 'xml/VastCompanionAd.xml';
 import VastIframeCompanionXml from 'xml/VastCompanionAdIFrame.xml';
+import VastHTMLCompanionXml from 'xml/VastCompanionAdHTML.xml';
 import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
@@ -420,6 +421,8 @@ export class TestFixtures {
 
         const hasIframeEndscreenFlag = !!vast.getIframeCompanionResourceUrl();
 
+        const hasHtmlEndscreenFlag = !!vast.getHtmlCompanionResourceContent();
+
         return {
             ... this.getVASTCampaignBaseParams(session, campaignId),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
@@ -427,6 +430,7 @@ export class TestFixtures {
             video: new Video(vast.getVideoUrl(), session),
             hasStaticEndscreen: hasStaticEndscreenFlag,
             hasIframeEndscreen: hasIframeEndscreenFlag,
+            hasHtmlEndscreen: hasHtmlEndscreenFlag,
             staticPortrait: staticPortraitAsset,
             staticLandscape: staticLandscapeAsset,
             appCategory: 'appCategory',
@@ -620,9 +624,15 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 
-     public static getCompanionIframeVastCampaign(): VastCampaign {
+    public static getCompanionIframeVastCampaign(): VastCampaign {
         const vastParser = TestFixtures.getVastParserStrict();
         const vast = vastParser.parseVast(VastIframeCompanionXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getCompanionHtmlVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParserStrict();
+        const vast = vastParser.parseVast(VastHTMLCompanionXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 

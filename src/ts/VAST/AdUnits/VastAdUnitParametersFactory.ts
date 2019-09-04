@@ -18,7 +18,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             overlay: overlay
         };
 
-        if (baseParams.campaign.hasStaticEndscreen() || baseParams.campaign.hasIframeEndscreen()) {
+        if (baseParams.campaign.hasStaticEndscreen() || baseParams.campaign.hasIframeEndscreen() || baseParams.campaign.hasHtmlEndscreen()) {
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: baseParams.campaign,
                 clientInfo: baseParams.clientInfo,

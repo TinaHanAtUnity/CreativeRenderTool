@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
 import VastIframeEndScreenTemplate from 'html/VastIframeEndScreen.html';
+import VastHTMLEndScreenTemplate from 'html/VastHTMLEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export interface IVastEndScreenHandler {
@@ -37,7 +38,12 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         this._country = parameters.country;
         this._privacy = privacy;
 
-        if (this._campaign.hasIframeEndscreen()) {
+        if (this._campaign.hasHtmlEndscreen()) {
+            this._template = new Template(VastHTMLEndScreenTemplate);
+            this._templateData = {
+                'endScreenHtmlContent': (this._campaign.getVast().getHtmlCompanionResourceContent() ? this._campaign.getVast().getHtmlCompanionResourceContent() : undefined)
+            };
+        } else if (this._campaign.hasIframeEndscreen()) {
             this._template = new Template(VastIframeEndScreenTemplate);
             this._templateData = {
                 'endScreenurl': (this._campaign.getVast().getIframeCompanionResourceUrl() ? this._campaign.getVast().getIframeCompanionResourceUrl() : undefined)

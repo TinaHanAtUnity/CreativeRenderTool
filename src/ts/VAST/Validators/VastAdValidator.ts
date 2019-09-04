@@ -7,6 +7,7 @@ import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities
 import { Url } from 'Core/Utilities/Url';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { VastCompanionAdIframeResourceValidator } from 'VAST/Validators/VastCompanionAdIframeResourceValidator';
+import { VastCompanionAdHTMLResourceValidator } from 'VAST/Validators/VastCompanionAdHTMLResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
@@ -48,6 +49,10 @@ export class VastAdValidator implements IValidator {
 
         vastAd.getIframeCompanionAds().forEach((companionAd) => {
             this._errors = this._errors.concat(new VastCompanionAdIframeResourceValidator(companionAd).getErrors());
+        });
+
+        vastAd.getHtmlCompanionAds().forEach((companionAd) => {
+            this._errors = this._errors.concat(new VastCompanionAdHTMLResourceValidator(companionAd).getErrors());
         });
     }
 
