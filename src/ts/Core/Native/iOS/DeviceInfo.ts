@@ -25,8 +25,8 @@ export class IosDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceVolume');
     }
 
-    public checkIsMuted(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'checkIsMuted');
+    public checkIsMuted(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'checkIsMuted');
     }
 
     public getFreeSpace(): Promise<number> {
@@ -74,7 +74,7 @@ export class IosDeviceInfoApi extends NativeApi {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
                 this.onVolumeChanged.trigger(<number>parameters[0], <number>parameters[1]);
                 break;
-            case DeviceInfoEvent[DeviceInfoEvent.MUTE_STATE_RECEIVED]:
+            case DeviceInfoEvent[DeviceInfoEvent.IOS_MUTE_STATE_RECEIVED]:
                 this.onMuteChanged.trigger(<boolean>parameters[0]);
                 break;
             default:

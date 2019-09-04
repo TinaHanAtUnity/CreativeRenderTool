@@ -205,13 +205,13 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         }
     }
 
-    public checkIsMuted(): Promise<boolean> {
+    public checkIsMuted(): Promise<void> {
         if (this._platform  === Platform.IOS) {
             return this._core.DeviceInfo.Ios!.checkIsMuted().then(finished => {
-                return finished;
+                // Return nothing, as the value is collected through sendEvent API
             });
         }
-        return Promise.resolve(false);
+        return Promise.resolve();
     }
 
     public getScreenBrightness(): Promise<number> {

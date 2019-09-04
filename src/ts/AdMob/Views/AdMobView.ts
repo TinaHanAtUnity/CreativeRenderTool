@@ -120,11 +120,11 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     public show(): void {
-        this._deviceInfo.checkIsMuted();
         super.show();
         this._afmaBridge.connect(this._iframe);
         this._mraidBridge.connect(this._iframe);
         this._handlers.forEach((h) => h.onShow());
+        this._deviceInfo.checkIsMuted();
 
         this.choosePrivacyShown();
     }
@@ -163,8 +163,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.sendClickSignalResponse(response);
     }
 
-    public sendMuteChange(mute: boolean) {
-        this._afmaBridge.sendMuteChange(mute);
+    public sendMuteChange(isMuted: boolean) {
+        this._afmaBridge.sendMuteChange(isMuted);
     }
 
     private choosePrivacyShown(): void {

@@ -128,8 +128,8 @@ export class AFMABridge {
         this.postMessage('clickSignal', response);
     }
 
-    public sendMuteChange(mute: boolean) {
-        this.postMessage('muteChange', mute);
+    public sendMuteChange(isMuted: boolean) {
+        this.postMessage('muteChange', isMuted);
     }
 
     private onMessage(e: MessageEvent) {
