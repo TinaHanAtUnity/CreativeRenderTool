@@ -1,3 +1,8 @@
+# Pending
+
+* Add Vast HTML Endcard Support Disabled AB Test [#11018](https://github.com/Applifier/unity-ads-webview/pull/11018)
+* Open Measurement - Fix data passthrough for Admob Session Interface [#11017](https://github.com/Applifier/unity-ads-webview/pull/11017)
+
 # Wed Sep  4 01:34:29 UTC 2019
 
 * Revert Polyfill Changes and New Polyfill Function Uses [#11074](https://github.com/Applifier/unity-ads-webview/pull/11074)
