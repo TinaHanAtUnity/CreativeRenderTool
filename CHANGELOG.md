@@ -1,4 +1,4 @@
-# Pending
+# Wed Sep  4 01:34:29 UTC 2019
 
 * Revert Polyfill Changes and New Polyfill Function Uses [#11074](https://github.com/Applifier/unity-ads-webview/pull/11074)
 * Consent A/B test: Make CTAs more compact [#11070](https://github.com/Applifier/unity-ads-webview/pull/11070)
