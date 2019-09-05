@@ -175,13 +175,6 @@ export class CustomFeatures {
     }
 
     /**
-     *  Method used for gating PTS metrics for this specific Zynga Game using Load API
-     */
-    public static isTrackedGameUsingLoadApi(gameId: string) {
-        return gameId === '2988443';
-    }
-
-    /**
      * Rollout plan can be found here: https://docs.google.com/document/d/1QI-bjyTZrwNgx4D6X8_oq5FW_57ikPKBcwbY_MQ_v4g/edit?ts=5d5713ce#
      * Lists are split out to easily handle the rollout plan
      */
