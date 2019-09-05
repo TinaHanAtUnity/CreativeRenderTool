@@ -16,9 +16,9 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Promises } from 'Core/Utilities/Promises';
 import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export class AnalyticsManager implements IAnalyticsManager {
 
@@ -28,7 +28,7 @@ export class AnalyticsManager implements IAnalyticsManager {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
-    private _adsConfiguration: AdsConfiguration;
+    private _privacySDK: PrivacySDK;
     private _analyticsUserId: string;
     private _analyticsSessionId: number;
     private _storage: AnalyticsStorage;
@@ -59,7 +59,7 @@ export class AnalyticsManager implements IAnalyticsManager {
         }
     }
 
-    constructor(core: ICore, analytics: IAnalyticsApi, adsConfiguration: AdsConfiguration, analyticsStorage: AnalyticsStorage) {
+    constructor(core: ICore, analytics: IAnalyticsApi, privacySDK: PrivacySDK, analyticsStorage: AnalyticsStorage) {
         this._platform = core.NativeBridge.getPlatform();
         this._analytics = analytics;
         this._focusManager = core.FocusManager;
@@ -67,7 +67,7 @@ export class AnalyticsManager implements IAnalyticsManager {
         this._clientInfo = core.ClientInfo;
         this._deviceInfo = core.DeviceInfo;
         this._configuration = core.Config;
-        this._adsConfiguration = adsConfiguration;
+        this._privacySDK = privacySDK;
         this._storage = analyticsStorage;
 
         this._analytics.Analytics.addExtras({
@@ -201,7 +201,7 @@ export class AnalyticsManager implements IAnalyticsManager {
     }
 
     protected send<T>(event: IAnalyticsObject<T>): Promise<void> {
-        const common: IAnalyticsCommonObjectV1 = AnalyticsProtocol.getCommonObject(this._platform, this._adsAnalyticsSessionId, this._analyticsUserId, this._analyticsSessionId, this._clientInfo, this._deviceInfo, this._configuration, this._adsConfiguration);
+        const common: IAnalyticsCommonObjectV1 = AnalyticsProtocol.getCommonObject(this._platform, this._adsAnalyticsSessionId, this._analyticsUserId, this._analyticsSessionId, this._clientInfo, this._deviceInfo, this._configuration, this._privacySDK);
         const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
         return Promises.voidResult(this._request.post(this._endpoint, data));

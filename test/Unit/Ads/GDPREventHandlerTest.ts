@@ -83,19 +83,20 @@ describe('GDPREventHandlerTest', () => {
 
     describe('When calling onGDPRPopupSkipped', () => {
         beforeEach(() => {
-            adUnitParameters.adsConfig.set('optOutRecorded', false);
-            sinon.spy(adUnitParameters.adsConfig, 'setOptOutRecorded');
+            // tslint:disable-next-line
+            adUnitParameters.privacySDK['_optOutRecorded'] = false;
         });
 
         it('should send GDPR skip event', () => {
             gdprEventHandler.onGDPRPopupSkipped();
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.adsConfig.setOptOutRecorded, true);
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacySDK.setOptOutRecorded, true);
             sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, GDPREventAction.SKIP);
         });
 
         it('GDPR skip event should not be sent', () => {
-            adUnitParameters.adsConfig.set('optOutRecorded', true);
+            // tslint:disable-next-line
+            adUnitParameters.privacySDK['_optOutRecorded'] = true;
             gdprEventHandler.onGDPRPopupSkipped();
 
             sinon.assert.notCalled(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent);

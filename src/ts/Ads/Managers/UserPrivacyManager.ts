@@ -195,11 +195,11 @@ export class UserPrivacyManager {
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
-        if (this._adsConfig.isGDPREnabled()) {
+        if (this._privacy.isGDPREnabled()) {
             // get consent only if gdpr is enabled
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
-                if (this._adsConfig.isGDPREnabled()) {
+                if (this._privacy.isGDPREnabled()) {
                     this.updateConfigurationWithConsent(consent);
                     this.pushConsent(consent);
                 }
@@ -237,7 +237,7 @@ export class UserPrivacyManager {
     }
 
     public isOptOutEnabled(): boolean {
-        return this._adsConfig.isOptOutEnabled();
+        return this._privacy.isOptOutEnabled();
     }
 
     public getGranularPermissions(): IGranularPermissions {
@@ -292,8 +292,8 @@ export class UserPrivacyManager {
             consent = false;
         }
 
-        this._adsConfig.setOptOutEnabled(!consent);
-        this._adsConfig.setOptOutRecorded(true);
+        this._privacy.setOptOutEnabled(!consent);
+        this._privacy.setOptOutRecorded(true);
 
         const gamePrivacy = this._privacy.getGamePrivacy();
         gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
@@ -312,7 +312,7 @@ export class UserPrivacyManager {
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
-        if (this._adsConfig.isGDPREnabled()) {
+        if (this._privacy.isGDPREnabled()) {
             if (data && data.gdpr && data.gdpr.consent) {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 

@@ -28,6 +28,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('PurchasingUtilitiesTest', () => {
     let platform: Platform;
@@ -48,6 +49,7 @@ describe('PurchasingUtilitiesTest', () => {
     let request: RequestManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let metaDataManager: MetaDataManager;
+    let privacySDK: PrivacySDK;
 
     const initWithConfiguration = (configuration: any) => {
         platform = Platform.ANDROID;
@@ -57,6 +59,7 @@ describe('PurchasingUtilitiesTest', () => {
         ads = TestFixtures.getAdsApi(nativeBridge);
         promo = TestFixtures.getPromoApi(nativeBridge);
         purchasing = TestFixtures.getPurchasingApi(nativeBridge);
+        privacySDK = TestFixtures.getPrivacySDK(core);
 
         campaignManager = sinon.createStubInstance(CampaignManager);
         analyticsManager = sinon.createStubInstance(AnalyticsManager);
@@ -96,7 +99,7 @@ describe('PurchasingUtilitiesTest', () => {
         thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
         metaDataManager = sinon.createStubInstance(MetaDataManager);
 
-        return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, metaDataManager, analyticsManager);
+        return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, metaDataManager, analyticsManager, privacySDK);
     };
 
     describe('without Promo Placements', () => {

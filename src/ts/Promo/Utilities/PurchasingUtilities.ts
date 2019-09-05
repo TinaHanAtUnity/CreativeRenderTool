@@ -21,6 +21,7 @@ import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter'
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -41,7 +42,7 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager: IAnalyticsManager) {
+    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager: IAnalyticsManager, privacySDK: PrivacySDK) {
         this._core = core;
         this._promo = promo;
         this._purchasing = purchasing;
@@ -53,6 +54,7 @@ export class PurchasingUtilities {
         this._promoEvents = promoEvents;
         this._request = request;
         this._metaDataManager = metaDataManager;
+        this._privacySDK = privacySDK;
 
         campaignManager.onAdPlanReceived.subscribe(() => this._placementManager.clear());
         return this.getPurchasingAdapter().then((adapter) => {
@@ -189,6 +191,7 @@ export class PurchasingUtilities {
     private static _request: RequestManager;
     private static _isInitialized = false;
     private static _metaDataManager: MetaDataManager;
+    private static _privacySDK: PrivacySDK;
 
     private static setProductPlacementStates(): void {
         const placementCampaignMap = this._placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
@@ -215,10 +218,10 @@ export class PurchasingUtilities {
             if (isAvailable) {
                 return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
-                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
+                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._privacySDK, this._clientInfo, this._metaDataManager);
             }
         }).catch(() => {
-            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
+            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._privacySDK, this._clientInfo, this._metaDataManager);
         });
     }
 

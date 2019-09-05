@@ -131,7 +131,7 @@ describe('VastAdUnitTest', () => {
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
         const campaign = TestFixtures.getCampaign();
         videoOverlayParameters = {

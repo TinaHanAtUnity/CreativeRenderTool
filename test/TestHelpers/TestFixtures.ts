@@ -170,6 +170,7 @@ import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import Test = Mocha.Test;
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -730,7 +731,8 @@ export class TestFixtures {
 
     public static getPrivacy(platform: Platform, campaign: Campaign): Privacy {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        return new Privacy(platform, campaign, privacyManager, TestFixtures.getAdsConfiguration().isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
+        const core = TestFixtures.getCoreApi(TestFixtures.getNativeBridge(platform, TestFixtures.getBackend(platform)));
+        return new Privacy(platform, campaign, privacyManager, TestFixtures.getPrivacySDK(core).isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
     }
 
     public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign, privacy: Privacy): IEndScreenParameters {
