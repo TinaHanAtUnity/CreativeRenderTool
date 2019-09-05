@@ -1,4 +1,4 @@
-# Pending
+# Thu Sep  5 17:17:01 UTC 2019
 
 * Add Vast HTML Endcard Support Disabled AB Test [#11018](https://github.com/Applifier/unity-ads-webview/pull/11018)
 * Open Measurement - Fix data passthrough for Admob Session Interface [#11017](https://github.com/Applifier/unity-ads-webview/pull/11017)
