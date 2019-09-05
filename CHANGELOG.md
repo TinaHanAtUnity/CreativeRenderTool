@@ -1,3 +1,8 @@
+# Pending
+
+* Update 3.2 Load Rollout AB Test for 10% of All PerPlacementLoad Traffic [#11076](https://github.com/Applifier/unity-ads-webview/pull/11076)
+* Add Sampled Tracking of Load API Performance in PTS [#11075](https://github.com/Applifier/unity-ads-webview/pull/11075)
+
 # Thu Sep  5 17:17:01 UTC 2019
 
 * Add Vast HTML Endcard Support Disabled AB Test [#11018](https://github.com/Applifier/unity-ads-webview/pull/11018)
