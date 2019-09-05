@@ -1,7 +1,7 @@
+import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 
 export interface IAnalyticsManager {
-    onPurchaseFailed(productId: string, reason: string, price: number | undefined, currency: string | undefined): void;
-    onIapTransaction(productId: string, receipt: string, currency: string, price: number): Promise<void[]>;
+    onIapTransaction(transactionDetails: ITransactionDetails): Promise<void>;
     init(): Promise<void>;
     getGameSessionId(): number;
 }

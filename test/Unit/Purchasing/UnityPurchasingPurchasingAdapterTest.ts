@@ -410,7 +410,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should send the promo payload with Purchase request value', () => {
 
             const callPurchase = () => {
-                return purchasingAdapter.purchaseItem(thirdPartyEventManager, 'com.example.iap.product1', TestFixtures.getPromoCampaign(), 'testId', false)
+                return purchasingAdapter.purchaseItem(thirdPartyEventManager, 'com.example.iap.product1', TestFixtures.getPromoCampaign(), false)
                 .then(() => triggerPurchasingCommand(true))
                 .then(() => {
                     sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);

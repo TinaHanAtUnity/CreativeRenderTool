@@ -30,7 +30,7 @@ export interface IProduct {
 
 export interface IPurchasingAdapter {
     initialize(): Promise<void>;
-    purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails>;
+    purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean): Promise<ITransactionDetails>;
     refreshCatalog(): Promise<IProduct[]>;
     onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void;
 
