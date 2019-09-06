@@ -2,7 +2,7 @@ import { ICoreApi } from 'Core/ICore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 export enum OMEvents {
-    IMPRESSION_OCCURED = 'impressionOccured',
+    IMPRESSION_OCCURRED = 'impressionOccurred',
     LOADED = 'loaded',
     START = 'start',
     FIRST_QUARTILE = 'firstQuartile',
@@ -220,7 +220,7 @@ export class OMIDEventBridge {
         this._openMeasurement = openMeasurement;
 
         this._omidHandlers = {};
-        this._omidHandlers[OMEvents.IMPRESSION_OCCURED] = (msg) => this._handler.onImpression(<IImpressionValues>msg.data);
+        this._omidHandlers[OMEvents.IMPRESSION_OCCURRED] = (msg) => this._handler.onImpression(<IImpressionValues>msg.data);
         this._omidHandlers[OMEvents.LOADED] = (msg) => this._handler.onLoaded(<IVastProperties>msg.data);
         this._omidHandlers[OMEvents.START] = (msg) => this._handler.onStart(<number>msg.data.duration, <number>msg.data.videoPlayerVolume);
         this._omidHandlers[OMEvents.FIRST_QUARTILE] = (msg) => this._handler.onSendFirstQuartile();
@@ -298,8 +298,6 @@ export class OMIDEventBridge {
 
         if (this._iframe3p.contentWindow && this._verificationsInjected) {
             this._iframe3p.contentWindow.postMessage(event, '*');
-        } else {
-            this._eventQueue.push(event);
         }
     }
 
@@ -314,16 +312,23 @@ export class OMIDEventBridge {
 
         if (this._iframe3p.contentWindow && this._verificationsInjected) {
             this._iframe3p.contentWindow.postMessage(event, '*');
-        } else {
-            this._eventQueue.push(event);
         }
     }
 
     public triggerSessionEvent(event: ISessionEvent) {
+
+        // posts current event to omid3p
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
         if (this._iframe3p.contentWindow) {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
+
+        // this posts back to the admob session interface
+        if (this._openMeasurement.getSessionStartCalled() && event.data.type === SESSIONEvents.SESSION_FINISH) {
+            this.postMessage(SESSIONEvents.SESSION_FINISH);
+        }
+
+        this._eventQueue.push(event);
     }
 
     private onMessage(e: MessageEvent) {

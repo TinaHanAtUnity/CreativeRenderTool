@@ -514,7 +514,7 @@ describe('VastParserStrict', () => {
                     });
                 });
             });
-            // enable these tests if abgroup is enabled
+            // enable these tests if vast iframe abgroup is enabled
             xdescribe('IFrameResource Companion Ad', () => {
                 describe('getIframeResourceURL from IFrameResource type CompanionAd', () => {
                     const tests: {
@@ -543,6 +543,7 @@ describe('VastParserStrict', () => {
                 });
             });
 
+            // enable these tests if vast html abgroup is enabled
             xdescribe('HTMLResource Companion Ad', () => {
                 describe('getHtmlCompanionResourceContent from HTMLResource type CompanionAd', () => {
                     const tests: {
@@ -570,9 +571,9 @@ describe('VastParserStrict', () => {
                     });
                 });
             });
-            // enable these tests if abgroup is enabled
-            describe('Unsupported Companion Ad', () => {
-                xdescribe('add into unsupported companion ads list for unsupported companion ads', () => {
+            // enable these tests if vast endcard abgroup is enabled
+            xdescribe('Unsupported Companion Ad', () => {
+                describe('add into unsupported companion ads list for unsupported companion ads', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
@@ -589,9 +590,9 @@ describe('VastParserStrict', () => {
                                 expectedVal: 0
                             },
                             {
-                                message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
+                                message: 'should have not added into unsupported companion ads for iframeResource and htmlResource',
                                 inputXml: VastCompanionAdHTMLXml,
-                                expectedVal: 1
+                                expectedVal: 0
                             },
                             {
                                 message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',

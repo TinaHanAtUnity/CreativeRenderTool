@@ -118,6 +118,8 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         const hasIframeEndscreenFlag = !!vast.getIframeCompanionResourceUrl();
 
+        const hasHtmlEndscreenFlag = !!vast.getHtmlCompanionResourceContent();
+
         const mediaVideo = VastMediaSelector.getOptimizedVastMediaFile(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideo) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, vast.getErrorURLTemplates(), undefined, response.getSeatId(), response.getCreativeId());
@@ -144,6 +146,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             video: new Video(mediaVideoUrl, session, undefined, response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
             hasStaticEndscreen: hasStaticEndscreenFlag,
             hasIframeEndscreen: hasIframeEndscreenFlag,
+            hasHtmlEndscreen: hasHtmlEndscreenFlag,
             staticPortrait: staticPortraitAsset,
             staticLandscape: staticLandscapeAsset,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),

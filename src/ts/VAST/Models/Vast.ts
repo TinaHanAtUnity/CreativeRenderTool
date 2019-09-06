@@ -240,9 +240,9 @@ export class Vast extends Model<IVast> {
     public getIframeCompanionResourceUrl(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const iframeCompanionAd = ad.getIframeCompanionAds();
-            if (iframeCompanionAd.length > 0) {
-                return iframeCompanionAd[0].getIframeResourceURL();
+            const iframeCompanionAds = ad.getIframeCompanionAds();
+            if (iframeCompanionAds.length > 0) {
+                return iframeCompanionAds[0].getIframeResourceURL();
             }
         }
         return null;
@@ -251,9 +251,9 @@ export class Vast extends Model<IVast> {
     public getHtmlCompanionResourceContent(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const htmlCompanionAd = ad.getHtmlCompanionAd();
-            if (htmlCompanionAd) {
-                return htmlCompanionAd.getHtmlResourceContent();
+            const htmlCompanionAds = ad.getHtmlCompanionAds();
+            if (htmlCompanionAds.length > 0) {
+                return htmlCompanionAds[0].getHtmlResourceContent();
             }
         }
         return null;

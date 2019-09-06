@@ -12,12 +12,13 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { VastCompanionAdIframeResourceValidator } from 'VAST/Validators/VastCompanionAdIframeResourceValidator';
+import { VastCompanionAdHTMLResourceValidator } from 'VAST/Validators/VastCompanionAdHTMLResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
-import { IframeEndcardTest} from 'Core/Models/ABGroup';
+import { IframeEndcardTest, HtmlEndcardTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 
@@ -357,9 +358,29 @@ export class VastParserStrict {
                 }
             }
 
-            // ignore element as it is not of a type we support
             if (htmlResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                if (this._coreConfig && HtmlEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                    const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
+                    const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
+                    let isWarningLevel = true;
+                    for (const adError of companionAdErrors) {
+                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                            if (adError.errorTrackingUrls.length === 0) {
+                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                            }
+                            this._compiledCampaignErrors.push(adError);
+                            isWarningLevel = false;
+                            break;
+                        }
+                    }
+                    if (isWarningLevel) {
+                        vastAd.addHtmlCompanionAd(companionAd);
+                    } else {
+                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    }
+                } else {
+                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                }
             }
         });
 

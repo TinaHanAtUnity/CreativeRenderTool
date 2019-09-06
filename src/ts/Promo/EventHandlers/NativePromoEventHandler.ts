@@ -65,7 +65,7 @@ export class NativePromoEventHandler {
     private sendClick(productId: string, placementId: string, campaign: PromoCampaign) {
         this._ads.Listener.sendClickEvent(placementId);
         this._thirdPartyEventManager.then((thirdPartyEventManager) => {
-            PurchasingUtilities.onPurchase(thirdPartyEventManager, productId, campaign, placementId, true);
+            PurchasingUtilities.onPurchase(thirdPartyEventManager, productId, campaign, true);
         });
         return this.sendTrackingEvent(TrackingEvent.CLICK, campaign);
     }

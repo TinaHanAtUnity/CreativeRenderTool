@@ -100,6 +100,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private _deviceVolume: number;
     private _sessionStartCalled = false;
+    private _sessionFinishCalled = false;
     private _adVerifications: VastAdVerification[];
     private _videoViewRectangle: IRectangle;
 
@@ -146,6 +147,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             onVideoElement: (element) => { this._admobVideoElement = element; },
             onElementBounds: (elementBounds) => { this._admobElementBounds = elementBounds; }
         }, this._omIframe, this);
+    }
+
+    public getSessionStartCalled(): boolean {
+        return this._sessionStartCalled;
     }
 
     public addToViewHierarchy(): void {
@@ -208,6 +213,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public render(): void {
         super.render();
+
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
         this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
 
@@ -233,7 +239,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Corresponds to the VAST  start event.
      */
     public start(duration: number) {
-        if (this.getState() === OMState.STOPPED && this._sessionStartCalled) {
+        if (this.getState() === OMState.STOPPED) {
             this.setState(OMState.PLAYING);
 
             this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_START, {
@@ -397,7 +403,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * SessionFinish:
     */
     public sessionFinish(event: ISessionEvent) {
-        this._omBridge.triggerSessionEvent(event);
+        if (!this._sessionFinishCalled) {
+            this._omBridge.triggerSessionEvent(event);
+            this._sessionFinishCalled = true;
+        }
     }
 
     /**
@@ -580,20 +589,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      */
     public onEventProcessed(eventType: string) {
         if (eventType === SESSIONEvents.SESSION_START) {
-
             this._sessionStartCalled = true;
-
-            this.loaded({
-                isSkippable: this._placement.allowSkip(),
-                skipOffset: this._placement.allowSkipInSeconds(),
-                isAutoplay: true,                   // Always autoplay for video
-                position: VideoPosition.STANDALONE  // Always standalone video
-            });
-
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-                const measuringElementAvailable = true;
-                this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
-            });
+            this.sendVASTStartEvents();
         }
 
         if (eventType === SESSIONEvents.SESSION_FINISH) {
@@ -608,6 +605,28 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (eventType === 'vendorkeyMismatch') {
             this._core.Sdk.logDebug('Vendor attribute was either never registered or vendor attribute does not match registered key. SessionStart not called.');
+        }
+
+        if (eventType === 'sessionRegistered') {
+            if (this._campaign instanceof AdMobCampaign) {
+                this._omBridge.sendQueuedEvents();
+            }
+        }
+    }
+
+    private sendVASTStartEvents() {
+        if (this._campaign instanceof VastCampaign) {
+            this.loaded({
+                isSkippable: this._placement.allowSkip(),
+                skipOffset: this._placement.allowSkipInSeconds(),
+                isAutoplay: true,                   // Always autoplay for video
+                position: VideoPosition.STANDALONE  // Always standalone video
+            });
+
+            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+                const measuringElementAvailable = true;
+                this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
+            });
         }
     }
 
@@ -724,7 +743,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return Promise.all(promises).then(() => {
             const verificationScriptsInjected = true;
             this._omBridge.setVerificationsInjected(verificationScriptsInjected);
-            this._omBridge.sendQueuedEvents();
         });
     }
 

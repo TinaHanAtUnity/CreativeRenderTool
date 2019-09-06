@@ -153,11 +153,13 @@ describe('VastTest', () => {
         it('should return html content when it has html companion ad', () => {
             const vast = new Vast([vastAd], []);
 
-            vastAd.setHtmlCompanionAd(new VastCompanionAdHTMLResource('id1', 320, 480, '<div>hello click me</div>'));
+            vastAd.addHtmlCompanionAd(new VastCompanionAdHTMLResource('id1', 320, 480, '<div>hello click me</div>'));
             assert.equal(vast.getHtmlCompanionResourceContent(), '<div>hello click me</div>');
 
-            vastAd.setHtmlCompanionAd(new VastCompanionAdHTMLResource('id2', 320, 480));
-            assert.equal(vast.getHtmlCompanionResourceContent(), null);
+            const vastAdTwo = new VastAd();
+            const vastTwo = new Vast([vastAdTwo], []);
+            vastAdTwo.addHtmlCompanionAd(new VastCompanionAdHTMLResource('id2', 320, 480));
+            assert.equal(vastTwo.getHtmlCompanionResourceContent(), null);
         });
     });
 });

@@ -147,19 +147,19 @@ export class ProgrammaticTrackingService {
 
     public reportMetric(event: ProgrammaticTrackingMetric, adType?: string, seatId?: number | undefined): Promise<INativeResponse> {
 
-        const isLoadMetric = Object.values(LoadMetric).includes(event);
-        const isZyngaFreeCellSolitareUsingLoad = CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId());
-        if (isLoadMetric && !isZyngaFreeCellSolitareUsingLoad) {
-            return Promise.resolve(<INativeResponse>{});
-        }
-
         const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
         const data: string = JSON.stringify(this.createMetricTagData(event, adType, seatId));
         const headers: [string, string][] = [];
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this._request.post(url, data, headers);
+        const isLoadMetric = Object.values(LoadMetric).includes(event);
+        const isSampledLoadMetric = isLoadMetric && CustomFeatures.sampleAtGivenPercent(1);
+        if (!isLoadMetric || isSampledLoadMetric) {
+            return this._request.post(url, data, headers);
+        } else {
+            return Promise.resolve(<INativeResponse>{});
+        }
     }
 
 }
