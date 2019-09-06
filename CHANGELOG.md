@@ -1,6 +1,6 @@
 # Pending
 
-* Open Measurement - Change order of events for IAS Lifecycle [#11124] https://github.com/Applifier/unity-ads-webview/pull/11124
+* Open Measurement - Change order of events for IAS Lifecycle [#11124](https://github.com/Applifier/unity-ads-webview/pull/11124)
 
 # Thu Sep  5 22:18:43 UTC 2019
 
