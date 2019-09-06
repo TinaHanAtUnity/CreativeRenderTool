@@ -35,7 +35,6 @@ export class PrivacyParser {
         const optOutRecorded = sanitizedConfigJson.optOutRecorded;
         const optOutEnabled = sanitizedConfigJson.optOutEnabled;
 
-
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled);
     }
 
