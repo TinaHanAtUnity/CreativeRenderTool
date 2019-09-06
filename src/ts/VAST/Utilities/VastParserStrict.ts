@@ -184,7 +184,7 @@ export class VastParserStrict {
 
         this.applyParentURLs(parsedVast, parent);
 
-        const wrapperURL = parsedVast.getWrapperURL();
+        let wrapperURL = parsedVast.getWrapperURL();
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         }
@@ -195,7 +195,19 @@ export class VastParserStrict {
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
         const wrapperUrlProtocol = Url.getProtocol(wrapperURL);
-        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+
+        const headers: [string, string][] = [];
+
+        // For IAS tags to return vast instead of vpaid
+        if (/^https?:\/\/vast\.adsafeprotected\.com/.test(wrapperURL)) {
+            wrapperURL = wrapperURL.replace('vast.adsafeprotected.com', 'vastpixel3.adsafeprotected.com');
+        }
+
+        if (/^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(wrapperURL)) {
+            headers.push(['X-Device-Type', 'unity']);
+        }
+
+        return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
