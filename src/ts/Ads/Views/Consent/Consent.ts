@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
@@ -63,9 +63,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
-        this._templateData = {
-            myChoicesCTATextTest: parameters.consentABTest
-        };
+        this._templateData = {};
 
         this._bindings = [
             {

@@ -10,7 +10,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3pEvents } from 'Ads/Views/OMIDEventBridge';
+import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3pEvents, OMSessionInfo, IRectangle } from 'Ads/Views/OMIDEventBridge';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     const sandbox = sinon.createSandbox();
@@ -69,7 +69,10 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
                 onSessionFinish: sinon.spy(),
                 onInjectVerificationResources: sinon.spy(),
                 onPopulateVendorKey: sinon.spy(),
-                onEventProcessed: sinon.spy()
+                onEventProcessed: sinon.spy(),
+                onSlotElement: sinon.spy(),
+                onVideoElement: sinon.spy(),
+                onElementBounds: sinon.spy()
             };
 
             omidEventBridge = new OMIDEventBridge(core, handler, iframe, omInstance);
@@ -98,7 +101,7 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
         describe('receiving OMID events', () => {
             const tests = [
                 {
-                    event: OMEvents.IMPRESSION_OCCURED,
+                    event: OMEvents.IMPRESSION_OCCURRED,
                     data: {
                         mediaType: MediaType.VIDEO,
                         videoEventAdaptorType: 'test',
@@ -230,9 +233,38 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
                 {
                     event: OMID3pEvents.ON_EVENT_PROCESSED,
                     data: {
-                        eventType: 'sessionStart'
+                        eventType: 'sessionStart',
+                        vendorKey: 'test-vendor-key'
                     },
-                    verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onEventProcessed, data.eventType)
+                    verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onEventProcessed, data.eventType, data.vendorKey)
+                },
+                {
+                    event: OMSessionInfo.VIDEO_ELEMENT,
+                    data: {
+                        videoElement: `${sinon.createStubInstance(HTMLElement)}`
+                    },
+                    verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onSlotElement, <HTMLElement>data.videoElement)
+                },
+                {
+                    event: OMSessionInfo.SLOT_ELEMENT,
+                    data: {
+                        slotElement: `${sinon.createStubInstance(HTMLElement)}`
+                    },
+                    verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onVideoElement, <HTMLElement>data.slotElement)
+                },
+                {
+                    event: OMSessionInfo.ELEMENT_BOUNDS,
+                    data: {
+                        elementBounds: {
+                            x: 1,
+                            y: 1,
+                            width: 1,
+                            height: 1
+                        }
+                    },
+                    verify: (data?: any) => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>handler.onElementBounds, <IRectangle>data.elementBounds);
+                    }
                 }
             ];
             for (const test of tests) {

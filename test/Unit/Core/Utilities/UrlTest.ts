@@ -270,4 +270,31 @@ describe('UrlTest', () => {
             assert.deepEqual(Url.getAppStoreUrlTemplates(Platform.IOS), iosStoreTemplates, 'iOS app store templates are not matching');
         });
     });
+
+    describe('isInternalTrackingProtocol', () => {
+
+        const tests: {
+            testCase: string;
+            url: string;
+            expectedOutcome: boolean;
+        }[] = [{
+            testCase: 'should work with a properly formatted internal tracking url',
+            url: 'https://tracking.prd.mz.internal.unity3d.com/queryparams',
+            expectedOutcome: true
+        }, {
+            testCase: 'should fail because of http only',
+            url: 'http://tracking.prd.mz.internal.unity3d.com/queryparams',
+            expectedOutcome: false
+        }, {
+            testCase: 'should fail if only contained within the url sting',
+            url: 'www.safedk-sucks-https://tracking.prd.mz.internal.unity3d.com/queryparams',
+            expectedOutcome: false
+        }];
+
+        tests.forEach((t) => {
+            it(t.testCase, () => {
+                assert.equal(Url.isInternalPTSTrackingProtocol(t.url), t.expectedOutcome);
+            });
+        });
+    });
 });

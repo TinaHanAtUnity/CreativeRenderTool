@@ -2,7 +2,7 @@
     (function() {
         var OmidSessionInterface = function() {
 
-            var IMPRESSION_OCCURED = 'impressionOccured',
+            var IMPRESSION_OCCURRED = 'impressionOccurred',
             LOADED = 'loaded',
             START = 'start',
             FIRST_QUARTILE = 'firstQuartile',
@@ -19,21 +19,9 @@
             AD_USER_INTERACTION = 'adUserInteraction',
             GEOMETRY_CHANGE = 'geometryChange';
 
-            /** 
-             * setSlotElement: 
-             * Sets the slot element for a display creative for measurement. Currently dont support display
-             * @param slotElement
-             * Implementation Pending
-             */
-            this.setSlotElement = function(slotElement) {};
-
-            /**
-            * setElementBounds:
-            * Only relevant to display ad slot elements. Called at beginning of playback and sessionfinish
-            * @param (omidSessionInterface.Rectangle) elementBounds
-            * Implementation Pending
-            */
-            this.setElementBounds = function(elementBounds) {};
+            var VIDEO_ELEMENT = 'videoElement',
+            SLOT_ELEMENT = 'slotElement',
+            ELEMENT_BOUNDS = 'elementBounds';
 
             /**
              * Sets the creative type for the active ad session, or the next one if there is no
@@ -144,10 +132,11 @@
             var videoElement;
             var adEventsRegistered = false;
             var mediaEventsRegistered = false;
+            var verificationResources = [];
 
             var impressionOccured = function(impressionEventData) {
                 if (adEventsRegistered) {
-                    postMessage(IMPRESSION_OCCURED, impressionEventData);
+                    postMessage(IMPRESSION_OCCURRED, impressionEventData);
                 }
             }
 
@@ -245,7 +234,7 @@
                 Context.environment = Environment.APP;
                 Context.accessMode = AccessMode.LIMITED;
                 Context.adSessionType = AdSessionType.HTML;
-                Context.supports = SupportedFeatures.VIDEO;
+                Context.supports = [SupportedFeatures.VIDEO, SupportedFeatures.CONTAINER];
                 Context.omidNativeInfo = omidNativeInfo;
                 Context.omidJsInfo = omidJSInfo;
                 Context.app = App;
@@ -279,10 +268,48 @@
                 postMessage('reportError', eventData);
             };
 
-            this.startAdSession = function() {
+            this.injectVerificationScriptResources = function(verificationScriptResources) {
+                verificationResources = verificationScriptResources;
+                postMessage('verificationResources', verificationScriptResources);
+            };
+
+            /**
+             * setVideoElement:
+             * Sets the slot element for a video creative for measurement
+             * @param videoElement
+             */
+            this.setVideoElement = function(videoElement) {
+                postMessage(VIDEO_ELEMENT, {
+                    videoElement: `${videoElement}`
+                });
+            };
+
+            /**
+             * setSlotElement:
+             * Sets the slot element for a display creative for measurement. Currently dont support display
+             * @param slotElement
+             */
+            this.setSlotElement = function(slotElement) {
+                postMessage(SLOT_ELEMENT, {
+                    slotElement: `${slotElement}`
+                });
+            };
+
+            /**
+            * setElementBounds:
+            * Only relevant to display ad slot elements. Called at beginning of playback and sessionfinish
+            * @param (omidSessionInterface.Rectangle) elementBounds
+            */
+            this.setElementBounds = function(elementBounds) {
+                postMessage(ELEMENT_BOUNDS, {
+                    elementBounds: elementBounds
+                });
+            };
+
+            var startAdSession = function() {
                 var sessionStartEventData = {
                     context: Context,
-                    verificationParameters: undefined
+                    verificationParameters: verificationResources[0].verificationParameters
                 }
                 var eventData = {
                     adSessionId: getSessionId(),
@@ -291,11 +318,11 @@
                     data: sessionStartEventData
                 }
 
-                sessionCallback(eventData);
-                postMessage('startAdSession', eventData);
+                sessionCallback(eventData);                         // needs to be called for session interface
+                postMessage(AdEventType.SESSION_START, eventData);  // needs to be called for omid3p
             };
-            
-            this.finishAdSession = function() {
+
+            var finishAdSession = function() {
                 var eventData = {
                     adSessionId: getSessionId(),
                     timestamp: + new Date(),
@@ -304,22 +331,13 @@
                 }
 
                 sessionCallback(eventData);
-                postMessage('finishAdSession', eventData);
                 sessionCallback = () => void 0;
-            };
-
-            this.injectVerificationScriptResources = function(verificationScriptResources) {
-                postMessage('verificationResources', verificationScriptResources);
-            };
-
-            this.setVideoElement = function(el) {
-                videoElement = el;
             };
 
             this.adEvents = {};
             this.mediaEvents = {};
             this.videoEvents = {};
-            this.adEvents[IMPRESSION_OCCURED] = impressionOccured;
+            this.adEvents[IMPRESSION_OCCURRED] = impressionOccured;
             this.mediaEvents[LOADED] = this.videoEvents[LOADED] = loaded;
             this.mediaEvents[START] = this.videoEvents[START] = start;
             this.mediaEvents[FIRST_QUARTILE] = this.videoEvents[FIRST_QUARTILE] = firstQuartile;
@@ -338,6 +356,7 @@
 
             this.registerAdEvents = function() {
                 adEventsRegistered = true;
+                startAdSession();
             };
 
             // We will support video events until OMID 1.3 is released. Then this will be removed.
@@ -353,8 +372,13 @@
                 switch(event.data.type) {
                     case 'sdkVersion':
                         sdkVersion = event.data.value;
+                        break;
                     case 'sessionId':
                         sessionId = event.data.value;
+                        break;
+                    case AdEventType.SESSION_FINISH:
+                        finishAdSession();
+                        break;
                 }
             });
 

@@ -151,7 +151,7 @@ describe('PurchasingUtilitiesTest', () => {
                         receipt: 'moneymoneymoney',
                         extras: 'schooterdoooter'
                     }));
-                    return PurchasingUtilities.onPurchase(thirdPartyEventManager, 'myPromo', TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+                    return PurchasingUtilities.onPurchase(thirdPartyEventManager, 'myPromo', TestFixtures.getPromoCampaign());
                 });
 
                 afterEach(() => {
@@ -166,7 +166,7 @@ describe('PurchasingUtilitiesTest', () => {
             describe('onFailure', () => {
                 it('should fail when purchase item transaction fails over api', () => {
                     (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
-                    PurchasingUtilities.onPurchase(thirdPartyEventManager, 'test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
+                    PurchasingUtilities.onPurchase(thirdPartyEventManager, 'test', TestFixtures.getPromoCampaign()).catch((e) => {
                         assert.equal(e.message, undefined);
                     });
                 });
@@ -174,7 +174,7 @@ describe('PurchasingUtilitiesTest', () => {
                 it('should fail when purchase item transaction error occurs ', () => {
                     sandbox.stub(purchasing.CustomPurchasing.onTransactionError, 'subscribe').callsFake((resolve) => resolve('UNKNOWN_ERROR', 'schooty'));
                     (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
-                    PurchasingUtilities.onPurchase(thirdPartyEventManager, 'test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
+                    PurchasingUtilities.onPurchase(thirdPartyEventManager, 'test', TestFixtures.getPromoCampaign()).catch((e) => {
                         assert.equal(e.message, `Did not complete transaction due to ${'UNKNOWN_ERROR'}:${'schooty'}`);
                     });
                 });

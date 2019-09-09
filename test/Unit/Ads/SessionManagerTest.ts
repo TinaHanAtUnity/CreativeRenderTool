@@ -20,6 +20,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 class TestHelper {
     public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
@@ -48,6 +49,7 @@ describe('SessionManagerTest', () => {
     let request: RequestManager;
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -65,6 +67,7 @@ describe('SessionManagerTest', () => {
         request = new RequestManager(platform, core, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
@@ -81,7 +84,8 @@ describe('SessionManagerTest', () => {
             adsConfig: TestFixtures.getAdsConfiguration(),
             storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign(),
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
     });
 

@@ -94,7 +94,6 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         om.addMessageListener();
                         sinon.stub(om, 'populateVendorKey');
                         sinon.stub(om, 'injectAsString');
-                        sinon.stub(om.getOmidBridge(), 'sendQueuedEvents');
                         return om.injectAdVerifications();
                     });
 
@@ -106,7 +105,6 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         // need a more reliable way to check the dom
                         sinon.assert.calledTwice(<sinon.SinonStub>om.injectAsString);
                         sinon.assert.calledTwice(<sinon.SinonStub>om.populateVendorKey);
-                        sinon.assert.calledOnce(<sinon.SinonStub>om.getOmidBridge().sendQueuedEvents);
                     });
                 });
 
@@ -161,13 +159,28 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 describe('onEventProcessed', () => {
                     context('sessionStart', () => {
                         beforeEach(() => {
-                            sinon.stub(om, 'loaded');
+                            sandbox.stub(om, 'loaded');
+                            sandbox.stub(om, 'geometryChange');
+                            sandbox.stub(om, 'impression');
+                            sandbox.stub(om.getOmidBridge(), 'sendQueuedEvents');
+                            clock = sinon.useFakeTimers();
                         });
 
                         it('should call session begin ad events', () => {
                             om.onEventProcessed('sessionStart');
 
                             sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                            sinon.assert.notCalled(<sinon.SinonSpy>om.geometryChange);
+                        });
+
+                        it('should call session begin ad events for IAS', () => {
+                            om.onEventProcessed('sessionStart', 'IAS');
+
+                            clock.tick(2000);
+                            clock.restore();
+                            sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
+                            sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                            sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
                         });
                     });
 

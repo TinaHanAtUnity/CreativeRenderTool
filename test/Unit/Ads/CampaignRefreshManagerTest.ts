@@ -55,6 +55,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IStoreApi } from 'Store/IStore';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -133,6 +134,7 @@ xdescribe('CampaignRefreshManager', () => {
     let placementManager: PlacementManager;
     let campaignParserManager: ContentTypeHandlerManager;
     let privacy: AbstractPrivacy;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -145,6 +147,7 @@ xdescribe('CampaignRefreshManager', () => {
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
         privacy = sinon.createStubInstance(AbstractPrivacy);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
 
         storageBridge = new StorageBridge(core);
         placementManager = sinon.createStubInstance(PlacementManager);
@@ -175,7 +178,8 @@ xdescribe('CampaignRefreshManager', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
@@ -203,17 +207,19 @@ xdescribe('CampaignRefreshManager', () => {
             options: {},
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacy: privacy
+            privacy: privacy,
+            privacySDK: privacySDK
         };
 
         RefreshManager.ParsingErrorRefillDelayInSeconds = 0; // prevent tests from hanging due to long retry timeouts
     });
 
     describe('PLC campaigns', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
             adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
+            privacySDK = TestFixtures.getPrivacySDK(core);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -221,7 +227,7 @@ xdescribe('CampaignRefreshManager', () => {
             assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
         });
 
-        it('get campaign should return a campaign (Performance)', async () => {
+        it('get campaign should return a campaign (Performance)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 return Promise.resolve();
@@ -248,7 +254,7 @@ xdescribe('CampaignRefreshManager', () => {
             });
         });
 
-        it('get campaign should return a campaign (XPromo)', async () => {
+        it('get campaign should return a campaign (XPromo)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getXPromoCampaign(), undefined);
                 return Promise.resolve();
@@ -277,7 +283,7 @@ xdescribe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (Vast)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionVastCampaign(), undefined);
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionStaticVastCampaign(), undefined);
                 return Promise.resolve();
             });
 
@@ -294,7 +300,7 @@ xdescribe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign(), undefined);
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionStaticVastCampaign(), undefined);
 
                 assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof VastCampaign);
@@ -614,7 +620,8 @@ xdescribe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
             coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
             adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
+            privacySDK = TestFixtures.getPrivacySDK(core);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 

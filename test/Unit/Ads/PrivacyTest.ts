@@ -1,10 +1,12 @@
 import 'mocha';
-import {assert} from 'chai';
+import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import {CurrentUnityConsentVersion, GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Ads/Models/Privacy';
-import {AdsConfigurationParser} from 'Ads/Parsers/AdsConfigurationParser';
-import {Diagnostics} from 'Core/Utilities/Diagnostics';
+import { CurrentUnityConsentVersion, GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import { Platform } from 'Core/Constants/Platform';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('GamePrivacyTests', () => {
     it('should be disabled if PrivacyMethod.DEFAULT', () => {
@@ -66,6 +68,13 @@ context('UserPrivacyTests', () => {
 
 describe('incident-20190516-2', () => {
     let diagnosticTriggerStub: sinon.SinonStub;
+    const platform = Platform.ANDROID;
+    const backend = TestFixtures.getBackend(platform);
+    const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+    const coreModule = TestFixtures.getCoreModule(nativeBridge);
+    const core = coreModule.Api;
+    const clientInfo = TestFixtures.getClientInfo(platform);
+    const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
     const baseAdsConf = {
         assetCaching: 'maybe',
         placements: [],
@@ -79,6 +88,8 @@ describe('incident-20190516-2', () => {
     });
     afterEach(() => {
         diagnosticTriggerStub.restore();
+        // tslint:disable-next-line
+        PrivacyParser['_updateUserPrivacyForIncident'] = false;
     });
     [   {profiling: false},
         {profiling: true},
@@ -97,8 +108,8 @@ describe('incident-20190516-2', () => {
                 },
                 ...baseAdsConf
             };
-            const desynced = AdsConfigurationParser.isUserPrivacyAndOptOutDesynchronized(configJson);
-            assert.isFalse(desynced);
+            PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+            assert.isFalse(PrivacyParser.isUpdateUserPrivacyForIncidentNeeded());
         });
     });
 
@@ -116,8 +127,8 @@ describe('incident-20190516-2', () => {
                 },
                 ...baseAdsConf
             };
-            const desynced = AdsConfigurationParser.isUserPrivacyAndOptOutDesynchronized(configJson);
-            assert.isTrue(desynced);
+            PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+            assert.isTrue(PrivacyParser.isUpdateUserPrivacyForIncidentNeeded());
         });
     });
 
@@ -125,7 +136,7 @@ describe('incident-20190516-2', () => {
         {ads: true, gameExp: true, external: true},
         {all: true}]
         .forEach((permissions) => {
-        it('AdsConfigurationParser should NOT mark privacy as desynchronized if optOutEnabled is false and Privacy.permission = ' + JSON.stringify(permissions), () => {
+        it('AdsConfigurationParser should NOT mark privacy as desynchronized if optOutEnabled is false and PrivacySDK.permission = ' + JSON.stringify(permissions), () => {
             const configJson = {
                 optOutRecorded: true,
                 optOutEnabled: false,
@@ -136,8 +147,8 @@ describe('incident-20190516-2', () => {
                 },
                 ...baseAdsConf
             };
-            const desynced = AdsConfigurationParser.isUserPrivacyAndOptOutDesynchronized(configJson);
-            assert.isFalse(desynced);
+            PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+            assert.isFalse(PrivacyParser.isUpdateUserPrivacyForIncidentNeeded());
         });
     });
 
@@ -156,8 +167,8 @@ describe('incident-20190516-2', () => {
             gamePrivacy: JSON.stringify(configJson.gamePrivacy),
             userPrivacy: JSON.stringify(configJson.userPrivacy)
         };
-        const desynced = AdsConfigurationParser.isUserPrivacyAndOptOutDesynchronized(configJson);
-        assert.isFalse(desynced);
+        PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+        assert.isFalse(PrivacyParser.isUpdateUserPrivacyForIncidentNeeded());
         sinon.assert.calledWith(diagnosticTriggerStub, 'ads_configuration_user_privacy_inconsistent', expectedDiagnosticsData);
         assert.isUndefined(configJson.userPrivacy);
     });
