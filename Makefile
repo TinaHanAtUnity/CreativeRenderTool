@@ -101,6 +101,9 @@ build-release: all $(RELEASE_BUILD_TARGETS)
 
 build-test: all $(TEST_BUILD_TARGETS)
 
+build-fonts:
+	node tools/generate_fonts.js
+
 test: test-unit test-integration
 
 test-unit: start-server $(TEST_BUILD_DIR)/UnitBundle.js $(TEST_BUILD_DIR)/unit-test.html
