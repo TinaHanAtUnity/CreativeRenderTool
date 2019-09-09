@@ -108,7 +108,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 false
             ]);
 
-            const configuration = CoreConfigurationParser.parse(ConfigurationAuctionPlc)
+            const configuration = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
 
             HttpKafka.setRequest(request);
             HttpKafka.setPlatform(platform);

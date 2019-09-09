@@ -131,8 +131,8 @@ describe('CampaignManager', () => {
     beforeEach(() => {
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
-        coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc)
-        adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc)
+        coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
+        adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
 
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParserStrict();
@@ -659,7 +659,7 @@ describe('CampaignManager', () => {
                 response: JSON.stringify(OnProgrammaticMraidUrlPlcCampaignJson)
             }));
 
-            const json = OnProgrammaticMraidUrlPlcCampaignJson
+            const json = OnProgrammaticMraidUrlPlcCampaignJson;
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -704,7 +704,7 @@ describe('CampaignManager', () => {
                 response: JSON.stringify(OnProgrammaticMraidPlcCampaignJson)
             }));
 
-            const json = OnProgrammaticMraidPlcCampaignJson
+            const json = OnProgrammaticMraidPlcCampaignJson;
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -1181,7 +1181,7 @@ describe('CampaignManager', () => {
         let assetManager;
         let campaignManager: any;
         let mockRequest: any;
-        const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc
+        const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc;
 
         beforeEach(() => {
             sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V5);
@@ -1277,7 +1277,7 @@ describe('CampaignManager', () => {
         let assetManager: AssetManager;
         let campaignManager: CampaignManager;
         let mockRequest: sinon.SinonMock;
-        const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc
+        const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc;
 
         beforeEach(() => {
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });

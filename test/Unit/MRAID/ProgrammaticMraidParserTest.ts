@@ -38,14 +38,14 @@ describe('ProgrammaticMraidParser', () => {
             };
 
             beforeEach(() => {
-                return parse(ProgrammaticMRAIDCampaign)
+                return parse(ProgrammaticMRAIDCampaign);
             });
 
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof MRAIDCampaign, 'Campaign was not an MRAIDCampaign');
 
-                const json = ProgrammaticMRAIDCampaign
+                const json = ProgrammaticMRAIDCampaign;
                 const content = JSON.parse(json.content);
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');

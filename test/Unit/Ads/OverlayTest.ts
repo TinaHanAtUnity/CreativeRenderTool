@@ -52,7 +52,7 @@ describe('OverlayTest', () => {
         privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(UserPrivacyManager), false, false);
         deviceInfo = <DeviceInfo>{ getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0' };
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        coreConfig = CoreConfigurationParser.parse(ConfigurationJson)
+        coreConfig = CoreConfigurationParser.parse(ConfigurationJson);
 
         const campaign = TestFixtures.getCampaign();
         const placement = TestFixtures.getPlacement();

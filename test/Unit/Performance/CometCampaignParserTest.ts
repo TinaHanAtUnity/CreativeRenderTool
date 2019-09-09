@@ -105,7 +105,7 @@ describe('CometCampaignParser', () => {
 
         describe('when it is an mraid campaign', () => {
             beforeEach(() => {
-                return parse(OnCometMraidPlcCampaign)
+                return parse(OnCometMraidPlcCampaign);
             });
 
             it('should parse and return an mraid campaign', () => {
@@ -125,7 +125,7 @@ describe('CometCampaignParser', () => {
 
         describe('when it is a performance campaign', () => {
             beforeEach(() => {
-                return parse(OnCometVideoPlcCampaign)
+                return parse(OnCometVideoPlcCampaign);
             });
 
             it('should parse and return a performance campaign', () => {
@@ -255,7 +255,7 @@ describe('CometCampaignParser', () => {
 
         describe('when it is a performance campaign with square end screen asset', () => {
             beforeEach(() => {
-                return parse(OnCometVideoPlcCampaignSquareEndScreenAsset)
+                return parse(OnCometVideoPlcCampaignSquareEndScreenAsset);
             });
 
             it('should parse and return a performance campaign with square end screen asset', () => {
@@ -263,7 +263,7 @@ describe('CometCampaignParser', () => {
                 assert.isTrue(campaign instanceof PerformanceCampaign, 'Campaign was not an MRAIDCampaign');
 
                 const perfCampaign = <PerformanceCampaign>campaign;
-                const json = OnCometVideoPlcCampaignSquareEndScreenAsset
+                const json = OnCometVideoPlcCampaignSquareEndScreenAsset;
                 const content = JSON.parse(json.content);
 
                 assertBaseCampaign(content);

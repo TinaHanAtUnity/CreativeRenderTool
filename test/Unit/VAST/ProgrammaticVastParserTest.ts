@@ -64,7 +64,7 @@ describe('ProgrammaticVastParser', () => {
             };
 
             beforeEach(() => {
-                return parse(ProgrammaticVastCampaignFlat)
+                return parse(ProgrammaticVastCampaignFlat);
             });
 
             it('should have valid data', () => {
@@ -72,7 +72,7 @@ describe('ProgrammaticVastParser', () => {
                 assert.isTrue(campaign instanceof VastCampaign, 'Campaign was not an VastCampaign');
 
                 const vastParser = new VastParserStrict();
-                const json = ProgrammaticVastCampaignFlat
+                const json = ProgrammaticVastCampaignFlat;
                 const vast = vastParser.parseVast(decodeURIComponent(json.content));
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');

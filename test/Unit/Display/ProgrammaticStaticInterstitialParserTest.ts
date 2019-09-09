@@ -43,14 +43,14 @@ describe('ProgrammaticStaticInterstitialParser', () => {
             };
 
             beforeEach(() => {
-                return parse(DisplayStaticInterstitialCampaignHTML)
+                return parse(DisplayStaticInterstitialCampaignHTML);
             });
 
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof DisplayInterstitialCampaign, 'Campaign was not an DisplayInterstitialCampaign');
 
-                const json = DisplayStaticInterstitialCampaignHTML
+                const json = DisplayStaticInterstitialCampaignHTML;
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
@@ -75,14 +75,14 @@ describe('ProgrammaticStaticInterstitialParser', () => {
             };
 
             beforeEach(() => {
-                return parse(DisplayStaticInterstitialCampaignJS)
+                return parse(DisplayStaticInterstitialCampaignJS);
             });
 
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof DisplayInterstitialCampaign, 'Campaign was not an DisplayInterstitialCampaign');
 
-                const json = DisplayStaticInterstitialCampaignJS
+                const json = DisplayStaticInterstitialCampaignJS;
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');

@@ -101,8 +101,8 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should set placement state of the passed placementId', () => {
-            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements)
-            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements)
+            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
+            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
             placementManager = new PlacementManager(ads, adsConfig);
             assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.NOT_AVAILABLE);
             placementManager.setPlacementReady('promoPlacement', campaign);
@@ -110,8 +110,8 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should set the campaign of the placement to passed campaign', () => {
-            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements)
-            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements)
+            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
+            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
             placementManager = new PlacementManager(ads, adsConfig);
             assert.equal(adsConfig.getPlacement('promoPlacement').getCurrentCampaign(), undefined);
             placementManager.setPlacementReady('promoPlacement', campaign);
@@ -119,8 +119,8 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should not change placement state to ready if placement doesnt exist in config', () => {
-            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements)
-            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements)
+            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
+            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
             placementManager = new PlacementManager(ads, adsConfig);
 
             sandbox.stub(adsConfig, 'getPlacement').returns(undefined);

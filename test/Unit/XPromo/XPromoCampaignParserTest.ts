@@ -71,7 +71,7 @@ describe('XPromoCampaignParser', () => {
             };
 
             beforeEach(() => {
-                return parse(XPromoCampaignJSON)
+                return parse(XPromoCampaignJSON);
             });
 
             it('should set the creative identification in the parser', () => {
@@ -85,7 +85,7 @@ describe('XPromoCampaignParser', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof XPromoCampaign, 'Campaign was not an MRAIDCampaign');
 
-                const json = XPromoCampaignJSON
+                const json = XPromoCampaignJSON;
                 const content = JSON.parse(json.content);
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');

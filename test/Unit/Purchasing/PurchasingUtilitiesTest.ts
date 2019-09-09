@@ -101,7 +101,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('without Promo Placements', () => {
         beforeEach(() => {
-            return initWithConfiguration(ConfigurationAuctionPlc)
+            return initWithConfiguration(ConfigurationAuctionPlc);
         });
 
         afterEach(() => {
@@ -118,7 +118,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('with Promo Placements', () => {
         beforeEach(() => {
-            return initWithConfiguration(ConfigurationPromoPlacements)
+            return initWithConfiguration(ConfigurationPromoPlacements);
         });
 
         afterEach(() => {

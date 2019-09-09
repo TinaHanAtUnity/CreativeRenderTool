@@ -37,14 +37,14 @@ describe('BannerCampaignParser', () => {
             };
 
             beforeEach(() => {
-                return parse(BannerCampaignJSON)
+                return parse(BannerCampaignJSON);
             });
 
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof BannerCampaign, 'Campaign was not an VastCampaign');
 
-                const json = BannerCampaignJSON
+                const json = BannerCampaignJSON;
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
