@@ -1,5 +1,14 @@
 # Pending
 
+* Open Measurement - Change order of events for IAS Lifecycle [#11124](https://github.com/Applifier/unity-ads-webview/pull/11124)
+
+# Thu Sep  5 22:18:43 UTC 2019
+
+* Update 3.2 Load Rollout AB Test for 10% of All PerPlacementLoad Traffic [#11076](https://github.com/Applifier/unity-ads-webview/pull/11076)
+* Add Sampled Tracking of Load API Performance in PTS [#11075](https://github.com/Applifier/unity-ads-webview/pull/11075)
+
+# Thu Sep  5 17:17:01 UTC 2019
+
 * Add Vast HTML Endcard Support Disabled AB Test [#11018](https://github.com/Applifier/unity-ads-webview/pull/11018)
 * Open Measurement - Fix data passthrough for Admob Session Interface [#11017](https://github.com/Applifier/unity-ads-webview/pull/11017)
 * Update Analytics Transaction Events Sent to ads.analytics.* [#11020](https://github.com/Applifier/unity-ads-webview/pull/11020)

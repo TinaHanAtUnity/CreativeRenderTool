@@ -637,23 +637,9 @@ export class Ads implements IAds {
         }
     }
 
-    private setupLoadApiEnabled(): Promise<void> {
-        if (CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) || CustomFeatures.isPartOfPhaseTwoLoadRollout(this._core.ClientInfo.getGameId())) {
+    private setupLoadApiEnabled(): void {
+        if (PhaseTwoLoadRolloutExperiment.isValid(this._core.Config.getAbGroup()) || CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) || CustomFeatures.isPartOfPhaseTwoLoadRollout(this._core.ClientInfo.getGameId())) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
-            return Promise.resolve();
-        } else {
-            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-                if (mediation) {
-                    const mediationName = mediation.getName() || '';
-                    if (mediationName.toLowerCase() === 'mopub' && PhaseTwoLoadRolloutExperiment.isValid(this._core.Config.getAbGroup())) {
-                        this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
-                    }
-                }
-                // Use .finally() when supported
-                return Promise.resolve();
-            }).catch(() => {
-                return Promise.resolve();
-            });
         }
     }
 }

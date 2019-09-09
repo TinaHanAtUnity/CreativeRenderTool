@@ -147,7 +147,7 @@ describe('ProgrammaticTrackingService', () => {
             expected: IProgrammaticTrackingData | undefined;
         };
 
-        it(`should send load metric when isTrackedGameUsingLoadApi returns true`, () => {
+        it(`should send load metric when sampleAtGivenPercent returns true`, () => {
             test = {
                 input: LoadMetric.LoadEnabledShow,
                 expected: {
@@ -160,7 +160,7 @@ describe('ProgrammaticTrackingService', () => {
                     ]
                 }
             };
-            sinon.stub(CustomFeatures, 'isTrackedGameUsingLoadApi').returns(true);
+            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(true);
             const promise = programmaticTrackingService.reportMetric(test.input);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);
@@ -170,12 +170,12 @@ describe('ProgrammaticTrackingService', () => {
             return promise;
         });
 
-        it(`should not send load metric when isTrackedGameUsingLoadApi returns false`, () => {
+        it(`should not send load metric when sampleAtGivenPercent returns false`, () => {
             test = {
                 input: LoadMetric.LoadEnabledShow,
                 expected: undefined
             };
-            sinon.stub(CustomFeatures, 'isTrackedGameUsingLoadApi').returns(false);
+            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(false);
             return programmaticTrackingService.reportMetric(test.input).then(res => {
                 sinon.assert.notCalled(postStub);
                 return res;
