@@ -17,7 +17,7 @@ const plugins = [
         chunkFilename: '[name].[contenthash].css',
     }),
     new HtmlWebPackPlugin({
-        template: './src/prod-index.html',
+        template: './src/prod-index.webpack.html',
         filename: './index.html',
         inject: 'body',
         inlineSource: '.(js|css)$',

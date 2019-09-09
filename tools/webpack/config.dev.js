@@ -34,7 +34,7 @@ const development = {
         new webpack.NamedModulesPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebPackPlugin({
-            template: './src/dev-index.html',
+            template: './src/dev-index.webpack.html',
             filename: './index.html',
             inject: 'body'
         }),
