@@ -86,6 +86,7 @@ export class VastParserStrict {
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
+    private _adVerifications: VastAdVerification[] = [];
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
         this._domParser = domParser || new DOMParser();
@@ -162,7 +163,7 @@ export class VastParserStrict {
         }
 
         // return vast ads with generated non-severe errors
-        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors, this._adVerifications);
     }
 
     // default to https: for relative urls
@@ -399,7 +400,7 @@ export class VastParserStrict {
         // parsing ad verification in VAST 4.1
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
-            vastAd.addAdVerifications(verifications);
+            this._adVerifications = this._adVerifications.concat(verifications);
         });
 
         // parsing ad verification in VAST 3.0/2.0
@@ -407,7 +408,7 @@ export class VastParserStrict {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
-                vastAd.addAdVerifications(verifications);
+                this._adVerifications = this._adVerifications.concat(verifications);
             }
         });
 

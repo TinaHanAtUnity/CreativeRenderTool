@@ -47,7 +47,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
             if (verifications) {
                 return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, verifications);
             } else {
-                const verification = campaign.getVast().getAd()!.getAdVerifications();
+                const verification = campaign.getVast().getAdVerifications();
                 return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, verification);
             }
         };

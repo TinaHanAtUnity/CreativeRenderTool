@@ -6,29 +6,44 @@ import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 
 interface IVast {
     ads: VastAd[];
     parseErrorURLTemplates: string[];
     additionalTrackingEvents: { [eventName: string]: string[] };
+    adVerifications: VastAdVerification[];
 }
 
 export class Vast extends Model<IVast> {
 
     private _campaignErrors: CampaignError[];
 
-    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
+    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[], adVerifications?: VastAdVerification[]) {
         super('Vast', {
             ads: ['array'],
             parseErrorURLTemplates: ['array'],
-            additionalTrackingEvents: ['object']
+            additionalTrackingEvents: ['object'],
+            adVerifications: ['array']
         });
 
         this.set('ads', ads);
         this.set('parseErrorURLTemplates', parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
+        this.set('adVerifications', adVerifications || []);
 
         this._campaignErrors = campaignErrors || [];
+    }
+
+    public getAdVerifications(): VastAdVerification[] {
+        return this.get('adVerifications');
+    }
+
+    public getAdVerification(): VastAdVerification | null {
+        if (this.getAdVerifications() && this.getAdVerifications().length > 0) {
+            return this.getAdVerifications()[0];
+        }
+        return null;
     }
 
     public getAds(): VastAd[] {
@@ -118,6 +133,10 @@ export class Vast extends Model<IVast> {
             this.get('additionalTrackingEvents')[eventName] = [];
         }
         this.get('additionalTrackingEvents')[eventName].push(url);
+    }
+
+    public addAdVerifications(verfications: VastAdVerification[]) {
+        this.set('adVerifications', this.get('adVerifications').concat(verfications));
     }
 
     public getDuration(): number | null {

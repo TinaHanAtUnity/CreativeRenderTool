@@ -630,7 +630,7 @@ describe('VastParserStrict', () => {
                 describe('ad verification as standalone for VAST 4.1', () => {
                     beforeEach(() => {
                         vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsStandAlone);
-                        vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        vastAdVerifications = vast.getAdVerifications();
                         vastAdVerification = vastAdVerifications[0];
                     });
 
@@ -659,7 +659,7 @@ describe('VastParserStrict', () => {
                 describe('ad verification as extension for VAST 3.x and under as Extension', () => {
                     beforeEach(() => {
                         vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsExtension);
-                        vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        vastAdVerifications = vast.getAdVerifications();
                         vastAdVerification = vastAdVerifications[0];
                     });
 
