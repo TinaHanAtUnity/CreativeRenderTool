@@ -104,7 +104,8 @@
                     var sendSessionStart = function(observer, vendorkey) {
                         observer(sessionStartData[vendorkey]);
                         postMessageCallback(ON_EVENT_PROCESSED, {
-                            eventType: SESSION_START
+                            eventType: SESSION_START,
+                            vendorKey: vendorkey
                         });
                     }
 
@@ -118,17 +119,18 @@
                         });
                     }
 
-                    var handleSessionStart = function(data) {
+                    var handleSessionStart = function(event) {
+                        let data = event.data.data;
                         // If passed vendor matches a registered vendor
                         if (sessionObserversMap[data.vendorkey]) {
-                            sessionStartData[data.vendorkey] = data;
+                            sessionStartData[data.vendorkey] = event.data;
                             if (!sessionStartCalled) {
                                 sendSessionStartForKey(data.vendorkey);
                             }
                             sessionStartCalled = true;
                         } else {
                             // It is possible session start was called before a vendor registers so we must always store the data
-                            sessionStartData[data.vendorkey] = data;
+                            sessionStartData[data.vendorkey] = event.data;
 
                             if (!data.verificationParameters) {
                                 // If we've already stored data for a default key, we can send SessionStart since the params do not matter
@@ -200,8 +202,7 @@
                         */
                         switch(event.data.type) {
                             case SESSION_START:
-                                const data = event.data.data;
-                                handleSessionStart(data);
+                                handleSessionStart(event);
                                 break;
                             case SESSION_FINISH:
                                 triggerSessionObserver(event.data);

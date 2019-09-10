@@ -1,3 +1,9 @@
+# Mon Sep  9 22:01:52 UTC 2019
+
+* Add functionality to force Creative Packs [#10807](https://github.com/Applifier/unity-ads-webview/pull/10807)
+* Change fonts to use material icons and add script to generate fonts from svg icon files [#11072](https://github.com/Applifier/unity-ads-webview/pull/11072)
+* Open Measurement - Change order of events for IAS Lifecycle [#11124](https://github.com/Applifier/unity-ads-webview/pull/11124)
+
 # Thu Sep  5 22:18:43 UTC 2019
 
 * Update 3.2 Load Rollout AB Test for 10% of All PerPlacementLoad Traffic [#11076](https://github.com/Applifier/unity-ads-webview/pull/11076)

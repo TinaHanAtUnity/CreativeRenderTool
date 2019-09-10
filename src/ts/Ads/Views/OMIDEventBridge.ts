@@ -168,7 +168,7 @@ export interface IOMIDHandler {
     onSessionError(event: ISessionEvent): void;
     onSessionFinish(event: ISessionEvent): void;
     onPopulateVendorKey(vendorKey: string): void;
-    onEventProcessed(eventType: string): void;
+    onEventProcessed(eventType: string, vendorKey?: string): void;
     onSlotElement(element: HTMLElement): void;
     onVideoElement(element: HTMLElement): void;
     onElementBounds(elementBounds: IRectangle): void;
@@ -209,6 +209,7 @@ export class OMIDEventBridge {
     private _iframeSessionInterface: HTMLIFrameElement;
 
     private _eventQueue: IVerificationEvent[] = [];
+    private _eventQueueSent = false;
     private _verificationsInjected = false;
 
     constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
@@ -242,7 +243,7 @@ export class OMIDEventBridge {
 
         this._omidHandlers[OMID3pEvents.VERIFICATION_RESOURCES] = (msg) => this._handler.onInjectVerificationResources(<IVerificationScriptResource[]>msg.data);
         this._omidHandlers[OMID3pEvents.POPULATE_VENDOR_KEY] = (msg) => this._handler.onPopulateVendorKey(<string>msg.data.vendorkey);
-        this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType);
+        this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
 
         this._omidHandlers[OMSessionInfo.SDK_VERSION] = (msg) => this.sendSDKVersion(openMeasurement.getSDKVersion());
         this._omidHandlers[OMSessionInfo.SESSION_ID] = (msg) => this.sendSessionId(openMeasurement.getOMAdSessionId());
@@ -285,6 +286,7 @@ export class OMIDEventBridge {
             const event = this._eventQueue.shift();
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
+        this._eventQueueSent = true;
     }
 
     public triggerAdEvent(type: string, payload?: unknown) {
@@ -313,6 +315,10 @@ export class OMIDEventBridge {
         if (this._iframe3p.contentWindow && this._verificationsInjected) {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
+
+        if (!this._eventQueueSent) {
+            this._eventQueue.push(event);
+        }
     }
 
     public triggerSessionEvent(event: ISessionEvent) {
@@ -328,6 +334,7 @@ export class OMIDEventBridge {
             this.postMessage(SESSIONEvents.SESSION_FINISH);
         }
 
+        // Adds session events for admob
         this._eventQueue.push(event);
     }
 

@@ -116,6 +116,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
+
         if (vastAdVerifications) {
             this._adVerifications = vastAdVerifications;
         }
@@ -142,7 +143,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             onSessionFinish: (sessionEvent) => this.sessionFinish(sessionEvent),
             onInjectVerificationResources: (verifcationResources) => this.injectVerificationResources(verifcationResources),
             onPopulateVendorKey: (vendorKey) => this.populateVendorKey(vendorKey),
-            onEventProcessed: (eventType) => this.onEventProcessed(eventType),
+            onEventProcessed: (eventType, vendorKey) => this.onEventProcessed(eventType, vendorKey),
             onSlotElement: (element) => { this._admobSlotElement = element; },
             onVideoElement: (element) => { this._admobVideoElement = element; },
             onElementBounds: (elementBounds) => { this._admobElementBounds = elementBounds; }
@@ -368,7 +369,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.HTML,
+            adSessionType: AdSessionType.NATIVE,
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
@@ -587,10 +588,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Used to ensure OMID#SessionStart is fired prior to video playback events
      * Used to ensure DOM is removed prior to OMID#SessionFinish
      */
-    public onEventProcessed(eventType: string) {
+    public onEventProcessed(eventType: string, vendorKey?: string) {
         if (eventType === SESSIONEvents.SESSION_START) {
             this._sessionStartCalled = true;
-            this.sendVASTStartEvents();
+            if (this._campaign instanceof VastCampaign) {
+                this.sendVASTStartEvents(vendorKey);
+            }
         }
 
         if (eventType === SESSIONEvents.SESSION_FINISH) {
@@ -614,20 +617,45 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
-    private sendVASTStartEvents() {
-        if (this._campaign instanceof VastCampaign) {
+    private sendVASTStartEvents(vendorKey?: string) {
+            let IASScreenWidth = 0;
+            let IASScreenHeight = 0;
+
+            this._sessionStartCalled = true;
+            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+                const measuringElementAvailable = true;
+                IASScreenWidth = screenWidth;
+                IASScreenHeight = screenHeight;
+                this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
+            });
+
+            if (vendorKey === 'IAS') {
+                this.sendIASEvents(IASScreenWidth, IASScreenHeight);
+            } else {
+                this.loaded({
+                    isSkippable: this._placement.allowSkip(),
+                    skipOffset: this._placement.allowSkipInSeconds(),
+                    isAutoplay: true,                   // Always autoplay for video
+                    position: VideoPosition.STANDALONE  // Always standalone video
+                });
+            }
+    }
+
+    private sendIASEvents(IASScreenWidth: number, IASScreenHeight: number) {
+        window.setTimeout(() => {
+            const viewPort = this.calculateViewPort(IASScreenWidth, IASScreenHeight);
+            const adView = this.calculateVastAdView(100, [], IASScreenWidth, IASScreenHeight, true, []);
+
+            this._omBridge.sendQueuedEvents();
+
+            this.geometryChange(viewPort, adView);
             this.loaded({
                 isSkippable: this._placement.allowSkip(),
                 skipOffset: this._placement.allowSkipInSeconds(),
                 isAutoplay: true,                   // Always autoplay for video
                 position: VideoPosition.STANDALONE  // Always standalone video
             });
-
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-                const measuringElementAvailable = true;
-                this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
-            });
-        }
+        }, 2000);
     }
 
     private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
@@ -736,6 +764,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]): Promise<void> {
         const promises: Promise<void>[] = [];
+
+        // TODO: Fix to only support one verification resource per OpenMeasurement instance
         verificationResources.forEach((resource) => {
             promises.push(this.injectResourceIntoDom(resource.resourceUrl, resource.vendorKey, resource.verificationParameters!));
         });
@@ -765,7 +795,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (CustomFeatures.isUnsupportedOMVendor(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_RESOURCE_REJECTED);
             return Promise.reject('verification resource rejected');
-        } else if (!resourceUrl.endsWith('.js')) {
+        } else if (!resourceUrl.includes('.js')) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_NOT_SUPPORTED);
             return Promise.reject('verification resource not supported');
         } else if (!Url.isValid(resourceUrl)) {

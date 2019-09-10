@@ -21,6 +21,7 @@ import VastStaticResourceWithTypeInsteadOfCreativeTypeXml from 'xml/VastStaticRe
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
+import WrappedVastIAS from 'xml/WrappedVastIAS.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastAboutBlank from 'xml/VastAboutBlank.xml';
 import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
@@ -92,6 +93,17 @@ describe('VastParserStrict', () => {
                 assert.equal(e.diagnostic['wrapperDepth'], 7);
                 // tslint:enable:no-string-literal
             });
+        });
+
+        it('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
+            const wrappedVAST = WrappedVastIAS;
+            sinon.stub(request, 'get').resolves();
+
+            const headers: [string, string][] = [['X-Device-Type', 'unity']];
+            const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml';
+
+            TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
+            sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
         });
     });
 
