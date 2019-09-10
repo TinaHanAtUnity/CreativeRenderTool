@@ -3,7 +3,7 @@
     <Ad id="602833">
         <Wrapper>
             <AdSystem>Acudeo Compatible</AdSystem>
-            <VASTAdTagURI>https://vast.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml</VASTAdTagURI>
+            <VASTAdTagURI>https://vast.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot</VASTAdTagURI>
             <Error>http://myErrorURL/wrapper/error</Error>
             <Impression>http://myTrackingURL/wrapper/impression</Impression>
             <Creatives>

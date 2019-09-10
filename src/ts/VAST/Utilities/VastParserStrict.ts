@@ -21,6 +21,7 @@ import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframe
 import { IframeEndcardTest, HtmlEndcardTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -167,7 +168,7 @@ export class VastParserStrict {
     }
 
     // default to https: for relative urls
-    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
+    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
         try {
@@ -199,18 +200,29 @@ export class VastParserStrict {
 
         const headers: [string, string][] = [];
 
-        // For IAS tags to return vast instead of vpaid
-        if (/^https?:\/\/vast\.adsafeprotected\.com/.test(wrapperURL)) {
-            wrapperURL = wrapperURL.replace('vast.adsafeprotected.com', 'vastpixel3.adsafeprotected.com');
-        }
-
-        if (/^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(wrapperURL)) {
+        // For IAS tags to return vast instead of vpaid for Open Measurement
+        if (CustomFeatures.isIASVastTag(wrapperURL)) {
+            wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
+            headers.push(['User-Agent', navigator.userAgent]);
         }
 
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
+            return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
         });
+    }
+
+    private setIASURLHack(wrapperURL: string, bundleId?: string) {
+        let url = wrapperURL.replace('vast.adsafeprotected.com', 'vastpixel3.adsafeprotected.com');
+        const stringSplice = (str1: string, start: number, delCount: number, newSubStr: string) => str1.slice(0, start) + newSubStr + str1.slice(start + Math.abs(delCount));
+
+        if (bundleId && /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(url) && url.includes('?')) {
+            url = stringSplice(url, url.indexOf('?'), 1, `?bundleId=${bundleId}&`);
+        } else if (bundleId && /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(url)) {
+            url += `?bundleId=${bundleId}&`;
+        }
+
+        return url;
     }
 
     private getVideoSizeInBytes(duration: number, kbitrate: number): number {
