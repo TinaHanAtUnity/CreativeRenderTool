@@ -1,4 +1,4 @@
-# Pending
+# Mon Sep  9 22:01:52 UTC 2019
 
 * Add functionality to force Creative Packs [#10807](https://github.com/Applifier/unity-ads-webview/pull/10807)
 * Change fonts to use material icons and add script to generate fonts from svg icon files [#11072](https://github.com/Applifier/unity-ads-webview/pull/11072)
