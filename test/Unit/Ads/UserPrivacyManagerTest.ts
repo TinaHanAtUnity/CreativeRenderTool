@@ -1,6 +1,6 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -19,6 +19,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
@@ -36,6 +37,7 @@ describe('UserPrivacyManagerTest', () => {
     let privacyManager: UserPrivacyManager;
     let gamePrivacy: sinon.SinonStubbedInstance<GamePrivacy>;
     let userPrivacy: sinon.SinonStubbedInstance<UserPrivacy>;
+    let privacySDK: PrivacySDK;
     let request: RequestManager;
 
     let onSetStub: sinon.SinonStub;
@@ -65,9 +67,10 @@ describe('UserPrivacyManagerTest', () => {
         coreConfig = sinon.createStubInstance(CoreConfiguration);
         adsConfig = sinon.createStubInstance(AdsConfiguration);
         gamePrivacy = sinon.createStubInstance(GamePrivacy);
-        (<sinon.SinonStub>adsConfig.getGamePrivacy).returns(gamePrivacy);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
+        (<sinon.SinonStub>privacySDK.getGamePrivacy).returns(gamePrivacy);
         userPrivacy = sinon.createStubInstance(UserPrivacy);
-        (<sinon.SinonStub>adsConfig.getUserPrivacy).returns(userPrivacy);
+        (<sinon.SinonStub>privacySDK.getUserPrivacy).returns(userPrivacy);
 
         request = sinon.createStubInstance(RequestManager);
 
@@ -95,7 +98,7 @@ describe('UserPrivacyManagerTest', () => {
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
         });
-        privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request);
+        privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         sendGDPREventStub = sinon.spy(privacyManager, 'sendGDPREvent');
     });
 
@@ -360,6 +363,37 @@ describe('UserPrivacyManagerTest', () => {
                                 sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
                             });
                         });
+                    });
+                });
+            });
+        });
+
+        describe('when limitAdTracking is enabled', () => {
+            beforeEach(() => {
+                let gamePrivacyMethod = PrivacyMethod.DEFAULT;
+                isGDPREnabled = true;
+                gamePrivacy.isEnabled.returns(true);
+                gamePrivacy.getMethod.callsFake(() => gamePrivacyMethod);
+                gamePrivacy.setMethod.callsFake((value) => gamePrivacyMethod = value);
+                gamePrivacy.getVersion.returns(0);
+                (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(true);
+            });
+
+            it('should override the configuration with no consent', () => {
+                consent = true;
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                    sinon.assert.calledWith(gamePrivacy.setMethod, PrivacyMethod.DEVELOPER_CONSENT);
+                    sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutEnabled, true);
+                    sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutRecorded, true);
+                    sinon.assert.calledWith(userPrivacy.update, {
+                        method: PrivacyMethod.DEVELOPER_CONSENT,
+                        version: 0,
+                        permissions: {
+                            all: false,
+                            gameExp: false,
+                            ads: false,
+                            external: false
+                        }
                     });
                 });
             });

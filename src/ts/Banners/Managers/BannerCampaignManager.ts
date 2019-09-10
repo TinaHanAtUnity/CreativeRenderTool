@@ -21,6 +21,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export class NoFillError extends Error {
     public response: INativeResponse;
@@ -54,8 +55,11 @@ export class BannerCampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _pts: ProgrammaticTrackingService;
+    private _privacySDK: PrivacySDK;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    private _promise: Promise<Campaign> | null;
+
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, privacySDK: PrivacySDK) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -67,6 +71,7 @@ export class BannerCampaignManager {
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
         this._pts = pts;
+        this._privacySDK = privacySDK;
     }
 
     public request(placement: Placement, bannerSize: IBannerDimensions, nofillRetry?: boolean): Promise<Campaign> {
@@ -83,7 +88,8 @@ export class BannerCampaignManager {
             request: this._request,
             sessionManager: this._sessionManager,
             programmaticTrackingService: this._pts,
-            bannerSize: bannerSize
+            bannerSize: bannerSize,
+            privacySDK: this._privacySDK
         });
         request.addPlacement(placement);
         request.setTimeout(3000);

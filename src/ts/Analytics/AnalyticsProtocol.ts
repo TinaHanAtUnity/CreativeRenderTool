@@ -1,207 +1,105 @@
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-
-// tslint:disable-next-line
-export interface IAnalyticsMessage {}
-/*
-TODO: IAnalyticsMessage should be refactored in following PRs.
-
-Looking at the code all analytic messages share the same field `ts`.
-Therefore this interface can be refactored to:
-
-export interface IAnalyticsMessage {
-    ts: number;
-}
-*/
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;
     game_id: string;
 }
 
-export interface IAnalyticsCustomParams {
-    unity_monetization_extras: string;
-}
-
-export interface IAnalyticsEvent<T extends IAnalyticsMessage> {
+export interface IAnalyticsObject<T> {
     type: string;
-    msg: T;
+    msg:  T;
 }
 
-interface IAnalyticsLevelUpEvent extends IAnalyticsCustomParams {
-    new_level_index: string;
+// Ads Analytics classes
+
+export interface IAnalyticsCommonObjectV1 {
+    common: {
+        gameId: string; // from config
+        organizationId: string; // from config
+        analyticsUserId: string; // Get a user id from analytics; May not exist; Default ""
+        analyticsSessionId: string; // Get a session id from analytics; May not exist; Default ""
+        sessionId: string; // Ads Session Id; Ads SDK generates this
+        platform: string; // ANDROID | IOS
+        adsSdkVersion: string;
+        gamerToken: string;
+        limitAdTracking: boolean;
+        coppaFlagged: boolean;
+        projectId: string; // from config
+        gdprEnabled: boolean;
+        optOutRecorded: boolean;
+        optOutEnabled: boolean;
+    };
 }
 
-interface IAnalyticsLevelFailedEvent extends IAnalyticsCustomParams {
-    level_index: string;
-}
-
-interface IAnalyticsItemEvent extends IAnalyticsCustomParams {
-    currency_type: string;
-    transaction_context: string;
-    amount: number;
-    item_id: string;
-    balance: number;
-    item_type: string;
-    level: string;
-    transaction_id: string;
-}
-
-interface IAnalyticsAdCompleteEvent extends IAnalyticsCustomParams {
-    rewarded: boolean;
-    network: string;
-    placement_id: string;
-}
-
-interface IIapTransactionEvent extends IAnalyticsMessage {
+export interface IAnalyticsAppStartEventV1 {
     ts: number;
-    productid: string;
-    amount: number;
-    currency: string;
-    transactionid: number;
-    iap_service: boolean;
-    promo: boolean;
-    receipt: string;
-    unity_monetization_extras: string;
 }
 
-interface IIapPurchaseFailedEvent extends IAnalyticsCustomParams {
-    productID: string;
-    reason: string;
+export interface IAnalyticsAppRunningEventV1 {
+    ts: number;
+    timeSinceStart: number;
+    localTimeOffset: number;
+}
+
+export interface IAnalyticsAppInstallEventV1 {
+    ts: number;
+    appVersion: string; // from sdk api
+    timeSinceStart: number;
+}
+
+export interface IAnalyticsAppUpdateEventV1 {
+    ts: number;
+    appVersion: string; // from sdk api
+    timeSinceStart: number;
+}
+
+export interface IAnalyticsTransactionEventV1 {
+    ts: number;
+    productId: string;
     price: number;
-    currency: string;
-}
-
-interface IAnalyticsCustomEvent<G extends IAnalyticsCustomParams> extends IAnalyticsMessage {
-    ts: number;
-    t_since_start: number; // appended by webview
-    name: string;
-    custom_params: G;
-}
-
-export type AnalyticsItemAcquiredEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
-export type AnalyticsItemSpentEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
-export type AnalyticsLevelUpEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelUpEvent>>;
-export type AnalyticsLevelFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelFailedEvent>>;
-export type AnalyticsGenericEvent = IAnalyticsEvent<IAnalyticsMessage>;
-export type AnalyticsAdCompleteEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsAdCompleteEvent>>;
-export type AnalyticsIapTransactionEvent = IAnalyticsEvent<IIapTransactionEvent>;
-export type AnalyticsIapPurchaseFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IIapPurchaseFailedEvent>>;
-
-export interface IAnalyticsObject {
-    type: string;
-    msg: IAnalyticsDeviceInfoEvent | IAnalyticsStartEvent | IAnalyticsInstallEvent | IAnalyticsUpdateEvent | IAnalyticsAppRunningEvent;
-}
-
-export interface IAnalyticsCommonObject {
-    common: IAnalyticsCommonObjectInternal;
-}
-
-interface IAnalyticsCommonObjectInternal {
-    appid: string;
-    userid: string;
-    sessionid: number;
-    platform: string;
-    platformid: number;
-    sdk_ver: string;
-    adsid: string | undefined | null;
-    ads_tracking: boolean;
-    ads_coppa: boolean;
-    ads_gameid: string;
-    ads_sdk: boolean;
-    iap_ver: string; // BYOP?
-    gamer_token: string;
-}
-
-interface IAnalyticsDeviceInfoEvent {
-    ts: number;
-    app_ver: string;
-    adsid: string | undefined | null;
-    ads_tracking: boolean;
-    os_ver: string;
-    model: string;
-    app_name: string;
-    ram: number;
-    screen: string;
-    lang: string;
-    rooted_jailbroken?: boolean;
-}
-
-interface IAnalyticsStartEvent {
-    ts: number;
-}
-
-interface IAnalyticsInstallEvent {
-    ts: number;
-    app_ver: string;
-}
-
-interface IAnalyticsUpdateEvent {
-    ts: number;
-    app_ver: string;
-}
-
-interface IAnalyticsAppRunningEvent {
-    ts: number;
-    duration: number;
-    local_time_offset: number;
+    currencyCode: string;
+    eventId: string;
+    receipt: {
+        appStore: string;
+        transactionId: string;
+        payload: string;
+    };
 }
 
 export class AnalyticsProtocol {
-    public static getCommonObject(platform: Platform, userId: string, sessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration): IAnalyticsCommonObject {
-        const common: IAnalyticsCommonObjectInternal = {
-            appid: configuration.getUnityProjectId(),
-            userid: userId,
-            sessionid: sessionId,
-            platform: platform === Platform.IOS ? 'IPhonePlayer' : 'AndroidPlayer',
-            platformid: platform === Platform.IOS ? 8 : 11,
-            sdk_ver: clientInfo.getSdkVersionName(),
-            adsid: AnalyticsProtocol.getAdvertisingIdentifier(deviceInfo),
-            ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
-            ads_coppa: configuration.isCoppaCompliant(),
-            ads_gameid: clientInfo.getGameId(),
-            ads_sdk: true,
-            iap_ver: 'ads sdk',
-            gamer_token: configuration.getToken()
-        };
+    public static getCommonObject(platform: Platform, adsAnalyticsSessionId: string, analyticsUserId: string, analyticsSessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration): IAnalyticsCommonObjectV1 {
+        const limitAdTracking: boolean = deviceInfo.getLimitAdTracking() ? true : false;
+        const maybeOrganizationId = configuration.getOrganizationId();
+        const organizationId: string = maybeOrganizationId ? maybeOrganizationId : '';
         return {
-            common: common
+            common: {
+                gameId: clientInfo.getGameId(),
+                organizationId: organizationId,
+                analyticsUserId: analyticsUserId,
+                analyticsSessionId: `${analyticsSessionId}`,
+                sessionId: adsAnalyticsSessionId,
+                platform: Platform[platform],
+                adsSdkVersion: clientInfo.getSdkVersionName(),
+                gamerToken: configuration.getToken(),
+                limitAdTracking: limitAdTracking,
+                coppaFlagged: configuration.isCoppaCompliant(),
+                projectId: configuration.getUnityProjectId(),
+                gdprEnabled: adsConfiguration.isGDPREnabled(),
+                optOutRecorded: adsConfiguration.isOptOutRecorded(),
+                optOutEnabled: adsConfiguration.isOptOutEnabled()
+            }
         };
     }
 
-    public static getDeviceInfoObject(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<IAnalyticsObject> {
-        return Promise.all([
-            AnalyticsProtocol.getScreen(platform, core, deviceInfo),
-            AnalyticsProtocol.getDeviceModel(platform, core, deviceInfo)
-        ]).then(([screen, model]) => {
-            const event: IAnalyticsDeviceInfoEvent = {
-                ts: Date.now(),
-                app_ver: clientInfo.getApplicationVersion(),
-                adsid: deviceInfo.getAdvertisingIdentifier(),
-                ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
-                os_ver: AnalyticsProtocol.getOsVersion(platform, deviceInfo),
-                model: model,
-                app_name: clientInfo.getApplicationName(),
-                ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
-                screen: screen,
-                lang: deviceInfo.getLanguage().split('_')[0],
-                rooted_jailbroken: deviceInfo.isRooted() ? true : false
-            };
-
-            return {
-                type: 'ads.analytics.deviceInfo.v1',
-                msg: event
-            };
-        });
-    }
-
-    public static getStartObject(): IAnalyticsObject {
-        const startEvent: IAnalyticsStartEvent = {
+    public static createAppStartEvent(): IAnalyticsObject<IAnalyticsAppStartEventV1> {
+        const startEvent: IAnalyticsAppStartEventV1 = {
             ts: Date.now()
         };
         return {
@@ -210,10 +108,12 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static getInstallObject(clientInfo: ClientInfo): IAnalyticsObject {
-        const installEvent: IAnalyticsInstallEvent = {
-            ts: Date.now(),
-            app_ver: clientInfo.getApplicationVersion()
+    public static createAppInstallEvent(clientInfo: ClientInfo, appStartTime: number): IAnalyticsObject<IAnalyticsAppInstallEventV1> {
+        const currentTime = Date.now();
+        const installEvent: IAnalyticsAppInstallEventV1 = {
+            ts: currentTime,
+            appVersion: clientInfo.getApplicationVersion(),
+            timeSinceStart: currentTime - appStartTime
         };
         return {
             type: 'ads.analytics.appInstall.v1',
@@ -221,10 +121,12 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static getUpdateObject(clientInfo: ClientInfo): IAnalyticsObject {
-        const updateEvent: IAnalyticsUpdateEvent = {
-            ts: Date.now(),
-            app_ver: clientInfo.getApplicationVersion()
+    public static createAppUpdateEvent(clientInfo: ClientInfo, appStartTime: number): IAnalyticsObject<IAnalyticsAppUpdateEventV1> {
+        const currentTime = Date.now();
+        const updateEvent: IAnalyticsAppUpdateEventV1 = {
+            ts: currentTime,
+            appVersion: clientInfo.getApplicationVersion(),
+            timeSinceStart: currentTime - appStartTime
         };
         return {
             type: 'ads.analytics.appUpdate.v1',
@@ -232,15 +134,36 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static getRunningObject(durationInSeconds: number): IAnalyticsObject {
-        const appRunningEvent: IAnalyticsAppRunningEvent = {
-            ts: Date.now(),
-            duration: durationInSeconds,
-            local_time_offset: new Date().getTimezoneOffset() * -1 * 60 * 1000
+    public static createAppRunningEvent(appStartTime: number): IAnalyticsObject<IAnalyticsAppRunningEventV1> {
+        const currentTime = Date.now();
+        const appRunningEvent: IAnalyticsAppRunningEventV1 = {
+            ts: currentTime,
+            timeSinceStart: currentTime - appStartTime,
+            localTimeOffset: new Date().getTimezoneOffset() * -1 * 60 * 1000
         };
         return {
             type: 'ads.analytics.appRunning.v1',
             msg: appRunningEvent
+        };
+    }
+
+    public static createTransactionEvent(transaction: ITransactionDetails, platform: Platform): IAnalyticsObject<IAnalyticsTransactionEventV1> {
+        const currentTime = Date.now();
+        const transactionEvent: IAnalyticsTransactionEventV1 = {
+            ts: currentTime,
+            productId: transaction.productId,
+            price: transaction.price,
+            currencyCode: transaction.currency,
+            eventId: JaegerUtilities.uuidv4(),
+            receipt: {
+                appStore: platform === Platform.ANDROID ? 'GooglePlay' : 'AppleAppStore',
+                transactionId: transaction.transactionId,
+                payload: transaction.receipt
+            }
+        };
+        return {
+            type: 'ads.analytics.transaction.v1',
+            msg: transactionEvent
         };
     }
 
@@ -251,72 +174,6 @@ export class AnalyticsProtocol {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
         } else {
             return '';
-        }
-    }
-
-    private static getAdvertisingIdentifier(deviceInfo: DeviceInfo): string | undefined {
-        const adsid: string | undefined | null = deviceInfo.getAdvertisingIdentifier();
-
-        if (adsid) {
-            return adsid.toLowerCase();
-        } else {
-            return undefined;
-        }
-    }
-
-    private static getScreen(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
-        if (platform === Platform.IOS) {
-            return Promise.all([
-                deviceInfo.getScreenWidth(),
-                deviceInfo.getScreenHeight(),
-                core.DeviceInfo.Ios!.isStatusBarHidden(),
-                core.DeviceInfo.Ios!.getStatusBarHeight()
-            ]).then(([width, height, statusBarHidden, statusBarHeight]) => {
-                let screenWidth = width;
-                let screenHeight = height;
-
-                if (!statusBarHidden) {
-                    screenHeight = screenHeight + statusBarHeight;
-                }
-
-                if (screenHeight > screenWidth) {
-                    screenWidth = height;
-                    screenHeight = width;
-                }
-
-                if (deviceInfo instanceof IosDeviceInfo) {
-                    screenWidth = screenWidth * deviceInfo.getScreenScale();
-                    screenHeight = screenHeight * deviceInfo.getScreenScale();
-                }
-
-                return Promise.resolve(screenWidth + ' x ' + screenHeight);
-            });
-        } else {
-            return Promise.all([
-                deviceInfo.getScreenWidth(),
-                deviceInfo.getScreenHeight()
-            ]).then(([width, height]) => {
-                let screenWidth = width;
-                let screenHeight = height;
-                if (screenHeight > screenWidth) {
-                    screenWidth = height;
-                    screenHeight = width;
-                }
-
-                return Promise.resolve(screenWidth + ' x ' + screenHeight);
-            });
-        }
-    }
-
-    private static getDeviceModel(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
-        if (platform === Platform.IOS) {
-            return Promise.resolve(deviceInfo.getModel());
-        } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-            return core.DeviceInfo.Android!.getDevice().then(device => {
-                return deviceInfo.getManufacturer() + '/' + deviceInfo.getModel() + '/' + device;
-            });
-        } else {
-            return Promise.resolve('');
         }
     }
 

@@ -1,4 +1,4 @@
-import { IPermissions } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Privacy/Privacy';
 import { GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IConsentViewHandler {

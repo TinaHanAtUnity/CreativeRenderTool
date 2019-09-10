@@ -3,7 +3,6 @@ import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -21,6 +20,7 @@ import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurc
 import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -41,7 +41,7 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager?: AnalyticsManager) {
+    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager: IAnalyticsManager) {
         this._core = core;
         this._promo = promo;
         this._purchasing = purchasing;
@@ -78,8 +78,10 @@ export class PurchasingUtilities {
         return this._isInitialized;
     }
 
-    public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
-        return this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, placementId, isNative);
+    public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean = false): Promise<void> {
+        return this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, isNative).then((transactionDetails) => {
+            return this._analyticsManager.onIapTransaction(transactionDetails);
+        });
     }
     public static onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
         this._purchasingAdapter.onPromoClosed(thirdPartyEventManager, campaign, placementId);
@@ -182,7 +184,7 @@ export class PurchasingUtilities {
     private static _nativeBridge: NativeBridge;
     private static _placementManager: PlacementManager;
     private static _purchasingAdapter: IPurchasingAdapter;
-    private static _analyticsManager: AnalyticsManager | undefined;
+    private static _analyticsManager: IAnalyticsManager;
     private static _promoEvents: PromoEvents;
     private static _request: RequestManager;
     private static _isInitialized = false;

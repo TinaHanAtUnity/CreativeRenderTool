@@ -1,0 +1,45 @@
+<script type="text/javascript">
+  (function() {
+    var _iframeOrientationListeners = [];
+    var originalAddEventListener = window.addEventListener;
+    var originalRemoveEventListener = window.removeEventListener;
+    window.addEventListener = function (event, listener, opts) {
+        if (event === 'deviceorientation') {
+            _iframeOrientationListeners.push(listener);
+            window.parent.postMessage({
+                type: 'deviceorientationSubscribe',
+            }, '*');
+        } else {
+            originalAddEventListener.apply(window, [event, listener, opts]);
+        }
+    }
+    window.removeEventListener = function(event, listener, opts) {
+        if (event === 'deviceorientation') {
+            if ((index = _iframeOrientationListeners.indexOf(listener)) > -1) {
+                _iframeOrientationListeners.splice(index, 1);
+            }
+        } else {
+            originalRemoveEventListener.apply(window, [event, listener, opts]);
+        }
+    }
+
+    window.addEventListener('message', function(event) {
+        switch(event.data.type) {
+            case 'deviceorientation_unity_v1':
+                var orientationEvent = document.createEvent('HTMLEvents');
+                orientationEvent.initEvent('deviceorientation', true, true);
+                orientationEvent.eventName = 'deviceorientation';
+                orientationEvent.absolute = event.data.value.absolute;
+                orientationEvent.alpha = event.data.value.alpha;
+                orientationEvent.beta = event.data.value.beta;
+                orientationEvent.gamma = event.data.value.gamma;
+                _iframeOrientationListeners.forEach(function (listener) {
+                    listener.apply(window, [orientationEvent]);
+                });
+                break;
+            default:
+                break;
+        }
+    });
+  })();
+</script>

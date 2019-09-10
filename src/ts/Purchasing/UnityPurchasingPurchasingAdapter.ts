@@ -71,7 +71,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return this._initPromise;
     }
 
-    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
+    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean): Promise<ITransactionDetails> {
         const purchaseUrls = campaign.getTrackingUrlsForEvent(TrackingEvent.PURCHASE);
         const modifiedPurchaseUrls = thirdPartyEventManager.replaceTemplateValuesAndEncodeUrls(purchaseUrls).map((value: string): string => {
             if (PromoEvents.purchaseHostnameRegex.test(value)) {
@@ -129,7 +129,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private validatePromoJSON(promoCatalogJSON: string): Promise<void> {
         if (promoCatalogJSON === 'NULL' || promoCatalogJSON === null || promoCatalogJSON === undefined) {
-            return Promise.reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
+            return Promise.reject(this.logIssue('Promo catalog JSON is null'));
         } else if (promoCatalogJSON === '') {
             return Promise.reject(this.logIssue('Promo catalog JSON is empty'));
         }

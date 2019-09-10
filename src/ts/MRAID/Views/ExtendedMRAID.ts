@@ -108,7 +108,14 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private setUpMraidContainer(): string {
-        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MRAIDContainer;
+
+        let originalUrl = 'none';
+        const htmlResource = this._campaign.getResourceUrl();
+        if (htmlResource) {
+            originalUrl = htmlResource.getOriginalUrl();
+        }
+
+        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MRAIDContainer.replace('{{ CREATIVE_URL }}', originalUrl);
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if (playableConfiguration) {
             // check configuration based on the ab group

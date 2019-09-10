@@ -50,6 +50,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
@@ -64,6 +65,9 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
+import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
+import { ITestCreativePack } from 'Ads/Models/CreativePack';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -72,7 +76,7 @@ import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { PrivacyMethod } from 'Privacy/Privacy';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -80,9 +84,12 @@ import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFac
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Analytics } from 'Analytics/Analytics';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { PhaseTwoLoadRolloutExperiment } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -98,6 +105,7 @@ export class Ads implements IAds {
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
+    public PrivacySDK: PrivacySDK;
     public PrivacyManager: UserPrivacyManager;
     public PlacementManager: PlacementManager;
     public AssetManager: AssetManager;
@@ -120,7 +128,8 @@ export class Ads implements IAds {
     public Analytics: Analytics;
 
     constructor(config: unknown, core: ICore, store: IStore) {
-        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
+        this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
+        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
         this._store = store;
 
@@ -173,15 +182,14 @@ export class Ads implements IAds {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
 
-            if (AdsConfigurationParser.isUpdateUserPrivacyForIncidentNeeded()) {
+            if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
                 this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.SANITIZATION);
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
-
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
@@ -247,7 +255,7 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK);
             if (this._loadApiEnabled) {
                 this.RefreshManager = new PerPlacementLoadManager(this._core.Api, this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else {
@@ -263,40 +271,17 @@ export class Ads implements IAds {
                 }
             });
 
-            return this.RefreshManager.initialize().then((resp) => {
-                return resp;
-            }).catch((error) => {
-                throw error;
-            });
+        }).then(() => {
+            return this._core.Api.Sdk.initComplete();
+        }).then(() => {
+            return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         });
     }
 
-    private isConsentShowRequired(): boolean {
-        if (Ads._forcedConsentUnit) {
-            return true;
-        }
-
-        const gamePrivacy = this.Config.getGamePrivacy();
-        const userPrivacy = this.Config.getUserPrivacy();
-
-        if (!gamePrivacy.isEnabled() && gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
-            return false;
-        }
-
-        if (!userPrivacy.isRecorded()) {
-            return true;
-        }
-
-        const methodChangedSinceConsent = gamePrivacy.getMethod() !== userPrivacy.getMethod();
-        const versionUpdatedSinceConsent = gamePrivacy.getVersion() > userPrivacy.getVersion();
-
-        return methodChangedSinceConsent || versionUpdatedSinceConsent;
-    }
-
     private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.isConsentShowRequired()) {
+        if (!this.PrivacySDK.isConsentShowRequired()) {
             return Promise.resolve();
         }
 
@@ -330,6 +315,11 @@ export class Ads implements IAds {
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
+        if (this.isAttemptingToShowInBackground()) {
+            this._core.ProgrammaticTrackingService.reportMetric(MiscellaneousMetric.CampaignAttemptedShowInBackground);
+            return;
+        }
+
         const campaign = this.RefreshManager.getCampaign(placementId);
         if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
@@ -343,7 +333,7 @@ export class Ads implements IAds {
         if (this._showing || this._showingConsent) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
-            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
+            this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
             return;
         }
 
@@ -364,7 +354,7 @@ export class Ads implements IAds {
         const placement: Placement = this.Config.getPlacement(placementId);
         if (!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
-            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.PlacementWithIdDoesNotExist, contentType, seatId);
+            this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.PlacementWithIdDoesNotExist, contentType, seatId);
             return;
         }
 
@@ -372,7 +362,7 @@ export class Ads implements IAds {
 
         if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
             this.showError(false, placementId, 'No creatives found for promo campaign');
-            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.PromoWithoutCreatives, contentType, seatId);
+            this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.PromoWithoutCreatives, contentType, seatId);
             return;
         }
 
@@ -386,7 +376,7 @@ export class Ads implements IAds {
                 contentType: campaign.getContentType()
             });
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
-            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.CampaignExpired, contentType, seatId);
+            this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.CampaignExpired, contentType, seatId);
             return;
         }
 
@@ -395,7 +385,7 @@ export class Ads implements IAds {
             // Do not remove: Removing will currently break all tracking
             campaign.setTrackingUrls(trackingUrls);
         } else {
-            this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
+            this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
         // First ad request within a game session can be made using recorded privacy information.
@@ -409,8 +399,8 @@ export class Ads implements IAds {
     }
 
     private resetOutdatedUserPrivacy() {
-        const gamePrivacy = this.Config.getGamePrivacy();
-        const userPrivacy = this.Config.getUserPrivacy();
+        const gamePrivacy = this.PrivacySDK.getGamePrivacy();
+        const userPrivacy = this.PrivacySDK.getUserPrivacy();
         const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
         const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
         if (gdprApplies && methodHasChanged) {
@@ -419,9 +409,6 @@ export class Ads implements IAds {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
-        if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAttemptedToShowAdInBackground)) {
-            return;
-        }
 
         this._showing = true;
 
@@ -449,7 +436,7 @@ export class Ads implements IAds {
                 });
                 SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
-                this._core.ProgrammaticTrackingService.reportError(ProgrammaticTrackingError.NoConnectionWhenNeeded, campaign.getContentType(), campaign.getSeatId());
+                this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.NoConnectionWhenNeeded, campaign.getContentType(), campaign.getSeatId());
                 return;
             }
 
@@ -463,7 +450,7 @@ export class Ads implements IAds {
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if (this._core.NativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
-                if (!IosUtils.isAppSheetBroken(this._core.DeviceInfo.getOsVersion(), this._core.DeviceInfo.getModel()) && !campaign.getBypassAppSheet()) {
+                if (!IosUtils.isAppSheetBroken(this._core.DeviceInfo.getOsVersion(), this._core.DeviceInfo.getModel(), orientation) && !campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
@@ -484,10 +471,6 @@ export class Ads implements IAds {
                 }
             }
 
-            if (this.shouldSkipShowAd(campaign, MiscellaneousMetric.CampaignAboutToShowAdInBackground)) {
-                return;
-            }
-
             OperativeEventManager.setPreviousPlacementId(this.CampaignManager.getPreviousPlacementId());
             this.CampaignManager.setPreviousPlacementId(placement.getId());
 
@@ -499,25 +482,10 @@ export class Ads implements IAds {
         });
     }
 
-    private shouldSkipShowAd(campaign: Campaign, logkey: MiscellaneousMetric): boolean {
-        if (!this._core.FocusManager.isAppForeground()) {
-            if (CustomFeatures.sampleAtGivenPercent(10)) {
-                Diagnostics.trigger(logkey, {
-                    seatId: campaign.getSeatId(),
-                    creativeId: campaign.getCreativeId(),
-                    contentType: campaign.getContentType()
-                });
-            }
-
-            this._core.ProgrammaticTrackingService.reportMetric(logkey);
-
-            if (CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId())) {
-                return false;
-            }
-            return true;
-        } else {
-            return false;
-        }
+    private isAttemptingToShowInBackground(): boolean {
+        const isAppBackgrounded = !this._core.FocusManager.isAppForeground();
+        const isAppWhitelistedToShowInBackground = CustomFeatures.isWhitelistedToShowInBackground(this._core.ClientInfo.getGameId());
+        return isAppBackgrounded && !isAppWhitelistedToShowInBackground;
     }
 
     private getAdUnitFactory(campaign: Campaign) {
@@ -613,6 +581,29 @@ export class Ads implements IAds {
             CampaignManager.setCampaignResponse(response);
         }
 
+        const creativePack: string = TestEnvironment.get('creativePack');
+        if (creativePack) {
+            const json = JsonParser.parse<ITestCreativePack>(creativePack);
+            const platform = this._core.NativeBridge.getPlatform();
+            let response: string = '';
+
+            if (platform === Platform.ANDROID) {
+                response = CreativePackResponseAndroid;
+            } else if (platform === Platform.IOS) {
+                response = CreativePackResponseIos;
+            }
+
+            response = response.replace('{ICON_PLACEHOLDER}', json.gameIcon ? json.gameIcon : '');
+            response = response.replace('{ENDSCREEN_PLACEHOLDER}', json.endScreen ? json.endScreen : '');
+            response = response.replace('{ENDSCREEN_LANDSCAPE_PLACEHOLDER}', json.endScreenLandscape ? json.endScreenLandscape : '');
+            response = response.replace('{ENDSCREEN_PORTRAIT_PLACEHOLDER}', json.endScreenPortrait ? json.endScreenPortrait : '');
+            response = response.replace('{TRAILER_DOWNLOADABLE_PLACEHOLDER}', json.trailerDownloadable ? json.trailerDownloadable : '');
+            response = response.replace('{TRAILER_DOWNLOADABLE_SIZE}', json.trailerDownloadableSize ? json.trailerDownloadableSize.toString() : '0');
+            response = response.replace('{TRAILER_STREAMING_PLACEHOLDER}', json.trailerStreaming ? json.trailerStreaming : '');
+
+            CampaignManager.setCampaignResponse(response);
+        }
+
         if (TestEnvironment.get('debugJsConsole')) {
             MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
         }
@@ -650,6 +641,12 @@ export class Ads implements IAds {
         const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
         if (chineseLanguage && chineseTimeZone) {
             this._core.ProgrammaticTrackingService.reportMetric(metric);
+        }
+    }
+
+    private setupLoadApiEnabled(): void {
+        if (PhaseTwoLoadRolloutExperiment.isValid(this._core.Config.getAbGroup()) || CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) || CustomFeatures.isPartOfPhaseTwoLoadRollout(this._core.ClientInfo.getGameId())) {
+            this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }
 }

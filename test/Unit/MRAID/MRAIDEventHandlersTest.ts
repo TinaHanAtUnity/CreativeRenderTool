@@ -27,6 +27,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -53,6 +54,7 @@ describe('MRAIDEventHandlersTest', () => {
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let webPlayerContainer: WebPlayerContainer;
+    let privacySDK: PrivacySDK;
 
     describe('with onClick', () => {
         beforeEach(() => {
@@ -85,6 +87,7 @@ describe('MRAIDEventHandlersTest', () => {
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+            privacySDK = sinon.createStubInstance(PrivacySDK);
 
             extendedMraidAdUnitParams = {
             platform,
@@ -110,7 +113,8 @@ describe('MRAIDEventHandlersTest', () => {
                 privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                webPlayerContainer: webPlayerContainer
+                webPlayerContainer: webPlayerContainer,
+                privacySDK: privacySDK
             };
 
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);

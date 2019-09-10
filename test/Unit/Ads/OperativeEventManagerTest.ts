@@ -29,6 +29,9 @@ import * as sinon from 'sinon';
 import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('OperativeEventManagerTest', () => {
     let platform: Platform;
@@ -47,6 +50,7 @@ describe('OperativeEventManagerTest', () => {
     let sessionManager: SessionManager;
     let operativeEventManagerParams: IOperativeEventManagerParams<Campaign>;
     let campaign: Campaign = TestFixtures.getCampaign();
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -64,6 +68,8 @@ describe('OperativeEventManagerTest', () => {
         request = new RequestManager(platform, core, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        const configJson = JSON.parse(ConfigurationJson);
+        privacySDK = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
@@ -80,7 +86,8 @@ describe('OperativeEventManagerTest', () => {
             adsConfig: TestFixtures.getAdsConfiguration(),
             storageBridge: storageBridge,
             campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         };
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
     });

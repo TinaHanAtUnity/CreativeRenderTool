@@ -34,6 +34,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -55,6 +56,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let storeHandler: StoreHandler;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -78,6 +80,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         video = new Video('', TestFixtures.getSession());
         const thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         const sessionManager = new SessionManager(core, request, storageBridge);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -91,7 +94,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -144,7 +148,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             video: video,
             privacy: privacy,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacySDK: privacySDK
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);

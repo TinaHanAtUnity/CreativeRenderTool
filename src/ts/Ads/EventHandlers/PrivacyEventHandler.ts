@@ -3,14 +3,16 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions, isUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
+import { IPermissions, isUnityConsentPermissions, PrivacyMethod } from 'Privacy/Privacy';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IPrivacyEventHandlerParameters {
     platform: Platform;
     core: ICoreApi;
     privacyManager: UserPrivacyManager;
     adsConfig: AdsConfiguration;
+    privacySDK: PrivacySDK;
 }
 
 export class PrivacyEventHandler implements IPrivacyHandler {
@@ -19,12 +21,14 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     private _core: ICoreApi;
     private _privacyManager: UserPrivacyManager;
     private _configuration: AdsConfiguration;
+    private _privacy: PrivacySDK;
 
     constructor(parameters: IPrivacyEventHandlerParameters) {
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._privacyManager = parameters.privacyManager;
         this._configuration = parameters.adsConfig;
+        this._privacy = parameters.privacySDK;
     }
 
     public onPrivacy(url: string): void {
@@ -66,21 +70,25 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
             }
         }
-        const userPrivacy = this._configuration.getUserPrivacy();
+        const gamePrivacy = this._privacy.getGamePrivacy();
+        const userPrivacy = this._privacy.getUserPrivacy();
+
         if (userPrivacy) {
             userPrivacy.update({
-                method: PrivacyMethod.LEGITIMATE_INTEREST,
+                method: gamePrivacy.getMethod(),
                 version: 0,
                 permissions: {
                     all: false,
                     ads: !optOutEnabled,
-                    external: false,
-                    gameExp: false}});
+                    external: gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT ? !optOutEnabled : false,
+                    gameExp: false
+                }
+            });
         }
     }
 
     public onPersonalizedConsent(permissions: IPermissions): void {
-        const gamePrivacy = this._configuration.getGamePrivacy();
+        const gamePrivacy = this._privacy.getGamePrivacy();
         if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
             this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.MY_CHOICES);
         }

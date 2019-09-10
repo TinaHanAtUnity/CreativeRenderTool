@@ -137,7 +137,7 @@ export class BannerAdContext {
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
-                this._programmaticTrackingService.reportError(ProgrammaticTrackingError.BannerRequestError, 'banner');
+                this._programmaticTrackingService.reportMetric(ProgrammaticTrackingError.BannerRequestError, 'banner');
                 if (e instanceof NoFillError) {
                     return this.onBannerNoFill();
                 } else {
@@ -164,7 +164,7 @@ export class BannerAdContext {
     }
 
     private sendBannerError(e: Error): Promise<void> {
-        this._programmaticTrackingService.reportError(ProgrammaticTrackingError.BannerRequestError, 'banner');
+        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingError.BannerRequestError, 'banner');
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(e.message, this._bannerAdViewId);
     }
 

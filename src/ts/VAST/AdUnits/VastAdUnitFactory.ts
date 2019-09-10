@@ -24,7 +24,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
         const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
         parameters.overlay.addEventHandler(vastOverlayHandler);
 
-        if (parameters.campaign.hasStaticEndscreen() && parameters.endScreen) {
+        if ((parameters.campaign.hasStaticEndscreen() || parameters.campaign.hasIframeEndscreen() || parameters.campaign.hasHtmlEndscreen()) && parameters.endScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
             parameters.endScreen.addEventHandler(vastEndScreenHandler);
 

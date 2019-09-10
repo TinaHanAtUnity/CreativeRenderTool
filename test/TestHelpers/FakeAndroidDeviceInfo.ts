@@ -158,3 +158,24 @@ export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
         return Promise.resolve(this._fakeDevice);
     }
 }
+
+export class FakeXiaomiDeviceInfo extends AndroidDeviceInfo {
+    private _fakeDevice: any;
+
+    constructor(core: ICoreApi) {
+        super(core);
+        this._fakeDevice = JSON.parse(AndroidDefaults);
+    }
+
+    public fetch(): Promise<any[]> {
+        return Promise.resolve(<any> void(0));
+    }
+
+    public isXiaomiStoreInstalled() {
+        return true;
+    }
+
+    public isGoogleStoreInstalled() {
+        return false;
+    }
+}

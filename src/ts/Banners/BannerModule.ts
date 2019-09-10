@@ -1,6 +1,5 @@
 import { IAds } from 'Ads/IAds';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
-import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerApi } from 'Banners/Native/BannerApi';
@@ -29,7 +28,7 @@ export class BannerModule implements IBannerModule {
         this.PlacementManager.sendBannersReady();
 
         this.AdUnitFactory = new BannerAdUnitFactory();
-        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager);
+        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK);
         this.AdUnitParametersFactory = new BannerAdUnitParametersFactory(this, ads, core);
         this.BannerAdContextManager = new BannerAdContextManager(core, ads, this);
     }

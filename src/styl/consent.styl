@@ -133,6 +133,7 @@
     height: 100%;
     border-radius: .5 * $default-size;
     background: $white;
+
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
   }
@@ -287,8 +288,10 @@
     overflow: scroll;
     border-radius: .5 * $default-size;
     background: $white;
+
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
+
     padding: 1.5 * $default-size;
   }
 
@@ -310,7 +313,7 @@
   }
 
   .empty-block {
-    height: 6 * $default-size;
+    height: 7 * $default-size;
   }
 
   .homepage-button-container {
@@ -322,7 +325,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: .75 * $default-size $default-size;
+    padding: $default-size 3.25 * $default-size .75 * $default-size 3.25 * $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -331,11 +334,10 @@
 
   .consent-button {
     position: relative;
-    padding: .75 * $default-size .75 * $default-size;
+    padding: .55 * $default-size .75 * $default-size;
     border-radius: 2 * $default-size;
     text-align: center;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-heading-font-size;
+    font-weight: $privacy-main-title-font-weight;
   }
 
   .consent-button {
@@ -349,18 +351,26 @@
     border: 1px solid $consent-blue;
     background: $consent-blue;
     color: $white;
+    font-size: $default-font-size * .75;
   }
 
   .show-choices {
     display: block;
-    margin-top: .75 * $default-size;
+    margin-top: .5 * $default-size;
     border: 1px solid $privacy-light-gray;
-    color: $consent-text-font-color;
+    color: $consent-disagree-button-color;
+    font-size: $privacy-heading-font-size;
+
   }
 
   .page-link {
     text-decoration: underline;
     cursor: pointer;
+  }
+
+  .unityads-logo {
+    $set-image(100%, $default-scale-size * $default-size, 0, "../img/unityads.png", contain);
+    margin-top: .75 * $default-size;
   }
 }
 
@@ -480,6 +490,12 @@
 }
 
 body {
+  &.landscape #consent-homepage {
+    .homepage-button-container {
+      padding: $default-size 5 * $default-size .75 * $default-size 5 * $default-size;
+    }
+  }
+
   &.landscape #consent-homescreen {
     .homescreen-container {
       display: flex;
