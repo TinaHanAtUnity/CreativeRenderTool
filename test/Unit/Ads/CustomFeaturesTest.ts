@@ -6,7 +6,7 @@ import { Platform } from 'Core/Constants/Platform';
 import * as sinon from 'sinon';
 
 // Only for the slider experiment
-const invalidABGroup: number = 7;
+const invalidABGroup: number = 5;
 
 describe('CustomFeatures', () => {
 
