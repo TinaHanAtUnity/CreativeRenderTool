@@ -7,17 +7,14 @@ import { AppleStoreManager } from 'Store/Managers/AppleStoreManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
-import { IAPAutoLoggingTest } from 'Core/Models/ABGroup';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { NullStoreManager } from 'Store/Managers/NullStoreManager';
 
 export class Store implements IStore {
     public readonly Api: Readonly<IStoreApi>;
     public StoreManager: StoreManager;
 
-    private _core: ICore;
-
-    constructor(core: ICore) {
-        this._core = core;
+    constructor(core: ICore, analyticsManager: IAnalyticsManager) {
 
         this.Api = {
             Android: core.NativeBridge.getPlatform() === Platform.ANDROID ? {
@@ -29,14 +26,12 @@ export class Store implements IStore {
             } : undefined
         };
 
-        if (IAPAutoLoggingTest.isValid(this._core.Config.getAbGroup())) {
-            if (core.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.StoreManager = new GoogleStoreManager(core, this.Api);
-            } else {
-                this.StoreManager = new AppleStoreManager(core, this.Api);
-            }
+        if (core.NativeBridge.getPlatform() === Platform.ANDROID) {
+            this.StoreManager = new GoogleStoreManager(this.Api, analyticsManager);
+        } else if (core.NativeBridge.getPlatform() === Platform.IOS) {
+            this.StoreManager = new AppleStoreManager(this.Api, analyticsManager);
         } else {
-            this.StoreManager = new NullStoreManager(core, this.Api);
+            this.StoreManager = new NullStoreManager(this.Api, analyticsManager);
         }
     }
 }

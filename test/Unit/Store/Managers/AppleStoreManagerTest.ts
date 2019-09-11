@@ -3,14 +3,14 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { AppleStoreManager } from 'Store/Managers/AppleStoreManager';
 import { IStoreApi } from 'Store/IStore';
-import { ICore } from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
-import { ProgrammaticTrackingService, PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 
 class ProductsApiMock extends ProductsApi {
     public readonly onProductRequestErrorNoProducts = sinon.createStubInstance(Observable1);
@@ -26,18 +26,15 @@ class ProductsApiMock extends ProductsApi {
 
 describe('AppleStoreManager Tests', () => {
 
-    let core: ICore;
     let products: ProductsApi;
     let appSheet: AppSheetApi;
     let store: IStoreApi;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let appleStoreManager: AppleStoreManager;
+    let analyticsManager: IAnalyticsManager;
 
     beforeEach(() => {
         const nativeBridge = TestFixtures.getNativeBridge(Platform.IOS, TestFixtures.getBackend(Platform.IOS));
-        core = TestFixtures.getCoreModule(nativeBridge);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        core.ProgrammaticTrackingService = programmaticTrackingService;
+        analyticsManager = sinon.createStubInstance(AnalyticsManager);
         products = new ProductsApiMock(nativeBridge);
         appSheet = sinon.createStubInstance(AppSheetApi);
         store = {
@@ -46,7 +43,7 @@ describe('AppleStoreManager Tests', () => {
                 AppSheet: appSheet
             }
         };
-        appleStoreManager = new AppleStoreManager(core, store);
+        appleStoreManager = new AppleStoreManager(store, analyticsManager);
         assert.exists(appleStoreManager);
     });
 
@@ -58,11 +55,6 @@ describe('AppleStoreManager Tests', () => {
 
         it('Starts transaction Observer', () => {
             sinon.assert.calledOnce(<sinon.SinonSpy>products.startTransactionObserver);
-        });
-
-        it('Reports PurchasingAppleStoreStarted', () => {
-            sinon.assert.calledOnce(<sinon.SinonSpy>programmaticTrackingService.reportMetric);
-            sinon.assert.calledWith(<sinon.SinonSpy>programmaticTrackingService.reportMetric, PurchasingMetric.PurchasingAppleStoreStarted);
         });
 
     });

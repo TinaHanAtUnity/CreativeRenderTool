@@ -1,15 +1,15 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { ICore } from 'Core/ICore';
 import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
-import { ProgrammaticTrackingService, PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { GoogleStoreManager } from 'Store/Managers/GoogleStoreManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
 import { Observable0, Observable2, Observable3 } from 'Core/Utilities/Observable';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 
 class AndroidStoreApiMock extends AndroidStoreApi {
     public readonly onInitialized = sinon.createStubInstance(Observable0);
@@ -35,24 +35,21 @@ class AndroidStoreApiMock extends AndroidStoreApi {
 }
 
 describe('GoogleStoreManager Tests', () => {
-    let core: ICore;
     let androidStore: AndroidStoreApi;
     let store: IStoreApi;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let googleStoreManager: GoogleStoreManager;
+    let analyticsManager: IAnalyticsManager;
 
     beforeEach(() => {
         const nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID, TestFixtures.getBackend(Platform.ANDROID));
-        core = TestFixtures.getCoreModule(nativeBridge);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        core.ProgrammaticTrackingService = programmaticTrackingService;
         androidStore = new AndroidStoreApiMock(nativeBridge);
         store = {
             Android: {
                 Store: androidStore
             }
         };
-        googleStoreManager = new GoogleStoreManager(core, store);
+        analyticsManager = sinon.createStubInstance(AnalyticsManager);
+        googleStoreManager = new GoogleStoreManager(store, analyticsManager);
         assert.exists(googleStoreManager);
     });
 
@@ -80,11 +77,6 @@ describe('GoogleStoreManager Tests', () => {
 
         it('initializes android store', () => {
             sinon.assert.calledOnce(<sinon.SinonSpy>androidStore.initialize);
-        });
-
-        it('Reports PurchasingGoogleStoreStarted', () => {
-            sinon.assert.calledOnce(<sinon.SinonSpy>programmaticTrackingService.reportMetric);
-            sinon.assert.calledWith(<sinon.SinonSpy>programmaticTrackingService.reportMetric, PurchasingMetric.PurchasingGoogleStoreStarted);
         });
 
     });

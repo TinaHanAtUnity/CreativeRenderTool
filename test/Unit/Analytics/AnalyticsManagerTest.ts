@@ -14,7 +14,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
-import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 class TestHelper {
     public static getEventType<T>(data: string) {
@@ -100,24 +100,17 @@ class TestHelper {
                 });
             });
 
-            it('should send iap transaction event', () => {
+            it('should send the transactionSuccess event', () => {
                 return analyticsManager.init().then(() => {
                     const requestSpy = <sinon.SinonStub>coreModule.RequestManager.post;
                     requestSpy.resetHistory();
 
-                    const fakeTransaction: ITransactionDetails = {
-                        productId: 'scottProduct',
-                        transactionId: '1234',
-                        receipt: 'scoot made a transaction to buy doots on august 28th',
-                        price: 69,
-                        currency: 'SD (Scott Dollars)',
-                        extras: undefined
-                    };
+                    const fakeTransaction = sinon.createStubInstance(StoreTransaction);
 
-                    return analyticsManager.onIapTransaction(fakeTransaction).then(() => {
+                    return analyticsManager.onTransactionSuccess(fakeTransaction).then(() => {
                         sinon.assert.called(requestSpy);
                         assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
-                        assert.equal(TestHelper.getEventType<IAnalyticsTransactionEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.transaction.v1');
+                        assert.equal(TestHelper.getEventType<IAnalyticsTransactionEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.transactionSuccess.v1');
                     });
                 });
             });
