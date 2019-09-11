@@ -750,6 +750,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         * This assumes that each VastAdverification has a VerificationResource and a Vendor
         * Both are required by the VAST spec
         */
+
+        // Currently lets only run the first verification
+        verifications = [verifications[0]];
+
         verifications.forEach((verification) => {
             const verificationResource: IVerificationScriptResource = {
                 // There will only ever be one verification resource per verification. TODO: update model
