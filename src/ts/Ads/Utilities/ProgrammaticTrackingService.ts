@@ -64,12 +64,7 @@ export enum LoadMetric {
     LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
-export enum PurchasingMetric {
-    PurchasingAppleStoreStarted = 'purchasing_apple_store_started',
-    PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
-}
-
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric | ProgrammaticTrackingError;
+type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError;
 
 export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;

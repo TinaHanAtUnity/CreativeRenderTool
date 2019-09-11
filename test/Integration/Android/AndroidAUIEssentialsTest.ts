@@ -58,7 +58,7 @@ interface ITestMetadataConfig {
     debugJSConsole: boolean;
 }
 
-describe('AndroidAUIEssentialsTest', () => {
+xdescribe('AndroidAUIEssentialsTest', () => {
     const sandbox = sinon.createSandbox();
     const playableTestUrl = 'https://fake-ads-backend.unityads.unity3d.com/get_file/mraids/game_of_war/android/index_android.html';
     const arTestUrl = 'https://fake-ads-backend.unityads.unity3d.com/get_file/ar/test_bridge_index.html';

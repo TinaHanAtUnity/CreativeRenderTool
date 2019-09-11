@@ -61,7 +61,7 @@ interface IDeviceOrientationData {
     absolute: boolean;
 }
 
-describe('AndroidDeviceOrientationTest', () => {
+xdescribe('AndroidDeviceOrientationTest', () => {
     const sandbox = sinon.createSandbox();
     const deviceOrientationTestCampaign = 'https://fake-ads-backend.unityads.unity3d.com/get_file/mraids/deviceorientation/deviceorientation_test.html';
 
