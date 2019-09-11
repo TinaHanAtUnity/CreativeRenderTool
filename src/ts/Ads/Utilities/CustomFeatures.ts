@@ -214,6 +214,10 @@ export class CustomFeatures {
         return this.isMRAIDWebPlayerAndroidGamesTest(gameId) && this.isMRAIDWebPlayerCreativesTest(creativeId);
     }
 
+    public static isIASVastTag(wrapperURL: string): boolean {
+        return /^https?:\/\/vast\.adsafeprotected\.com/.test(wrapperURL);
+    }
+
     private static isMRAIDWebPlayerAndroidGamesTest(gameId: string) {
         return gameId === '1789727' ||      // ru.iprado.spot
                gameId === '1373394' ||      // pl.idreams.Dino

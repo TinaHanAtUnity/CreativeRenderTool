@@ -391,24 +391,10 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        // First ad request within a game session can be made using recorded privacy information.
-        // If game method has changed since, it should be reset before e.g. showing consent dialog
-        this.resetOutdatedUserPrivacy();
-
         this.showConsentIfNeeded(options).then(() => {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
-    }
-
-    private resetOutdatedUserPrivacy() {
-        const gamePrivacy = this.PrivacySDK.getGamePrivacy();
-        const userPrivacy = this.PrivacySDK.getUserPrivacy();
-        const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
-        const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
-        if (gdprApplies && methodHasChanged) {
-            userPrivacy.clear();
-        }
     }
 
     public showBanner(placementId: string, callback: INativeCallback) {
