@@ -79,6 +79,7 @@ import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
+import { Store } from 'Store/Store';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { LoadApi } from 'Core/Native/LoadApi';
@@ -119,21 +120,21 @@ export class Ads implements IAds {
     private _showingConsent: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
-    private _store: IStore;
 
     public Banners: Banners;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
     public Analytics: Analytics;
+    public Store: IStore;
 
-    constructor(config: unknown, core: ICore, store: IStore) {
+    constructor(config: unknown, core: ICore) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
-        this._store = store;
 
         this.Analytics = new Analytics(core, this.Config);
+        this.Store = new Store(core, this.Analytics.AnalyticsManager);
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -391,24 +392,10 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        // First ad request within a game session can be made using recorded privacy information.
-        // If game method has changed since, it should be reset before e.g. showing consent dialog
-        this.resetOutdatedUserPrivacy();
-
         this.showConsentIfNeeded(options).then(() => {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
-    }
-
-    private resetOutdatedUserPrivacy() {
-        const gamePrivacy = this.PrivacySDK.getGamePrivacy();
-        const userPrivacy = this.PrivacySDK.getUserPrivacy();
-        const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
-        const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
-        if (gdprApplies && methodHasChanged) {
-            userPrivacy.clear();
-        }
     }
 
     public showBanner(placementId: string, callback: INativeCallback) {
@@ -474,17 +461,17 @@ export class Ads implements IAds {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
-                    this._store.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
-                        const onCloseObserver = this._store.Api.iOS!.AppSheet.onClose.subscribe(() => {
-                            this._store.Api.iOS!.AppSheet.prepare(appSheetOptions);
+                    this.Store.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this.Store.Api.iOS!.AppSheet.onClose.subscribe(() => {
+                            this.Store.Api.iOS!.AppSheet.prepare(appSheetOptions);
                         });
                         this._currentAdUnit.onClose.subscribe(() => {
-                            this._store.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this.Store.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
                             if (CustomFeatures.isSimejiJapaneseKeyboardApp(this._core.ClientInfo.getGameId())) {
                                 // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
-                                this._store.Api.iOS!.AppSheet.destroy();
+                                this.Store.Api.iOS!.AppSheet.destroy();
                             } else {
-                                this._store.Api.iOS!.AppSheet.destroy(appSheetOptions);
+                                this.Store.Api.iOS!.AppSheet.destroy(appSheetOptions);
                             }
                         });
                     });

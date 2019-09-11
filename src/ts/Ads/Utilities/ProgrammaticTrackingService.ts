@@ -63,16 +63,11 @@ export enum LoadMetric {
     LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
-export enum PurchasingMetric {
-    PurchasingAppleStoreStarted = 'purchasing_apple_store_started',
-    PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
-}
-
 export enum TimeMetric {
     WebviewInitializationTimeTaken = 'webview_initialization_time_taken'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric | ProgrammaticTrackingError | TimeMetric;
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | TimeMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[] | undefined;

@@ -1,18 +1,17 @@
 import { StoreManager } from 'Store/Managers/StoreManager';
-import { ICore } from 'Core/ICore';
 import { IStoreApi } from 'Store/IStore';
 import { IGooglePurchaseData, IGooglePurchaseStatus } from 'Store/Native/Android/Store';
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { PurchasingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export class GoogleStoreManager extends StoreManager {
     private _googleStore: GoogleStore;
     private _existingOrderIds: { [activity: string]: string[] };
 
-    constructor(core: ICore, store: IStoreApi) {
-        super(core, store);
+    constructor(store: IStoreApi, analyticsManager: IAnalyticsManager) {
+        super(store, analyticsManager);
 
         this._googleStore = new GoogleStore(store);
         this._existingOrderIds = {};
@@ -24,7 +23,6 @@ export class GoogleStoreManager extends StoreManager {
         this._store.Android!.Store.onPurchaseStatusOnStop.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnStop(activity, data));
 
         this._store.Android!.Store.initialize('com.android.vending.billing.InAppBillingService.BIND', 'com.android.vending');
-        core.ProgrammaticTrackingService.reportMetricEvent(PurchasingMetric.PurchasingGoogleStoreStarted);
     }
 
     private onInitialized() {
@@ -95,7 +93,7 @@ export class GoogleStoreManager extends StoreManager {
         const timestamp = Date.now();
 
         this._googleStore.getSkuDetails(purchaseData.productId, 'inapp').then(skuDetails => {
-            const transaction = new StoreTransaction(timestamp, purchaseData.productId, skuDetails.price_amount_micros / 1000000, skuDetails.price_currency_code, signature);
+            const transaction = new StoreTransaction(timestamp, purchaseData.productId, skuDetails.price_amount_micros / 1000000, skuDetails.price_currency_code, signature, purchaseData.orderId);
             this.onStoreTransaction.trigger(transaction);
         }).catch(() => {
             Diagnostics.trigger('store_getskudetails_failed', {
