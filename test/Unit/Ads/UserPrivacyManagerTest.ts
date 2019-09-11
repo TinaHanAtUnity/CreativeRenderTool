@@ -509,42 +509,52 @@ describe('UserPrivacyManagerTest', () => {
             action: GDPREventAction.SKIP,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'skip',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.CONSENT,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'consent',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTOUT,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTOUT,
             source: GDPREventSource.METADATA,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
@@ -552,12 +562,15 @@ describe('UserPrivacyManagerTest', () => {
                 'gameId': testGameId,
                 'country': 'FF',
                 'source': 'metadata',
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTOUT,
             source: GDPREventSource.USER,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
@@ -565,25 +578,31 @@ describe('UserPrivacyManagerTest', () => {
                 'gameId': testGameId,
                 'country': 'FF',
                 'source': 'user',
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTIN,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optin',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }];
 
         tests.forEach((t) => {
             it(`should send matching payload when action is "${t.action}"`, () => {
                 httpKafkaStub.resetHistory();
+                isGDPREnabled = true;
                 const comparison = (value: any): boolean => {
                     if (Object.keys(value).length !== Object.keys(t.infoJson).length) {
                         return false;

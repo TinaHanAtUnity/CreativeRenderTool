@@ -44,6 +44,18 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
+export enum LegalFramework {
+    DEFAULT = 'default',
+    GDPR = 'gdpr',
+    CCPA = 'ccpa'
+}
+
+export enum AgeGateChoice {
+    MISSING = 'missing',
+    YES = 'yes',
+    NO = 'no'
+}
+
 export interface IUserPrivacyStorageData {
     gdpr: {
         consent: {
@@ -85,13 +97,16 @@ export class UserPrivacyManager {
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
         let infoJson: unknown = {
+            'v': 1,
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._platform].toLowerCase(),
             'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId(),
-            'bundleId': this._clientInfo.getApplicationName()
+            'bundleId': this._clientInfo.getApplicationName(),
+            'legalFramework': this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
+            'agreedOverAgeLimit': AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
         };
         if (source) {
             infoJson = {
