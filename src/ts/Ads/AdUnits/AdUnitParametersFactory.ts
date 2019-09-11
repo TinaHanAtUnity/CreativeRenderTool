@@ -78,7 +78,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._platform = core.NativeBridge.getPlatform();
         this._core = core.Api;
         this._ads = ads.Api;
-        this._store = core.Store.Api;
+        this._store = ads.Store.Api;
         this._focusManager = core.FocusManager;
         this._container = ads.Container;
         this._deviceInfo = core.DeviceInfo;

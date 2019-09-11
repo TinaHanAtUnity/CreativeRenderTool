@@ -34,7 +34,6 @@ import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IPurchasing } from 'Purchasing/IPurchasing';
-import { IStore } from 'Store/IStore';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -84,6 +83,5 @@ export interface ICore extends IApiModule {
     Config: CoreConfiguration;
     Ads: IAds;
     Purchasing: IPurchasing;
-    Store: IStore;
     ProgrammaticTrackingService: ProgrammaticTrackingService;
 }

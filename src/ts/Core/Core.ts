@@ -45,7 +45,6 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
@@ -77,7 +76,6 @@ export class Core implements ICore {
 
     public Ads: Ads;
     public Purchasing: Purchasing;
-    public Store: Store;
     public ProgrammaticTrackingService: ProgrammaticTrackingService;
 
     private _initialized = false;
@@ -211,9 +209,8 @@ export class Core implements ICore {
 
             return configJson;
         }).then((configJson: unknown) => {
-            this.Store = new Store(this);
             this.Purchasing = new Purchasing(this);
-            this.Ads = new Ads(configJson, this, this.Store);
+            this.Ads = new Ads(configJson, this);
 
             return this.Ads.initialize();
         }).catch((error: { message: string; name: unknown }) => {
