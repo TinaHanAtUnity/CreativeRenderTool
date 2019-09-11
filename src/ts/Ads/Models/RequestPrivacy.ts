@@ -6,9 +6,7 @@ import {
     IProfilingPermissions,
     PrivacyMethod,
     UserPrivacy
-} from 'Ads/Models/Privacy';
-
-import { ABGroup, ConsentTest } from 'Core/Models/ABGroup';
+} from 'Privacy/Privacy';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -27,8 +25,8 @@ function isProfilingPermissions(permissions: IPermissions | { [key: string]: nev
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy, abGroup: ABGroup): IRequestPrivacy | undefined {
-        if (this.GameUsesConsent(gamePrivacy, abGroup) === false) {
+    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy | undefined {
+        if (this.GameUsesConsent(gamePrivacy) === false) {
             return undefined;
         }
 
@@ -46,9 +44,9 @@ export class RequestPrivacyFactory {
         };
     }
 
-    private static GameUsesConsent(gamePrivacy: GamePrivacy, abGroup: ABGroup): boolean {
-        const isInDeveloperConsentTreatment: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT && ConsentTest.isValid(abGroup);
-        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isInDeveloperConsentTreatment;
+    private static GameUsesConsent(gamePrivacy: GamePrivacy): boolean {
+        const isDeveloperConsent: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT;
+        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
     }
 
     private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {

@@ -35,6 +35,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -127,6 +128,7 @@ describe('VastVideoEventHandler tests', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
 
         const adsConfig = TestFixtures.getAdsConfiguration();
+        const privacySDK = sinon.createStubInstance(PrivacySDK);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -140,7 +142,8 @@ describe('VastVideoEventHandler tests', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
 
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -169,7 +172,8 @@ describe('VastVideoEventHandler tests', () => {
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
             privacy,
-            om: sinon.createStubInstance(OpenMeasurement)
+            om: sinon.createStubInstance(OpenMeasurement),
+            privacySDK: privacySDK
         };
 
         testAdUnit = new VastAdUnit(vastAdUnitParameters);

@@ -24,7 +24,7 @@ export class GoogleStoreManager extends StoreManager {
         this._store.Android!.Store.onPurchaseStatusOnStop.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnStop(activity, data));
 
         this._store.Android!.Store.initialize('com.android.vending.billing.InAppBillingService.BIND', 'com.android.vending');
-        core.ProgrammaticTrackingService.reportMetric(PurchasingMetric.PurchasingGoogleStoreStarted);
+        core.ProgrammaticTrackingService.reportMetricEvent(PurchasingMetric.PurchasingGoogleStoreStarted);
     }
 
     private onInitialized() {

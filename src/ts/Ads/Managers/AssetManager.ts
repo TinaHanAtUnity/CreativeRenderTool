@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, ProgrammaticTrackingService, CachingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -181,19 +181,11 @@ export class AssetManager {
         this._fastConnectionDetected = false;
         this._cache.stop();
 
-        while (this._requiredQueue.length) {
-            const object: IAssetQueueObject | undefined = this._requiredQueue.shift();
-            if (object) {
-                object.reject(CacheStatus.STOPPED);
-            }
-        }
+        this._requiredQueue.forEach(o => o.reject(CacheStatus.STOPPED));
+        this._requiredQueue = [];
 
-        while (this._optionalQueue.length) {
-            const object: IAssetQueueObject | undefined = this._optionalQueue.shift();
-            if (object) {
-                object.reject(CacheStatus.STOPPED);
-            }
-        }
+        this._optionalQueue.forEach(o => o.reject(CacheStatus.STOPPED));
+        this._optionalQueue = [];
     }
 
     public checkFreeSpace(): Promise<void> {
@@ -205,10 +197,7 @@ export class AssetManager {
             // disable caching if there is less than 20 megabytes free space in cache directory
             if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
-
-                Diagnostics.trigger('caching_disabled', {
-                    freeCacheSpace: freeSpace
-                });
+                this._pts.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
             }
 
             return;
@@ -218,29 +207,27 @@ export class AssetManager {
     }
 
     private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
-        let chain = Promise.resolve();
-        for (const asset of assets) {
-            chain = chain.then(() => {
-                if (this._stopped) {
-                    return Promise.reject(CacheStatus.STOPPED);
-                }
+        return assets.reduce((chain, asset) => chain.then(() => this.cacheAsset(asset, campaign, cacheType)), Promise.resolve());
+    }
 
-                const promise = this.queueAsset(asset.getOriginalUrl(), cacheType, this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
-                    asset.setFileId(fileId);
-                    asset.setCachedUrl(fileUrl);
-                    return fileId;
-                }).then((fileId) => {
-                    if (cacheType === CacheType.REQUIRED) {
-                        return this._cacheBookkeeping.writeFileForCampaign(campaign.getId(), fileId);
-                    }
-
-                    return Promise.resolve();
-                });
-                this.executeAssetQueue(campaign);
-                return promise;
-            });
+    private cacheAsset(asset: Asset, campaign: Campaign, cacheType: CacheType): Promise<void> {
+        if (this._stopped) {
+            return Promise.reject(CacheStatus.STOPPED);
         }
-        return chain;
+
+        const promise = this.queueAsset(asset.getOriginalUrl(), cacheType, this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
+            asset.setFileId(fileId);
+            asset.setCachedUrl(fileUrl);
+            return fileId;
+        }).then((fileId) => {
+            if (cacheType === CacheType.REQUIRED) {
+                return this._cacheBookkeeping.writeFileForCampaign(campaign.getId(), fileId);
+            }
+
+            return Promise.resolve();
+        });
+        this.executeAssetQueue(campaign);
+        return promise;
     }
 
     private queueAsset(url: string, cacheType: CacheType, diagnostics?: ICacheDiagnostics): Promise<string[]> {
@@ -397,7 +384,7 @@ export class AssetManager {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            this._pts.reportError(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            this._pts.reportErrorEvent(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
         }
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {

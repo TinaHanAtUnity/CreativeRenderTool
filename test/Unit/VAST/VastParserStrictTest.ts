@@ -21,6 +21,7 @@ import VastStaticResourceWithTypeInsteadOfCreativeTypeXml from 'xml/VastStaticRe
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
+import WrappedVastIAS from 'xml/WrappedVastIAS.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastAboutBlank from 'xml/VastAboutBlank.xml';
 import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
@@ -91,6 +92,30 @@ describe('VastParserStrict', () => {
                 assert.equal(e.diagnostic['rootWrapperVast'], rootVast);
                 assert.equal(e.diagnostic['wrapperDepth'], 7);
                 // tslint:enable:no-string-literal
+            });
+        });
+
+        context('for IAS', () => {
+            it('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
+                const wrappedVAST = WrappedVastIAS;
+                sinon.stub(request, 'get').resolves();
+
+                const headers: [string, string][] = [['X-Device-Type', 'unity'], ['User-Agent', navigator.userAgent]];
+                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot';
+
+                TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
+                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+            });
+
+            it('should splice bundleID as first url query param', () => {
+                const wrappedVAST = WrappedVastIAS;
+                sinon.stub(request, 'get').resolves();
+
+                const headers: [string, string][] = [['X-Device-Type', 'unity'], ['User-Agent', navigator.userAgent]];
+                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?bundleId=booyah&scoot=doot';
+
+                TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah');
+                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
             });
         });
     });
@@ -381,7 +406,7 @@ describe('VastParserStrict', () => {
                 });
             });
 
-            describe('getCompanionPortraitUrl', () => {
+            describe('getStaticCompanionPortraitUrl', () => {
                 const tests: {
                     message: string;
                     inputXml: string;
@@ -412,7 +437,7 @@ describe('VastParserStrict', () => {
                 tests.forEach((test) => {
                     it(test.message, () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
-                        assert.equal(vast.getCompanionPortraitUrl(), test.expectedValue);
+                        assert.equal(vast.getStaticCompanionPortraitUrl(), test.expectedValue);
                     });
                 });
             });
@@ -430,7 +455,7 @@ describe('VastParserStrict', () => {
             });
 
             describe('StaticResource Companion Ad', () => {
-                describe('getCompanionLandscapeUrl from StaticResource type CompanionAd', () => {
+                describe('getStaticCompanionLandscapeUrl from StaticResource type CompanionAd', () => {
                     const tests: {
                         message: string;
                         inputXml: string;
@@ -461,7 +486,7 @@ describe('VastParserStrict', () => {
                     tests.forEach((test) => {
                         it(test.message, () => {
                             const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
-                            assert.equal(vast.getCompanionLandscapeUrl(), test.expectedValue);
+                            assert.equal(vast.getStaticCompanionLandscapeUrl(), test.expectedValue);
                         });
                     });
                 });
@@ -514,7 +539,7 @@ describe('VastParserStrict', () => {
                     });
                 });
             });
-
+            // enable these tests if vast iframe abgroup is enabled
             xdescribe('IFrameResource Companion Ad', () => {
                 describe('getIframeResourceURL from IFrameResource type CompanionAd', () => {
                     const tests: {
@@ -543,6 +568,7 @@ describe('VastParserStrict', () => {
                 });
             });
 
+            // enable these tests if vast html abgroup is enabled
             xdescribe('HTMLResource Companion Ad', () => {
                 describe('getHtmlCompanionResourceContent from HTMLResource type CompanionAd', () => {
                     const tests: {
@@ -570,8 +596,8 @@ describe('VastParserStrict', () => {
                     });
                 });
             });
-
-            describe('Unsupported Companion Ad', () => {
+            // enable these tests if vast endcard abgroup is enabled
+            xdescribe('Unsupported Companion Ad', () => {
                 describe('add into unsupported companion ads list for unsupported companion ads', () => {
                     const tests: {
                         message: string;
@@ -584,14 +610,14 @@ describe('VastParserStrict', () => {
                                 expectedVal: 0
                             },
                             {
-                                message: 'should have added into unsupported companion ads for iframeResource',
+                                message: 'should have not added into unsupported companion ads for iframeResource',
                                 inputXml: VastCompanionAdIFrameXml,
-                                expectedVal: 1
+                                expectedVal: 0
                             },
                             {
-                                message: 'should have added into unsupported companion ads for iframeResource and htmlResource',
+                                message: 'should have not added into unsupported companion ads for iframeResource and htmlResource',
                                 inputXml: VastCompanionAdHTMLXml,
-                                expectedVal: 2
+                                expectedVal: 0
                             },
                             {
                                 message: 'should have added into unsupported companion ads for static end card not meeting minimum size requirement',
@@ -617,7 +643,7 @@ describe('VastParserStrict', () => {
                 describe('ad verification as standalone for VAST 4.1', () => {
                     beforeEach(() => {
                         vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsStandAlone);
-                        vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        vastAdVerifications = vast.getAdVerifications();
                         vastAdVerification = vastAdVerifications[0];
                     });
 
@@ -646,7 +672,7 @@ describe('VastParserStrict', () => {
                 describe('ad verification as extension for VAST 3.x and under as Extension', () => {
                     beforeEach(() => {
                         vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsExtension);
-                        vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        vastAdVerifications = vast.getAdVerifications();
                         vastAdVerification = vastAdVerifications[0];
                     });
 

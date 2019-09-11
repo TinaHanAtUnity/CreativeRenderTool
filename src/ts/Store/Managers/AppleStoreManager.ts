@@ -19,7 +19,7 @@ export class AppleStoreManager extends StoreManager {
         this._store.iOS!.Products.onTransaction.subscribe((data) => this.onTransaction(data));
 
         this._store.iOS!.Products.startTransactionObserver();
-        core.ProgrammaticTrackingService.reportMetric(PurchasingMetric.PurchasingAppleStoreStarted);
+        core.ProgrammaticTrackingService.reportMetricEvent(PurchasingMetric.PurchasingAppleStoreStarted);
     }
 
     private onTransaction(data: IAppleTransaction[]): void {

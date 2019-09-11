@@ -28,7 +28,7 @@ describe('VastEndScreen', () => {
 
         vastEndscreenParameters = {
             clientInfo: sinon.createStubInstance(ClientInfo),
-            campaign: TestFixtures.getCompanionVastCampaign(),
+            campaign: TestFixtures.getCompanionStaticVastCampaign(),
             country: ''
         };
 

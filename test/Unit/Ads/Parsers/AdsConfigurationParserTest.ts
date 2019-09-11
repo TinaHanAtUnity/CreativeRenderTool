@@ -1,12 +1,22 @@
-import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { assert } from 'chai';
+import {AdsConfiguration, IRawAdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {PrivacyMethod} from 'Privacy/Privacy';
+import {AdsConfigurationParser} from 'Ads/Parsers/AdsConfigurationParser';
+import {assert} from 'chai';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
-import {CacheMode} from 'Core/Models/CoreConfiguration';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from 'Core/Constants/Platform';
 
 describe('AdsConfigurationParserTest', () => {
+    const platform = Platform.ANDROID;
+    const backend = TestFixtures.getBackend(platform);
+    const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+    const coreModule = TestFixtures.getCoreModule(nativeBridge);
+    const core = coreModule.Api;
+    const clientInfo = TestFixtures.getClientInfo(platform);
+    const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
     context('Parsing json to configuration', () => {
         let adsConfig: AdsConfiguration;
         beforeEach(() => adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationJson)));
@@ -33,7 +43,7 @@ describe('AdsConfigurationParserTest', () => {
         });
     });
 
-    context('Privacy', () => {
+    context('PrivacySDK', () => {
         let configJson: IRawAdsConfiguration;
         beforeEach(() => {
             configJson = JSON.parse(ConfigurationJson);
@@ -61,30 +71,30 @@ describe('AdsConfigurationParserTest', () => {
 
                 it('should set to DEFAULT if GDPR not enabled', () => {
                     configJson.gdprEnabled = false;
-                    const config = AdsConfigurationParser.parse(configJson);
-                    assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
-                    assert.equal(config.getGamePrivacy().isEnabled(), false);
+                    const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+                    assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
+                    assert.equal(privacy.getGamePrivacy().isEnabled(), false);
                 });
 
                 it('should set to LEGITIMATE_INTEREST if GDPR enabled', () => {
                     configJson.gdprEnabled = true;
-                    const config = AdsConfigurationParser.parse(configJson);
-                    assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
-                    assert.equal(config.getGamePrivacy().isEnabled(), false);
+                    const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+                    assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
+                    assert.equal(privacy.getGamePrivacy().isEnabled(), false);
                 });
             });
 
             it('should set to UNITY_CONSENT', () => {
                 configJson.gamePrivacy!.method = 'unity_consent';
-                const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
-                assert.equal(config.getGamePrivacy().isEnabled(), true);
+                const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+                assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
+                assert.equal(privacy.getGamePrivacy().isEnabled(), true);
             });
 
             it('should mark as not recorded if userPrivacy is undefined', () => {
                 configJson.userPrivacy = undefined;
-                const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getUserPrivacy().isRecorded(), false);
+                const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+                assert.equal(privacy.getUserPrivacy().isRecorded(), false);
             });
         });
     });

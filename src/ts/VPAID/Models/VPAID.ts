@@ -46,10 +46,10 @@ export class VPAID {
     }
 
     public getCompanionPortraitUrl(): string | null {
-        return this.vast.getCompanionPortraitUrl();
+        return this.vast.getStaticCompanionPortraitUrl();
     }
     public getCompanionLandscapeUrl(): string | null {
-        return this.vast.getCompanionLandscapeUrl();
+        return this.vast.getStaticCompanionLandscapeUrl();
     }
 
     public getScriptUrl(): string {

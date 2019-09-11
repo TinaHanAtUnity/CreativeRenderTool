@@ -83,8 +83,8 @@ describe('GoogleStoreManager Tests', () => {
         });
 
         it('Reports PurchasingGoogleStoreStarted', () => {
-            sinon.assert.calledOnce(<sinon.SinonSpy>programmaticTrackingService.reportMetric);
-            sinon.assert.calledWith(<sinon.SinonSpy>programmaticTrackingService.reportMetric, PurchasingMetric.PurchasingGoogleStoreStarted);
+            sinon.assert.calledOnce(<sinon.SinonSpy>programmaticTrackingService.reportMetricEvent);
+            sinon.assert.calledWith(<sinon.SinonSpy>programmaticTrackingService.reportMetricEvent, PurchasingMetric.PurchasingGoogleStoreStarted);
         });
 
     });

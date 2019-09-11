@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
@@ -63,9 +63,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
-        this._templateData = {
-            myChoicesCTATextTest: parameters.consentABTest
-        };
+        this._templateData = {};
 
         this._bindings = [
             {
@@ -336,7 +334,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
         // To get a rough estimate how often users click links on the homescreen
-        this._pts.reportMetric(MiscellaneousMetric.ConsentParagraphLinkClicked);
+        this._pts.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
     }

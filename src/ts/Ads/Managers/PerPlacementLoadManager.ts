@@ -101,7 +101,18 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     // count is the number of times load was called for a placementId before we could process it
     private loadPlacement(placementId: string, count: number) {
-        LoadCalledCounter.report(this._clientInfo.getGameId(), placementId, this._coreConfig.getCountry(), count, this._coreConfig.getAbGroup(), this._coreConfig.getOrganizationId());
+
+        LoadCalledCounter.report({
+            gameId: this._clientInfo.getGameId(),
+            placementId: placementId,
+            country: this._coreConfig.getCountry(),
+            count: count,
+            abGroup: this._coreConfig.getAbGroup(),
+            organizationId: this._coreConfig.getOrganizationId(),
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            gamerToken: this._coreConfig.getToken()
+        });
+
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
@@ -116,7 +127,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             });
         } else {
             this.alertPlacementReadyStatus(placement);
-            this._pts.reportMetric(LoadMetric.LoadAuctionRequestBlocked);
+            this._pts.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
 

@@ -75,7 +75,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
 
     public onShow(): Promise<void> {
         if (!this._impressionEventsSent) {
-            this._programmaticTrackingService.reportMetric(BannerMetric.BannerAdImpression);
+            this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdImpression);
             this.sendTrackingEvent(TrackingEvent.IMPRESSION);
             this._impressionEventsSent = true;
         }

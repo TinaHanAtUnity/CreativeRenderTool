@@ -1,7 +1,8 @@
 import { GDPREventAction, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { PrivacyMethod } from 'Privacy/Privacy';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IGDPREventHandler {
     onGDPRPopupSkipped(): void;
@@ -10,20 +11,22 @@ export interface IGDPREventHandler {
 export abstract class GDPREventHandler implements IGDPREventHandler {
 
     private _privacyManager: UserPrivacyManager;
+    private _privacySDK: PrivacySDK;
     protected _coreConfig: CoreConfiguration;
     protected _adsConfig: AdsConfiguration;
 
-    constructor(privacyManager: UserPrivacyManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration) {
+    constructor(privacyManager: UserPrivacyManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, privacy: PrivacySDK) {
         this._privacyManager = privacyManager;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
+        this._privacySDK = privacy;
     }
 
     public onGDPRPopupSkipped(): void {
         if (!this._adsConfig.isOptOutRecorded()) {
             this._adsConfig.setOptOutRecorded(true);
             this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
-            const userPrivacy = this._adsConfig.getUserPrivacy();
+            const userPrivacy = this._privacySDK.getUserPrivacy();
             if (userPrivacy) {
                 userPrivacy.update({
                     method: PrivacyMethod.LEGITIMATE_INTEREST,

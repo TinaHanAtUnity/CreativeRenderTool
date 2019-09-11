@@ -24,6 +24,7 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -41,6 +42,7 @@ describe('MraidAdUnit', () => {
     let operativeEventThirdQuartileStub: sinon.SinonStub;
     let operativeEventSkipStub: sinon.SinonStub;
     let sendWithGetStub: sinon.SinonStub;
+    let privacySDK: PrivacySDK;
 
     const orientationProperties = {
         allowOrientationChange: false,
@@ -71,6 +73,7 @@ describe('MraidAdUnit', () => {
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
+        privacySDK = sinon.createStubInstance(PrivacySDK);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform: platform,
@@ -85,7 +88,8 @@ describe('MraidAdUnit', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: mraidCampaign,
-            playerMetadataServerId: 'https://hi.com'
+            playerMetadataServerId: 'https://hi.com',
+            privacySDK: privacySDK
         });
 
         mraidAdUnitParameters = {
@@ -112,7 +116,8 @@ describe('MraidAdUnit', () => {
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
             privacyManager: userPrivacyManager,
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            webPlayerContainer: webPlayerContainer
+            webPlayerContainer: webPlayerContainer,
+            privacySDK: privacySDK
         };
 
         containerOpen = (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());

@@ -2,7 +2,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -30,6 +29,10 @@ export enum BannerMetric {
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
+}
+
+export enum CachingMetric {
+    CachingModeForcedToDisabled = 'caching_mode_forced_to_disabled' // Occurs when user has less than 20mb of freespace in cache directory
 }
 
 export enum ChinaMetric {
@@ -65,25 +68,25 @@ export enum PurchasingMetric {
     PurchasingGoogleStoreStarted = 'purchasing_google_store_started'
 }
 
-export enum WebviewLifeCycleMetric {
+export enum TimeMetric {
     WebviewInitializationTimeTaken = 'webview_initialization_time_taken'
 }
 
-type ProgrammaticTrackingMetric = AdmobMetric | BannerMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric | WebviewLifeCycleMetric;
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | PurchasingMetric | ProgrammaticTrackingError | TimeMetric;
 
 export interface IProgrammaticTrackingData {
-    metrics: IProgrammaticTrackingMetric[] | undefined;
+    metrics: IPTSEvent[] | undefined;
 }
 
-interface IProgrammaticTrackingMetric {
+interface IPTSEvent {
     name: string;
     value: number;
     tags: string[];
 }
 
 export class ProgrammaticTrackingService {
-    private static newProductionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
-    private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics';
+    private static productionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
+    private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics'; // Currently unused
 
     private _platform: Platform;
     private _request: RequestManager;
@@ -97,53 +100,31 @@ export class ProgrammaticTrackingService {
         this._deviceInfo = deviceInfo;
     }
 
-    private createErrorTag(tagValue: string): string {
-        return this.createAdsSdkTag('eevt', tagValue);
+    private createMetricTags(event: PTSEvent): string[] {
+        return [this.createAdsSdkTag('mevt', event)];
     }
 
-    private createMetricTag(tagValue: string): string {
-        return this.createAdsSdkTag('mevt', tagValue);
+    private createErrorTags(event: PTSEvent, adType: string, seatId?: number): string[] {
+
+        const platform: Platform = this._platform;
+        const osVersion: string = this._deviceInfo.getOsVersion();
+        const sdkVersion: string = this._clientInfo.getSdkVersionName();
+
+        return [
+            this.createAdsSdkTag('eevt', event),
+            this.createAdsSdkTag('plt', Platform[platform]),
+            this.createAdsSdkTag('osv', osVersion),
+            this.createAdsSdkTag('sdv', sdkVersion),
+            this.createAdsSdkTag('adt', `${adType}`),
+            this.createAdsSdkTag('sid', `${seatId}`)
+        ];
     }
 
     private createAdsSdkTag(suffix: string, tagValue: string): string {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
-    public reportError(error: ProgrammaticTrackingError, adType: string, seatId?: number | undefined): Promise<INativeResponse> {
-        const platform: Platform = this._platform;
-        const osVersion: string = this._deviceInfo.getOsVersion();
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-        const metricData: IProgrammaticTrackingData = {
-            metrics: [
-                {
-                    name: error,
-                    value: 1,
-                    tags: [
-                        this.createErrorTag(error),
-                        this.createAdsSdkTag('plt', Platform[platform]),
-                        this.createAdsSdkTag('osv', osVersion),
-                        this.createAdsSdkTag('sdv', sdkVersion),
-                        this.createAdsSdkTag('adt', adType),
-                        this.createAdsSdkTag('sid', `${seatId}`)
-                    ]
-                }
-            ]
-        };
-        const url: string = ProgrammaticTrackingService.newProductionMetricServiceUrl;
-        const data: string = JSON.stringify(metricData);
-        const headers: [string, string][] = [];
-
-        headers.push(['Content-Type', 'application/json']);
-
-        return this._request.post(url, data, headers);
-    }
-
-    public reportMetricWithTags(event: ProgrammaticTrackingMetric, value: number, tags: string[]): Promise<INativeResponse> {
-        const isLoadMetric = Object.values(LoadMetric).includes(event);
-        const isZyngaFreeCellSolitareUsingLoad = CustomFeatures.isTrackedGameUsingLoadApi(this._clientInfo.getGameId());
-        if (isLoadMetric && !isZyngaFreeCellSolitareUsingLoad) {
-            return Promise.resolve(<INativeResponse>{});
-        }
+    public postWithTags(event: PTSEvent, value: number, tags: string[]): Promise<INativeResponse> {
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
@@ -153,22 +134,25 @@ export class ProgrammaticTrackingService {
                 }
             ]
         };
-        const url: string = ProgrammaticTrackingService.newProductionMetricServiceUrl;
+        const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this._request.post(url, data, headers).then((res) => {
-            if (CustomFeatures.sampleAtGivenPercent(1)) {
-                return this._request.post(ProgrammaticTrackingService.newProductionMetricServiceUrl, data, headers);
-            }
-            return res;
-        });
+        return this._request.post(url, data, headers);
     }
 
-    public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
-        return this.reportMetricWithTags(event, 1, [this.createMetricTag(event)]);
+    public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
+        return this.postWithTags(event, 1, this.createMetricTags(event));
+    }
+
+    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
+        return this.postWithTags(event, 1, this.createErrorTags(event, adType, seatId));
+    }
+
+    public reportTimeEvent(event: PTSEvent, value: number) {
+        return this.postWithTags(event, value, this.createMetricTags(event));
     }
 
 }

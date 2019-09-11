@@ -4,93 +4,13 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-
-// tslint:disable-next-line
-export interface IAnalyticsMessage {}
-/*
-TODO: IAnalyticsMessage should be refactored in following PRs.
-
-Looking at the code all analytic messages share the same field `ts`.
-Therefore this interface can be refactored to:
-
-export interface IAnalyticsMessage {
-    ts: number;
-}
-*/
+import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;
     game_id: string;
 }
-
-export interface IAnalyticsCustomParams {
-    unity_monetization_extras: string;
-}
-
-export interface IAnalyticsEvent<T extends IAnalyticsMessage> {
-    type: string;
-    msg: T;
-}
-
-interface IAnalyticsLevelUpEvent extends IAnalyticsCustomParams {
-    new_level_index: string;
-}
-
-interface IAnalyticsLevelFailedEvent extends IAnalyticsCustomParams {
-    level_index: string;
-}
-
-interface IAnalyticsItemEvent extends IAnalyticsCustomParams {
-    currency_type: string;
-    transaction_context: string;
-    amount: number;
-    item_id: string;
-    balance: number;
-    item_type: string;
-    level: string;
-    transaction_id: string;
-}
-
-interface IAnalyticsAdCompleteEvent extends IAnalyticsCustomParams {
-    rewarded: boolean;
-    network: string;
-    placement_id: string;
-}
-
-interface IIapTransactionEvent extends IAnalyticsMessage {
-    ts: number;
-    productid: string;
-    amount: number;
-    currency: string;
-    transactionid: number;
-    iap_service: boolean;
-    promo: boolean;
-    receipt: string;
-    unity_monetization_extras: string;
-}
-
-interface IIapPurchaseFailedEvent extends IAnalyticsCustomParams {
-    productID: string;
-    reason: string;
-    price: number;
-    currency: string;
-}
-
-interface IAnalyticsCustomEvent<G extends IAnalyticsCustomParams> extends IAnalyticsMessage {
-    ts: number;
-    t_since_start: number; // appended by webview
-    name: string;
-    custom_params: G;
-}
-
-export type AnalyticsItemAcquiredEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
-export type AnalyticsItemSpentEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
-export type AnalyticsLevelUpEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelUpEvent>>;
-export type AnalyticsLevelFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelFailedEvent>>;
-export type AnalyticsGenericEvent = IAnalyticsEvent<IAnalyticsMessage>;
-export type AnalyticsAdCompleteEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsAdCompleteEvent>>;
-export type AnalyticsIapTransactionEvent = IAnalyticsEvent<IIapTransactionEvent>;
-export type AnalyticsIapPurchaseFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IIapPurchaseFailedEvent>>;
 
 export interface IAnalyticsObject<T> {
     type: string;
@@ -138,6 +58,19 @@ export interface IAnalyticsAppUpdateEventV1 {
     ts: number;
     appVersion: string; // from sdk api
     timeSinceStart: number;
+}
+
+export interface IAnalyticsTransactionEventV1 {
+    ts: number;
+    productId: string;
+    price: number;
+    currencyCode: string;
+    eventId: string;
+    receipt: {
+        appStore: string;
+        transactionId: string;
+        payload: string;
+    };
 }
 
 export class AnalyticsProtocol {
@@ -211,6 +144,26 @@ export class AnalyticsProtocol {
         return {
             type: 'ads.analytics.appRunning.v1',
             msg: appRunningEvent
+        };
+    }
+
+    public static createTransactionEvent(transaction: ITransactionDetails, platform: Platform): IAnalyticsObject<IAnalyticsTransactionEventV1> {
+        const currentTime = Date.now();
+        const transactionEvent: IAnalyticsTransactionEventV1 = {
+            ts: currentTime,
+            productId: transaction.productId,
+            price: transaction.price,
+            currencyCode: transaction.currency,
+            eventId: JaegerUtilities.uuidv4(),
+            receipt: {
+                appStore: platform === Platform.ANDROID ? 'GooglePlay' : 'AppleAppStore',
+                transactionId: transaction.transactionId,
+                payload: transaction.receipt
+            }
+        };
+        return {
+            type: 'ads.analytics.transaction.v1',
+            msg: transactionEvent
         };
     }
 

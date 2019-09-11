@@ -48,7 +48,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onCompleted(url);
 
         if (!this._vastAdUnit.hasImpressionOccurred()) {
-            this._pts.reportMetric(VastMetric.VastVideoImpressionFailed);
+            this._pts.reportMetricEvent(VastMetric.VastVideoImpressionFailed);
         }
 
         const session = this._vastCampaign.getSession();

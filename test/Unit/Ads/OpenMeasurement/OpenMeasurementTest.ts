@@ -47,7 +47,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
             if (verifications) {
                 return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, verifications);
             } else {
-                const verification = campaign.getVast().getAd()!.getAdVerifications();
+                const verification = campaign.getVast().getAdVerifications();
                 return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, verification);
             }
         };
@@ -65,7 +65,7 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p);
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
@@ -94,7 +94,6 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         om.addMessageListener();
                         sinon.stub(om, 'populateVendorKey');
                         sinon.stub(om, 'injectAsString');
-                        sinon.stub(om.getOmidBridge(), 'sendQueuedEvents');
                         return om.injectAdVerifications();
                     });
 
@@ -106,7 +105,6 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         // need a more reliable way to check the dom
                         sinon.assert.calledTwice(<sinon.SinonStub>om.injectAsString);
                         sinon.assert.calledTwice(<sinon.SinonStub>om.populateVendorKey);
-                        sinon.assert.calledOnce(<sinon.SinonStub>om.getOmidBridge().sendQueuedEvents);
                     });
                 });
 
@@ -161,13 +159,28 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 describe('onEventProcessed', () => {
                     context('sessionStart', () => {
                         beforeEach(() => {
-                            sinon.stub(om, 'loaded');
+                            sandbox.stub(om, 'loaded');
+                            sandbox.stub(om, 'geometryChange');
+                            sandbox.stub(om, 'impression');
+                            sandbox.stub(om.getOmidBridge(), 'sendQueuedEvents');
+                            clock = sinon.useFakeTimers();
                         });
 
                         it('should call session begin ad events', () => {
                             om.onEventProcessed('sessionStart');
 
                             sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                            sinon.assert.notCalled(<sinon.SinonSpy>om.geometryChange);
+                        });
+
+                        it('should call session begin ad events for IAS', () => {
+                            om.onEventProcessed('sessionStart', 'IAS');
+
+                            clock.tick(2000);
+                            clock.restore();
+                            sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
+                            sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                            sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
                         });
                     });
 

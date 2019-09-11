@@ -1,4 +1,5 @@
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
+import { Polyfiller } from 'Core/Utilities/Polyfiller';
 
 // In certain versions of Android, we found that DOMParser might not support
 // parsing text/html mime types.
@@ -27,7 +28,5 @@ import { DOMUtils } from 'Core/Utilities/DOMUtils';
  *  Object.values() has issues with older Android Devices.
  */
 if (!Object.values) {
-    Object.values = (obj: {}) => {
-        return Object.keys(obj).map((values) => obj[<keyof typeof obj>values]);
-    };
+    Object.values = Polyfiller.getObjectValuesFunction();
 }

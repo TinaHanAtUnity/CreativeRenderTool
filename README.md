@@ -69,6 +69,18 @@ To build continuously (on file changes), use:
 - Change webview development config to point to local build (is done automagically by `make build-dev`) (`http://LOCAL_IP:LOCAL_PORT/build/dev/index.html`)
 - Start local web server in project root (`make start-server`)
 
+### Adding new icon
+ **Add icon to existing font file**
+ - Copy the svg file into an existing src/fonts/* folder
+ - `make build-fonts`
+
+ **Create new font file**
+ - Create a new folder under src/fonts and copy the svg file(s) into the folder
+ - Modify tools/generate_fonts.js to include the newly added folder
+ - `make build-fonts`
+
+`make build-fonts` will generate svg, ttf, and woff files in src/fonts/*/generated and styl file in src/styl/generated
+
 ## Testing
 
 ### Local tests

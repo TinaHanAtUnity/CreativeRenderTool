@@ -39,6 +39,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -96,6 +97,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sessionManager = new SessionManager(core, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
@@ -110,7 +112,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -169,7 +172,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 video: video,
                 privacy: privacy,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                privacySDK: privacySDK
             };
 
             xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);
@@ -269,6 +273,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sessionManager = new SessionManager(core, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -282,7 +287,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -337,7 +343,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 video: video,
                 privacy: privacy,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                privacySDK: privacySDK
             };
 
             xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);

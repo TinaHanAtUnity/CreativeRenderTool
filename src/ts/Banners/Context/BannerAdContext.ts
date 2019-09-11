@@ -119,7 +119,7 @@ export class BannerAdContext {
     }
 
     private loadBannerAdUnit(): Promise<void> {
-        this._programmaticTrackingService.reportMetric(BannerMetric.BannerAdRequest);
+        this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdRequest);
         return this._campaignManager.request(this._placement).then((campaign) => {
                 this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
@@ -145,7 +145,7 @@ export class BannerAdContext {
     }
 
     private handleBannerRequestError(e: Error): Promise<void> {
-        this._programmaticTrackingService.reportError(ProgrammaticTrackingError.BannerRequestError, 'banner');
+        this._programmaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
         return Promise.reject(e);
     }
 
