@@ -119,7 +119,7 @@ export class ProgrammaticTrackingService {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
-    public postWithTags(event: PTSEvent, value: number, tags: string[]): Promise<INativeResponse> {
+    private postWithTags(event: PTSEvent, value: number, tags: string[]): Promise<INativeResponse> {
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
