@@ -101,8 +101,14 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
+        let originalUrl = 'none';
+        const htmlResource = this._campaign.getResourceUrl();
+        if (htmlResource) {
+            originalUrl = htmlResource.getOriginalUrl();
+        }
+
         this.createMRAID(
-            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MRAIDContainer
+            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MRAIDContainer.replace('{{ CREATIVE_URL }}', originalUrl)
         ).then(mraid => {
             this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());

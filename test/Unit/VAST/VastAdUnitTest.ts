@@ -35,6 +35,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('VastAdUnitTest', () => {
 
@@ -102,6 +103,7 @@ describe('VastAdUnitTest', () => {
         const video = vastCampaign.getVideo();
         coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
+        const privacySDK = sinon.createStubInstance(PrivacySDK);
 
         let duration = vastCampaign.getVast().getDuration();
         if (duration) {
@@ -124,7 +126,8 @@ describe('VastAdUnitTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: vastCampaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -169,7 +172,8 @@ describe('VastAdUnitTest', () => {
             video: video,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            om: openMeasurement
+            om: openMeasurement,
+            privacySDK: privacySDK
         };
 
         vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -269,7 +273,7 @@ describe('VastAdUnitTest', () => {
                 };
 
                 const video = new Video('', TestFixtures.getSession());
-                vastCampaign = TestFixtures.getCompanionVastCampaign();
+                vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
                 sinon.stub(vastCampaign, 'getVideo').returns(video);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
                 const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
@@ -331,6 +335,16 @@ describe('VastAdUnitTest', () => {
             }).then(() => {
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.hide);
                 sinon.assert.called(<sinon.SinonSpy>vastEndScreen.remove);
+            });
+        });
+    });
+
+    it('should hide and then remove om on hide', () => {
+        return vastAdUnit.hide().then(() => {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, 500);
+            }).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>openMeasurement.removeFromViewHieararchy);
             });
         });
     });

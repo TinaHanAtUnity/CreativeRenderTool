@@ -27,6 +27,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDView, IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('WebPlayerMraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -80,6 +81,7 @@ describe('WebPlayerMraidAdUnit', () => {
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
+        const privacySDK = sinon.createStubInstance(PrivacySDK);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform: platform,
@@ -94,7 +96,8 @@ describe('WebPlayerMraidAdUnit', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: mraidCampaign,
-            playerMetadataServerId: 'https://hi.com'
+            playerMetadataServerId: 'https://hi.com',
+            privacySDK: privacySDK
         });
 
         mraidAdUnitParameters = {
@@ -121,7 +124,8 @@ describe('WebPlayerMraidAdUnit', () => {
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
             privacyManager: userPrivacyManager,
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            webPlayerContainer: webPlayerContainer
+            webPlayerContainer: webPlayerContainer,
+            privacySDK: privacySDK
         };
 
         containerOpen = (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());

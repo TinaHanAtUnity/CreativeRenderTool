@@ -26,7 +26,8 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { PrivacyMethod } from 'Privacy/Privacy';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -42,6 +43,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     storageBridge: StorageBridge;
     campaign: T;
     playerMetadataServerId: string | undefined;
+    privacySDK: PrivacySDK;
 }
 
 export interface IOperativeEventParams {
@@ -144,6 +146,7 @@ export class OperativeEventManager {
     protected _core: ICoreApi;
     protected _ads: IAdsApi;
     private _playerMetadataServerId: string | undefined;
+    private _privacySDK: PrivacySDK;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         this._storageBridge = params.storageBridge;
@@ -159,6 +162,7 @@ export class OperativeEventManager {
         this._core = params.core;
         this._ads = params.ads;
         this._playerMetadataServerId = params.playerMetadataServerId;
+        this._privacySDK = params.privacySDK;
     }
 
     public sendStart(params: IOperativeEventParams): Promise<void> {
@@ -417,7 +421,7 @@ export class OperativeEventManager {
                 };
             }
 
-            const privacyMethod = this._adsConfig.getUserPrivacy().getMethod();
+            const privacyMethod = this._privacySDK.getUserPrivacy().getMethod();
             if (privacyMethod === PrivacyMethod.LEGITIMATE_INTEREST || privacyMethod === PrivacyMethod.DEVELOPER_CONSENT) {
                 infoJson.privacyType = privacyMethod;
             }

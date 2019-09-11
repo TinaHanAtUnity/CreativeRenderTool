@@ -5,9 +5,8 @@ import {
     IGranularPermissions,
     IPermissions,
     isUnityConsentPermissions,
-    PrivacyMethod,
-    UserPrivacy
-} from 'Ads/Models/Privacy';
+    PrivacyMethod, UserPrivacy
+} from 'Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -21,6 +20,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -61,19 +61,22 @@ export class UserPrivacyManager {
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
-    private readonly _gamePrivacy: GamePrivacy;
+    private readonly _privacy: PrivacySDK;
     private readonly _userPrivacy: UserPrivacy;
+    private readonly _gamePrivacy: GamePrivacy;
+
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
-        this._gamePrivacy = adsConfig.getGamePrivacy();
-        this._userPrivacy = adsConfig.getUserPrivacy();
+        this._privacy = privacy;
+        this._userPrivacy = privacy.getUserPrivacy();
+        this._gamePrivacy = privacy.getGamePrivacy();
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -238,7 +241,7 @@ export class UserPrivacyManager {
     }
 
     public getGranularPermissions(): IGranularPermissions {
-        const permissions = this._adsConfig.getUserPrivacy().getPermissions();
+        const permissions = this._privacy.getUserPrivacy().getPermissions();
         if (!isUnityConsentPermissions(permissions)) {
             return {
                 gameExp: false,
@@ -285,17 +288,24 @@ export class UserPrivacyManager {
     }
 
     private updateConfigurationWithConsent(consent: boolean) {
+        if (this._deviceInfo.getLimitAdTracking()) {
+            consent = false;
+        }
+
         this._adsConfig.setOptOutEnabled(!consent);
         this._adsConfig.setOptOutRecorded(true);
 
-        const gamePrivacy = this._adsConfig.getGamePrivacy();
+        const gamePrivacy = this._privacy.getGamePrivacy();
         gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-        const userPrivacy = this._adsConfig.getUserPrivacy();
+        const userPrivacy = this._privacy.getUserPrivacy();
         userPrivacy.update({
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
             permissions: {
-                profiling: consent
+                all: false,
+                gameExp: false,
+                ads: consent,
+                external: consent
             }
         });
     }

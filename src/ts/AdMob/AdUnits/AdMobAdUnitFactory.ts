@@ -23,7 +23,8 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory<AdMobCampaign, IAd
             clientInfo: parameters.clientInfo,
             coreConfig: parameters.coreConfig,
             adsConfig: parameters.adsConfig,
-            privacyManager: parameters.privacyManager
+            privacyManager: parameters.privacyManager,
+            privacySDK: parameters.privacySDK
         });
         parameters.view.render();
         parameters.view.addEventHandler(eventHandler);

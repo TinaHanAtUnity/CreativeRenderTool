@@ -3,13 +3,14 @@ import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Template } from 'Core/Utilities/Template';
-import { BannerViewType } from 'Banners/Native/Banner';
+import { BannerViewType } from 'Banners/Native/BannerApi';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
 import { ProgrammaticTrackingService, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { IBannersApi } from 'Banners/IBanners';
+import { IBannerNativeApi } from 'Banners/IBannerModule';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 export interface IBannerAdUnitParameters {
     platform: Platform;
@@ -18,8 +19,9 @@ export interface IBannerAdUnitParameters {
     thirdPartyEventManager: ThirdPartyEventManager;
     webPlayerContainer: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
-    bannersApi: IBannersApi;
+    bannerNativeApi: IBannerNativeApi;
     placementId: string;
+    bannerAdViewId: string;
 }
 
 export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
@@ -30,8 +32,9 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     protected _webPlayerContainer: WebPlayerContainer;
-    private _bannersApi: IBannersApi;
+    private _bannerNativeApi: IBannerNativeApi;
     private _placementId: string;
+    private _bannerAdViewId: string;
 
     private _clickEventsSent = false;
     private _impressionEventsSent = false;
@@ -43,12 +46,9 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._webPlayerContainer = parameters.webPlayerContainer;
         this._programmaticTrackingService = parameters.programmaticTrackingService;
-        this._bannersApi = parameters.bannersApi;
+        this._bannerNativeApi = parameters.bannerNativeApi;
         this._placementId = parameters.placementId;
-    }
-
-    public getViews() {
-        return [BannerViewType.BannerPlayer];
+        this._bannerAdViewId = parameters.bannerAdViewId;
     }
 
     public onLoad(): Promise<void> {
@@ -74,6 +74,8 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     }
 
     public onShow(): Promise<void> {
+        GameSessionCounters.addStart(this._campaign);
+        GameSessionCounters.addView(this._campaign);
         if (!this._impressionEventsSent) {
             this._programmaticTrackingService.reportMetric(BannerMetric.BannerAdImpression);
             this.sendTrackingEvent(TrackingEvent.IMPRESSION);
@@ -97,7 +99,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
             if (!this._clickEventsSent) {
                 this._clickEventsSent = true;
                 this.sendTrackingEvent(TrackingEvent.CLICK);
-                this._bannersApi.Listener.sendClickEvent(this._placementId);
+                this._bannerNativeApi.BannerListenerApi.sendClickEvent(this._placementId, this._bannerAdViewId);
             }
             if (this._platform === Platform.IOS) {
                 this._core.iOS!.UrlScheme.open(url);

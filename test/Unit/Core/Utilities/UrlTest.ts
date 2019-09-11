@@ -50,6 +50,7 @@ describe('UrlTest', () => {
             assert.equal(false, Url.isValid('https://example.net/"url".png'), 'invalid url was accepted, test 2');
             assert.equal(false, Url.isValid(''), 'invalid url was accepted, test 3');
             assert.equal(false, Url.isValid('https://bs.serving-sys.com/Serving?cn=display&c=23&pl=VAST&pli=19864721&PluID=0&pos=9317&ncu=https://i.w55c.net/cl?t=1&btid=YTdmNGEwZTItZGJmYi00YWJmLTgxYTYtOGQ1Y2QxNDE0YjU0fFRGdVE2WmU1T0p8MTQ4MjQyODcyMTAyNHwxfDBGUkxJUmFKejF8MFJkUlU2cmgyMHwzMGM1ZWY3YS1iNTk0LTRjMzEtODQ1OC02ZmM3YTdjZDQ5MzFfZ2FfR0VOX0VYfDI1ODIzMzd8fHx8MTcuMFB8VVNE&ei=TREMOR&rurl=&ord=2611507143758033&cim=1\n\n\n<SCRIPT  language=\'JavaScript1.1\' SRC=\"https://pixel.adsafeprotected.com/rjss/st/69577/12006978/skeleton.js\"></SCRIPT>\n<NOSCRIPT><IMG SRC=\"https://pixel.adsafeprotected.com/rfw/st/69577/12006977/skeleton.gif\" BORDER=0 WIDTH=1 HEIGHT=1 ALT=\"\"></NOSCRIPT>&cb=1482428721026'), 'invalid url was accepted, test 4');
+            assert.equal(false, Url.isValid('http://example.net/"url".png'), 'invalid url was accepted, test 5');
         });
     });
 
@@ -267,6 +268,33 @@ describe('UrlTest', () => {
         it('should return correct app store url templates', () => {
             const iosStoreTemplates = ['https://itunes.apple.com'];
             assert.deepEqual(Url.getAppStoreUrlTemplates(Platform.IOS), iosStoreTemplates, 'iOS app store templates are not matching');
+        });
+    });
+
+    describe('isInternalTrackingProtocol', () => {
+
+        const tests: {
+            testCase: string;
+            url: string;
+            expectedOutcome: boolean;
+        }[] = [{
+            testCase: 'should work with a properly formatted internal tracking url',
+            url: 'https://tracking.prd.mz.internal.unity3d.com/queryparams',
+            expectedOutcome: true
+        }, {
+            testCase: 'should fail because of http only',
+            url: 'http://tracking.prd.mz.internal.unity3d.com/queryparams',
+            expectedOutcome: false
+        }, {
+            testCase: 'should fail if only contained within the url sting',
+            url: 'www.safedk-sucks-https://tracking.prd.mz.internal.unity3d.com/queryparams',
+            expectedOutcome: false
+        }];
+
+        tests.forEach((t) => {
+            it(t.testCase, () => {
+                assert.equal(Url.isInternalPTSTrackingProtocol(t.url), t.expectedOutcome);
+            });
         });
     });
 });

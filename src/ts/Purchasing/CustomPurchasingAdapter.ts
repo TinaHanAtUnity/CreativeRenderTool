@@ -14,20 +14,21 @@ import {
     ITransactionDetails,
     ITransactionErrorDetails
 } from 'Purchasing/PurchasingAdapter';
+import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export class CustomPurchasingAdapter implements IPurchasingAdapter {
     public readonly onCatalogRefreshed = new Observable1<IProduct[]>();
 
     private _core: ICoreApi;
     private _purchasing: IPurchasingApi;
-    private _analyticsManager?: AnalyticsManager;
+    private _analyticsManager: IAnalyticsManager;
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
 
     private static purchasePathRegex = new RegExp('events\/v1\/purchase');
     private static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
 
-    constructor(core: ICoreApi, purchasing: IPurchasingApi, promoEvents: PromoEvents, request: RequestManager, analyticsManager?: AnalyticsManager) {
+    constructor(core: ICoreApi, purchasing: IPurchasingApi, promoEvents: PromoEvents, request: RequestManager, analyticsManager: IAnalyticsManager) {
         this._core = core;
         this._purchasing = purchasing;
         this._analyticsManager = analyticsManager;
@@ -57,18 +58,14 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         });
     }
 
-    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
+    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean): Promise<ITransactionDetails> {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
             onSuccess = this._purchasing.CustomPurchasing.onTransactionComplete.subscribe((details) => {
                 this._purchasing.CustomPurchasing.onTransactionError.unsubscribe(onError);
                 this._purchasing.CustomPurchasing.onTransactionComplete.unsubscribe(onSuccess);
-                // should send events
-                if (this._analyticsManager) {
-                    // send analytics event if analytics is enabled
-                    this._analyticsManager.onIapTransaction(details.productId, details.receipt, details.currency, details.price);
-                }
+                this._analyticsManager.onIapTransaction(details);
                 // send iap transaction event
                 const product: IProduct | undefined = this._products[productId];
                 if (product) {
@@ -105,11 +102,9 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                 // should send events
                 const product: IProduct | undefined = this._products[productId];
                 if (product) {
-                    // send analytics event if analytics is enabled
-                    if (this._analyticsManager) {
-                        this._analyticsManager.onPurchaseFailed(productId, details.transactionError, product.localizedPrice, product.isoCurrencyCode);
-                    }
-                    // send iap transaction event
+
+                    // TODO: Potentially add Analytics Purchase Failed here
+
                     const events = campaign.getTrackingEventUrls();
                     if (events) {
                         const purchaseKey = TrackingEvent.PURCHASE;

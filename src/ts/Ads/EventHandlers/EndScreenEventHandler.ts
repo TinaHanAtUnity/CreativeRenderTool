@@ -30,7 +30,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _storeHandler: IStoreHandler;
 
     constructor(adUnit: T2, parameters: IAdUnitParameters<T>, storeHandler: IStoreHandler) {
-        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig, parameters.privacySDK);
         this._adUnit = adUnit;
         this._storeHandler = storeHandler;
     }

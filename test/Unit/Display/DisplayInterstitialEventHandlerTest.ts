@@ -26,6 +26,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -89,6 +90,7 @@ describe('DisplayInterstitialEventHandler', () => {
             view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);
 
             const webPlayerContainer: WebPlayerContainer = TestFixtures.getWebPlayerContainer();
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
 
             displayInterstitialAdUnitParameters = {
                 platform: platform,
@@ -112,7 +114,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 view: view,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                webPlayerContainer: webPlayerContainer
+                webPlayerContainer: webPlayerContainer,
+                privacySDK: privacySDK
             };
 
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialAdUnitParameters);

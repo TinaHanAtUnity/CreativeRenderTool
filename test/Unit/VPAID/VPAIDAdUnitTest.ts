@@ -34,6 +34,7 @@ import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('VPAIDAdUnit', () => {
     let platform: Platform;
@@ -87,8 +88,9 @@ describe('VPAIDAdUnit', () => {
             forceOrientation: Orientation.NONE,
             options: {},
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
-        };
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
+            privacySDK: sinon.createStubInstance(PrivacySDK)
+    };
 
         (<any>nativeBridge).Listener = sinon.createStubInstance(ListenerApi);
 

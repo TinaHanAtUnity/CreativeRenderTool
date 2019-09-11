@@ -2,19 +2,33 @@ import { IAdsApi } from 'Ads/IAds';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { IBannerNativeApi } from 'Banners/IBannerModule';
 
 interface IPlacementMap {
     [id: string]: Placement;
 }
 
 export class BannerPlacementManager {
-    private _ads: IAdsApi;
+
+    // 30s is the default banner refresh rate
+    private static defaultRefreshRate: number = 30;
+
+    private _bannerNativeApi: IBannerNativeApi;
+    private _adsApi: IAdsApi;
     private _placements: IPlacementMap;
 
-    constructor(ads: IAdsApi, configuration: AdsConfiguration) {
-        this._ads = ads;
+    constructor(adsApi: IAdsApi, configuration: AdsConfiguration, bannerNativeApi: IBannerNativeApi) {
+        this._adsApi = adsApi;
+        this._bannerNativeApi = bannerNativeApi;
         this._placements = this.getPlacements(configuration);
         configuration.removePlacements(Object.keys(this._placements));
+        Object.keys(this._placements).forEach((placementId) => {
+            const placement = this._placements[placementId];
+            // 30s is the default banner refresh rate
+            const maybeBannerRefreshRate = placement.getBannerRefreshRate();
+            const refreshRate = maybeBannerRefreshRate ? maybeBannerRefreshRate : BannerPlacementManager.defaultRefreshRate;
+            this._bannerNativeApi.BannerApi.setRefreshRate(placementId, refreshRate);
+        });
     }
 
     public sendBannersReady() {
@@ -39,11 +53,11 @@ export class BannerPlacementManager {
 
     private sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState) {
         if (oldState !== newState) {
-            this._ads.Placement.setPlacementState(placementId, newState);
-            this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
+            this._adsApi.Placement.setPlacementState(placementId, newState);
+            this._adsApi.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
 
             if (newState === PlacementState.READY) {
-                this._ads.Listener.sendReadyEvent(placementId);
+                this._adsApi.Listener.sendReadyEvent(placementId);
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
             }

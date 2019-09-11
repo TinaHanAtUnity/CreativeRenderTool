@@ -22,6 +22,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -36,6 +37,7 @@ export interface IAdMobEventHandlerParameters {
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     privacyManager: UserPrivacyManager;
+    privacySDK: PrivacySDK;
 }
 
 export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHandler {
@@ -56,7 +58,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     private _clientInfo: ClientInfo;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
-        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig, parameters.privacySDK);
         this._adUnit = parameters.adUnit;
         this._platform = parameters.platform;
         this._core = parameters.core;

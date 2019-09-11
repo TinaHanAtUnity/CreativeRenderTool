@@ -20,6 +20,8 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export class NoFillError extends Error {
     public response: INativeResponse;
@@ -53,10 +55,11 @@ export class BannerCampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _pts: ProgrammaticTrackingService;
+    private _privacySDK: PrivacySDK;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, privacySDK: PrivacySDK) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -68,16 +71,12 @@ export class BannerCampaignManager {
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
         this._pts = pts;
+        this._privacySDK = privacySDK;
     }
 
-    public request(placement: Placement, nofillRetry?: boolean): Promise<Campaign> {
-        // prevent having more then one ad request in flight
-        if (this._promise) {
-            return this._promise;
-        }
-
+    public request(placement: Placement, bannerSize: IBannerDimensions, nofillRetry?: boolean): Promise<Campaign> {
         GameSessionCounters.addAdRequest();
-        const request = BannerAuctionRequest.create({
+        const request = new BannerAuctionRequest({
             platform: this._platform,
             core: this._core,
             adMobSignalFactory: this._adMobSignalFactory,
@@ -88,14 +87,15 @@ export class BannerCampaignManager {
             metaDataManager: this._metaDataManager,
             request: this._request,
             sessionManager: this._sessionManager,
-            programmaticTrackingService: this._pts
+            programmaticTrackingService: this._pts,
+            bannerSize: bannerSize,
+            privacySDK: this._privacySDK
         });
         request.addPlacement(placement);
         request.setTimeout(3000);
 
-        this._promise = request.request()
+        return request.request()
             .then((response) => {
-                this._promise = null;
                 const nativeResponse = request.getNativeResponse();
                 if (nativeResponse) {
                     if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
@@ -106,14 +106,11 @@ export class BannerCampaignManager {
                 throw new Error('Empty campaign response');
             })
             .catch((e) => {
-                this._promise = null;
                 return this.handleError(e, 'banner_auction_request_failed');
             })
             .then((campaign) => {
                 return campaign;
             });
-
-        return this._promise;
     }
 
     public setPreviousPlacementId(id: string | undefined) {

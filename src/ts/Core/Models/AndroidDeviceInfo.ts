@@ -125,14 +125,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
         if (this.isGoogleStoreInstalled()) {
             storeString = 'google';
-        }
-        if (this.isXiaomiStoreInstalled()) {
-            storeString = 'xiaomi';
-        }
-        if (this.isXiaomiStoreInstalled() && this.isGoogleStoreInstalled()) {
-            storeString = 'xiaomi,google';
-        }
-        if (!this.isXiaomiStoreInstalled() && !this.isGoogleStoreInstalled()) {
+        } else {
+            // There is no live campaign for Xiaomi Store anymore.
             storeString = 'none';
         }
 

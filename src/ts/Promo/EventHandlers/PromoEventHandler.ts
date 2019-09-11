@@ -13,11 +13,11 @@ export class PromoEventHandler {
         PurchasingUtilities.onPromoClosed(adUnit.getThirdPartyEventManager(), campaign, placementId);
     }
 
-    public static onPromoClick(adUnit: PromoAdUnit, campaign: PromoCampaign, placementId: string) {
+    public static onPromoClick(adUnit: PromoAdUnit, campaign: PromoCampaign) {
         adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.sendClick();
         adUnit.hide();
-        PurchasingUtilities.onPurchase(adUnit.getThirdPartyEventManager(), campaign.getIapProductId(), campaign, placementId);
+        PurchasingUtilities.onPurchase(adUnit.getThirdPartyEventManager(), campaign.getIapProductId(), campaign);
     }
 
     public static onGDPRPopupSkipped(configuration: AdsConfiguration, privacyManager: UserPrivacyManager): void {

@@ -17,6 +17,7 @@ import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import JsConsoleDebugScript from 'html/DebugJsConsole.html';
+import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -84,6 +85,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTimestamp: number;
 
     protected _mraidAdapterContainer: MRAIDAdapterContainer;
+
+    protected _deviceorientationListener: EventListener | undefined;
 
     protected _privacyPanelOpen: boolean;
 
@@ -178,6 +181,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if (this._stats !== undefined) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
+
+        if (this._deviceorientationListener) {
+            window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
+            this._deviceorientationListener = undefined;
+        }
     }
 
     public createMRAID(container: string): Promise<string> {
@@ -196,6 +204,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
                 if (MRAIDView.DebugJsConsole) {
                     container = container.replace('<script id=\"debug-js-console\"></script>', JsConsoleDebugScript);
                 }
+
+                container = container.replace('<script id=\"deviceorientation-support\"></script>', DeviceOrientationScript);
 
                 mraid = mraid.replace(/\$/g, '$$$');
                 mraid = this.replaceMraidSources(mraid);
@@ -483,5 +493,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
         return Promise.resolve();
+    }
+
+    protected handleDeviceOrientation(event: DeviceOrientationEvent) {
+        this._mraidAdapterContainer.sendDeviceOrientationEvent(event);
+    }
+
+    public onBridgeDeviceOrientationSubscribe() {
+        // Defer subscribing to deviceorientation event here to only subscribe to the event when the creative needs the data
+        if (!this._deviceorientationListener) {
+            this._deviceorientationListener = (orientationEvent: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>orientationEvent);
+            window.addEventListener('deviceorientation', this._deviceorientationListener, false);
+        }
     }
 }
