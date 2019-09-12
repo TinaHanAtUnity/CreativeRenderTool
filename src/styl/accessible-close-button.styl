@@ -4,10 +4,11 @@
     #end-screen {
         .btn-close-region {
             z-index: 100;
-            padding: .8rem;
+            padding: 1.1em 1em;
             width: auto;
             height: auto;
             text-shadow: none;
+            font-size: 15px;
             line-height: 1;
         }
 
@@ -22,7 +23,101 @@
 
         .icon-close:before {
             display: block;
-            padding: .3rem;
+            padding: .3em;
         }
     }
 }
+
+@media (min-width: 1025px) {
+    .slider-experiment #end-screen .btn-close-region {
+        font-size: $default-px-size * 2;
+    }
+}
+
+/* *********
+ * Portrait
+  ********** */
+@media (orientation: portrait) {
+    @media (min-width: 960px) and (max-width: 1024px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 2;
+        }
+    }
+
+    @media (min-width: 801px) and (max-width: 959px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 2;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 800px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.6;
+        }
+    }
+
+    @media (min-width: 569px) and (max-width: 768px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.5;
+        }
+    }
+
+    @media (min-width: 481px) and (max-width: 568px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.4;
+        }
+    }
+
+    @media (min-width: 414px) and (max-width: 480px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.3;
+        }
+    }
+
+    @media (min-width: 360px) and (max-width: 413px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.2;
+        }
+    }
+
+    @media (min-width: 321px) and (max-width: 359px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size;
+        }
+    }
+}
+
+/* iPhone X portrait */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    .slider-experiment #end-screen .btn-close-region {
+        font-size: $default-px-size * 1.25;
+    }
+}
+
+/* *********
+ * Landscape
+  ********** */
+@media (orientation: landscape) {
+    @media (min-width: 580px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.2;
+        }
+    }
+
+    @media (min-width: 760px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.4;
+        }
+    }
+
+    @media (min-width: 960px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 1.6;
+        }
+    }
+
+    @media (min-width: 1160px) {
+        .slider-experiment #end-screen .btn-close-region {
+            font-size: $default-px-size * 2;
+        }
+    }
