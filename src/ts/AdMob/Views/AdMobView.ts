@@ -22,9 +22,10 @@ import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import OMIDSessionClient from 'html/omid/admob-session-interface.html';
-import { OpenMeasurement, PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
-import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
+import { OpenMeasurement, PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -193,8 +194,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                         if (videoEl) {
                             const rect = videoEl.getBoundingClientRect();
                             if (this._om) {
-                                const view = this._om.createRectangle(rect.left, rect.right, rect.width, rect.height);
-                                this._om.setVideoViewRectangle(view);
+                                const view = OpenMeasurementUtilities.createRectangle(rect.left, rect.right, rect.width, rect.height);
+                                OpenMeasurementUtilities.VideoViewRectangle = view;
                             }
                         }
                     }
@@ -266,15 +267,15 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onClose() {
-        if (this._om) {
-            this._om.sessionFinish({
-                adSessionId: this._om.getOMAdSessionId(),
-                timestamp: Date.now(),
-                type: 'sessionFinish',
-                data: {}
-            });
-            setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
-        }
+        // if (this._om) {
+        //     this._om.sessionFinish({
+        //         adSessionId: this._om.getOMAdSessionId(),
+        //         timestamp: Date.now(),
+        //         type: 'sessionFinish',
+        //         data: {}
+        //     });
+        //     setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
+        // }
         // Added a timeout for admob session interface to receive session finish before removing the dom element
         setTimeout(() => this._handlers.forEach((h) => h.onClose()), 1);
     }
@@ -347,30 +348,31 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         const gdprRectheight = gdprRect.height;
 
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-            const viewPort = om.calculateViewPort(screenWidth, screenHeight);
+            const viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
 
-            let obstructionRectangle = om.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
+            let obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
             const videoView =  om.getAdmobVideoElementBounds();
 
             if (this._platform === Platform.ANDROID) {
-                const adjustedx = om.getAndroidViewSize(gdprRectx, om.getScreenDensity());
-                const adjustedy = om.getAndroidViewSize(gdprRecty, om.getScreenDensity());
-                const adjustedwidth = om.getAndroidViewSize(gdprRectwidth, om.getScreenDensity());
-                const adjustedheight = om.getAndroidViewSize(gdprRectheight, om.getScreenDensity());
-                obstructionRectangle = om.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
+                const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
+                const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(gdprRectx, screenDensity);
+                const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(gdprRecty, screenDensity);
+                const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(gdprRectwidth, screenDensity);
+                const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(gdprRectheight, screenDensity);
+                obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
             }
 
-            const screenView = om.createRectangle(0, 0, screenWidth, screenHeight);
+            const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             const obstructionReasons: ObstructionReasons[] = [];
 
-            if (om.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
+            if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
                 obstructionReasons.push(ObstructionReasons.HIDDEN);
             }
 
-            const percentInView = om.calculatePercentageInView(videoView, obstructionRectangle, screenView);
+            const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
             obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
-            const obstructedAdView = om.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
-            om.geometryChange(viewPort, obstructedAdView);
+            const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
+            // om.geometryChange(viewPort, obstructedAdView);
         });
     }
 }

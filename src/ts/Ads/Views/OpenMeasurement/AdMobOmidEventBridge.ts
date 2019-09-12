@@ -1,5 +1,5 @@
 import { ICoreApi } from 'Core/ICore';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 export enum OMEvents {
     IMPRESSION_OCCURRED = 'impressionOccurred',
@@ -198,7 +198,34 @@ export interface IVerificationScriptResource {
     verificationParameters: string | null;
 }
 
-export class OMIDEventBridge {
+export interface IOMIDHandler {
+    onImpression(impressionValues: IImpressionValues): void;
+    onLoaded(vastPropeties: IVastProperties): void;
+    onStart(duration: number, videoPlayerVolume: number): void;
+    onSendFirstQuartile(): void;
+    onSendMidpoint(): void;
+    onSendThirdQuartile(): void;
+    onCompleted(): void;
+    onPause(): void;
+    onResume(): void;
+    onBufferStart(): void;
+    onBufferFinish(): void;
+    onSkipped(): void;
+    onVolumeChange(videoPlayerVolume: number): void;
+    onPlayerStateChange(videoPlayerState: VideoPlayerState): void;
+    onAdUserInteraction(interactionType: InteractionType): void;
+    onInjectVerificationResources(verificationResources: IVerificationScriptResource[]): void;
+    onSessionStart(event: ISessionEvent): void;
+    onSessionError(event: ISessionEvent): void;
+    onSessionFinish(event: ISessionEvent): void;
+    onPopulateVendorKey(vendorKey: string): void;
+    onEventProcessed(eventType: string, vendorKey?: string): void;
+    onSlotElement(element: HTMLElement): void;
+    onVideoElement(element: HTMLElement): void;
+    onElementBounds(elementBounds: IRectangle): void;
+}
+
+export class AdMobOmidEventBridge {
     private _core: ICoreApi;
     private _messageListener: (e: Event) => void;
     private _handler: IOMIDHandler;

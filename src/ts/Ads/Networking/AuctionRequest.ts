@@ -25,7 +25,7 @@ import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 export interface IAuctionResponse {
     correlationId: string;

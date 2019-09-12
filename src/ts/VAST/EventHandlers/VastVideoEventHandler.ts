@@ -6,15 +6,17 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
-import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
     private _vastAdUnit: VastAdUnit;
     private _vastCampaign: VastCampaign;
-    private _om?: OpenMeasurement;
+    private _om?: OpenMeasurementManager;
     private _omStartCalled = false;
     private _pts: ProgrammaticTrackingService;
 
@@ -22,7 +24,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
-        this._om = this._vastAdUnit.getOpenMeasurement();
+        this._om = this._vastAdUnit.getOpenMeasurementManager();
         this._pts = params.programmaticTrackingService;
     }
 
@@ -104,8 +106,8 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om && !this._omStartCalled) {
             this._adUnit.getVideoViewRectangle().then((rect) => {
                 if (this._om) {
-                    const view = this._om.createRectangle(rect[0], rect[1], rect[2], rect[3]);
-                    this._om.setVideoViewRectangle(view);
+                    const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    OpenMeasurementUtilities.VideoViewRectangle = view;
                     this._om.sessionStart({
                         adSessionId: this._om.getOMAdSessionId(),
                         timestamp: Date.now(),

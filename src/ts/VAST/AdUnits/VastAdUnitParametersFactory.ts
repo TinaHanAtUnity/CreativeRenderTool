@@ -4,8 +4,9 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
+import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -30,11 +31,21 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const adVerifications = baseParams.campaign.getVast().getAdVerifications();
-        if (OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && adVerifications) {
-            const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adVerifications);
-            om.addToViewHierarchy();
-            om.injectAdVerifications();
-            vastAdUnitParameters.om = om;
+        // OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) &&
+        if (adVerifications) {
+
+            const omInstances: OpenMeasurement[] = [];
+            let i = 0;
+            adVerifications.forEach((adverification) => {
+                i++;
+                const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification);
+                omInstances.push(om);
+            });
+
+            const omManager = new OpenMeasurementManager(omInstances, baseParams.placement);
+            omManager.addToViewHierarchy();
+            omManager.injectVerifications();
+            vastAdUnitParameters.om = omManager;
         }
 
         return vastAdUnitParameters;

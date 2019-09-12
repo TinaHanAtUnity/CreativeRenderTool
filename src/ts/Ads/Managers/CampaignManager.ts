@@ -51,7 +51,7 @@ import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/Programma
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 export interface ILoadedCampaign {
     campaign: Campaign;

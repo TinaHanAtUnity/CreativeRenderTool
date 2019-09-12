@@ -12,9 +12,10 @@ import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
-import { InteractionType, ObstructionReasons, IViewPort, IAdView } from 'Ads/Views/OMIDEventBridge';
+import { InteractionType, ObstructionReasons, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -26,7 +27,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastOverlay?: AbstractVideoOverlay;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
-    private _om?: OpenMeasurement;
+    private _om?: OpenMeasurementManager;
     private _deviceInfo: DeviceInfo;
 
     private _viewPort: IViewPort;
@@ -46,7 +47,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._vastOverlay = this._vastAdUnit.getOverlay();
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
-        this._om = this._vastAdUnit.getOpenMeasurement();
+        this._om = this._vastAdUnit.getOpenMeasurementManager();
         this._deviceInfo = parameters.deviceInfo;
     }
 
@@ -63,29 +64,30 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 if (this._om) {
 
                     // TODO: Move to internal function
-                    this._viewPort = this._om.calculateViewPort(screenWidth, screenHeight);
-                    let obstructionRectangle = this._om.createRectangle(x, y, width, height);
+                    this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+                    let obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
 
                     if (this._platform === Platform.ANDROID) {
-                        const adjustedx = this._om.getAndroidViewSize(x, this._om.getScreenDensity());
-                        const adjustedy = this._om.getAndroidViewSize(y, this._om.getScreenDensity());
-                        const adjustedwidth = this._om.getAndroidViewSize(width, this._om.getScreenDensity());
-                        const adjustedheight = this._om.getAndroidViewSize(height, this._om.getScreenDensity());
-                        obstructionRectangle = this._om.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
+                        const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
+                        const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(x, screenDensity);
+                        const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(y, screenDensity);
+                        const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(width, screenDensity);
+                        const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(height, screenDensity);
+                        obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
                     }
 
-                    const screenView = this._om.createRectangle(0, 0, screenWidth, screenHeight);
-                    const videoView = this._om.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+                    const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
+                    const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
                     const obstructionReasons: ObstructionReasons[] = [];
 
-                    if (this._om.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
+                    if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
                         obstructionReasons.push(ObstructionReasons.HIDDEN);
                     }
 
-                    const percentInView = this._om.calculatePercentageInView(videoView, obstructionRectangle, screenView);
+                    const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
                     obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
 
-                    this._obstructedAdView = this._om.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
+                    this._obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
                     this._om.geometryChange(this._viewPort, this._obstructedAdView);
                 }
             });
@@ -107,17 +109,17 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 if (this._om) {
 
                     // TODO: Move to internal function
-                    const screenView = this._om.createRectangle(0, 0, width, height);
-                    const videoView = this._om.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+                    const screenView = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
+                    const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
 
-                    const percentInView = this._om.calculateObstructionOverlapPercentage(videoView, screenView);
+                    const percentInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView);
                     const obstructionReasons: ObstructionReasons[] = [];
                     if (percentInView < 100) {
                         obstructionReasons.push(ObstructionReasons.HIDDEN);
                     }
 
-                    this._viewPort = this._om.calculateViewPort(width, height);
-                    this._unObstructedAdView = this._om.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
+                    this._viewPort = OpenMeasurementUtilities.calculateViewPort(width, height);
+                    this._unObstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
                     this._om.geometryChange(this._viewPort, this._unObstructedAdView);
                 }
             });
