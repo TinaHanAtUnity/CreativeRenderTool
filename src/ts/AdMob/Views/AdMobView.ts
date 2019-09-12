@@ -26,6 +26,7 @@ import { OpenMeasurement, PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeas
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -60,10 +61,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
-    private _om: OpenMeasurement | undefined;
+    private _om: AdmobOpenMeasurementManager | undefined;
     private _deviceInfo: DeviceInfo;
 
-    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: OpenMeasurement | undefined) {
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementManager | undefined) {
         super(platform, 'admob');
 
         this._campaign = campaign;
@@ -186,7 +187,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
             if (this._om) {
                 iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
-                this._om.getOmidBridge().setAdmobIframe(iframe);
+                this._om.getAdmobBridge().setAdmobIframe(iframe);
 
                 iframe.onload = () => {
                     if (iframe.contentWindow) {
@@ -267,15 +268,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onClose() {
-        // if (this._om) {
-        //     this._om.sessionFinish({
-        //         adSessionId: this._om.getOMAdSessionId(),
-        //         timestamp: Date.now(),
-        //         type: 'sessionFinish',
-        //         data: {}
-        //     });
-        //     setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
-        // }
+        if (this._om) {
+            this._om.sessionFinish();
+            setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
+        }
         // Added a timeout for admob session interface to receive session finish before removing the dom element
         setTimeout(() => this._handlers.forEach((h) => h.onClose()), 1);
     }
@@ -339,7 +335,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         }
     }
 
-    private sendOMGeometryChange(om: OpenMeasurement) {
+    private sendOMGeometryChange(om: AdmobOpenMeasurementManager) {
         const popup = <HTMLElement>document.querySelector('.pop-up');
         const gdprRect = popup.getBoundingClientRect();
         const gdprRectx = gdprRect.left;
@@ -372,7 +368,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
             obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
             const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
-            // om.geometryChange(viewPort, obstructedAdView);
+            om.geometryChange(viewPort, obstructedAdView);
         });
     }
 }

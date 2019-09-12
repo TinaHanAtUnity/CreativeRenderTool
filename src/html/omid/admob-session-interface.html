@@ -39,6 +39,7 @@
             this.setImpressionType = function(impressionType) {};
 
             var postMessage = function(event, data) {
+                console.log('sending ^_^_^: ', event);
                 window.parent.postMessage({
                     type: 'omid',
                     event: event,

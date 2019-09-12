@@ -137,6 +137,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     // needed - done general vast
     public addToViewHierarchy(): void {
+        console.log('rendering om script: ' + this._omAdSessionId);
         this.render();
         this.addMessageListener();
         document.body.appendChild(this.container());
@@ -202,12 +203,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
         this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
         this._omIframe.id += this._omAdSessionId;
-        console.log(this._omAdSessionId);
 
         this._omIframe.style.position = 'absolute';
         this._omIframe.style.top = '0';
         this._omIframe.style.left = '0';
-        this._omIframe.style.display = 'display';
+        this._omIframe.style.display = 'none';
         this._omIframe.style.width = '100vw';
         this._omIframe.style.height = '100vh';
         this._omIframe.style.border = 'none';

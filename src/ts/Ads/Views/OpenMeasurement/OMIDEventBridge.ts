@@ -230,6 +230,7 @@ export class OMIDEventBridge {
     public sendQueuedEvents() {
         while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
             const event = this._eventQueue.shift();
+            console.log('sending queued events: ', event);
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
         this._eventQueueSent = true;

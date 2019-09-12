@@ -1,5 +1,7 @@
 import { ICoreApi } from 'Core/ICore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
 
 export enum OMEvents {
     IMPRESSION_OCCURRED = 'impressionOccurred',
@@ -36,7 +38,6 @@ export enum SESSIONEvents {
 
 export enum OMID3pEvents {
     VERIFICATION_RESOURCES = 'verificationResources',
-    POPULATE_VENDOR_KEY = 'populateVendorKey',
     ON_EVENT_PROCESSED = 'onEventProcessed',
     OMID_IMPRESSION = 'omidImpression',
     OMID_LOADED = 'omidLoaded',
@@ -167,8 +168,6 @@ export interface IOMIDHandler {
     onSessionStart(event: ISessionEvent): void;
     onSessionError(event: ISessionEvent): void;
     onSessionFinish(event: ISessionEvent): void;
-    onPopulateVendorKey(vendorKey: string): void;
-    onEventProcessed(eventType: string, vendorKey?: string): void;
     onSlotElement(element: HTMLElement): void;
     onVideoElement(element: HTMLElement): void;
     onElementBounds(elementBounds: IRectangle): void;
@@ -198,39 +197,12 @@ export interface IVerificationScriptResource {
     verificationParameters: string | null;
 }
 
-export interface IOMIDHandler {
-    onImpression(impressionValues: IImpressionValues): void;
-    onLoaded(vastPropeties: IVastProperties): void;
-    onStart(duration: number, videoPlayerVolume: number): void;
-    onSendFirstQuartile(): void;
-    onSendMidpoint(): void;
-    onSendThirdQuartile(): void;
-    onCompleted(): void;
-    onPause(): void;
-    onResume(): void;
-    onBufferStart(): void;
-    onBufferFinish(): void;
-    onSkipped(): void;
-    onVolumeChange(videoPlayerVolume: number): void;
-    onPlayerStateChange(videoPlayerState: VideoPlayerState): void;
-    onAdUserInteraction(interactionType: InteractionType): void;
-    onInjectVerificationResources(verificationResources: IVerificationScriptResource[]): void;
-    onSessionStart(event: ISessionEvent): void;
-    onSessionError(event: ISessionEvent): void;
-    onSessionFinish(event: ISessionEvent): void;
-    onPopulateVendorKey(vendorKey: string): void;
-    onEventProcessed(eventType: string, vendorKey?: string): void;
-    onSlotElement(element: HTMLElement): void;
-    onVideoElement(element: HTMLElement): void;
-    onElementBounds(elementBounds: IRectangle): void;
-}
-
 export class AdMobOmidEventBridge {
     private _core: ICoreApi;
     private _messageListener: (e: Event) => void;
     private _handler: IOMIDHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
-    private _openMeasurement: OpenMeasurement;
+    private _openMeasurement: AdmobOpenMeasurementManager;
 
     private _iframe3p: HTMLIFrameElement;
     private _iframeSessionInterface: HTMLIFrameElement;
@@ -239,17 +211,18 @@ export class AdMobOmidEventBridge {
     private _eventQueueSent = false;
     private _verificationsInjected = false;
 
-    constructor(core: ICoreApi, handler: IOMIDHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
+    // , iframe: HTMLIFrameElement
+    constructor(core: ICoreApi, handler: IOMIDHandler, openMeasurement: AdmobOpenMeasurementManager) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._omidHandlers = {};
         this._handler = handler;
-        this._iframe3p = iframe;
+        // this._iframe3p = iframe;
         this._openMeasurement = openMeasurement;
 
         this._omidHandlers = {};
-        this._omidHandlers[OMEvents.IMPRESSION_OCCURRED] = (msg) => this._handler.onImpression(<IImpressionValues>msg.data);
-        this._omidHandlers[OMEvents.LOADED] = (msg) => this._handler.onLoaded(<IVastProperties>msg.data);
+        this._omidHandlers[OMEvents.IMPRESSION_OCCURRED] = (msg) => this._handler.onImpression(<IImpressionValues><unknown>msg.data);
+        this._omidHandlers[OMEvents.LOADED] = (msg) => this._handler.onLoaded(<IVastProperties><unknown>msg.data);
         this._omidHandlers[OMEvents.START] = (msg) => this._handler.onStart(<number>msg.data.duration, <number>msg.data.videoPlayerVolume);
         this._omidHandlers[OMEvents.FIRST_QUARTILE] = (msg) => this._handler.onSendFirstQuartile();
         this._omidHandlers[OMEvents.MIDPOINT] = (msg) => this._handler.onSendMidpoint();
@@ -264,13 +237,11 @@ export class AdMobOmidEventBridge {
         this._omidHandlers[OMEvents.PLAYER_STATE_CHANGE] = (msg) => this._handler.onPlayerStateChange(<VideoPlayerState>msg.data.playerState);
         this._omidHandlers[OMEvents.AD_USER_INTERACTION] = (msg) => this._handler.onAdUserInteraction(<InteractionType>msg.data.interactionType);
 
-        this._omidHandlers[SESSIONEvents.SESSION_START] = (msg) => this._handler.onSessionStart(<ISessionEvent>msg.data);
-        this._omidHandlers[SESSIONEvents.SESSION_FINISH] = (msg) => this._handler.onSessionFinish(<ISessionEvent>msg.data);
-        this._omidHandlers[SESSIONEvents.SESSION_ERROR] = (msg) => this._handler.onSessionError(<ISessionEvent>msg.data);
+        this._omidHandlers[SESSIONEvents.SESSION_START] = (msg) => this._handler.onSessionStart(<ISessionEvent><unknown>msg.data);
+        this._omidHandlers[SESSIONEvents.SESSION_FINISH] = (msg) => this._handler.onSessionFinish(<ISessionEvent><unknown>msg.data);
+        this._omidHandlers[SESSIONEvents.SESSION_ERROR] = (msg) => this._handler.onSessionError(<ISessionEvent><unknown>msg.data);
 
-        this._omidHandlers[OMID3pEvents.VERIFICATION_RESOURCES] = (msg) => this._handler.onInjectVerificationResources(<IVerificationScriptResource[]>msg.data);
-        this._omidHandlers[OMID3pEvents.POPULATE_VENDOR_KEY] = (msg) => this._handler.onPopulateVendorKey(<string>msg.data.vendorkey);
-        this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
+        this._omidHandlers[OMID3pEvents.VERIFICATION_RESOURCES] = (msg) => this._handler.onInjectVerificationResources(<IVerificationScriptResource[]><unknown>msg.data);
 
         this._omidHandlers[OMSessionInfo.SDK_VERSION] = (msg) => this.sendSDKVersion(openMeasurement.getSDKVersion());
         this._omidHandlers[OMSessionInfo.SESSION_ID] = (msg) => this.sendSessionId(openMeasurement.getOMAdSessionId());
@@ -288,9 +259,9 @@ export class AdMobOmidEventBridge {
         window.removeEventListener('message', this._messageListener);
     }
 
-    public setIframe(iframe: HTMLIFrameElement) {
-        this._iframe3p = iframe;
-    }
+    // public setIframe(iframe: HTMLIFrameElement) {
+    //     this._iframe3p = iframe;
+    // }
 
     public setAdmobIframe(iframe: HTMLIFrameElement) {
         this._iframeSessionInterface = iframe;
@@ -308,67 +279,68 @@ export class AdMobOmidEventBridge {
         this._verificationsInjected = verificationsInjected;
     }
 
-    public sendQueuedEvents() {
-        while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
-            const event = this._eventQueue.shift();
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-        this._eventQueueSent = true;
-    }
+    // public sendQueuedEvents() {
+    //     while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
+    //         const event = this._eventQueue.shift();
+    //         this._iframe3p.contentWindow.postMessage(event, '*');
+    //     }
+    //     this._eventQueueSent = true;
+    // }
 
-    public triggerAdEvent(type: string, payload?: unknown) {
-        this._core.Sdk.logDebug('Calling OM ad event "' + type + '" with payload: ' + payload);
+    // public triggerAdEvent(type: string, payload?: unknown) {
+    //     this._core.Sdk.logDebug('Calling OM ad event "' + type + '" with payload: ' + payload);
 
-        const event: IVerificationEvent = {
-            type: type,
-            adSessionId: this._openMeasurement.getOMAdSessionId(),
-            payload: payload
-        };
+    //     const event: IVerificationEvent = {
+    //         type: type,
+    //         adSessionId: this._openMeasurement.getOMAdSessionId(),
+    //         payload: payload
+    //     };
 
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-    }
+    //     if (this._iframe3p.contentWindow && this._verificationsInjected) {
+    //         this._iframe3p.contentWindow.postMessage(event, '*');
+    //     }
+    // }
 
-    public triggerVideoEvent(type: string, payload?: unknown) {
-        this._core.Sdk.logDebug('Calling OM viewability event "' + type + '" with payload: ' + payload);
+    // public triggerVideoEvent(type: string, payload?: unknown) {
+    //     this._core.Sdk.logDebug('Calling OM viewability event "' + type + '" with payload: ' + payload);
 
-        const event: IVerificationEvent = {
-            type: type,
-            adSessionId: this._openMeasurement.getOMAdSessionId(),
-            payload: payload
-        };
+    //     const event: IVerificationEvent = {
+    //         type: type,
+    //         adSessionId: this._openMeasurement.getOMAdSessionId(),
+    //         payload: payload
+    //     };
 
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
+    //     if (this._iframe3p.contentWindow && this._verificationsInjected) {
+    //         this._iframe3p.contentWindow.postMessage(event, '*');
+    //     }
 
-        if (!this._eventQueueSent) {
-            this._eventQueue.push(event);
-        }
-    }
+    //     if (!this._eventQueueSent) {
+    //         this._eventQueue.push(event);
+    //     }
+    // }
 
-    public triggerSessionEvent(event: ISessionEvent) {
+    // public triggerSessionEvent(event: ISessionEvent) {
 
-        // posts current event to omid3p
-        this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
-        if (this._iframe3p.contentWindow) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
+    //     // posts current event to omid3p
+    //     this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
+    //     if (this._iframe3p.contentWindow) {
+    //         this._iframe3p.contentWindow.postMessage(event, '*');
+    //     }
 
-        // this posts back to the admob session interface
-        if (this._openMeasurement.getSessionStartCalled() && event.data.type === SESSIONEvents.SESSION_FINISH) {
-            this.postMessage(SESSIONEvents.SESSION_FINISH);
-        }
+    //     // this posts back to the admob session interface
+    //     if (this._openMeasurement.getSessionStartCalled() && event.data.type === SESSIONEvents.SESSION_FINISH) {
+    //         this.postMessage(SESSIONEvents.SESSION_FINISH);
+    //     }
 
-        // Adds session events for admob
-        this._eventQueue.push(event);
-    }
+    //     // Adds session events for admob
+    //     this._eventQueue.push(event);
+    // }
 
     private onMessage(e: MessageEvent) {
         const message = <IOMIDMessage>e.data;
         if (message.type === 'omid') {
             this._core.Sdk.logInfo(`omid: event=${message.event}, data=${JSON.stringify(message.data)}`);
+            console.log(`omid: event=${message.event}, data=${JSON.stringify(message.data)}`);
             if (message.event in this._omidHandlers) {
                 const handler = this._omidHandlers[message.event];
                 handler(message);
