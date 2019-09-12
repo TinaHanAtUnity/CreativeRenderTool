@@ -392,12 +392,6 @@ export class Slider {
 
     private postSlide(): void {
         this._isAnimating = false;
-
-        if (this._currentSlideIndex < 0) {
-            this._currentSlideIndex = this._slideCount + this._currentSlideIndex;
-        } else if (this._currentSlideIndex >= (this._slideCount)) {
-            this._currentSlideIndex = this._currentSlideIndex - this._slideCount;
-        }
         this._currentSlideIndex = this.modulo(this._currentSlideIndex, this._slideCount);
 
         this.setActiveSlide(true);
