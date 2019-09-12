@@ -65,8 +65,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
             onSuccess = this._purchasing.CustomPurchasing.onTransactionComplete.subscribe((details) => {
                 this._purchasing.CustomPurchasing.onTransactionError.unsubscribe(onError);
                 this._purchasing.CustomPurchasing.onTransactionComplete.unsubscribe(onSuccess);
-                this._analyticsManager.onIapTransaction(details);
-                // send iap transaction event
                 const product: IProduct | undefined = this._products[productId];
                 if (product) {
                     const purchaseKey = TrackingEvent.PURCHASE;
@@ -102,9 +100,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                 // should send events
                 const product: IProduct | undefined = this._products[productId];
                 if (product) {
-
-                    // TODO: Potentially add Analytics Purchase Failed here
-
                     const events = campaign.getTrackingEventUrls();
                     if (events) {
                         const purchaseKey = TrackingEvent.PURCHASE;

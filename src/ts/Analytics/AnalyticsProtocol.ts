@@ -6,6 +6,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 export interface IAnalyticsMonetizationExtras {
     gamer_token: string;
@@ -147,22 +148,22 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static createTransactionEvent(transaction: ITransactionDetails, platform: Platform): IAnalyticsObject<IAnalyticsTransactionEventV1> {
+    public static createTransactionEvent(transaction: StoreTransaction, platform: Platform): IAnalyticsObject<IAnalyticsTransactionEventV1> {
         const currentTime = Date.now();
         const transactionEvent: IAnalyticsTransactionEventV1 = {
             ts: currentTime,
-            productId: transaction.productId,
-            price: transaction.price,
-            currencyCode: transaction.currency,
+            productId: transaction.getProductId(),
+            price: transaction.getPrice(),
+            currencyCode: transaction.getCurrency(),
             eventId: JaegerUtilities.uuidv4(),
             receipt: {
                 appStore: platform === Platform.ANDROID ? 'GooglePlay' : 'AppleAppStore',
-                transactionId: transaction.transactionId,
-                payload: transaction.receipt
+                transactionId: transaction.getTransactionId(),
+                payload: transaction.getReceipt()
             }
         };
         return {
-            type: 'ads.analytics.transaction.v1',
+            type: 'ads.analytics.transactionSuccess.v1',
             msg: transactionEvent
         };
     }

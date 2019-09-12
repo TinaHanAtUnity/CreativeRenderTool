@@ -50,6 +50,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
@@ -64,6 +65,9 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
+import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
+import { ITestCreativePack } from 'Ads/Models/CreativePack';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -75,6 +79,7 @@ import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
+import { Store } from 'Store/Store';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { LoadApi } from 'Core/Native/LoadApi';
@@ -115,21 +120,21 @@ export class Ads implements IAds {
     private _showingConsent: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
-    private _store: IStore;
 
     public Banners: Banners;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
     public Analytics: Analytics;
+    public Store: IStore;
 
-    constructor(config: unknown, core: ICore, store: IStore) {
+    constructor(config: unknown, core: ICore) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
-        this._store = store;
 
         this.Analytics = new Analytics(core, this.PrivacySDK);
+        this.Store = new Store(core, this.Analytics.AnalyticsManager);
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -387,24 +392,10 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        // First ad request within a game session can be made using recorded privacy information.
-        // If game method has changed since, it should be reset before e.g. showing consent dialog
-        this.resetOutdatedUserPrivacy();
-
         this.showConsentIfNeeded(options).then(() => {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
-    }
-
-    private resetOutdatedUserPrivacy() {
-        const gamePrivacy = this.PrivacySDK.getGamePrivacy();
-        const userPrivacy = this.PrivacySDK.getUserPrivacy();
-        const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
-        const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
-        if (gdprApplies && methodHasChanged) {
-            userPrivacy.clear();
-        }
     }
 
     public showBanner(placementId: string, callback: INativeCallback) {
@@ -470,17 +461,17 @@ export class Ads implements IAds {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
-                    this._store.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
-                        const onCloseObserver = this._store.Api.iOS!.AppSheet.onClose.subscribe(() => {
-                            this._store.Api.iOS!.AppSheet.prepare(appSheetOptions);
+                    this.Store.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this.Store.Api.iOS!.AppSheet.onClose.subscribe(() => {
+                            this.Store.Api.iOS!.AppSheet.prepare(appSheetOptions);
                         });
                         this._currentAdUnit.onClose.subscribe(() => {
-                            this._store.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this.Store.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
                             if (CustomFeatures.isSimejiJapaneseKeyboardApp(this._core.ClientInfo.getGameId())) {
                                 // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
-                                this._store.Api.iOS!.AppSheet.destroy();
+                                this.Store.Api.iOS!.AppSheet.destroy();
                             } else {
-                                this._store.Api.iOS!.AppSheet.destroy(appSheetOptions);
+                                this.Store.Api.iOS!.AppSheet.destroy(appSheetOptions);
                             }
                         });
                     });
@@ -593,6 +584,29 @@ export class Ads implements IAds {
             } else {
                 response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID');
             }
+
+            CampaignManager.setCampaignResponse(response);
+        }
+
+        const creativePack: string = TestEnvironment.get('creativePack');
+        if (creativePack) {
+            const json = JsonParser.parse<ITestCreativePack>(creativePack);
+            const platform = this._core.NativeBridge.getPlatform();
+            let response: string = '';
+
+            if (platform === Platform.ANDROID) {
+                response = CreativePackResponseAndroid;
+            } else if (platform === Platform.IOS) {
+                response = CreativePackResponseIos;
+            }
+
+            response = response.replace('{ICON_PLACEHOLDER}', json.gameIcon ? json.gameIcon : '');
+            response = response.replace('{ENDSCREEN_PLACEHOLDER}', json.endScreen ? json.endScreen : '');
+            response = response.replace('{ENDSCREEN_LANDSCAPE_PLACEHOLDER}', json.endScreenLandscape ? json.endScreenLandscape : '');
+            response = response.replace('{ENDSCREEN_PORTRAIT_PLACEHOLDER}', json.endScreenPortrait ? json.endScreenPortrait : '');
+            response = response.replace('{TRAILER_DOWNLOADABLE_PLACEHOLDER}', json.trailerDownloadable ? json.trailerDownloadable : '');
+            response = response.replace('{TRAILER_DOWNLOADABLE_SIZE}', json.trailerDownloadableSize ? json.trailerDownloadableSize.toString() : '0');
+            response = response.replace('{TRAILER_STREAMING_PLACEHOLDER}', json.trailerStreaming ? json.trailerStreaming : '');
 
             CampaignManager.setCampaignResponse(response);
         }

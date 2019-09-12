@@ -170,7 +170,9 @@ import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
-import Test = Mocha.Test;
+import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
+import { Analytics } from 'Analytics/Analytics';
+import { Store } from 'Store/Store';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -847,7 +849,7 @@ export class TestFixtures {
         };
     }
 
-    public static getAdmobAdUnitParameters(platform: Platform, core: ICore, ads: IAds, store: IStore): IAdMobAdUnitParameters {
+    public static getAdmobAdUnitParameters(platform: Platform, core: ICore, ads: IAds): IAdMobAdUnitParameters {
         const campaign = new AdMobCampaign(TestFixtures.getAdmobCampaignBaseParams());
         const privacy = TestFixtures.getPrivacy(platform, campaign);
 
@@ -855,7 +857,7 @@ export class TestFixtures {
             platform: platform,
             core: core.Api,
             ads: ads.Api,
-            store: core.Store.Api,
+            store: ads.Store.Api,
             forceOrientation: Orientation.PORTRAIT,
             focusManager: core.FocusManager,
             container: ads.Container,
@@ -1017,6 +1019,8 @@ export class TestFixtures {
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
         ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
+        ads.Analytics = new Analytics(core, ads.PrivacySDK!);
+        ads.Store = new Store(core, ads.Analytics.AnalyticsManager);
         return <IAds>ads;
     }
 

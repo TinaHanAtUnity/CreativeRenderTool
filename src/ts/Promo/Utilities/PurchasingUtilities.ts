@@ -22,6 +22,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { Promises } from 'Core/Utilities/Promises';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -81,9 +82,7 @@ export class PurchasingUtilities {
     }
 
     public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean = false): Promise<void> {
-        return this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, isNative).then((transactionDetails) => {
-            return this._analyticsManager.onIapTransaction(transactionDetails);
-        });
+        return Promises.voidResult(this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, isNative));
     }
     public static onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
         this._purchasingAdapter.onPromoClosed(thirdPartyEventManager, campaign, placementId);

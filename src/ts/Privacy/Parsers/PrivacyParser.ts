@@ -143,6 +143,18 @@ export class PrivacyParser {
                 }
             });
         }
+
+        // reset outdated user privacy if the game privacy method has been changed, first ad request will be contextual
+        const methodHasChanged = rawUserPrivacy.method !== rawGamePrivacy.method;
+        if (rawGamePrivacy.method !== PrivacyMethod.DEFAULT && methodHasChanged) {
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
+                    all: false,
+                    gameExp: false,
+                    ads: false,
+                    external: false
+                }});
+        }
+
         return new UserPrivacy(rawUserPrivacy);
     }
 }
