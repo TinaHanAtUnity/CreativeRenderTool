@@ -5,7 +5,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { View } from 'Core/Views/View';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { OMIDEventBridge, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, ISessionEvent, IVerificationScriptResource, IViewPort, IAdView, VideoPosition, ObstructionReasons, MediaType, AccessMode, VideoEventAdaptorType, IRectangle, OMID3pEvents, SESSIONEvents } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { OMIDEventBridge, IImpressionValues, IVastProperties, ISessionEvent, IVerificationScriptResource, IViewPort, IAdView, VideoPosition, ObstructionReasons, MediaType, AccessMode, VideoEventAdaptorType, IRectangle, OMID3pEvents, SESSIONEvents } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { Template } from 'Core/Utilities/Template';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Placement } from 'Ads/Models/Placement';
@@ -15,7 +15,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 interface IVerifationVendorMap {
@@ -137,7 +136,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     // needed - done general vast
     public addToViewHierarchy(): void {
-        console.log('rendering om script: ' + this._omAdSessionId);
         this.render();
         this.addMessageListener();
         document.body.appendChild(this.container());
@@ -341,13 +339,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             if (this._campaign instanceof VastCampaign) {
                 this.sendVASTStartEvents(vendorKey);
             }
-            console.log(eventType, ' called');
         }
 
         if (eventType === SESSIONEvents.SESSION_FINISH && !this._sessionFinishCalled) {
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
-            console.log(eventType, ' called');
             this._sessionFinishCalled = true;
             window.setTimeout(() => this.removeFromViewHieararchy(), 1000);
         }
@@ -422,7 +418,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             impressionObject.viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             const screenRectangle = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
 
-            const percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(OpenMeasurementUtilities.VideoViewRectangle, screenRectangle);
+            let percentageInView = 100;
+            if (OpenMeasurementUtilities.VideoViewRectangle) {
+                percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(OpenMeasurementUtilities.VideoViewRectangle, screenRectangle);
+            }
             const obstructionReasons: ObstructionReasons[] = [];
             if (percentageInView < 100) {
                 obstructionReasons.push(ObstructionReasons.HIDDEN);

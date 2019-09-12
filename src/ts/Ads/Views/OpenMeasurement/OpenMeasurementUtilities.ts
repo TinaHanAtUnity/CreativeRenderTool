@@ -151,7 +151,8 @@ export class OpenMeasurementUtilities {
         return adjustedObstruction;
     }
 
-    public static VideoViewRectangle: IRectangle;
+    public static VideoViewRectangle: IRectangle | undefined;
+    public static campaign: Campaign;
 
     /**
      * All AdViews will assume fullscreen interstitial video
@@ -161,10 +162,10 @@ export class OpenMeasurementUtilities {
 
         // For integrations less than SDK 3.2.0
         // TODO: Will be removed in subsequent refactor
-        let videoWidth = 0; // OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, this._campaign);
-        let videoHeight = 0; // OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, this._campaign);
+        let videoWidth = OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, this.campaign);
+        let videoHeight = OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, this.campaign);
         let topLeftX = 0;
-        let topLeftY = 0; // OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+        let topLeftY = OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
 
         // For integrations SDK 3.2.0+
         if (this.VideoViewRectangle) {
