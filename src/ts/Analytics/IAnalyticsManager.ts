@@ -1,7 +1,7 @@
-import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 export interface IAnalyticsManager {
-    onIapTransaction(transactionDetails: ITransactionDetails): Promise<void>;
+    onTransactionSuccess(transactionDetails: StoreTransaction): Promise<void>;
     init(): Promise<void>;
     getGameSessionId(): number;
 }

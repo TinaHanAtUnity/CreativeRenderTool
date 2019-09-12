@@ -18,7 +18,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Promises } from 'Core/Utilities/Promises';
-import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 export class AnalyticsManager implements IAnalyticsManager {
 
@@ -129,8 +129,8 @@ export class AnalyticsManager implements IAnalyticsManager {
         return this._analyticsSessionId;
     }
 
-    public onIapTransaction(transactionDetails: ITransactionDetails): Promise<void> {
-        return this.sendTransaction(transactionDetails);
+    public onTransactionSuccess(transaction: StoreTransaction): Promise<void> {
+        return this.sendTransaction(transaction);
     }
 
     private subscribeListeners(): void {
@@ -158,7 +158,7 @@ export class AnalyticsManager implements IAnalyticsManager {
         this.send(AnalyticsProtocol.createAppUpdateEvent(this._clientInfo, this._latestAppStartTime));
     }
 
-    private sendTransaction(transaction: ITransactionDetails): Promise<void> {
+    private sendTransaction(transaction: StoreTransaction): Promise<void> {
         return this.send(AnalyticsProtocol.createTransactionEvent(transaction, this._platform));
     }
 
