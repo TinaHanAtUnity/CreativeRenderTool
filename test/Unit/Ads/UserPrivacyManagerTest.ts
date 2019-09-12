@@ -628,11 +628,19 @@ describe('UserPrivacyManagerTest', () => {
                     if (value.bundleId !== t.infoJson.bundleId) {
                         return false;
                     }
+                    if (value.legalFramework !== t.infoJson.legalFramework) {
+                        return false;
+                    }
+                    if (value.agreedOverAgeLimit !== t.infoJson.agreedOverAgeLimit) {
+                        return false;
+                    }
+                    if (value.v !== t.infoJson.v) {
+                        return false;
+                    }
                     return true;
                 };
                 return privacyManager.sendGDPREvent(t.action, t.source).then(() => {
                     assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
-                    httpKafkaStub.calledWithExactly('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, t.infoJson);
                 });
             });
         });
