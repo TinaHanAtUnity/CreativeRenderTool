@@ -58,7 +58,7 @@ interface ITestMetadataConfig {
     debugJSConsole: boolean;
 }
 
-xdescribe('AndroidAUIEssentialsTest', () => {
+describe('AndroidAUIEssentialsTest', () => {
     const sandbox = sinon.createSandbox();
     const playableTestUrl = 'https://fake-ads-backend.unityads.unity3d.com/get_file/mraids/game_of_war/android/index_android.html';
     const arTestUrl = 'https://fake-ads-backend.unityads.unity3d.com/get_file/ar/test_bridge_index.html';
@@ -127,7 +127,7 @@ xdescribe('AndroidAUIEssentialsTest', () => {
             UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
             UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
 
-            AbstractAdUnit.setAutoCloseDelay(1000);
+            AbstractAdUnit.setAutoCloseDelay(10000);
             AbstractAdUnit.setAutoClose(true);
 
             ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -177,6 +177,8 @@ xdescribe('AndroidAUIEssentialsTest', () => {
 
                     const container = <HTMLDivElement>document.querySelector('#extended-mraid');
                     containerSrc = container.innerHTML;
+
+                    UnityAds.getBackend().Api.AdUnit.close();
                 });
             });
             showAdWhenReady('defaultVideoAndPictureZone');
@@ -195,7 +197,7 @@ xdescribe('AndroidAUIEssentialsTest', () => {
         });
 
         it ('should have loaded the content correctly', () => {
-            assert.isNotNull(iframeSrc);
+            assert.isNotEmpty(iframeSrc);
         });
 
         it ('should have enabled debugJsConsole', () => {
@@ -241,7 +243,7 @@ xdescribe('AndroidAUIEssentialsTest', () => {
         });
 
         it ('should have loaded the content correctly', () => {
-            assert.isNotNull(iframeSrc);
+            assert.isNotEmpty(iframeSrc);
         });
 
         it ('should not have enabled debugJsConsole', () => {

@@ -61,7 +61,7 @@ interface IDeviceOrientationData {
     absolute: boolean;
 }
 
-xdescribe('AndroidDeviceOrientationTest', () => {
+describe('AndroidDeviceOrientationTest', () => {
     const sandbox = sinon.createSandbox();
     const deviceOrientationTestCampaign = 'https://fake-ads-backend.unityads.unity3d.com/get_file/mraids/deviceorientation/deviceorientation_test.html';
 
@@ -108,7 +108,7 @@ xdescribe('AndroidDeviceOrientationTest', () => {
             UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
             UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
 
-            AbstractAdUnit.setAutoCloseDelay(1000);
+            AbstractAdUnit.setAutoCloseDelay(10000);
             AbstractAdUnit.setAutoClose(true);
 
             ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -159,6 +159,8 @@ xdescribe('AndroidDeviceOrientationTest', () => {
                       if (event.data.data.alpha && event.data.data.beta && event.data.data.gamma) {
                         orientationTestResponse = {alpha: event.data.data.alpha, beta: event.data.data.beta, gamma: event.data.data.gamma, absolute: event.data.data.absolute};
                         window.removeEventListener('message', devOrientationResponseListener);
+
+                        UnityAds.getBackend().Api.AdUnit.close();
                       }
                     }
                   };
@@ -183,7 +185,7 @@ xdescribe('AndroidDeviceOrientationTest', () => {
         });
 
         it ('should have loaded the content correctly', () => {
-            assert.isNotNull(iframeSrc);
+            assert.isNotEmpty(iframeSrc);
         });
 
         it ('should receive the data sent', () => {
