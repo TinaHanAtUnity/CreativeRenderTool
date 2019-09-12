@@ -95,15 +95,28 @@ describe('VastParserStrict', () => {
             });
         });
 
-        it('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
-            const wrappedVAST = WrappedVastIAS;
-            sinon.stub(request, 'get').resolves();
+        context('for IAS', () => {
+            it('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
+                const wrappedVAST = WrappedVastIAS;
+                sinon.stub(request, 'get').resolves();
 
-            const headers: [string, string][] = [['X-Device-Type', 'unity']];
-            const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml';
+                const headers: [string, string][] = [['X-Device-Type', 'unity'], ['User-Agent', navigator.userAgent]];
+                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot';
 
-            TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
-            sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+                TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
+                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+            });
+
+            it('should splice bundleID as first url query param', () => {
+                const wrappedVAST = WrappedVastIAS;
+                sinon.stub(request, 'get').resolves();
+
+                const headers: [string, string][] = [['X-Device-Type', 'unity'], ['User-Agent', navigator.userAgent]];
+                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?bundleId=booyah&scoot=doot';
+
+                TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah');
+                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+            });
         });
     });
 
@@ -630,7 +643,7 @@ describe('VastParserStrict', () => {
                 describe('ad verification as standalone for VAST 4.1', () => {
                     beforeEach(() => {
                         vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsStandAlone);
-                        vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        vastAdVerifications = vast.getAdVerifications();
                         vastAdVerification = vastAdVerifications[0];
                     });
 
@@ -659,7 +672,7 @@ describe('VastParserStrict', () => {
                 describe('ad verification as extension for VAST 3.x and under as Extension', () => {
                     beforeEach(() => {
                         vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsExtension);
-                        vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        vastAdVerifications = vast.getAdVerifications();
                         vastAdVerification = vastAdVerifications[0];
                     });
 
