@@ -76,12 +76,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         if (this._om) {
             this._om.completed();
-            this._om.sessionFinish({
-                adSessionId: this._om.getOMAdSessionId(),
-                timestamp: Date.now(),
-                type: 'sessionFinish',
-                data: {}
-            });
+            this._om.sessionFinish();
         }
     }
 
@@ -108,22 +103,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
                 if (this._om) {
                     const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
                     OpenMeasurementUtilities.VideoViewRectangle = view;
-                    this._om.sessionStart({
-                        adSessionId: this._om.getOMAdSessionId(),
-                        timestamp: Date.now(),
-                        type: 'sessionStart',
-                        data: {}
-                    });
+                    this._om.sessionStart();
                     this._omStartCalled = true;
                 }
             }).catch((e) => {
                 if (this._om) {
-                    this._om.sessionStart({
-                        adSessionId: this._om.getOMAdSessionId(),
-                        timestamp: Date.now(),
-                        type: 'sessionStart',
-                        data: {}
-                    });
+                    this._om.sessionStart();
                     this._omStartCalled = true;
                 }
             });

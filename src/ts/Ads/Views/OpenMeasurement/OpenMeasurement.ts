@@ -202,6 +202,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
         this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
         this._omIframe.id += this._omAdSessionId;
+        console.log(this._omAdSessionId);
 
         this._omIframe.style.position = 'absolute';
         this._omIframe.style.top = '0';
@@ -245,7 +246,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart(event: ISessionEvent) {
+    public sessionStart() {
+        const event: ISessionEvent = {
+            adSessionId: this.getOMAdSessionId(),
+            timestamp: Date.now(),
+            type: 'sessionStart',
+            data: {}
+        };
+
         this._vendorKeys.forEach(vendorKey => {
             if (this._verificationVendorMap[vendorKey]) {
                 event.data.verificationParameters = this._verificationVendorMap[vendorKey];
@@ -298,7 +306,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
    /**
     * SessionFinish:
     */
-    public sessionFinish(event: ISessionEvent) {
+    public sessionFinish() {
+        const event: ISessionEvent = {
+            adSessionId: this.getOMAdSessionId(),
+            timestamp: Date.now(),
+            type: 'sessionFinish',
+            data: {}
+        };
         if (!this._sessionFinishCalled) {
             this._omBridge.triggerSessionEvent(event);
             this._sessionFinishCalled = true;
