@@ -105,8 +105,8 @@ export class UserPrivacyManager {
             'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
-            'agreedOverAgeLimit': AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
+            'legalFramework': this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
+            'agreedOverAgeLimit': AgeGateChoice.MISSING
         };
         if (source) {
             infoJson = {
@@ -183,6 +183,7 @@ export class UserPrivacyManager {
 
     private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse> {
         const infoJson: unknown = {
+            'v': 1,
             adid: this._deviceInfo.getAdvertisingIdentifier(),
             group: this._coreConfig.getAbGroup(),
             layout: layout,
@@ -196,7 +197,9 @@ export class UserPrivacyManager {
             version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
             bundleId: this._clientInfo.getApplicationName(),
-            permissions: permissions
+            permissions: permissions,
+            legalFramework: this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
+            agreedOverAgeLimit: AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
