@@ -5,6 +5,11 @@ import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi, ICore } from 'Core/ICore';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 enum OMState {
     PLAYING,
@@ -17,7 +22,6 @@ export class AdmobOpenMeasurementManager {
 
     private _omInstances: OpenMeasurement[] = [];
     private _state: OMState = OMState.STOPPED;
-    private _placement: Placement;
     private _deviceVolume: number;
 
     // only for admob
@@ -26,14 +30,28 @@ export class AdmobOpenMeasurementManager {
     private _admobSlotElement: HTMLElement;
     private _admobVideoElement: HTMLElement;
     private _admobElementBounds: IRectangle;
-    private _baseParams: IAdUnitParameters<AdMobCampaign>;
 
-    constructor(placement: Placement, baseParams: IAdUnitParameters<AdMobCampaign>) {
+    // base params:
+    private _placement: Placement;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _clientInfo: ClientInfo;
+    private _campaign: AdMobCampaign;
+    private _deviceInfo: DeviceInfo;
+    private _request: RequestManager;
+
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager) {
+        this._platform = platform;
+        this._core = core;
+        this._clientInfo = clientInfo;
+        this._campaign = campaign;
         this._placement = placement;
-        this._omAdSessionId = JaegerUtilities.uuidv4();
-        this._baseParams = baseParams;
+        this._deviceInfo = deviceInfo;
+        this._request = request;
 
-        this._omBridge = new AdMobOmidEventBridge(baseParams.core, {
+        this._omAdSessionId = JaegerUtilities.uuidv4();
+
+        this._omBridge = new AdMobOmidEventBridge(core, {
             onImpression: (impressionValues: IImpressionValues) => this.impression(impressionValues),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration),
@@ -76,14 +94,12 @@ export class AdmobOpenMeasurementManager {
     }
 
     public getSDKVersion() {
-        return this._baseParams.clientInfo.getSdkVersionName();
+        return this._clientInfo.getSdkVersionName();
     }
 
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
-        const baseParams = this._baseParams;
-
         verificationResources.forEach((resource) => {
-            const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
+            const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request);
             this._omInstances.push(om);
             om.addToViewHierarchy();
             om.injectVerificationResources([resource]);

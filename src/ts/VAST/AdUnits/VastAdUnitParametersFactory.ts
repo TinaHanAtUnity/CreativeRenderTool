@@ -35,9 +35,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         if (adVerifications) {
 
             const omInstances: OpenMeasurement[] = [];
-            let i = 0;
             adVerifications.forEach((adverification) => {
-                i++;
                 const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification);
                 omInstances.push(om);
             });

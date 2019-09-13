@@ -2,7 +2,6 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OMID3pEvents, IVastProperties, InteractionType, IViewPort, IRectangle, ObstructionReasons } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { IImpressionValues, VideoPlayerState, IAdView, ISessionEvent } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { Placement } from 'Ads/Models/Placement';
-import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 enum OMState {
     PLAYING,
@@ -17,12 +16,10 @@ export class OpenMeasurementManager {
     private _state: OMState = OMState.STOPPED;
     private _placement: Placement;
     private _deviceVolume: number;
-    private _omAdSessionId: string;
 
     constructor(omInstances: OpenMeasurement[], placement: Placement) {
         this._omInstances = omInstances;
         this._placement = placement;
-        this._omAdSessionId = JaegerUtilities.uuidv4();
     }
 
     public addToViewHierarchy(): void {
@@ -41,10 +38,6 @@ export class OpenMeasurementManager {
         this._omInstances.forEach((om) => {
             om.injectAdVerifications();
         });
-    }
-
-    public getOMAdSessionId() {
-        return this._omAdSessionId;
     }
 
     public impression(impressionValues: IImpressionValues) {

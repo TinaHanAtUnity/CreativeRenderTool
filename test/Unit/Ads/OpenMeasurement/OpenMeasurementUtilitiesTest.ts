@@ -140,6 +140,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         });
 
         describe('Calculating Vast AdView', () => {
+            beforeEach(() => {
+                om.VideoViewRectangle = undefined;
+            });
             afterEach(() => {
                 om.VideoViewRectangle = undefined;
                 om.campaign = TestFixtures.getPromoCampaign();

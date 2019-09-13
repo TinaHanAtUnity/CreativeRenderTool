@@ -10,11 +10,109 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         const sandbox = sinon.createSandbox();
         let placement: Placement;
 
-        const init = () => {
+        const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            const openMeasurement: OpenMeasurement = sandbox.createStubInstance(OpenMeasurement);
-
-            return new OpenMeasurementManager([openMeasurement], placement);
+            return new OpenMeasurementManager(om, placement);
         };
+
+        describe('DOM Hierarchy', () => {
+            let omManager: OpenMeasurementManager;
+            let openMeasurement: OpenMeasurement;
+
+            beforeEach(() => {
+                openMeasurement = sandbox.createStubInstance(OpenMeasurement);
+                omManager = initOMManager([openMeasurement]);
+            });
+            afterEach(() => {
+                sandbox.restore();
+            });
+            describe('addToViewHierarchy', () => {
+                it('should add every om to the hierarchy', () => {
+                    sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement.addToViewHierarchy);
+                });
+            });
+            describe('removeFromViewHieararchy', () => {
+                it('should add every om to the hierarchy', () => {
+                    sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement.removeFromViewHieararchy);
+                });
+            });
+            describe('injectVerifications', () => {
+                it('should add every om to the hierarchy', () => {
+                    sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement.injectAdVerifications);
+                });
+            });
+        });
+        describe('adEvents', () => {
+            let omManager: OpenMeasurementManager;
+            beforeEach(() => {
+                //
+            });
+            afterEach(() => {
+                sandbox.restore();
+            });
+            describe('impression', () => {
+                //
+            });
+            describe('loaded', () => {
+                //
+            });
+            describe('start', () => {
+                //
+            });
+            describe('playerStateChanged', () => {
+                //
+            });
+            describe('sendFirstQuartile', () => {
+                //
+            });
+            describe('sendMidpoint', () => {
+                //
+            });
+            describe('sendThirdQuartile', () => {
+                //
+            });
+            describe('completed', () => {
+                //
+            });
+            describe('pause', () => {
+                //
+            });
+            describe('resume', () => {
+                //
+            });
+            describe('skipped', () => {
+                //
+            });
+            describe('volumeChange', () => {
+                //
+            });
+            describe('adUserInteraction', () => {
+                //
+            });
+            describe('bufferStart', () => {
+                //
+            });
+            describe('bufferFinish', () => {
+                //
+            });
+            describe('geometryChange', () => {
+                //
+            });
+        });
+        describe('session events', () => {
+            let omManager: OpenMeasurementManager;
+            beforeEach(() => {
+                //
+            });
+            afterEach(() => {
+                sandbox.restore();
+            });
+            describe('sessionStart', () => {
+                //
+            });
+            describe('sessionFinish', () => {
+                //
+            });
+        });
     });
 });
