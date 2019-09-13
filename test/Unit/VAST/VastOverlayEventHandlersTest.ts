@@ -38,6 +38,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -343,36 +344,40 @@ import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasuremen
             }
         });
 
-        // describe('When calling onShowPrivacyPopUp', () => {
-        //     beforeEach(() => {
-        //         sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
-        //         sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
-        //         sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
+        describe('When calling onShowPrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+                sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
+                sinon.stub(OpenMeasurementUtilities, 'calculateViewPort');
+                sinon.stub(OpenMeasurementUtilities, 'calculateVastAdView');
 
-        //         return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
-        //     });
+                return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
+            });
 
-        //     it ('should fire geometry change as a percentage of the adview', () => {
-        //         sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
-        //         sinon.assert.called(<sinon.SinonStub>om!.calculateVastAdView);
-        //         sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
-        //     });
-        // });
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>OpenMeasurementUtilities.calculateViewPort, 1280, 768);
+                sinon.assert.called(<sinon.SinonStub>OpenMeasurementUtilities.calculateVastAdView);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
+        });
 
-        // describe('When calling onClosePrivacyPopUp', () => {
-        //     beforeEach(() => {
-        //         sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
-        //         sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
-        //         sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
+        describe('When calling onClosePrivacyPopUp', () => {
+            beforeEach(() => {
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
+                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
+                sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
+                sinon.stub(OpenMeasurementUtilities, 'calculateViewPort');
+                sinon.stub(OpenMeasurementUtilities, 'calculateVastAdView');
 
-        //         return vastOverlayEventHandler.onClosePrivacyPopUp();
-        //     });
+                return vastOverlayEventHandler.onClosePrivacyPopUp();
+            });
 
-        //     it ('should fire geometry change as a percentage of the adview', () => {
-        //         sinon.assert.calledWith(<sinon.SinonStub>om!.calculateViewPort, 1280, 768);
-        //         sinon.assert.calledWith(<sinon.SinonStub>om!.calculateVastAdView);
-        //         sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
-        //     });
-        // });
+            it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>OpenMeasurementUtilities.calculateViewPort, 1280, 768);
+                sinon.assert.calledWith(<sinon.SinonStub>OpenMeasurementUtilities.calculateVastAdView);
+                sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
+            });
+        });
     });
 });

@@ -170,8 +170,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
         this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
-        this._omIframe.id += this._omAdSessionId;
 
+        this._omIframe.id += this._omAdSessionId;
         this._omIframe.style.position = 'absolute';
         this._omIframe.style.top = '0';
         this._omIframe.style.left = '0';

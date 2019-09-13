@@ -82,7 +82,6 @@ export class AdmobOpenMeasurementManager {
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
         const baseParams = this._baseParams;
 
-        // TODO: Fix to only support one verification resource per OpenMeasurement instance
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
             this._omInstances.push(om);

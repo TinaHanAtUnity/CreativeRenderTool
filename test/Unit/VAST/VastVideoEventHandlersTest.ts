@@ -37,6 +37,7 @@ import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -228,10 +229,6 @@ describe('VastVideoEventHandler tests', () => {
             it('should call om session start on videoview receive success', () => {
                 sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
             });
-
-            // it('should set om setVideoViewRectangle receive success', () => {
-            //     sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setVideoViewRectangle, openMeasurement!.createRectangle(0, 0, 0, 0));
-            // });
 
             it('should call om session start once', () => {
                 vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);

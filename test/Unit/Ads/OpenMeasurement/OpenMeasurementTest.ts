@@ -13,6 +13,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import OMID3p from 'html/omid/omid3p.html';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurement`, () => {
@@ -61,10 +62,10 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     om = initWithVastVerifications();
                 });
 
-                // it('should populate the omid-iframe with omid3p container code', () => {
-                //     om.render();
-                //     assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
-                // });
+                it('should populate the omid-iframe with omid3p container code', () => {
+                    om.render();
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
+                });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
                     om.render();
@@ -99,11 +100,12 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                         om.removeMessageListener();
                     });
 
-                    // it('should populate script to dom with multiple passed resources', () => {
-                    //     // need a more reliable way to check the dom
-                    //     sinon.assert.calledTwice(<sinon.SinonStub>om.injectAsString);
-                    //     sinon.assert.calledTwice(<sinon.SinonStub>om.populateVendorKey);
-                    // });
+                    // now we use iframes for multiple scripts
+                    xit('should populate script to dom with multiple passed resources', () => {
+                        // need a more reliable way to check the dom
+                        sinon.assert.calledTwice(<sinon.SinonStub>om.injectAsString);
+                        sinon.assert.calledTwice(<sinon.SinonStub>om.populateVendorKey);
+                    });
                 });
 
                 describe('on failure', () => {
