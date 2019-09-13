@@ -159,7 +159,7 @@ export class CometCampaignParser extends CampaignParser {
             const osVersion = this._core.DeviceInfo.getOsVersion();
             const platform = this._core.NativeBridge.getPlatform();
 
-            if (navigator && window && CustomFeatures.isParallaxEndScreenEnabled(this._abGroup, parameters.gameId, navigator.userAgent, window.innerWidth, window.innerHeight, window.screen)) {
+            if (CustomFeatures.isParallaxEndScreenEnabled(this._abGroup, parameters.gameId)) {
                 const getParallaxEndScreenData = CustomFeatures.getParallaxEndScreenData(parameters.gameId);
                 if (getParallaxEndScreenData && getParallaxEndScreenData.length > 0) {
                     const screenshots = [];
