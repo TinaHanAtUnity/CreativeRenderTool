@@ -11,8 +11,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IAdView, ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import OMID3p from 'html/omid/omid3p.html';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
@@ -63,10 +61,10 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     om = initWithVastVerifications();
                 });
 
-                it('should populate the omid-iframe with omid3p container code', () => {
-                    om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
-                });
+                // it('should populate the omid-iframe with omid3p container code', () => {
+                //     om.render();
+                //     assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe')).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
+                // });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
                     om.render();
@@ -155,50 +153,50 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                 });
             });
 
-            // describe('SessionEvents not on OMBridge', () => {
-            //     describe('onEventProcessed', () => {
-            //         context('sessionStart', () => {
-            //             beforeEach(() => {
-            //                 sandbox.stub(om, 'loaded');
-            //                 sandbox.stub(om, 'geometryChange');
-            //                 sandbox.stub(om, 'impression');
-            //                 sandbox.stub(om.getOmidBridge(), 'sendQueuedEvents');
-            //                 clock = sinon.useFakeTimers();
-            //             });
+            describe('SessionEvents not on OMBridge', () => {
+                describe('onEventProcessed', () => {
+                    context('sessionStart', () => {
+                        beforeEach(() => {
+                            sandbox.stub(om, 'loaded');
+                            sandbox.stub(om, 'geometryChange');
+                            sandbox.stub(om, 'impression');
+                            sandbox.stub(om.getOmidBridge(), 'sendQueuedEvents');
+                            clock = sinon.useFakeTimers();
+                        });
 
-            //             it('should call session begin ad events', () => {
-            //                 om.onEventProcessed('sessionStart');
+                        it('should call session begin ad events', () => {
+                            om.onEventProcessed('sessionStart');
 
-            //                 sinon.assert.called(<sinon.SinonSpy>om.loaded);
-            //                 sinon.assert.notCalled(<sinon.SinonSpy>om.geometryChange);
-            //             });
+                            sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                            sinon.assert.notCalled(<sinon.SinonSpy>om.geometryChange);
+                        });
 
-            //             it('should call session begin ad events for IAS', () => {
-            //                 om.onEventProcessed('sessionStart', 'IAS');
+                        it('should call session begin ad events for IAS', () => {
+                            om.onEventProcessed('sessionStart', 'IAS');
 
-            //                 clock.tick(2000);
-            //                 clock.restore();
-            //                 sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
-            //                 sinon.assert.called(<sinon.SinonSpy>om.loaded);
-            //                 sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
-            //             });
-            //         });
+                            clock.tick(2000);
+                            clock.restore();
+                            sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
+                            sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                            sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
+                        });
+                    });
 
-            //         context('sessionFinish', () => {
-            //             beforeEach(() => {
-            //                 sinon.stub(om, 'removeFromViewHieararchy');
-            //                 clock = sinon.useFakeTimers();
-            //             });
-            //             it('should remove OM from dom on sessionFinish', () => {
+                    context('sessionFinish', () => {
+                        beforeEach(() => {
+                            sinon.stub(om, 'removeFromViewHieararchy');
+                            clock = sinon.useFakeTimers();
+                        });
+                        it('should remove OM from dom on sessionFinish', () => {
 
-            //                 om.onEventProcessed('sessionFinish');
-            //                 clock.tick(1000);
-            //                 clock.restore();
-            //                 sinon.assert.called(<sinon.SinonSpy>om.removeFromViewHieararchy);
-            //             });
-            //         });
-            //     });
-            // });
+                            om.onEventProcessed('sessionFinish');
+                            clock.tick(1000);
+                            clock.restore();
+                            sinon.assert.called(<sinon.SinonSpy>om.removeFromViewHieararchy);
+                        });
+                    });
+                });
+            });
         });
     });
 });

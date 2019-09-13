@@ -93,9 +93,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _vendorKeys: string[];
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
-    private _admobSlotElement: HTMLElement;
-    private _admobVideoElement: HTMLElement;
-    private _admobElementBounds: IRectangle;
 
     private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
@@ -134,14 +131,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this._sessionStartCalled;
     }
 
-    // needed - done general vast
     public addToViewHierarchy(): void {
         this.render();
         this.addMessageListener();
         document.body.appendChild(this.container());
     }
 
-    // needed - done general vast
     public removeFromViewHieararchy(): void {
         this.removeMessageListener();
         if (this.container().parentElement) {
@@ -149,52 +144,27 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
-    // only used above and test
     public addMessageListener() {
         if (this._omBridge) {
             this._omBridge.connect();
         }
     }
 
-    // only used above and test
     public removeMessageListener() {
         if (this._omBridge) {
             this._omBridge.disconnect();
         }
     }
 
-    // needed done
     public injectAdVerifications(): Promise<void> {
         const verificationResources: IVerificationScriptResource[] = [this.setUpVerificationResource(this._adVerification)];
         return this.injectVerificationResources(verificationResources);
     }
 
-    // admob
-    public getSlotElement(): HTMLElement {
-        return this._admobSlotElement;
-    }
-
-    // admob
-    public getVideoElement(): HTMLElement {
-        return this._admobVideoElement;
-    }
-
-    // admob
-    public getAdmobVideoElementBounds(): IRectangle {
-        return this._admobElementBounds;
-    }
-
-    // admob
-    public getSDKVersion() {
-        return this._clientInfo.getSdkVersionName();
-    }
-
-    // done used by bridge
     public getOmidBridge(): OMIDEventBridge {
         return this._omBridge;
     }
 
-    // TODO --- need to make each iframe id different
     public render(): void {
         super.render();
 
@@ -213,8 +183,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.setIframe(this._omIframe);
     }
 
-    // internal
-    private impression(impressionValues: IImpressionValues) {
+    public impression(impressionValues: IImpressionValues) {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_IMPRESSION, impressionValues);
     }
 
@@ -223,7 +192,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * media and assets either fully or to the extent that it is ready
      * to play the media. Corresponds to the VAST  loaded  event.
      */
-    private loaded(vastProperties: IVastProperties) {
+    public loaded(vastProperties: IVastProperties) {
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_LOADED, {vastProperties});
     }
 
@@ -234,7 +203,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
      * TODO: Calculate Geometry change for Privacy coverage
      */
-    private geometryChange(viewPort: IViewPort, adView: IAdView) {
+    public geometryChange(viewPort: IViewPort, adView: IAdView) {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewPort, adView});
     }
 
@@ -264,7 +233,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         });
     }
 
-    // DONE
     private buildSessionContext(): IContext {
         const contextData: IContext = {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
@@ -432,7 +400,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return impressionObject;
     }
 
-    // done in here
     private setUpVerificationResource(verification: VastAdVerification): IVerificationScriptResource {
         return {
             // There will only ever be one verification resource per verification. TODO: update model
@@ -442,7 +409,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
     }
 
-    // needed - although will be refactored for admob
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]): Promise<void> {
         const promises: Promise<void>[] = [];
 
@@ -457,7 +423,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         });
     }
 
-    // needed
     private injectResourceIntoDom(resourceUrl: string, vendorKey: string, verificationParameters: string): Promise<void> {
         return this.checkVendorResourceURL(resourceUrl).then(() => {
             this.injectAsString(resourceUrl, vendorKey);
@@ -469,12 +434,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         });
     }
 
-    // dont really need a map here anymore
     public populateVendorKey(vendorKey: string) {
         this._vendorKeys.push(vendorKey);
     }
 
-    // needed in here - done
     private checkVendorResourceURL(resourceUrl: string): Promise<void> {
         if (CustomFeatures.isUnsupportedOMVendor(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_RESOURCE_REJECTED);
@@ -490,7 +453,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return Promise.resolve();
     }
 
-    // needed in here - done
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
         const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
         if (adVerificationErrorURL) {
@@ -498,9 +460,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
-    // needed in here - done
     public injectAsString(resourceUrl: string, vendorKey: string) {
-        // this._omIframe.id += JaegerUtilities.uuidv4();
         const dom = new DOMParser().parseFromString(this._omIframe.srcdoc, 'text/html');
         const scriptEl = dom.createElement('script');
         dom.head.appendChild(scriptEl);

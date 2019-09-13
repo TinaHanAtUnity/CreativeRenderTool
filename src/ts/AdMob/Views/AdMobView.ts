@@ -188,19 +188,6 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             if (this._om) {
                 iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
                 this._om.getAdmobBridge().setAdmobIframe(iframe);
-
-                iframe.onload = () => {
-                    if (iframe.contentWindow) {
-                        const videoEl = iframe.contentWindow.document.querySelector('video');
-                        if (videoEl) {
-                            const rect = videoEl.getBoundingClientRect();
-                            if (this._om) {
-                                const view = OpenMeasurementUtilities.createRectangle(rect.left, rect.right, rect.width, rect.height);
-                                OpenMeasurementUtilities.VideoViewRectangle = view;
-                            }
-                        }
-                    }
-                };
             }
         });
     }
@@ -348,6 +335,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
             let obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
             const videoView =  om.getAdmobVideoElementBounds();
+            OpenMeasurementUtilities.VideoViewRectangle = videoView;
 
             if (this._platform === Platform.ANDROID) {
                 const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
@@ -368,6 +356,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
             obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
             const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
+
             om.geometryChange(viewPort, obstructedAdView);
         });
     }

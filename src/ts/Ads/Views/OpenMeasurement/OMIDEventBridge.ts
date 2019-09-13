@@ -211,18 +211,6 @@ export class OMIDEventBridge {
         this._iframe3p = iframe;
     }
 
-    public setAdmobIframe(iframe: HTMLIFrameElement) {
-        this._iframeSessionInterface = iframe;
-    }
-
-    public sendSDKVersion(sdkVersion: string) {
-        this.postMessage(OMSessionInfo.SDK_VERSION, sdkVersion);
-    }
-
-    public sendSessionId(sessionId: string) {
-        this.postMessage(OMSessionInfo.SESSION_ID, sessionId);
-    }
-
     public setVerificationsInjected(verificationsInjected: boolean) {
         this._verificationsInjected = verificationsInjected;
     }
@@ -230,7 +218,6 @@ export class OMIDEventBridge {
     public sendQueuedEvents() {
         while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
             const event = this._eventQueue.shift();
-            console.log('sending queued events: ', event);
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
         this._eventQueueSent = true;

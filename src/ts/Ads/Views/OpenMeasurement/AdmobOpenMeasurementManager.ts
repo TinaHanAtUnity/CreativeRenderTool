@@ -59,17 +59,14 @@ export class AdmobOpenMeasurementManager {
         }, this);
     }
 
-    // admob
     public getSlotElement(): HTMLElement {
         return this._admobSlotElement;
     }
 
-    // admob
     public getVideoElement(): HTMLElement {
         return this._admobVideoElement;
     }
 
-    // admob
     public getAdmobVideoElementBounds(): IRectangle {
         return this._admobElementBounds;
     }
