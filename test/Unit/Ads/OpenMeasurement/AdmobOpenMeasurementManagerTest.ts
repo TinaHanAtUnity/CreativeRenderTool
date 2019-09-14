@@ -28,81 +28,113 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
 
-        const init = () => {
+        const initAdMobOMManager = () => {
             placement = TestFixtures.getPlacement();
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            core = TestFixtures.getCoreApi(nativeBridge);
+            clientInformation = TestFixtures.getClientInfo(platform);
+            campaign = sandbox.createStubInstance(AdMobCampaign);
 
-            const openMeasurement: OpenMeasurement = sandbox.createStubInstance(OpenMeasurement);
+            // const openMeasurement: OpenMeasurement = sandbox.createStubInstance(OpenMeasurement);
             return new AdmobOpenMeasurementManager(platform, core, clientInformation, campaign, placement, deviceInfo, request);
         };
 
         describe('DOM Hierarchy', () => {
-            describe('addToViewHierarchy', () => {
+            let omManager: AdmobOpenMeasurementManager;
+            // let openMeasurement: OpenMeasurement;
+
+            beforeEach(() => {
+                // openMeasurement = sandbox.createStubInstance(OpenMeasurement);
+                omManager = initAdMobOMManager();
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('addToViewHierarchy', () => {
                 //
             });
-            describe('removeFromViewHieararchy', () => {
+            it('removeFromViewHieararchy', () => {
                 //
             });
-            describe('injectVerifications', () => {
+            it('injectVerificationResources', () => {
                 //
             });
         });
         describe('adEvents', () => {
-            describe('impression', () => {
+            it('impression', () => {
                 //
             });
-            describe('loaded', () => {
+            it('loaded', () => {
                 //
             });
-            describe('start', () => {
+            it('start', () => {
                 //
             });
-            describe('playerStateChanged', () => {
+            it('playerStateChanged', () => {
                 //
             });
-            describe('sendFirstQuartile', () => {
+            it('sendFirstQuartile', () => {
                 //
             });
-            describe('sendMidpoint', () => {
+            it('sendMidpoint', () => {
                 //
             });
-            describe('sendThirdQuartile', () => {
+            it('sendThirdQuartile', () => {
                 //
             });
-            describe('completed', () => {
+            it('completed', () => {
                 //
             });
-            describe('pause', () => {
+            it('pause', () => {
                 //
             });
-            describe('resume', () => {
+            it('resume', () => {
                 //
             });
-            describe('skipped', () => {
+            it('skipped', () => {
                 //
             });
-            describe('volumeChange', () => {
+            it('volumeChange', () => {
                 //
             });
-            describe('adUserInteraction', () => {
+            it('adUserInteraction', () => {
                 //
             });
-            describe('bufferStart', () => {
+            it('bufferStart', () => {
                 //
             });
-            describe('bufferFinish', () => {
+            it('bufferFinish', () => {
                 //
             });
-            describe('geometryChange', () => {
+            it('geometryChange', () => {
                 //
             });
         });
+
         describe('session events', () => {
-            describe('sessionStart', () => {
-                //
+            let omManager: AdmobOpenMeasurementManager;
+            // let openMeasurement: OpenMeasurement;
+
+            beforeEach(() => {
+                // openMeasurement = sandbox.createStubInstance(OpenMeasurement);
+                omManager = initAdMobOMManager();
+                // omManager.injectVerificationResources();
             });
-            describe('sessionFinish', () => {
-                //
+            afterEach(() => {
+                sandbox.restore();
             });
+
+            // it('sessionStart should be called twice', () => {
+            //     omManager.sessionStart();
+            //     sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionStart);
+            // });
+            // it('sessionFinish should be called twice', () => {
+            //     omManager.sessionFinish();
+            //     sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionFinish);
+            // });
         });
     });
 });

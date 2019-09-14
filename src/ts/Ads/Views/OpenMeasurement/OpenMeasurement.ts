@@ -144,6 +144,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
+    public triggerAdEvent(type: string, payload?: unknown) {
+        this._omBridge.triggerAdEvent(type, payload);
+    }
+
+    public triggerVideoEvent(type: string, payload?: unknown) {
+        this._omBridge.triggerVideoEvent(type, payload);
+    }
+
     public addMessageListener() {
         if (this._omBridge) {
             this._omBridge.connect();
@@ -341,18 +349,17 @@ export class OpenMeasurement extends View<AdMobCampaign> {
                 IASScreenWidth = screenWidth;
                 IASScreenHeight = screenHeight;
                 this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
+                if (vendorKey === 'IAS') {
+                    this.sendIASEvents(IASScreenWidth, IASScreenHeight);
+                } else {
+                    this.loaded({
+                        isSkippable: this._placement.allowSkip(),
+                        skipOffset: this._placement.allowSkipInSeconds(),
+                        isAutoplay: true,                   // Always autoplay for video
+                        position: VideoPosition.STANDALONE  // Always standalone video
+                    });
+                }
             });
-
-            if (vendorKey === 'IAS') {
-                this.sendIASEvents(IASScreenWidth, IASScreenHeight);
-            } else {
-                this.loaded({
-                    isSkippable: this._placement.allowSkip(),
-                    skipOffset: this._placement.allowSkipInSeconds(),
-                    isAutoplay: true,                   // Always autoplay for video
-                    position: VideoPosition.STANDALONE  // Always standalone video
-                });
-            }
     }
 
     private sendIASEvents(IASScreenWidth: number, IASScreenHeight: number) {

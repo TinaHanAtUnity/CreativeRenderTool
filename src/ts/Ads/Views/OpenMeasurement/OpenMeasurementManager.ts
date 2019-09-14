@@ -42,7 +42,7 @@ export class OpenMeasurementManager {
 
     public impression(impressionValues: IImpressionValues) {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerAdEvent(OMID3pEvents.OMID_IMPRESSION, impressionValues);
+            om.triggerAdEvent(OMID3pEvents.OMID_IMPRESSION, impressionValues);
         });
     }
 
@@ -53,7 +53,7 @@ export class OpenMeasurementManager {
      */
     public loaded(vastProperties: IVastProperties) {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_LOADED, {vastProperties});
+            om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, {vastProperties});
         });
     }
 
@@ -67,7 +67,7 @@ export class OpenMeasurementManager {
             this.setState(OMState.PLAYING);
 
             this._omInstances.forEach((om) => {
-                    om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_START, {
+                    om.triggerVideoEvent(OMID3pEvents.OMID_START, {
                     duration: duration,
                     videoPlayerVolume: this._placement.muteVideo() ? 0 : 1,
                     deviceVolume: this._deviceVolume
@@ -84,32 +84,32 @@ export class OpenMeasurementManager {
     */
     public playerStateChanged(videoPlayerState: VideoPlayerState) {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_PLAYER_STATE_CHANGE, { state: videoPlayerState });
+            om.triggerVideoEvent(OMID3pEvents.OMID_PLAYER_STATE_CHANGE, { state: videoPlayerState });
         });
     }
 
     public sendFirstQuartile() {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_FIRST_QUARTILE);
+            om.triggerVideoEvent(OMID3pEvents.OMID_FIRST_QUARTILE);
         });
     }
 
     public sendMidpoint() {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_MIDPOINT);
+            om.triggerVideoEvent(OMID3pEvents.OMID_MIDPOINT);
         });
     }
 
     public sendThirdQuartile() {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_THIRD_QUARTILE);
+            om.triggerVideoEvent(OMID3pEvents.OMID_THIRD_QUARTILE);
         });
     }
 
     public completed() {
         this.setState(OMState.COMPLETED);
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_COMPLETE);
+            om.triggerVideoEvent(OMID3pEvents.OMID_COMPLETE);
         });
     }
 
@@ -117,7 +117,7 @@ export class OpenMeasurementManager {
         if (this.getState() === OMState.PLAYING) {
             this.setState(OMState.PAUSED);
             this._omInstances.forEach((om) => {
-                om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_PAUSE);
+                om.triggerVideoEvent(OMID3pEvents.OMID_PAUSE);
             });
         }
     }
@@ -126,7 +126,7 @@ export class OpenMeasurementManager {
         if (this.getState() !== OMState.STOPPED && this.getState() === OMState.PAUSED) {
             this.setState(OMState.PLAYING);
             this._omInstances.forEach((om) => {
-                om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_RESUME);
+                om.triggerVideoEvent(OMID3pEvents.OMID_RESUME);
             });
         }
     }
@@ -134,7 +134,7 @@ export class OpenMeasurementManager {
     public skipped() {
         this.setState(OMState.STOPPED);
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_SKIPPED);
+            om.triggerVideoEvent(OMID3pEvents.OMID_SKIPPED);
         });
     }
 
@@ -149,7 +149,7 @@ export class OpenMeasurementManager {
     public volumeChange(videoPlayerVolume: number) {
         if (this.getState() !== OMState.COMPLETED) {
             this._omInstances.forEach((om) => {
-                    om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {
+                    om.triggerVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE, {
                     videoPlayerVolume: videoPlayerVolume,
                     deviceVolume: this._deviceVolume
                 });
@@ -163,21 +163,21 @@ export class OpenMeasurementManager {
      */
     public adUserInteraction(interactionType: InteractionType) {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, interactionType);
+            om.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, interactionType);
         });
     }
 
     // TODO: Not used at the moment
     public bufferStart() {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_BUFFER_START);
+            om.triggerVideoEvent(OMID3pEvents.OMID_BUFFER_START);
         });
     }
 
     // TODO: Not used at the moment
     public bufferFinish() {
         this._omInstances.forEach((om) => {
-            om.getOmidBridge().triggerVideoEvent(OMID3pEvents.OMID_BUFFER_FINISH);
+            om.triggerVideoEvent(OMID3pEvents.OMID_BUFFER_FINISH);
         });
     }
 
@@ -191,7 +191,7 @@ export class OpenMeasurementManager {
     public geometryChange(viewPort: IViewPort, adView: IAdView) {
         if (this.getState() !== OMState.STOPPED && (this.getState() === OMState.PAUSED || this.getState() === OMState.PLAYING)) {
             this._omInstances.forEach((om) => {
-                om.getOmidBridge().triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewPort, adView});
+                om.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewPort, adView});
             });
         }
     }

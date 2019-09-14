@@ -21,98 +21,120 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
-                omManager = initOMManager([openMeasurement]);
+                omManager = initOMManager([openMeasurement, openMeasurement]);
             });
+
             afterEach(() => {
                 sandbox.restore();
             });
+
             describe('addToViewHierarchy', () => {
                 it('should add every om to the hierarchy', () => {
-                    sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement.addToViewHierarchy);
+                    omManager.addToViewHierarchy();
+                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.addToViewHierarchy);
                 });
             });
             describe('removeFromViewHieararchy', () => {
                 it('should add every om to the hierarchy', () => {
-                    sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement.removeFromViewHieararchy);
+                    omManager.removeFromViewHieararchy();
+                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.removeFromViewHieararchy);
                 });
             });
             describe('injectVerifications', () => {
                 it('should add every om to the hierarchy', () => {
-                    sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement.injectAdVerifications);
+                    omManager.injectVerifications();
+                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.injectAdVerifications);
                 });
             });
         });
-        describe('adEvents', () => {
-            let omManager: OpenMeasurementManager;
-            beforeEach(() => {
-                //
-            });
-            afterEach(() => {
-                sandbox.restore();
-            });
-            describe('impression', () => {
-                //
-            });
-            describe('loaded', () => {
-                //
-            });
-            describe('start', () => {
-                //
-            });
-            describe('playerStateChanged', () => {
-                //
-            });
-            describe('sendFirstQuartile', () => {
-                //
-            });
-            describe('sendMidpoint', () => {
-                //
-            });
-            describe('sendThirdQuartile', () => {
-                //
-            });
-            describe('completed', () => {
-                //
-            });
-            describe('pause', () => {
-                //
-            });
-            describe('resume', () => {
-                //
-            });
-            describe('skipped', () => {
-                //
-            });
-            describe('volumeChange', () => {
-                //
-            });
-            describe('adUserInteraction', () => {
-                //
-            });
-            describe('bufferStart', () => {
-                //
-            });
-            describe('bufferFinish', () => {
-                //
-            });
-            describe('geometryChange', () => {
-                //
-            });
-        });
+
         describe('session events', () => {
             let omManager: OpenMeasurementManager;
+            let openMeasurement: OpenMeasurement;
+
             beforeEach(() => {
-                //
+                openMeasurement = sandbox.createStubInstance(OpenMeasurement);
+                omManager = initOMManager([openMeasurement, openMeasurement]);
             });
             afterEach(() => {
                 sandbox.restore();
             });
-            describe('sessionStart', () => {
-                //
+
+            it('sessionStart should be called twice', () => {
+                omManager.sessionStart();
+                sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionStart);
             });
-            describe('sessionFinish', () => {
-                //
+            it('sessionFinish should be called twice', () => {
+                omManager.sessionFinish();
+                sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionFinish);
             });
         });
+
+        // describe('adEvents', () => {
+        //     let omManager: OpenMeasurementManager;
+        //     let openMeasurement: OpenMeasurement;
+        //     let omidEventBridge: OMIDEventBridge;
+
+        //     beforeEach(() => {
+        //         openMeasurement = sandbox.createStubInstance(OpenMeasurement);
+        //         omManager = initOMManager([openMeasurement, openMeasurement]);
+        //     });
+        //     afterEach(() => {
+        //         sandbox.restore();
+        //     });
+
+        //     it('impression', () => {
+        //         // omManager.impression();
+        //     });
+        //     it('loaded', () => {
+        //         //
+        //     });
+        //     it('start', () => {
+        //         //
+        //     });
+        //     it('playerStateChanged', () => {
+        //         //
+        //     });
+        //     it('sendFirstQuartile', () => {
+        //         omidEventBridge = sandbox.createStubInstance(OMIDEventBridge);
+        //         sandbox.stub(openMeasurement, 'getOmidBridge').returns(omidEventBridge);
+        //         sandbox.stub(openMeasurement.getOmidBridge(), 'triggerVideoEvent');
+        //         omManager.sendFirstQuartile();
+        //         sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.getOmidBridge().triggerVideoEvent);
+        //     });
+        //     it('sendMidpoint', () => {
+        //         //
+        //     });
+        //     it('sendThirdQuartile', () => {
+        //         //
+        //     });
+        //     it('completed', () => {
+        //         //
+        //     });
+        //     it('pause', () => {
+        //         //
+        //     });
+        //     it('resume', () => {
+        //         //
+        //     });
+        //     it('skipped', () => {
+        //         //
+        //     });
+        //     it('volumeChange', () => {
+        //         //
+        //     });
+        //     it('adUserInteraction', () => {
+        //         //
+        //     });
+        //     it('bufferStart', () => {
+        //         //
+        //     });
+        //     it('bufferFinish', () => {
+        //         //
+        //     });
+        //     it('geometryChange', () => {
+        //         //
+        //     });
+        // });
     });
 });
