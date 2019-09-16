@@ -56,7 +56,6 @@ import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
             sandbox.stub(bannerModule.CampaignManager, 'request').resolves(campaign);
             sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
             sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
-            sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendLoadEvent');
             sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
                 return Promise.resolve().then(() => bannerModule.Api.BannerApi.onBannerLoaded.trigger(bannerAdViewId));
             });
@@ -70,11 +69,6 @@ import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
                 sinon.assert.called(asStub(adUnit.onLoad));
             });
 
-            context('on first load', () => {
-                it('should send the load event', () => {
-                    sinon.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendLoadEvent), placementId);
-                });
-            });
         });
 
         describe('No fill banner scenario', () => {
