@@ -1,5 +1,7 @@
 # Pending
 
+* Upgrade Akamai Purging Implementation to Supported Version [#11183](https://github.com/Applifier/unity-ads-webview/pull/11183)
+* Add AdRequest to GameSessionCounters for Load API [#11185](https://github.com/Applifier/unity-ads-webview/pull/11185)
 * Open Measurement - Move Ad Verifications to base Vast Ad [#11152](https://github.com/Applifier/unity-ads-webview/pull/11152)
 * Open Measurement - Add bundleId hack for IAS [#11150](https://github.com/Applifier/unity-ads-webview/pull/11150)
 * Change to Only Request Contextual Ad for the First Ad Request After Privacy Method Change [#11148](https://github.com/Applifier/unity-ads-webview/pull/11148)
