@@ -155,23 +155,14 @@ import OMID3p from 'html/omid/omid3p.html';
                 });
             });
 
-            const triggerFetchScreenValues = () => {
-                return new Promise((resolve) => {
-                    deviceInfo.getScreenHeight().then((val) => {
-                        console.log(val);
-                    });
-                    deviceInfo.getScreenWidth().then((val) => {
-                        console.log(val);
-                    });
-                    setTimeout(resolve);
-                });
-            };
-
             describe('SessionEvents not on OMBridge', () => {
                 describe('onEventProcessed', () => {
                     context('sessionStart', () => {
                         beforeEach(() => {
                             om = initWithVastVerifications();
+
+                            sinon.stub(deviceInfo, 'getScreenWidth').resolves(1280);
+                            sinon.stub(deviceInfo, 'getScreenHeight').resolves(768);
                             sandbox.stub(om, 'loaded');
                             sandbox.stub(om, 'geometryChange');
                             sandbox.stub(om, 'impression');
@@ -180,25 +171,30 @@ import OMID3p from 'html/omid/omid3p.html';
                             clock = sinon.useFakeTimers();
                         });
 
-                        xit('should call session begin ad events', () => {
-                            om.onEventProcessed('sessionStart');
-
-                            return triggerFetchScreenValues().then(() => {
+                        it('should call session start ad events', () => {
+                            return om.onEventProcessed('sessionStart').then(() => {
                                 sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                                sinon.assert.called(<sinon.SinonSpy>om.impression);
                                 sinon.assert.notCalled(<sinon.SinonSpy>om.geometryChange);
                             });
                         });
 
-                        xit('should call session begin ad events for IAS', () => {
-                            om.onEventProcessed('sessionStart', 'IAS');
-
-                            return triggerFetchScreenValues().then(() => {
+                        it('should call session begin ad events for IAS', () => {
+                            return om.onEventProcessed('sessionStart', 'IAS').then(() => {
                                 clock.tick(2000);
                                 clock.restore();
                                 sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
                                 sinon.assert.called(<sinon.SinonSpy>om.impression);
                                 sinon.assert.called(<sinon.SinonSpy>om.loaded);
-                                sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
+                                sinon.assert.calledWith(<sinon.SinonSpy>om.geometryChange, { height: 768, width: 1280 }, {
+                                    containerGeometry: { height: 768, width: 1280, x: 0, y: 0 },
+                                    geometry: { height: 768, width: 1280, x: 0, y: 0 },
+                                    measuringElement: true,
+                                    onScreenContainerGeometry: { height: 768, obstructions: [], width: 1280, x: 0, y: 0 },
+                                    onScreenGeometry: { height: 768, obstructions: [], width: 1280, x: 0, y: 0 },
+                                    percentageInView: 100,
+                                    reasons: []
+                                });
                             });
                         });
                     });

@@ -309,11 +309,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Used to ensure OMID#SessionStart is fired prior to video playback events
      * Used to ensure DOM is removed prior to OMID#SessionFinish
      */
-    public onEventProcessed(eventType: string, vendorKey?: string) {
+    public onEventProcessed(eventType: string, vendorKey?: string): Promise<void> {
         if (eventType === SESSIONEvents.SESSION_START) {
             this._sessionStartCalled = true;
             if (this._campaign instanceof VastCampaign) {
-                this.sendVASTStartEvents(vendorKey);
+                return this.sendVASTStartEvents(vendorKey);
             }
         }
 
@@ -337,18 +337,21 @@ export class OpenMeasurement extends View<AdMobCampaign> {
                 this._omBridge.sendQueuedEvents();
             }
         }
+
+        return Promise.resolve();
     }
 
-    private sendVASTStartEvents(vendorKey?: string) {
+    private sendVASTStartEvents(vendorKey?: string): Promise<void> {
             let IASScreenWidth = 0;
             let IASScreenHeight = 0;
-
             this._sessionStartCalled = true;
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
                 const measuringElementAvailable = true;
                 IASScreenWidth = screenWidth;
                 IASScreenHeight = screenHeight;
                 this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight, measuringElementAvailable));
+
                 if (vendorKey === 'IAS') {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
                 } else {
@@ -367,9 +370,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             const viewPort = OpenMeasurementUtilities.calculateViewPort(IASScreenWidth, IASScreenHeight);
             const adView = OpenMeasurementUtilities.calculateVastAdView(100, [], IASScreenWidth, IASScreenHeight, true, []);
 
+            // must be called before geometry change to avoid re-queueing and calling geometry change twice
             this._omBridge.sendQueuedEvents();
 
             this.geometryChange(viewPort, adView);
+
+            // must be called after geometry change for IAS because they don't register other ad events until after it is called
             this.loaded({
                 isSkippable: this._placement.allowSkip(),
                 skipOffset: this._placement.allowSkipInSeconds(),
