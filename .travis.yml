@@ -21,7 +21,7 @@ cache:
   directories:
   - node_modules
   - "$HOME/google-cloud-sdk/"
-script: make lint && make test-coverage && make test-integration && make build-test && make test-browser && npm run test && make build-release && make deploy
+script: npm run test
 notifications:
   slack:
     rooms:
