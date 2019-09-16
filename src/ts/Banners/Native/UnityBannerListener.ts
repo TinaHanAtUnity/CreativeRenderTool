@@ -19,7 +19,4 @@ export class BannerListenerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [error, bannerAdViewId]);
     }
 
-    public sendUnloadEvent(placementId: string, bannerAdViewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendUnloadEvent', [placementId, bannerAdViewId]);
-    }
 }
