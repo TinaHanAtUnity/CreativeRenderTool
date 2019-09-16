@@ -8,7 +8,6 @@ import { ICore } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { Store } from 'Store/Store';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('AdmobAdUnitTest', () => {
@@ -31,10 +30,9 @@ describe('AdmobAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreModule(nativeBridge);
         ads = TestFixtures.getAdsModule(core);
+        core.Ads = ads;
 
-        core.Store = new Store(core);
-
-        admobAdUnitParameters = TestFixtures.getAdmobAdUnitParameters(platform, core, ads, core.Store);
+        admobAdUnitParameters = TestFixtures.getAdmobAdUnitParameters(platform, core, ads);
 
         (<sinon.SinonStub>admobAdUnitParameters.view.container).returns(document.createElement('div'));
 
