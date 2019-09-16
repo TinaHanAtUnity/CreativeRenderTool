@@ -3,13 +3,10 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import { SliderEndCardExperiment, ParallaxEndScreenExperiment, ABGroup } from 'Core/Models/ABGroup';
+import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
-import ParallaxEndScreenImagesJson from 'json/experiments/ParallaxEndScreenImages.json';
-
-const ParallaxEndScreenImages = ParallaxEndScreenImagesJson;
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -115,36 +112,6 @@ export class CustomFeatures {
 
     public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
         return SliderEndScreenImagesJson[targetGameAppStoreId];
-    }
-
-    public static isParallaxEndScreenEnabled(abGroup: ABGroup, targetGameId: number, userAgent: string, innerWidth: number, innerHeight: number, screen: Screen | undefined) {
-        // Filter out old samsung devices since they give odd deviceorientation values
-        const isOldSamsung = userAgent.match(/Android.*(SM-A500|SM-A300|SM-A310|SM-N91|SM-G1|SM-G85|G530|SM-G3|SM-G90|GT-I|GT-S)/i);
-        if (isOldSamsung) {
-            return false;
-        }
-
-        let width = innerWidth;
-        let height = innerHeight;
-        if ((width === 0 || height === 0) && screen !== undefined) {
-            width = screen.width;
-            height = screen.height;
-        }
-
-        if (width <= 0 || height <= 0) {
-            return false;
-        }
-
-        // Endcard and parallax backgrounds have the same aspect ratio in landscape on iPads, which will prevent us from moving the background.
-        // Prevent parallax effect from running on devices with aspect ratio similar to iPads
-        const aspectRatio = height / width;
-        const isValidAspectRatio = aspectRatio > 4 / 3 || aspectRatio < 3 / 4;
-
-        return ParallaxEndScreenExperiment.isValid(abGroup) && ParallaxEndScreenImages[targetGameId] !== undefined && isValidAspectRatio;
-    }
-
-    public static getParallaxEndScreenData(targetGameId: number): number[][] {
-        return ParallaxEndScreenImages[targetGameId];
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {

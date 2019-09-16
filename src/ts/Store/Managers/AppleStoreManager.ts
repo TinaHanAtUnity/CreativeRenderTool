@@ -4,7 +4,6 @@ import { IAppleTransaction } from 'Store/Native/iOS/Products';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { AppleStore } from 'Store/Utilities/AppleStore';
 import { PaymentTransactionState } from 'Store/Constants/iOS/PaymentTransactionState';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export class AppleStoreManager extends StoreManager {
@@ -35,23 +34,9 @@ export class AppleStoreManager extends StoreManager {
                     const storeTransaction = new StoreTransaction(timestamp, transaction.productId, product.price, product.priceLocale.currencyCode, transaction.receipt, transaction.transactionIdentifier);
 
                     this.onStoreTransaction.trigger(storeTransaction);
-                } else {
-                    Diagnostics.trigger('store_getproduct_info_missing', {
-                        productId: transaction.productId,
-                        price: product.price,
-                        currencyCode: product.priceLocale.currencyCode
-                    });
                 }
             }).catch(() => {
-                Diagnostics.trigger('store_getproduct_failed', {
-                    productId: transaction.productId
-                });
-            });
-        } else {
-            Diagnostics.trigger('store_apple_transaction_not_processed', {
-                hasProductId: transaction.productId ? true : false,
-                hasReceipt: transaction.receipt ? true : false,
-                transactionState: transaction.transactionState
+                // Do nothing
             });
         }
     }
