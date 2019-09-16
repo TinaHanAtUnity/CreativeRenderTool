@@ -24,6 +24,7 @@ import {
     ProgrammaticTrackingServiceMock
 } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
+import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 
 describe('AdmobAdUnitTest', () => {
 
@@ -62,7 +63,8 @@ describe('AdmobAdUnitTest', () => {
             options: undefined,
             privacyManager: new UserPrivacyManager(),
             programmaticTrackingService: pts,
-            privacy: new AbstractPrivacy()
+            privacy: new AbstractPrivacy(),
+            privacySDK: new PrivacySDK()
         };
         admobAdUnit = new AdMobAdUnit(admobAdUnitParameters);
     });
