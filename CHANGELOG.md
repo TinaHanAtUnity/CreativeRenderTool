@@ -1,3 +1,11 @@
+# Pending
+
+* End Parallax Endcard Experiment [#11182](https://github.com/Applifier/unity-ads-webview/pull/11182)
+* Remove Unused Store Transaction Diagnostics [#11186](https://github.com/Applifier/unity-ads-webview/pull/11186)
+* Add New Fields for CCPA Compliance [#11177](https://github.com/Applifier/unity-ads-webview/pull/11177)
+* Fix AUI Integration Test Stability [#11184](https://github.com/Applifier/unity-ads-webview/pull/11184)
+* Begin Slider v2.1 Experiment on Groups 7 and 8 [#10838](https://github.com/Applifier/unity-ads-webview/pull/10838)
+
 # Mon Sep 16 19:23:57 UTC 2019
 
 * Upgrade Akamai Purging Implementation to Supported Version [#11183](https://github.com/Applifier/unity-ads-webview/pull/11183)
