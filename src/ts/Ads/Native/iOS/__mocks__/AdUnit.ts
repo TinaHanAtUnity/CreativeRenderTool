@@ -1,4 +1,4 @@
-import { IosAdUnitApi as Base } from 'Ads/Native/Ios/AdUnit';
+import { IosAdUnitApi as Base } from 'Ads/Native/iOS/AdUnit';
 
 export type IosAdUnitApiMock = Base & {};
 

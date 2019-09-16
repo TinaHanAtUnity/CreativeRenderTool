@@ -1,4 +1,4 @@
-import { IosVideoPlayerApi as Base } from 'Ads/Native/Ios/VideoPlayer';
+import { IosVideoPlayerApi as Base } from 'Ads/Native/iOS/VideoPlayer';
 
 export type VideoPlayerMock = Base & {};
 
