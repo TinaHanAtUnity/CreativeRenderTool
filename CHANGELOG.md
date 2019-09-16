@@ -1,4 +1,4 @@
-# Pending
+# Mon Sep 16 19:23:57 UTC 2019
 
 * Upgrade Akamai Purging Implementation to Supported Version [#11183](https://github.com/Applifier/unity-ads-webview/pull/11183)
 * Add AdRequest to GameSessionCounters for Load API [#11185](https://github.com/Applifier/unity-ads-webview/pull/11185)
