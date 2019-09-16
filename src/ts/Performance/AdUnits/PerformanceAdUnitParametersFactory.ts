@@ -16,8 +16,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { ParallaxPerformanceCampaign } from 'Performance/Models/ParallaxPerformanceCampaign';
-import { PerformanceParallaxEndScreen } from 'Performance/Views/PerformanceParallaxEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -49,8 +47,6 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
         if (baseParams.campaign instanceof SliderPerformanceCampaign) {
             endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (baseParams.campaign instanceof ParallaxPerformanceCampaign) {
-            endScreen = new PerformanceParallaxEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
