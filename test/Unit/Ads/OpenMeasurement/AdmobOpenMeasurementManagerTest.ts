@@ -35,6 +35,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
             core = TestFixtures.getCoreApi(nativeBridge);
             clientInformation = TestFixtures.getClientInfo(platform);
             campaign = sandbox.createStubInstance(AdMobCampaign);
+            if (platform === Platform.ANDROID) {
+                deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            } else {
+                deviceInfo = TestFixtures.getIosDeviceInfo(core);
+            }
+            request = sinon.createStubInstance(RequestManager);
 
             // const openMeasurement: OpenMeasurement = sandbox.createStubInstance(OpenMeasurement);
             return new AdmobOpenMeasurementManager(platform, core, clientInformation, campaign, placement, deviceInfo, request);
