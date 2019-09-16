@@ -28,6 +28,7 @@ server.pid
 
 # Travis
 gcs_credentials.json
+.edgerc
 
 # Chromium
 .chromium_user_prefs.json
