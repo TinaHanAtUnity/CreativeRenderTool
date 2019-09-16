@@ -100,6 +100,7 @@ export class AdmobOpenMeasurementManager {
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request);
             this._omInstances.push(om);
+            om.setAdmobOMSessionId(this._omAdSessionId);
             om.addToViewHierarchy();
             om.injectVerificationResources([resource]);
         });
@@ -307,6 +308,7 @@ export class AdmobOpenMeasurementManager {
         this._omInstances.forEach((om) => {
             om.sessionFinish();
         });
+        this._omBridge.sendSessionFinish();
     }
 
     /**

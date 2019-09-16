@@ -5,11 +5,11 @@ import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasuremen
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OMIDEventBridge, MediaType, IVastProperties, VideoPosition } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { IImpressionValues } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
+import { IImpressionValues, VideoPlayerState, InteractionType } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { Video } from 'Ads/Models/Assets/Video';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${platform} OpenMeasurementManager`, () => {
+    describe(`${platform} OMManager`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
 
@@ -95,23 +95,25 @@ import { Video } from 'Ads/Models/Assets/Video';
             });
 
             it('loaded', () => {
-                const vastProps: IVastProperties = {
+                const vastProperties: IVastProperties = {
                     isSkippable: false,
                     skipOffset: 10,
                     isAutoplay: true,                   // Always autoplay for video
                     position: VideoPosition.STANDALONE  // Always standalone video
                 };
-                omManager.loaded(vastProps);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', vastProps);
+                omManager.loaded(vastProperties);
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', { vastProperties });
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
 
-            it('start', () => {
-                //
+            describe('start event with varying states', () => {
+                // TODO: DO
             });
 
-            it('playerStateChanged', () => {
-                //
+            it('should fire multiple playerStateChanged events regardless of state', () => {
+                omManager.playerStateChanged(VideoPlayerState.NORMAL);
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidPlayerStateChange', { state: 'normal' });
+                sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
 
             it('should fire multiple sendFirstQuartile events regardless of state', () => {
@@ -131,24 +133,25 @@ import { Video } from 'Ads/Models/Assets/Video';
                 sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidThirdQuartile');
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
-
-            it('completed', () => {
-                //
+            describe('completed event with varying states', () => {
+                // TODO: DO
             });
-            it('pause', () => {
-                //
+            describe('pause event with varying states', () => {
+                // TODO: DO
             });
-            it('resume', () => {
-                //
+            describe('resume event with varying states', () => {
+                // TODO: DO
             });
-            it('skipped', () => {
-                //
+            describe('skipped event with varying states', () => {
+                // TODO: DO
             });
-            it('volumeChange', () => {
-                //
+            describe('volumeChange event with varying states', () => {
+                // TODO: DO
             });
             it('adUserInteraction', () => {
-                //
+                omManager.adUserInteraction(InteractionType.CLICK);
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', 'click');
+                sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
             it('should fire multiple bufferStart regardless of state', () => {
                 omManager.bufferStart();
@@ -160,8 +163,8 @@ import { Video } from 'Ads/Models/Assets/Video';
                 sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidBufferFinish');
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
-            it('geometryChange', () => {
-                //
+            describe('geometryChange event with varying states', () => {
+                // TODO: DO
             });
         });
     });

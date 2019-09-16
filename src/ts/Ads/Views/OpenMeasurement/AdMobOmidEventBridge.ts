@@ -264,6 +264,10 @@ export class AdMobOmidEventBridge {
         this.postMessage(OMSessionInfo.SESSION_ID, sessionId);
     }
 
+    public sendSessionFinish() {
+        this.postMessage(SESSIONEvents.SESSION_FINISH);
+    }
+
     public setVerificationsInjected(verificationsInjected: boolean) {
         this._verificationsInjected = verificationsInjected;
     }

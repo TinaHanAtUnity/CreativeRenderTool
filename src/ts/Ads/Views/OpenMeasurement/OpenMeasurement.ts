@@ -98,6 +98,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _sessionFinishCalled = false;
     private _adVerification: VastAdVerification;
 
+    // GUID for running all current omid3p with same sessionid as session interface
+    private _admobOMSessionId: string;
+
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement');
 
@@ -121,6 +124,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendorKey) => this.onEventProcessed(eventType, vendorKey)
         }, this._omIframe, this);
+    }
+
+    public setAdmobOMSessionId(admobSessionInterfaceId: string) {
+        this._admobOMSessionId = admobSessionInterfaceId;
     }
 
     public getOMAdSessionId() {
@@ -189,6 +196,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omIframe.style.border = 'none';
 
         this._omBridge.setIframe(this._omIframe);
+
+        // Used for all ad, video, and session events
+        if (this._campaign instanceof AdMobCampaign && this._admobOMSessionId) {
+            this._omAdSessionId = this._admobOMSessionId;
+        }
     }
 
     public impression(impressionValues: IImpressionValues) {

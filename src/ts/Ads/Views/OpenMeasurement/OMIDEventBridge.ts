@@ -183,7 +183,6 @@ export class OMIDEventBridge {
     private _openMeasurement: OpenMeasurement;
 
     private _iframe3p: HTMLIFrameElement;
-    private _iframeSessionInterface: HTMLIFrameElement;
 
     private _eventQueue: IVerificationEvent[] = [];
     private _eventQueueSent = false;
@@ -235,6 +234,11 @@ export class OMIDEventBridge {
         if (this._iframe3p.contentWindow && this._verificationsInjected) {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
+
+        // TODO: FIX
+        // if (!this._eventQueueSent) {
+        //     this._eventQueue.push(event);
+        // }
     }
 
     public triggerVideoEvent(type: string, payload?: unknown) {
@@ -263,13 +267,10 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // this posts back to the admob session interface
-        if (this._openMeasurement.getSessionStartCalled() && event.data.type === SESSIONEvents.SESSION_FINISH) {
-            this.postMessage(SESSIONEvents.SESSION_FINISH);
-        }
-
-        // Adds session events for admob
-        this._eventQueue.push(event);
+        // TODO: FIX
+        // if (!this._eventQueueSent) {
+        //     this._eventQueue.push(event);
+        // }
     }
 
     private onMessage(e: MessageEvent) {
@@ -280,15 +281,6 @@ export class OMIDEventBridge {
                 const handler = this._omidHandlers[message.event];
                 handler(message);
             }
-        }
-    }
-
-    private postMessage(event: string, data?: unknown) {
-        if (this._iframeSessionInterface && this._iframeSessionInterface.contentWindow) {
-            this._iframeSessionInterface.contentWindow.postMessage({
-                type: event,
-                value: data
-            }, '*');
         }
     }
 }

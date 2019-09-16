@@ -139,7 +139,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         });
 
-        describe('Calculating Vast AdView', () => {
+        // TODO: Fix these tests
+        describe('Calculating Vast AdView for sdk 3.2 and lower', () => {
             beforeEach(() => {
                 om.VideoViewRectangle = undefined;
             });

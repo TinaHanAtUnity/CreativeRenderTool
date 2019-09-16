@@ -8,58 +8,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class OpenMeasurementUtilities {
 
-    public static calculateAdViewVideoWidth(screenWidth: number, screenHeight: number, campaign: Campaign) {
-        let videoWidth = screenWidth;
-
-        const isLandscape = screenWidth > screenHeight;
-        let campaignVideoWidth = 0;
-
-        // TODO: Will be removed in subsequent refactor
-        // The campaign values are not to scale to device
-        // But we need a solution like this for fallback OM certification <3.2
-        if (campaign instanceof VastCampaign) {
-            campaignVideoWidth = campaign.getVideo().getWidth();
-        }
-
-        if (!isLandscape && campaignVideoWidth > 0) {
-            videoWidth = campaignVideoWidth;
-        }
-
-        return videoWidth;
-    }
-
-    public static calculateAdViewVideoHeight(screenWidth: number, screenHeight: number, campaign: Campaign) {
-        let videoHeight = screenHeight;
-
-        const isLandscape = screenWidth > screenHeight;
-        let campaignVideoHeight = 0;
-
-        // TODO: Will be removed in subsequent refactor
-        // The campaign values are not to scale to device
-        // But we need a solution like this for fallback OM certification <3.2
-        if (campaign instanceof VastCampaign) {
-            campaignVideoHeight = campaign.getVideo().getHeight();
-        }
-
-        if (!isLandscape && campaignVideoHeight > 0) {
-            videoHeight = campaignVideoHeight;
-        }
-
-        return videoHeight;
-    }
-
-    public static estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
-        let topLeftY = 0;
-
-        const isLandscape = screenWidth > screenHeight;
-        if (!isLandscape && videoHeight > 0) {
-            const centerpoint = screenHeight / 2;
-            topLeftY = centerpoint - (videoHeight / 2);
-        }
-
-        return topLeftY;
-    }
-
     public static getScreenDensity(platform: Platform, deviceInfo: DeviceInfo): number {
         if (platform === Platform.ANDROID) {
             return (<AndroidDeviceInfo> deviceInfo).getScreenDensity();
@@ -152,6 +100,7 @@ export class OpenMeasurementUtilities {
     }
 
     public static VideoViewRectangle: IRectangle | undefined;
+    // TODO: Double check this
     public static campaign: Campaign;
 
     /**
@@ -160,19 +109,23 @@ export class OpenMeasurementUtilities {
      */
     public static calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], videoView?: IRectangle): IAdView {
 
-        // For integrations less than SDK 3.2.0
-        // TODO: Will be removed in subsequent refactor
-        let videoWidth = OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, this.campaign);
-        let videoHeight = OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, this.campaign);
         let topLeftX = 0;
-        let topLeftY = OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+        let topLeftY = 0;
+        let videoWidth = 0;
+        let videoHeight = 0;
 
-        // For integrations SDK 3.2.0+
+        // For integrations SDK 3.2.0+ and Admob
         if (this.VideoViewRectangle) {
             topLeftX = this.VideoViewRectangle.x;
             topLeftY = this.VideoViewRectangle.y;
             videoWidth = this.VideoViewRectangle.width;
             videoHeight = this.VideoViewRectangle.height;
+        } else {
+            // For integrations less than SDK 3.2.0 -> For partial om cert if needed
+            topLeftX = 0;
+            topLeftY = OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+            videoWidth = OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, this.campaign);
+            videoHeight = OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, this.campaign);
         }
 
         if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
@@ -222,5 +175,57 @@ export class OpenMeasurementUtilities {
         }
 
         return adView;
+    }
+
+    private static calculateAdViewVideoWidth(screenWidth: number, screenHeight: number, campaign: Campaign) {
+        let videoWidth = screenWidth;
+
+        const isLandscape = screenWidth > screenHeight;
+        let campaignVideoWidth = 0;
+
+        // TODO: Will be removed in subsequent refactor
+        // The campaign values are not to scale to device
+        // But we need a solution like this for fallback OM certification <3.2
+        if (campaign instanceof VastCampaign) {
+            campaignVideoWidth = campaign.getVideo().getWidth();
+        }
+
+        if (!isLandscape && campaignVideoWidth > 0) {
+            videoWidth = campaignVideoWidth;
+        }
+
+        return videoWidth;
+    }
+
+    private static calculateAdViewVideoHeight(screenWidth: number, screenHeight: number, campaign: Campaign) {
+        let videoHeight = screenHeight;
+
+        const isLandscape = screenWidth > screenHeight;
+        let campaignVideoHeight = 0;
+
+        // TODO: Will be removed in subsequent refactor
+        // The campaign values are not to scale to device
+        // But we need a solution like this for fallback OM certification <3.2
+        if (campaign instanceof VastCampaign) {
+            campaignVideoHeight = campaign.getVideo().getHeight();
+        }
+
+        if (!isLandscape && campaignVideoHeight > 0) {
+            videoHeight = campaignVideoHeight;
+        }
+
+        return videoHeight;
+    }
+
+    private static estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
+        let topLeftY = 0;
+
+        const isLandscape = screenWidth > screenHeight;
+        if (!isLandscape && videoHeight > 0) {
+            const centerpoint = screenHeight / 2;
+            topLeftY = centerpoint - (videoHeight / 2);
+        }
+
+        return topLeftY;
     }
 }
