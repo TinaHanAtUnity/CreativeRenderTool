@@ -71,6 +71,12 @@ describe('AndroidAUIEssentialsTest', () => {
         sandbox.restore();
     });
 
+    // Reset Autoclose settings after tests
+    after(() => {
+        AbstractAdUnit.setAutoCloseDelay(0);
+        AbstractAdUnit.setAutoClose(false);
+    });
+
     const fakeARSupport = (targetSandbox: sinon.SinonSandbox) => {
         targetSandbox.stub(ARUtil, 'isARSupported').callsFake(() => {
             return Promise.resolve<boolean>(true);
@@ -100,86 +106,78 @@ describe('AndroidAUIEssentialsTest', () => {
     };
 
     const initialize = async () => {
-        return new Promise((resolve) => {
-            fakeARSupport(sandbox);
-            listener = new TestListener();
-            const readyObserver = listener.onReady.subscribe((placement) => {
-                listener.onReady.unsubscribe(readyObserver);
-                resolve();
-            });
+        fakeARSupport(sandbox);
+        // We must reset these parameters manually because the webview does not get completely reset between runs.
+        // The way metadata is read during initialization prevents false value from updating it to the respective systems.
+        AbstractAdUnitParametersFactory.setForcedGDPRBanner(false);
+        AbstractAdUnitParametersFactory.setForcedConsentUnit(false);
+        MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(false);
+        MRAIDAdUnitParametersFactory.setForcedARMRAID(false);
+        MRAIDView.setDebugJsConsole(false);
 
-            // We must reset these parameters manually because the webview does not get completely reset between runs.
-            // The way metadata is read during initialization prevents false value from updating it to the respective systems.
-            AbstractAdUnitParametersFactory.setForcedGDPRBanner(false);
-            AbstractAdUnitParametersFactory.setForcedConsentUnit(false);
-            MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(false);
-            MRAIDAdUnitParametersFactory.setForcedARMRAID(false);
-            MRAIDView.setDebugJsConsole(false);
+        UnityAds.setBackend(new Backend(Platform.ANDROID));
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
 
-            UnityAds.setBackend(new Backend(Platform.ANDROID));
-            UnityAds.getBackend().Api.Request.setPassthrough(true);
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('LGE');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('Nexus 5');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('6.0.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
 
-            UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
-            UnityAds.getBackend().Api.DeviceInfo.setManufacturer('LGE');
-            UnityAds.getBackend().Api.DeviceInfo.setModel('Nexus 5');
-            UnityAds.getBackend().Api.DeviceInfo.setOsVersion('6.0.1');
-            UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1080);
-            UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
-            UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
+        AbstractAdUnit.setAutoCloseDelay(10000);
+        AbstractAdUnit.setAutoClose(true);
 
-            AbstractAdUnit.setAutoCloseDelay(1000);
-            AbstractAdUnit.setAutoClose(true);
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
-            ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
-            CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
-            ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
-
-            UnityAds.initialize(Platform.ANDROID, '444', listener, true);
-            });
-    };
-
-    const showAdWhenReady = (placement: string) => {
-        if (UnityAds.isReady(placement)) {
-            UnityAds.show(placement);
-        } else {
-            window.setTimeout(showAdWhenReady, 20, placement);
-        }
-    };
-
-    const waitUntilLoaded = (sel: string) => {
-        return new Promise((resolve) => {
-            const checkEl = () => {
-                const el = <HTMLIFrameElement>document.querySelector(sel);
-                if (el && el.srcdoc) {
-                    resolve();
-                } else {
-                    window.setTimeout(checkEl, 20);
-                }
-            };
-            checkEl();
-        });
+        UnityAds.initialize(Platform.ANDROID, '444', listener, true);
     };
 
     const showAdAndGatherSources = () => {
+        listener = new TestListener();
         iframeSrc = '';
         containerSrc = '';
         return new Promise((resolve) => {
+            const readyListener = listener.onReady.subscribe((placement) => {
+                listener.onReady.unsubscribe(readyListener);
+                UnityAds.show(placement);
+            });
+
+            const startListener = listener.onStart.subscribe((placement) => {
+                listener.onStart.unsubscribe(startListener);
+                const iframe = <HTMLIFrameElement>document.querySelector('#mraid-iframe');
+                // loadingComplete will fire after the iframe is ready for testing purposes
+                const loadingComplete = () => {
+
+                    setTimeout(() => {
+                        iframeSrc = iframe.srcdoc;
+
+                        const container = <HTMLDivElement>document.querySelector('#extended-mraid');
+                        containerSrc = container.innerHTML;
+
+                        UnityAds.getBackend().Api.AdUnit.close();
+                    }, 250);
+                };
+
+                // contentDocument should be undefined until the iframe is ready
+                if (!iframe.contentDocument) {
+                    // In case no contentDocument present, wait until load event
+                    iframe.addEventListener('load', loadingComplete, true);
+                } else {
+                    // In case contentDocument is present, the iframe should be ready for testing purposes.
+                    loadingComplete();
+                }
+            });
+
             const finishListener = listener.onFinish.subscribe((placement) => {
                 listener.onFinish.unsubscribe(finishListener);
                 resolve();
             });
 
-            const startListener = listener.onStart.subscribe((placement) => {
-                listener.onStart.unsubscribe(startListener);
-                waitUntilLoaded('#mraid-iframe').then(() => {
-                    const iframe = <HTMLIFrameElement>document.querySelector('#mraid-iframe');
-                    iframeSrc = iframe.srcdoc;
-
-                    const container = <HTMLDivElement>document.querySelector('#extended-mraid');
-                    containerSrc = container.innerHTML;
-                });
-            });
-            showAdWhenReady('defaultVideoAndPictureZone');
+            initialize();
         });
     };
 
@@ -191,11 +189,11 @@ describe('AndroidAUIEssentialsTest', () => {
                 forceGDPRBanner: true,
                 debugJSConsole: true
             });
-            await initialize().then(showAdAndGatherSources);
+            await showAdAndGatherSources(); // initialize().then(showAdAndGatherSources);
         });
 
         it ('should have loaded the content correctly', () => {
-            assert.isNotNull(iframeSrc);
+            assert.isNotEmpty(iframeSrc);
         });
 
         it ('should have enabled debugJsConsole', () => {
@@ -237,11 +235,11 @@ describe('AndroidAUIEssentialsTest', () => {
                 forceGDPRBanner: false,
                 debugJSConsole: false
             });
-            await initialize().then(showAdAndGatherSources);
+            await showAdAndGatherSources();
         });
 
         it ('should have loaded the content correctly', () => {
-            assert.isNotNull(iframeSrc);
+            assert.isNotEmpty(iframeSrc);
         });
 
         it ('should not have enabled debugJsConsole', () => {

@@ -81,19 +81,18 @@ export class BannerAdContext {
 
         this._onBannerOpened = this._bannerNativeApi.BannerApi.onBannerOpened.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this._bannerNativeApi.BannerListenerApi.sendShowEvent(this._placement.getId(), this._bannerAdViewId);
                 this.onBannerShow();
             }
         });
         this._onBannerClosed = this._bannerNativeApi.BannerApi.onBannerClosed.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this._bannerNativeApi.BannerListenerApi.sendHideEvent(this._placement.getId(), this._bannerAdViewId);
                 this.hide();
             }
         });
         this._onBannerDestroyed = this._bannerNativeApi.BannerApi.onBannerDestroyed.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this._bannerNativeApi.BannerListenerApi.sendUnloadEvent(this._placement.getId(), this._bannerAdViewId);
+                // We probably want to clean up some stuff.
+                // TODO
             }
         });
     }
@@ -133,7 +132,6 @@ export class BannerAdContext {
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
-                    return this._bannerNativeApi.BannerListenerApi.sendLoadEvent(this._placement.getId(), this._bannerAdViewId);
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
