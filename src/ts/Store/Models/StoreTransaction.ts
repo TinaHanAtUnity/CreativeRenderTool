@@ -4,8 +4,9 @@ export interface IStoreTransaction {
     ts: number;
     receipt: string;
     productId: string;
-    amount: number;
+    price: number;
     currency: string;
+    transactionId: string;
 }
 
 export class StoreTransaction extends Model<IStoreTransaction> {
@@ -13,17 +14,19 @@ export class StoreTransaction extends Model<IStoreTransaction> {
         ts: ['number'],
         receipt: ['string'],
         productId: ['string'],
-        amount: ['number'],
-        currency: ['string']
+        price: ['number'],
+        currency: ['string'],
+        transactionId: ['string']
     };
 
-    constructor(timestamp: number, productId: string, amount: number, currency: string, receipt: string) {
+    constructor(timestamp: number, productId: string, price: number, currency: string, receipt: string, transactionId: string) {
         super('StoreTransaction', StoreTransaction.Schema, {
             ts: timestamp,
             receipt: receipt,
             productId: productId,
-            amount: amount,
-            currency: currency
+            price: price,
+            currency: currency,
+            transactionId: transactionId
         });
     }
 
@@ -39,12 +42,16 @@ export class StoreTransaction extends Model<IStoreTransaction> {
         return this.get('productId');
     }
 
-    public getAmount(): number {
-        return this.get('amount');
+    public getPrice(): number {
+        return this.get('price');
     }
 
     public getCurrency(): string {
         return this.get('currency');
+    }
+
+    public getTransactionId(): string {
+        return this.get('transactionId');
     }
 
     public getDTO() {
@@ -52,8 +59,9 @@ export class StoreTransaction extends Model<IStoreTransaction> {
             ts: this.getTimestamp(),
             receipt: this.getReceipt(),
             productId: this.getProductId(),
-            amount: this.getAmount(),
-            currency: this.getCurrency()
+            amount: this.getPrice(),
+            currency: this.getCurrency(),
+            transactionId: this.getTransactionId()
         };
     }
 }

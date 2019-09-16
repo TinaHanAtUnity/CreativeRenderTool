@@ -165,7 +165,6 @@ describe('CustomPurchasingAdapter', () => {
                 return triggerTransactionComplete(transactionDetails)
                     .then(() => {
                         return purchaseItemPromise.then((transactionDets) => {
-                            sinon.assert.called(<sinon.SinonStub>analyticsManager.onIapTransaction);
                             assert.deepEqual(transactionDets, transactionDetails);
                         });
                 });

@@ -66,7 +66,6 @@ export interface IPerformanceCampaign extends ICampaign {
     appDownloadUrl?: string;
     screenshots?: Image[];
     screenshotsOrientation?: SliderEndScreenImageOrientation;
-    screenshotLayout?: number[][];
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -95,8 +94,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             adUnitStyle: ['object', 'undefined'],
             screenshots: ['array', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
-            screenshotsOrientation: ['number', 'undefined'],
-            screenshotLayout: ['array', 'undefined']
+            screenshotsOrientation: ['number', 'undefined']
         }, campaign);
     }
 
