@@ -128,6 +128,10 @@ export class AFMABridge {
         this.postMessage('clickSignal', response);
     }
 
+    public sendMuteChange(isMuted: boolean) {
+        this.postMessage('muteChange', isMuted);
+    }
+
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {

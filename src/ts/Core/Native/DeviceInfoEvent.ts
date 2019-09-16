@@ -1,3 +1,4 @@
 export enum DeviceInfoEvent {
-    VOLUME_CHANGED
+    VOLUME_CHANGED,
+    IOS_MUTE_STATE_RECEIVED
 }

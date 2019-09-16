@@ -273,6 +273,10 @@
                 clickSignalListeners = [];
             };
 
+            this.onReceiveMuteChange = function(isMuted) {
+                videoEl.muted = isMuted;
+            };
+
             this.notifyRewardedVideoStart = function() {
                 // Do nothing, but leave so Admob can continue calling it
             };
@@ -418,6 +422,9 @@
                     } else if (e.data.event === 'clickSignal') {
                         console.log('recieved click signal', e);
                         self.onReceiveClickSignal(e.data.data);
+                    } else if (e.data.event === 'muteChange') {
+                        console.log('received mute change', e);
+                        self.onReceiveMuteChange(e.data.data);
                     }
                 }
             });

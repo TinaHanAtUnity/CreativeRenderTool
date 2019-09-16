@@ -160,6 +160,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._view.sendClickSignalResponse(response);
     }
 
+    public sendMuteChange(isMuted: boolean) {
+        this._view.sendMuteChange(isMuted);
+    }
+
     public getRequestToViewTime(): number {
         return this._requestToViewTime;
     }
