@@ -1,7 +1,6 @@
-import { OMID3pEvents, IVastProperties, InteractionType, IViewPort, IRectangle, ObstructionReasons } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
-import { IImpressionValues, VideoPlayerState, IAdView, ISessionEvent } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { VideoPlayerState, InteractionType, ISessionEvent, IImpressionValues, IVastProperties, OMID3pEvents, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 interface IOMManager {
     impression(impressionValues: IImpressionValues): void;

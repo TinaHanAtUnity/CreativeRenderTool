@@ -5,7 +5,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { View } from 'Core/Views/View';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { OMIDEventBridge, IImpressionValues, IVastProperties, ISessionEvent, IVerificationScriptResource, IViewPort, IAdView, VideoPosition, ObstructionReasons, MediaType, AccessMode, VideoEventAdaptorType, IRectangle, OMID3pEvents, SESSIONEvents } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { OMIDEventBridge } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { Template } from 'Core/Utilities/Template';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Placement } from 'Ads/Models/Placement';
@@ -16,6 +16,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SESSIONEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;

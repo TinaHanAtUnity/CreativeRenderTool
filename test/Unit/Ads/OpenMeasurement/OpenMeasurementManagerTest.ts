@@ -4,9 +4,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MediaType, IVastProperties, VideoPosition } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { IImpressionValues, VideoPlayerState, InteractionType, IAdView } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { OpenMeasurementManager, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlayerState, InteractionType, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {

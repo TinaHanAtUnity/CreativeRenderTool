@@ -1,9 +1,8 @@
 import { Platform } from 'Core/Constants/Platform';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { IRectangle } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { assert } from 'chai';
-import { IAdView, ObstructionReasons } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IRectangle, IAdView, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { assert } from 'chai';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('OMUtilities', () => {

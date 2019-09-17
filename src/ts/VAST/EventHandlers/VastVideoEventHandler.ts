@@ -6,11 +6,10 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 

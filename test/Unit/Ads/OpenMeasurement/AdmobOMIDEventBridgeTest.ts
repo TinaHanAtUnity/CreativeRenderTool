@@ -10,9 +10,9 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { OMIDEventBridge, OMEvents, MediaType, VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3pEvents, OMSessionInfo, IRectangle, IOMIDEventHandler } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { IOMIDHandler, AdMobOmidEventBridge } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
+import { IOMIDHandler, AdMobOmidEventBridge, OMEvents, OMSessionInfo } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
+import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3pEvents, MediaType, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     const sandbox = sinon.createSandbox();

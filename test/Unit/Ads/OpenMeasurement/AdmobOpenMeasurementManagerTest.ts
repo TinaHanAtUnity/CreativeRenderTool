@@ -10,9 +10,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { assert } from 'chai';
+import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementManager`, () => {

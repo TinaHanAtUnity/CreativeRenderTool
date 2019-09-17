@@ -10,7 +10,8 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { OMIDEventBridge, OMEvents, MediaType, VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3pEvents, OMSessionInfo, IRectangle, IOMIDEventHandler } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { OMIDEventBridge, IOMIDEventHandler } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { OMID3pEvents } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     const sandbox = sinon.createSandbox();

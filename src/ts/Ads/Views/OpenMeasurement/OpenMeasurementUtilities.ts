@@ -1,10 +1,9 @@
-import { IRectangle, IAdView } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { IViewPort, ObstructionReasons } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { Platform } from 'Core/Constants/Platform';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IViewPort, IRectangle, ObstructionReasons, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class OpenMeasurementUtilities {
 

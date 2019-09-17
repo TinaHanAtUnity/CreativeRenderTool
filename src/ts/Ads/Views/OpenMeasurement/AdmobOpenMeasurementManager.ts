@@ -1,6 +1,5 @@
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { IVastProperties, InteractionType, IViewPort, IRectangle, ObstructionReasons, AdMobOmidEventBridge } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
-import { IImpressionValues, VideoPlayerState, IAdView, ISessionEvent, IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { AdMobOmidEventBridge } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
@@ -10,6 +9,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
 
