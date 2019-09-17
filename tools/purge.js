@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
+const childProcess = require('child_process');
 
 const cdnConfig = {
     'akamai': {
@@ -11,9 +13,10 @@ const cdnConfig = {
             'webview.unityads.unity3d.com',
             'config-cn.unityads.unity3d.com'
         ],
-        'check_url': 'cdn-akamai.unityads.unity3d.com',
-        'username': process.env.AKAMAI_USERNAME,
-        'password': process.env.AKAMAI_PASSWORD
+        'host': process.env.AKAMAI_HOST,
+        'access_token': process.env.AKAMAI_ACCESS_TOKEN,
+        'client_secret': process.env.AKAMAI_CLIENT_SECRET,
+        'client_token': process.env.AKAMAI_CLIENT_TOKEN
     },
     'highwinds': {
         'base_urls': [
@@ -44,16 +47,16 @@ const cdnConfig = {
 };
 
 let branch = process.env.TRAVIS_BRANCH;
-if(!branch) {
+if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-if(branch === 'master') {
+if (branch === 'master') {
     branch = 'development';
 }
 
 const commit = process.env.TRAVIS_COMMIT;
-if(!commit) {
+if (!commit) {
     throw new Error('Invalid commit: ' + commit);
 }
 
@@ -88,7 +91,7 @@ const fetchRetry = (url, options, retries, delay) => {
             });
         });
     };
-    if(retries >= 0) {
+    if (retries >= 0) {
         return doFetch();
     }
     return Promise.reject('Failed to fetch "' + url + '" after retries');
@@ -98,7 +101,7 @@ const checkConfigJson = (url, version) => {
     console.log('Checking "' + url + '"');
     const doFetch = () => {
         return fetchRetry(url, {}, 5, 5000).then(res => res.json()).then(configJson => {
-            if(configJson.version !== version) {
+            if (configJson.version !== version) {
                 console.log('Invalid version "' + configJson.version + '" from "' + url + '"');
                 return new Promise((resolve) => {
                     setTimeout(() => {
@@ -116,33 +119,22 @@ let purgeAkamai = (urlRoot) => {
         return urlsFromPath(urlRoot, cdnConfig.akamai.base_urls, path, true);
     }));
 
-    console.log('Starting Akamai purge of: ');
-    console.dir(urls);
-
-    let body = {
-        'objects': urls,
-        'action': 'invalidate'
+    const executeShell = (command) => {
+        childProcess.execSync(command, (err, stdout, stderr) => {
+            console.log(stdout);
+            console.log(stderr);
+            if (stdout.indexOf('[OK]') === -1 || stderr.indexOf('API Error') > -1) {
+                throw new Error(`Akamai purge request failed`);
+            }
+        });
     };
 
-    const endpoint = 'https://api.ccu.akamai.com/ccu/v2/queues/default';
-
-    return fetchRetry(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + Buffer.from(cdnConfig.akamai.username + ':' + cdnConfig.akamai.password).toString('base64')
-        },
-        body: JSON.stringify(body)
-    }, 5, 5000).then(res => {
-        if(res.status !== 201) {
-            throw new Error(`Akamai purge request failed with HTTP code: ${res.status}`);
-        }
-        return res.text();
-    }).then(body => {
-        console.dir(body);
-        console.log('Akamai purge request successful');
-        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.akamai.check_url + urlRoot + path, commit)));
-    });
+    console.log('Starting Akamai purge of: ');
+    console.dir(urls);
+    const edgerc = `[ccu]\nhost = ${cdnConfig.akamai.host}\nclient_token = ${cdnConfig.akamai.client_token}\nclient_secret = ${cdnConfig.akamai.client_secret}=\naccess_token = ${cdnConfig.akamai.access_token}`;
+    const createEdgercFile = `echo $'${edgerc}' > $(pwd)/.edgerc`;
+    const purgeAkamai = `akamai purge --edgerc $(pwd)/.edgerc invalidate ${urls.join(' ')}`;
+    executeShell(`${createEdgercFile} && ${purgeAkamai}`);
 };
 
 let purgeHighwinds = (urlRoot) => {
@@ -155,7 +147,7 @@ let purgeHighwinds = (urlRoot) => {
 
     let body = {
         'list': urls.map((url) => {
-            return {'url': url};
+            return { 'url': url };
         })
     };
 
@@ -169,7 +161,7 @@ let purgeHighwinds = (urlRoot) => {
         },
         body: JSON.stringify(body)
     }, 5, 5000).then(res => {
-        if(res.status !== 200) {
+        if (res.status !== 200) {
             console.log('Highwinds purge request failed, HTTP ' + res.status);
             return res.text().then(body => {
                 console.dir(body);
@@ -205,7 +197,7 @@ let purgeChinaNetCenter = (urlRoot) => {
     }) + '&url=' + combinedUrls;
 
     return fetchRetry(endpoint, {}, 5, 5000).then(res => {
-        if(res.status !== 200) {
+        if (res.status !== 200) {
             throw new Error(`ChinaNetCenter purge request failed with HTTP code: ${res.status}`);
         }
         return res.text();
@@ -243,7 +235,7 @@ let purgeAliBabaCloud = (urlRoot) => {
     const getCanonicalized = (parameters) => {
         let canonicalized = [];
         Object.keys(parameters).sort().forEach((key) => {
-            if(parameters[key]) {
+            if (parameters[key]) {
                 canonicalized.push(encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]));
             }
         });
@@ -262,18 +254,18 @@ let purgeAliBabaCloud = (urlRoot) => {
 
     const getUrls = (urls) => {
         return urls.map(url => {
-             const parameters = getParameters(url);
-             const signature = getSignedString(getStringToSign(getCanonicalized(parameters)));
-             parameters.Signature = encodeURIComponent(signature);
-             return 'https://cdn.aliyuncs.com/?' + Object.entries(parameters).map(([key, value]) => {
-                 return key + '=' + value;
-             }).join('&');
+            const parameters = getParameters(url);
+            const signature = getSignedString(getStringToSign(getCanonicalized(parameters)));
+            parameters.Signature = encodeURIComponent(signature);
+            return 'https://cdn.aliyuncs.com/?' + Object.entries(parameters).map(([key, value]) => {
+                return key + '=' + value;
+            }).join('&');
         });
     };
 
     return Promise.all(getUrls(urls).map((url) => {
         return fetchRetry(url, {}, 5, 5000).then(res => {
-            if(res.status !== 200) {
+            if (res.status !== 200) {
                 throw new Error(`AliBabaCloud purge request failed with HTTP code: ${res.status}`);
             }
             return res.text();
@@ -287,9 +279,9 @@ let purgeAliBabaCloud = (urlRoot) => {
 };
 
 let urlRoot = '/webview/' + branch;
-if(branch === '2.0.6') {
+if (branch === '2.0.6') {
     urlRoot = '/webview/master';
-} else if(branch === '3.0.1') {
+} else if (branch === '3.0.1') {
     urlRoot = '/webview/3.0.1-rc2';
 }
 
@@ -299,11 +291,11 @@ let purgeList = [
     purgeAliBabaCloud(urlRoot)
 ];
 
-if(branch === '2.0.6') {
+if (branch === '2.0.6') {
     purgeList.push(purgeAkamai('/webview/2.0.6'));
     purgeList.push(purgeHighwinds('/webview/2.0.6'));
     purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
-} else if(branch === '3.0.1') {
+} else if (branch === '3.0.1') {
     purgeList.push(purgeAkamai('/webview/3.0.1'));
     purgeList.push(purgeHighwinds('/webview/3.0.1'));
     purgeList.push(purgeAliBabaCloud('/webview/3.0.1'));

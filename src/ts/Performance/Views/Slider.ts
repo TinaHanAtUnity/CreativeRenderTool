@@ -30,9 +30,9 @@ export class Slider {
     private _imageUrls: string[];
     private _slidesContainer: HTMLElement;
     private _slideCount: number;
+    private _cloneCount: number;
     private _rootElement: HTMLElement;
     private _ready: Promise<void> | null;
-    private _autoplayTimeoutId: number | null;
     private _onDownloadCallback: OnDownloadCallback;
     private _slides: (HTMLElement | null)[];
     private _currentSlideIndex: number;
@@ -61,16 +61,12 @@ export class Slider {
         this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
         this._transitionPropertyName = typeof document.documentElement.style.transition === 'string' ? 'transition' : 'webkitTransition';
         this._isInterrupted = false;
-        this._slideSpeed = 300;
+        this._slideSpeed = 400;
         this._minimalSwipeLength = 60;
         this._swipableIndexes = [];
         this._imageUrls = slideImageUrls;
 
         const allSlidesCreatedPromise: Promise<HTMLElement | null>[] = [];
-        const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
-            'background-image': `url(${this._imageUrls[0]})`
-        });
-        this._rootElement.appendChild(blurredBackground);
         this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
@@ -89,6 +85,7 @@ export class Slider {
             });
 
             this._slideCount = this._slides.length;
+            this._cloneCount = this._slideCount - 1;
             this._rootElement.appendChild(this._slidesContainer);
             this.init();
             this._ready = null;
@@ -103,6 +100,8 @@ export class Slider {
         this.prepareIndicators('slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
         this.updateIndicators();
         this.initializeTouchEvents();
+        const firstSlide = <HTMLElement> this._slides[0];
+        firstSlide.classList.add('active-slide');
     }
 
     private prepareIndicators(wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: string): void {
@@ -125,11 +124,20 @@ export class Slider {
         this._rootElement.appendChild(indicatorContainer);
     }
 
+    // https://stackoverflow.com/questions/4467539/javascript-modulo-gives-a-negative-result-for-negative-numbers
+    private modulo(dividend: number, divisor: number): number {
+        return ((dividend % divisor) + divisor) % divisor;
+    }
+
     private updateIndicators(): void {
         for (const indicator of this._indicators) {
             indicator.classList.remove('active');
         }
-        this._indicators[this._currentSlideIndex].classList.add('active');
+        const slideIndex = this._currentSlideIndex;
+        const slideLength = this._slides.length;
+
+        const realModulo = this.modulo(slideIndex, slideLength);
+        this._indicators[realModulo].classList.add('active');
     }
 
     private initializeTouchEvents(): void {
@@ -199,7 +207,6 @@ export class Slider {
             } else {
                 targetSlideIndex = this.calculateSwipableSlideIndex(this._currentSlideIndex - this.getSlideCount());
             }
-
             this.slideHandler(targetSlideIndex);
             this._drag = this.clearDrag();
         } else if (this._drag.startX !== this._drag.curX) {
@@ -287,7 +294,6 @@ export class Slider {
         if (!this._isDragging || touches && touches.length !== 1) {
             return;
         }
-
         this._drag.curX = touches && touches[0] !== undefined ? touches[0].pageX : 0;
         this._drag.curY = touches && touches[0] !== undefined ? touches[0].pageY : 0;
         this._drag.swipeLength = Math.round(Math.sqrt(Math.pow(this._drag.curX - this._drag.startX, 2)));
@@ -327,12 +333,12 @@ export class Slider {
 
     private autoplay(): void {
         this.autoPlayClear();
-        this._autoPlayTimer = setInterval((this.autoPlayIterator).bind(this), 2000);
+        this._autoPlayTimer = setTimeout((this.autoPlayIterator).bind(this), 2000);
     }
 
     private autoPlayClear(): void {
         if (this._autoPlayTimer) {
-            clearInterval(this._autoPlayTimer);
+            clearTimeout(this._autoPlayTimer);
         }
     }
 
@@ -354,14 +360,8 @@ export class Slider {
 
         this._isAnimating = true;
 
-        if (targetSlideIndex < 0) {
-            this._currentSlideIndex = this._slideCount + targetSlideIndex;
-        } else if (targetSlideIndex >= this._slideCount) {
-            this._currentSlideIndex = targetSlideIndex - this._slideCount;
-        } else {
-            this._currentSlideIndex = targetSlideIndex;
-        }
-
+        this._currentSlideIndex = targetSlideIndex;
+        this.setActiveSlide();
         this.animateSlide(targetTransitionPosition, () => {
             // slide calback
             this._onSlideCallback({ automatic });
@@ -370,8 +370,31 @@ export class Slider {
         this.updateIndicators();
     }
 
+    private setActiveSlide(instant?: boolean): void {
+        for (const child of this._slidesContainer.childNodes) {
+            const slide = <HTMLElement>child;
+            if (!slide) {
+                return;
+            }
+            const index = parseInt(slide.getAttribute('slide-index')!, 10);
+
+            slide.classList.remove('active-slide');
+            slide.classList.remove('no-animation');
+
+            if (index === this._currentSlideIndex) {
+                slide.classList.add('active-slide');
+                if (instant) {
+                    slide.classList.add('no-animation');
+                }
+            }
+        }
+    }
+
     private postSlide(): void {
         this._isAnimating = false;
+        this._currentSlideIndex = this.modulo(this._currentSlideIndex, this._slideCount);
+
+        this.setActiveSlide(true);
         this.setPosition();
         this.autoplay();
     }
@@ -402,7 +425,7 @@ export class Slider {
     }
 
     private getTransitionPosition(slideIndex: number): number {
-        const targetSlide = <HTMLElement> this._slidesContainer.children[slideIndex + 2];
+        const targetSlide = <HTMLElement> this._slidesContainer.children[slideIndex + this._cloneCount];
         let targetTransitionPosition = targetSlide ? targetSlide.offsetLeft * -1 : 0;
         targetTransitionPosition += (this.getWidth(this._rootElement) - targetSlide.offsetWidth) / 2;
 
@@ -422,25 +445,20 @@ export class Slider {
     }
 
     private prepareCloneSlides(): void {
-        let slideIndex: number | null = null;
-        const infiniteCount: number = 2;
-
-        for (let i = this._slideCount; i > (this._slideCount - infiniteCount); i -= 1) {
-            slideIndex = i - 1;
-            let clone = this._slides[slideIndex];
+        for (let i = this._slideCount - 1; i >= (this._slideCount - this._cloneCount); i -= 1) {
+            let clone = this._slides[i];
             if (clone) {
                 clone = <HTMLElement>clone.cloneNode(true);
-                clone.setAttribute('slide-index', (slideIndex - this._slideCount).toString());
+                clone.setAttribute('slide-index', (i - this._slideCount).toString());
                 clone.classList.add('slide-clone');
                 this._slidesContainer.insertBefore(clone, this._slidesContainer.firstChild);
             }
         }
-        for (let i = 0; i < infiniteCount + this._slideCount; i += 1) {
-            slideIndex = i;
-            let clone = this._slides[slideIndex];
+        for (let i = 0; i < this._cloneCount; i += 1) {
+            let clone = this._slides[i];
             if (clone) {
                 clone = <HTMLElement>clone.cloneNode(true);
-                clone.setAttribute('slide-index', (slideIndex + this._slideCount).toString());
+                clone.setAttribute('slide-index', (i + this._slideCount).toString());
                 clone.classList.add('slide-clone');
                 this._slidesContainer.appendChild(clone);
             }
@@ -459,9 +477,7 @@ export class Slider {
     }
 
     public hide(): void {
-        if (this._autoplayTimeoutId) {
-            clearTimeout(this._autoplayTimeoutId);
-        }
+        this.autoPlayClear();
     }
 
     private createSlide(url: string): Promise<HTMLElement> {
