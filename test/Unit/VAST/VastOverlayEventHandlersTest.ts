@@ -37,7 +37,7 @@ import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -66,7 +66,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
         let sandbox: sinon.SinonSandbox;
         let privacy: Privacy;
         let programmaticTrackingService: ProgrammaticTrackingService;
-        let om: OpenMeasurementManager | undefined;
+        let om: VastOpenMeasurementManager | undefined;
 
         before(() => {
             sandbox = sinon.createSandbox();
@@ -164,7 +164,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
                 privacy,
-                om: sinon.createStubInstance(OpenMeasurementManager),
+                om: sinon.createStubInstance(VastOpenMeasurementManager),
                 privacySDK: privacySDK
             };
 

@@ -1,7 +1,7 @@
 import * as sinon from 'sinon';
 import { Platform } from 'Core/Constants/Platform';
 import { Placement } from 'Ads/Models/Placement';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OMIDEventBridge, MediaType, IVastProperties, VideoPosition } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
@@ -15,11 +15,11 @@ import { Video } from 'Ads/Models/Assets/Video';
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new OpenMeasurementManager(om, placement);
+            return new VastOpenMeasurementManager(placement, om);
         };
 
         describe('DOM Hierarchy', () => {
-            let omManager: OpenMeasurementManager;
+            let omManager: VastOpenMeasurementManager;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {
@@ -52,7 +52,7 @@ import { Video } from 'Ads/Models/Assets/Video';
         });
 
         describe('session events', () => {
-            let omManager: OpenMeasurementManager;
+            let omManager: VastOpenMeasurementManager;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {
@@ -74,7 +74,7 @@ import { Video } from 'Ads/Models/Assets/Video';
         });
 
         describe('adEvents', () => {
-            let omManager: OpenMeasurementManager;
+            let omManager: VastOpenMeasurementManager;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {

@@ -8,12 +8,12 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
-    om?: OpenMeasurementManager;
+    om?: VastOpenMeasurementManager;
 }
 
 export class VastAdUnit extends VideoAdUnit<VastCampaign> {
@@ -25,7 +25,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _impressionSent = false;
-    private _om?: OpenMeasurementManager;
+    private _om?: VastOpenMeasurementManager;
 
     constructor(parameters: IVastAdUnitParameters) {
         super(parameters);
@@ -128,7 +128,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager.sendTrackingEvents(this._vastCampaign, eventName, 'vast', this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 
-    public getOpenMeasurementManager(): OpenMeasurementManager | undefined {
+    public getOpenMeasurementManager(): VastOpenMeasurementManager | undefined {
         return this._om;
     }
 

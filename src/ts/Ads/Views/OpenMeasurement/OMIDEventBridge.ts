@@ -254,6 +254,7 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
+        // TODO: FIX for admob just in case
         if (!this._eventQueueSent) {
             this._eventQueue.push(event);
         }
@@ -267,10 +268,10 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: FIX
-        // if (!this._eventQueueSent) {
-        //     this._eventQueue.push(event);
-        // }
+        // TODO: FIX for admob just in case
+        if (!this._eventQueueSent) {
+            this._eventQueue.push(event);
+        }
     }
 
     private onMessage(e: MessageEvent) {

@@ -36,7 +36,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 describe('VastVideoEventHandler tests', () => {
@@ -69,7 +69,7 @@ describe('VastVideoEventHandler tests', () => {
     let privacyManager: UserPrivacyManager;
     let privacy: Privacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let openMeasurement: OpenMeasurementManager | undefined;
+    let openMeasurement: VastOpenMeasurementManager | undefined;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -174,7 +174,7 @@ describe('VastVideoEventHandler tests', () => {
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
             privacy,
-            om: sinon.createStubInstance(OpenMeasurementManager),
+            om: sinon.createStubInstance(VastOpenMeasurementManager),
             privacySDK: privacySDK
         };
 

@@ -6,7 +6,7 @@ import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -40,7 +40,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 omInstances.push(om);
             });
 
-            const omManager = new OpenMeasurementManager(omInstances, baseParams.placement);
+            const omManager = new VastOpenMeasurementManager(baseParams.placement, omInstances);
             omManager.addToViewHierarchy();
             omManager.injectVerifications();
             vastAdUnitParameters.om = omManager;
