@@ -118,15 +118,9 @@ export class CustomFeatures {
         return this.existsInList(LionStudiosGamesJson, gameId);
     }
 
-    /**
-     * Rollout plan can be found here: https://docs.google.com/document/d/1QI-bjyTZrwNgx4D6X8_oq5FW_57ikPKBcwbY_MQ_v4g/edit?ts=5d5713ce#
-     * Lists are split out to easily handle the rollout plan
-     */
-    public static isPartOfPhaseTwoLoadRollout(gameId: string): boolean {
+    public static isZyngaWordsWithFriends(gameId: string): boolean {
         const wordsWithFriends = ['2895988', '2895998', '2796593', '2895987', '2896000', '2796594'];
-        const zyngaSolitaire = ['2988443', '2988442', '2988495', '2988494'];
-
-        return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
+        return this.existsInList(wordsWithFriends, gameId);
     }
 
     public static isWhiteListedForLoadApi(gameId: string): boolean {
