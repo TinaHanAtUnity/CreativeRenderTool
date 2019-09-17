@@ -63,11 +63,7 @@ export enum LoadMetric {
     LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
-export enum TimeMetric {
-    WebviewInitializationTimeTaken = 'webview_initialization_time_taken'
-}
-
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | TimeMetric;
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[] | undefined;
@@ -144,10 +140,6 @@ export class ProgrammaticTrackingService {
 
     public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
         return this.postWithTags(event, 1, this.createErrorTags(event, adType, seatId));
-    }
-
-    public reportTimeEvent(event: PTSEvent, value: number) {
-        return this.postWithTags(event, value, this.createMetricTags(event));
     }
 
 }

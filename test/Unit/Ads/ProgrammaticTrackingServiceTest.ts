@@ -3,8 +3,7 @@ import {
     ProgrammaticTrackingService,
     IProgrammaticTrackingData,
     AdmobMetric,
-    LoadMetric,
-    TimeMetric
+    LoadMetric
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -139,40 +138,6 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEvent(t.input);
-                sinon.assert.calledOnce(postStub);
-                assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
-                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
-                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
-                return promise;
-            });
-        });
-    });
-
-    describe('reportMetricEvent', () => {
-
-        const value = 140238952;
-
-        const tests: {
-            input: TimeMetric;
-            expected: IProgrammaticTrackingData;
-        }[] = [{
-            input: TimeMetric.WebviewInitializationTimeTaken,
-            expected: {
-                metrics: [
-                    {
-                        name: 'webview_initialization_time_taken',
-                        value: 140238952,
-                        tags: [
-                            'ads_sdk2_mevt:webview_initialization_time_taken'
-                        ]
-                    }
-                ]
-            }
-        }];
-        tests.forEach((t) => {
-            it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportTimeEvent(t.input, value);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
                 assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');

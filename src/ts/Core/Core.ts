@@ -49,7 +49,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { ProgrammaticTrackingService, TimeMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class Core implements ICore {
 
@@ -213,8 +213,6 @@ export class Core implements ICore {
             this.Ads = new Ads(configJson, this);
 
             return this.Ads.initialize();
-        }).then(() => {
-            this.ProgrammaticTrackingService.reportTimeEvent(TimeMetric.WebviewInitializationTimeTaken, Date.now() - this.ClientInfo.getInitTimestamp());
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
                 // tslint:disable-next-line
