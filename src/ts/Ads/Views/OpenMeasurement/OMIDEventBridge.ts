@@ -136,7 +136,7 @@ export interface IImpressionValues {
     mediaType: MediaType;
     videoEventAdaptorType?: string;
     videoEventAdaptorVersion?: string;
-    viewPort?: unknown;
+    viewport?: unknown;
     adView?: IAdView;
 }
 

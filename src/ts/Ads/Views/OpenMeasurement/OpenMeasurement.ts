@@ -223,8 +223,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
      * TODO: Calculate Geometry change for Privacy coverage
      */
-    public geometryChange(viewPort: IViewPort, adView: IAdView) {
-        this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewPort, adView});
+    public geometryChange(viewport: IViewPort, adView: IAdView) {
+        this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
     }
 
     /*
@@ -408,7 +408,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (accessMode === AccessMode.LIMITED) {
-            impressionObject.viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             const screenRectangle = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
 
             let percentageInView = 100;
