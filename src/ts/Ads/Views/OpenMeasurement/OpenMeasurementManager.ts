@@ -24,7 +24,7 @@ interface IOMManager {
     sessionError(event: ISessionEvent): void;
 }
 
-enum OMState {
+export enum OMState {
     PLAYING,
     PAUSED,
     COMPLETED,
@@ -238,7 +238,7 @@ export class OpenMeasurementManager implements IOMManager {
         });
     }
 
-    private getState(): OMState {
+    public getState(): OMState {
         return this._state;
     }
 
