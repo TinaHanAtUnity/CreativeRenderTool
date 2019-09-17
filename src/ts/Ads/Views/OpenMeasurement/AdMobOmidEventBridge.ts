@@ -203,10 +203,6 @@ export class AdMobOmidEventBridge {
 
     private _iframeSessionInterface: HTMLIFrameElement;
 
-    private _eventQueue: IVerificationEvent[] = [];
-    private _eventQueueSent = false;
-    private _verificationsInjected = false;
-
     constructor(core: ICoreApi, handler: IOMIDHandler, openMeasurement: AdmobOpenMeasurementManager) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
@@ -266,10 +262,6 @@ export class AdMobOmidEventBridge {
 
     public sendSessionFinish() {
         this.postMessage(SESSIONEvents.SESSION_FINISH);
-    }
-
-    public setVerificationsInjected(verificationsInjected: boolean) {
-        this._verificationsInjected = verificationsInjected;
     }
 
     private onMessage(e: MessageEvent) {

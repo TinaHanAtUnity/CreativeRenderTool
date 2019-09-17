@@ -15,7 +15,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { InteractionType, ObstructionReasons, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;

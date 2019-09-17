@@ -1,12 +1,11 @@
 import * as sinon from 'sinon';
 import { Platform } from 'Core/Constants/Platform';
 import { Placement } from 'Ads/Models/Placement';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { OMIDEventBridge, MediaType, IVastProperties, VideoPosition } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { MediaType, IVastProperties, VideoPosition } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { IImpressionValues, VideoPlayerState, InteractionType } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
-import { Video } from 'Ads/Models/Assets/Video';
+import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
@@ -15,44 +14,11 @@ import { Video } from 'Ads/Models/Assets/Video';
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new VastOpenMeasurementManager(placement, om);
+            return new OpenMeasurementManager(placement, om);
         };
 
-        describe('DOM Hierarchy', () => {
-            let omManager: VastOpenMeasurementManager;
-            let openMeasurement: OpenMeasurement;
-
-            beforeEach(() => {
-                openMeasurement = sandbox.createStubInstance(OpenMeasurement);
-                omManager = initOMManager([openMeasurement, openMeasurement]);
-            });
-
-            afterEach(() => {
-                sandbox.restore();
-            });
-
-            describe('addToViewHierarchy', () => {
-                it('should add every om to the hierarchy', () => {
-                    omManager.addToViewHierarchy();
-                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.addToViewHierarchy);
-                });
-            });
-            describe('removeFromViewHieararchy', () => {
-                it('should add every om to the hierarchy', () => {
-                    omManager.removeFromViewHieararchy();
-                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.removeFromViewHieararchy);
-                });
-            });
-            describe('injectVerifications', () => {
-                it('should add every om to the hierarchy', () => {
-                    omManager.injectVerifications();
-                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.injectAdVerifications);
-                });
-            });
-        });
-
         describe('session events', () => {
-            let omManager: VastOpenMeasurementManager;
+            let omManager: OpenMeasurementManager;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {
@@ -74,7 +40,7 @@ import { Video } from 'Ads/Models/Assets/Video';
         });
 
         describe('adEvents', () => {
-            let omManager: VastOpenMeasurementManager;
+            let omManager: OpenMeasurementManager;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {

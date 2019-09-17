@@ -9,9 +9,9 @@ import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { OMManager } from 'Ads/Views/OpenMeasurement/OMManager';
+import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
 
-export class AdmobOpenMeasurementManager extends OMManager {
+export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
 
     // only for admob:
     private _omBridge: AdMobOmidEventBridge;
@@ -43,7 +43,7 @@ export class AdmobOpenMeasurementManager extends OMManager {
         this._omBridge = new AdMobOmidEventBridge(core, {
             onImpression: (impressionValues: IImpressionValues) => this.impression(impressionValues),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
-            onStart: (duration: number, videoPlayerVolume: number) => this.start(duration),
+            onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
             onSendFirstQuartile: () => this.sendFirstQuartile(),
             onSendMidpoint: () =>  this.sendMidpoint(),
             onSendThirdQuartile: () => this.sendThirdQuartile(),
@@ -70,10 +70,14 @@ export class AdmobOpenMeasurementManager extends OMManager {
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request);
             this._omInstances.push(om);
-            om.setAdmobOMSessionId(this._omAdSessionId);
-            om.addToViewHierarchy();
-            om.injectVerificationResources([resource]);
+            this.setupOMInstance(om, resource);
         });
+    }
+
+    public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
+        om.setAdmobOMSessionId(this._omAdSessionId);
+        om.addToViewHierarchy();
+        om.injectVerificationResources([resource]);
     }
 
     public addToViewHierarchy(): void {

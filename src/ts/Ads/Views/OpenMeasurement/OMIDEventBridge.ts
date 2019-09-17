@@ -235,7 +235,7 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: FIX
+        // TODO: FIX for impression event
         // if (!this._eventQueueSent) {
         //     this._eventQueue.push(event);
         // }

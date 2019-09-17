@@ -67,13 +67,6 @@ interface IContext {
     customReferenceData?: string;
 }
 
-enum OMState {
-    PLAYING,
-    PAUSED,
-    COMPLETED,
-    STOPPED
-}
-
 export const PARTNER_NAME = 'Unity3d';
 export const DEFAULT_VENDOR_KEY = 'default_key';
 export const OM_JS_VERSION = '1.2.10';

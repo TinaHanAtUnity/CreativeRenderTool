@@ -36,7 +36,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
 
 describe('VastAdUnitTest', () => {
 

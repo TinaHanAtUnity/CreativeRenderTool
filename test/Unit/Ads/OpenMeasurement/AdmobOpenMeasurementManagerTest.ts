@@ -10,6 +10,9 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
+import { assert } from 'chai';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementManager`, () => {
@@ -37,105 +40,66 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
             }
             request = sinon.createStubInstance(RequestManager);
 
-            // const openMeasurement: OpenMeasurement = sandbox.createStubInstance(OpenMeasurement);
             return new AdmobOpenMeasurementManager(platform, core, clientInformation, campaign, placement, deviceInfo, request);
         };
 
         describe('DOM Hierarchy', () => {
             let omManager: AdmobOpenMeasurementManager;
-            // let openMeasurement: OpenMeasurement;
+            let verificationResource: IVerificationScriptResource;
 
             beforeEach(() => {
-                // openMeasurement = sandbox.createStubInstance(OpenMeasurement);
                 omManager = initAdMobOMManager();
+                sandbox.stub(omManager.getAdmobBridge(), 'connect');
+                sandbox.stub(omManager.getAdmobBridge(), 'disconnect');
             });
 
             afterEach(() => {
                 sandbox.restore();
+            });
+
+            describe('injectVerificationResources', () => {
+                beforeEach(() => {
+                    sandbox.stub(omManager, 'setupOMInstance');
+                });
+
+                it ('should add multiple om instances to dom and inject', () => {
+                    verificationResource = {
+                        resourceUrl: 'http://scoot.com',
+                        vendorKey: 'scoot',
+                        verificationParameters: 'scootage'
+                    };
+                    omManager.injectVerificationResources([verificationResource, verificationResource]);
+                    sinon.assert.calledTwice(<sinon.SinonStub>omManager.setupOMInstance);
+                });
             });
 
             it('addToViewHierarchy', () => {
-                //
+                omManager.addToViewHierarchy();
+                sinon.assert.called(<sinon.SinonStub>omManager.getAdmobBridge().connect);
             });
             it('removeFromViewHieararchy', () => {
-                //
-            });
-            it('injectVerificationResources', () => {
-                //
-            });
-        });
-        describe('adEvents', () => {
-            it('impression', () => {
-                //
-            });
-            it('loaded', () => {
-                //
-            });
-            it('start', () => {
-                //
-            });
-            it('playerStateChanged', () => {
-                //
-            });
-            it('sendFirstQuartile', () => {
-                //
-            });
-            it('sendMidpoint', () => {
-                //
-            });
-            it('sendThirdQuartile', () => {
-                //
-            });
-            it('completed', () => {
-                //
-            });
-            it('pause', () => {
-                //
-            });
-            it('resume', () => {
-                //
-            });
-            it('skipped', () => {
-                //
-            });
-            it('volumeChange', () => {
-                //
-            });
-            it('adUserInteraction', () => {
-                //
-            });
-            it('bufferStart', () => {
-                //
-            });
-            it('bufferFinish', () => {
-                //
-            });
-            it('geometryChange', () => {
-                //
+                omManager.removeFromViewHieararchy();
+                sinon.assert.called(<sinon.SinonStub>omManager.getAdmobBridge().disconnect);
             });
         });
 
-        describe('session events', () => {
+        describe('session event additional handling', () => {
             let omManager: AdmobOpenMeasurementManager;
-            // let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {
-                // openMeasurement = sandbox.createStubInstance(OpenMeasurement);
                 omManager = initAdMobOMManager();
-                // omManager.injectVerificationResources();
+                sandbox.stub(omManager.getAdmobBridge(), 'sendSessionFinish');
+                sandbox.stub(omManager, 'setupOMInstance');
             });
+
             afterEach(() => {
                 sandbox.restore();
             });
 
-            // it('sessionStart should be called twice', () => {
-            //     omManager.sessionStart();
-            //     sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionStart);
-            // });
-            // it('sessionFinish should be called twice', () => {
-            //     omManager.sessionFinish();
-            //     sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionFinish);
-            // });
+            it('sessionFinish should should pass to admob session interface bridge', () => {
+                omManager.sessionFinish();
+                sinon.assert.calledOnce(<sinon.SinonStub>omManager.getAdmobBridge().sendSessionFinish);
+            });
         });
     });
 });
