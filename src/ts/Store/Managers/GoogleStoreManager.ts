@@ -3,7 +3,6 @@ import { IStoreApi } from 'Store/IStore';
 import { IGooglePurchaseData, IGooglePurchaseStatus } from 'Store/Native/Android/Store';
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 
 export class GoogleStoreManager extends StoreManager {
@@ -29,22 +28,18 @@ export class GoogleStoreManager extends StoreManager {
         this._googleStore.isBillingSupported('inapp').then(result => {
             if (result === 0) {
                 this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp']);
-            } else {
-                Diagnostics.trigger('store_billing_not_supported', {
-                    result: result
-                });
             }
-        }).catch(error => {
-            Diagnostics.trigger('store_isbillingsupported_failed', {});
+        }).catch(() => {
+            // Do nothing
         });
     }
 
     private onInitializationFailed() {
-        Diagnostics.trigger('store_initialization_failed', {});
+        // Do nothing
     }
 
     private onDisconnected() {
-        Diagnostics.trigger('store_disconnected', {});
+        // Do nothing
     }
 
     private onPurchaseStatusOnResume(activity: string, data: IGooglePurchaseStatus) {
@@ -68,10 +63,6 @@ export class GoogleStoreManager extends StoreManager {
                     if (purchaseData.orderId && this.isNewPurchase(activity, purchaseData.orderId)) {
                         if (data.inapp!.signatureList && data.inapp!.signatureList[index]) {
                             this.logNewPurchase(purchaseData, data.inapp!.signatureList[index]);
-                        } else {
-                            Diagnostics.trigger('store_signature_missing', {
-                                productId: purchaseData.productId
-                            });
                         }
                     }
                 });
@@ -96,9 +87,7 @@ export class GoogleStoreManager extends StoreManager {
             const transaction = new StoreTransaction(timestamp, purchaseData.productId, skuDetails.price_amount_micros / 1000000, skuDetails.price_currency_code, signature, purchaseData.orderId);
             this.onStoreTransaction.trigger(transaction);
         }).catch(() => {
-            Diagnostics.trigger('store_getskudetails_failed', {
-                productId: purchaseData.productId
-            });
+            // Do nothing
         });
     }
 }
