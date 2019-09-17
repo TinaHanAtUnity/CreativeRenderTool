@@ -105,7 +105,7 @@ export class UserPrivacyManager {
             'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
+            'legalFramework': this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
             'agreedOverAgeLimit': AgeGateChoice.MISSING
         };
         if (source) {
@@ -198,7 +198,7 @@ export class UserPrivacyManager {
             coppa: this._coreConfig.isCoppaCompliant(),
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
-            legalFramework: this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
+            legalFramework: this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
             agreedOverAgeLimit: AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
         };
 
