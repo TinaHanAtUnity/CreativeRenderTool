@@ -574,9 +574,9 @@ export class Ads implements IAds {
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
             if (platform === Platform.ANDROID) {
-                response = CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
+                response = JSON.stringify(CreativeUrlResponseAndroid).replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
             } else if (platform === Platform.IOS) {
-                response = CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
+                response = JSON.stringify(CreativeUrlResponseIos).replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
             }
 
             if (forcedARMRAID) {
