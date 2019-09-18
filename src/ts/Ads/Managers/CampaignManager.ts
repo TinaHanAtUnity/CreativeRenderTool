@@ -150,6 +150,7 @@ export class CampaignManager {
 
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
+
         const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
 
         this._assetManager.enableCaching();
@@ -217,7 +218,7 @@ export class CampaignManager {
         // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
         this._assetManager.enableCaching();
 
-        // todo: current logic for session counters assumes ad request cycle based on automatic loading
+        GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
