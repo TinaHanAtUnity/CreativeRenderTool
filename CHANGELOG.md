@@ -1,4 +1,4 @@
-# Pending
+# Wed Sep 18 22:57:49 UTC 2019
 
 * Decode vast wrapper urls before requesting in our Vast Parser [#11217](https://github.com/Applifier/unity-ads-webview/pull/11219)
 * Disable AppleStoreManager for iOS Versions 11.1 and Below #11219
