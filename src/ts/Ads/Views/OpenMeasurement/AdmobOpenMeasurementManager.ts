@@ -86,6 +86,9 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
 
     public removeFromViewHieararchy(): void {
         this.removeMessageListener();
+        this._omInstances.forEach((om) => {
+            om.removeFromViewHieararchy();
+        });
     }
 
     // only used above and test

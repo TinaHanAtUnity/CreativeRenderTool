@@ -18,7 +18,7 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
-import { IframeEndcardTest, HtmlEndcardTest } from 'Core/Models/ABGroup';
+import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -201,7 +201,7 @@ export class VastParserStrict {
         const headers: [string, string][] = [];
 
         // For IAS tags to return vast instead of vpaid for Open Measurement
-        if (CustomFeatures.isIASVastTag(wrapperURL)) {
+    if (CustomFeatures.isIASVastTag(wrapperURL) && this._coreConfig && OpenMeasurementTest.isValid(this._coreConfig.getAbGroup())) {
             wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
             headers.push(['User-Agent', navigator.userAgent]);
