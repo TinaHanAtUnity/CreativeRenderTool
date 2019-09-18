@@ -572,5 +572,12 @@
     "description": "Flag describing the omid js implementation version indicating omid is supported",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "legalFramework",
+    "type": "string",
+    "description": "Current legal framework e.g. \"gdpr\", \"ccpa\" or \"default\"",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]
