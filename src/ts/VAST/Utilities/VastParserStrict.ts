@@ -207,6 +207,8 @@ export class VastParserStrict {
             headers.push(['User-Agent', navigator.userAgent]);
         }
 
+        wrapperURL = decodeURIComponent(wrapperURL);
+
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
         });

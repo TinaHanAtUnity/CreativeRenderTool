@@ -181,7 +181,7 @@ import OMID3p from 'html/omid/omid3p.html';
 
                         it('should call session begin ad events for IAS', () => {
                             return om.onEventProcessed('sessionStart', 'IAS').then(() => {
-                                clock.tick(2000);
+                                clock.tick(1000);
                                 clock.restore();
                                 sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
                                 sinon.assert.called(<sinon.SinonSpy>om.impression);
