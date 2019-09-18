@@ -1,3 +1,8 @@
+# Pending
+
+* Decode vast wrapper urls before requesting in our Vast Parser [#11217](https://github.com/Applifier/unity-ads-webview/pull/11219)
+* Disable AppleStoreManager for iOS Versions 11.1 and Below #11219
+
 # Tue Sep 17 19:18:02 UTC 2019
 
 * End Parallax Endcard Experiment [#11182](https://github.com/Applifier/unity-ads-webview/pull/11182)
