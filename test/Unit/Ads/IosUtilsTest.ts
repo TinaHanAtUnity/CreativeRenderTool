@@ -42,7 +42,7 @@ describe('IosUtilsTest', () => {
 
     describe('isStoreApiBroken', () => {
         const storeApiTests: {
-            osVersion: string;
+            osVersion: string | undefined;
             expectedResult: boolean;
         }[] = [{
             osVersion: '12.4',
@@ -64,6 +64,9 @@ describe('IosUtilsTest', () => {
             expectedResult: true
         }, {
             osVersion: '1a.4',
+            expectedResult: true // NaN
+        }, {
+            osVersion: undefined,
             expectedResult: true // NaN
         }];
 

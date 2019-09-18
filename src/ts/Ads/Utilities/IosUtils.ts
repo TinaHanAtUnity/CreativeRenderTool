@@ -17,9 +17,9 @@ export class IosUtils {
     /**
      * Store API functionality is broken on osVersion 11.1 and below
      */
-    public static isStoreApiBroken(osVersion: string): boolean {
+    public static isStoreApiBroken(osVersion: string | undefined): boolean {
 
-        const osVersionSplit = osVersion.split('.');
+        const osVersionSplit = osVersion ? osVersion.split('.') : '';
         if (osVersionSplit.length >= 2) {
 
             const majorOsVersion = +osVersionSplit[0];
