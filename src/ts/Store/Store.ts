@@ -30,7 +30,7 @@ export class Store implements IStore, IApiModule {
 
         if (core.NativeBridge.getPlatform() === Platform.ANDROID) {
             this.StoreManager = new GoogleStoreManager(this.Api, analyticsManager);
-        } else if (core.NativeBridge.getPlatform() === Platform.IOS && IosUtils.isStoreApiBroken(core.DeviceInfo.getOsVersion())) {
+        } else if (core.NativeBridge.getPlatform() === Platform.IOS && !IosUtils.isStoreApiBroken(core.DeviceInfo.getOsVersion())) {
             this.StoreManager = new AppleStoreManager(this.Api, analyticsManager);
         } else {
             this.StoreManager = new NullStoreManager(this.Api, analyticsManager);
