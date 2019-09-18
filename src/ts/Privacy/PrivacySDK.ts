@@ -1,22 +1,20 @@
 import {
-    CurrentUnityConsentVersion,
-    GamePrivacy, IAllPermissions, IGranularPermissions, IProfilingPermissions,
-    IRawGamePrivacy,
-    IRawUserPrivacy,
+    GamePrivacy,
     PrivacyMethod,
     UserPrivacy
 } from 'Privacy/Privacy';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AgeGate } from 'Privacy/AgeGate';
 
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
     private _userPrivacy: UserPrivacy;
+    private _ageGate: AgeGate;
     private _testForceConsentUnit: boolean;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, ageGate: AgeGate) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
+        this._ageGate = ageGate;
         this._testForceConsentUnit = false;
     }
 
@@ -45,5 +43,9 @@ export class PrivacySDK {
 
     public getUserPrivacy(): UserPrivacy {
         return this._userPrivacy;
+    }
+
+    public getAgeGate(): AgeGate {
+        return this._ageGate;
     }
 }
