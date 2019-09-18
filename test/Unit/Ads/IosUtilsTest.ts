@@ -39,4 +39,38 @@ describe('IosUtilsTest', () => {
             });
         });
     });
+
+    describe('isStoreApiBroken', () => {
+        const storeApiTests: {
+            osVersion: string;
+            expectedResult: boolean;
+        }[] = [{
+            osVersion: '12.4',
+            expectedResult: false
+        }, {
+            osVersion: '11.4',
+            expectedResult: false
+        }, {
+            osVersion: '12.4.4.4.4.4', // Don't care about additional splits
+            expectedResult: false
+        }, {
+            osVersion: '12', // No minor version
+            expectedResult: true
+        }, {
+            osVersion: '11.1',
+            expectedResult: true // First broken version
+        }, {
+            osVersion: '8.4',
+            expectedResult: true
+        }, {
+            osVersion: '1a.4',
+            expectedResult: true // NaN
+        }];
+
+        storeApiTests.forEach(t => {
+            it(`should return ${t.expectedResult} for osVersion ${t.osVersion}`, () => {
+                assert.equal(t.expectedResult, IosUtils.isStoreApiBroken(t.osVersion));
+            });
+        });
+    });
 });

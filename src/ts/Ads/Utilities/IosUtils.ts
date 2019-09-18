@@ -14,6 +14,29 @@ export class IosUtils {
         }
     }
 
+    /**
+     * Store API functionality is broken on osVersion 11.1 and below
+     */
+    public static isStoreApiBroken(osVersion: string): boolean {
+
+        const osVersionSplit = osVersion.split('.');
+        if (osVersionSplit.length >= 2) {
+
+            const majorOsVersion = +osVersionSplit[0];
+            const minorOsVersion = +osVersionSplit[1];
+
+            if (!isNaN(majorOsVersion) && !isNaN(minorOsVersion)) {
+                if (majorOsVersion >= 12) {
+                    return false;
+                } else if (majorOsVersion === 11 && minorOsVersion >= 2) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public static hasVideoStallingApi(osVersion: string): boolean {
         if (osVersion.match(/^1/)) {
             return true;
