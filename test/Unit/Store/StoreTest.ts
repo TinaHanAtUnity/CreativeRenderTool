@@ -16,13 +16,18 @@ describe('StoreTest', () => {
 
     describe('AppleStoreManager', () => {
 
-        const sandbox = sinon.createSandbox();
+        let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS, TestFixtures.getBackend(Platform.IOS));
             core = TestFixtures.getCoreModule(nativeBridge);
             core.Ads = TestFixtures.getAdsModule(core);
+            sandbox = sinon.createSandbox();
             sandbox.stub(IosUtils, 'isStoreApiBroken').returns(false);
+        });
+
+        afterEach(() => {
+            sandbox.restore();
         });
 
         it('should create an AppleStoreManger', () => {
