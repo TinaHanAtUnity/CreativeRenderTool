@@ -57,6 +57,7 @@ export class OMIDEventBridge {
         this._verificationsInjected = verificationsInjected;
     }
 
+    // Open Question: when should queued events be sent?
     public sendQueuedEvents() {
         while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
             const event = this._eventQueue.shift();
@@ -67,7 +68,6 @@ export class OMIDEventBridge {
 
     public triggerAdEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM ad event "' + type + '" with payload: ' + payload);
-
         const event: IVerificationEvent = {
             type: type,
             adSessionId: this._openMeasurement.getOMAdSessionId(),
@@ -78,7 +78,7 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: FIX for impression, geometry event
+        // TODO: For now, ignore impression, geometry event
         // if (!this._eventQueueSent) {
         //     this._eventQueue.push(event);
         // }
@@ -86,7 +86,6 @@ export class OMIDEventBridge {
 
     public triggerVideoEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM viewability event "' + type + '" with payload: ' + payload);
-
         const event: IVerificationEvent = {
             type: type,
             adSessionId: this._openMeasurement.getOMAdSessionId(),
@@ -97,21 +96,19 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: FIX for admob just in case
+        // TODO: Check event queue
         if (!this._eventQueueSent) {
             this._eventQueue.push(event);
         }
     }
 
     public triggerSessionEvent(event: ISessionEvent) {
-
-        // posts current event to omid3p
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
         if (this._iframe3p.contentWindow) {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: FIX for admob just in case
+        // TODO: Check event queue
         if (!this._eventQueueSent) {
             this._eventQueue.push(event);
         }

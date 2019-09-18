@@ -388,7 +388,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
                 isAutoplay: true,                   // Always autoplay for video
                 position: VideoPosition.STANDALONE  // Always standalone video
             });
-        }, 2000);
+        }, 1000);
     }
 
     private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {

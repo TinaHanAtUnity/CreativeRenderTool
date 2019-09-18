@@ -31,8 +31,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const adVerifications = baseParams.campaign.getVast().getAdVerifications();
-        // OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) &&
-        if (adVerifications) {
+        if (OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && adVerifications) {
 
             const omInstances: OpenMeasurement[] = [];
             adVerifications.forEach((adverification) => {

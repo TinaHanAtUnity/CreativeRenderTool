@@ -22,7 +22,7 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         const showGDPRBanner = this.showGDPRBanner(baseParams);
 
         let om;
-        const isOMEnabled = true; //OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup());
+        const isOMEnabled = OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup());
         if (isOMEnabled) {
             om = new AdmobOpenMeasurementManager(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
             om.addToViewHierarchy();
