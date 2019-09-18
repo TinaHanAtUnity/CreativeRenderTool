@@ -18,7 +18,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             overlay: overlay
         };
 
-        if (baseParams.campaign.hasStaticEndscreen() || baseParams.campaign.hasIframeEndscreen()) {
+        if (baseParams.campaign.hasStaticEndscreen() || baseParams.campaign.hasIframeEndscreen() || baseParams.campaign.hasHtmlEndscreen()) {
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: baseParams.campaign,
                 clientInfo: baseParams.clientInfo,
@@ -29,9 +29,9 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
-        const vastAd = baseParams.campaign.getVast().getAd();
-        if (OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && vastAd && vastAd.getAdVerification()) {
-            const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, vastAd.getAdVerifications());
+        const adVerifications = baseParams.campaign.getVast().getAdVerifications();
+        if (OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && adVerifications) {
+            const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adVerifications);
             om.addToViewHierarchy();
             om.injectAdVerifications();
             vastAdUnitParameters.om = om;

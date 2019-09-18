@@ -6,29 +6,44 @@ import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 
 interface IVast {
     ads: VastAd[];
     parseErrorURLTemplates: string[];
     additionalTrackingEvents: { [eventName: string]: string[] };
+    adVerifications: VastAdVerification[];
 }
 
 export class Vast extends Model<IVast> {
 
     private _campaignErrors: CampaignError[];
 
-    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
+    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[], adVerifications?: VastAdVerification[]) {
         super('Vast', {
             ads: ['array'],
             parseErrorURLTemplates: ['array'],
-            additionalTrackingEvents: ['object']
+            additionalTrackingEvents: ['object'],
+            adVerifications: ['array']
         });
 
         this.set('ads', ads);
         this.set('parseErrorURLTemplates', parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
+        this.set('adVerifications', adVerifications || []);
 
         this._campaignErrors = campaignErrors || [];
+    }
+
+    public getAdVerifications(): VastAdVerification[] {
+        return this.get('adVerifications');
+    }
+
+    public getAdVerification(): VastAdVerification | null {
+        if (this.getAdVerifications() && this.getAdVerifications().length > 0) {
+            return this.getAdVerifications()[0];
+        }
+        return null;
     }
 
     public getAds(): VastAd[] {
@@ -118,6 +133,10 @@ export class Vast extends Model<IVast> {
             this.get('additionalTrackingEvents')[eventName] = [];
         }
         this.get('additionalTrackingEvents')[eventName].push(url);
+    }
+
+    public addAdVerifications(verfications: VastAdVerification[]) {
+        this.set('adVerifications', this.get('adVerifications').concat(verfications));
     }
 
     public getDuration(): number | null {
@@ -240,9 +259,9 @@ export class Vast extends Model<IVast> {
     public getIframeCompanionResourceUrl(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const iframeCompanionAd = ad.getIframeCompanionAds();
-            if (iframeCompanionAd.length > 0) {
-                return iframeCompanionAd[0].getIframeResourceURL();
+            const iframeCompanionAds = ad.getIframeCompanionAds();
+            if (iframeCompanionAds.length > 0) {
+                return iframeCompanionAds[0].getIframeResourceURL();
             }
         }
         return null;
@@ -251,9 +270,9 @@ export class Vast extends Model<IVast> {
     public getHtmlCompanionResourceContent(): string | null {
         const ad = this.getAd();
         if (ad) {
-            const htmlCompanionAd = ad.getHtmlCompanionAd();
-            if (htmlCompanionAd) {
-                return htmlCompanionAd.getHtmlResourceContent();
+            const htmlCompanionAds = ad.getHtmlCompanionAds();
+            if (htmlCompanionAds.length > 0) {
+                return htmlCompanionAds[0].getHtmlResourceContent();
             }
         }
         return null;

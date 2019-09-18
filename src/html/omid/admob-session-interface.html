@@ -2,7 +2,7 @@
     (function() {
         var OmidSessionInterface = function() {
 
-            var IMPRESSION_OCCURED = 'impressionOccured',
+            var IMPRESSION_OCCURRED = 'impressionOccurred',
             LOADED = 'loaded',
             START = 'start',
             FIRST_QUARTILE = 'firstQuartile',
@@ -132,10 +132,11 @@
             var videoElement;
             var adEventsRegistered = false;
             var mediaEventsRegistered = false;
+            var verificationResources = [];
 
             var impressionOccured = function(impressionEventData) {
                 if (adEventsRegistered) {
-                    postMessage(IMPRESSION_OCCURED, impressionEventData);
+                    postMessage(IMPRESSION_OCCURRED, impressionEventData);
                 }
             }
 
@@ -233,7 +234,7 @@
                 Context.environment = Environment.APP;
                 Context.accessMode = AccessMode.LIMITED;
                 Context.adSessionType = AdSessionType.HTML;
-                Context.supports = SupportedFeatures.VIDEO;
+                Context.supports = [SupportedFeatures.VIDEO, SupportedFeatures.CONTAINER];
                 Context.omidNativeInfo = omidNativeInfo;
                 Context.omidJsInfo = omidJSInfo;
                 Context.app = App;
@@ -267,36 +268,8 @@
                 postMessage('reportError', eventData);
             };
 
-            this.startAdSession = function() {
-                var sessionStartEventData = {
-                    context: Context,
-                    verificationParameters: undefined
-                }
-                var eventData = {
-                    adSessionId: getSessionId(),
-                    timestamp: + new Date(),
-                    type: AdEventType.SESSION_START,
-                    data: sessionStartEventData
-                }
-
-                sessionCallback(eventData);
-                postMessage('startAdSession', eventData);
-            };
-            
-            this.finishAdSession = function() {
-                var eventData = {
-                    adSessionId: getSessionId(),
-                    timestamp: + new Date(),
-                    type: AdEventType.SESSION_FINISH,
-                    data: {}
-                }
-
-                sessionCallback(eventData);
-                postMessage('finishAdSession', eventData);
-                sessionCallback = () => void 0;
-            };
-
             this.injectVerificationScriptResources = function(verificationScriptResources) {
+                verificationResources = verificationScriptResources;
                 postMessage('verificationResources', verificationScriptResources);
             };
 
@@ -333,10 +306,38 @@
                 });
             };
 
+            var startAdSession = function() {
+                var sessionStartEventData = {
+                    context: Context,
+                    verificationParameters: verificationResources[0].verificationParameters
+                }
+                var eventData = {
+                    adSessionId: getSessionId(),
+                    timestamp: + new Date(),
+                    type: AdEventType.SESSION_START,
+                    data: sessionStartEventData
+                }
+
+                sessionCallback(eventData);                         // needs to be called for session interface
+                postMessage(AdEventType.SESSION_START, eventData);  // needs to be called for omid3p
+            };
+
+            var finishAdSession = function() {
+                var eventData = {
+                    adSessionId: getSessionId(),
+                    timestamp: + new Date(),
+                    type: AdEventType.SESSION_FINISH,
+                    data: {}
+                }
+
+                sessionCallback(eventData);
+                sessionCallback = () => void 0;
+            };
+
             this.adEvents = {};
             this.mediaEvents = {};
             this.videoEvents = {};
-            this.adEvents[IMPRESSION_OCCURED] = impressionOccured;
+            this.adEvents[IMPRESSION_OCCURRED] = impressionOccured;
             this.mediaEvents[LOADED] = this.videoEvents[LOADED] = loaded;
             this.mediaEvents[START] = this.videoEvents[START] = start;
             this.mediaEvents[FIRST_QUARTILE] = this.videoEvents[FIRST_QUARTILE] = firstQuartile;
@@ -355,6 +356,7 @@
 
             this.registerAdEvents = function() {
                 adEventsRegistered = true;
+                startAdSession();
             };
 
             // We will support video events until OMID 1.3 is released. Then this will be removed.
@@ -370,8 +372,13 @@
                 switch(event.data.type) {
                     case 'sdkVersion':
                         sdkVersion = event.data.value;
+                        break;
                     case 'sessionId':
                         sessionId = event.data.value;
+                        break;
+                    case AdEventType.SESSION_FINISH:
+                        finishAdSession();
+                        break;
                 }
             });
 

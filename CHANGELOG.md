@@ -1,11 +1,64 @@
-# Pending
+# Tue Sep 17 19:18:02 UTC 2019
+
+* End Parallax Endcard Experiment [#11182](https://github.com/Applifier/unity-ads-webview/pull/11182)
+* Remove Unused Store Transaction Diagnostics [#11186](https://github.com/Applifier/unity-ads-webview/pull/11186)
+* Add New Fields for CCPA Compliance [#11177](https://github.com/Applifier/unity-ads-webview/pull/11177)
+* Fix AUI Integration Test Stability [#11184](https://github.com/Applifier/unity-ads-webview/pull/11184)
+* Begin Slider v2.1 Experiment on Groups 7 and 8 [#10838](https://github.com/Applifier/unity-ads-webview/pull/10838)
+* Add WWF Load Test on ABGroups 13 and 14 [#11212](https://github.com/Applifier/unity-ads-webview/pull/11212)
+
+# Mon Sep 16 19:23:57 UTC 2019
+
+* Upgrade Akamai Purging Implementation to Supported Version [#11183](https://github.com/Applifier/unity-ads-webview/pull/11183)
+* Add AdRequest to GameSessionCounters for Load API [#11185](https://github.com/Applifier/unity-ads-webview/pull/11185)
+* Open Measurement - Move Ad Verifications to base Vast Ad [#11152](https://github.com/Applifier/unity-ads-webview/pull/11152)
+* Open Measurement - Add bundleId hack for IAS [#11150](https://github.com/Applifier/unity-ads-webview/pull/11150)
+* Change to Only Request Contextual Ad for the First Ad Request After Privacy Method Change [#11148](https://github.com/Applifier/unity-ads-webview/pull/11148)
+* Enable IAP Transaction Event Collection [#11151](https://github.com/Applifier/unity-ads-webview/pull/11151)
+* Temporarily Disable TestEnvironment Metadata Tests [#11178](https://github.com/Applifier/unity-ads-webview/pull/11178)
+
+# Mon Sep  9 22:01:52 UTC 2019
+
+* Add functionality to force Creative Packs [#10807](https://github.com/Applifier/unity-ads-webview/pull/10807)
+* Change fonts to use material icons and add script to generate fonts from svg icon files [#11072](https://github.com/Applifier/unity-ads-webview/pull/11072)
+* Open Measurement - Change order of events for IAS Lifecycle [#11124](https://github.com/Applifier/unity-ads-webview/pull/11124)
+
+# Thu Sep  5 22:18:43 UTC 2019
+
+* Update 3.2 Load Rollout AB Test for 10% of All PerPlacementLoad Traffic [#11076](https://github.com/Applifier/unity-ads-webview/pull/11076)
+* Add Sampled Tracking of Load API Performance in PTS [#11075](https://github.com/Applifier/unity-ads-webview/pull/11075)
+
+# Thu Sep  5 17:17:01 UTC 2019
+
+* Add Vast HTML Endcard Support Disabled AB Test [#11018](https://github.com/Applifier/unity-ads-webview/pull/11018)
+* Open Measurement - Fix data passthrough for Admob Session Interface [#11017](https://github.com/Applifier/unity-ads-webview/pull/11017)
+* Update Analytics Transaction Events Sent to ads.analytics.* [#11020](https://github.com/Applifier/unity-ads-webview/pull/11020)
+
+# Wed Sep  4 01:34:29 UTC 2019
+
+* Revert Polyfill Changes and New Polyfill Function Uses [#11074](https://github.com/Applifier/unity-ads-webview/pull/11074)
+* Consent A/B test: Make CTAs more compact [#11070](https://github.com/Applifier/unity-ads-webview/pull/11070)
+* Fix Support for APK Campaigns on Xiaomi Devices [#10957](https://github.com/Applifier/unity-ads-webview/pull/10957)
+* Migrate Fully to New PTS Endpoint and Add Error Metric Support [#11019](https://github.com/Applifier/unity-ads-webview/pull/11019)
+* End and Revert Material Font Experiment [#10985](https://github.com/Applifier/unity-ads-webview/pull/10985)
+* Add Creative URL for Extended MRAIDs [#10955](https://github.com/Applifier/unity-ads-webview/pull/10955)
+* Small refactor for asset manager [#10839](https://github.com/Applifier/unity-ads-webview/pull/10839)
+
+# Thu Aug 29 21:30:40 UTC 2019
+
+* Add Initial Privacy SDK Refactor [#11013](https://github.com/Applifier/unity-ads-webview/pull/11013)
+
+# Wed Aug 28 19:42:50 UTC 2019
 
 * Begin Parallax Endcard Experiment on ABGroups 5 and 6 [#10868](https://github.com/Applifier/unity-ads-webview/pull/10868)
 * Fix Ads SDK 3.2 usePerPlacementLoad Bug [#10986](https://github.com/Applifier/unity-ads-webview/pull/10986)
 * Add CDN Purge HTTP Status Code for Failures [#10987](https://github.com/Applifier/unity-ads-webview/pull/10987)
 * Remove Max Ads from Load Whitelist [#10983](https://github.com/Applifier/unity-ads-webview/pull/10983)
-* add vast iframe endcard support [#10926](https://github.com/Applifier/unity-ads-webview/pull/10926)
-* add vast iframe endcard support fix [#11015](https://github.com/Applifier/unity-ads-webview/pull/11015)
+* Add Vast IFrame Endcard support [#10926](https://github.com/Applifier/unity-ads-webview/pull/10926)
+* Add Small Fix for Vast IFrame Endcard [#11015](https://github.com/Applifier/unity-ads-webview/pull/11015)
+* Align Operative and Internal Third Party Tracking Events Retry Logic [#10959](https://github.com/Applifier/unity-ads-webview/pull/10959)
+* Add sdkVersion and gamerToken to LoadCalledCounter [#11014](https://github.com/Applifier/unity-ads-webview/pull/11014)
+* Fix Parallax Endscreen Hybrid Test Failure [#11016](https://github.com/Applifier/unity-ads-webview/pull/11016)
 
 # Fri Aug 23 22:21:31 UTC 2019
 

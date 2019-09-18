@@ -12,14 +12,16 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
 import { VastCompanionAdIframeResourceValidator } from 'VAST/Validators/VastCompanionAdIframeResourceValidator';
+import { VastCompanionAdHTMLResourceValidator } from 'VAST/Validators/VastCompanionAdHTMLResourceValidator';
 import { CampaignError, CampaignErrorLevel } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
-import { IframeEndcardTest} from 'Core/Models/ABGroup';
+import { IframeEndcardTest, HtmlEndcardTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -85,6 +87,7 @@ export class VastParserStrict {
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
+    private _adVerifications: VastAdVerification[] = [];
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
         this._domParser = domParser || new DOMParser();
@@ -161,11 +164,11 @@ export class VastParserStrict {
         }
 
         // return vast ads with generated non-severe errors
-        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors, this._adVerifications);
     }
 
     // default to https: for relative urls
-    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
+    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
         try {
@@ -183,7 +186,7 @@ export class VastParserStrict {
 
         this.applyParentURLs(parsedVast, parent);
 
-        const wrapperURL = parsedVast.getWrapperURL();
+        let wrapperURL = parsedVast.getWrapperURL();
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         }
@@ -194,9 +197,32 @@ export class VastParserStrict {
 
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
         const wrapperUrlProtocol = Url.getProtocol(wrapperURL);
-        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
+
+        const headers: [string, string][] = [];
+
+        // For IAS tags to return vast instead of vpaid for Open Measurement
+        if (CustomFeatures.isIASVastTag(wrapperURL)) {
+            wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
+            headers.push(['X-Device-Type', 'unity']);
+            headers.push(['User-Agent', navigator.userAgent]);
+        }
+
+        return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+            return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
         });
+    }
+
+    private setIASURLHack(wrapperURL: string, bundleId?: string) {
+        let url = wrapperURL.replace('vast.adsafeprotected.com', 'vastpixel3.adsafeprotected.com');
+        const stringSplice = (str1: string, start: number, delCount: number, newSubStr: string) => str1.slice(0, start) + newSubStr + str1.slice(start + Math.abs(delCount));
+
+        if (bundleId && /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(url) && url.includes('?')) {
+            url = stringSplice(url, url.indexOf('?'), 1, `?bundleId=${bundleId}&`);
+        } else if (bundleId && /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(url)) {
+            url += `?bundleId=${bundleId}&`;
+        }
+
+        return url;
     }
 
     private getVideoSizeInBytes(duration: number, kbitrate: number): number {
@@ -357,16 +383,36 @@ export class VastParserStrict {
                 }
             }
 
-            // ignore element as it is not of a type we support
             if (htmlResourceElement) {
-                vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                if (this._coreConfig && HtmlEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                    const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
+                    const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
+                    let isWarningLevel = true;
+                    for (const adError of companionAdErrors) {
+                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                            if (adError.errorTrackingUrls.length === 0) {
+                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                            }
+                            this._compiledCampaignErrors.push(adError);
+                            isWarningLevel = false;
+                            break;
+                        }
+                    }
+                    if (isWarningLevel) {
+                        vastAd.addHtmlCompanionAd(companionAd);
+                    } else {
+                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    }
+                } else {
+                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                }
             }
         });
 
         // parsing ad verification in VAST 4.1
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
-            vastAd.addAdVerifications(verifications);
+            this._adVerifications = this._adVerifications.concat(verifications);
         });
 
         // parsing ad verification in VAST 3.0/2.0
@@ -374,7 +420,7 @@ export class VastParserStrict {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
-                vastAd.addAdVerifications(verifications);
+                this._adVerifications = this._adVerifications.concat(verifications);
             }
         });
 

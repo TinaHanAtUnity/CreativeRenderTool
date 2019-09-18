@@ -30,6 +30,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -71,6 +72,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const campaign = TestFixtures.getCampaign();
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
+        const privacySDK = sinon.createStubInstance(PrivacySDK);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -84,7 +86,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: campaign,
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -136,7 +139,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacySDK: privacySDK
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);

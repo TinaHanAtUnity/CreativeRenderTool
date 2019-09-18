@@ -50,6 +50,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
 
 export interface ILoadedCampaign {
@@ -106,6 +107,7 @@ export class CampaignManager {
     protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
+    protected  _privacy: PrivacySDK;
     private _contentTypeHandlerManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -119,7 +121,7 @@ export class CampaignManager {
     private _pts: ProgrammaticTrackingService;
     private _isLoadEnabled: boolean = false;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -136,6 +138,7 @@ export class CampaignManager {
         this._requesting = false;
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._pts = core.ProgrammaticTrackingService;
+        this._privacy = privacySDK;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -147,7 +150,8 @@ export class CampaignManager {
 
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+
+        const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -214,11 +218,11 @@ export class CampaignManager {
         // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
         this._assetManager.enableCaching();
 
-        // todo: current logic for session counters assumes ad request cycle based on automatic loading
+        GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
 
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);

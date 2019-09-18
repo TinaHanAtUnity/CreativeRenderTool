@@ -17,7 +17,7 @@ export class TestModePurchasingAdapter implements IPurchasingAdapter {
         return Promise.resolve();
     }
 
-    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
+    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean): Promise<ITransactionDetails> {
         return Promise.resolve(<ITransactionDetails>{});
     }
 

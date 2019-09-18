@@ -12,6 +12,7 @@ import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { FakeXiaomiDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
 
 describe('DeviceInfoTest', () => {
 
@@ -163,6 +164,21 @@ describe('DeviceInfoTest Android', () => {
         });
 
         nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], StreamType.STREAM_MUSIC, 0.5, 1]);
+    });
+
+    it('getStores on Xiaomi Device without GooglePlay should return none', () => {
+
+        backend = TestFixtures.getBackend(Platform.ANDROID);
+        nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        backend.Api.DeviceInfo = {
+            ... TestFixtures.getFakeNativeDeviceInfo(),
+            Android: {
+                ... TestFixtures.getFakeNativeAndroidDeviceInfo()
+            }
+        };
+        deviceInfo = new FakeXiaomiDeviceInfo(core);
+        assert.equal(deviceInfo.getStores(), 'none');
     });
 });
 

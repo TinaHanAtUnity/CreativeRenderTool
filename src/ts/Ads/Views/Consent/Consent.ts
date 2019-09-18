@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';

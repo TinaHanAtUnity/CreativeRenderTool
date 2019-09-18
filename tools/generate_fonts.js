@@ -1,11 +1,12 @@
 const fs = require('fs');
+const path = require('path');
 const promisedFs = require('fs').promises;
 const webfont = require("webfont").default;
 
-const headerStyleTemplate = (fontPath, fontName) => `
+const headerStyleTemplate = (fontPath, fontName, iconPrefix) => `
 @font-face {
   font-family: "${fontName}";
-  src: url("../fonts/${fontName}.ttf") format("truetype");
+  src: url("${fontPath}/${fontName}.ttf") format("truetype");
 }
 
 [data-icon]:before {
@@ -13,85 +14,97 @@ const headerStyleTemplate = (fontPath, fontName) => `
   font-family: "${fontName}" !important; // @stylint ignore
 }
 
-[class^="${fontName}-icon-"]:before,
-[class*=" ${fontName}-icon-"]:before {
+[class^="${iconPrefix}-"]:before,
+[class*=" ${iconPrefix}-"]:before {
   font-family: "${fontName}" !important; // @stylint ignore
 }
 `;
 
-const glyphStyleTemplate = (fontName, name, unicode) => `
-.${fontName}-icon-${name}:before {
+const glyphStyleTemplate = (iconPrefix, name, unicode) => `
+.${iconPrefix}-${name}:before {
   content: "\\${unicode[0].charCodeAt(0).toString(16)}";
 }
 `;
 
-const createStylesheet = (fontPath, fontName, glyphs) => {
+const createStylesheet = (stylPath, fontPath, iconSet, glyphs) => {
+  const { fontName, glyphNamePrefix } = iconSet;
   const generatedFromComment = `/** GENERATED FROM ${fontPath} */`;
-  const stylesheet = headerStyleTemplate(fontPath, fontName);
+  const relativeFontPath = path.relative(stylPath, fontPath);
+  const stylesheet = headerStyleTemplate(relativeFontPath, fontName, glyphNamePrefix);
 
-  const glyphStyles = [];
-  glyphs.forEach((glyph) => {
+  const glyphStyles = glyphs.map((glyph) => {
     const { name, unicode } = glyph.metadata;
-    const glyphStyle = glyphStyleTemplate(fontName, name, unicode);
-    glyphStyles.push(glyphStyle);
+    return glyphStyleTemplate(glyphNamePrefix, name, unicode);
   });
 
   return [generatedFromComment, stylesheet, ...glyphStyles].join('');
 };
 
-const createFont = async (path, fontName, startUnicodeIndex) => {
+const createFont = async (iconSet, startUnicodeIndex) => {
   const result = await webfont({
-    files: `${path}/*`,
-    fontName: fontName,
+    files: `${iconSet.path}/*`,
+    fontName: iconSet.fontName,
     startUnicode: startUnicodeIndex,
-    formats: ['svg', 'ttf', 'woff'],
+    formats: ['ttf'],
     normalize: true,
   });
 
   const glyphs = result.glyphsData;
-  const glyphsCount = glyphs.length;
-  const stylesheet = createStylesheet(path, fontName, glyphs);
 
-  if (!fs.existsSync(`${path}/generated`)) {
-    fs.mkdirSync(`${path}/generated`);
-  }
+  const font = {
+    ttf: result.ttf,
+    glyphs: glyphs
+  };
 
-  await promisedFs.writeFile(`${path}/generated/${fontName}.svg`, result.svg);
-  await promisedFs.writeFile(`${path}/generated/${fontName}.ttf`, result.ttf);
-  await promisedFs.writeFile(`${path}/generated/${fontName}.woff`, result.woff);
-
-  // in this experiment, let's save the .styl into the same folder with generated fonts
-  // and copy the content of .styl manually into existing icon .styl files, e.g., icons.styl
-  await promisedFs.writeFile(`${path}/generated/${fontName}.styl`, stylesheet);
-
-  return glyphsCount;
+  return font;
 };
 
-const createFonts = async (path, startUnicodeIndex) => {
-  const dirNames = fs.readdirSync(path)
-                     .filter((fileName) => fs.lstatSync(`${path}/${fileName}`).isDirectory());
-
+const createFonts = async (iconSets, startUnicodeIndex, stylPath) => {
   let glyphTotalCount = 0;
+  for (let i = 0; i < iconSets.length; i++) {
+    const iconSet = iconSets[i];
+    const fontPath = iconSet.path;
+    const fontName = iconSet.fontName;
 
-  for (let i = 0; i < dirNames.length; i++) {
-    const dirName = dirNames[i];
-
-    const fontPath = `${path}/${dirName}`;
-    const fontName = dirName;
     const fontStartUnicodeIndex = startUnicodeIndex + glyphTotalCount;
+    const fontPathOut = `${fontPath}/generated`;
+    const stylPathOut = `${stylPath}/generated`;
 
     try {
-      const glyphCount = await createFont(fontPath, fontName, fontStartUnicodeIndex);
-      glyphTotalCount += glyphCount;
+      const font = await createFont(iconSet, fontStartUnicodeIndex);
+
+      if (!fs.existsSync(fontPathOut)) {
+        fs.mkdirSync(fontPathOut);
+      }
+
+      await promisedFs.writeFile(`${fontPathOut}/${fontName}.ttf`, font.ttf);
+
+      const stylesheet = createStylesheet(stylPathOut, fontPathOut, iconSet, font.glyphs);
+      if (!fs.existsSync(stylPathOut)) {
+        fs.mkdirSync(stylPathOut);
+      }
+
+      await promisedFs.writeFile(`${stylPathOut}/${fontName}.styl`, stylesheet);
+
+      glyphTotalCount += font.glyphs.length;
+      console.log(`${fontName}: ${font.glyphs.length} glyphs`);
     } catch (err) {
       console.error(fontPath, err);
       throw err;
     }
   }
 
-  console.log('created', glyphTotalCount, 'glyphs');
+  console.log('created', glyphTotalCount, 'glyphs in total');
 };
 
-const fontPath = 'src/fonts/experiment';
+const iconSets = [
+  {
+    glyphNamePrefix: 'icon',
+    fontName: 'unityicons',
+    path: 'src/fonts/unityicons'
+  }
+];
 const startUnicodeIndex = 0xe000;
-createFonts(fontPath, startUnicodeIndex);
+const stylPath = 'src/styl';
+
+createFonts(iconSets, startUnicodeIndex, stylPath);

@@ -66,21 +66,21 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign());
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
         it('should set adunit finish state to completed', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign());
             sinon.assert.calledWith(<sinon.SinonStub>promoAdUnit.setFinishState, FinishState.COMPLETED);
         });
 
         it('should call onPurchase', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign());
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.onPurchase);
         });
     });

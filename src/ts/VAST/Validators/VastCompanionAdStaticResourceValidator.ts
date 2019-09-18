@@ -60,14 +60,13 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const height = companionAd.getHeight();
         const width = companionAd.getWidth();
         const staticResourceURL = companionAd.getStaticResourceURL() || undefined;
-        if (height > width) {   // Portrait
-            // Check minimum square size but notify minimum Portrait/Landscape as suggestion
-            // minimum square size 200 px will be the limit to cuoff rendering
-            if (height < VastCompanionAdStaticResourceValidator._minSquareSize || width < VastCompanionAdStaticResourceValidator._minSquareSize) {
+
+        // Check minimum square size but notify minimum Portrait/Landscape as suggestion
+        // minimum square size 200 px will be the limit to cuoff rendering
+        if (height < VastCompanionAdStaticResourceValidator._minSquareSize || width < VastCompanionAdStaticResourceValidator._minSquareSize) {
+            if (height > width) { // Portrait
                 this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size ${VastCompanionAdStaticResourceValidator._minPortraitWidth} x ${VastCompanionAdStaticResourceValidator._minPortraitHeight} for Portrait display`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
-            }
-        } else {    // Landscape
-            if (height < VastCompanionAdStaticResourceValidator._minSquareSize || width < VastCompanionAdStaticResourceValidator._minSquareSize) {
+            } else { // Landscape
                 this._errors.push(new CampaignError(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size ${VastCompanionAdStaticResourceValidator._minLandscapeWidth} x ${VastCompanionAdStaticResourceValidator._minLandscapeHeight} for Landscape display`, CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.MEDIUM, VastErrorCode.COMPANION_SIZE_UNSUPPORTED, undefined, staticResourceURL));
             }
         }

@@ -26,6 +26,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -37,6 +38,7 @@ describe('GDPREventHandlerTest', () => {
     let store: IStoreApi;
     let adUnit: PerformanceAdUnit;
     let adUnitParameters: IPerformanceAdUnitParameters;
+    let privacySDK: PrivacySDK;
 
     let gdprEventHandler: OverlayEventHandler<PerformanceCampaign>;
 
@@ -47,6 +49,7 @@ describe('GDPREventHandlerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
         adUnitParameters = {
             platform,
             core,
@@ -70,7 +73,8 @@ describe('GDPREventHandlerTest', () => {
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(Privacy),
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
+            privacySDK: privacySDK
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);

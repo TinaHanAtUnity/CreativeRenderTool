@@ -101,7 +101,7 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
         describe('receiving OMID events', () => {
             const tests = [
                 {
-                    event: OMEvents.IMPRESSION_OCCURED,
+                    event: OMEvents.IMPRESSION_OCCURRED,
                     data: {
                         mediaType: MediaType.VIDEO,
                         videoEventAdaptorType: 'test',
@@ -233,9 +233,10 @@ import { OMIDEventBridge, IOMIDHandler, OMEvents, MediaType, VideoPosition, Vide
                 {
                     event: OMID3pEvents.ON_EVENT_PROCESSED,
                     data: {
-                        eventType: 'sessionStart'
+                        eventType: 'sessionStart',
+                        vendorKey: 'test-vendor-key'
                     },
-                    verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onEventProcessed, data.eventType)
+                    verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onEventProcessed, data.eventType, data.vendorKey)
                 },
                 {
                     event: OMSessionInfo.VIDEO_ELEMENT,

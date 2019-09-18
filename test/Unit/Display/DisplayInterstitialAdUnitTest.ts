@@ -36,6 +36,7 @@ import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('DisplayInterstitialAdUnitTest', () => {
@@ -57,6 +58,7 @@ import { IStoreApi } from 'Store/IStore';
         let clientInfo: ClientInfo;
         let webPlayerContainer: WebPlayerContainer;
         let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
+        let privacySDK: PrivacySDK;
 
         function adUnitTests(): void {
             beforeEach(() => {
@@ -92,6 +94,7 @@ import { IStoreApi } from 'Store/IStore';
                 sessionManager = new SessionManager(core, request, storageBridge);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
                 const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+                privacySDK = sinon.createStubInstance(PrivacySDK);
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                     platform: platform,
                     core: core,
@@ -105,7 +108,8 @@ import { IStoreApi } from 'Store/IStore';
                     adsConfig: adsConfig,
                     storageBridge: storageBridge,
                     campaign: campaign,
-                    playerMetadataServerId: 'test-gamerSid'
+                    playerMetadataServerId: 'test-gamerSid',
+                    privacySDK: privacySDK
                 });
 
                 const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
@@ -143,7 +147,8 @@ import { IStoreApi } from 'Store/IStore';
                     options: {},
                     view: view,
                     privacyManager: privacyManager,
-                    programmaticTrackingService: programmaticTrackingService
+                    programmaticTrackingService: programmaticTrackingService,
+                    privacySDK: privacySDK
                 };
 
                 adUnit = new DisplayInterstitialAdUnit(displayInterstitialAdUnitParameters);

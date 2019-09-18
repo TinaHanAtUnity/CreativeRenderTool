@@ -35,6 +35,7 @@ import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('AndroidAdUnitTest', () => {
     let platform: Platform;
@@ -75,6 +76,7 @@ describe('AndroidAdUnitTest', () => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const privacy = sinon.createStubInstance(AbstractPrivacy);
+        const privacySDK = sinon.createStubInstance(PrivacySDK);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -88,7 +90,8 @@ describe('AndroidAdUnitTest', () => {
             adsConfig: adsConfig,
             storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign(),
-            playerMetadataServerId: 'test-gamerSid'
+            playerMetadataServerId: 'test-gamerSid',
+            privacySDK: privacySDK
         });
 
         adUnitParams = {
@@ -111,7 +114,8 @@ describe('AndroidAdUnitTest', () => {
             options: {},
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacy: privacy
+            privacy: privacy,
+            privacySDK: privacySDK
         };
     });
 

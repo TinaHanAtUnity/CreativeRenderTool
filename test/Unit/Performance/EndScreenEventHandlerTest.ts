@@ -47,6 +47,7 @@ import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { IChinaApi } from 'China/IChina';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -75,6 +76,7 @@ describe('EndScreenEventHandlerTest', () => {
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let storeHandler: IStoreHandler;
+    let privacySDK: PrivacySDK;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -100,6 +102,7 @@ describe('EndScreenEventHandlerTest', () => {
             sessionManager = new SessionManager(core, request, storageBridge);
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
+            privacySDK = sinon.createStubInstance(PrivacySDK);
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -113,7 +116,8 @@ describe('EndScreenEventHandlerTest', () => {
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -171,7 +175,8 @@ describe('EndScreenEventHandlerTest', () => {
                 video: video,
                 privacy: privacy,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmticTrackingService
+                programmaticTrackingService: programmticTrackingService,
+                privacySDK: privacySDK
             };
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
@@ -987,7 +992,8 @@ describe('EndScreenEventHandlerTest', () => {
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
@@ -1041,7 +1047,8 @@ describe('EndScreenEventHandlerTest', () => {
                 video: video,
                 privacy: privacy,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                privacySDK: privacySDK
             };
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);

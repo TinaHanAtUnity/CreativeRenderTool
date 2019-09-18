@@ -6,7 +6,7 @@ import {
     IProfilingPermissions,
     PrivacyMethod,
     UserPrivacy
-} from 'Ads/Models/Privacy';
+} from 'Privacy/Privacy';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;

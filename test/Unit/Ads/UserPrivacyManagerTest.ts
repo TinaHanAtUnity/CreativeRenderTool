@@ -1,6 +1,6 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -19,6 +19,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
@@ -36,6 +37,7 @@ describe('UserPrivacyManagerTest', () => {
     let privacyManager: UserPrivacyManager;
     let gamePrivacy: sinon.SinonStubbedInstance<GamePrivacy>;
     let userPrivacy: sinon.SinonStubbedInstance<UserPrivacy>;
+    let privacySDK: PrivacySDK;
     let request: RequestManager;
 
     let onSetStub: sinon.SinonStub;
@@ -65,9 +67,10 @@ describe('UserPrivacyManagerTest', () => {
         coreConfig = sinon.createStubInstance(CoreConfiguration);
         adsConfig = sinon.createStubInstance(AdsConfiguration);
         gamePrivacy = sinon.createStubInstance(GamePrivacy);
-        (<sinon.SinonStub>adsConfig.getGamePrivacy).returns(gamePrivacy);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
+        (<sinon.SinonStub>privacySDK.getGamePrivacy).returns(gamePrivacy);
         userPrivacy = sinon.createStubInstance(UserPrivacy);
-        (<sinon.SinonStub>adsConfig.getUserPrivacy).returns(userPrivacy);
+        (<sinon.SinonStub>privacySDK.getUserPrivacy).returns(userPrivacy);
 
         request = sinon.createStubInstance(RequestManager);
 
@@ -95,7 +98,7 @@ describe('UserPrivacyManagerTest', () => {
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
         });
-        privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request);
+        privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         sendGDPREventStub = sinon.spy(privacyManager, 'sendGDPREvent');
     });
 
@@ -506,42 +509,52 @@ describe('UserPrivacyManagerTest', () => {
             action: GDPREventAction.SKIP,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'skip',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.CONSENT,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'consent',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTOUT,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTOUT,
             source: GDPREventSource.METADATA,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
@@ -549,12 +562,15 @@ describe('UserPrivacyManagerTest', () => {
                 'gameId': testGameId,
                 'country': 'FF',
                 'source': 'metadata',
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTOUT,
             source: GDPREventSource.USER,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
@@ -562,25 +578,31 @@ describe('UserPrivacyManagerTest', () => {
                 'gameId': testGameId,
                 'country': 'FF',
                 'source': 'user',
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }, {
             action: GDPREventAction.OPTIN,
             source: undefined,
             infoJson: {
+                'v': 1,
                 'adid': testAdvertisingId,
                 'action': 'optin',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'country': 'FF',
                 'gameId': testGameId,
-                'bundleId': testBundleId
+                'bundleId': testBundleId,
+                'legalFramework': 'gdpr',
+                'agreedOverAgeLimit': 'missing'
             }
         }];
 
         tests.forEach((t) => {
             it(`should send matching payload when action is "${t.action}"`, () => {
                 httpKafkaStub.resetHistory();
+                isGDPREnabled = true;
                 const comparison = (value: any): boolean => {
                     if (Object.keys(value).length !== Object.keys(t.infoJson).length) {
                         return false;
@@ -606,11 +628,21 @@ describe('UserPrivacyManagerTest', () => {
                     if (value.bundleId !== t.infoJson.bundleId) {
                         return false;
                     }
+                    if (value.legalFramework !== t.infoJson.legalFramework) {
+                        return false;
+                    }
+                    if (value.agreedOverAgeLimit !== t.infoJson.agreedOverAgeLimit) {
+                        return false;
+                    }
+                    if (value.v !== t.infoJson.v) {
+                        return false;
+                    }
                     return true;
                 };
                 return privacyManager.sendGDPREvent(t.action, t.source).then(() => {
+                    assert.equal(httpKafkaStub.firstCall.args[0], 'ads.events.optout.v1.json', 'privacy event sent to incorrect kafka topic');
+                    assert.equal(httpKafkaStub.firstCall.args[1], KafkaCommonObjectType.EMPTY, 'incorrect kafka common object for privacy event');
                     assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
-                    httpKafkaStub.calledWithExactly('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, t.infoJson);
                 });
             });
         });

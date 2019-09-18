@@ -4,7 +4,6 @@ import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStatic
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
-import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVastAd {
@@ -13,41 +12,38 @@ interface IVastAd {
     unsupportedCompanionAds: string[];
     staticCompanionAds: VastCompanionAdStaticResource[];
     iframeCompanionAds: VastCompanionAdIframeResource[];
-    htmlCompanionAd: VastCompanionAdHTMLResource | null;
+    htmlCompanionAds: VastCompanionAdHTMLResource[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
     wrapperURLs: string[];
-    adVerifications: VastAdVerification[];
 }
 
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], staticCompanionAds: VastCompanionAdStaticResource[], unsupportedCompanionAds: string[], adVerifications: VastAdVerification[], iframeCompanionAds?: VastCompanionAdIframeResource[], htmlCompanionAd?: VastCompanionAdHTMLResource);
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], staticCompanionAds?: VastCompanionAdStaticResource[], unsupportedCompanionAds?: string[], adVerifications?: VastAdVerification[], iframeCompanionAds?: VastCompanionAdIframeResource[], htmlCompanionAd?: VastCompanionAdHTMLResource) {
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], staticCompanionAds: VastCompanionAdStaticResource[], unsupportedCompanionAds: string[], iframeCompanionAds?: VastCompanionAdIframeResource[], htmlCompanionAds?: VastCompanionAdHTMLResource[]);
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], staticCompanionAds?: VastCompanionAdStaticResource[], unsupportedCompanionAds?: string[], iframeCompanionAds?: VastCompanionAdIframeResource[], htmlCompanionAds?: VastCompanionAdHTMLResource[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
             staticCompanionAds: ['array'],
             iframeCompanionAds: ['array'],
-            htmlCompanionAd: ['object', 'null'],
+            htmlCompanionAds: ['array'],
             errorURLTemplates: ['array'],
             impressionURLTemplates: ['array'],
             wrapperURLs: ['array'],
-            unsupportedCompanionAds: ['array'],
-            adVerifications: ['array']
+            unsupportedCompanionAds: ['array']
         });
 
         this.set('id', id || null);
         this.set('creatives', creatives || []);
         this.set('staticCompanionAds', staticCompanionAds || []);
         this.set('iframeCompanionAds', iframeCompanionAds || []);
-        this.set('htmlCompanionAd', htmlCompanionAd || null);
+        this.set('htmlCompanionAds', htmlCompanionAds || []);
         this.set('errorURLTemplates', errorURLTemplates || []);
         this.set('impressionURLTemplates', impressionURLTemplates || []);
         this.set('wrapperURLs', wrapperURLs || []);
         this.set('unsupportedCompanionAds', unsupportedCompanionAds || []);
-        this.set('adVerifications', adVerifications || []);
     }
 
     public getId(): string | null {
@@ -67,17 +63,6 @@ export class VastAd extends Model<IVastAd> {
             return this.getCreatives()[0];
         }
 
-        return null;
-    }
-
-    public getAdVerifications(): VastAdVerification[] {
-        return this.get('adVerifications');
-    }
-
-    public getAdVerification(): VastAdVerification | null {
-        if (this.getAdVerifications() && this.getAdVerifications().length > 0) {
-            return this.getAdVerifications()[0];
-        }
         return null;
     }
 
@@ -101,12 +86,12 @@ export class VastAd extends Model<IVastAd> {
         this.get('iframeCompanionAds').push(companionAd);
     }
 
-    public getHtmlCompanionAd(): VastCompanionAdHTMLResource | null {
-        return this.get('htmlCompanionAd');
+    public getHtmlCompanionAds(): VastCompanionAdHTMLResource[] {
+        return this.get('htmlCompanionAds');
     }
 
-    public setHtmlCompanionAd(companionAd: VastCompanionAdHTMLResource) {
-        this.set('htmlCompanionAd', companionAd);
+    public addHtmlCompanionAd(companionAd: VastCompanionAdHTMLResource) {
+        this.get('htmlCompanionAds').push(companionAd);
     }
 
     public getUnsupportedCompanionAds(): string[] {
@@ -115,10 +100,6 @@ export class VastAd extends Model<IVastAd> {
 
     public addUnsupportedCompanionAd(unsupportedItem: string) {
         this.get('unsupportedCompanionAds').push(unsupportedItem);
-    }
-
-    public addAdVerifications(verfications: VastAdVerification[]) {
-        this.set('adVerifications', this.get('adVerifications').concat(verfications));
     }
 
     public getErrorURLTemplates(): string[] {
@@ -207,6 +188,11 @@ export class VastAd extends Model<IVastAd> {
             iframeCompanionAds.push(companionAd.getDTO());
         }
 
+        const htmlCompanionAds = [];
+        for (const companionAd of this.getHtmlCompanionAds()) {
+            htmlCompanionAds.push(companionAd.getDTO());
+        }
+
         return {
             'id': this.getId(),
             'errorURLTemplates': this.getErrorURLTemplates(),
@@ -215,7 +201,7 @@ export class VastAd extends Model<IVastAd> {
             'vastCreatives': vastCreatives,
             'staticCompanionAds': staticCompanionAds,
             'iframeCompanionAds': iframeCompanionAds,
-            'htmlCompanionAd': this.getHtmlCompanionAd(),
+            'htmlCompanionAds': htmlCompanionAds,
             'unsupportedItems': this.getUnsupportedCompanionAds()
         };
     }

@@ -165,6 +165,14 @@ export class Url {
         }
     }
 
+    public static isInternalPTSTrackingProtocol(url: string): boolean {
+        if (url && url.match(/^https:\/\/tracking.prd.mz.internal.unity3d.com/i)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static getProtocol(url: string): string {
         const urlElement = document.createElement('a');
         urlElement.setAttribute('href', url);

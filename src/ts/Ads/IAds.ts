@@ -25,6 +25,8 @@ import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventMana
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { Analytics } from 'Analytics/Analytics';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { Store } from 'Store/Store';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -59,4 +61,6 @@ export interface IAds extends IApiModule {
     RefreshManager: RefreshManager;
     ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
     Analytics: Analytics;
+    Store: Store;
+    PrivacySDK: PrivacySDK;
 }

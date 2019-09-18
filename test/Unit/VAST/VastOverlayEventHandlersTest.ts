@@ -36,6 +36,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import { IStoreApi } from 'Store/IStore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OMIDEventBridge';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -118,6 +119,7 @@ import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OMIDEventBridge';
                 return Promise.resolve(url);
             });
 
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
             const adsConfig = TestFixtures.getAdsConfiguration();
             const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
@@ -132,7 +134,8 @@ import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OMIDEventBridge';
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid'
+                playerMetadataServerId: 'test-gamerSid',
+                privacySDK: privacySDK
             });
 
             vastAdUnitParameters = {
@@ -159,7 +162,8 @@ import { ObstructionReasons, OMIDEventBridge } from 'Ads/Views/OMIDEventBridge';
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
                 privacy,
-                om: sinon.createStubInstance(OpenMeasurement)
+                om: sinon.createStubInstance(OpenMeasurement),
+                privacySDK: privacySDK
             };
 
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);

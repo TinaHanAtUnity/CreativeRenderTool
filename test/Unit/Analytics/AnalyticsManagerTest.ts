@@ -1,5 +1,5 @@
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { IAnalyticsObject, IAnalyticsAppStartEventV1, IAnalyticsAppRunningEventV1 } from 'Analytics/AnalyticsProtocol';
+import { IAnalyticsObject, IAnalyticsAppStartEventV1, IAnalyticsAppRunningEventV1, IAnalyticsTransactionEventV1 } from 'Analytics/AnalyticsProtocol';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { Backend } from 'Backend/Backend';
@@ -14,6 +14,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 class TestHelper {
     public static getEventType<T>(data: string) {
@@ -81,6 +82,7 @@ class TestHelper {
 
                 return analyticsManager.init().then(() => {
                     sinon.assert.called(requestSpy);
+                    assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
                     assert.equal(TestHelper.getEventType<IAnalyticsAppStartEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.appStart.v1');
                 });
             });
@@ -93,83 +95,24 @@ class TestHelper {
                     coreModule.FocusManager.onActivityPaused.trigger('com.test.activity');
 
                     sinon.assert.called(requestSpy);
+                    assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
                     assert.equal(TestHelper.getEventType<IAnalyticsAppRunningEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.appRunning.v1');
                 });
             });
 
-            it('should clear queue after event is sent', () => {
-                // tslint:disable:no-string-literal
+            it('should send the transactionSuccess event', () => {
                 return analyticsManager.init().then(() => {
-                    const eventQueue: any = (<AnalyticsManager>analyticsManager)['_analyticsEventQueue'];
-                    const promise = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {
-                        assert.equal(Object.keys(eventQueue).length, 0);
-                    });
-                    assert.equal(Object.keys(eventQueue).length, 1);
-                    return promise;
-                });
-                // tslint:enable:no-string-literal
-            });
+                    const requestSpy = <sinon.SinonStub>coreModule.RequestManager.post;
+                    requestSpy.resetHistory();
 
-            it('should clear queue after multiple events are sent', () => {
-                // tslint:disable:no-string-literal
-                return analyticsManager.init().then(() => {
-                    const eventQueue: any = (<AnalyticsManager>analyticsManager)['_analyticsEventQueue'];
-                    const postStub = <sinon.SinonStub>coreModule.RequestManager.post;
-                    postStub.resetHistory();
-                    const first = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).catch((error) => {
-                        assert.fail(error);
-                    });
-                    const second = analyticsManager.onIapTransaction('fakeProductId2', 'fakeReceipt', 'USD', 1.99).catch((error) => {
-                        assert.fail(error);
-                    });
-                    assert.equal(Object.keys(eventQueue).length, 2);
-                    return Promise.all([first, second]).then(() => {
-                        let cdpPostCalls: number = 0;
-                        postStub.getCalls().map((call) => {
-                            const url = call.args[0];
-                            if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
-                                cdpPostCalls++;
-                            }
-                        });
-                        assert.equal(JSON.stringify(eventQueue), '{}');
-                        assert.equal(cdpPostCalls, 2);
-                        assert.equal(Object.keys(eventQueue).length, 0);
-                    });
-                });
-                // tslint:enable:no-string-literal
-            });
+                    const fakeTransaction = sinon.createStubInstance(StoreTransaction);
 
-            it('should clear queue when first send fails and second succeeds', () => {
-                // tslint:disable:no-string-literal
-                return analyticsManager.init().then(() => {
-                    const eventQueue: any = (<AnalyticsManager>analyticsManager)['_analyticsEventQueue'];
-                    const postStub = <sinon.SinonStub>coreModule.RequestManager.post;
-                    postStub.resetHistory();
-                    postStub.rejects();
-                    return analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {
-                        assert.fail('should throw');
-                    }).catch(() => {
-                        assert.equal(Object.keys(eventQueue).length, 1);
-                        postStub.resolves();
-                        return analyticsManager.onIapTransaction('fakeProductId2', 'fakeReceipt', 'USD', 1.99)
-                            .then(() => {
-                                let cdpPostCalls: number = 0;
-                                postStub.getCalls().map((call) => {
-                                    const url = call.args[0];
-                                    if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
-                                        cdpPostCalls++;
-                                    }
-                                });
-                                assert.equal(JSON.stringify(eventQueue), '{}');
-                                assert.equal(cdpPostCalls, 2);
-                                assert.equal(Object.keys(eventQueue).length, 0);
-                            })
-                            .catch(() => {
-                                assert.fail('should not throw');
-                            });
+                    return analyticsManager.onTransactionSuccess(fakeTransaction).then(() => {
+                        sinon.assert.called(requestSpy);
+                        assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
+                        assert.equal(TestHelper.getEventType<IAnalyticsTransactionEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.transactionSuccess.v1');
                     });
                 });
-                // tslint:enable:no-string-literal
             });
         });
 

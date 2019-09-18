@@ -21,6 +21,7 @@ import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter'
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { Promises } from 'Core/Utilities/Promises';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -41,7 +42,7 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager?: IAnalyticsManager) {
+    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager: IAnalyticsManager) {
         this._core = core;
         this._promo = promo;
         this._purchasing = purchasing;
@@ -78,8 +79,8 @@ export class PurchasingUtilities {
         return this._isInitialized;
     }
 
-    public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
-        return this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, placementId, isNative);
+    public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, isNative: boolean = false): Promise<void> {
+        return Promises.voidResult(this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, isNative));
     }
     public static onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
         this._purchasingAdapter.onPromoClosed(thirdPartyEventManager, campaign, placementId);
@@ -182,7 +183,7 @@ export class PurchasingUtilities {
     private static _nativeBridge: NativeBridge;
     private static _placementManager: PlacementManager;
     private static _purchasingAdapter: IPurchasingAdapter;
-    private static _analyticsManager: IAnalyticsManager | undefined;
+    private static _analyticsManager: IAnalyticsManager;
     private static _promoEvents: PromoEvents;
     private static _request: RequestManager;
     private static _isInitialized = false;

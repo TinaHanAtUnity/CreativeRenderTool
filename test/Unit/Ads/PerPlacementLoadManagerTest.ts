@@ -33,6 +33,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('PerPlacementLoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -58,6 +59,7 @@ describe('PerPlacementLoadManagerTest', () => {
     let cache: CacheManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let campaignParserManager: ContentTypeHandlerManager;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -67,6 +69,7 @@ describe('PerPlacementLoadManagerTest', () => {
         core = TestFixtures.getCoreModule(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
+        privacySDK = TestFixtures.getPrivacySDK(core.Api);
 
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
@@ -84,7 +87,7 @@ describe('PerPlacementLoadManagerTest', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core.Api);
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager);
+        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
         loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 

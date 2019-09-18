@@ -27,8 +27,9 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
-import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -60,6 +61,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _privacyManager: UserPrivacyManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
+    private _privacySDK: PrivacySDK;
 
     private _playerMetadataServerId: string;
     private _options: unknown;
@@ -76,7 +78,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._platform = core.NativeBridge.getPlatform();
         this._core = core.Api;
         this._ads = ads.Api;
-        this._store = core.Store.Api;
+        this._store = ads.Store.Api;
         this._focusManager = core.FocusManager;
         this._container = ads.Container;
         this._deviceInfo = core.DeviceInfo;
@@ -91,6 +93,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
         this._osVersion = core.DeviceInfo.getOsVersion();
+        this._privacySDK = ads.PrivacySDK;
     }
 
     public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2 {
@@ -131,7 +134,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             programmaticTrackingService: this._programmaticTrackingService,
             gameSessionId: this._sessionManager.getGameSessionId(),
             options: this._options,
-            privacy: this.createPrivacy()
+            privacy: this.createPrivacy(),
+            privacySDK: this._privacySDK
         };
     }
 
@@ -149,14 +153,15 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             adsConfig: this._adsConfig,
             storageBridge: this._storageBridge,
             campaign: this._campaign,
-            playerMetadataServerId: this._playerMetadataServerId
+            playerMetadataServerId: this._playerMetadataServerId,
+            privacySDK: this._privacySDK
         });
     }
 
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._adsConfig.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
+        if (this._privacySDK.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
@@ -166,7 +171,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             platform: this._platform,
             core: this._core,
             privacyManager: this._privacyManager,
-            adsConfig: this._adsConfig
+            adsConfig: this._adsConfig,
+            privacySDK: this._privacySDK
         };
 
         const privacyEventHandler = new PrivacyEventHandler(privacyEventHandlerParameters);
@@ -180,7 +186,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             return true;
         }
 
-        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.privacySDK.getGamePrivacy().getMethod()) {
             return false;
         }
 

@@ -3,6 +3,13 @@
         <script>
             (function() {
                 var OmidVerification = function() {
+
+                    const ON_EVENT_PROCESSED = 'onEventProcessed',
+                    SESSION_FINISH = 'sessionFinish',
+                    SESSION_START = 'sessionStart',
+                    SESSION_ERROR = 'sessionError',
+                    SESSION_REGISTERED = 'sessionRegistered';
+
         
                     /**
                      * Enum for ad event types.
@@ -34,7 +41,7 @@
                         geometryChange: [],
                         impression: []
                     };
-        
+
                     /**
                      * Calls the corresponding listener events function
                      * @param {string} event to send to the server
@@ -61,7 +68,7 @@
                     var sessionObserversMap = {};
                     var sessionStartData = {};
                     var sessionStartCalled = false;
-        
+
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
                      * @param {Object} eventData structured data to indicate type for observer to fire
@@ -96,8 +103,9 @@
                      */
                     var sendSessionStart = function(observer, vendorkey) {
                         observer(sessionStartData[vendorkey]);
-                        postMessageCallback('onEventProcessed', {
-                            eventType: 'sessionStart'
+                        postMessageCallback(ON_EVENT_PROCESSED, {
+                            eventType: SESSION_START,
+                            vendorKey: vendorkey
                         });
                     }
 
@@ -111,13 +119,15 @@
                         });
                     }
 
-                    var handleSessionStart = function(data) {
+                    var handleSessionStart = function(event) {
+                        let data = event.data.data;
                         // If passed vendor matches a registered vendor
                         if (sessionObserversMap[data.vendorkey]) {
                             sessionStartData[data.vendorkey] = event.data;
                             if (!sessionStartCalled) {
                                 sendSessionStartForKey(data.vendorkey);
                             }
+                            sessionStartCalled = true;
                         } else {
                             // It is possible session start was called before a vendor registers so we must always store the data
                             sessionStartData[data.vendorkey] = event.data;
@@ -126,20 +136,20 @@
                                 // If we've already stored data for a default key, we can send SessionStart since the params do not matter
                                 if (sessionStartData[DEFAULT_VENDOR_KEY]) {
                                     sendSessionStartForKey(DEFAULT_VENDOR_KEY);
+                                    sessionStartCalled = true;
                                 } else {
                                     // Log even if registration will happen later
-                                    postMessageCallback('onEventProcessed', {
+                                    postMessageCallback(ON_EVENT_PROCESSED, {
                                         eventType: 'vendorkeyMismatch'
                                     });
                                 }
                             } else {
                                 // Log even if registration will happen later
-                                postMessageCallback('onEventProcessed', {
+                                postMessageCallback(ON_EVENT_PROCESSED, {
                                     eventType: 'vendorkeyMismatch'
                                 });
                             }
                         }
-                        sessionStartCalled = true;
                     }
         
                     /**
@@ -191,20 +201,19 @@
                         * SESSION EVENTS:
                         */
                         switch(event.data.type) {
-                            case 'sessionStart':
-                                const data = event.data.data;
-                                handleSessionStart(data);
+                            case SESSION_START:
+                                handleSessionStart(event);
                                 break;
-                            case 'sessionFinish':
+                            case SESSION_FINISH:
                                 triggerSessionObserver(event.data);
                                 for (var listener in videoListeners) { 
                                     delete videoListeners[listener]; 
                                 }
-                                postMessageCallback('onEventProcessed', {
-                                    eventType: 'sessionFinish'
+                                postMessageCallback(ON_EVENT_PROCESSED, {
+                                    eventType: SESSION_FINISH
                                 });
                                 break;
-                            case 'sessionError': 
+                            case SESSION_ERROR:
                                 triggerSessionObserver(event.data);
                                 break;
                             default:
@@ -226,7 +235,7 @@
                             data: data
                         }, '*');
                     };
-        
+
                    /**
                      * Registers session events for the given vendor key
                      * @param {function} functionToExecute sessionObserver for given vendor
@@ -243,9 +252,10 @@
 
                         sessionObserversMap[vendorKey].push(functionToExecute);
 
-                        // If start has been called from OM, send the start event immediately after registration
-                        if (!sessionStartCalled && sessionStartData[vendorKey]) {
-                            sendSessionStartForKey(vendorKey);
+                        if (!sessionStartCalled) {
+                            postMessageCallback(ON_EVENT_PROCESSED, {
+                                eventType: SESSION_REGISTERED
+                            });
                         }
                     }
 
@@ -265,6 +275,7 @@
                 /**
                  * Generic Vast verification scripts attach to this:
                  */
+
                 window.omid3p = new OmidVerification();
                 Object.freeze(window.omid3p);
         

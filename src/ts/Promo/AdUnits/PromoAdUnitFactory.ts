@@ -13,7 +13,7 @@ export class PromoAdUnitFactory extends AbstractAdUnitFactory<PromoCampaign, IPr
 
         parameters.view.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.privacyManager));
         parameters.view.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
-        parameters.view.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        parameters.view.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign));
 
         return promoAdUnit;
     }
