@@ -1,6 +1,6 @@
 import { ICoreApi } from 'Core/ICore';
 import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
-import { OMID3pEvents, SESSIONEvents, ISessionEvent, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { OMID3pEvents, SessionEvents, ISessionEvent, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export enum OMEvents {
     IMPRESSION_OCCURRED = 'impressionOccurred',
@@ -60,7 +60,7 @@ export interface IOMIDMessage {
     data: { [key: string]: unknown };
 }
 
-export class AdMobOmidEventBridge {
+export class AdMobSessionInterfaceEventBridge {
     private _core: ICoreApi;
     private _messageListener: (e: Event) => void;
     private _handler: IOMIDHandler;
@@ -91,9 +91,9 @@ export class AdMobOmidEventBridge {
         this._omidHandlers[OMEvents.PLAYER_STATE_CHANGE] = (msg) => this._handler.onPlayerStateChange(<VideoPlayerState>msg.data.playerState);
         this._omidHandlers[OMEvents.AD_USER_INTERACTION] = (msg) => this._handler.onAdUserInteraction(<InteractionType>msg.data.interactionType);
 
-        this._omidHandlers[SESSIONEvents.SESSION_START] = (msg) => this._handler.onSessionStart(<ISessionEvent><unknown>msg.data);
-        this._omidHandlers[SESSIONEvents.SESSION_FINISH] = (msg) => this._handler.onSessionFinish(<ISessionEvent><unknown>msg.data);
-        this._omidHandlers[SESSIONEvents.SESSION_ERROR] = (msg) => this._handler.onSessionError(<ISessionEvent><unknown>msg.data);
+        this._omidHandlers[SessionEvents.SESSION_START] = (msg) => this._handler.onSessionStart(<ISessionEvent><unknown>msg.data);
+        this._omidHandlers[SessionEvents.SESSION_FINISH] = (msg) => this._handler.onSessionFinish(<ISessionEvent><unknown>msg.data);
+        this._omidHandlers[SessionEvents.SESSION_ERROR] = (msg) => this._handler.onSessionError(<ISessionEvent><unknown>msg.data);
 
         this._omidHandlers[OMID3pEvents.VERIFICATION_RESOURCES] = (msg) => this._handler.onInjectVerificationResources(<IVerificationScriptResource[]><unknown>msg.data);
 
@@ -126,7 +126,7 @@ export class AdMobOmidEventBridge {
     }
 
     public sendSessionFinish() {
-        this.postMessage(SESSIONEvents.SESSION_FINISH);
+        this.postMessage(SessionEvents.SESSION_FINISH);
     }
 
     private onMessage(e: MessageEvent) {

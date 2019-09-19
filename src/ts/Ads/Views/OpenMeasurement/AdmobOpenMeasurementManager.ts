@@ -1,5 +1,5 @@
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { AdMobOmidEventBridge } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
+import { AdMobSessionInterfaceEventBridge } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
@@ -14,7 +14,7 @@ import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, Inter
 export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
 
     // only for admob:
-    private _omBridge: AdMobOmidEventBridge;
+    private _omBridge: AdMobSessionInterfaceEventBridge;
     private _omAdSessionId: string;
     private _admobSlotElement: HTMLElement;
     private _admobVideoElement: HTMLElement;
@@ -40,7 +40,7 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
 
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
-        this._omBridge = new AdMobOmidEventBridge(core, {
+        this._omBridge = new AdMobSessionInterfaceEventBridge(core, {
             onImpression: (impressionValues: IImpressionValues) => this.impression(impressionValues),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
@@ -122,7 +122,7 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
         return this._admobElementBounds;
     }
 
-    public getAdmobBridge(): AdMobOmidEventBridge {
+    public getAdmobBridge(): AdMobSessionInterfaceEventBridge {
         return this._omBridge;
     }
 

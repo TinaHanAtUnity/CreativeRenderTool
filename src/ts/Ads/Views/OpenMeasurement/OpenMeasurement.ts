@@ -16,7 +16,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SESSIONEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
@@ -316,14 +316,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Used to ensure DOM is removed prior to OMID#SessionFinish
      */
     public onEventProcessed(eventType: string, vendorKey?: string): Promise<void> {
-        if (eventType === SESSIONEvents.SESSION_START) {
+        if (eventType === SessionEvents.SESSION_START) {
             this._sessionStartCalled = true;
             if (this._campaign instanceof VastCampaign) {
                 return this.sendVASTStartEvents(vendorKey);
             }
         }
 
-        if (eventType === SESSIONEvents.SESSION_FINISH && !this._sessionFinishCalled) {
+        if (eventType === SessionEvents.SESSION_FINISH && !this._sessionFinishCalled) {
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
             this._sessionFinishCalled = true;

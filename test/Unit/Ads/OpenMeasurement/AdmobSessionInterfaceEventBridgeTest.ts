@@ -10,9 +10,9 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IOMIDHandler, AdMobOmidEventBridge, OMEvents, OMSessionInfo } from 'Ads/Views/OpenMeasurement/AdMobOmidEventBridge';
+import { IOMIDHandler, AdMobSessionInterfaceEventBridge, OMEvents, OMSessionInfo } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
-import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3pEvents, MediaType, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { VideoPosition, VideoPlayerState, InteractionType, SessionEvents, OMID3pEvents, MediaType, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     const sandbox = sinon.createSandbox();
@@ -27,9 +27,9 @@ import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3p
     let request: RequestManager;
     let iframe: HTMLIFrameElement;
     let handler: IOMIDHandler;
-    let omidEventBridge: AdMobOmidEventBridge;
+    let omidEventBridge: AdMobSessionInterfaceEventBridge;
 
-    describe(`${platform} AdmobOmidEventsBridge`, () => {
+    describe(`${platform} AdmobSessionInterfaceEventBridge`, () => {
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -75,7 +75,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3p
                 onElementBounds: sinon.spy()
             };
 
-            omidEventBridge = new AdMobOmidEventBridge(core, handler, omInstance);
+            omidEventBridge = new AdMobSessionInterfaceEventBridge(core, handler, omInstance);
             omidEventBridge.connect();
         });
 
@@ -185,7 +185,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3p
                     verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAdUserInteraction, data.interactionType)
                 },
                 {
-                    event: SESSIONEvents.SESSION_START,
+                    event: SessionEvents.SESSION_START,
                     data: {
                         adSessionId: 'testid',
                         timestamp: 'date',
@@ -195,7 +195,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3p
                     verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onSessionStart, data)
                 },
                 {
-                    event: SESSIONEvents.SESSION_FINISH,
+                    event: SessionEvents.SESSION_FINISH,
                     data: {
                         adSessionId: 'testid',
                         timestamp: 'date',
@@ -205,7 +205,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SESSIONEvents, OMID3p
                     verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onSessionFinish, data)
                 },
                 {
-                    event: SESSIONEvents.SESSION_ERROR,
+                    event: SessionEvents.SESSION_ERROR,
                     data: {
                         adSessionId: 'testid',
                         timestamp: 'date',

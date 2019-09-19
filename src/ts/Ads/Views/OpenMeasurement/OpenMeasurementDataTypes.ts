@@ -1,4 +1,4 @@
-export enum SESSIONEvents {
+export enum SessionEvents {
     SESSION_START = 'sessionStart',
     SESSION_ERROR = 'sessionError',
     SESSION_FINISH = 'sessionFinish'
