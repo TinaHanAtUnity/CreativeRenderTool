@@ -1,4 +1,4 @@
-# Pending
+# Thu Sep 19 20:08:11 UTC 2019
 
 * Add legalFramework to Auction Requests and Operative Events [#11216](https://github.com/Applifier/unity-ads-webview/pull/11216)
 * Put ABGroup Gate around IAS Header Hack [#11243](https://github.com/Applifier/unity-ads-webview/pull/11243)
