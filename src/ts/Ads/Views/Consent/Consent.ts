@@ -27,6 +27,7 @@ export interface IConsentViewParameters {
     osVersion?: string;
     pts: ProgrammaticTrackingService;
     consentABTest: boolean;
+    ageGateLimit: number;
 }
 
 export enum ConsentPage {
@@ -46,6 +47,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
     private _pts: ProgrammaticTrackingService;
+    private _ageGateLimit: number;
 
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
@@ -60,6 +62,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._osVersion = parameters.osVersion;
         this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
+        this._ageGateLimit = parameters.ageGateLimit;
 
         this._isABTest = parameters.consentABTest;
 
@@ -178,6 +181,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 this._container.classList.add('android4-ios7-ios8');
             }
         }
+
+        (<HTMLElement> this._container.querySelector('.age-limit-over')).innerHTML = `${this._ageGateLimit}`;
+        (<HTMLElement> this._container.querySelector('.age-limit-under')).innerHTML = `${this._ageGateLimit - 1}`;
 
         this.showPage(this._landingPage);
     }
@@ -335,7 +341,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
-        this.showPage(this._landingPage);
+        this.showPage(ConsentPage.HOMEPAGE);
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
@@ -346,7 +352,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private on13OrOlderEvent(event: Event): void {
-        // todo: use correct consent page
         this.showPage(ConsentPage.HOMEPAGE);
     }
 

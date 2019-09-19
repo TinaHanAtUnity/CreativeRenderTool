@@ -15,7 +15,8 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ABGroup, ConsentUXTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -26,6 +27,7 @@ export interface IConsentUnitParameters {
     core: ICoreApi;
     deviceInfo: DeviceInfo;
     pts: ProgrammaticTrackingService;
+    privacySDK: PrivacySDK;
 }
 
 export class ConsentUnit implements IConsentViewHandler, IAdUnit {
@@ -38,6 +40,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _privacyManager: UserPrivacyManager;
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
+    private _privacySDK: PrivacySDK;
 
     constructor(parameters: IConsentUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -45,8 +48,9 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
+        this._privacySDK = parameters.privacySDK;
 
-        this._landingPage = ConsentUXTest.isValid(parameters.abGroup) ? ConsentPage.HOMEPAGE : ConsentPage.HOMESCREEN;
+        this._landingPage = this._privacySDK.isAgeGateEnabled() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
 
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
@@ -54,7 +58,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             landingPage: this._landingPage,
             pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
-            consentABTest: false
+            consentABTest: false,
+            ageGateLimit: this._privacySDK.getAgeGateLimit()
         };
 
         if (this._platform === Platform.ANDROID) {
