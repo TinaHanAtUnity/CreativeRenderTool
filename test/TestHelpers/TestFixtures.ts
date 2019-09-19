@@ -201,7 +201,8 @@ export class TestFixtures {
             ... this.getCampaignBaseParams(session, 'fakeCampaignId', undefined),
             dynamicMarkup: 'foo',
             video: null,
-            useWebViewUserAgentForTracking: false
+            useWebViewUserAgentForTracking: false,
+            isOMEnabled: false
         };
     }
 
