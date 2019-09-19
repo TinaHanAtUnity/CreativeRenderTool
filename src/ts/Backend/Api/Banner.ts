@@ -6,8 +6,8 @@ export class BannerBackendApi extends BackendApi implements IBannerApi {
 
     public readonly onBannerResized = new Observable2<string, IBannerResizedEvent>();
     public readonly onBannerVisibilityChanged = new Observable2<string, Visibility>();
-    public readonly onBannerOpened = new Observable1<string>();
-    public readonly onBannerClosed = new Observable1<string>();
+    public readonly onBannerAttached = new Observable1<string>();
+    public readonly onBannerDetached = new Observable1<string>();
     public readonly onBannerLoaded = new Observable1<string>();
     public readonly onBannerDestroyed = new Observable1<string>();
     public readonly onBannerLoadPlacement = new Observable4<string, string, number, number>();

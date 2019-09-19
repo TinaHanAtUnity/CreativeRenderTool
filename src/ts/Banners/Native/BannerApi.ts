@@ -40,8 +40,8 @@ export enum BannerViewType {
 export interface IBannerApi {
     onBannerResized: Observable2<string, IBannerResizedEvent>;
     onBannerVisibilityChanged: Observable2<string, Visibility>;
-    onBannerOpened: Observable1<string>;
-    onBannerClosed: Observable1<string>;
+    onBannerAttached: Observable1<string>;
+    onBannerDetached: Observable1<string>;
     onBannerLoaded: Observable1<string>;
     onBannerDestroyed: Observable1<string>;
     onBannerLoadPlacement: Observable4<string, string, number, number>;
@@ -56,8 +56,8 @@ export class BannerApi extends NativeApi implements IBannerApi {
 
     public readonly onBannerResized = new Observable2<string, IBannerResizedEvent>();
     public readonly onBannerVisibilityChanged = new Observable2<string, Visibility>();
-    public readonly onBannerOpened = new Observable1<string>();
-    public readonly onBannerClosed = new Observable1<string>();
+    public readonly onBannerAttached = new Observable1<string>();
+    public readonly onBannerDetached = new Observable1<string>();
     public readonly onBannerLoaded = new Observable1<string>();
     public readonly onBannerDestroyed = new Observable1<string>();
     public readonly onBannerLoadPlacement = new Observable4<string, string, number, number>();
@@ -158,11 +158,11 @@ export class BannerApi extends NativeApi implements IBannerApi {
     }
 
     private handleBannerOpenedEvent(bannerAdViewId: string) {
-        this.onBannerOpened.trigger(bannerAdViewId);
+        this.onBannerAttached.trigger(bannerAdViewId);
     }
 
     private handleBannerClosedEvent(bannerAdViewId: string) {
-        this.onBannerClosed.trigger(bannerAdViewId);
+        this.onBannerDetached.trigger(bannerAdViewId);
     }
     private handleBannerLoadedEvent(bannerAdViewId: string) {
         this.onBannerLoaded.trigger(bannerAdViewId);

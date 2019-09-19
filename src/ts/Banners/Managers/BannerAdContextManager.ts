@@ -5,6 +5,7 @@ import { IBannerModule } from 'Banners/IBannerModule';
 import { IAds } from 'Ads/IAds';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { BannerSizeUtil, IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 interface IBannerContextMap {
     [placementId: string]: BannerAdContext;
@@ -68,10 +69,10 @@ export class BannerAdContextManager {
                     const context = this.createContext(placement, bannerAdViewId, BannerSizeUtil.getBannerSizeFromWidthAndHeight(width, height, this._core.Api.Sdk));
                     context.load();
                 } catch (error) {
-                    return this._bannerModule.Api.BannerListenerApi.sendErrorEvent(error.message, bannerAdViewId);
+                    return this._bannerModule.Api.BannerListenerApi.sendErrorEvent(bannerAdViewId, BannerErrorCode.WebViewError, error.message);
                 }
             } else {
-                this._bannerModule.Api.BannerListenerApi.sendErrorEvent(`Placement ${placementId} could not be found`, bannerAdViewId);
+                this._bannerModule.Api.BannerListenerApi.sendErrorEvent(bannerAdViewId, BannerErrorCode.WebViewError, `Placement ${placementId} could not be found`);
             }
         });
     }
