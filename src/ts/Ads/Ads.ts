@@ -90,7 +90,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { PhaseTwoLoadRolloutExperiment } from 'Core/Models/ABGroup';
+import { MediationLoadExperiment } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -652,7 +652,7 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        if (PhaseTwoLoadRolloutExperiment.isValid(this._core.Config.getAbGroup()) || CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId()) || CustomFeatures.isPartOfPhaseTwoLoadRollout(this._core.ClientInfo.getGameId())) {
+        if (MediationLoadExperiment.isValid(this._core.Config.getAbGroup()) || CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }

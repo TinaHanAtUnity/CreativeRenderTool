@@ -7,6 +7,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Store } from 'Store/Store';
 import { GoogleStoreManager } from 'Store/Managers/GoogleStoreManager';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
+import * as sinon from 'sinon';
 
 describe('StoreTest', () => {
     let nativeBridge: NativeBridge;
@@ -14,10 +16,18 @@ describe('StoreTest', () => {
 
     describe('AppleStoreManager', () => {
 
+        let sandbox: sinon.SinonSandbox;
+
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS, TestFixtures.getBackend(Platform.IOS));
             core = TestFixtures.getCoreModule(nativeBridge);
             core.Ads = TestFixtures.getAdsModule(core);
+            sandbox = sinon.createSandbox();
+            sandbox.stub(IosUtils, 'isStoreApiBroken').returns(false);
+        });
+
+        afterEach(() => {
+            sandbox.restore();
         });
 
         it('should create an AppleStoreManger', () => {
