@@ -579,5 +579,12 @@
     "description": "Current legal framework e.g. \"gdpr\", \"ccpa\" or \"default\"",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "nofillRetry",
+    "type": "boolean",
+    "description": "Retrying after no fill",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
