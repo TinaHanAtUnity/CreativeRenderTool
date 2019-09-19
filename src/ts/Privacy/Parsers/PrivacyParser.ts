@@ -12,7 +12,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { AgeGate, IRawAgeGate } from 'Privacy/AgeGate';
 
 export class PrivacyParser {
     private static _updateUserPrivacyForIncident: boolean = false;
@@ -33,9 +32,9 @@ export class PrivacyParser {
         const userPrivacy = this.parseUserPrivacy(sanitizedConfigJson.userPrivacy, sanitizedConfigJson.gamePrivacy,
             sanitizedConfigJson.optOutEnabled, limitAdTracking);
 
-        const ageGate = this.parseAgeGate(sanitizedConfigJson.ageGate);
+        const ageGateLimit = sanitizedConfigJson.ageGateLimit ? sanitizedConfigJson.ageGateLimit : 0;
 
-        return new PrivacySDK(gamePrivacy, userPrivacy, ageGate);
+        return new PrivacySDK(gamePrivacy, userPrivacy, ageGateLimit);
     }
 
     // For #incident-20190516-2
@@ -156,13 +155,5 @@ export class PrivacyParser {
         }
 
         return new UserPrivacy(rawUserPrivacy);
-    }
-
-    private static parseAgeGate(rawAgeGate: IRawAgeGate | undefined): AgeGate {
-        if (rawAgeGate) {
-            return new AgeGate(rawAgeGate);
-        }
-
-        return new AgeGate({ ageLimit: -1, enabled: false});
     }
 }

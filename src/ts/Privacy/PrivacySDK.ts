@@ -3,18 +3,17 @@ import {
     PrivacyMethod,
     UserPrivacy
 } from 'Privacy/Privacy';
-import { AgeGate } from 'Privacy/AgeGate';
 
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
     private _userPrivacy: UserPrivacy;
-    private _ageGate: AgeGate;
+    private _ageGateLimit: number;
     private _testForceConsentUnit: boolean;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, ageGate: AgeGate) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, ageGateLimit: number) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
-        this._ageGate = ageGate;
+        this._ageGateLimit = ageGateLimit;
         this._testForceConsentUnit = false;
     }
 
@@ -45,7 +44,15 @@ export class PrivacySDK {
         return this._userPrivacy;
     }
 
-    public getAgeGate(): AgeGate {
-        return this._ageGate;
+    public isAgeGateEnabled(): boolean {
+        if (this._ageGateLimit > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public getAgeGateLimit(): number {
+        return this._ageGateLimit;
     }
 }

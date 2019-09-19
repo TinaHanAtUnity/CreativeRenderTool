@@ -2,7 +2,6 @@ import { IRawPlacement, Placement } from 'Ads/Models/Placement';
 import { IRawGamePrivacy, IRawUserPrivacy } from 'Privacy/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
-import { IRawAgeGate } from 'Privacy/AgeGate';
 
 export interface IRawAdsConfiguration {
     assetCaching: string;
@@ -14,7 +13,7 @@ export interface IRawAdsConfiguration {
     defaultBannerPlacement: string | undefined;
     gamePrivacy: IRawGamePrivacy | undefined;
     userPrivacy: IRawUserPrivacy | undefined;
-    ageGate: IRawAgeGate | undefined;
+    ageGateLimit: number | undefined;
 }
 
 export interface IAdsConfiguration {

@@ -82,7 +82,7 @@ describe('incident-20190516-2', () => {
         defaultBannerPlacement: '',
         gdprEnabled: true,
         gamePrivacy: {method: 'legitimate_interest'},
-        ageGate: undefined
+        ageGateLimit: undefined
     };
     beforeEach(() => {
         diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
