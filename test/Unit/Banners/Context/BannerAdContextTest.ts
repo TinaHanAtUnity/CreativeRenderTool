@@ -1,4 +1,4 @@
-import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { BannerAdContext, BannerLoadState } from 'Banners/Context/BannerAdContext';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IBannerModule } from 'Banners/IBannerModule';
 import { ICore } from 'Core/ICore';
@@ -66,9 +66,22 @@ import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
             beforeEach(loadBannerAdUnit);
 
             it('should call onLoad', () => {
-                sinon.assert.called(asStub(adUnit.onLoad));
+                sandbox.assert.called(asStub(adUnit.onLoad));
             });
 
+            it('should call onLoad again when banner has aleady loaded', () => {
+                return bannerAdContext.load().then(() => {
+                    sandbox.assert.calledTwice(asStub(adUnit.onLoad));
+                });
+            });
+
+            it('should not call onLoad again while banner state is loading', () => {
+                // tslint:disable-next-line:no-string-literal
+                bannerAdContext['_loadState'] = BannerLoadState.Loading;
+                return bannerAdContext.load().then(() => {
+                    sandbox.assert.calledOnce(asStub(adUnit.onLoad));
+                });
+            });
         });
 
         describe('No fill banner scenario', () => {
@@ -79,7 +92,7 @@ import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
 
             it('will fail when the banner request returns NoFillError', () => {
                 return bannerAdContext.load().catch((e) => {
-                    sinon.assert.called(asStub(bannerModule.Api.BannerListenerApi.sendNoFillEvent));
+                    sandbox.assert.called(asStub(bannerModule.Api.BannerListenerApi.sendNoFillEvent));
                 });
             });
         });
