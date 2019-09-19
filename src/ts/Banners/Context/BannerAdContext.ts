@@ -111,11 +111,11 @@ export class BannerAdContext {
     public load(): Promise<void> {
         switch (this._loadState) {
             case BannerLoadState.Unloaded:
-                return this.getCampaign();
             case BannerLoadState.Loaded:
+                return this.getCampaign();
             case BannerLoadState.Loading:
             default:
-                // do nothing
+                // Do nothing while loading a separate banner
                 return Promise.resolve();
         }
     }
