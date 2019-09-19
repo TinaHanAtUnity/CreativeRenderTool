@@ -149,7 +149,7 @@
     background: $white;
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
-    padding: 1.5 * $default-size;
+    padding: 2 * $default-size;
   }
 
   .title {
@@ -165,7 +165,7 @@
   }
 
   .empty-block {
-    height: 6 * $default-size;
+    height: 5.25 * $default-size;
   }
 
   .homepage-button-container {
@@ -177,7 +177,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: .75 * $default-size $default-size;
+    padding: 0 3.25 * $default-size 2 * $default-size 3.25 * $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -185,12 +185,14 @@
 
   .consent-button {
     position: relative;
-    margin-top: .75 * $default-size;
-    padding: .75 * $default-size .75 * $default-size;
+    margin-top: .5 * $default-size;
+    padding: .55 * $default-size .75 * $default-size;
     border: 1px solid $consent-border-gray;
     border-radius: 2 * $default-size;
     text-align: center;
-    font-weight: $privacy-title-font-weight;
+    color: $consent-disagree-button-color;
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $privacy-heading-font-size;
     font-size: $privacy-heading-font-size;
   }
 
@@ -198,6 +200,11 @@
     &.click-animation {
       $click-animation();
     }
+  }
+
+  .unityads-logo {
+    $set-image(100%, $default-scale-size * $default-size, 0, "../img/unityads.png", contain);
+    margin-top: .75 * $default-size;
   }
 }
 
