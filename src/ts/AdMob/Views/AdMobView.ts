@@ -25,7 +25,7 @@ import OMIDSessionClient from 'html/omid/admob-session-interface.html';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
@@ -61,10 +61,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
-    private _om: AdmobOpenMeasurementManager | undefined;
+    private _om: AdmobOpenMeasurementController | undefined;
     private _deviceInfo: DeviceInfo;
 
-    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementManager | undefined) {
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
         super(platform, 'admob');
 
         this._campaign = campaign;
@@ -322,7 +322,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         }
     }
 
-    private sendOMGeometryChange(om: AdmobOpenMeasurementManager) {
+    private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
         const popup = <HTMLElement>document.querySelector('.pop-up');
         const gdprRect = popup.getBoundingClientRect();
         const gdprRectx = gdprRect.left;

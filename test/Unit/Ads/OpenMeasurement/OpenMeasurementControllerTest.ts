@@ -4,21 +4,21 @@ import { Platform } from 'Core/Constants/Platform';
 import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { OpenMeasurementManager, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlayerState, InteractionType, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${platform} OMManager`, () => {
+    describe(`${platform} OMController`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new OpenMeasurementManager(placement, om);
+            return new OpenMeasurementController(placement, om);
         };
 
         describe('session events', () => {
-            let omManager: OpenMeasurementManager;
+            let omManager: OpenMeasurementController;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {
@@ -40,7 +40,7 @@ import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlay
         });
 
         describe('adEvents', () => {
-            let omManager: OpenMeasurementManager;
+            let omManager: OpenMeasurementController;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {

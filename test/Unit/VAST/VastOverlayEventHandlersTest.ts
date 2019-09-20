@@ -35,7 +35,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -64,7 +64,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
         let sandbox: sinon.SinonSandbox;
         let privacy: Privacy;
         let programmaticTrackingService: ProgrammaticTrackingService;
-        let om: VastOpenMeasurementManager | undefined;
+        let om: VastOpenMeasurementController | undefined;
 
         before(() => {
             sandbox = sinon.createSandbox();
@@ -162,7 +162,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
                 privacy,
-                om: sinon.createStubInstance(VastOpenMeasurementManager),
+                om: sinon.createStubInstance(VastOpenMeasurementController),
                 privacySDK: privacySDK
             };
 

@@ -1,7 +1,7 @@
 import * as sinon from 'sinon';
 import { Platform } from 'Core/Constants/Platform';
 import { Placement } from 'Ads/Models/Placement';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
@@ -12,11 +12,11 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new VastOpenMeasurementManager(placement, om);
+            return new VastOpenMeasurementController(placement, om);
         };
 
         describe('DOM Hierarchy', () => {
-            let omManager: VastOpenMeasurementManager;
+            let omManager: VastOpenMeasurementController;
             let openMeasurement: OpenMeasurement;
 
             beforeEach(() => {

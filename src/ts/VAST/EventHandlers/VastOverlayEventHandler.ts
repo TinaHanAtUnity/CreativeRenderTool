@@ -14,7 +14,7 @@ import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { IViewPort, IAdView, ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
@@ -27,7 +27,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastOverlay?: AbstractVideoOverlay;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
-    private _om?: VastOpenMeasurementManager;
+    private _om?: VastOpenMeasurementController;
     private _deviceInfo: DeviceInfo;
 
     private _viewPort: IViewPort;

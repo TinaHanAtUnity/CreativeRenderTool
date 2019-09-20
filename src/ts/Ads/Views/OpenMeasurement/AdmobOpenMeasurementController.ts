@@ -8,13 +8,13 @@ import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
-export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
+export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
     // only for admob:
-    private _omBridge: AdMobSessionInterfaceEventBridge;
+    private _omSessionInterfaceBridge: AdMobSessionInterfaceEventBridge;
     private _omAdSessionId: string;
     private _admobSlotElement: HTMLElement;
     private _admobVideoElement: HTMLElement;
@@ -40,7 +40,7 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
 
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
-        this._omBridge = new AdMobSessionInterfaceEventBridge(core, {
+        this._omSessionInterfaceBridge = new AdMobSessionInterfaceEventBridge(core, {
             onImpression: (impressionValues: IImpressionValues) => this.impression(impressionValues),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
@@ -91,17 +91,15 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
         });
     }
 
-    // only used above and test
     private addMessageListener() {
-        if (this._omBridge) {
-            this._omBridge.connect();
+        if (this._omSessionInterfaceBridge) {
+            this._omSessionInterfaceBridge.connect();
         }
     }
 
-    // only used above and test
     private removeMessageListener() {
-        if (this._omBridge) {
-            this._omBridge.disconnect();
+        if (this._omSessionInterfaceBridge) {
+            this._omSessionInterfaceBridge.disconnect();
         }
     }
 
@@ -123,7 +121,7 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
     }
 
     public getAdmobBridge(): AdMobSessionInterfaceEventBridge {
-        return this._omBridge;
+        return this._omSessionInterfaceBridge;
     }
 
     public getSDKVersion() {
@@ -135,6 +133,6 @@ export class AdmobOpenMeasurementManager extends OpenMeasurementManager {
      */
     public sessionFinish() {
         super.sessionFinish();
-        this._omBridge.sendSessionFinish();
+        this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }

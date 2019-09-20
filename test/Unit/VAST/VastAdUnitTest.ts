@@ -34,9 +34,8 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IStoreApi } from 'Store/IStore';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 
 describe('VastAdUnitTest', () => {
 
@@ -57,7 +56,7 @@ describe('VastAdUnitTest', () => {
     let vastCampaign: VastCampaign;
     let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
     let coreConfig: CoreConfiguration;
-    let openMeasurement: VastOpenMeasurementManager;
+    let openMeasurement: VastOpenMeasurementController;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -147,7 +146,7 @@ describe('VastAdUnitTest', () => {
         const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        openMeasurement = sinon.createStubInstance(VastOpenMeasurementManager);
+        openMeasurement = sinon.createStubInstance(VastOpenMeasurementController);
 
         vastAdUnitParameters = {
             platform,

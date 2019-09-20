@@ -2,7 +2,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { VideoPlayerState, InteractionType, ISessionEvent, IImpressionValues, IVastProperties, OMID3pEvents, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
-interface IOMManager {
+interface IOMController {
     impression(impressionValues: IImpressionValues): void;
     loaded(vastPropeties: IVastProperties): void;
     start(duration: number, videoPlayerVolume: number): void;
@@ -30,7 +30,7 @@ export enum OMState {
     STOPPED
 }
 
-export class OpenMeasurementManager implements IOMManager {
+export class OpenMeasurementController implements IOMController {
 
     private _state: OMState = OMState.STOPPED;
     private _deviceVolume: number;

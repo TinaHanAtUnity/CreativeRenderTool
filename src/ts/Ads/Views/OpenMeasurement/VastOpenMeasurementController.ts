@@ -1,8 +1,8 @@
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { Placement } from 'Ads/Models/Placement';
-import { OpenMeasurementManager } from 'Ads/Views/OpenMeasurement/OpenMeasurementManager';
+import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 
-export class VastOpenMeasurementManager extends OpenMeasurementManager {
+export class VastOpenMeasurementController extends OpenMeasurementController {
 
     constructor(placement: Placement, omInstances: OpenMeasurement[]) {
         super(placement, omInstances);

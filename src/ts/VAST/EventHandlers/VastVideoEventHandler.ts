@@ -7,7 +7,7 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { VastOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementManager';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
@@ -15,7 +15,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
     private _vastAdUnit: VastAdUnit;
     private _vastCampaign: VastCampaign;
-    private _om?: VastOpenMeasurementManager;
+    private _om?: VastOpenMeasurementController;
     private _omStartCalled = false;
     private _pts: ProgrammaticTrackingService;
 

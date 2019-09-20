@@ -1,5 +1,5 @@
 import { ICoreApi } from 'Core/ICore';
-import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { OMID3pEvents, SessionEvents, ISessionEvent, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export enum OMEvents {
@@ -68,7 +68,7 @@ export class AdMobSessionInterfaceEventBridge {
 
     private _iframeSessionInterface: HTMLIFrameElement;
 
-    constructor(core: ICoreApi, handler: IOMIDHandler, openMeasurement: AdmobOpenMeasurementManager) {
+    constructor(core: ICoreApi, handler: IOMIDHandler, openMeasurement: AdmobOpenMeasurementController) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._omidHandlers = {};

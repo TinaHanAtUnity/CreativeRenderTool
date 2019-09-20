@@ -11,12 +11,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IOMIDHandler, AdMobSessionInterfaceEventBridge, OMEvents, OMSessionInfo } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
-import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { VideoPosition, VideoPlayerState, InteractionType, SessionEvents, OMID3pEvents, MediaType, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     const sandbox = sinon.createSandbox();
-    let omInstance: AdmobOpenMeasurementManager;
+    let omInstance: AdmobOpenMeasurementController;
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;

@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import { Platform } from 'Core/Constants/Platform';
 import { Placement } from 'Ads/Models/Placement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdmobOpenMeasurementManager } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementManager';
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { Backend } from 'Backend/Backend';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -13,7 +13,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${platform} AdmobOpenMeasurementManager`, () => {
+    describe(`${platform} AdmobOpenMeasurementContoller`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
         let backend: Backend;
@@ -38,11 +38,11 @@ import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasu
             }
             request = sinon.createStubInstance(RequestManager);
 
-            return new AdmobOpenMeasurementManager(platform, core, clientInformation, campaign, placement, deviceInfo, request);
+            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request);
         };
 
         describe('DOM Hierarchy', () => {
-            let omManager: AdmobOpenMeasurementManager;
+            let omManager: AdmobOpenMeasurementController;
             let verificationResource: IVerificationScriptResource;
 
             beforeEach(() => {
@@ -82,7 +82,7 @@ import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasu
         });
 
         describe('session event additional handling', () => {
-            let omManager: AdmobOpenMeasurementManager;
+            let omManager: AdmobOpenMeasurementController;
 
             beforeEach(() => {
                 omManager = initAdMobOMManager();
