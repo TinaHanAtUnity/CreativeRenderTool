@@ -99,7 +99,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
             if (!this._clickEventsSent) {
                 this._clickEventsSent = true;
                 this.sendTrackingEvent(TrackingEvent.CLICK);
-                this._bannerNativeApi.BannerListenerApi.sendClickEvent(this._placementId, this._bannerAdViewId);
+                this._bannerNativeApi.BannerListenerApi.sendClickEvent(this._bannerAdViewId);
             }
             if (this._platform === Platform.IOS) {
                 this._core.iOS!.UrlScheme.open(url);

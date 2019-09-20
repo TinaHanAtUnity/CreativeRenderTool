@@ -202,7 +202,7 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                             const url = 'http://unity3d.com';
                             webPlayerContainer.onCreateWebView.trigger(url);
                             sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
-                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, placementId);
+                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
                         });
                     });
                 });
@@ -218,7 +218,7 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                                 'action': 'android.intent.action.VIEW',
                                 'uri': url
                             });
-                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, placementId);
+                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
                         });
                     });
                 });

@@ -1,5 +1,6 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 export class BannerListenerApi extends NativeApi {
 
@@ -7,16 +8,20 @@ export class BannerListenerApi extends NativeApi {
         super(nativeBridge, 'BannerListener', ApiPackage.BANNER);
     }
 
-    public sendNoFillEvent(bannerAdViewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendNoFillEvent', [bannerAdViewId]);
+    public sendLoadEvent(bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendLoadEvent', [bannerAdViewId]);
     }
 
-    public sendClickEvent(placementId: string, bannerAdViewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendClickEvent', [placementId, bannerAdViewId]);
+    public sendClickEvent(bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendClickEvent', [bannerAdViewId]);
     }
 
-    public sendErrorEvent(error: string, bannerAdViewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [error, bannerAdViewId]);
+    public sendLeaveApplicationEvent(bannerAdViewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendLeaveApplicationEvent', [bannerAdViewId]);
+    }
+
+    public sendErrorEvent(bannerAdViewId: string, bannerErrorCode: BannerErrorCode, errorMessage: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [bannerAdViewId, bannerErrorCode, errorMessage]);
     }
 
 }

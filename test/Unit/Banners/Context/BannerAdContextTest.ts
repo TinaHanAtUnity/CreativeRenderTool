@@ -14,6 +14,7 @@ import { asStub } from 'TestHelpers/Functions';
 import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerViewType } from 'Banners/Native/BannerApi';
 import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 [
     Platform.IOS,
@@ -84,15 +85,48 @@ import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
             });
         });
 
+        const failLoadBannerAdUnit = (error: Error) => {
+            adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
+            sandbox.stub(bannerModule.CampaignManager, 'request').rejects(error);
+            sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
+            sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
+            sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
+                return Promise.resolve().then(() => bannerModule.Api.BannerApi.onBannerLoaded.trigger(bannerAdViewId));
+            });
+            return bannerAdContext.load();
+        };
+
+        describe('Fail loading a Banner Ad', () => {
+            beforeEach(() => {
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
+                return failLoadBannerAdUnit(new Error('failLoadBannerAdUnit'));
+            });
+
+            it('should call sendErrorEvent with web view error', () => {
+                sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.WebViewError, 'Banner failed to load : failLoadBannerAdUnit');
+            });
+        });
+
+        describe('Fail loading a Banner Ad with no fill', () => {
+            beforeEach(() => {
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
+                return failLoadBannerAdUnit(new NoFillError(`No fill for ${placementId}`));
+            });
+
+            it('should call sendErrorEvent with no fill', () => {
+                sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
+            });
+        });
+
         describe('No fill banner scenario', () => {
             beforeEach(() => {
                 sandbox.stub(bannerModule.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
-                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendNoFillEvent');
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
             });
 
             it('will fail when the banner request returns NoFillError', () => {
                 return bannerAdContext.load().catch((e) => {
-                    sandbox.assert.called(asStub(bannerModule.Api.BannerListenerApi.sendNoFillEvent));
+                    sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
                 });
             });
         });

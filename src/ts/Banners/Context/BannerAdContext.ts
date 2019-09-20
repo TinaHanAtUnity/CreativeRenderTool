@@ -16,8 +16,8 @@ import { BannerSizeUtil, IBannerDimensions } from 'Banners/Utilities/BannerSizeU
 import { ProgrammaticTrackingService, ProgrammaticTrackingError, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IObserver0, IObserver1 } from 'Core/Utilities/IObserver';
-import { SdkApi } from 'Core/Native/Sdk';
 import { BannerViewType } from 'Banners/Native/BannerApi';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 export enum BannerLoadState {
     Unloaded,
@@ -79,12 +79,12 @@ export class BannerAdContext {
         this._onActivityPaused = this._focusManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
         this._onActivityResumed = this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
 
-        this._onBannerOpened = this._bannerNativeApi.BannerApi.onBannerOpened.subscribe((bannerAdViewId: string) => {
+        this._onBannerOpened = this._bannerNativeApi.BannerApi.onBannerAttached.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
                 this.onBannerShow();
             }
         });
-        this._onBannerClosed = this._bannerNativeApi.BannerApi.onBannerClosed.subscribe((bannerAdViewId: string) => {
+        this._onBannerClosed = this._bannerNativeApi.BannerApi.onBannerDetached.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
                 this.hide();
             }
@@ -103,8 +103,8 @@ export class BannerAdContext {
         this._focusManager.onActivityPaused.unsubscribe(this._onActivityPaused);
         this._focusManager.onActivityResumed.unsubscribe(this._onActivityResumed);
 
-        this._bannerNativeApi.BannerApi.onBannerOpened.unsubscribe(this._onBannerOpened);
-        this._bannerNativeApi.BannerApi.onBannerClosed.unsubscribe(this._onBannerClosed);
+        this._bannerNativeApi.BannerApi.onBannerAttached.unsubscribe(this._onBannerOpened);
+        this._bannerNativeApi.BannerApi.onBannerDetached.unsubscribe(this._onBannerClosed);
         this._bannerNativeApi.BannerApi.onBannerDestroyed.unsubscribe(this._onBannerDestroyed);
     }
 
@@ -132,6 +132,7 @@ export class BannerAdContext {
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
+                    return this._bannerNativeApi.BannerListenerApi.sendLoadEvent(this._bannerAdViewId);
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
@@ -163,11 +164,11 @@ export class BannerAdContext {
 
     private sendBannerError(e: Error): Promise<void> {
         this._programmaticTrackingService.reportMetric(ProgrammaticTrackingError.BannerRequestError, 'banner');
-        return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(e.message, this._bannerAdViewId);
+        return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.WebViewError, e.message);
     }
 
     private onBannerNoFill() {
-        this._bannerNativeApi.BannerListenerApi.sendNoFillEvent(this._bannerAdViewId);
+        this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
     }
 
     private onBannerShow() {
