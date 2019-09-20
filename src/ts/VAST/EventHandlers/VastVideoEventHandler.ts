@@ -23,7 +23,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
-        this._om = this._vastAdUnit.getOpenMeasurementManager();
+        this._om = this._vastAdUnit.getOpenMeasurementController();
         this._pts = params.programmaticTrackingService;
     }
 

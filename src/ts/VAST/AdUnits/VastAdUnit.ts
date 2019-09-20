@@ -127,7 +127,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager.sendTrackingEvents(this._vastCampaign, eventName, 'vast', this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 
-    public getOpenMeasurementManager(): VastOpenMeasurementController | undefined {
+    public getOpenMeasurementController(): VastOpenMeasurementController | undefined {
         return this._om;
     }
 
