@@ -74,13 +74,6 @@ export class VastAd extends Model<IVastAd> {
         return this.get('adVerifications');
     }
 
-    public getAdVerification(): VastAdVerification | null {
-        if (this.getAdVerifications() && this.getAdVerifications().length > 0) {
-            return this.getAdVerifications()[0];
-        }
-        return null;
-    }
-
     public addCreative(creative: VastCreative) {
         this.get('creatives').push(creative);
     }
