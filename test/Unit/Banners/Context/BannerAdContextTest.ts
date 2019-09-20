@@ -14,6 +14,7 @@ import { asStub } from 'TestHelpers/Functions';
 import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerViewType } from 'Banners/Native/BannerApi';
 import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 [
     Platform.IOS,
@@ -87,12 +88,12 @@ import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
         describe('No fill banner scenario', () => {
             beforeEach(() => {
                 sandbox.stub(bannerModule.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
-                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendNoFillEvent');
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
             });
 
             it('will fail when the banner request returns NoFillError', () => {
                 return bannerAdContext.load().catch((e) => {
-                    sandbox.assert.called(asStub(bannerModule.Api.BannerListenerApi.sendNoFillEvent));
+                    sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
                 });
             });
         });

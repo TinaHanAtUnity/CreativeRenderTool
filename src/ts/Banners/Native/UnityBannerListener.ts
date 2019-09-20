@@ -12,10 +12,6 @@ export class BannerListenerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendLoadEvent', [bannerAdViewId]);
     }
 
-    public sendNoFillEvent(bannerAdViewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendNoFillEvent', [bannerAdViewId]);
-    }
-
     public sendClickEvent(bannerAdViewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendClickEvent', [bannerAdViewId]);
     }

@@ -168,7 +168,7 @@ export class BannerAdContext {
     }
 
     private onBannerNoFill() {
-        this._bannerNativeApi.BannerListenerApi.sendNoFillEvent(this._bannerAdViewId);
+        this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
     }
 
     private onBannerShow() {
