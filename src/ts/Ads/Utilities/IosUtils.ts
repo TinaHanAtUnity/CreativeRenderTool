@@ -9,6 +9,8 @@ export class IosUtils {
             return true; //iOS 8 not supported
         } else if (osVersion.match(/^7\.[0-9]/)) {
             return true; //iOS 7 not supported
+        } else if (osVersion.match(/^13\.[0-9]/)) {
+            return true; //iOS 13 disabled. TODO: Allow iOS 13 in SDK 3.3+
         } else {
             return false;
         }

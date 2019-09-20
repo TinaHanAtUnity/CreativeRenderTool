@@ -473,7 +473,8 @@ export class AuctionRequest {
                     organizationId: this._coreConfig.getOrganizationId(),
                     isLoadEnabled: false, // TODO: When this is used for anything other than banners, pass actual flag
                     omidPartnerName: PARTNER_NAME,
-                    omidJSVersion: OM_JS_VERSION
+                    omidJSVersion: OM_JS_VERSION,
+                    legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
                 };
             });
         });
