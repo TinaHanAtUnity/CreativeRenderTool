@@ -79,12 +79,12 @@ describe('AdmobAdUnitTest', () => {
 
         await admobAdUnit.show();
 
-        expect(pts.reportMetric).toHaveBeenCalled();
-        expect(pts.reportMetric).toHaveBeenCalledWith(AdmobMetric.AdmobRewardedVideoStart);
+        expect(pts.reportMetricEvent).toHaveBeenCalled();
+        expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobRewardedVideoStart);
         admobAdUnit.sendRewardEvent();
-        expect(pts.reportMetric).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
+        expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
         admobAdUnit.sendSkipEvent();
-        expect(pts.reportMetric).toHaveBeenCalledWith(AdmobMetric.AdmobUserSkippedRewardedVideo);
+        expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserSkippedRewardedVideo);
     });
 
     it('should not call rewarded placement metrics when allowSkip is true', async () => {
@@ -93,10 +93,10 @@ describe('AdmobAdUnitTest', () => {
 
         await admobAdUnit.show();
 
-        expect(pts.reportMetric).not.toHaveBeenCalled();
+        expect(pts.reportMetricEvent).not.toHaveBeenCalled();
         admobAdUnit.sendRewardEvent();
-        expect(pts.reportMetric).not.toHaveBeenCalled();
+        expect(pts.reportMetricEvent).not.toHaveBeenCalled();
         admobAdUnit.sendSkipEvent();
-        expect(pts.reportMetric).not.toHaveBeenCalled();
+        expect(pts.reportMetricEvent).not.toHaveBeenCalled();
     });
 });
