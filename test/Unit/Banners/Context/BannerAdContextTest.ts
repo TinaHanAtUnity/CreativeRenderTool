@@ -85,9 +85,9 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
             });
         });
 
-        const failLoadBannerAdUnit = () => {
+        const failLoadBannerAdUnit = (error: Error) => {
             adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
-            sandbox.stub(bannerModule.CampaignManager, 'request').rejects(new Error('failLoadBannerAdUnit'));
+            sandbox.stub(bannerModule.CampaignManager, 'request').rejects(error);
             sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
             sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
             sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
@@ -99,11 +99,22 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
         describe('Fail loading a Banner Ad', () => {
             beforeEach(() => {
                 sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
-                return failLoadBannerAdUnit();
+                return failLoadBannerAdUnit(new Error('failLoadBannerAdUnit'));
             });
 
-            it('should call sendErrorEvent', () => {
+            it('should call sendErrorEvent with web view error', () => {
                 sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.WebViewError, 'Banner failed to load : failLoadBannerAdUnit');
+            });
+        });
+
+        describe('Fail loading a Banner Ad with no fill', () => {
+            beforeEach(() => {
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
+                return failLoadBannerAdUnit(new NoFillError(`No fill for ${placementId}`));
+            });
+
+            it('should call sendErrorEvent with no fill', () => {
+                sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
             });
         });
 
