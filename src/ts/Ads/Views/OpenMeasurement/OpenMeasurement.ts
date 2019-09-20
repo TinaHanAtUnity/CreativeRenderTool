@@ -18,7 +18,7 @@ import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
-interface IVerifationVendorMap {
+interface IVerificationVendorMap {
     [vendorKey: string]: string;
 }
 
@@ -83,7 +83,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _request: RequestManager;
     private _omAdSessionId: string;
 
-    private _verificationVendorMap: IVerifationVendorMap;
+    private _verificationVendorMap: IVerificationVendorMap;
     private _vendorKeys: string[];
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
@@ -116,7 +116,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         this._omBridge = new OMIDEventBridge(core, {
-            onEventProcessed: (eventType, vendorKeay) => this.onEventProcessed(eventType, vendorKeay)
+            onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
         }, this._omIframe, this);
     }
 
@@ -124,7 +124,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._admobOMSessionId = admobSessionInterfaceId;
     }
 
-    public getOMAdSessionId() {
+    public getOMAdSessionId(): string {
         return this._omAdSessionId;
     }
 

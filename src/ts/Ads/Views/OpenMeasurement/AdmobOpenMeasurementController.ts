@@ -104,7 +104,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     // look at getting an individual session id from an om instance
-    public getOMAdSessionId() {
+    public getOMAdSessionId(): string {
         return this._omAdSessionId;
     }
 
@@ -124,7 +124,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._omSessionInterfaceBridge;
     }
 
-    public getSDKVersion() {
+    public getSDKVersion(): string {
         return this._clientInfo.getSdkVersionName();
     }
 
