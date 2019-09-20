@@ -85,6 +85,28 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
             });
         });
 
+        const failLoadBannerAdUnit = () => {
+            adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
+            sandbox.stub(bannerModule.CampaignManager, 'request').rejects(new Error('failLoadBannerAdUnit'));
+            sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
+            sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
+            sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
+                return Promise.resolve().then(() => bannerModule.Api.BannerApi.onBannerLoaded.trigger(bannerAdViewId));
+            });
+            return bannerAdContext.load();
+        };
+
+        describe('Fail loading a Banner Ad', () => {
+            beforeEach(() => {
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
+                return failLoadBannerAdUnit();
+            });
+
+            it('should call sendErrorEvent', () => {
+                sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.WebViewError, 'Banner failed to load : failLoadBannerAdUnit');
+            });
+        });
+
         describe('No fill banner scenario', () => {
             beforeEach(() => {
                 sandbox.stub(bannerModule.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
