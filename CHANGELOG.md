@@ -1,5 +1,7 @@
 # Pending
 
+* Open Measurement - Add Initial Launch Implementation for IAS and Admob [#11274](https://github.com/Applifier/unity-ads-webview/pull/11274)
+* Open Measurement - Get Verification Per VastAd [#11244](https://github.com/Applifier/unity-ads-webview/pull/11244)
 * Small Refactor to Sending PTS Events [#10667](https://github.com/Applifier/unity-ads-webview/pull/10667)
 * Enable Native Store API Only If Analytics is Enabled [#11273](https://github.com/Applifier/unity-ads-webview/pull/11273)
 * Fix Race Condition between Ads SDK & IAP SDK [#11213](https://github.com/Applifier/unity-ads-webview/pull/11213)
