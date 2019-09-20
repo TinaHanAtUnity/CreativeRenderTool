@@ -24,7 +24,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _impressionSent = false;
-    private _om?: VastOpenMeasurementController;
+    private _vastOMController?: VastOpenMeasurementController;
 
     constructor(parameters: IVastAdUnitParameters) {
         super(parameters);
@@ -35,7 +35,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._moat = MoatViewabilityService.getMoat();
-        this._om = parameters.om;
+        this._vastOMController = parameters.om;
 
         if (this._endScreen) {
             this._endScreen.render();
@@ -76,8 +76,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 endScreen.remove();
             }
 
-            if (this._om) {
-                this._om.removeFromViewHieararchy();
+            if (this._vastOMController) {
+                this._vastOMController.removeFromViewHieararchy();
             }
 
             if (this._moat) {
@@ -128,7 +128,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getOpenMeasurementController(): VastOpenMeasurementController | undefined {
-        return this._om;
+        return this._vastOMController;
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -180,15 +180,15 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             this._moat.pause(this.getVolume());
         }
 
-        if (this.isShowing() && this.canShowVideo() && this._om) {
-            this._om.pause();
+        if (this.isShowing() && this.canShowVideo() && this._vastOMController) {
+            this._vastOMController.pause();
 
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-                if (this._om) {
+                if (this._vastOMController) {
                     const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height);
                     const obstructionRectangle = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
                     const adView = OpenMeasurementUtilities.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
-                    this._om.geometryChange(viewPort, adView);
+                    this._vastOMController.geometryChange(viewPort, adView);
                 }
             });
         }
@@ -200,11 +200,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             this._moat.play(this.getVolume());
         }
 
-        if (this.isShowing() && this.canShowVideo() && this._om) {
-            this._om.resume();
+        if (this.isShowing() && this.canShowVideo() && this._vastOMController) {
+            this._vastOMController.resume();
 
             Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
-                if (this._om) {
+                if (this._vastOMController) {
                     const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height);
                     const screenView = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
                     const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
@@ -215,7 +215,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                         obstructionReasons.push(ObstructionReasons.HIDDEN);
                     }
                     const adView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
-                    this._om.geometryChange(viewPort, adView);
+                    this._vastOMController.geometryChange(viewPort, adView);
                 }
             });
         }

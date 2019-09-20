@@ -61,7 +61,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
-    private _om: AdmobOpenMeasurementController | undefined;
+    private _admobOMController: AdmobOpenMeasurementController | undefined;
     private _deviceInfo: DeviceInfo;
 
     constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
@@ -74,7 +74,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
-        this._om = om;
+        this._admobOMController = om;
         this._deviceInfo = deviceInfo;
 
         this._afmaBridge = new AFMABridge(core, {
@@ -185,9 +185,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;
 
-            if (this._om) {
+            if (this._admobOMController) {
                 iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
-                this._om.getAdmobBridge().setAdmobIframe(iframe);
+                this._admobOMController.getAdmobBridge().setAdmobIframe(iframe);
             }
         });
     }
@@ -255,9 +255,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onClose() {
-        if (this._om) {
-            this._om.sessionFinish();
-            setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
+        if (this._admobOMController) {
+            this._admobOMController.sessionFinish();
+            setTimeout(() => {if (this._admobOMController) { this._admobOMController.removeFromViewHieararchy(); }}, 1000);
         }
         // Added a timeout for admob session interface to receive session finish before removing the dom element
         setTimeout(() => this._handlers.forEach((h) => h.onClose()), 1);
@@ -308,8 +308,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         }
         this._privacy.show();
 
-        if (this._om) {
-            this.sendOMGeometryChange(this._om);
+        if (this._admobOMController) {
+            this.sendOMGeometryChange(this._admobOMController);
         }
     }
 
@@ -317,8 +317,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         event.preventDefault();
         this._privacy.show();
 
-        if (this._om) {
-            this.sendOMGeometryChange(this._om);
+        if (this._admobOMController) {
+            this.sendOMGeometryChange(this._admobOMController);
         }
     }
 
