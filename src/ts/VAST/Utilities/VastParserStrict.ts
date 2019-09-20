@@ -295,7 +295,6 @@ export class VastParserStrict {
         // use the first 'InLine' ad
         const element = this.getFirstNodeWithName(adElement, VastNodeName.INLINE) || this.getFirstNodeWithName(adElement, VastNodeName.WRAPPER);
         if (element) {
-            this._adVerifications = [];
             const parsedAd = this.parseAdContent(element, urlProtocol);
             parsedAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return parsedAd;
