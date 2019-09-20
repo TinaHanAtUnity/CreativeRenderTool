@@ -17,6 +17,7 @@ import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -91,11 +92,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
     private _adVerification: VastAdVerification;
+    private _pts: ProgrammaticTrackingService | undefined;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification, pts?: ProgrammaticTrackingService) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -110,6 +112,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
+
+        if (this._pts) {
+            this._pts = pts;
+        }
 
         if (vastAdVerification) {
             this._adVerification = vastAdVerification;
@@ -324,6 +330,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === SessionEvents.SESSION_FINISH && !this._sessionFinishCalled) {
+            if (vendorKey === 'IAS' && this._pts) {
+                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
+            }
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
             this._sessionFinishCalled = true;
@@ -447,9 +456,17 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             this.injectAsString(resourceUrl, vendorKey);
             this.populateVendorKey(vendorKey);
             this._verificationVendorMap[vendorKey] = verificationParameters;
+
+            if (vendorKey === 'IAS' && this._pts) {
+                this._pts.reportMetricEvent(OMMetric.IASVerificatonInjected);
+            }
+
             return Promise.resolve();
         }).catch((e) => {
             this._core.Sdk.logDebug(`Could not load open measurement verification script: ${e}`);
+            if (vendorKey === 'IAS' && this._pts) {
+                this._pts.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
+            }
         });
     }
 

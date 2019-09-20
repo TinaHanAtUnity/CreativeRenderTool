@@ -63,7 +63,15 @@ export enum LoadMetric {
     LoadAuctionRequestBlocked = 'load_auction_request_blocked'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError;
+export enum OMMetric {
+    IASVASTVerificationParsed = 'ias_vast_verification_parsed',
+    IASNestedVastTagHackApplied = 'ias_nested_vast_tag_hack_applied',
+    IASVerificatonInjected = 'ias_verification_injected',
+    IASVerificationSessionFinished = 'ias_verification_session_finished',
+    IASVerificatonInjectionFailed = 'ias_verification_injection_failed',
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[] | undefined;
