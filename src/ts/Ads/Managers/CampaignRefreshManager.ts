@@ -20,7 +20,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PurchasingUtilities, ProductState } from 'Promo/Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
@@ -202,27 +202,41 @@ export class CampaignRefreshManager extends RefreshManager {
             PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         }
         this._parsingErrorCount = 0;
-        const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
-
-        if (isPromoWithoutProduct) {
-            const productID = (<PromoCampaign>campaign).getIapProductId();
-            this._core.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productID} available`);
-            this.onNoFill(placementId);
-            PromoErrorService.report(this._request, {
-                auctionID: campaign.getSession().getId(),
-                corrID: campaign.getCorrelationId(),
-                country: this._coreConfig.getCountry(),
-                projectID: this._coreConfig.getUnityProjectId(),
-                gameID: this._clientInfo.getGameId(),
-                placementID: placementId,
-                productID: productID,
-                platform: this._platform,
-                gamerToken: this._coreConfig.getToken(),
-                errorCode: 102,
-                errorMessage: 'placement missing productId'
-            });
+        if (campaign instanceof PromoCampaign) {
+            this.handlePromoCampaign(placementId, campaign, trackingUrls);
         } else {
             this.setPlacementReady(placementId, campaign, trackingUrls);
+        }
+    }
+
+    private handlePromoCampaign(placementId: string, campaign: PromoCampaign, trackingUrls: ICampaignTrackingUrls | undefined) {
+        const productId = campaign.getIapProductId();
+        const state = PurchasingUtilities.getProductState(productId);
+        switch (state) {
+            case ProductState.EXISTS_IN_CATALOG:
+                this.setPlacementReady(placementId, campaign, trackingUrls);
+                break;
+            case ProductState.MISSING_PRODUCT_IN_CATALOG:
+                PromoErrorService.report(this._request, {
+                    auctionID: campaign.getSession().getId(),
+                    corrID: campaign.getCorrelationId(),
+                    country: this._coreConfig.getCountry(),
+                    projectID: this._coreConfig.getUnityProjectId(),
+                    gameID: this._clientInfo.getGameId(),
+                    placementID: placementId,
+                    productID: productId,
+                    platform: this._platform,
+                    gamerToken: this._coreConfig.getToken(),
+                    errorCode: 102,
+                    errorMessage: 'placement missing productId'
+                });
+                this._core.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productId} available in purchasing catalog`);
+                this.onDisable(placementId);
+                break;
+            case ProductState.WAITING_FOR_CATALOG:
+                this.setPlacementState(placementId, PlacementState.WAITING);
+                break;
+            default:
         }
     }
 
@@ -237,6 +251,14 @@ export class CampaignRefreshManager extends RefreshManager {
         this._core.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
+    }
+
+    private onDisable(placementId: string) {
+        this._parsingErrorCount = 0;
+
+        this._core.Sdk.logDebug('Unity Ads server returned fill; however, the ad is disabled for placement: ' + placementId);
+        this.setCampaignForPlacement(placementId, undefined, undefined);
+        this.handlePlacementState(placementId, PlacementState.DISABLED);
     }
 
     private onError(error: unknown, placementIds: string[], diagnosticsType: string, session?: Session) {

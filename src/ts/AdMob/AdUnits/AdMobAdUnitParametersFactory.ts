@@ -6,8 +6,8 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { AdMobView } from 'AdMob/Views/AdMobView';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 
 export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactory<AdMobCampaign, IAdMobAdUnitParameters> {
 
@@ -24,7 +24,7 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         let om;
         const isOMEnabled = baseParams.campaign.isOMEnabled() && OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup());
         if (isOMEnabled) {
-            om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
+            om = new AdmobOpenMeasurementController(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
             om.addToViewHierarchy();
         }
 

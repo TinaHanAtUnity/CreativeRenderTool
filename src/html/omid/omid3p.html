@@ -189,7 +189,7 @@
                             payload = event.data.payload;
                             const eventData = {
                                     adSessionId: event.data.adSessionId,
-                                    timestamp: Date.now(),
+                                    timestamp: Date.now(),                      // TODO: set timestamp at TS level for event queue
                                     type: stripEventString(event.data.type),
                                     data: payload
                             }
@@ -278,7 +278,7 @@
 
                 window.omid3p = new OmidVerification();
                 Object.freeze(window.omid3p);
-        
+
                 /**
                  * Used for IAB test:
                  * window.OmidVerificationClient = {'omid3p': OmidVerification};
