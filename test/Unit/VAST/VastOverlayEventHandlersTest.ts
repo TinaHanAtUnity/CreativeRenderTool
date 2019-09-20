@@ -171,7 +171,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
 
             moat = sinon.createStubInstance(MOAT);
             sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
-            sandbox.stub(vastAdUnit, 'getOpenMeasurementManager').returns(vastAdUnitParameters.om);
+            sandbox.stub(vastAdUnit, 'getOpenMeasurementController').returns(vastAdUnitParameters.om);
             om = vastAdUnitParameters.om;
         });
 

@@ -183,7 +183,7 @@ describe('VastVideoEventHandler tests', () => {
         sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
 
         openMeasurement = vastAdUnitParameters.om;
-        sandbox.stub(testAdUnit, 'getOpenMeasurementManager').returns(openMeasurement);
+        sandbox.stub(testAdUnit, 'getOpenMeasurementController').returns(openMeasurement);
 
         videoEventHandlerParams = {
             platform,

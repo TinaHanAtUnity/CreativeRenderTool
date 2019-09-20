@@ -47,7 +47,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._vastOverlay = this._vastAdUnit.getOverlay();
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
-        this._om = this._vastAdUnit.getOpenMeasurementManager();
+        this._om = this._vastAdUnit.getOpenMeasurementController();
         this._deviceInfo = parameters.deviceInfo;
     }
 
