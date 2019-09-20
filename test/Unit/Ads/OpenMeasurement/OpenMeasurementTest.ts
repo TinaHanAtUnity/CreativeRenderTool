@@ -44,10 +44,10 @@ import OMID3p from 'html/omid/omid3p.html';
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, verifications[0]);
+                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, verification);
+                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
             }
         };
 

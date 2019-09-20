@@ -7,6 +7,7 @@ import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScree
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -30,12 +31,12 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
-        const adVerifications = baseParams.campaign.getVast().getAdVerifications();
-        if (OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && adVerifications) {
+        const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
+        if (adVerifications) {
 
             const omInstances: OpenMeasurement[] = [];
             adVerifications.forEach((adverification) => {
-                const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification);
+                const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification);
                 omInstances.push(om);
             });
 

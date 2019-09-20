@@ -201,14 +201,13 @@ export class VastParserStrict {
         const headers: [string, string][] = [];
 
         // For IAS tags to return vast instead of vpaid for Open Measurement
-    if (CustomFeatures.isIASVastTag(wrapperURL) && this._coreConfig && OpenMeasurementTest.isValid(this._coreConfig.getAbGroup())) {
+        if (CustomFeatures.isIASVastTag(wrapperURL) && this._coreConfig && OpenMeasurementTest.isValid(this._coreConfig.getAbGroup())) {
             wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
             headers.push(['User-Agent', navigator.userAgent]);
         }
 
         wrapperURL = decodeURIComponent(wrapperURL);
-
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
         });

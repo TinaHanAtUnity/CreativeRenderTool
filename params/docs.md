@@ -79,22 +79,23 @@
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | string | Organization ID from Genesis' | Server | all |
-| developerId | number | Developer ID from Configuration Service | Server | all |
+| developerId | number | Developer ID from Configuration | Server | all |
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | abGroup | number | AB Group number assigned to this user from configuration | Server | all |
 | unityCreativeId | string | Creative id of the shown creative | SDK | all |
-| imei | string | IMEI or MEID from getDeviceId | SDK | android |
+| imei | string | default or slot 0 from getDeviceId  | SDK | android |
 | analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
-| isBackupCampaign | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
-| isPromoCatalogAvailable | boolean | Flag describing if the developer has set up a catalog for their IAP Promo Placement | SDK | all |
-| noFillRetry | boolean | Flag describing retry should be made upon nofilling | SDK | no |
-| isLoadEnabled | boolean | Flag describing if Auction Request was made using Load API | SDK | all |
+| isPromoCatalogAvailable | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
+| isLoadEnabled | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | omidPartnerName | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
 | omidJSVersion | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
+| legalFramework | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
+| nofillRetry | boolean | Retrying after no fill | SDK | all |
+
 
 
 ### Configuration request
@@ -118,7 +119,7 @@
 | frameworkVersion | no | True | False | string | Unity engine version | SDK | all |
 | adapterName | no | True | False | string | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
 | adapterVersion | no | True | False | string | SDK version name for adapter, should be in sync with SDK version | SDK | all |
-| imei | no | True | False | string | IMEI or MEID from getDeviceId | SDK | android |
+| imei | no | True | False | string | default or slot 0 from getDeviceId  | SDK | android |
 | analyticsUserId | no | True | False | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | no | True | False | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 
@@ -144,8 +145,9 @@
 | test | no | True | False | boolean | Test mode | App | all |
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
-| stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
+| stores | all | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
+| nofillRetry | no | False | True | boolean | Retrying after no fill | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | timeZone | all | False | True | string | Current timezone | SDK | all |
@@ -178,15 +180,18 @@
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | all | False | True | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | no | False | True | string | Organization ID from Genesis' | Server | all |
+| developerId | all | False | True | number | Developer ID from Configuration | Server | all |
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
-| imei | no | True | False | string | IMEI or MEID from getDeviceId  | SDK | android |
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
-| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
-| isPromoCatalogAvailable | yes | False | True | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
-| omidPartnerName | yes | False | True | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
-| omidJSVersion | yes | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
+| privacy | all | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
+| isPromoCatalogAvailable | all | False | True | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
+| isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
+| omidPartnerName | all | False | True | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
+| omidJSVersion | all | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
+| legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
+
 
 
 ### Video events
@@ -233,10 +238,11 @@
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
-| imei | no | False | True | string | IMEI or MEID from getDeviceId | SDK | android |
-| isBackupCampaign | all | False | True | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
+| imei | no | False | True | string | default or slot 0 from getDeviceId  | SDK | android |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
+| isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
+| legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 
 
 
@@ -284,8 +290,9 @@
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
-| imei | no | False | True | string | IMEI or MEID from getDeviceId | SDK | android |
-| isBackupCampaign | all | False | True | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
+| imei | no | False | True | string | default or slot 0 from getDeviceId  | SDK | android |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
+| isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
+| legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 

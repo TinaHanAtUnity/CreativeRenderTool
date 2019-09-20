@@ -95,8 +95,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerification?: VastAdVerification) {
-        super(platform, 'openMeasurement');
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
+        super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
 
@@ -116,7 +116,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         this._omBridge = new OMIDEventBridge(core, {
-            onEventProcessed: (eventType, vendorKey) => this.onEventProcessed(eventType, vendorKey)
+            onEventProcessed: (eventType, vendorKeay) => this.onEventProcessed(eventType, vendorKeay)
         }, this._omIframe, this);
     }
 
