@@ -71,7 +71,7 @@ describe('StoreTest', () => {
             core.Config = TestFixtures.getCoreConfiguration();
         });
 
-        it('should create a GoogleStoreManager', () => {
+        it('should create a NullStoreManager', () => {
             const store = new Store(core, core.Ads.Analytics.AnalyticsManager);
             assert.instanceOf(store.StoreManager, NullStoreManager);
         });
