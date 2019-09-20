@@ -1,3 +1,9 @@
+# Pending
+
+* Small Refactor to Sending PTS Events [#10667](https://github.com/Applifier/unity-ads-webview/pull/10667)
+* Enable Native Store API Only If Analytics is Enabled [#11273](https://github.com/Applifier/unity-ads-webview/pull/11273)
+* Fix Race Condition between Ads SDK & IAP SDK [#11213](https://github.com/Applifier/unity-ads-webview/pull/11213)
+
 # Thu Sep 19 20:08:11 UTC 2019
 
 * Add legalFramework to Auction Requests and Operative Events [#11216](https://github.com/Applifier/unity-ads-webview/pull/11216)
@@ -6,8 +12,8 @@
 
 # Wed Sep 18 22:57:49 UTC 2019
 
-* Decode vast wrapper urls before requesting in our Vast Parser [#11217](https://github.com/Applifier/unity-ads-webview/pull/11219)
-* Disable AppleStoreManager for iOS Versions 11.1 and Below #11219
+* Decode vast wrapper urls before requesting in our Vast Parser [#11217](https://github.com/Applifier/unity-ads-webview/pull/11217)
+* Disable AppleStoreManager for iOS Versions 11.1 and Below [#11219](https://github.com/Applifier/unity-ads-webview/pull/11219)
 
 # Tue Sep 17 19:18:02 UTC 2019
 

@@ -19,7 +19,7 @@ import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStatic
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Models/ABGroup';
-import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement';
+import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -295,6 +295,7 @@ export class VastParserStrict {
         // use the first 'InLine' ad
         const element = this.getFirstNodeWithName(adElement, VastNodeName.INLINE) || this.getFirstNodeWithName(adElement, VastNodeName.WRAPPER);
         if (element) {
+            this._adVerifications = [];
             const parsedAd = this.parseAdContent(element, urlProtocol);
             parsedAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return parsedAd;
