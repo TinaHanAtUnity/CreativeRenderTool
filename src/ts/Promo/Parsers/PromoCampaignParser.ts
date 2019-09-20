@@ -7,7 +7,6 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PromoOrientationAsset, IPromoOrientationAsset, IRawPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { Image } from 'Ads/Models/Assets/Image';
@@ -64,13 +63,7 @@ export class PromoCampaignParser extends CampaignParser {
             };
 
             const promoCampaign = new PromoCampaign(promoCampaignParams);
-            let promise = Promise.resolve();
-
-            if (PurchasingUtilities.isInitialized() && !PurchasingUtilities.isCatalogValid()) {
-                promise = PurchasingUtilities.refreshCatalog();
-            }
-
-            return promise.then(() => Promise.resolve(promoCampaign));
+            return Promise.resolve(promoCampaign);
         } else {
             this._core.Sdk.logError('Product is undefined');
             return Promise.reject();

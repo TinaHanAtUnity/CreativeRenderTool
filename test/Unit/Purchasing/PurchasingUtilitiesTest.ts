@@ -20,7 +20,7 @@ import IapPromoCatalog from 'json/IapPromoCatalog.json';
 import { IPromoApi } from 'Promo/IPromo';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PurchasingUtilities, ProductState } from 'Promo/Utilities/PurchasingUtilities';
 import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
@@ -99,23 +99,6 @@ describe('PurchasingUtilitiesTest', () => {
         return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, metaDataManager, analyticsManager);
     };
 
-    describe('without Promo Placements', () => {
-        beforeEach(() => {
-            return initWithConfiguration(ConfigurationAuctionPlc);
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        describe('initialize', () => {
-            it('should not call purchasing adapters refreshCatalog if promos are not in the config', () => {
-                expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
-                sinon.assert.notCalled(<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog);
-            });
-        });
-    });
-
     describe('with Promo Placements', () => {
         beforeEach(() => {
             return initWithConfiguration(ConfigurationPromoPlacements);
@@ -125,21 +108,79 @@ describe('PurchasingUtilitiesTest', () => {
             sandbox.restore();
         });
 
-        describe('initialize', () => {
-            it('should set purchasing adapter and set isInitialized to true', () => {
-                expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
-                assert.isTrue(PurchasingUtilities.isInitialized());
+        describe('refreshCatalog', () => {
+            describe('onSuccess', () => {
+                beforeEach(() => {
+                    const promise = PurchasingUtilities.refreshCatalog();
+                    purchasing.CustomPurchasing.onProductsRetrieved.trigger([
+                            {
+                                productId: 'myPromo',
+                                localizedPriceString: '$0.00',
+                                localizedTitle: 'test',
+                                localizedPrice: 0,
+                                productType: 'nonconsumable',
+                                isoCurrencyCode: 'USA'
+                            },
+                            {
+                                productId: '100.gold.coins',
+                                localizedPriceString: '$0.99',
+                                localizedTitle: 'test',
+                                localizedPrice: 0,
+                                productType: 'consumable',
+                                isoCurrencyCode: 'USA'
+                            }
+                        ]
+                    );
+                    return promise;
+                });
+
+                it('should set the catalog to the value returned by promo', () => {
+                    assert.isTrue(PurchasingUtilities.isProductAvailable('myPromo'));
+                    assert.isTrue(PurchasingUtilities.isProductAvailable('100.gold.coins'));
+                });
+
+                it('should not store a product that is not returned by promo', () => {
+                    assert.isFalse(PurchasingUtilities.isProductAvailable('myScooter'));
+                });
+
+                it('should return undefined if product name is not available', () => {
+                    assert.isUndefined(PurchasingUtilities.getProductPrice('unavailableProductID'));
+                });
+
+                it('should return the price of the product for the given productid if product is available', () => {
+                    assert.equal(PurchasingUtilities.getProductPrice('myPromo'), '$0.00');
+                    assert.equal(PurchasingUtilities.getProductPrice('100.gold.coins'), '$0.99');
+                });
+
+                it('should return undefined if product is not available', () => {
+                    assert.isUndefined(PurchasingUtilities.getProductName('unavailableProductID'));
+                });
+
+                it('should return correct product name for the given productid if product is available', () => {
+                    assert.equal(PurchasingUtilities.getProductName('100.gold.coins'), 'test');
+                });
+
+                it('should be undefined if product is not available', () => {
+                    assert.equal(PurchasingUtilities.getProductType('unavailableProductID'), undefined);
+                });
+
+                it('should return correct product type for the given productid if product is available', () => {
+                    assert.equal(PurchasingUtilities.getProductType('100.gold.coins'), 'consumable');
+                });
+
+                it('ensures catalog is vaild if products exist', () => {
+                    assert.isTrue(PurchasingUtilities.isCatalogValid());
+                });
             });
 
-            it('should call purchasing adapters refreshCatalog with promos in the config', () => {
-                expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
-                sinon.assert.called(<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog);
-            });
-        });
-
-        describe('isInitialized', () => {
-            it('should return true if Purchasing was initialized', () => {
-                assert.isTrue(PurchasingUtilities.isInitialized());
+            describe('onFail', () => {
+                it('should fail when get promo catalog fetch over api fails', () => {
+                    (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).returns(Promise.reject('fail'));
+                    PurchasingUtilities.refreshCatalog().catch((e) => {
+                        assert.equal((<any>PurchasingUtilities)._refreshPromise, null);
+                        assert.equal(e.message, undefined);
+                    });
+                });
             });
         });
 
@@ -181,53 +222,6 @@ describe('PurchasingUtilitiesTest', () => {
             });
         });
 
-        describe('refreshCatalog', () => {
-            describe('onSuccess', () => {
-                beforeEach(() => {
-                    const promise = PurchasingUtilities.refreshCatalog();
-                    purchasing.CustomPurchasing.onProductsRetrieved.trigger([
-                            {
-                                productId: 'myPromo',
-                                localizedPriceString: '$0.00',
-                                localizedTitle: 'test',
-                                localizedPrice: 0,
-                                productType: 'test1',
-                                isoCurrencyCode: 'USA'
-                            },
-                            {
-                                productId: '100.gold.coins',
-                                localizedPriceString: '$0.99',
-                                localizedTitle: 'test',
-                                localizedPrice: 0,
-                                productType: 'test2',
-                                isoCurrencyCode: 'USA'
-                            }
-                        ]
-                    );
-                    return promise;
-                });
-
-                it('should set the catalog to the value returned by promo', () => {
-                    assert.isTrue(PurchasingUtilities.isProductAvailable('myPromo'));
-                    assert.isTrue(PurchasingUtilities.isProductAvailable('100.gold.coins'));
-                });
-
-                it('should not store a product that is not returned by promo', () => {
-                    assert.isFalse(PurchasingUtilities.isProductAvailable('myScooter'));
-                });
-            });
-
-            describe('onFail', () => {
-                it('should fail when get promo catalog fetch over api fails', () => {
-                    (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).returns(Promise.reject('fail'));
-                    PurchasingUtilities.refreshCatalog().catch((e) => {
-                        assert.equal((<any>PurchasingUtilities)._refreshPromise, null);
-                        assert.equal(e.message, undefined);
-                    });
-                });
-            });
-        });
-
         describe('onPromoClosed', () => {
             it('should resolve and do nothing for CustomPurchasingAdapter', () => {
                 sandbox.stub(((<any>PurchasingUtilities)._purchasingAdapter), 'onPromoClosed');
@@ -236,178 +230,66 @@ describe('PurchasingUtilitiesTest', () => {
             });
         });
 
-        describe('getProductPrice', () => {
-            beforeEach(() => {
-                const promise = PurchasingUtilities.refreshCatalog();
-                purchasing.CustomPurchasing.onProductsRetrieved.trigger([
-                        {
-                            productId: 'myPromo',
-                            localizedPriceString: '$0.00',
-                            localizedTitle: 'test',
-                            localizedPrice: 0,
-                            productType: 'test1',
-                            isoCurrencyCode: 'USA'
-                        },
-                        {
-                            productId: '100.gold.coins',
-                            localizedPriceString: '$0.99',
-                            localizedTitle: 'test',
-                            localizedPrice: 0,
-                            productType: 'test2',
-                            isoCurrencyCode: 'USA'
-                        }
-                    ]
-                );
-                return promise;
-            });
-
-            it('should return undefined if product is not available', () => {
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
-
-                assert.isUndefined(PurchasingUtilities.getProductPrice('myPromo'));
-            });
-
-            it('should return the price of the product for the given productid if product is available', () => {
+        describe('getProductState', () => {
+            it('returns exist in catalog case if productID exists in catalog', () => {
+                sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
                 sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-
-                assert.equal(PurchasingUtilities.getProductPrice('myPromo'), '$0.00');
-                assert.equal(PurchasingUtilities.getProductPrice('100.gold.coins'), '$0.99');
+                assert.equal(PurchasingUtilities.getProductState('prodID'), ProductState.EXISTS_IN_CATALOG);
             });
-        });
-
-        describe('getProductName', () => {
-            beforeEach(() => {
-                const promise = PurchasingUtilities.refreshCatalog();
-                purchasing.CustomPurchasing.onProductsRetrieved.trigger([
-                        {
-                            productId: '100.gold.coins',
-                            localizedPriceString: '$0.99',
-                            localizedTitle: 'goldcoins',
-                            localizedPrice: 0,
-                            productType: 'test2',
-                            isoCurrencyCode: 'USA'
-                        }
-                    ]
-                );
-                return promise;
-            });
-
-            it('should return undefined if product is not available', () => {
+            it('returns missing product in catalog case if productID does not exist in catalog', () => {
+                sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
                 sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
-                assert.isUndefined(PurchasingUtilities.getProductName('myPromo'));
+                assert.equal(PurchasingUtilities.getProductState('prodID'), ProductState.MISSING_PRODUCT_IN_CATALOG);
+            });
+            it('returns waiting for catalog when catalog is unavailable', () => {
+                sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(false);
+                assert.equal(PurchasingUtilities.getProductState('prodID'), ProductState.WAITING_FOR_CATALOG);
+            });
+        });
+    });
+
+    describe('initialization without Promo Placements', () => {
+        beforeEach(() => {
+            sinon.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+            return initWithConfiguration(JSON.parse(ConfigurationAuctionPlc));
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        describe('initialize', () => {
+            it('should not call purchasing adapters refreshCatalog if promos are not in the config', () => {
+                expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
+                sinon.assert.notCalled(<sinon.SinonStub>PurchasingUtilities.refreshCatalog);
+            });
+        });
+    });
+
+    describe('initialization with Promo Placements', () => {
+        beforeEach(() => {
+            sinon.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+            return initWithConfiguration(JSON.parse(ConfigurationPromoPlacements));
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        describe('initialize', () => {
+            it('should set purchasing adapter and set isInitialized to true', () => {
+                expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
+                assert.isTrue(PurchasingUtilities.isInitialized());
             });
 
-            it('should return correct product name for the given productid if product is available', () => {
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-                assert.equal(PurchasingUtilities.getProductName('100.gold.coins'), 'goldcoins');
+            it('should call purchasing utilities refreshCatalog', () => {
+                sinon.assert.called(<sinon.SinonStub>PurchasingUtilities.refreshCatalog);
             });
         });
 
-        describe('getProductType', () => {
-            beforeEach(() => {
-                const promise = PurchasingUtilities.refreshCatalog();
-                purchasing.CustomPurchasing.onProductsRetrieved.trigger([
-                        {
-                            productId: '100.gold.coins',
-                            localizedPriceString: '$0.99',
-                            localizedTitle: 'test',
-                            localizedPrice: 0,
-                            productType: 'nonConsumable',
-                            isoCurrencyCode: 'USA'
-                        }
-                    ]
-                );
-                return promise;
-            });
-
-            it('should be undefined if product is not available', () => {
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
-                assert.equal(PurchasingUtilities.getProductType('myPromo'), undefined);
-            });
-
-            it('should return correct product type for the given productid if product is available', () => {
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-                assert.equal(PurchasingUtilities.getProductType('100.gold.coins'), 'nonConsumable');
-            });
-        });
-
-        describe('isProductAvailable', () => {
-            beforeEach(() => {
-                const promise = PurchasingUtilities.refreshCatalog();
-                purchasing.CustomPurchasing.onProductsRetrieved.trigger([
-                        {
-                            productId: 'myPromo',
-                            localizedPriceString: '$0.00',
-                            localizedTitle: 'test',
-                            localizedPrice: 0,
-                            productType: 'test1',
-                            isoCurrencyCode: 'USA'
-                        },
-                        {
-                            productId: '100.gold.coins',
-                            localizedPriceString: '$0.99',
-                            localizedTitle: 'test',
-                            localizedPrice: 0,
-                            productType: 'test2',
-                            isoCurrencyCode: 'USA'
-                        }
-                    ]
-                );
-                return promise;
-            });
-
-            it('should return true if given product id is in the product catalog', () => {
-                assert.equal(true, PurchasingUtilities.isProductAvailable('myPromo'));
-            });
-
-            it('should return false if given product is not in the catalog', () => {
-                assert.equal(false, PurchasingUtilities.isProductAvailable('booyah'));
-            });
-
-            describe('If promo catalog is invalid', () => {
-                beforeEach(() => {
-                    const promise = PurchasingUtilities.refreshCatalog();
-                    purchasing.CustomPurchasing.onProductsRetrieved.trigger([]);
-                    return promise;
-                });
-                it('should return false if catalog has has size of 0', () => {
-                    assert.equal(false, PurchasingUtilities.isProductAvailable('myPromo'));
-                });
-            });
-        });
-
-        describe('isCatalogValid', () => {
-            context('should be false', () => {
-                beforeEach(() => {
-                    const promise = PurchasingUtilities.refreshCatalog();
-                    purchasing.CustomPurchasing.onProductsRetrieved.trigger([]);
-                    return promise;
-                });
-
-                it('if the catalog contains zero products', () => {
-                    assert.isFalse(PurchasingUtilities.isCatalogValid());
-                });
-            });
-
-            context('should be true', () => {
-                beforeEach(() => {
-                    const promise = PurchasingUtilities.refreshCatalog();
-                    purchasing.CustomPurchasing.onProductsRetrieved.trigger([
-                        {
-                            productId: 'test',
-                            localizedPriceString: 'tset',
-                            localizedTitle: 'test',
-                            localizedPrice: 0,
-                            productType: 'test',
-                            isoCurrencyCode: 'USA'
-                        }
-                    ]);
-                    return promise;
-                });
-
-                it('if the catalog contains at least one product', () => {
-                    assert.isTrue(PurchasingUtilities.isCatalogValid());
-                });
+        describe('isInitialized', () => {
+            it('should return true if Purchasing was initialized', () => {
+                assert.isTrue(PurchasingUtilities.isInitialized());
             });
         });
     });

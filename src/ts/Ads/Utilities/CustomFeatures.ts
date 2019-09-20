@@ -176,7 +176,8 @@ export class CustomFeatures {
     }
 
     public static isIASVastTag(wrapperURL: string): boolean {
-        return /^https?:\/\/vast\.adsafeprotected\.com/.test(wrapperURL);
+        return /^https?:\/\/vast\.adsafeprotected\.com/.test(wrapperURL) ||
+               /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(wrapperURL);
     }
 
     private static isMRAIDWebPlayerAndroidGamesTest(gameId: string) {

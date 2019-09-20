@@ -9,9 +9,34 @@ export class IosUtils {
             return true; //iOS 8 not supported
         } else if (osVersion.match(/^7\.[0-9]/)) {
             return true; //iOS 7 not supported
+        } else if (osVersion.match(/^13\.[0-9]/)) {
+            return true; //iOS 13 disabled. TODO: Allow iOS 13 in SDK 3.3+
         } else {
             return false;
         }
+    }
+
+    /**
+     * Store API functionality is broken on osVersion 11.1 and below
+     */
+    public static isStoreApiBroken(osVersion: string | undefined): boolean {
+
+        const osVersionSplit = osVersion ? osVersion.split('.') : '';
+        if (osVersionSplit.length >= 2) {
+
+            const majorOsVersion = +osVersionSplit[0];
+            const minorOsVersion = +osVersionSplit[1];
+
+            if (!isNaN(majorOsVersion) && !isNaN(minorOsVersion)) {
+                if (majorOsVersion >= 12) {
+                    return false;
+                } else if (majorOsVersion === 11 && minorOsVersion >= 2) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public static hasVideoStallingApi(osVersion: string): boolean {

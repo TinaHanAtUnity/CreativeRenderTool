@@ -9,6 +9,7 @@ import { ProductsApi } from 'Store/Native/iOS/Products';
 import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { NullStoreManager } from 'Store/Managers/NullStoreManager';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
 
 export class Store implements IStore {
     public readonly Api: Readonly<IStoreApi>;
@@ -26,9 +27,10 @@ export class Store implements IStore {
             } : undefined
         };
 
-        if (core.NativeBridge.getPlatform() === Platform.ANDROID) {
+        const analyticsEnabled = core.Config.isAnalyticsEnabled();
+        if (analyticsEnabled && core.NativeBridge.getPlatform() === Platform.ANDROID) {
             this.StoreManager = new GoogleStoreManager(this.Api, analyticsManager);
-        } else if (core.NativeBridge.getPlatform() === Platform.IOS) {
+        } else if (analyticsEnabled && core.NativeBridge.getPlatform() === Platform.IOS && !IosUtils.isStoreApiBroken(core.DeviceInfo.getOsVersion())) {
             this.StoreManager = new AppleStoreManager(this.Api, analyticsManager);
         } else {
             this.StoreManager = new NullStoreManager(this.Api, analyticsManager);

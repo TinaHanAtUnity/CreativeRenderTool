@@ -15,7 +15,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { OMID_P, SDK_APIS } from 'Ads/Views/OpenMeasurement';
+import { OMID_P, SDK_APIS } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 export class AdMobSignalFactory {
     private _platform: Platform;

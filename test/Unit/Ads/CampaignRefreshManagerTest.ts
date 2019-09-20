@@ -629,7 +629,8 @@ xdescribe('CampaignRefreshManager', () => {
             sandbox.restore();
         });
 
-        it('should mark a placement for a promo campaign as ready', () => {
+        it('should mark a placement for a promo campaign as ready if productID is available', () => {
+            sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
@@ -651,7 +652,8 @@ xdescribe('CampaignRefreshManager', () => {
             });
         });
 
-        it('should mark a placement for a promo campaign as nofill if product is not available', () => {
+        it('should mark a placement for a promo campaign as disabled if product is not available', () => {
+            sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
@@ -659,7 +661,19 @@ xdescribe('CampaignRefreshManager', () => {
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.DISABLED);
+            });
+        });
+
+        it('should mark a placement for a promo campaign as waiting if IAP catalog is not fetched yet', () => {
+            sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(false);
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.WAITING);
             });
         });
     });

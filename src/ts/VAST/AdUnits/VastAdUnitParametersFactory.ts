@@ -4,8 +4,10 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -29,12 +31,19 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
-        const adVerifications = baseParams.campaign.getVast().getAdVerifications();
+        const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
         if (OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup()) && adVerifications) {
-            const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adVerifications);
-            om.addToViewHierarchy();
-            om.injectAdVerifications();
-            vastAdUnitParameters.om = om;
+
+            const omInstances: OpenMeasurement[] = [];
+            adVerifications.forEach((adverification) => {
+                const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification);
+                omInstances.push(om);
+            });
+
+            const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances);
+            omManager.addToViewHierarchy();
+            omManager.injectVerifications();
+            vastAdUnitParameters.om = omManager;
         }
 
         return vastAdUnitParameters;

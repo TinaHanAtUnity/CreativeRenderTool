@@ -28,7 +28,11 @@ class Creator(object):
         event_html_str = self.create_table_head(PARAM_FIELDS_IN_EVENT)
         for event_param in event_dict["parameters"]:
             try:
-                param = next(d for d in PARAMS if d['key'] == event_param['parameter'])
+                try:
+                    param = next(d for d in PARAMS if d['key'] == event_param['parameter'])
+                except StopIteration as e:
+                    print("Parameter '%s' is not available in '%s', check json files! Exiting" % (event_param['parameter'], PARAMS_JSON))
+                    raise e
                 these_fields = {}
                 these_fields.update(event_param)
                 these_fields.update(param)
@@ -38,7 +42,7 @@ class Creator(object):
                 event_html_str += self.create_table_row(values)
             except Exception as e:
                 print("Exeption when parsing event_table. event_name='%s', json_file='%s', param='%s' , Exception='%s'" % (event_name, json_path, event_param, str(e)))
-                raise
+                raise e
         return self.create_table(event_name, event_html_str)
 
 

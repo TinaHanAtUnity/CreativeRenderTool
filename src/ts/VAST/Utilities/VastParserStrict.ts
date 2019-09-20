@@ -18,8 +18,8 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
-import { IframeEndcardTest, HtmlEndcardTest } from 'Core/Models/ABGroup';
-import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement';
+import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Models/ABGroup';
+import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -87,7 +87,6 @@ export class VastParserStrict {
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
-    private _adVerifications: VastAdVerification[] = [];
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
         this._domParser = domParser || new DOMParser();
@@ -164,7 +163,7 @@ export class VastParserStrict {
         }
 
         // return vast ads with generated non-severe errors
-        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors, this._adVerifications);
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
     }
 
     // default to https: for relative urls
@@ -201,12 +200,13 @@ export class VastParserStrict {
         const headers: [string, string][] = [];
 
         // For IAS tags to return vast instead of vpaid for Open Measurement
-        if (CustomFeatures.isIASVastTag(wrapperURL)) {
+        if (CustomFeatures.isIASVastTag(wrapperURL) && this._coreConfig && OpenMeasurementTest.isValid(this._coreConfig.getAbGroup())) {
             wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
             headers.push(['User-Agent', navigator.userAgent]);
         }
 
+        wrapperURL = decodeURIComponent(wrapperURL);
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
         });
@@ -412,7 +412,7 @@ export class VastParserStrict {
         // parsing ad verification in VAST 4.1
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
-            this._adVerifications = this._adVerifications.concat(verifications);
+            vastAd.addAdVerifications(verifications);
         });
 
         // parsing ad verification in VAST 3.0/2.0
@@ -420,7 +420,7 @@ export class VastParserStrict {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
-                this._adVerifications = this._adVerifications.concat(verifications);
+                vastAd.addAdVerifications(verifications);
             }
         });
 
