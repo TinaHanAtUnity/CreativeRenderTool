@@ -334,7 +334,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
         // To get a rough estimate how often users click links on the homescreen
-        this._pts.reportMetric(MiscellaneousMetric.ConsentParagraphLinkClicked);
+        this._pts.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
     }

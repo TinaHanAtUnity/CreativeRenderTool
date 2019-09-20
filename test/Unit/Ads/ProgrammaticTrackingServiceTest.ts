@@ -12,7 +12,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import 'mocha';
 import * as sinon from 'sinon';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 describe('ProgrammaticTrackingService', () => {
 
@@ -39,7 +38,7 @@ describe('ProgrammaticTrackingService', () => {
         });
     });
 
-    describe('reportMetric with ProgrammaticTrackingError', () => {
+    describe('reportErrorEvent', () => {
 
         const osVersion = '11.2.1';
         const sdkVersion = '2.3.0';
@@ -67,6 +66,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'too_large_file',
+                        value: 1,
                         tags: [
                             'ads_sdk2_eevt:too_large_file',
                             ...tagBuilder
@@ -80,6 +81,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'banner_request_error',
+                        value: 1,
                         tags: [
                             'ads_sdk2_eevt:banner_request_error',
                             ...tagBuilder
@@ -90,7 +93,7 @@ describe('ProgrammaticTrackingService', () => {
         }];
         tests.forEach((t) => {
             it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportMetric(t.input, adType, seatId);
+                const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
                 assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
@@ -101,7 +104,7 @@ describe('ProgrammaticTrackingService', () => {
         });
     });
 
-    describe('reportMetric', () => {
+    describe('reportMetricEvent', () => {
         const tests: {
             input: AdmobMetric;
             expected: IProgrammaticTrackingData;
@@ -110,6 +113,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'admob_used_cached_video',
+                        value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_cached_video'
                         ]
@@ -121,6 +126,8 @@ describe('ProgrammaticTrackingService', () => {
             expected: {
                 metrics: [
                     {
+                        name: 'admob_used_streamed_video',
+                        value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_streamed_video'
                         ]
@@ -130,55 +137,13 @@ describe('ProgrammaticTrackingService', () => {
         }];
         tests.forEach((t) => {
             it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportMetric(t.input);
+                const promise = programmaticTrackingService.reportMetricEvent(t.input);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
                 assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;
-            });
-        });
-    });
-
-    describe('reportMetric with Load metrics', () => {
-        let test: {
-            input: LoadMetric;
-            expected: IProgrammaticTrackingData | undefined;
-        };
-
-        it(`should send load metric when sampleAtGivenPercent returns true`, () => {
-            test = {
-                input: LoadMetric.LoadEnabledShow,
-                expected: {
-                    metrics: [
-                        {
-                            tags: [
-                                'ads_sdk2_mevt:load_enabled_show'
-                            ]
-                        }
-                    ]
-                }
-            };
-            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(true);
-            const promise = programmaticTrackingService.reportMetric(test.input);
-            sinon.assert.calledOnce(postStub);
-            assert.equal(postStub.firstCall.args.length, 3);
-            assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
-            assert.equal(postStub.firstCall.args[1], JSON.stringify(test.expected));
-            assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
-            return promise;
-        });
-
-        it(`should not send load metric when sampleAtGivenPercent returns false`, () => {
-            test = {
-                input: LoadMetric.LoadEnabledShow,
-                expected: undefined
-            };
-            sinon.stub(CustomFeatures, 'sampleAtGivenPercent').returns(false);
-            return programmaticTrackingService.reportMetric(test.input).then(res => {
-                sinon.assert.notCalled(postStub);
-                return res;
             });
         });
     });
