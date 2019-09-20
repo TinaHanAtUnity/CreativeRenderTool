@@ -228,7 +228,7 @@ export class CampaignManager {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
-            this._pts.reportMetric(LoadMetric.LoadEnabledAuctionRequest);
+            this._pts.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
@@ -239,15 +239,15 @@ export class CampaignManager {
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
-                    this._pts.reportMetric(LoadMetric.LoadEnabledFill);
+                    this._pts.reportMetricEvent(LoadMetric.LoadEnabledFill);
                     loadedCampaign.campaign.setIsLoadEnabled(true);
                 } else {
-                    this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
+                    this._pts.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 }
                 return loadedCampaign;
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
-                this._pts.reportMetric(LoadMetric.LoadEnabledNoFill);
+                this._pts.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
         });

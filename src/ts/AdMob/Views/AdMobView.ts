@@ -228,10 +228,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                     const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
                     scriptEl.textContent = replacedSrc;
                     // report using cached video
-                    this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUsedCachedVideo).catch();
+                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo).catch();
                 } else {
                     // report using streaming video
-                    this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUsedStreamedVideo).catch();
+                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo).catch();
                 }
             }
         }
@@ -312,7 +312,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onUserSeeked() {
-        this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUserVideoSeeked).catch();
+        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked).catch();
     }
 
     private onGDPRPopupEvent(event: Event) {
