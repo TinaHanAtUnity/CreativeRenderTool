@@ -1,4 +1,4 @@
-# Pending
+# Sat Sep 21 00:14:36 UTC 2019
 
 * Open Measurement - Add Initial Launch Implementation for IAS and Admob [#11274](https://github.com/Applifier/unity-ads-webview/pull/11274)
 * Open Measurement - Get Verification Per VastAd [#11244](https://github.com/Applifier/unity-ads-webview/pull/11244)
