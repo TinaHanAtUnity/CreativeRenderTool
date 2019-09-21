@@ -68,7 +68,7 @@ export enum OMMetric {
     IASNestedVastTagHackApplied = 'ias_nested_vast_tag_hack_applied',
     IASVerificatonInjected = 'ias_verification_injected',
     IASVerificationSessionFinished = 'ias_verification_session_finished',
-    IASVerificatonInjectionFailed = 'ias_verification_injection_failed',
+    IASVerificatonInjectionFailed = 'ias_verification_injection_failed'
 }
 
 type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric;
