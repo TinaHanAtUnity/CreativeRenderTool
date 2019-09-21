@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 enum CacheType {
     REQUIRED,
@@ -87,7 +88,7 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
-        if (this._cacheMode === CacheMode.DISABLED) {
+        if (this._cacheMode === CacheMode.DISABLED || campaign instanceof PromoCampaign) {
             return Promise.resolve(campaign);
         }
 
