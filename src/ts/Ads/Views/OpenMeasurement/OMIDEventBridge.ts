@@ -10,6 +10,7 @@ export interface IOMIDMessage {
 
 export interface IVerificationEvent {
     type: string;
+    timestamp: number;
     adSessionId: string;
     payload?: unknown;
 }
@@ -71,6 +72,7 @@ export class OMIDEventBridge {
         const event: IVerificationEvent = {
             type: type,
             adSessionId: this._openMeasurement.getOMAdSessionId(),
+            timestamp: Date.now(),
             payload: payload
         };
 
@@ -89,6 +91,7 @@ export class OMIDEventBridge {
         const event: IVerificationEvent = {
             type: type,
             adSessionId: this._openMeasurement.getOMAdSessionId(),
+            timestamp: Date.now(),
             payload: payload
         };
 
