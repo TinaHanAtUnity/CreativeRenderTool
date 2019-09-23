@@ -85,7 +85,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _omAdSessionId: string;
 
     private _verificationVendorMap: IVerificationVendorMap;
-    private _vendorKeys: string[];
+    private _vendorKey: string;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
 
@@ -108,7 +108,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._verificationVendorMap = {};
         this._clientInfo = clientInfo;
         this._campaign = campaign;
-        this._vendorKeys = [];
+        if (vendorKey) {
+            this._vendorKey = vendorKey;
+        }
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -238,16 +240,14 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             data: {}
         };
 
-        this._vendorKeys.forEach(vendorKey => {
-            if (this._verificationVendorMap[vendorKey]) {
-                event.data.verificationParameters = this._verificationVendorMap[vendorKey];
-            }
-            const contextData: IContext = this.buildSessionContext();
-            event.data.context = contextData;
-            event.data.vendorkey = vendorKey;
+        if (this._verificationVendorMap[this._vendorKey]) {
+            event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+        }
+        const contextData: IContext = this.buildSessionContext();
+        event.data.context = contextData;
+        event.data.vendorkey = this._vendorKey;
 
-            this._omBridge.triggerSessionEvent(event);
-        });
+        this._omBridge.triggerSessionEvent(event);
     }
 
     private buildSessionContext(): IContext {
@@ -347,6 +347,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             if (this._campaign instanceof AdMobCampaign) {
                 this._omBridge.sendQueuedEvents();
             }
+            // this._omBridge.sendQueuedEvents();
+        }
+
+        if (eventType === 'listenersRegistered') {
+            //
         }
 
         return Promise.resolve();
@@ -467,7 +472,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     public populateVendorKey(vendorKey: string) {
-        this._vendorKeys.push(vendorKey);
+        this._vendorKey = vendorKey;
     }
 
     private checkVendorResourceURL(resourceUrl: string): Promise<void> {

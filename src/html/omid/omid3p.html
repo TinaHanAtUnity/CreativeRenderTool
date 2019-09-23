@@ -52,6 +52,7 @@
                             parameters = [];
                         }
                         if(event in videoListeners) {
+                            console.log(event, ' called');
                             videoListeners[event].forEach(function(listener) {
                                 listener(parameters);
                             });
@@ -253,9 +254,9 @@
                         }
 
                         sessionObserversMap[vendorKey].push(functionToExecute);
-                        scriptVendor = vendorKey;
 
                         if (!sessionStartCalled) {
+                            scriptVendor = vendorKey;
                             postMessageCallback(ON_EVENT_PROCESSED, {
                                 eventType: SESSION_REGISTERED
                             });
@@ -266,6 +267,7 @@
                         if(type in videoListeners && videoListeners[type] !== listener) {
                             videoListeners[type].push(listener);
                         }
+                        console.log('listner registerd: ', type);
                     }
         
                     this.sendUrl = function(resourceUrl, successCallback, failureCallback) {}
@@ -279,8 +281,10 @@
                  * Generic Vast verification scripts attach to this:
                  */
 
-                window.omid3p = new OmidVerification();
-                Object.freeze(window.omid3p);
+                // window.omid3p = new OmidVerification();
+                // Object.freeze(window.omid3p);
+
+                window.OmidVerificationClient = {'omid3p': OmidVerification};
 
                 /**
                  * Used for IAB test:

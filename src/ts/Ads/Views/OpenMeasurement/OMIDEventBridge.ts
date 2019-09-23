@@ -60,8 +60,10 @@ export class OMIDEventBridge {
 
     // Open Question: when should queued events be sent?
     public sendQueuedEvents() {
+        console.log('sending events form event queue');
         while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
             const event = this._eventQueue.shift();
+            console.log('queued event ', event);
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
         this._eventQueueSent = true;
@@ -80,10 +82,10 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: For now, ignore impression, geometry event
-        // if (!this._eventQueueSent) {
-        //     this._eventQueue.push(event);
-        // }
+        if (!this._eventQueueSent) {
+            this._eventQueue.push(event);
+            console.log('queueing: ', event);
+        }
     }
 
     public triggerVideoEvent(type: string, payload?: unknown) {
@@ -99,7 +101,6 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: Check event queue
         if (!this._eventQueueSent) {
             this._eventQueue.push(event);
         }
@@ -111,7 +112,6 @@ export class OMIDEventBridge {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
 
-        // TODO: Check event queue
         if (!this._eventQueueSent) {
             this._eventQueue.push(event);
         }
