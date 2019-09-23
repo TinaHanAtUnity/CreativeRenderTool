@@ -321,6 +321,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public onEventProcessed(eventType: string, vendorKey?: string): Promise<void> {
         if (eventType === SessionEvents.SESSION_START) {
             this._sessionStartCalled = true;
+
+            if (vendorKey === 'IAS' && this._pts) {
+                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+            }
+
             if (this._campaign instanceof VastCampaign) {
                 return this.sendVASTStartEvents(vendorKey);
             }
