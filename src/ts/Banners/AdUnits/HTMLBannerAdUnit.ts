@@ -103,14 +103,14 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
             }
             if (this._platform === Platform.IOS) {
                 this._core.iOS!.UrlScheme.open(url).then(() => {
-                        this._bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent(this._bannerAdViewId);
+                    this._bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent(this._bannerAdViewId);
                 });
             } else if (this._platform === Platform.ANDROID) {
                 this._core.Android!.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': url
                 }).then(() => {
-                        this._bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent(this._bannerAdViewId);
+                    this._bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent(this._bannerAdViewId);
                 });
             }
         }
