@@ -115,8 +115,7 @@ describe('VastParserStrict', () => {
         });
 
         context('for IAS', () => {
-            // enable once we enable IAS om in production
-            xit('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
+            it('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
                 const wrappedVAST = WrappedVastIAS;
                 sinon.stub(request, 'get').resolves();
 
@@ -127,7 +126,7 @@ describe('VastParserStrict', () => {
                 sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
             });
 
-            xit('should splice bundleID as first url query param', () => {
+            it('should splice bundleID as first url query param', () => {
                 const wrappedVAST = WrappedVastIAS;
                 sinon.stub(request, 'get').resolves();
 
