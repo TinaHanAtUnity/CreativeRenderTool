@@ -88,7 +88,11 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
-        if (this._cacheMode === CacheMode.DISABLED || campaign instanceof PromoCampaign) {
+        let disablePromoCache = false;
+        if (typeof navigator !== 'undefined' && campaign instanceof PromoCampaign) {
+            disablePromoCache = campaign.disableCache(navigator.userAgent);
+        }
+        if (this._cacheMode === CacheMode.DISABLED || disablePromoCache) {
             return Promise.resolve(campaign);
         }
 
