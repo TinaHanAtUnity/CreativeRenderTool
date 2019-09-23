@@ -298,7 +298,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
         if (!this._sessionFinishCalled) {
             this._omBridge.triggerSessionEvent(event);
-            this._sessionFinishCalled = true;
         }
     }
 
