@@ -298,6 +298,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
         if (!this._sessionFinishCalled) {
             this._omBridge.triggerSessionEvent(event);
+            this._sessionFinishCalled = true;
         }
     }
 
@@ -325,13 +326,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             }
         }
 
-        if (eventType === SessionEvents.SESSION_FINISH && !this._sessionFinishCalled) {
+        if (eventType === SessionEvents.SESSION_FINISH) {
             if (vendorKey === 'IAS' && this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
             }
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
-            this._sessionFinishCalled = true;
             window.setTimeout(() => this.removeFromViewHieararchy(), 1000);
         }
 
