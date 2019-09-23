@@ -112,10 +112,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
-
-        if (this._pts) {
-            this._pts = pts;
-        }
+        this._pts = pts;
 
         if (vastAdVerification) {
             this._adVerification = vastAdVerification;
