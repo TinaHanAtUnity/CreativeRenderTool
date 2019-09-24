@@ -344,14 +344,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            if (this._campaign instanceof AdMobCampaign) {
-                this._omBridge.sendQueuedEvents();
-            }
+            // if (this._campaign instanceof AdMobCampaign) {
+            //     this._omBridge.sendQueuedEvents();
+            // }
             // this._omBridge.sendQueuedEvents();
-        }
-
-        if (eventType === 'listenersRegistered') {
-            //
         }
 
         return Promise.resolve();
@@ -370,35 +366,21 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
                 if (vendorKey === 'IAS') {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
-                } else {
-                    this.loaded({
-                        isSkippable: this._placement.allowSkip(),
-                        skipOffset: this._placement.allowSkipInSeconds(),
-                        isAutoplay: true,                   // Always autoplay for video
-                        position: VideoPosition.STANDALONE  // Always standalone video
-                    });
                 }
+
+                this.loaded({
+                    isSkippable: this._placement.allowSkip(),
+                    skipOffset: this._placement.allowSkipInSeconds(),
+                    isAutoplay: true,                   // Always autoplay for video
+                    position: VideoPosition.STANDALONE  // Always standalone video
+                });
             });
     }
 
     private sendIASEvents(IASScreenWidth: number, IASScreenHeight: number) {
-        window.setTimeout(() => {
             const viewPort = OpenMeasurementUtilities.calculateViewPort(IASScreenWidth, IASScreenHeight);
             const adView = OpenMeasurementUtilities.calculateVastAdView(100, [], IASScreenWidth, IASScreenHeight, true, []);
-
-            // must be called before geometry change to avoid re-queueing and calling geometry change twice
-            this._omBridge.sendQueuedEvents();
-
             this.geometryChange(viewPort, adView);
-
-            // must be called after geometry change for IAS because they don't register other ad events until after it is called
-            this.loaded({
-                isSkippable: this._placement.allowSkip(),
-                skipOffset: this._placement.allowSkipInSeconds(),
-                isAutoplay: true,                   // Always autoplay for video
-                position: VideoPosition.STANDALONE  // Always standalone video
-            });
-        }, 1000);
     }
 
     private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {

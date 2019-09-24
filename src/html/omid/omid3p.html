@@ -9,7 +9,7 @@
                     SESSION_START = 'sessionStart',
                     SESSION_ERROR = 'sessionError',
                     SESSION_REGISTERED = 'sessionRegistered';
-
+                    let videoEventRegistered = false;
         
                     /**
                      * Enum for ad event types.
@@ -42,8 +42,34 @@
                         impression: []
                     };
 
+                    let handleEventQueue = function(event, parameters) {
+                        if (event === 'geometryChange' || event === 'impression') {
+                            adEventsQueue[event] = parameters;
+                        } else {
+                            videoEventsQueue[event] = parameters;
+                        }
+                        console.log('stored next call: ', event);
+                    }
+
+                    let handleEventCall = function(event, parameters) {
+                        // any event passed we handle individually
+                        videoListeners[event].forEach(function(listener) {
+                            listener(parameters);
+                            console.log(event, ' indvidual called');
+                        });
+
+                        // 'video' event is not fired from our sdk
+                        // only call video function for any non ad event: impression, geometry
+                        if (event !== 'geometryChange' && event !== 'impression' && event !== 'video') {
+                            videoListeners['video'].forEach(function(listener) {
+                                listener(parameters);
+                                console.log(event, ' aggregate video called');
+                            });
+                        }
+                    }
+
                     /**
-                     * Calls the corresponding listener events function
+                     * Calls the corresponding listener events function for Video/Ad events
                      * @param {string} event to send to the server
                      * @param {Object} parameters of the event
                      */
@@ -51,17 +77,13 @@
                         if(!parameters) {
                             parameters = [];
                         }
-                        if(event in videoListeners) {
-                            console.log(event, ' called');
-                            videoListeners[event].forEach(function(listener) {
-                                listener(parameters);
-                            });
 
-                            if (event !== 'geometryChange' && event !== 'impression' && event !== 'video') {
-                                videoListeners['video'].forEach(function(listener) {
-                                    listener(parameters);
-                                });
+                        if (event in videoListeners) {
+                            // we never store video event since it is not fired from our sdk
+                            if (videoListeners[event].length === 0) {
+                                handleEventQueue(event, parameters);
                             }
+                            handleEventCall(event, parameters);
                         }
                     };
         
@@ -70,6 +92,10 @@
                     var sessionStartData = {};
                     var sessionStartCalled = false;
                     let scriptVendor = '';
+
+                    let sessionEventsQueue = {};
+                    let adEventsQueue = {};
+                    let videoEventsQueue = {};
 
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
@@ -109,6 +135,7 @@
                             eventType: SESSION_START,
                             vendorKey: vendorkey
                         });
+                        console.log('session start called', sessionStartData[vendorkey]);
                     }
 
                     /**
@@ -254,6 +281,7 @@
                         }
 
                         sessionObserversMap[vendorKey].push(functionToExecute);
+                        console.log('session observer registered');
 
                         if (!sessionStartCalled) {
                             scriptVendor = vendorKey;
@@ -266,8 +294,40 @@
                     this.addEventListener = function(type, listener) {
                         if(type in videoListeners && videoListeners[type] !== listener) {
                             videoListeners[type].push(listener);
+                            console.log('listener registered: ', type);
                         }
-                        console.log('listner registerd: ', type);
+
+                        if (adEventsQueue[type] !== undefined) {
+                            console.log('queued call: ', type);
+                            trigger(type, adEventsQueue[type]);
+                        } 
+
+                        if (type === 'video') {
+                            videoEventRegistered = true;
+                            sendAllQueuedVideoEvents(); 
+                        } 
+
+                        if (videoEventsQueue[type] !== undefined) {
+                            console.log('queued call: ', type);
+                            trigger(type, videoEventsQueue[type]);
+                        }
+                    }
+
+                    let sendAllQueuedVideoEvents = function() {
+                        if (videoEventsQueue['loaded'])            trigger('loaded', videoEventsQueue['loaded']);
+                        if (videoEventsQueue['start'])             trigger('start', videoEventsQueue['start']);
+                        if (videoEventsQueue['firstQuartile'])     trigger('firstQuartile', videoEventsQueue['firstQuartile']);
+                        if (videoEventsQueue['midpoint'])          trigger('midpoint', videoEventsQueue['midpoint']);
+                        if (videoEventsQueue['thirdQuartile'])     trigger('thirdQuartile', videoEventsQueue['thirdQuartile']);
+                        if (videoEventsQueue['complete'])          trigger('complete', videoEventsQueue['complete']);
+                        if (videoEventsQueue['pause'])             trigger('pause', videoEventsQueue['pause']);
+                        if (videoEventsQueue['resume'])            trigger('resume', videoEventsQueue['resume']);
+                        if (videoEventsQueue['bufferStart'])       trigger('bufferStart', videoEventsQueue['bufferStart']);
+                        if (videoEventsQueue['bufferFinish'])      trigger('bufferFinish', videoEventsQueue['bufferFinish']);
+                        if (videoEventsQueue['skipped'])           trigger('skipped', videoEventsQueue['skipped']);
+                        if (videoEventsQueue['volumeChange'])      trigger('volumeChange', videoEventsQueue['volumeChange']);
+                        if (videoEventsQueue['playerStateChange']) trigger('playerStateChange', videoEventsQueue['playerStateChange']);
+                        if (videoEventsQueue['adUserInteraction']) trigger('adUserInteraction', videoEventsQueue['adUserInteraction']);
                     }
         
                     this.sendUrl = function(resourceUrl, successCallback, failureCallback) {}
@@ -280,11 +340,10 @@
                 /**
                  * Generic Vast verification scripts attach to this:
                  */
+                window.omid3p = new OmidVerification();
+                Object.freeze(window.omid3p);
 
-                // window.omid3p = new OmidVerification();
-                // Object.freeze(window.omid3p);
-
-                window.OmidVerificationClient = {'omid3p': OmidVerification};
+                // window.OmidVerificationClient = {'omid3p': OmidVerification};
 
                 /**
                  * Used for IAB test:

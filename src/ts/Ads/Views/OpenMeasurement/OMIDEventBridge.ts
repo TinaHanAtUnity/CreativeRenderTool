@@ -27,9 +27,6 @@ export class OMIDEventBridge {
     private _openMeasurement: OpenMeasurement;
 
     private _iframe3p: HTMLIFrameElement;
-
-    private _eventQueue: IVerificationEvent[] = [];
-    private _eventQueueSent = false;
     private _verificationsInjected = false;
 
     constructor(core: ICoreApi, handler: IOMIDEventHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
@@ -58,17 +55,6 @@ export class OMIDEventBridge {
         this._verificationsInjected = verificationsInjected;
     }
 
-    // Open Question: when should queued events be sent?
-    public sendQueuedEvents() {
-        console.log('sending events form event queue');
-        while (this._eventQueue.length > 0 && this._iframe3p.contentWindow) {
-            const event = this._eventQueue.shift();
-            console.log('queued event ', event);
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-        this._eventQueueSent = true;
-    }
-
     public triggerAdEvent(type: string, payload?: unknown) {
         this._core.Sdk.logDebug('Calling OM ad event "' + type + '" with payload: ' + payload);
         const event: IVerificationEvent = {
@@ -80,11 +66,6 @@ export class OMIDEventBridge {
 
         if (this._iframe3p.contentWindow && this._verificationsInjected) {
             this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-
-        if (!this._eventQueueSent) {
-            this._eventQueue.push(event);
-            console.log('queueing: ', event);
         }
     }
 
@@ -100,20 +81,12 @@ export class OMIDEventBridge {
         if (this._iframe3p.contentWindow && this._verificationsInjected) {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
-
-        if (!this._eventQueueSent) {
-            this._eventQueue.push(event);
-        }
     }
 
     public triggerSessionEvent(event: ISessionEvent) {
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
         if (this._iframe3p.contentWindow) {
             this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-
-        if (!this._eventQueueSent) {
-            this._eventQueue.push(event);
         }
     }
 
