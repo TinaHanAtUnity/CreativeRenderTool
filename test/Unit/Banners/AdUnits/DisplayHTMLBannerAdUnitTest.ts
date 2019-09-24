@@ -59,9 +59,11 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
 
             if (platform === Platform.ANDROID) {
                 core.Android!.Intent = sinon.createStubInstance(IntentApi);
+                core.Android!.Intent.launch = sinon.stub().returns(Promise.resolve());
             }
             if (platform === Platform.IOS) {
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
+                core.iOS!.UrlScheme.open = sinon.stub().returns(Promise.resolve());
             }
 
             bannerNativeApi = TestFixtures.getBannerNativeApi(nativeBridge);
@@ -73,6 +75,7 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
             });
 
             sinon.spy(bannerNativeApi.BannerListenerApi, 'sendClickEvent');
+            sinon.spy(bannerNativeApi.BannerListenerApi, 'sendLeaveApplicationEvent');
 
             campaign = new BannerCampaign(getBannerCampaign(TestFixtures.getSession()));
 
@@ -200,9 +203,14 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                     it('should open the URL', () => {
                         return adUnit.onLoad().then(() => {
                             const url = 'http://unity3d.com';
-                            webPlayerContainer.onCreateWebView.trigger(url);
-                            sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
-                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
+                            return new Promise((res) => {
+                                webPlayerContainer.onCreateWebView.trigger(url);
+                                setTimeout(res, 1000);
+                            }).then(() => {
+                                sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
+                                sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
+                                sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent, bannerAdViewId);
+                            });
                         });
                     });
                 });
@@ -213,12 +221,17 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                     it('should launch an intent with the given URL', () => {
                         return adUnit.onLoad().then(() => {
                             const url = 'http://unity3d.com';
-                            webPlayerContainer.shouldOverrideUrlLoading.trigger(url, 'GET');
-                            sinon.assert.calledWith(asSpy(core.Android!.Intent.launch), {
-                                'action': 'android.intent.action.VIEW',
-                                'uri': url
+                            return new Promise((res) => {
+                                webPlayerContainer.shouldOverrideUrlLoading.trigger(url, 'GET');
+                                setTimeout(res, 1000);
+                            }).then(() => {
+                                sinon.assert.calledWith(asSpy(core.Android!.Intent.launch), {
+                                    'action': 'android.intent.action.VIEW',
+                                    'uri': url
+                                });
+                                sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
+                                sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent, bannerAdViewId);
                             });
-                            sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
                         });
                     });
                 });
