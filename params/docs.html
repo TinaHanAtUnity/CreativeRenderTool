@@ -77,18 +77,22 @@
 <tr><td>gameSessionCounters</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
 <tr><td>ext</td><td>object</td><td>JSON string for optional signals for admob</td><td>SDK</td><td>all</td></tr>
 <tr><td>organizationId</td><td>string</td><td>Organization ID from Genesis'</td><td>Server</td><td>all</td></tr>
+<tr><td>developerId</td><td>number</td><td>Developer ID from Configuration</td><td>Server</td><td>all</td></tr>
 <tr><td>gdprEnabled</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutRecorded</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutEnabled</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>abGroup</td><td>number</td><td>AB Group number assigned to this user from configuration</td><td>Server</td><td>all</td></tr>
 <tr><td>unityCreativeId</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
+<tr><td>imei</td><td>string</td><td>default or slot 0 from getDeviceId </td><td>SDK</td><td>android</td></tr>
 <tr><td>analyticsUserId</td><td>string</td><td>Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)</td><td>SDK</td><td>all</td></tr>
 <tr><td>analyticsSessionId</td><td>string</td><td>Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit</td><td>SDK</td><td>all</td></tr>
-<tr><td>isBackupCampaign</td><td>boolean</td><td>Flag describing if the campaign was loaded from server or from backup stored on device</td><td>SDK</td><td>all</td></tr>
 <tr><td>privacy</td><td>object</td><td>Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK</td><td>SDK</td><td>all</td></tr>
-<tr><td>isPromoCatalogAvailable</td><td>yes</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the developer has a set up a catalog for their IAP Promo Placement</td><td>SDK</td><td>all</td></tr>
+<tr><td>isPromoCatalogAvailable</td><td>boolean</td><td>Flag describing if the developer has a set up a catalog for their IAP Promo Placement</td><td>SDK</td><td>all</td></tr>
+<tr><td>isLoadEnabled</td><td>boolean</td><td>Flag describing if the campaign was loaded using Load API or from Precached Initialization</td><td>SDK</td><td>all</td></tr>
 <tr><td>omidPartnerName</td><td>string</td><td>Flag describing the omid partner name indicating omid is supported</td><td>SDK</td><td>all</td></tr>
 <tr><td>omidJSVersion</td><td>string</td><td>Flag describing the omid js implementation version indicating omid is supported</td><td>SDK</td><td>all</td></tr>
+<tr><td>legalFramework</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
+<tr><td>nofillRetry</td><td>boolean</td><td>Retrying after no fill</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -109,6 +113,7 @@
 <tr><td>frameworkVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterName</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
+<tr><td>imei</td><td>no</td><td>True</td><td>False</td><td>string</td><td>default or slot 0 from getDeviceId </td><td>SDK</td><td>android</td></tr>
 <tr><td>analyticsUserId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)</td><td>SDK</td><td>all</td></tr>
 <tr><td>analyticsSessionId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3> 
@@ -130,8 +135,9 @@
 <tr><td>test</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
 <tr><td>connectionType</td><td>all</td><td>True</td><td>False</td><td>string</td><td>"wifi", "cellular" or "none"</td><td>SDK</td><td>all</td></tr>
 <tr><td>networkType</td><td>no</td><td>True</td><td>False</td><td>number</td><td>Detailed cellular network type</td><td>SDK</td><td>all</td></tr>
-<tr><td>stores</td><td>yes</td><td>True</td><td>False</td><td>string</td><td>List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')</td><td>SDK</td><td>all</td></tr>
+<tr><td>stores</td><td>all</td><td>True</td><td>False</td><td>string</td><td>List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')</td><td>SDK</td><td>all</td></tr>
 <tr><td>bundleVersion</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Game version</td><td>SDK</td><td>all</td></tr>
+<tr><td>nofillRetry</td><td>no</td><td>False</td><td>True</td><td>boolean</td><td>Retrying after no fill</td><td>SDK</td><td>all</td></tr>
 <tr><td>bundleId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>language</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>timeZone</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current timezone</td><td>SDK</td><td>all</td></tr>
@@ -164,17 +170,17 @@
 <tr><td>gameSessionCounters</td><td>all</td><td>False</td><td>True</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
 <tr><td>ext</td><td>all</td><td>False</td><td>True</td><td>object</td><td>JSON string for optional signals for admob</td><td>SDK</td><td>all</td></tr>
 <tr><td>organizationId</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Organization ID from Genesis'</td><td>Server</td><td>all</td></tr>
-<tr><td>developerId</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Developer ID from Configuration Service</td><td>Server</td><td>all</td></tr>
+<tr><td>developerId</td><td>all</td><td>False</td><td>True</td><td>number</td><td>Developer ID from Configuration</td><td>Server</td><td>all</td></tr>
 <tr><td>gdprEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutRecorded</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>abGroup</td><td>no</td><td>False</td><td>True</td><td>number</td><td>AB Group number assigned to this user from configuration</td><td>Server</td><td>all</td></tr>
-<tr><td>privacy</td><td>yes</td><td>False</td><td>True</td><td>object</td><td>Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK</td><td>SDK</td><td>all</td></tr>
-<tr><td>isPromoCatalogAvailable</td><td>yes</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the developer has a set up a catalog for their IAP Promo Placement</td><td>SDK</td><td>all</td></tr>
-<tr><td>nofillRetry</td><td>yes</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing retry should be made upon nofilling</td><td>SDK</td><td>no</td></tr>
-<tr><td>isLoadEnabled</td><td>yes</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if Auction Request was made using Load API</td><td>SDK</td><td>all</td></tr>
-<tr><td>omidPartnerName</td><td>yes</td><td>False</td><td>True</td><td>string</td><td>Flag describing the omid partner name indicating omid is supported</td><td>SDK</td><td>all</td></tr>
-<tr><td>omidJSVersion</td><td>yes</td><td>False</td><td>True</td><td>string</td><td>Flag describing the omid js implementation version indicating omid is supported</td><td>SDK</td><td>all</td></tr>
+<tr><td>privacy</td><td>all</td><td>False</td><td>True</td><td>object</td><td>Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK</td><td>SDK</td><td>all</td></tr>
+<tr><td>isPromoCatalogAvailable</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the developer has a set up a catalog for their IAP Promo Placement</td><td>SDK</td><td>all</td></tr>
+<tr><td>isLoadEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded using Load API or from Precached Initialization</td><td>SDK</td><td>all</td></tr>
+<tr><td>omidPartnerName</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Flag describing the omid partner name indicating omid is supported</td><td>SDK</td><td>all</td></tr>
+<tr><td>omidJSVersion</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Flag describing the omid js implementation version indicating omid is supported</td><td>SDK</td><td>all</td></tr>
+<tr><td>legalFramework</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
@@ -218,9 +224,11 @@
 <tr><td>optOutEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutRecorded</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>unityCreativeId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
-<tr><td>isBackupCampaign</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded from server or from backup stored on device</td><td>SDK</td><td>all</td></tr>
+<tr><td>imei</td><td>no</td><td>False</td><td>True</td><td>string</td><td>default or slot 0 from getDeviceId </td><td>SDK</td><td>android</td></tr>
 <tr><td>privacy</td><td>yes</td><td>False</td><td>True</td><td>object</td><td>Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceFreeSpace</td><td>yes</td><td>False</td><td>True</td><td>number</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
+<tr><td>isLoadEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded using Load API or from Precached Initialization</td><td>SDK</td><td>all</td></tr>
+<tr><td>legalFramework</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
  </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
@@ -264,7 +272,9 @@
 <tr><td>optOutRecorded</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>videoOrientation</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Chosen video orientation</td><td>SDK</td><td>all</td></tr>
 <tr><td>unityCreativeId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
-<tr><td>isBackupCampaign</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded from server or from backup stored on device</td><td>SDK</td><td>all</td></tr>
+<tr><td>imei</td><td>no</td><td>False</td><td>True</td><td>string</td><td>default or slot 0 from getDeviceId </td><td>SDK</td><td>android</td></tr>
 <tr><td>privacy</td><td>yes</td><td>False</td><td>True</td><td>object</td><td>Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceFreeSpace</td><td>yes</td><td>False</td><td>True</td><td>number</td><td>Free space in kilobytes</td><td>SDK</td><td>all</td></tr>
+<tr><td>isLoadEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded using Load API or from Precached Initialization</td><td>SDK</td><td>all</td></tr>
+<tr><td>legalFramework</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
  </table></body></html>

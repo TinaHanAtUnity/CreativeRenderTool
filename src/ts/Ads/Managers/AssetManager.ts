@@ -197,7 +197,7 @@ export class AssetManager {
             // disable caching if there is less than 20 megabytes free space in cache directory
             if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
-                this._pts.reportMetric(CachingMetric.CachingModeForcedToDisabled);
+                this._pts.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
             }
 
             return;
@@ -384,7 +384,7 @@ export class AssetManager {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            this._pts.reportMetric(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            this._pts.reportErrorEvent(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
         }
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {

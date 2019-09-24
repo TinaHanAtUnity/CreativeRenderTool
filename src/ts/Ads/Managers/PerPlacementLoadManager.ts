@@ -127,7 +127,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             });
         } else {
             this.alertPlacementReadyStatus(placement);
-            this._pts.reportMetric(LoadMetric.LoadAuctionRequestBlocked);
+            this._pts.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
 

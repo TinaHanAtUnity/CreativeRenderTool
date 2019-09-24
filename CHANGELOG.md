@@ -1,3 +1,30 @@
+# Pending
+
+* Open Measurement - Add Session Start and AdPlan for IAS [#11302](https://github.com/Applifier/unity-ads-webview/pull/11302)
+
+# Mon Sep 23 17:57:07 UTC 2019
+
+* Open Measurement - Enable IAS Experiment [#11298](https://github.com/Applifier/unity-ads-webview/pull/11298)
+
+# Sat Sep 21 00:14:36 UTC 2019
+
+* Open Measurement - Add Initial Launch Implementation for IAS and Admob [#11274](https://github.com/Applifier/unity-ads-webview/pull/11274)
+* Open Measurement - Get Verification Per VastAd [#11244](https://github.com/Applifier/unity-ads-webview/pull/11244)
+* Small Refactor to Sending PTS Events [#10667](https://github.com/Applifier/unity-ads-webview/pull/10667)
+* Enable Native Store API Only If Analytics is Enabled [#11273](https://github.com/Applifier/unity-ads-webview/pull/11273)
+* Fix Race Condition between Ads SDK & IAP SDK [#11213](https://github.com/Applifier/unity-ads-webview/pull/11213)
+
+# Thu Sep 19 20:08:11 UTC 2019
+
+* Add legalFramework to Auction Requests and Operative Events [#11216](https://github.com/Applifier/unity-ads-webview/pull/11216)
+* Put ABGroup Gate around IAS Header Hack [#11243](https://github.com/Applifier/unity-ads-webview/pull/11243)
+* Disable AppSheet in iOS 13 Temporarily [#11218](https://github.com/Applifier/unity-ads-webview/pull/11218)
+
+# Wed Sep 18 22:57:49 UTC 2019
+
+* Decode vast wrapper urls before requesting in our Vast Parser [#11217](https://github.com/Applifier/unity-ads-webview/pull/11217)
+* Disable AppleStoreManager for iOS Versions 11.1 and Below [#11219](https://github.com/Applifier/unity-ads-webview/pull/11219)
+
 # Tue Sep 17 19:18:02 UTC 2019
 
 * End Parallax Endcard Experiment [#11182](https://github.com/Applifier/unity-ads-webview/pull/11182)

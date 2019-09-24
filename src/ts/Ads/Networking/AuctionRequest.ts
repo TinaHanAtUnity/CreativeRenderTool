@@ -25,7 +25,7 @@ import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -473,7 +473,8 @@ export class AuctionRequest {
                     organizationId: this._coreConfig.getOrganizationId(),
                     isLoadEnabled: false, // TODO: When this is used for anything other than banners, pass actual flag
                     omidPartnerName: PARTNER_NAME,
-                    omidJSVersion: OM_JS_VERSION
+                    omidJSVersion: OM_JS_VERSION,
+                    legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
                 };
             });
         });

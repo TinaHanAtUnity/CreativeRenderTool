@@ -53,13 +53,13 @@ describe('AdmobAdUnitTest', () => {
 
         await admobAdUnit.show();
 
-        sandbox.assert.calledWithExactly(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetric, AdmobMetric.AdmobRewardedVideoStart);
+        sandbox.assert.calledWithExactly(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetricEvent, AdmobMetric.AdmobRewardedVideoStart);
 
         admobAdUnit.sendRewardEvent();
-        sandbox.assert.calledWithExactly(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetric, AdmobMetric.AdmobUserWasRewarded);
+        sandbox.assert.calledWithExactly(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetricEvent, AdmobMetric.AdmobUserWasRewarded);
 
         admobAdUnit.sendSkipEvent();
-        sandbox.assert.calledWithExactly(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetric, AdmobMetric.AdmobUserSkippedRewardedVideo);
+        sandbox.assert.calledWithExactly(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetricEvent, AdmobMetric.AdmobUserSkippedRewardedVideo);
     });
 
     it('should not call rewarded placement metrics when allowSkip is true', async () => {
@@ -69,12 +69,12 @@ describe('AdmobAdUnitTest', () => {
 
         await admobAdUnit.show();
 
-        sandbox.assert.notCalled(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetric);
+        sandbox.assert.notCalled(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetricEvent);
 
         admobAdUnit.sendRewardEvent();
-        sandbox.assert.notCalled(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetric);
+        sandbox.assert.notCalled(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetricEvent);
 
         admobAdUnit.sendSkipEvent();
-        sandbox.assert.notCalled(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetric);
+        sandbox.assert.notCalled(<sinon.SinonStub>core.ProgrammaticTrackingService.reportMetricEvent);
     });
 });
