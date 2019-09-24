@@ -135,17 +135,4 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     public getLimitedTimeOffer(): LimitedTimeOffer | undefined {
         return this.get('limitedTimeOffer');
     }
-
-    public disableCache(userAgent: string): boolean {
-        const isValidUserAgent = (userAgent && typeof userAgent === 'string');
-        if (!isValidUserAgent) {
-            return false;
-        }
-        const regexFields = userAgent.match(/Chrom(e|ium)\/([0-9]+)/);
-        if (regexFields && regexFields.length >= 3) {
-            const majorVersion = parseInt(regexFields[2], 10);
-            return majorVersion >= 77;
-        }
-        return false;
-    }
 }

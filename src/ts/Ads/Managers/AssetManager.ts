@@ -88,11 +88,7 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
-        let disablePromoCache = false;
-        if (typeof navigator !== 'undefined' && campaign instanceof PromoCampaign) {
-            disablePromoCache = campaign.disableCache(navigator.userAgent);
-        }
-        if (this._cacheMode === CacheMode.DISABLED || disablePromoCache) {
+        if (this._cacheMode === CacheMode.DISABLED || this.shouldDisableCacheForPromo(navigator.userAgent, campaign)) {
             return Promise.resolve(campaign);
         }
 
@@ -395,5 +391,20 @@ export class AssetManager {
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {
             fileSize: Math.floor(totalSize / (1024 * 1024))
         });
+    }
+
+    private shouldDisableCacheForPromo(userAgent: unknown, campaign: Campaign) {
+
+        if (!(campaign instanceof PromoCampaign)) {
+            return false;
+        }
+
+        const userAgentString = (userAgent && typeof userAgent === 'string') ? userAgent : '';
+        const regexFields = userAgentString.match(/Chrom(e|ium)\/([0-9]+)/);
+        if (regexFields && regexFields.length >= 3) {
+            const majorVersion = parseInt(regexFields[2], 10);
+            return majorVersion >= 77;
+        }
+        return false;
     }
 }

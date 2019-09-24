@@ -206,4 +206,28 @@ describe('AssetManagerTest', () => {
         });
     });
 
+    describe('For Promo Campaigns', () => {
+        let cache: CacheManager;
+        let assetManager: AssetManager;
+        let asset: HTML;
+        let campaign: Campaign;
+        let cacheStub: sinon.SinonStub;
+
+        beforeEach(() => {
+            cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
+            assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            asset = new HTML('https://www.google.fi', TestFixtures.getSession());
+            campaign = TestFixtures.getPromoCampaign();
+            cacheStub = sinon.stub(cache, 'cache');
+        });
+
+        it('should disable caching for Android Webview 77', () => {
+            sinon.stub(navigator, 'userAgent').value('Chrome/77.105.123.2');
+            return assetManager.setup(campaign).then(() => {
+                sinon.assert.notCalled(cacheStub);
+                assert.isFalse(asset.isCached());
+            });
+        });
+    });
+
 });
