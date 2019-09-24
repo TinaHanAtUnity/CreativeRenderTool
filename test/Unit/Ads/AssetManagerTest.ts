@@ -209,23 +209,61 @@ describe('AssetManagerTest', () => {
     describe('For Promo Campaigns', () => {
         let cache: CacheManager;
         let assetManager: AssetManager;
-        let asset: HTML;
         let campaign: Campaign;
-        let cacheStub: sinon.SinonStub;
+        let spy: sinon.SinonSpy;
 
         beforeEach(() => {
             cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
             assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
-            asset = new HTML('https://www.google.fi', TestFixtures.getSession());
             campaign = TestFixtures.getPromoCampaign();
-            cacheStub = sinon.stub(cache, 'cache');
+            spy = sinon.spy(cache, 'cache');
         });
 
         it('should disable caching for Android Webview 77', () => {
             sinon.stub(navigator, 'userAgent').value('Chrome/77.105.123.2');
             return assetManager.setup(campaign).then(() => {
-                sinon.assert.notCalled(cacheStub);
-                assert.isFalse(asset.isCached());
+                assert.isTrue(spy.notCalled);
+                assert.isFalse(campaign.getRequiredAssets()[0].isCached());
+            });
+        });
+
+        it('should disable caching for Android Webview 77 with real useragent', () => {
+            sinon.stub(navigator, 'userAgent').value('Mozilla/5.0 (Linux; Android 10; Pixel Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.92 Mobile Safari/537.36');
+            return assetManager.setup(campaign).then(() => {
+                assert.isTrue(spy.notCalled);
+                assert.isFalse(campaign.getRequiredAssets()[0].isCached());
+            });
+        });
+
+        it('should disable caching for Android Webview above 77', () => {
+            sinon.stub(navigator, 'userAgent').value('Chrome/79.105.123.2');
+            return assetManager.setup(campaign).then(() => {
+                assert.isTrue(spy.notCalled);
+                assert.isFalse(campaign.getRequiredAssets()[0].isCached());
+            });
+        });
+
+        it('should enable caching for Android Webview below 77', () => {
+            sinon.stub(navigator, 'userAgent').value('Chrome/76.105.123.2');
+            return assetManager.setup(campaign).then(() => {
+                assert.isTrue(spy.called);
+                assert.isTrue(campaign.getRequiredAssets()[0].isCached());
+            });
+        });
+
+        it('should enable caching for Android Webview for empty userAgents', () => {
+            sinon.stub(navigator, 'userAgent').value('');
+            return assetManager.setup(campaign).then(() => {
+                assert.isTrue(spy.called);
+                assert.isTrue(campaign.getRequiredAssets()[0].isCached());
+            });
+        });
+
+        it('should enable caching for Android Webview for non-Chrome userAgents', () => {
+            sinon.stub(navigator, 'userAgent').value('Mozilla/76.105.123.2');
+            return assetManager.setup(campaign).then(() => {
+                assert.isTrue(spy.called);
+                assert.isTrue(campaign.getRequiredAssets()[0].isCached());
             });
         });
     });

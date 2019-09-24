@@ -135,4 +135,5 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     public getLimitedTimeOffer(): LimitedTimeOffer | undefined {
         return this.get('limitedTimeOffer');
     }
+
 }

@@ -2,6 +2,7 @@ import { assert } from 'chai';
 
 import DummyPromo from 'json/DummyPromoCampaign.json';
 import 'mocha';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoCampaign', () => {
