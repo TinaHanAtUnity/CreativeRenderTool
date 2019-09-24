@@ -393,6 +393,10 @@ export class AssetManager {
         });
     }
 
+    /**
+     * Promos are currently broken in the latest Android Webview 77 Release.
+     * TODO: Once this issue is resolved, then this workaround should be removed
+     */
     private shouldDisableCacheForPromo(userAgent: unknown, campaign: Campaign) {
 
         if (!(campaign instanceof PromoCampaign)) {
