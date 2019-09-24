@@ -12,38 +12,38 @@ interface IVast {
     ads: VastAd[];
     parseErrorURLTemplates: string[];
     additionalTrackingEvents: { [eventName: string]: string[] };
-    adVerifications: VastAdVerification[];
 }
 
 export class Vast extends Model<IVast> {
 
     private _campaignErrors: CampaignError[];
 
-    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[], adVerifications?: VastAdVerification[]) {
+    constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
         super('Vast', {
             ads: ['array'],
             parseErrorURLTemplates: ['array'],
-            additionalTrackingEvents: ['object'],
-            adVerifications: ['array']
+            additionalTrackingEvents: ['object']
         });
 
         this.set('ads', ads);
         this.set('parseErrorURLTemplates', parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
-        this.set('adVerifications', adVerifications || []);
 
         this._campaignErrors = campaignErrors || [];
     }
 
     public getAdVerifications(): VastAdVerification[] {
-        return this.get('adVerifications');
-    }
+        const vastAds = this.getAds();
+        let verifications: VastAdVerification[] = [];
 
-    public getAdVerification(): VastAdVerification | null {
-        if (this.getAdVerifications() && this.getAdVerifications().length > 0) {
-            return this.getAdVerifications()[0];
-        }
-        return null;
+        vastAds.forEach((ad) => {
+            const adVerifications = ad.getAdVerifications();
+            if (adVerifications) {
+                verifications = verifications.concat(adVerifications);
+            }
+        });
+
+        return verifications;
     }
 
     public getAds(): VastAd[] {
@@ -133,10 +133,6 @@ export class Vast extends Model<IVast> {
             this.get('additionalTrackingEvents')[eventName] = [];
         }
         this.get('additionalTrackingEvents')[eventName].push(url);
-    }
-
-    public addAdVerifications(verfications: VastAdVerification[]) {
-        this.set('adVerifications', this.get('adVerifications').concat(verfications));
     }
 
     public getDuration(): number | null {

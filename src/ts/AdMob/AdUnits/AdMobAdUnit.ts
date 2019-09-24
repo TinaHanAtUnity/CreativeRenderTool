@@ -64,7 +64,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
 
         if (this._isRewardedPlacement) {
-            this._pts.reportMetric(AdmobMetric.AdmobRewardedVideoStart);
+            this._pts.reportMetricEvent(AdmobMetric.AdmobRewardedVideoStart);
         }
 
         this.sendTrackingEvent(TrackingEvent.SHOW);
@@ -121,7 +121,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendSkipEvent() {
         if (this._isRewardedPlacement) {
-            this._pts.reportMetric(AdmobMetric.AdmobUserSkippedRewardedVideo);
+            this._pts.reportMetricEvent(AdmobMetric.AdmobUserSkippedRewardedVideo);
         }
         this.sendTrackingEvent(TrackingEvent.SKIP);
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
@@ -136,7 +136,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
         if (this._isRewardedPlacement) {
-            this._pts.reportMetric(AdmobMetric.AdmobUserWasRewarded);
+            this._pts.reportMetricEvent(AdmobMetric.AdmobUserWasRewarded);
         }
     }
 

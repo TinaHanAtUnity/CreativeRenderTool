@@ -128,15 +128,12 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isPartOfPhaseTwoRollout', () => {
+    describe('isZyngaWordsWithFriends', () => {
         const tests: {
             gameId: string;
             expected: boolean;
         }[] = [{
             gameId: '2895988', // WWF
-            expected: true
-        }, {
-            gameId: '2988443', // Zynga Solitaire
             expected: true
         }, {
             gameId: 'scott',
@@ -145,7 +142,7 @@ describe('CustomFeatures', () => {
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isPartOfPhaseTwoLoadRollout(t.gameId);
+                const value = CustomFeatures.isZyngaWordsWithFriends(t.gameId);
                 assert.equal(value, t.expected);
             });
         });

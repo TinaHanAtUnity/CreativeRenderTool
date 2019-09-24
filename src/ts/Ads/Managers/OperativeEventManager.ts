@@ -107,6 +107,7 @@ export interface IInfoJson {
     imei?: string;
     privacyType?: string;
     isLoadEnabled: boolean;
+    legalFramework: string;
 }
 
 export class OperativeEventManager {
@@ -408,7 +409,8 @@ export class OperativeEventManager {
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
-                'isLoadEnabled': this._campaign.isLoadEnabled()
+                'isLoadEnabled': this._campaign.isLoadEnabled(),
+                'legalFramework': this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
             };
 
             if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

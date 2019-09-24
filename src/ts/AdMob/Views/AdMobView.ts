@@ -22,9 +22,11 @@ import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import OMIDSessionClient from 'html/omid/admob-session-interface.html';
-import { OpenMeasurement, PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement';
-import { ObstructionReasons } from 'Ads/Views/OMIDEventBridge';
+import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
+import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -59,10 +61,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
-    private _om: OpenMeasurement | undefined;
+    private _admobOMController: AdmobOpenMeasurementController | undefined;
     private _deviceInfo: DeviceInfo;
 
-    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: OpenMeasurement | undefined) {
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
         super(platform, 'admob');
 
         this._campaign = campaign;
@@ -72,7 +74,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
-        this._om = om;
+        this._admobOMController = om;
         this._deviceInfo = deviceInfo;
 
         this._afmaBridge = new AFMABridge(core, {
@@ -188,22 +190,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;
 
-            if (this._om) {
+            if (this._admobOMController) {
                 iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementorMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
-                this._om.getOmidBridge().setAdmobIframe(iframe);
-
-                iframe.onload = () => {
-                    if (iframe.contentWindow) {
-                        const videoEl = iframe.contentWindow.document.querySelector('video');
-                        if (videoEl) {
-                            const rect = videoEl.getBoundingClientRect();
-                            if (this._om) {
-                                const view = this._om.createRectangle(rect.left, rect.right, rect.width, rect.height);
-                                this._om.setVideoViewRectangle(view);
-                            }
-                        }
-                    }
-                };
+                this._admobOMController.getAdmobBridge().setAdmobIframe(iframe);
             }
         });
     }
@@ -233,10 +222,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                     const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
                     scriptEl.textContent = replacedSrc;
                     // report using cached video
-                    this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUsedCachedVideo).catch();
+                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo).catch();
                 } else {
                     // report using streaming video
-                    this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUsedStreamedVideo).catch();
+                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo).catch();
                 }
             }
         }
@@ -271,14 +260,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onClose() {
-        if (this._om) {
-            this._om.sessionFinish({
-                adSessionId: this._om.getOMAdSessionId(),
-                timestamp: Date.now(),
-                type: 'sessionFinish',
-                data: {}
-            });
-            setTimeout(() => {if (this._om) { this._om.removeFromViewHieararchy(); }}, 1000);
+        if (this._admobOMController) {
+            this._admobOMController.sessionFinish();
+            setTimeout(() => {if (this._admobOMController) { this._admobOMController.removeFromViewHieararchy(); }}, 1000);
         }
         // Added a timeout for admob session interface to receive session finish before removing the dom element
         setTimeout(() => this._handlers.forEach((h) => h.onClose()), 1);
@@ -317,7 +301,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onUserSeeked() {
-        this._programmaticTrackingService.reportMetric(AdmobMetric.AdmobUserVideoSeeked).catch();
+        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked).catch();
     }
 
     private onGDPRPopupEvent(event: Event) {
@@ -329,8 +313,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         }
         this._privacy.show();
 
-        if (this._om) {
-            this.sendOMGeometryChange(this._om);
+        if (this._admobOMController) {
+            this.sendOMGeometryChange(this._admobOMController);
         }
     }
 
@@ -338,12 +322,12 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         event.preventDefault();
         this._privacy.show();
 
-        if (this._om) {
-            this.sendOMGeometryChange(this._om);
+        if (this._admobOMController) {
+            this.sendOMGeometryChange(this._admobOMController);
         }
     }
 
-    private sendOMGeometryChange(om: OpenMeasurement) {
+    private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
         const popup = <HTMLElement>document.querySelector('.pop-up');
         const gdprRect = popup.getBoundingClientRect();
         const gdprRectx = gdprRect.left;
@@ -352,29 +336,32 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         const gdprRectheight = gdprRect.height;
 
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-            const viewPort = om.calculateViewPort(screenWidth, screenHeight);
+            const viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
 
-            let obstructionRectangle = om.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
+            let obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
             const videoView =  om.getAdmobVideoElementBounds();
+            OpenMeasurementUtilities.VideoViewRectangle = videoView;
 
             if (this._platform === Platform.ANDROID) {
-                const adjustedx = om.getAndroidViewSize(gdprRectx, om.getScreenDensity());
-                const adjustedy = om.getAndroidViewSize(gdprRecty, om.getScreenDensity());
-                const adjustedwidth = om.getAndroidViewSize(gdprRectwidth, om.getScreenDensity());
-                const adjustedheight = om.getAndroidViewSize(gdprRectheight, om.getScreenDensity());
-                obstructionRectangle = om.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
+                const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
+                const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(gdprRectx, screenDensity);
+                const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(gdprRecty, screenDensity);
+                const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(gdprRectwidth, screenDensity);
+                const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(gdprRectheight, screenDensity);
+                obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
             }
 
-            const screenView = om.createRectangle(0, 0, screenWidth, screenHeight);
+            const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             const obstructionReasons: ObstructionReasons[] = [];
 
-            if (om.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
+            if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
                 obstructionReasons.push(ObstructionReasons.HIDDEN);
             }
 
-            const percentInView = om.calculatePercentageInView(videoView, obstructionRectangle, screenView);
+            const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
             obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
-            const obstructedAdView = om.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
+            const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
+
             om.geometryChange(viewPort, obstructedAdView);
         });
     }

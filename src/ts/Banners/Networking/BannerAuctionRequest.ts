@@ -28,7 +28,7 @@ export class BannerAuctionRequest extends AuctionRequest {
 
     public request(): Promise<IAuctionResponse> {
         if (this._deviceInfo.getLimitAdTracking()) {
-            this._pts.reportMetric(BannerMetric.BannerAdRequestWithLimitedAdTracking);
+            this._pts.reportMetricEvent(BannerMetric.BannerAdRequestWithLimitedAdTracking);
         }
         return super.request();
     }

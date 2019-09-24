@@ -77,7 +77,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         GameSessionCounters.addStart(this._campaign);
         GameSessionCounters.addView(this._campaign);
         if (!this._impressionEventsSent) {
-            this._programmaticTrackingService.reportMetric(BannerMetric.BannerAdImpression);
+            this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdImpression);
             this.sendTrackingEvent(TrackingEvent.IMPRESSION);
             this._impressionEventsSent = true;
         }

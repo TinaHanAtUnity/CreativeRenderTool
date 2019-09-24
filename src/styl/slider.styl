@@ -12,18 +12,22 @@ $slider-experiment-dot-margin = .3em;
   15%, 45%, 70%, 85% {
     transition-timing-function: cubic-bezier(.215, .610, .355, 1.000);
   }
+
   15% {
     opacity: .25;
     transform: scale3d(.9, .9, .9);
   }
+
   45% {
     opacity: .5;
     transform: scale3d(1.03, 1.03, 1.03);
   }
+
   70% {
     opacity: .85;
     transform: scale3d(.99, .99, .99);
   }
+
   85% {
     opacity: 1;
     transform: scale3d(1, 1, 1);
@@ -149,19 +153,23 @@ $iphone-x-slider-styles() {
     opacity: .3;
     transform: scale(.8);
     transition: all .3s;
+
     img {
       max-height: 100%;
     }
     &.active-slide {
       opacity: 1;
       transform: scale(1);
+
       img {
         animation: bounceIn .7s;
+
         animation-fill-mode: both;
       }
     }
     &.active-slide.no-animation {
       transition: none;
+
       img {
         animation: none;
       }

@@ -122,7 +122,7 @@ export class BannerAdContext {
 
     public getCampaign(): Promise<void> {
         this._loadState = BannerLoadState.Loading;
-        this._programmaticTrackingService.reportMetric(BannerMetric.BannerAdRequest);
+        this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdRequest);
         return this._campaignManager.request(this._placement, this._size).then((campaign) => {
                 this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
@@ -136,7 +136,7 @@ export class BannerAdContext {
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
-                this._programmaticTrackingService.reportMetric(ProgrammaticTrackingError.BannerRequestError, 'banner');
+                this._programmaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
                 if (e instanceof NoFillError) {
                     return this.onBannerNoFill();
                 } else {
@@ -163,7 +163,6 @@ export class BannerAdContext {
     }
 
     private sendBannerError(e: Error): Promise<void> {
-        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingError.BannerRequestError, 'banner');
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.WebViewError, e.message);
     }
 

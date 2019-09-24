@@ -22,11 +22,18 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { Promises } from 'Core/Utilities/Promises';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
     PURCHASE = 'purchase',
     CLOSE = 'close'
+}
+
+export enum ProductState {
+    EXISTS_IN_CATALOG,
+    MISSING_PRODUCT_IN_CATALOG,
+    WAITING_FOR_CATALOG
 }
 
 export interface IPromoPayload {
@@ -68,9 +75,7 @@ export class PurchasingUtilities {
         }).then(() => {
             this._isInitialized = true;
             if (this.configurationIncludesPromoPlacement()) {
-                this._purchasingAdapter.refreshCatalog().catch(() => {
-                    this._core.Sdk.logDebug('Purchasing Catalog failed to refresh');
-                });
+                PurchasingUtilities.refreshCatalog();
             }
         });
     }
@@ -94,11 +99,9 @@ export class PurchasingUtilities {
             this._refreshPromise = this._purchasingAdapter.refreshCatalog()
                 .then((products) => this.updateCatalog(products))
                 .then(() => this.setProductPlacementStates())
-                // TODO clean me up when finally is supported.
                 .then(() => { this._refreshPromise = null; })
-                .catch((e) => {
+                .catch((e) => { // whenever IAP is not ready yet or IAP SDK Version is below 1.17.0
                     this._refreshPromise = null;
-                    throw e;
                 });
             return this._refreshPromise;
         }
@@ -193,14 +196,30 @@ export class PurchasingUtilities {
         const placementCampaignMap = this._placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
         const promoPlacementIds = Object.keys(placementCampaignMap);
         for (const placementId of promoPlacementIds) {
-            const currentCampaign = placementCampaignMap[placementId];
-
-            if (currentCampaign instanceof PromoCampaign && this.isProductAvailable(currentCampaign.getIapProductId())) {
-                this._placementManager.setPlacementReady(placementId, currentCampaign);
-            } else {
-                this._placementManager.setPlacementState(placementId, PlacementState.NO_FILL);
+            const campaign = placementCampaignMap[placementId];
+            if (campaign instanceof PromoCampaign) {
+                const state = PurchasingUtilities.getProductState(campaign.getIapProductId());
+                switch (state) {
+                    case ProductState.EXISTS_IN_CATALOG:
+                        this._placementManager.setPlacementReady(placementId, campaign);
+                        break;
+                    case ProductState.MISSING_PRODUCT_IN_CATALOG:
+                        this._placementManager.setPlacementState(placementId, PlacementState.DISABLED);
+                        break;
+                    case ProductState.WAITING_FOR_CATALOG:
+                        this._placementManager.setPlacementState(placementId, PlacementState.WAITING);
+                        break;
+                    default:
+                }
             }
         }
+    }
+
+    public static getProductState(productID: string): ProductState {
+        if (PurchasingUtilities.isCatalogAvailable()) {
+            return PurchasingUtilities.isProductAvailable(productID) ? ProductState.EXISTS_IN_CATALOG : ProductState.MISSING_PRODUCT_IN_CATALOG;
+        }
+        return ProductState.WAITING_FOR_CATALOG;
     }
 
     private static getPurchasingAdapter(): Promise<IPurchasingAdapter> {
