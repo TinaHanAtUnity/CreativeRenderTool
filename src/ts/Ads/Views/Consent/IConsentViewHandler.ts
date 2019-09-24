@@ -6,4 +6,5 @@ export interface IConsentViewHandler {
     onClose(): void;
     onPrivacy(url: string): void;
     onAgeGateDisagree(): void;
+    onAgeGateAgree(): void;
 }

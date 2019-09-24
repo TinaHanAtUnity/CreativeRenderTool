@@ -120,7 +120,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, layout? : ConsentPage): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, ageGateChoice: AgeGateChoice, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
@@ -146,7 +146,7 @@ export class UserPrivacyManager {
         }
 
         this._userPrivacy.update(updatedPrivacy);
-        return this.sendUnityConsentEvent(permissions, source, layout);
+        return this.sendUnityConsentEvent(permissions, source, ageGateChoice, layout);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -181,7 +181,7 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse> {
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, ageGateChoice: AgeGateChoice, layout = ''): Promise<INativeResponse> {
         const infoJson: unknown = {
             'v': 1,
             adid: this._deviceInfo.getAdvertisingIdentifier(),
@@ -199,7 +199,7 @@ export class UserPrivacyManager {
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
-            agreedOverAgeLimit: AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
+            agreedOverAgeLimit: ageGateChoice
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {

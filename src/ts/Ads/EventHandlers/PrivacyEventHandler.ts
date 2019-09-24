@@ -1,4 +1,4 @@
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -90,7 +90,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     public onPersonalizedConsent(permissions: IPermissions): void {
         const gamePrivacy = this._privacy.getGamePrivacy();
         if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.MY_CHOICES);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.MISSING, ConsentPage.MY_CHOICES);
         }
     }
 }

@@ -4,7 +4,7 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
@@ -41,6 +41,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
     private _privacySDK: PrivacySDK;
+    private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
 
     constructor(parameters: IConsentUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -137,7 +138,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
+        this._privacyManager.updateUserPrivacy(permissions, source, this._ageGateChoice, this._landingPage);
     }
 
     // IConsentViewHandler
@@ -152,12 +153,17 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onAgeGateDisagree(): void {
+        this._ageGateChoice = AgeGateChoice.NO;
         const permissions: IPermissions = {
             gameExp: false,
             ads: false,
             external: false
         };
-        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE);
+        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.NO, ConsentPage.AGE_GATE);
+    }
+
+    public onAgeGateAgree(): void {
+        this._ageGateChoice = AgeGateChoice.YES;
     }
 
     public onPrivacy(url: string): void {
