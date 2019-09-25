@@ -173,6 +173,9 @@ import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { Analytics } from 'Analytics/Analytics';
 import { Store } from 'Store/Store';
+import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
+import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
+import { PromoSize } from 'Promo/Models/PromoSize';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -554,6 +557,22 @@ export class TestFixtures {
             type: ProductInfoType.PREMIUM,
             quantity: 1
         };
+        const buttonAsset: IPromoAsset = {
+            image: new Image('https://storage.googleapis.com/promo-asset-prd/test-mode-IAP-button.png', session),
+            font: undefined,
+            coordinates: undefined,
+            size: new PromoSize({width: '20', height: '20'})
+        };
+        const backgroundAsset: IPromoAsset = {
+            image: new Image('https://storage.googleapis.com/promo-asset-prd/test-mode-IAP-phone-portrait.png', session),
+            font: undefined,
+            coordinates: undefined,
+            size: new PromoSize({width: '20', height: '20'})
+        };
+        const orientationAsset: IPromoOrientationAsset = {
+            buttonAsset: new PromoAsset(buttonAsset),
+            backgroundAsset: new PromoAsset(backgroundAsset)
+        };
         return {
             ... this.getCampaignBaseParams(session, json.promo.id, json.meta, adType),
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
@@ -561,8 +580,8 @@ export class TestFixtures {
             costs: costProductInfoList,
             payouts: payoutProductInfoList,
             premiumProduct: new ProductInfo(premiumProduct),
-            portraitAssets: undefined,
-            landscapeAssets: undefined
+            portraitAssets: new PromoOrientationAsset(orientationAsset),
+            landscapeAssets: new PromoOrientationAsset(orientationAsset)
         };
     }
 
