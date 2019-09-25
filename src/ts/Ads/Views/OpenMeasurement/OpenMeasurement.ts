@@ -18,6 +18,7 @@ import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -91,6 +92,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
+    private _sessionStartProcessedByOmidScript = false;
+    private _sessionFinishProcessedByOmidScript = false;
     private _adVerification: VastAdVerification;
     private _pts: ProgrammaticTrackingService | undefined;
 
@@ -133,10 +136,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this._omAdSessionId;
     }
 
-    public getSessionStartCalled(): boolean {
-        return this._sessionStartCalled;
-    }
-
     public addToViewHierarchy(): void {
         this.render();
         this.addMessageListener();
@@ -147,6 +146,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this.removeMessageListener();
         if (this.container().parentElement) {
             document.body.removeChild(this.container());
+        }
+
+        if (!this._sessionFinishProcessedByOmidScript && !this._sessionStartProcessedByOmidScript) {
+            SessionDiagnostics.trigger('ias_failed_register_events', {}, this._campaign.getSession());
         }
     }
 
@@ -239,6 +242,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             type: 'sessionStart',
             data: {}
         };
+        this._sessionStartCalled = true;
 
         if (this._verificationVendorMap[this._vendorKey]) {
             event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
@@ -319,13 +323,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      */
     public onEventProcessed(eventType: string, vendorKey?: string): Promise<void> {
         if (eventType === SessionEvents.SESSION_START) {
-            this._sessionStartCalled = true;
+            this._sessionStartProcessedByOmidScript = true;
+
+            if (vendorKey === 'IAS' && this._pts) {
+                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+            }
+
             if (this._campaign instanceof VastCampaign) {
                 return this.sendVASTStartEvents(vendorKey);
             }
         }
 
         if (eventType === SessionEvents.SESSION_FINISH) {
+            this._sessionFinishProcessedByOmidScript = true;
             if (vendorKey === 'IAS' && this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
             }
@@ -352,7 +362,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private sendVASTStartEvents(vendorKey?: string): Promise<void> {
             let IASScreenWidth = 0;
             let IASScreenHeight = 0;
-            this._sessionStartCalled = true;
 
             return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
                 const measuringElementAvailable = true;

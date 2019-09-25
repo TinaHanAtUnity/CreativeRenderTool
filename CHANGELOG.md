@@ -1,5 +1,11 @@
 # Pending
 
+* Open Measurement - Add Session Start and AdPlan for IAS [#11302](https://github.com/Applifier/unity-ads-webview/pull/11302)
+* Disable Promo Cache mode to remove reliance on Storage API [#11299](https://github.com/Applifier/unity-ads-webview/pull/11299)
+* Remove slider v2.1 experiment [#11327](https://github.com/Applifier/unity-ads-webview/pull/11327)
+
+# Mon Sep 23 17:57:07 UTC 2019
+
 * Open Measurement - Enable IAS Experiment [#11298](https://github.com/Applifier/unity-ads-webview/pull/11298)
 
 # Sat Sep 21 00:14:36 UTC 2019

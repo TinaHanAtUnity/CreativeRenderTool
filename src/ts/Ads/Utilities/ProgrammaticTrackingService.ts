@@ -67,6 +67,7 @@ export enum OMMetric {
     IASVASTVerificationParsed = 'ias_vast_verification_parsed',
     IASNestedVastTagHackApplied = 'ias_nested_vast_tag_hack_applied',
     IASVerificatonInjected = 'ias_verification_injected',
+    IASVerificationSessionStarted = 'ias_verification_session_started',
     IASVerificationSessionFinished = 'ias_verification_session_finished',
     IASVerificatonInjectionFailed = 'ias_verification_injection_failed'
 }
