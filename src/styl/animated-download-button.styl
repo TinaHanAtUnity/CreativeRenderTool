@@ -1,4 +1,4 @@
-@keyframes heartbeat {
+@keyframes animated-download-button-heartbeat {
   from, 100% {
     background: $blue;
     transform: scale(1);
@@ -36,7 +36,7 @@
   }
 }
 
-@keyframes blink {
+@keyframes animated-download-button-blink {
   from, 50%, 100% {
     background: $blue;
     box-shadow: none;
@@ -50,7 +50,7 @@
   }
 }
 
-@keyframes bounce {
+@keyframes animated-download-button-bounce {
   from {
     transform: translateY(0) rotateZ(0);
   }
@@ -87,7 +87,7 @@
   }
 }
 
-@keyframes bounce-shadow {
+@keyframes animated-download-button-bounce-shadow {
   0%, 30%, 100% {
     transform: scale(1);
   }
@@ -101,7 +101,7 @@
   }
 }
 
-@keyframes sheen {
+@keyframes animated-download-button-sheen {
   from {
     transform: skewX(-30deg) translateX(0);
   }
@@ -111,16 +111,16 @@
   }
 }
 
-.download-container-shadow {
-  display: none;
+.heartbeating-download-button-end-screen #end-screen.on-show {
+  .download-container {
+    animation: animated-download-button-heartbeat 2s ease-in 1s infinite both;
+  }
 }
 
-.heartbeating-download-button-end-screen #end-screen.on-show .download-container {
-  animation: heartbeat 2s ease-in 1s infinite both;
-}
-
-.blinking-download-button-end-screen #end-screen.on-show .download-container {
-  animation: blink 2s ease 1s infinite both;
+.blinking-download-button-end-screen #end-screen.on-show {
+  .download-container {
+    animation: animated-download-button-blink 2s ease 1s infinite both;
+  }
 }
 
 .bouncing-download-button-end-screen #end-screen.on-show {
@@ -130,19 +130,18 @@
 
   .download-container {
     z-index: 1;
-    animation: bounce 2s ease 1s infinite both;
+    animation: animated-download-button-bounce 2s ease 1s infinite both;
   }
 
   .download-container-shadow {
     position: absolute;
     bottom: -.15em;
     z-index: 0;
-    display: block;
     width: 11.2em;
     height: .4em;
     background: radial-gradient(closest-side, $gray, transparent);
     opacity: .6;
-    animation: bounce-shadow 2s linear 1s infinite both;
+    animation: animated-download-button-bounce-shadow 2s linear 1s infinite both;
   }
 }
 
@@ -161,7 +160,7 @@
     height: 100%;
     background-color: rgba(255, 255, 255, .5);
     content: "";
-    animation: sheen 2s linear 1s infinite both;
+    animation: animated-download-button-sheen 2s linear 1s infinite both;
   }
 }
 

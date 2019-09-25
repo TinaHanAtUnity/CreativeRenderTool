@@ -4,13 +4,19 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { Template } from 'Core/Utilities/Template';
 import EndScreenAnimatedDownloadButton from 'html/EndScreenAnimatedDownloadButton.html';
 
+type Animation = 'heartbeating' | 'bouncing' | 'blinking' | 'shining';
+
 export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
   private _animation: string;
 
-  constructor(animation: string, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+  constructor(animation: Animation, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
     super(parameters, campaign, country);
     this._animation = animation;
     this._template = new Template(EndScreenAnimatedDownloadButton, this._localization);
+    this._templateData = {
+      ...this._templateData,
+      'hasShadow': animation === 'bouncing'
+    };
   }
 
   public render(): void {
