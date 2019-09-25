@@ -246,7 +246,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         const contextData: IContext = this.buildSessionContext();
         event.data.context = contextData;
         event.data.vendorkey = this._vendorKey;
-
         this._omBridge.triggerSessionEvent(event);
     }
 
@@ -344,10 +343,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            // if (this._campaign instanceof AdMobCampaign) {
-            //     this._omBridge.sendQueuedEvents();
-            // }
-            // this._omBridge.sendQueuedEvents();
+            this.sessionStart();
         }
 
         return Promise.resolve();
