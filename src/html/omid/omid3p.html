@@ -15,7 +15,7 @@
                      * Enum for ad event types.
                      * @enum {string}
                      */
-                    var videoListeners = {
+                    const videoListeners = {
                         /* 
                         * Common Video Event Types
                         */
@@ -56,16 +56,14 @@
                          * Calls any events passed individually
                          */
                         videoListeners[event].forEach(function(listener) {
-                            console.log('individual: ', event, parameters);
                             listener(parameters);
                         });
 
                         /**
-                         * Calls video events of aggregate comment video event types
+                         * Calls video events of aggregate common video event types
                          */
                         if (event !== 'geometryChange' && event !== 'impression' && event !== 'video') {
                             videoListeners['video'].forEach(function(listener) {
-                                console.log('aggregate: ', event, parameters);
                                 listener(parameters);
                             });
                         }
@@ -76,7 +74,7 @@
                      * @param {string} event to send to the server
                      * @param {Object} parameters of the event
                      */
-                    var trigger = function(event, parameters) {
+                    let trigger = function(event, parameters) {
                         if(!parameters) {
                             parameters = [];
                         }
@@ -90,10 +88,10 @@
                         }
                     };
         
-                    var DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
-                    var sessionObserversMap = {};
-                    var sessionStartData = {};
-                    var sessionStartCalled = false;
+                    let DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
+                    let sessionObserversMap = {};
+                    let sessionStartData = {};
+                    let sessionStartCalled = false;
                     let scriptVendor = '';
 
                     let sessionEventsQueue = {};
@@ -104,7 +102,7 @@
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
                      * @param {Object} eventData structured data to indicate type for observer to fire
                      */
-                    var triggerSessionObserver = function(eventData) {
+                    let triggerSessionObserver = function(eventData) {
                         const observerList = Object.keys(sessionObserversMap).map(function(vendorKey) {
                             return sessionObserversMap[vendorKey];
                         });
@@ -119,7 +117,7 @@
                      * @param {string} event to send to the server
                      * @param {Object} data of the event
                      */
-                    var postMessageCallback = function(event, data) {
+                    let postMessageCallback = function(event, data) {
                         window.parent.postMessage({
                             type: 'omid',
                             event: event,
@@ -132,9 +130,8 @@
                      * @param {function} observer
                      * @param {string} vendorkey
                      */
-                    var sendSessionStart = function(observer, vendorkey) {
+                    let sendSessionStart = function(observer, vendorkey) {
                         observer(sessionStartData[vendorkey]);
-                        console.log('session start: ', vendorkey, sessionStartData[vendorkey]);
                         postMessageCallback(ON_EVENT_PROCESSED, {
                             eventType: SESSION_START,
                             vendorKey: vendorkey
@@ -145,13 +142,13 @@
                      * Calls SessionListener for specified vendorkey
                      * @param {string} key
                      */
-                    var sendSessionStartForKey = function(key) {
+                    let sendSessionStartForKey = function(key) {
                         sessionObserversMap[key].forEach((sessionObserver) => {
                             sendSessionStart(sessionObserver, key);
                         });
                     }
 
-                    var handleSessionStart = function(event) {
+                    let handleSessionStart = function(event) {
                         let data = event.data.data;
                         // If passed vendor matches the registered vendor
                         if (sessionObserversMap[data.vendorkey]) {
@@ -188,11 +185,11 @@
                      * Strips 'omid' from string to be passed to vendor
                      * @param {string} event to send to the vendor
                      */
-                    var stripEventString = function(eventType) {
+                    let stripEventString = function(eventType) {
                         return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
                     }
                 
-                    var eventHandlers = {};
+                    let eventHandlers = {};
                     eventHandlers['omidImpression'] = (e) => trigger('impression', e);
                     eventHandlers['omidGeometryChange'] = (e) => trigger('geometryChange', e);
                     eventHandlers['omidLoaded'] = (e) => trigger('loaded', e);
