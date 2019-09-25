@@ -88,7 +88,14 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
-        if (this._cacheMode === CacheMode.DISABLED || this.shouldDisableCacheForPromo(navigator.userAgent, campaign)) {
+        if (campaign instanceof PromoCampaign) {
+            // only run this logic for promo campaigns
+            if (this.shouldDisableCacheForPromo(navigator.userAgent)) {
+                return Promise.resolve(campaign);
+            }
+        }
+
+        if (this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }
 
@@ -397,12 +404,7 @@ export class AssetManager {
      * Promos are currently broken in the latest Android Webview 77 Release.
      * TODO: Once this issue is resolved, then this workaround should be removed
      */
-    private shouldDisableCacheForPromo(userAgent: unknown, campaign: Campaign) {
-
-        if (!(campaign instanceof PromoCampaign)) {
-            return false;
-        }
-
+    private shouldDisableCacheForPromo(userAgent: unknown) {
         const userAgentString = (userAgent && typeof userAgent === 'string') ? userAgent : '';
         const regexFields = userAgentString.match(/Chrom(e|ium)\/([0-9]+)/);
         if (regexFields && regexFields.length >= 3) {
