@@ -59,9 +59,11 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
 
             if (platform === Platform.ANDROID) {
                 core.Android!.Intent = sinon.createStubInstance(IntentApi);
+                core.Android!.Intent.launch = sinon.stub().returns(Promise.resolve());
             }
             if (platform === Platform.IOS) {
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
+                core.iOS!.UrlScheme.open = sinon.stub().returns(Promise.resolve());
             }
 
             bannerNativeApi = TestFixtures.getBannerNativeApi(nativeBridge);
@@ -72,7 +74,8 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                 return Promise.resolve().then(() => bannerNativeApi.BannerApi.onBannerLoaded.trigger(_bannerAdViewId));
             });
 
-            sinon.spy(bannerNativeApi.BannerListenerApi, 'sendClickEvent');
+            sinon.stub(bannerNativeApi.BannerListenerApi, 'sendClickEvent').returns(Promise.resolve());
+            sinon.stub(bannerNativeApi.BannerListenerApi, 'sendLeaveApplicationEvent').returns(Promise.resolve());
 
             campaign = new BannerCampaign(getBannerCampaign(TestFixtures.getSession()));
 
@@ -201,8 +204,10 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                         return adUnit.onLoad().then(() => {
                             const url = 'http://unity3d.com';
                             webPlayerContainer.onCreateWebView.trigger(url);
-                            sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
                             sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
+                            return (<sinon.SinonStub>core.iOS!.UrlScheme.open).getCalls()[0].returnValue.then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent, bannerAdViewId);
+                            });
                         });
                     });
                 });
@@ -219,6 +224,9 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                                 'uri': url
                             });
                             sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendClickEvent, bannerAdViewId);
+                            return (<sinon.SinonStub>core.Android!.Intent.launch).getCalls()[0].returnValue.then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent, bannerAdViewId);
+                            });
                         });
                     });
                 });

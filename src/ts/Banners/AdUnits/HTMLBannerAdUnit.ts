@@ -38,6 +38,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
 
     private _clickEventsSent = false;
     private _impressionEventsSent = false;
+    private _leaveApplicationEventTriggered = false;
 
     constructor(parameters: IBannerAdUnitParameters) {
         this._platform = parameters.platform;
@@ -102,11 +103,21 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
                 this._bannerNativeApi.BannerListenerApi.sendClickEvent(this._bannerAdViewId);
             }
             if (this._platform === Platform.IOS) {
-                this._core.iOS!.UrlScheme.open(url);
+                this._core.iOS!.UrlScheme.open(url).then(() => {
+                    if (!this._leaveApplicationEventTriggered) {
+                        this._leaveApplicationEventTriggered = true;
+                        this._bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent(this._bannerAdViewId);
+                    }
+                });
             } else if (this._platform === Platform.ANDROID) {
                 this._core.Android!.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': url
+                }).then(() => {
+                    if (!this._leaveApplicationEventTriggered) {
+                        this._leaveApplicationEventTriggered = true;
+                        this._bannerNativeApi.BannerListenerApi.sendLeaveApplicationEvent(this._bannerAdViewId);
+                    }
                 });
             }
         }
