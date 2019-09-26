@@ -143,7 +143,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isZyngaWordsWithFriends', () => {
+    describe('isWhitelistedForLoadApi', () => {
         const tests: {
             gameId: string;
             expected: boolean;
