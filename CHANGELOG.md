@@ -1,6 +1,7 @@
 # Staged
 
 * Enable A/B tested Consent layout for all users [#11326](https://github.com/Applifier/unity-ads-webview/pull/11326)
+* Add Updated Load Whitelist and Modify Load 3.2 Experiment [#11335](https://github.com/Applifier/unity-ads-webview/pull/11335)
 
 # Wed Sep 25 23:32:36 UTC 2019
 
