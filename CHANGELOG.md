@@ -1,4 +1,4 @@
-# Pending
+# Wed Sep 25 23:32:36 UTC 2019
 
 * Open Measurement - Add Session Start and AdPlan for IAS [#11302](https://github.com/Applifier/unity-ads-webview/pull/11302)
 * Disable Promo Cache mode to remove reliance on Storage API [#11299](https://github.com/Applifier/unity-ads-webview/pull/11299)
