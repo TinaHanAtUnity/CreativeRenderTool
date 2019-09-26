@@ -123,7 +123,7 @@ export class CustomFeatures {
     }
 
     /**
-     * Includes the list of games for the 3.2 Load API Whitelist (including test gameIDs 14850 and 14851)
+     * Includes the list of games for the 3.2 Load API Whitelist
      */
     public static isWhiteListedForLoadApi(gameId: string): boolean {
         return this.existsInList(LoadWhitelist, gameId);
