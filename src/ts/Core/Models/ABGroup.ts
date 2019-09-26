@@ -69,5 +69,5 @@ export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
 export const ZyngaWWFLoadTest = new ABTest(13, 14);
-export const MediationLoadExperiment = new ABTest(15, 16);
+export const LoadExperiment = new ABTest(15, 16);
 export const ConsentUXTest = new ABTest(18, 19);
