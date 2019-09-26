@@ -329,35 +329,48 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         const gdprRecty = gdprRect.top;
         const gdprRectwidth = gdprRect.width;
         const gdprRectheight = gdprRect.height;
+        const obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
 
-        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-            const viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+        // const adViewBuilder = om.getOMAdViewBuilder();
+        //     adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit).then((adView) => {
+        //         if (this._om) {
+        //             const viewPort = adViewBuilder.getViewPort();
+        //             this._om.geometryChange(viewPort, adView);
+        //         }
+        //     });
 
-            let obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
-            const videoView =  om.getAdmobVideoElementBounds();
-            OpenMeasurementUtilities.VideoViewRectangle = videoView;
+        // buildAdmobAdView(obstructionRectangle, [ObstructionReasons.OBSTRUCTED]).then((obstructedAdView) => {
+        //     let viewPort = omAdViewBuilder.getViewport();
+        //     om.geometryChange(viewPort, obstructedAdView);
+        // });
+        // return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+        //     const viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight, this._deviceInfo, this._platform);
 
-            if (this._platform === Platform.ANDROID) {
-                const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
-                const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(gdprRectx, screenDensity);
-                const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(gdprRecty, screenDensity);
-                const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(gdprRectwidth, screenDensity);
-                const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(gdprRectheight, screenDensity);
-                obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
-            }
+        //     const obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
+        //     const videoView =  om.getAdmobVideoElementBounds();
+        //     OpenMeasurementUtilities.VideoViewRectangle = videoView;
 
-            const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
-            const obstructionReasons: ObstructionReasons[] = [];
+        //     // if (this._platform === Platform.ANDROID) {
+        //     //     const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
+        //     //     const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(gdprRectx, screenDensity);
+        //     //     const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(gdprRecty, screenDensity);
+        //     //     const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(gdprRectwidth, screenDensity);
+        //     //     const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(gdprRectheight, screenDensity);
+        //     //     obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
+        //     // }
 
-            if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
-                obstructionReasons.push(ObstructionReasons.HIDDEN);
-            }
+        //     const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
+        //     const obstructionReasons: ObstructionReasons[] = [];
 
-            const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
-            obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
-            const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle]);
+        //     if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
+        //         obstructionReasons.push(ObstructionReasons.HIDDEN);
+        //     }
 
-            om.geometryChange(viewPort, obstructedAdView);
-        });
+        //     const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
+        //     obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
+        //     const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle], this._campaign);
+
+        //     om.geometryChange(viewPort, obstructedAdView);
+        // });
     }
 }

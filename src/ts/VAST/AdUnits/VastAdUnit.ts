@@ -9,6 +9,7 @@ import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
@@ -25,6 +26,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _impressionSent = false;
     private _vastOMController?: VastOpenMeasurementController;
+    private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
 
     constructor(parameters: IVastAdUnitParameters) {
         super(parameters);
@@ -36,6 +38,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._vastCampaign = parameters.campaign;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOMController = parameters.om;
+        this._omAdViewBuilder = new OpenMeasurementAdViewBuilder(parameters.campaign, parameters.deviceInfo, parameters.platform);
 
         if (this._endScreen) {
             this._endScreen.render();
@@ -183,14 +186,21 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._vastOMController) {
             this._vastOMController.pause();
 
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            this._omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
                 if (this._vastOMController) {
-                    const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height);
-                    const obstructionRectangle = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
-                    const adView = OpenMeasurementUtilities.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle]);
+                    const viewPort = this._omAdViewBuilder.getViewPort();
                     this._vastOMController.geometryChange(viewPort, adView);
                 }
             });
+
+            // Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            //     if (this._vastOMController) {
+            //         const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height, this._deviceInfo, this._platform);
+            //         const obstructionRectangle = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
+            //         const adView = OpenMeasurementUtilities.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle], this._vastCampaign);
+            //         this._vastOMController.geometryChange(viewPort, adView);
+            //     }
+            // });
         }
     }
 
@@ -203,22 +213,29 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._vastOMController) {
             this._vastOMController.resume();
 
-            Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
+            this._omAdViewBuilder.buildVastAdView([], this).then((adView) => {
                 if (this._vastOMController) {
-                    const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height);
-                    const screenView = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
-                    const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
-
-                    const percentInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView);
-                    const obstructionReasons: ObstructionReasons[] = [];
-                    if (percentInView < 100) {
-                        obstructionReasons.push(ObstructionReasons.HIDDEN);
-                    }
-                    const adView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, width, height, true, []);
+                    const viewPort = this._omAdViewBuilder.getViewPort();
                     this._vastOMController.geometryChange(viewPort, adView);
                 }
             });
         }
+        //     Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
+        //         if (this._vastOMController) {
+        //             const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height, this._deviceInfo, this._platform);
+        //             const screenView = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
+        //             const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
+
+        //             const percentInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView);
+        //             const obstructionReasons: ObstructionReasons[] = [];
+        //             if (percentInView < 100) {
+        //                 obstructionReasons.push(ObstructionReasons.HIDDEN);
+        //             }
+        //             const adView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, width, height, true, [], this._vastCampaign);
+        //             this._vastOMController.geometryChange(viewPort, adView);
+        //         }
+        //     });
+        // }
     }
 
     public onVideoError(): void {

@@ -12,7 +12,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new VastOpenMeasurementController(placement, om);
+            return new VastOpenMeasurementController(placement, om, platform);
         };
 
         describe('DOM Hierarchy', () => {

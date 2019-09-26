@@ -105,85 +105,83 @@ export class OpenMeasurementUtilities {
         return adjustedObstruction;
     }
 
-    public static VideoViewRectangle: IRectangle | undefined;
-    // TODO: Double check this
-    public static campaign: Campaign;
+    // public static VideoViewRectangle: IRectangle | undefined;
 
     /**
      * All AdViews will assume fullscreen interstitial video
      * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
      */
-    public static calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], videoView?: IRectangle): IAdView {
+    // public static calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], campaign: Campaign): IAdView {
 
-        let topLeftX = 0;
-        let topLeftY = 0;
-        let videoWidth = 0;
-        let videoHeight = 0;
+    //     let topLeftX = 0;
+    //     let topLeftY = 0;
+    //     let videoWidth = 0;
+    //     let videoHeight = 0;
 
-        // For integrations SDK 3.2.0+ and Admob
-        if (this.VideoViewRectangle) {
-            topLeftX = this.VideoViewRectangle.x;
-            topLeftY = this.VideoViewRectangle.y;
-            videoWidth = this.VideoViewRectangle.width;
-            videoHeight = this.VideoViewRectangle.height;
-        } else {
-            // For integrations less than SDK 3.2.0 -> For partial om cert if needed
-            topLeftX = 0;
-            topLeftY = OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
-            videoWidth = OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, this.campaign);
-            videoHeight = OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, this.campaign);
-        }
+    //     // For integrations SDK 3.2.0+ and Admob
+    //     if (this.VideoViewRectangle) {
+    //         topLeftX = this.VideoViewRectangle.x;
+    //         topLeftY = this.VideoViewRectangle.y;
+    //         videoWidth = this.VideoViewRectangle.width;
+    //         videoHeight = this.VideoViewRectangle.height;
+    //     } else {
+    //         // For integrations less than SDK 3.2.0 -> For partial om cert if needed
+    //         topLeftX = 0;
+    //         topLeftY = OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
+    //         videoWidth = OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, campaign);
+    //         videoHeight = OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, campaign);
+    //     }
 
-        if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
-            topLeftX = 0;
-            topLeftY = 0;
-            videoWidth = 0;
-            videoHeight = 0;
-        }
+    //     if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
+    //         topLeftX = 0;
+    //         topLeftY = 0;
+    //         videoWidth = 0;
+    //         videoHeight = 0;
+    //     }
 
-        const adView: IAdView = {
-            percentageInView: percentInView,
-            geometry: {
-                x: topLeftX,
-                y: topLeftY,
-                width: videoWidth,
-                height: videoHeight
-            },
-            onScreenGeometry: {
-                x: topLeftX,
-                y: topLeftY,
-                width: videoWidth,
-                height: videoHeight,
-                obstructions: obstructionRectangles
-            },
-            measuringElement: measuringElementAvailable,
-            reasons: obstructionReasons
-        };
+    //     const adView: IAdView = {
+    //         percentageInView: percentInView,
+    //         geometry: {
+    //             x: topLeftX,
+    //             y: topLeftY,
+    //             width: videoWidth,
+    //             height: videoHeight
+    //         },
+    //         onScreenGeometry: {
+    //             x: topLeftX,
+    //             y: topLeftY,
+    //             width: videoWidth,
+    //             height: videoHeight,
+    //             obstructions: obstructionRectangles
+    //         },
+    //         measuringElement: measuringElementAvailable,
+    //         reasons: obstructionReasons
+    //     };
 
-        /*
-        * Only provided if both the native-layer ad view and web-layer
-        * ad element exist and are available for measurement
-        */
-        if (measuringElementAvailable) {
-            adView.containerGeometry = {
-                x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight
-            };
-            adView.onScreenContainerGeometry = {
-                x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight,
-                obstructions: obstructionRectangles
-            };
-        }
+    //     /*
+    //     * Only provided if both the native-layer ad view and web-layer
+    //     * ad element exist and are available for measurement
+    //     */
+    //     if (measuringElementAvailable) {
+    //         adView.containerGeometry = {
+    //             x: 0,
+    //             y: 0,
+    //             width: screenWidth,
+    //             height: screenHeight
+    //         };
+    //         adView.onScreenContainerGeometry = {
+    //             x: 0,
+    //             y: 0,
+    //             width: screenWidth,
+    //             height: screenHeight,
+    //             obstructions: obstructionRectangles
+    //         };
+    //     }
 
-        return adView;
-    }
+    //     return adView;
+    // }
 
-    private static calculateAdViewVideoWidth(screenWidth: number, screenHeight: number, campaign: Campaign) {
+    public static calculateAdViewVideoWidth(screenWidth: number, screenHeight: number, campaign: Campaign) {
         let videoWidth = screenWidth;
 
         const isLandscape = screenWidth > screenHeight;
@@ -203,7 +201,7 @@ export class OpenMeasurementUtilities {
         return videoWidth;
     }
 
-    private static calculateAdViewVideoHeight(screenWidth: number, screenHeight: number, campaign: Campaign) {
+    public static calculateAdViewVideoHeight(screenWidth: number, screenHeight: number, campaign: Campaign) {
         let videoHeight = screenHeight;
 
         const isLandscape = screenWidth > screenHeight;
@@ -223,7 +221,7 @@ export class OpenMeasurementUtilities {
         return videoHeight;
     }
 
-    private static estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
+    public static estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
         let topLeftY = 0;
 
         const isLandscape = screenWidth > screenHeight;

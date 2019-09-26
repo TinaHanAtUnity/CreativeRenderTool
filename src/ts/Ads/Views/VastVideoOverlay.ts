@@ -1,6 +1,7 @@
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerView {
 
@@ -32,6 +33,7 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
         const y = rect.top;
         const width = rect.width;
         const height = rect.height;
+        const omRect = OpenMeasurementUtilities.createRectangle(x, y, width, height);
 
         this._handlers.forEach(handler => handler.onShowPrivacyPopUp(x, y, width, height));
     }

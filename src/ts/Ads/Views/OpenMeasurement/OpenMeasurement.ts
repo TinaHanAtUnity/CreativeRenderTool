@@ -15,7 +15,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
-import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
@@ -387,13 +386,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private sendIASEvents(IASScreenWidth: number, IASScreenHeight: number) {
         window.setTimeout(() => {
-            const viewPort = OpenMeasurementUtilities.calculateViewPort(IASScreenWidth, IASScreenHeight);
-            const adView = OpenMeasurementUtilities.calculateVastAdView(100, [], IASScreenWidth, IASScreenHeight, true, []);
+            // const viewPort = OpenMeasurementUtilities.calculateViewPort(IASScreenWidth, IASScreenHeight, this._deviceInfo, this._platform);
+            // const adView = OpenMeasurementUtilities.calculateVastAdView(100, [], IASScreenWidth, IASScreenHeight, true, [], this._campaign);
 
             // must be called before geometry change to avoid re-queueing and calling geometry change twice
-            this._omBridge.sendQueuedEvents();
+            // this._omBridge.sendQueuedEvents();
 
-            this.geometryChange(viewPort, adView);
+            // this.geometryChange(viewPort, adView);
 
             // must be called after geometry change for IAS because they don't register other ad events until after it is called
             this.loaded({
@@ -416,18 +415,20 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (accessMode === AccessMode.LIMITED) {
-            impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
-            const screenRectangle = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
+            // impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight, this._deviceInfo, this._platform);
+            // const screenRectangle = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
 
-            let percentageInView = 100;
-            if (OpenMeasurementUtilities.VideoViewRectangle) {
-                percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(OpenMeasurementUtilities.VideoViewRectangle, screenRectangle);
-            }
-            const obstructionReasons: ObstructionReasons[] = [];
-            if (percentageInView < 100) {
-                obstructionReasons.push(ObstructionReasons.HIDDEN);
-            }
-            impressionObject.adView = OpenMeasurementUtilities.calculateVastAdView(percentageInView, obstructionReasons, screenWidth, screenHeight, measuringElementAvailable, []);
+            // let percentageInView = 100;
+            // if (OpenMeasurementUtilities.VideoViewRectangle) {
+            //     percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(OpenMeasurementUtilities.VideoViewRectangle, screenRectangle);
+            // }
+            // const obstructionReasons: ObstructionReasons[] = [];
+            // if (percentageInView < 100) {
+            //     obstructionReasons.push(ObstructionReasons.HIDDEN);
+            // }
+            // const adView = omAdViewBuilder.build();
+            // OpenMeasurementUtilities.calculateVastAdView(percentageInView, obstructionReasons, screenWidth, screenHeight, measuringElementAvailable, [], this._campaign);
+            // impressionObject.adView = adView;
         }
 
         return impressionObject;
