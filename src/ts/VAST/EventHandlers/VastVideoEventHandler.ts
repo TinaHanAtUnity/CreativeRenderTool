@@ -10,6 +10,7 @@ import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/Programma
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { Platform } from 'Core/Constants/Platform';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -100,8 +101,8 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om && !this._omStartCalled) {
             this._adUnit.getVideoViewRectangle().then((rect) => {
                 if (this._om) {
-                    // const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
-                    // OpenMeasurementUtilities.VideoViewRectangle = view;
+                    const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    OpenMeasurementUtilities.videoView = view;
                     this._om.sessionStart();
                     this._omStartCalled = true;
                 }

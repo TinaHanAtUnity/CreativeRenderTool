@@ -65,44 +65,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                     this._om.geometryChange(viewPort, adView);
                 }
             });
-
-            // if obstruction already calculated
-            // if (this._viewPort && this._obstructedAdView) {
-            //     this._om.geometryChange(this._viewPort, this._obstructedAdView);
-            //     return Promise.resolve();
-            // }
-
-            // return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this._vastAdUnit.getVideoViewRectangle()]).then(([screenWidth, screenHeight, rectangle]) => {
-            //     if (this._om) {
-
-            //         // TODO: Move to internal function
-            //         this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight, this._deviceInfo, this._platform);
-            //         const obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
-
-            //         // if (this._platform === Platform.ANDROID) {
-            //         //     const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
-            //         //     const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(x, screenDensity);
-            //         //     const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(y, screenDensity);
-            //         //     const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(width, screenDensity);
-            //         //     const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(height, screenDensity);
-            //         //     obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
-            //         // }
-
-            //         const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
-            //         const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
-            //         const obstructionReasons: ObstructionReasons[] = [];
-
-            //         if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
-            //             obstructionReasons.push(ObstructionReasons.HIDDEN);
-            //         }
-
-            //         const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
-            //         obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
-
-            //         this._obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle], this._campaign);
-            //         this._om.geometryChange(this._viewPort, this._obstructedAdView);
-            //     }
-            // });
         }
 
         return super.onShowPrivacyPopUp(x, y, width, height);
@@ -117,31 +79,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                     this._om.geometryChange(viewPort, adView);
                 }
             });
-            // this._om.geometryChange(viewport, onobstructedadview);
-            // if obstruction already calculated
-            // if (this._viewPort && this._unObstructedAdView) {
-            //     this._om.geometryChange(this._viewPort, this._unObstructedAdView);
-            //     return Promise.resolve();
-            // }
-
-            // return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this._vastAdUnit.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
-            //     if (this._om) {
-
-            //         // TODO: Move to internal function
-            //         const screenView = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
-            //         const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
-
-            //         const percentInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView);
-            //         const obstructionReasons: ObstructionReasons[] = [];
-            //         if (percentInView < 100) {
-            //             obstructionReasons.push(ObstructionReasons.HIDDEN);
-            //         }
-
-            //         this._viewPort = OpenMeasurementUtilities.calculateViewPort(width, height, this._deviceInfo, this._platform);
-            //         this._unObstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, width, height, true, [], this._campaign);
-            //         this._om.geometryChange(this._viewPort, this._unObstructedAdView);
-            //     }
-            // });
         }
 
         return super.onClosePrivacyPopUp();

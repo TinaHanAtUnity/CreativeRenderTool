@@ -192,15 +192,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                     this._vastOMController.geometryChange(viewPort, adView);
                 }
             });
-
-            // Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            //     if (this._vastOMController) {
-            //         const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height, this._deviceInfo, this._platform);
-            //         const obstructionRectangle = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
-            //         const adView = OpenMeasurementUtilities.calculateVastAdView(0, [ObstructionReasons.BACKGROUNDED], 0, 0, true, [obstructionRectangle], this._vastCampaign);
-            //         this._vastOMController.geometryChange(viewPort, adView);
-            //     }
-            // });
         }
     }
 
@@ -220,22 +211,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 }
             });
         }
-        //     Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight(), this.getVideoViewRectangle()]).then(([width, height, rectangle]) => {
-        //         if (this._vastOMController) {
-        //             const viewPort = OpenMeasurementUtilities.calculateViewPort(width, height, this._deviceInfo, this._platform);
-        //             const screenView = OpenMeasurementUtilities.createRectangle(0, 0, width, height);
-        //             const videoView = OpenMeasurementUtilities.createRectangle(rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
-
-        //             const percentInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView);
-        //             const obstructionReasons: ObstructionReasons[] = [];
-        //             if (percentInView < 100) {
-        //                 obstructionReasons.push(ObstructionReasons.HIDDEN);
-        //             }
-        //             const adView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, width, height, true, [], this._vastCampaign);
-        //             this._vastOMController.geometryChange(viewPort, adView);
-        //         }
-        //     });
-        // }
     }
 
     public onVideoError(): void {

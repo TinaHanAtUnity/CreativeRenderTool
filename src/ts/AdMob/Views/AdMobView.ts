@@ -24,8 +24,8 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import OMIDSessionClient from 'html/omid/admob-session-interface.html';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
@@ -62,6 +62,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _admobOMController: AdmobOpenMeasurementController | undefined;
+    private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
     private _deviceInfo: DeviceInfo;
 
     constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
@@ -76,6 +77,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._showGDPRBanner = showGDPRBanner;
         this._admobOMController = om;
         this._deviceInfo = deviceInfo;
+        this._omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
         this._afmaBridge = new AFMABridge(core, {
             onAFMAClose: () => this.onClose(),
@@ -323,54 +325,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
-        const popup = <HTMLElement>document.querySelector('.pop-up');
-        const gdprRect = popup.getBoundingClientRect();
-        const gdprRectx = gdprRect.left;
-        const gdprRecty = gdprRect.top;
-        const gdprRectwidth = gdprRect.width;
-        const gdprRectheight = gdprRect.height;
-        const obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
-
-        // const adViewBuilder = om.getOMAdViewBuilder();
-        //     adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit).then((adView) => {
-        //         if (this._om) {
-        //             const viewPort = adViewBuilder.getViewPort();
-        //             this._om.geometryChange(viewPort, adView);
-        //         }
-        //     });
-
-        // buildAdmobAdView(obstructionRectangle, [ObstructionReasons.OBSTRUCTED]).then((obstructedAdView) => {
-        //     let viewPort = omAdViewBuilder.getViewport();
-        //     om.geometryChange(viewPort, obstructedAdView);
-        // });
-        // return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-        //     const viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight, this._deviceInfo, this._platform);
-
-        //     const obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
-        //     const videoView =  om.getAdmobVideoElementBounds();
-        //     OpenMeasurementUtilities.VideoViewRectangle = videoView;
-
-        //     // if (this._platform === Platform.ANDROID) {
-        //     //     const screenDensity = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
-        //     //     const adjustedx = OpenMeasurementUtilities.getAndroidViewSize(gdprRectx, screenDensity);
-        //     //     const adjustedy = OpenMeasurementUtilities.getAndroidViewSize(gdprRecty, screenDensity);
-        //     //     const adjustedwidth = OpenMeasurementUtilities.getAndroidViewSize(gdprRectwidth, screenDensity);
-        //     //     const adjustedheight = OpenMeasurementUtilities.getAndroidViewSize(gdprRectheight, screenDensity);
-        //     //     obstructionRectangle = OpenMeasurementUtilities.createRectangle(adjustedx, adjustedy, adjustedwidth, adjustedheight);
-        //     // }
-
-        //     const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
-        //     const obstructionReasons: ObstructionReasons[] = [];
-
-        //     if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
-        //         obstructionReasons.push(ObstructionReasons.HIDDEN);
-        //     }
-
-        //     const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
-        //     obstructionReasons.push(ObstructionReasons.OBSTRUCTED);
-        //     const obstructedAdView = OpenMeasurementUtilities.calculateVastAdView(percentInView, obstructionReasons, screenWidth, screenHeight, true, [obstructionRectangle], this._campaign);
-
-        //     om.geometryChange(viewPort, obstructedAdView);
-        // });
+        return this._omAdViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om).then((adview) => {
+            const viewPort = this._omAdViewBuilder.getViewPort();
+            om.geometryChange(viewPort, adview);
+        });
     }
 }
