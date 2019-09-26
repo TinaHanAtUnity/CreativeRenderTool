@@ -390,10 +390,6 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        if (this._loadApiEnabled && campaign instanceof PerformanceCampaign) {
-            (<PerPlacementLoadManager>this.RefreshManager).refreshReadyCometCampaigns();
-        }
-
         this.showConsentIfNeeded(options).then(() => {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
@@ -486,6 +482,10 @@ export class Ads implements IAds {
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled) {
                     this._core.ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
+
+                    if (campaign instanceof PerformanceCampaign) {
+                        (<PerPlacementLoadManager>this.RefreshManager).refreshReadyCometCampaigns();
+                    }
                 }
             });
         });
