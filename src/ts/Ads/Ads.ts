@@ -650,6 +650,7 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
+        console.log(`${this._core.Config.getAbGroup()}`);
         if (LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
