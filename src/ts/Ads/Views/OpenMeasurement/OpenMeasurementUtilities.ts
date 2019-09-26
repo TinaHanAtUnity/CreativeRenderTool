@@ -18,6 +18,13 @@ export class OpenMeasurementUtilities {
         return size * (density / 160);
     }
 
+    public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
+        if (platform === Platform.ANDROID) {
+            return Math.trunc((px / (<AndroidDeviceInfo>deviceInfo).getScreenDensity()) * 160);
+        }
+        return px;
+    }
+
     public static createRectangle(x: number, y: number, width: number, height: number): IRectangle {
         return {
             x: x,
