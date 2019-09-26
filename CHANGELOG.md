@@ -1,3 +1,7 @@
+# Staged
+
+* Enable A/B tested Consent layout for all users [#11326](https://github.com/Applifier/unity-ads-webview/pull/11326)
+
 # Wed Sep 25 23:32:36 UTC 2019
 
 * Open Measurement - Add Session Start and AdPlan for IAS [#11302](https://github.com/Applifier/unity-ads-webview/pull/11302)
