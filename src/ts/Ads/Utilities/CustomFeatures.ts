@@ -3,7 +3,7 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import LoadWhitelistSDK3200 from 'json/custom_features/LoadWhitelist.json'
+import LoadWhitelistSDK3200 from 'json/custom_features/LoadWhitelist.json';
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];

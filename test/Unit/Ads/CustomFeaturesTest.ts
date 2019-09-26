@@ -148,10 +148,10 @@ describe('CustomFeatures', () => {
             gameId: string;
             expected: boolean;
         }[] = [{
-            gameId: '3179966',
+            gameId: '2924747',
             expected: true
         }, {
-            gameId: '317996699999',
+            gameId: '292474799999',
             expected: false
         }, {
             gameId: 'scott',
