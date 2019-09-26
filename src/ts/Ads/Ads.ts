@@ -484,7 +484,7 @@ export class Ads implements IAds {
                     this._core.ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
 
                     if (campaign instanceof PerformanceCampaign) {
-                        (<PerPlacementLoadManager>this.RefreshManager).refreshReadyCometCampaigns();
+                        (<PerPlacementLoadManager> this.RefreshManager).refreshReadyCometCampaigns();
                     }
                 }
             });
