@@ -6,13 +6,14 @@ import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
 export class PerPlacementLoadManager extends RefreshManager {
     private _core: ICoreApi;
@@ -97,6 +98,28 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
         // todo: implement method or remove from parent class
+    }
+
+    public refreshReadyCometCampaigns(): void {
+        for (const placementId of this._adsConfig.getPlacementIds()) {
+            const placement = this._adsConfig.getPlacement(placementId);
+
+            if (placement && placement.getState() === PlacementState.READY) {
+                const campaign = placement.getCurrentCampaign();
+
+                if (campaign && campaign instanceof PerformanceCampaign) {
+                    this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
+                        if (loadedCampaign) {
+                            // Don't update state change since it's already Ready
+                            placement.setCurrentCampaign(loadedCampaign.campaign);
+                            placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
+                        } else {
+                            // Keep previous Ready state
+                        }
+                    });
+                }
+            }
+        }
     }
 
     // count is the number of times load was called for a placementId before we could process it
