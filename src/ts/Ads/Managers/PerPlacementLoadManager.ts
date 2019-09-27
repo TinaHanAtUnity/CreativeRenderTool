@@ -100,7 +100,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         // todo: implement method or remove from parent class
     }
 
-    public refreshReadyCometCampaigns(): void {
+    public refreshReadyPerformanceCampaigns(): Promise<void> {
         for (const placementId of this._adsConfig.getPlacementIds()) {
             const placement = this._adsConfig.getPlacement(placementId);
 
@@ -120,6 +120,7 @@ export class PerPlacementLoadManager extends RefreshManager {
                 }
             }
         }
+        return Promise.resolve();
     }
 
     // count is the number of times load was called for a placementId before we could process it

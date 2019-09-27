@@ -89,6 +89,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment } from 'Core/Models/ABGroup';
+import { Observables } from 'Core/Utilities/Observables';
 
 export class Ads implements IAds {
 
@@ -484,7 +485,9 @@ export class Ads implements IAds {
                     this._core.ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
 
                     if (campaign instanceof PerformanceCampaign) {
-                        (<PerPlacementLoadManager> this.RefreshManager).refreshReadyCometCampaigns();
+                        Observables.once(this._currentAdUnit.onFinish, () => {
+                            (<PerPlacementLoadManager> this.RefreshManager).refreshReadyPerformanceCampaigns();
+                        });
                     }
                 }
             });
