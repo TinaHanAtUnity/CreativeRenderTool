@@ -7,7 +7,6 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PromoOrientationAsset, IPromoOrientationAsset, IRawPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { Image } from 'Ads/Models/Assets/Image';
@@ -59,18 +58,12 @@ export class PromoCampaignParser extends CampaignParser {
                 costs: this.getProductInfoList(promoJson.costs),
                 payouts: this.getProductInfoList(promoJson.payouts),
                 premiumProduct: premiumProduct,
-                portraitAssets: this.getOrientationAssets(promoJson.portrait, session, this._core),
-                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, this._core)
+                portraitAssets: this.getOrientationAssets(promoJson.portrait, session),
+                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session)
             };
 
             const promoCampaign = new PromoCampaign(promoCampaignParams);
-            let promise = Promise.resolve();
-
-            if (PurchasingUtilities.isInitialized() && !PurchasingUtilities.isCatalogValid()) {
-                promise = PurchasingUtilities.refreshCatalog();
-            }
-
-            return promise.then(() => Promise.resolve(promoCampaign));
+            return Promise.resolve(promoCampaign);
         } else {
             this._core.Sdk.logError('Product is undefined');
             return Promise.reject();
@@ -78,7 +71,7 @@ export class PromoCampaignParser extends CampaignParser {
 
     }
 
-    private getOrientationAssets(orientationJSON: IRawPromoOrientationAsset, session: Session, core: ICoreApi): PromoOrientationAsset | undefined {
+    private getOrientationAssets(orientationJSON: IRawPromoOrientationAsset, session: Session): PromoOrientationAsset | undefined {
         if (orientationJSON === undefined) {
             return undefined;
         }

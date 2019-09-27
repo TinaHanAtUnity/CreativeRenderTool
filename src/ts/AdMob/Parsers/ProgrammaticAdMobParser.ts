@@ -184,7 +184,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private reportHttpFailure(e: RequestError, session: Session): void {
-        this._pts.reportMetric(ProgrammaticTrackingError.AdmobTestHttpError, 'AdMob', this.seatID);
+        this._pts.reportErrorEvent(ProgrammaticTrackingError.AdmobTestHttpError, 'AdMob', this.seatID);
         const failureTimestamp = Math.floor(Date.now() / 1000);
         const urlTimestamp = Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP);
 

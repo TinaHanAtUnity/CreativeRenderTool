@@ -34,8 +34,8 @@ import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler'
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -67,7 +67,7 @@ describe('VastVideoEventHandler tests', () => {
     let privacyManager: UserPrivacyManager;
     let privacy: Privacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let openMeasurement: OpenMeasurement | undefined;
+    let openMeasurement: VastOpenMeasurementController | undefined;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -172,7 +172,7 @@ describe('VastVideoEventHandler tests', () => {
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
             privacy,
-            om: sinon.createStubInstance(OpenMeasurement),
+            om: sinon.createStubInstance(VastOpenMeasurementController),
             privacySDK: privacySDK
         };
 
@@ -183,7 +183,7 @@ describe('VastVideoEventHandler tests', () => {
         sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
 
         openMeasurement = vastAdUnitParameters.om;
-        sandbox.stub(testAdUnit, 'getOpenMeasurement').returns(openMeasurement);
+        sandbox.stub(testAdUnit, 'getOpenMeasurementController').returns(openMeasurement);
 
         videoEventHandlerParams = {
             platform,
@@ -226,10 +226,6 @@ describe('VastVideoEventHandler tests', () => {
 
             it('should call om session start on videoview receive success', () => {
                 sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
-            });
-
-            it('should set om setVideoViewRectangle receive success', () => {
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.setVideoViewRectangle, openMeasurement!.createRectangle(0, 0, 0, 0));
             });
 
             it('should call om session start once', () => {

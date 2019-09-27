@@ -68,6 +68,7 @@
                     var sessionObserversMap = {};
                     var sessionStartData = {};
                     var sessionStartCalled = false;
+                    let scriptVendor = '';
 
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
@@ -189,7 +190,7 @@
                             payload = event.data.payload;
                             const eventData = {
                                     adSessionId: event.data.adSessionId,
-                                    timestamp: Date.now(),
+                                    timestamp: Date.now(),                      // TODO: set timestamp at TS level for event queue
                                     type: stripEventString(event.data.type),
                                     data: payload
                             }
@@ -210,7 +211,8 @@
                                     delete videoListeners[listener]; 
                                 }
                                 postMessageCallback(ON_EVENT_PROCESSED, {
-                                    eventType: SESSION_FINISH
+                                    eventType: SESSION_FINISH,
+                                    vendorKey: scriptVendor
                                 });
                                 break;
                             case SESSION_ERROR:
@@ -251,6 +253,7 @@
                         }
 
                         sessionObserversMap[vendorKey].push(functionToExecute);
+                        scriptVendor = vendorKey;
 
                         if (!sessionStartCalled) {
                             postMessageCallback(ON_EVENT_PROCESSED, {
@@ -278,7 +281,7 @@
 
                 window.omid3p = new OmidVerification();
                 Object.freeze(window.omid3p);
-        
+
                 /**
                  * Used for IAB test:
                  * window.OmidVerificationClient = {'omid3p': OmidVerification};

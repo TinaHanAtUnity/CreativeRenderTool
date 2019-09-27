@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 enum CacheType {
     REQUIRED,
@@ -87,6 +88,13 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
+        if (campaign instanceof PromoCampaign) {
+            // only run this logic for promo campaigns
+            if (this.shouldDisableCacheForPromo(navigator.userAgent)) {
+                return Promise.resolve(campaign);
+            }
+        }
+
         if (this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }
@@ -197,7 +205,7 @@ export class AssetManager {
             // disable caching if there is less than 20 megabytes free space in cache directory
             if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
-                this._pts.reportMetric(CachingMetric.CachingModeForcedToDisabled);
+                this._pts.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
             }
 
             return;
@@ -384,11 +392,25 @@ export class AssetManager {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            this._pts.reportMetric(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            this._pts.reportErrorEvent(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
         }
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {
             fileSize: Math.floor(totalSize / (1024 * 1024))
         });
+    }
+
+    /**
+     * Promos are currently broken in the latest Android Webview 77 Release.
+     * TODO: Once this issue is resolved, then this workaround should be removed
+     */
+    private shouldDisableCacheForPromo(userAgent: unknown) {
+        const userAgentString = (userAgent && typeof userAgent === 'string') ? userAgent : '';
+        const regexFields = userAgentString.match(/Chrom(e|ium)\/([0-9]+)/);
+        if (regexFields && regexFields.length >= 3) {
+            const majorVersion = parseInt(regexFields[2], 10);
+            return majorVersion >= 77;
+        }
+        return false;
     }
 }
