@@ -25,7 +25,6 @@ import OMIDSessionClient from 'html/omid/admob-session-interface.html';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
@@ -62,7 +61,6 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _admobOMController: AdmobOpenMeasurementController | undefined;
-    private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
     private _deviceInfo: DeviceInfo;
 
     constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
@@ -77,7 +75,6 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._showGDPRBanner = showGDPRBanner;
         this._admobOMController = om;
         this._deviceInfo = deviceInfo;
-        this._omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
         this._afmaBridge = new AFMABridge(core, {
             onAFMAClose: () => this.onClose(),
@@ -325,8 +322,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
-        return this._omAdViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om).then((adview) => {
-            const viewPort = this._omAdViewBuilder.getViewPort();
+        const adViewBuilder = om.getOMAdViewBuilder();
+        return adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om).then((adview) => {
+            const viewPort = adViewBuilder.getViewPort();
             om.geometryChange(viewPort, adview);
         });
     }

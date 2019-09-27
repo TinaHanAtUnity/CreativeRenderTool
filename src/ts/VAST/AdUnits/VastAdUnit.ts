@@ -25,7 +25,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _impressionSent = false;
     private _vastOMController?: VastOpenMeasurementController;
-    private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
 
     constructor(parameters: IVastAdUnitParameters) {
         super(parameters);
@@ -37,7 +36,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._vastCampaign = parameters.campaign;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOMController = parameters.om;
-        this._omAdViewBuilder = new OpenMeasurementAdViewBuilder(parameters.campaign, parameters.deviceInfo, parameters.platform);
 
         if (this._endScreen) {
             this._endScreen.render();
@@ -185,9 +183,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._vastOMController) {
             this._vastOMController.pause();
 
-            this._omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
+            const adViewBuilder = this._vastOMController.getOMAdViewBuilder();
+            adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
                 if (this._vastOMController) {
-                    const viewPort = this._omAdViewBuilder.getViewPort();
+                    const viewPort = adViewBuilder.getViewPort();
                     this._vastOMController.geometryChange(viewPort, adView);
                 }
             });
@@ -203,9 +202,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         if (this.isShowing() && this.canShowVideo() && this._vastOMController) {
             this._vastOMController.resume();
 
-            this._omAdViewBuilder.buildVastAdView([], this).then((adView) => {
+            const adViewBuilder = this._vastOMController.getOMAdViewBuilder();
+            adViewBuilder.buildVastAdView([], this).then((adView) => {
                 if (this._vastOMController) {
-                    const viewPort = this._omAdViewBuilder.getViewPort();
+                    const viewPort = adViewBuilder.getViewPort();
                     this._vastOMController.geometryChange(viewPort, adView);
                 }
             });

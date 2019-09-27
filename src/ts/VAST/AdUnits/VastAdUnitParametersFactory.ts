@@ -8,6 +8,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -41,7 +42,8 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 // }
             });
 
-            const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, baseParams.platform);
+            const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
+            const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
             omManager.addToViewHierarchy();
             omManager.injectVerifications();
             vastAdUnitParameters.om = omManager;

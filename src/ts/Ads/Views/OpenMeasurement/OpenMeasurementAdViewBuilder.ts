@@ -23,7 +23,7 @@ export class OpenMeasurementAdViewBuilder {
         this._deviceInfo = deviceInfo;
     }
 
-    public buildVideoView() {
+    public buildVideoView(videoView: IRectangle) {
         this._videoViewRectangle = OpenMeasurementUtilities.videoView;
     }
 

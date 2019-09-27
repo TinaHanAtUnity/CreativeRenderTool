@@ -4,6 +4,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
@@ -12,7 +13,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new VastOpenMeasurementController(placement, om, platform);
+            const adViewBuilder = sandbox.createStubInstance(OpenMeasurementAdViewBuilder);
+            return new VastOpenMeasurementController(placement, om, adViewBuilder);
         };
 
         describe('DOM Hierarchy', () => {

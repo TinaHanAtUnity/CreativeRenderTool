@@ -15,8 +15,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
-import { IViewPort, IAdView, ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -29,12 +28,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;
-    private _deviceInfo: DeviceInfo;
-
-    private _viewPort: IViewPort;
-    private _obstructedAdView: IAdView;
-    private _unObstructedAdView: IAdView;
-    private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -50,18 +43,16 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._om = this._vastAdUnit.getOpenMeasurementController();
-        this._deviceInfo = parameters.deviceInfo;
-        this._omAdViewBuilder = new OpenMeasurementAdViewBuilder(parameters.campaign, parameters.deviceInfo, parameters.platform);
-
     }
 
     public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
         if (this._om) {
             const obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
-            this._omAdViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit, obstructionRectangle)
+            const adViewBuilder = this._om.getOMAdViewBuilder();
+            adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit, obstructionRectangle)
             .then((adView) => {
                 if (this._om) {
-                    const viewPort = this._omAdViewBuilder.getViewPort();
+                    const viewPort = adViewBuilder.getViewPort();
                     this._om.geometryChange(viewPort, adView);
                 }
             });
@@ -71,11 +62,11 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     }
 
     public onClosePrivacyPopUp(): Promise<void> {
-
         if (this._om) {
-            this._omAdViewBuilder.buildVastAdView([], this._vastAdUnit).then((adView) => {
+            const adViewBuilder = this._om.getOMAdViewBuilder();
+            adViewBuilder.buildVastAdView([], this._vastAdUnit).then((adView) => {
                 if (this._om) {
-                    const viewPort = this._omAdViewBuilder.getViewPort();
+                    const viewPort = adViewBuilder.getViewPort();
                     this._om.geometryChange(viewPort, adView);
                 }
             });
