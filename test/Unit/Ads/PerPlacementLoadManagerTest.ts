@@ -280,8 +280,8 @@ describe('PerPlacementLoadManagerTest', () => {
             loadCampaignStub.returns(Promise.resolve(<ILoadedCampaign>{}));
             return loadManager.refreshReadyPerformanceCampaigns().then(() => {
                 sinon.assert.calledOnce(loadCampaignStub);
-                assert.equal(placement1.getState(), PlacementState.NOT_AVAILABLE, 'Placement State should be not available');
-                assert.equal(placement2.getState(), PlacementState.READY, 'Placement State should be not available');
+                assert.equal(placement1.getState(), PlacementState.NOT_AVAILABLE);
+                assert.equal(placement2.getState(), PlacementState.READY);
             });
         });
 
@@ -291,8 +291,8 @@ describe('PerPlacementLoadManagerTest', () => {
             loadCampaignStub.returns(Promise.resolve(<ILoadedCampaign>{}));
             return loadManager.refreshReadyPerformanceCampaigns().then(() => {
                 sinon.assert.calledTwice(loadCampaignStub);
-                assert.equal(placement1.getState(), PlacementState.READY, 'Placement State should be not available');
-                assert.equal(placement2.getState(), PlacementState.READY, 'Placement State should be not available');
+                assert.equal(placement1.getState(), PlacementState.READY);
+                assert.equal(placement2.getState(), PlacementState.READY);
             });
         });
 
