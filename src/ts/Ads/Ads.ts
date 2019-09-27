@@ -88,7 +88,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
 import { Observables } from 'Core/Utilities/Observables';
 
 export class Ads implements IAds {
@@ -484,7 +484,7 @@ export class Ads implements IAds {
                 if (this._loadApiEnabled) {
                     this._core.ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
 
-                    if (campaign instanceof PerformanceCampaign) {
+                    if (LoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup()) && campaign instanceof PerformanceCampaign) {
                         Observables.once(this._currentAdUnit.onFinish, () => {
                             (<PerPlacementLoadManager> this.RefreshManager).refreshReadyPerformanceCampaigns();
                         });
