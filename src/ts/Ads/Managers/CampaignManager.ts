@@ -872,7 +872,7 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
             simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
             token: this._coreConfig.getToken(),
-            legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+            legalFramework: this._privacy.isGDPREnabled() ? 'gdpr' : 'default'
         };
 
         if (this.getPreviousPlacementId()) {

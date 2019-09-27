@@ -476,7 +476,7 @@ export class AuctionRequest {
                     isLoadEnabled: false, // TODO: When this is used for anything other than banners, pass actual flag
                     omidPartnerName: PARTNER_NAME,
                     omidJSVersion: OM_JS_VERSION,
-                    legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+                    legalFramework: this._privacySDK.isGDPREnabled() ? 'gdpr' : 'default'
                 };
             });
         });

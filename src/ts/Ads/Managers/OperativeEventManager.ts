@@ -410,7 +410,7 @@ export class OperativeEventManager {
                 'screenHeight': screenHeight,
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
                 'isLoadEnabled': this._campaign.isLoadEnabled(),
-                'legalFramework': this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+                'legalFramework': this._privacySDK.isGDPREnabled() ? 'gdpr' : 'default'
             };
 
             if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
