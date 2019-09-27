@@ -214,7 +214,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             showGDPRBanner: showGDPRBanner,
             adUnitStyle: undefined,
             campaignId: undefined,
-            osVersion: undefined
+            osVersion: undefined,
+            hidePrivacy: parameters.adsConfig.getHidePrivacy()
         };
     }
 }

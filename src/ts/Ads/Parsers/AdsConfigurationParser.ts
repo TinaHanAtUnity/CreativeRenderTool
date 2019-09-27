@@ -45,7 +45,8 @@ export class AdsConfigurationParser {
             gdprEnabled: configJson.gdprEnabled,
             optOutRecorded: configJson.optOutRecorded,
             optOutEnabled: configJson.optOutEnabled,
-            defaultBannerPlacement: defaultBannerPlacement
+            defaultBannerPlacement: defaultBannerPlacement,
+            hidePrivacy: configJson.hidePrivacy
         };
 
         return new AdsConfiguration(configurationParams);

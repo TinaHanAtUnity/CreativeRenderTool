@@ -24,6 +24,7 @@ export interface IEndScreenParameters {
     adUnitStyle?: AdUnitStyle;
     campaignId?: string;
     osVersion?: string;
+    hidePrivacy?: boolean;
 }
 
 export interface IEndScreenHandler extends IGDPREventHandler {
@@ -45,6 +46,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
     private _apiLevel?: number;
+    private _hidePrivacy: boolean = false;
 
     constructor(parameters: IEndScreenParameters) {
         super(parameters.platform, 'end-screen');
@@ -57,6 +59,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
         this._apiLevel = parameters.apiLevel;
+        this._hidePrivacy = parameters.hidePrivacy || false;
 
         this._bindings = [
             {
@@ -117,6 +120,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // Android <= 4.4.4
         if (this._platform === Platform.ANDROID && this._apiLevel! <= 19) {
             this._container.classList.add('old-androids');
+        }
+
+        // hide privacy icon for China
+        if (this._hidePrivacy) {
+            this._container.classList.add('hidePrivacyButton');
         }
     }
 
