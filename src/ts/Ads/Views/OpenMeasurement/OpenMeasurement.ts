@@ -118,7 +118,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._deviceInfo = deviceInfo;
         this._request = request;
         this._pts = pts;
-        this._omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
         if (vastAdVerification) {
             this._adVerification = vastAdVerification;
@@ -127,6 +126,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
         }, this._omIframe, this);
+    }
+
+    // only needed to build impression adview for VAST campaigns
+    public setOMAdViewBuilder(omAdViewBuilder: OpenMeasurementAdViewBuilder) {
+        this._omAdViewBuilder = omAdViewBuilder;
     }
 
     public setAdmobOMSessionId(admobSessionInterfaceId: string) {

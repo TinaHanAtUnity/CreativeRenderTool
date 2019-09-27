@@ -10,12 +10,13 @@ import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobO
 
 export class OpenMeasurementAdViewBuilder {
 
-    private _videoViewRectangle: IRectangle;
     private _campaign: Campaign;
     private _platform: Platform;
 
     private _deviceInfo: DeviceInfo;
     private _viewPort: IViewPort;
+
+    private _videoViewRectangle: IRectangle;
 
     constructor(campaign: AdMobCampaign | VastCampaign, deviceInfo: DeviceInfo, platform: Platform) {
         this._platform = platform;
@@ -23,19 +24,22 @@ export class OpenMeasurementAdViewBuilder {
         this._deviceInfo = deviceInfo;
     }
 
-    public buildVideoView(videoView: IRectangle) {
-        this._videoViewRectangle = OpenMeasurementUtilities.videoView;
+    /**
+     * The video view is only used for the adview which gets calculated after session start has finished run
+     * @param videoView IRectangle passed on session start
+     */
+    public setVideoView(videoView: IRectangle) {
+        if (this._platform === Platform.ANDROID && this._campaign instanceof VastCampaign) {
+            videoView.x = OpenMeasurementUtilities.pxToDp(videoView.x, this._deviceInfo, this._platform);
+            videoView.y = OpenMeasurementUtilities.pxToDp(videoView.y, this._deviceInfo, this._platform);
+            videoView.width = OpenMeasurementUtilities.pxToDp(videoView.width, this._deviceInfo, this._platform);
+            videoView.height = OpenMeasurementUtilities.pxToDp(videoView.height, this._deviceInfo, this._platform);
+        }
+        this._videoViewRectangle = videoView;
     }
 
     public getVideoView(): IRectangle {
-        if (this._platform === Platform.ANDROID && !OpenMeasurementUtilities.androidDPConverted && OpenMeasurementUtilities.videoView && this._campaign instanceof VastCampaign) {
-            OpenMeasurementUtilities.videoView.x = OpenMeasurementUtilities.pxToDp(OpenMeasurementUtilities.videoView.x, this._deviceInfo, this._platform);
-            OpenMeasurementUtilities.videoView.y = OpenMeasurementUtilities.pxToDp(OpenMeasurementUtilities.videoView.y, this._deviceInfo, this._platform);
-            OpenMeasurementUtilities.videoView.width = OpenMeasurementUtilities.pxToDp(OpenMeasurementUtilities.videoView.width, this._deviceInfo, this._platform);
-            OpenMeasurementUtilities.videoView.height = OpenMeasurementUtilities.pxToDp(OpenMeasurementUtilities.videoView.height, this._deviceInfo, this._platform);
-            OpenMeasurementUtilities.androidDPConverted = true;
-        }
-        return OpenMeasurementUtilities.videoView;
+        return this._videoViewRectangle;
     }
 
     public getViewPort(): IViewPort {
@@ -117,7 +121,6 @@ export class OpenMeasurementAdViewBuilder {
 
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
-            this._videoViewRectangle = videoView;
 
             if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
                 obstructionReasons.push(ObstructionReasons.HIDDEN);
@@ -146,7 +149,7 @@ export class OpenMeasurementAdViewBuilder {
 
             const obstructionRectangle = OpenMeasurementUtilities.createRectangle(gdprRectx, gdprRecty, gdprRectwidth, gdprRectheight);
             const videoView =  om.getAdmobVideoElementBounds();
-            OpenMeasurementUtilities.videoView = videoView;
+            this.setVideoView(videoView);
             let screenView;
 
             if (this._platform === Platform.ANDROID) {

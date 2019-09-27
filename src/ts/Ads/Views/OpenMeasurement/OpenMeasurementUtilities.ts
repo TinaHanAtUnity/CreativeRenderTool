@@ -3,12 +3,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IViewPort, IRectangle, ObstructionReasons, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IViewPort, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class OpenMeasurementUtilities {
 
-    public static videoView: IRectangle;
-    public static androidDPConverted: boolean = false;
+    // public static videoView: IRectangle;
+    // public static androidDPConverted: boolean = false;
 
     public static getScreenDensity(platform: Platform, deviceInfo: DeviceInfo): number {
         if (platform === Platform.ANDROID) {

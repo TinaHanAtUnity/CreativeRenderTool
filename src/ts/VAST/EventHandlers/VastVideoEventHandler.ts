@@ -102,7 +102,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._adUnit.getVideoViewRectangle().then((rect) => {
                 if (this._om) {
                     const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
-                    OpenMeasurementUtilities.videoView = view;
+                    this._om.getOMAdViewBuilder().setVideoView(view);
                     this._om.sessionStart();
                     this._omStartCalled = true;
                 }
