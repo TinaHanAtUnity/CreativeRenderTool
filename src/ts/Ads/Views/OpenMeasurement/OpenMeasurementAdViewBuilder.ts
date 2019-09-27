@@ -60,11 +60,6 @@ export class OpenMeasurementAdViewBuilder {
 
         const obstructionReasons: ObstructionReasons[] = [];
 
-        // TODO: Remove reason hidden as per IAB
-        if (percentageInView < 100) {
-            obstructionReasons.push(ObstructionReasons.HIDDEN);
-        }
-
         return this.calculateVastAdView(percentageInView, obstructionReasons, measuringElementAvailable, [], screenWidth, screenHeight);
     }
 
@@ -122,10 +117,6 @@ export class OpenMeasurementAdViewBuilder {
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
 
-            if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
-                obstructionReasons.push(ObstructionReasons.HIDDEN);
-            }
-
             if (obstructionRect) {
                 // obstructed adview
                 const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
@@ -158,10 +149,6 @@ export class OpenMeasurementAdViewBuilder {
             }
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
-
-            if (OpenMeasurementUtilities.calculateObstructionOverlapPercentage(videoView, screenView) < 100) {
-                obstructionReasons.push(ObstructionReasons.HIDDEN);
-            }
 
             const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRectangle, screenView);
 
