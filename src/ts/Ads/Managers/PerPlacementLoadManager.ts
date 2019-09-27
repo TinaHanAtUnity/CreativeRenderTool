@@ -108,6 +108,8 @@ export class PerPlacementLoadManager extends RefreshManager {
                 const campaign = placement.getCurrentCampaign();
 
                 if (campaign && campaign instanceof PerformanceCampaign) {
+                    this.triggerLoadCalledCounter(placementId, 1);
+
                     this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
                         if (loadedCampaign) {
                             // Don't update state change since it's already Ready
@@ -126,16 +128,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     // count is the number of times load was called for a placementId before we could process it
     private loadPlacement(placementId: string, count: number) {
 
-        LoadCalledCounter.report({
-            gameId: this._clientInfo.getGameId(),
-            placementId: placementId,
-            country: this._coreConfig.getCountry(),
-            count: count,
-            abGroup: this._coreConfig.getAbGroup(),
-            organizationId: this._coreConfig.getOrganizationId(),
-            sdkVersion: this._clientInfo.getSdkVersion(),
-            gamerToken: this._coreConfig.getToken()
-        });
+        this.triggerLoadCalledCounter(placementId, count);
 
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
@@ -196,5 +189,18 @@ export class PerPlacementLoadManager extends RefreshManager {
         if (placement && placement.getState() === PlacementState.READY) {
             this._ads.Listener.sendReadyEvent(placement.getId());
         }
+    }
+
+    private triggerLoadCalledCounter(placementId: string, count: number): void  {
+        LoadCalledCounter.report({
+            gameId: this._clientInfo.getGameId(),
+            placementId: placementId,
+            country: this._coreConfig.getCountry(),
+            count: count,
+            abGroup: this._coreConfig.getAbGroup(),
+            organizationId: this._coreConfig.getOrganizationId(),
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            gamerToken: this._coreConfig.getToken()
+        });
     }
 }
