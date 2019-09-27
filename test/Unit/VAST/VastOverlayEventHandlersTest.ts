@@ -36,9 +36,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
-import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
@@ -358,7 +356,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
 
         describe('When calling onShowPrivacyPopUp', () => {
             beforeEach(() => {
-                // sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
                 sinon.stub(om!.getOMAdViewBuilder(), 'buildVastAdView').returns(Promise.resolve([]));
                 return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
             });
@@ -367,7 +364,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 const obstructionReason = [ObstructionReasons.OBSTRUCTED];
                 const rect = OpenMeasurementUtilities.createRectangle(20, 20, 517, 367);
 
-                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildAdmobAdView, obstructionReason, vastAdUnit, rect);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, vastAdUnit, rect);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });
@@ -379,6 +376,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             });
 
             it ('should fire geometry change as a percentage of the adview', () => {
+                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, [], vastAdUnit);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });
