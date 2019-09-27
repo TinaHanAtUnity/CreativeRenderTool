@@ -486,7 +486,9 @@ export class Ads implements IAds {
 
                     if (LoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup()) && campaign instanceof PerformanceCampaign) {
                         Observables.once(this._currentAdUnit.onFinish, () => {
-                            (<PerPlacementLoadManager> this.RefreshManager).refreshReadyPerformanceCampaigns();
+                            if (this.RefreshManager instanceof PerPlacementLoadManager) {
+                                this.RefreshManager.refreshReadyPerformanceCampaigns();
+                            }
                         });
                     }
                 }

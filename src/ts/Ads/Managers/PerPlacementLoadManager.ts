@@ -112,11 +112,11 @@ export class PerPlacementLoadManager extends RefreshManager {
 
                     this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
                         if (loadedCampaign) {
-                            // Don't update state change since it's already Ready
+                            // Don't update state since this is just swapping a ready campaign for a ready campaign
                             placement.setCurrentCampaign(loadedCampaign.campaign);
                             placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
                         } else {
-                            // Keep previous Ready state
+                            // Keep previous campaign fill and ready state
                         }
                     });
                 }
