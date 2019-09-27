@@ -10,7 +10,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Backend } from 'Backend/Backend';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    // xdescribe('OpenMeasurementAdViewBuilder', () => {
+    // describe('OpenMeasurementAdViewBuilder', () => {
     //     let omAdViewBuilder: OpenMeasurementAdViewBuilder;
     //     let campaign: Campaign;
     //     let deviceInfo: DeviceInfo;
@@ -30,6 +30,14 @@ import { Backend } from 'Backend/Backend';
     //         }
 
     //         omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+    //     });
+
+    //     describe('Vast Campaign', () => {
+    //         //
+    //     });
+
+    //     describe('Admob Campaign', () => {
+    //         //
     //     });
 
     //     xdescribe('Calculating Vast AdView for sdk 3.2 and lower', () => {
