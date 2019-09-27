@@ -10,7 +10,6 @@ import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/Programma
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { Platform } from 'Core/Constants/Platform';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 

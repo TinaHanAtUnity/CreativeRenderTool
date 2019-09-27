@@ -7,9 +7,6 @@ import { IViewPort, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurement
 
 export class OpenMeasurementUtilities {
 
-    // public static videoView: IRectangle;
-    // public static androidDPConverted: boolean = false;
-
     public static getScreenDensity(platform: Platform, deviceInfo: DeviceInfo): number {
         if (platform === Platform.ANDROID) {
             return (<AndroidDeviceInfo> deviceInfo).getScreenDensity();
