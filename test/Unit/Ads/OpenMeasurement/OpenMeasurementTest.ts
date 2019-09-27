@@ -14,6 +14,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
@@ -160,6 +161,8 @@ import OMID3p from 'html/omid/omid3p.html';
                     context('sessionStart', () => {
                         beforeEach(() => {
                             om = initWithVastVerifications();
+                            const omAdViewBuilder = sandbox.createStubInstance(OpenMeasurementAdViewBuilder);
+                            om.setOMAdViewBuilder(omAdViewBuilder);
 
                             sinon.stub(deviceInfo, 'getScreenWidth').resolves(1280);
                             sinon.stub(deviceInfo, 'getScreenHeight').resolves(768);
@@ -186,15 +189,7 @@ import OMID3p from 'html/omid/omid3p.html';
                                 sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
                                 sinon.assert.called(<sinon.SinonSpy>om.impression);
                                 sinon.assert.called(<sinon.SinonSpy>om.loaded);
-                                sinon.assert.calledWith(<sinon.SinonSpy>om.geometryChange, { height: 768, width: 1280 }, {
-                                    containerGeometry: { height: 768, width: 1280, x: 0, y: 0 },
-                                    geometry: { height: 768, width: 1280, x: 0, y: 0 },
-                                    measuringElement: true,
-                                    onScreenContainerGeometry: { height: 768, obstructions: [], width: 1280, x: 0, y: 0 },
-                                    onScreenGeometry: { height: 768, obstructions: [], width: 1280, x: 0, y: 0 },
-                                    percentageInView: 100,
-                                    reasons: []
-                                });
+                                sinon.assert.calledWith(<sinon.SinonSpy>om.geometryChange);
                             });
                         });
                     });
