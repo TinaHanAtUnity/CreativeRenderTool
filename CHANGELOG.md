@@ -1,3 +1,7 @@
+# Staged
+
+* Remove unused code related to Consent Homescreen [#11337](https://github.com/Applifier/unity-ads-webview/pull/11337)
+
 # Thu Sep 26 22:28:16 UTC 2019
 
 * Enable A/B tested Consent layout for all users [#11326](https://github.com/Applifier/unity-ads-webview/pull/11326)
