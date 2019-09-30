@@ -31,7 +31,8 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: baseParams.campaign,
                 clientInfo: baseParams.clientInfo,
-                country: baseParams.coreConfig.getCountry()
+                country: baseParams.coreConfig.getCountry(),
+                hidePrivacy: baseParams.adsConfig.getHidePrivacy()
             };
 
             vastEndScreen = new VastEndScreen(baseParams.platform, vastEndscreenParameters, baseParams.privacy);
