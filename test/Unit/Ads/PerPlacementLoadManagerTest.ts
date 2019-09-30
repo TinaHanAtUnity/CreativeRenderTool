@@ -88,7 +88,7 @@ describe('PerPlacementLoadManagerTest', () => {
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
-        loadManager = new PerPlacementLoadManager(core.Api, ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+        loadManager = new PerPlacementLoadManager(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 
     describe('getCampaign and initialize', () => {
@@ -250,59 +250,6 @@ describe('PerPlacementLoadManagerTest', () => {
                         sinon.assert.called(loadCampaignStub);
                     });
                 });
-            });
-        });
-    });
-
-    describe('refreshReadyPerformanceCampaigns', () => {
-        let sandbox: sinon.SinonSandbox;
-        let loadCampaignStub: sinon.SinonStub;
-
-        let placement1: Placement;
-        let placement2: Placement;
-
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
-            placement1 = adsConfig.getPlacement('premium');
-            placement2 = adsConfig.getPlacement('video');
-            placement1.setCurrentCampaign(TestFixtures.getCampaign());
-            placement2.setCurrentCampaign(TestFixtures.getCampaign());
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        it('should only invalidate ready comet campaigns when new fill is returned', () => {
-            placement1.setState(PlacementState.NOT_AVAILABLE);
-            placement2.setState(PlacementState.READY);
-            loadCampaignStub.returns(Promise.resolve(<ILoadedCampaign>{}));
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                sinon.assert.calledOnce(loadCampaignStub);
-                assert.equal(placement1.getState(), PlacementState.NOT_AVAILABLE);
-                assert.equal(placement2.getState(), PlacementState.READY);
-            });
-        });
-
-        it('should invalidate both performance campaigns', () => {
-            placement1.setState(PlacementState.READY);
-            placement2.setState(PlacementState.READY);
-            loadCampaignStub.returns(Promise.resolve(<ILoadedCampaign>{}));
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                sinon.assert.calledTwice(loadCampaignStub);
-                assert.equal(placement1.getState(), PlacementState.READY);
-                assert.equal(placement2.getState(), PlacementState.READY);
-            });
-        });
-
-        it('should not invalidate programmatic campaigns', () => {
-            placement1.setCurrentCampaign(TestFixtures.getDisplayInterstitialCampaign());
-            placement1.setState(PlacementState.READY);
-            placement2.setState(PlacementState.NOT_AVAILABLE);
-            loadCampaignStub.returns(Promise.resolve(<ILoadedCampaign>{}));
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                sinon.assert.notCalled(loadCampaignStub);
             });
         });
     });

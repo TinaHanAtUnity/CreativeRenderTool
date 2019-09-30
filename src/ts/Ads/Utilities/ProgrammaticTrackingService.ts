@@ -60,7 +60,10 @@ export enum LoadMetric {
     LoadEnabledShow = 'load_enabled_show',
     LoadEnabledInitializationSuccess = 'load_enabled_initialization_success',
     LoadEnabledInitializationFailure = 'load_enabled_initialization_failure',
-    LoadAuctionRequestBlocked = 'load_auction_request_blocked'
+    LoadAuctionRequestBlocked = 'load_auction_request_blocked',
+    LoadCometRefreshRequest = 'load_comet_refresh_request',
+    LoadCometRefreshFill = 'load_comet_refresh_fill',
+    LoadCometRefreshNoFill = 'load_comet_refresh_no_fill'
 }
 
 export enum OMMetric {

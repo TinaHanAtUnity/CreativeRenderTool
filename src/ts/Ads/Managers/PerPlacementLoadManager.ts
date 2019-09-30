@@ -4,31 +4,28 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
-import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
 export class PerPlacementLoadManager extends RefreshManager {
-    private _core: ICoreApi;
     private _ads: IAdsApi;
-    private _adsConfig: AdsConfiguration;
-    private _coreConfig: CoreConfiguration;
-    private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
-    private _pts: ProgrammaticTrackingService;
 
-    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    protected _adsConfig: AdsConfiguration;
+    protected _coreConfig: CoreConfiguration;
+    protected _campaignManager: CampaignManager;
+    protected _pts: ProgrammaticTrackingService;
+
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
-        this._core = core;
         this._ads = ads;
         this._adsConfig = adsConfig;
         this._coreConfig = coreConfig;
@@ -100,35 +97,19 @@ export class PerPlacementLoadManager extends RefreshManager {
         // todo: implement method or remove from parent class
     }
 
-    public refreshReadyPerformanceCampaigns(): Promise<void> {
-        for (const placementId of this._adsConfig.getPlacementIds()) {
-            const placement = this._adsConfig.getPlacement(placementId);
-
-            if (placement && placement.getState() === PlacementState.READY) {
-                const campaign = placement.getCurrentCampaign();
-
-                if (campaign && campaign instanceof PerformanceCampaign) {
-                    this.triggerLoadCalledCounter(placementId, 1);
-
-                    this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
-                        if (loadedCampaign) {
-                            // Don't update state since this is just swapping a ready campaign for a ready campaign
-                            placement.setCurrentCampaign(loadedCampaign.campaign);
-                            placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
-                        } else {
-                            // Keep previous campaign fill and ready state
-                        }
-                    });
-                }
-            }
-        }
-        return Promise.resolve();
-    }
-
     // count is the number of times load was called for a placementId before we could process it
     private loadPlacement(placementId: string, count: number) {
 
-        this.triggerLoadCalledCounter(placementId, count);
+        LoadCalledCounter.report({
+            gameId: this._clientInfo.getGameId(),
+            placementId: placementId,
+            country: this._coreConfig.getCountry(),
+            count: count,
+            abGroup: this._coreConfig.getAbGroup(),
+            organizationId: this._coreConfig.getOrganizationId(),
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            gamerToken: this._coreConfig.getToken()
+        });
 
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
@@ -189,18 +170,5 @@ export class PerPlacementLoadManager extends RefreshManager {
         if (placement && placement.getState() === PlacementState.READY) {
             this._ads.Listener.sendReadyEvent(placement.getId());
         }
-    }
-
-    private triggerLoadCalledCounter(placementId: string, count: number): void  {
-        LoadCalledCounter.report({
-            gameId: this._clientInfo.getGameId(),
-            placementId: placementId,
-            country: this._coreConfig.getCountry(),
-            count: count,
-            abGroup: this._coreConfig.getAbGroup(),
-            organizationId: this._coreConfig.getOrganizationId(),
-            sdkVersion: this._clientInfo.getSdkVersion(),
-            gamerToken: this._coreConfig.getToken()
-        });
     }
 }
