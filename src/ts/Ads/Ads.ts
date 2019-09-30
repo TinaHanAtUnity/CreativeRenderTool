@@ -89,7 +89,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
-import { PerPlacementLoadManagerWithCometRefresh } from './Managers/PerPlacementLoadManagerWithCometRefresh';
+import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
 
 export class Ads implements IAds {
 
