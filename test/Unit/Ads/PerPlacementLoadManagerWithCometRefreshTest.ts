@@ -1,4 +1,5 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
@@ -9,7 +10,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
-import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
@@ -18,16 +18,19 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable0 } from 'Core/Utilities/Observable';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
     let deviceInfo: DeviceInfo;
@@ -40,7 +43,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICore;
-    let ads: IAdsApi;
+    let adsApi: IAdsApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
@@ -61,7 +64,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreModule(nativeBridge);
-        ads = TestFixtures.getAdsApi(nativeBridge);
+        adsApi = TestFixtures.getAdsApi(nativeBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
         privacySDK = TestFixtures.getPrivacySDK(core.Api);
 
@@ -82,7 +85,53 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
-        loadManager = new PerPlacementLoadManagerWithCometRefresh(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+        loadManager = new PerPlacementLoadManagerWithCometRefresh(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+    });
+
+    describe('setCurrentAdUnit', () => {
+        let sandbox: sinon.SinonSandbox;
+        let refreshReadyPerformanceCampaignStub: sinon.SinonStub;
+        let abTestStub: sinon.SinonStub;
+
+        let placement: Placement;
+        let adUnit: AbstractAdUnit;
+
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            refreshReadyPerformanceCampaignStub = sandbox.stub(loadManager, 'refreshReadyPerformanceCampaigns');
+            abTestStub = sandbox.stub(LoadExperimentWithCometRefreshing, 'isValid');
+            placement = adsConfig.getPlacement('premium');
+            adUnit = sandbox.createStubInstance(AbstractAdUnit);
+            (<any>adUnit).onFinish = new Observable0();
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should call refreshReadyPerformanceCampaigns onFinish when ABTest is active and a Performance Campaign was shown', () => {
+            abTestStub.returns(true);
+            placement.setCurrentCampaign(TestFixtures.getCampaign());
+            loadManager.setCurrentAdUnit(adUnit, placement);
+            adUnit.onFinish.trigger();
+            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+        });
+
+        it('should not call refreshReadyPerformanceCampaigns onFinish when ABTest is active but a Display Interstitial Campaign was shown', () => {
+            abTestStub.returns(true);
+            placement.setCurrentCampaign(TestFixtures.getDisplayInterstitialCampaign());
+            loadManager.setCurrentAdUnit(adUnit, placement);
+            adUnit.onFinish.trigger();
+            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
+        });
+
+        it('should not call refreshReadyPerformanceCampaigns onFinish when ABTest is disabled but a Performance Campaign was shown', () => {
+            abTestStub.returns(false);
+            placement.setCurrentCampaign(TestFixtures.getCampaign());
+            loadManager.setCurrentAdUnit(adUnit, placement);
+            adUnit.onFinish.trigger();
+            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
+        });
     });
 
     describe('refreshReadyPerformanceCampaigns', () => {
