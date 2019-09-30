@@ -37,8 +37,9 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private _messageListener: EventListener;
     private _timers: number[] = [];
     private _showGDPRBanner: boolean;
+    private _hidePrivacy: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, hidePrivacy: boolean = false) {
         super(platform, 'display-interstitial');
 
         this._core = core;
@@ -48,6 +49,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         this._template = new Template(DisplayInterstitialTemplate);
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
+        this._hidePrivacy = hidePrivacy;
 
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
@@ -132,6 +134,11 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
             this._privacyButtonElement.style.visibility = 'visible';
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
+        }
+
+        if (this._hidePrivacy) {
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
         }
     }
 
