@@ -111,56 +111,57 @@
   }
 }
 
-.heartbeating-download-button-end-screen #end-screen.on-show {
-  .download-container {
-    animation: animated-download-button-heartbeat 2s ease-in 1s infinite both;
+#end-screen.on-show {
+  &.heartbeating-download-button-end-screen {
+    .download-container {
+      animation: animated-download-button-heartbeat 2s ease-in 1s infinite both;
+    }
+  }
+
+  &.blinking-download-button-end-screen {
+    .download-container {
+      animation: animated-download-button-blink 2s ease 1s infinite both;
+    }
+  }
+
+  $.bouncing-download-button-end-screen {
+    .column-container {
+      position: relative;
+    }
+
+    .download-container {
+      z-index: 1;
+      animation: animated-download-button-bounce 2s ease 1s infinite both;
+    }
+
+    .download-container-shadow {
+      position: absolute;
+      bottom: -.15em;
+      z-index: 0;
+      width: 11.2em;
+      height: .4em;
+      background: radial-gradient(closest-side, $gray, transparent);
+      opacity: .6;
+      animation: animated-download-button-bounce-shadow 2s linear 1s infinite both;
+    }
+  }
+
+  $.shining-download-button-end-screen {
+    .download-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-container:before {
+      position: absolute;
+      top: 0;
+      left: -2em;
+      display: block;
+      width: 1.5em;
+      height: 100%;
+      background-color: rgba(255, 255, 255, .5);
+      content: "";
+      animation: animated-download-button-sheen 2s linear 1s infinite both;
+    }
   }
 }
-
-.blinking-download-button-end-screen #end-screen.on-show {
-  .download-container {
-    animation: animated-download-button-blink 2s ease 1s infinite both;
-  }
-}
-
-.bouncing-download-button-end-screen #end-screen.on-show {
-  .column-container {
-    position: relative;
-  }
-
-  .download-container {
-    z-index: 1;
-    animation: animated-download-button-bounce 2s ease 1s infinite both;
-  }
-
-  .download-container-shadow {
-    position: absolute;
-    bottom: -.15em;
-    z-index: 0;
-    width: 11.2em;
-    height: .4em;
-    background: radial-gradient(closest-side, $gray, transparent);
-    opacity: .6;
-    animation: animated-download-button-bounce-shadow 2s linear 1s infinite both;
-  }
-}
-
-.shining-download-button-end-screen #end-screen.on-show {
-  .download-container {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .download-container:before {
-    position: absolute;
-    top: 0;
-    left: -2em;
-    display: block;
-    width: 1.5em;
-    height: 100%;
-    background-color: rgba(255, 255, 255, .5);
-    content: "";
-    animation: animated-download-button-sheen 2s linear 1s infinite both;
-  }
-}
-

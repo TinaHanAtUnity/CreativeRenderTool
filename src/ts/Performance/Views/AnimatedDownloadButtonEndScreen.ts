@@ -7,7 +7,7 @@ import EndScreenAnimatedDownloadButton from 'html/EndScreenAnimatedDownloadButto
 type Animation = 'heartbeating' | 'bouncing' | 'blinking' | 'shining';
 
 export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
-  private _animation: string;
+  private _animation: Animation;
 
   constructor(animation: Animation, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
     super(parameters, campaign, country);
@@ -21,6 +21,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
   public render(): void {
     super.render();
-    document.documentElement.classList.add(`${this._animation}-download-button-end-screen`);
+
+    this.container().classList.add(`${this._animation}-download-button-end-screen`);
   }
 }
