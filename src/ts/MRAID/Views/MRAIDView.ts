@@ -90,7 +90,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _privacyPanelOpen: boolean;
 
-    private _hidePrivcyButton: boolean;
+    private _hidePrivacyButton: boolean;
 
     private static DebugJsConsole: boolean | undefined;
 
@@ -107,7 +107,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
-        this._hidePrivcyButton = hidePrivacy;
+        this._hidePrivacyButton = hidePrivacy;
 
         this._abGroup = abGroup;
 
@@ -269,7 +269,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         // hide privacy for China
-        if (this._hidePrivcyButton) {
+        if (this._hidePrivacyButton) {
             this._privacyButton.style.pointerEvents = '1';
             this._privacyButton.style.visibility = 'hidden';
             return;
