@@ -100,7 +100,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             refreshReadyPerformanceCampaignStub = sandbox.stub(loadManager, 'refreshReadyPerformanceCampaigns');
             placement = adsConfig.getPlacement('premium');
             adUnit = sandbox.createStubInstance(AbstractAdUnit);
-            (<any>adUnit).onFinish = new Observable0();
+            (<any>adUnit).onStartProcessed = new Observable0();
         });
 
         afterEach(() => {
@@ -118,23 +118,23 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false }
         ].forEach(({ campaign, shouldCall }) => {
-            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onFinish when a ${campaign.getContentType()} was shown`, () => {
+            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onStartProcessed when a ${campaign.getContentType()} was shown`, () => {
                 placement.setCurrentCampaign(campaign);
                 loadManager.setCurrentAdUnit(adUnit, placement);
 
-                adUnit.onFinish.trigger();
+                adUnit.onStartProcessed.trigger();
 
                 sinon.assert.callCount(refreshReadyPerformanceCampaignStub, shouldCall ? 1 : 0);
             });
         });
 
-        it('should only call refreshReadyPerformanceCampaign once when onFinish is called multiple times', () => {
+        it('should only call refreshReadyPerformanceCampaign once when onStartProcessed is called multiple times', () => {
             placement.setCurrentCampaign(TestFixtures.getCampaign());
             loadManager.setCurrentAdUnit(adUnit, placement);
 
-            adUnit.onFinish.trigger();
-            adUnit.onFinish.trigger();
-            adUnit.onFinish.trigger();
+            adUnit.onStartProcessed.trigger();
+            adUnit.onStartProcessed.trigger();
+            adUnit.onStartProcessed.trigger();
 
             sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
         });
