@@ -117,6 +117,16 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
         });
 
+        it('should only call refreshReadyPerformanceCampaign once when onFinish is called multiple times', () => {
+            abTestStub.returns(true);
+            placement.setCurrentCampaign(TestFixtures.getCampaign());
+            loadManager.setCurrentAdUnit(adUnit, placement);
+            adUnit.onFinish.trigger();
+            adUnit.onFinish.trigger();
+            adUnit.onFinish.trigger();
+            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+        });
+
         it('should not call refreshReadyPerformanceCampaigns onFinish when ABTest is active but a Display Interstitial Campaign was shown', () => {
             abTestStub.returns(true);
             placement.setCurrentCampaign(TestFixtures.getDisplayInterstitialCampaign());
