@@ -752,7 +752,8 @@ export class TestFixtures {
 
     public static getPrivacy(platform: Platform, campaign: Campaign): Privacy {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        return new Privacy(platform, campaign, privacyManager, TestFixtures.getAdsConfiguration().isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
+        const core = TestFixtures.getCoreApi(TestFixtures.getNativeBridge(platform, TestFixtures.getBackend(platform)));
+        return new Privacy(platform, campaign, privacyManager, TestFixtures.getPrivacySDK(core).isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
     }
 
     public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign, privacy: Privacy): IEndScreenParameters {
@@ -1037,7 +1038,7 @@ export class TestFixtures {
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
         ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
-        ads.Analytics = new Analytics(core, ads.Config!);
+        ads.Analytics = new Analytics(core, ads.PrivacySDK!);
         ads.Store = new Store(core, ads.Analytics.AnalyticsManager);
         return <IAds>ads;
     }

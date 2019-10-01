@@ -187,6 +187,7 @@ export class AuctionRequest {
     private _body: IAuctionRequestBody | null;
     private _headers: [string, string][] = [];
     private _privacy: IRequestPrivacy | undefined;
+    private _privacySDK: PrivacySDK;
 
     private _requestStart: number;
     private _requestDuration: number = 0;
@@ -206,6 +207,7 @@ export class AuctionRequest {
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
         this._privacy = RequestPrivacyFactory.create(params.privacySDK.getUserPrivacy(), params.privacySDK.getGamePrivacy());
+        this._privacySDK = params.privacySDK;
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
@@ -464,9 +466,9 @@ export class AuctionRequest {
                     sessionDepth: SdkStats.getAdRequestOrdinal(),
                     projectId: this._coreConfig.getUnityProjectId(),
                     gameSessionCounters: GameSessionCounters.getCurrentCounters(),
-                    gdprEnabled: this._adsConfig.isGDPREnabled(),
-                    optOutEnabled: this._adsConfig.isOptOutEnabled(),
-                    optOutRecorded: this._adsConfig.isOptOutRecorded(),
+                    gdprEnabled: this._privacySDK.isGDPREnabled(),
+                    optOutEnabled: this._privacySDK.isOptOutEnabled(),
+                    optOutRecorded: this._privacySDK.isOptOutRecorded(),
                     privacy: this._privacy,
                     abGroup: this._coreConfig.getAbGroup(),
                     developerId: this._coreConfig.getDeveloperId(),
@@ -474,7 +476,7 @@ export class AuctionRequest {
                     isLoadEnabled: false, // TODO: When this is used for anything other than banners, pass actual flag
                     omidPartnerName: PARTNER_NAME,
                     omidJSVersion: OM_JS_VERSION,
-                    legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+                    legalFramework: this._privacySDK.isGDPREnabled() ? 'gdpr' : 'default'
                 };
             });
         });

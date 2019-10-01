@@ -131,7 +131,7 @@ export class Ads implements IAds {
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
 
-        this.Analytics = new Analytics(core, this.Config);
+        this.Analytics = new Analytics(core, this.PrivacySDK);
         this.Store = new Store(core, this.Analytics.AnalyticsManager);
 
         const platform = core.NativeBridge.getPlatform();
@@ -340,7 +340,7 @@ export class Ads implements IAds {
         }
 
         if (this._core.DeviceIdManager &&
-            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.Config.isGDPREnabled(), this.Config.isOptOutRecorded(), this.Config.isOptOutEnabled()) &&
+            this._core.DeviceIdManager.isCompliant(this._core.Config.getCountry(), this.PrivacySDK.isGDPREnabled(), this.PrivacySDK.isOptOutRecorded(), this.PrivacySDK.isOptOutEnabled()) &&
             this._core.DeviceInfo instanceof AndroidDeviceInfo &&
             !this._core.DeviceInfo.getDeviceId1()) {
 

@@ -105,7 +105,7 @@ export class UserPrivacyManager {
             'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
+            'legalFramework': this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
             'agreedOverAgeLimit': AgeGateChoice.MISSING
         };
         if (source) {
@@ -198,7 +198,7 @@ export class UserPrivacyManager {
             coppa: this._coreConfig.isCoppaCompliant(),
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
-            legalFramework: this._adsConfig.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
+            legalFramework: this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
             agreedOverAgeLimit: AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
         };
 
@@ -213,11 +213,11 @@ export class UserPrivacyManager {
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
-        if (this._adsConfig.isGDPREnabled()) {
+        if (this._privacy.isGDPREnabled()) {
             // get consent only if gdpr is enabled
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
-                if (this._adsConfig.isGDPREnabled()) {
+                if (this._privacy.isGDPREnabled()) {
                     this.updateConfigurationWithConsent(consent);
                     this.pushConsent(consent);
                 }
@@ -255,7 +255,7 @@ export class UserPrivacyManager {
     }
 
     public isOptOutEnabled(): boolean {
-        return this._adsConfig.isOptOutEnabled();
+        return this._privacy.isOptOutEnabled();
     }
 
     public getGranularPermissions(): IGranularPermissions {
@@ -310,8 +310,8 @@ export class UserPrivacyManager {
             consent = false;
         }
 
-        this._adsConfig.setOptOutEnabled(!consent);
-        this._adsConfig.setOptOutRecorded(true);
+        this._privacy.setOptOutEnabled(!consent);
+        this._privacy.setOptOutRecorded(true);
 
         const gamePrivacy = this._privacy.getGamePrivacy();
         gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
@@ -330,7 +330,7 @@ export class UserPrivacyManager {
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
-        if (this._adsConfig.isGDPREnabled()) {
+        if (this._privacy.isGDPREnabled()) {
             if (data && data.gdpr && data.gdpr.consent) {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 

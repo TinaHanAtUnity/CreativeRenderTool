@@ -104,7 +104,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
         describe('on onGDPROptOut', () => {
 
             it('should send operative event with action `optout`', () => {
-                (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(false);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(false);
 
                 privacyEventHandler.onGDPROptOut(true);
 
@@ -112,8 +112,8 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
             });
 
             it('should send operative event with action `optin`', () => {
-                (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(true);
-                (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutRecorded).returns(true);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(true);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(true);
 
                 privacyEventHandler.onGDPROptOut(false);
 
@@ -121,8 +121,8 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
             });
 
             it('should send operative event with action `skip`', () => {
-                (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(true);
-                (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutRecorded).returns(false);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(true);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(false);
 
                 privacyEventHandler.onGDPROptOut(false);
 
