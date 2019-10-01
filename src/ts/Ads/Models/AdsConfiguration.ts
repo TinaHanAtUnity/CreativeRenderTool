@@ -14,6 +14,7 @@ export interface IRawAdsConfiguration {
     gamePrivacy: IRawGamePrivacy | undefined;
     userPrivacy: IRawUserPrivacy | undefined;
     ageGateLimit: number | undefined;
+    hidePrivacy: boolean | undefined;
 }
 
 export interface IAdsConfiguration {
@@ -24,6 +25,7 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
+    hidePrivacy: boolean | undefined;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -34,7 +36,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
-        defaultBannerPlacement: ['string', 'undefined']
+        defaultBannerPlacement: ['string', 'undefined'],
+        hidePrivacy: ['boolean', 'undefined']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -117,6 +120,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public setOptOutEnabled(optOutEnabled: boolean) {
         this.set('optOutEnabled', optOutEnabled);
+    }
+
+    public getHidePrivacy(): boolean | undefined {
+        return this.get('hidePrivacy');
     }
 
     public getDTO(): { [key: string]: unknown } {

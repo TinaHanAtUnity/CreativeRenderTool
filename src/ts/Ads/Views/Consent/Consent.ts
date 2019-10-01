@@ -31,7 +31,6 @@ export interface IConsentViewParameters {
 }
 
 export enum ConsentPage {
-    HOMESCREEN = 'homescreen',
     MY_CHOICES = 'mychoices',
     HOMEPAGE = 'homepage',
     AGE_GATE = 'agegate'
@@ -84,11 +83,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onSaveMyChoicesEvent(event),
                 selector: '.save-my-choices'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onAcceptAllEvent(event),
-                selector: '.accept-all'
             },
             {
                 event: 'click',
@@ -154,7 +148,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     public testAutoConsentAll() {
         const testEvent = new Event('testAutoConsent');
-        this.onAcceptAllEvent(testEvent);
+        this.onHomepageAcceptAllEvent(testEvent);
     }
 
     public testAutoConsent(consent: IPermissions): void {
@@ -229,7 +223,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        const states = [ConsentPage.HOMESCREEN, ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE, ConsentPage.AGE_GATE];
+        const states = [ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE, ConsentPage.AGE_GATE];
         states.forEach(state => {
             if (state === page) {
                 this.container().classList.add(page);
@@ -237,17 +231,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 this.container().classList.remove(state);
             }
         });
-    }
-
-    private onAcceptAllEvent(event: Event) {
-        event.preventDefault();
-
-        const permissions: IPermissions = {
-            all: true
-        };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
-        const element = (<HTMLElement> this._container.querySelector('.accept-all'));
-        this.closeWithAnimation(element);
     }
 
     private onHomepageAcceptAllEvent(event: Event) {
