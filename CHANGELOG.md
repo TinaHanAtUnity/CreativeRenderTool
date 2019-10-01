@@ -1,4 +1,5 @@
-# Pending
+# Tue Oct  1 15:57:35 UTC 2019
+
 * Privacy SDK Refactor part 2 [#11181](https://github.com/Applifier/unity-ads-webview/pull/11181)
 
 # Mon Sep 30 17:14:55 UTC 2019
