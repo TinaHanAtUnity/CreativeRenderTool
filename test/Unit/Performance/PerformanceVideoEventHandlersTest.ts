@@ -91,7 +91,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const endScreenParams: IEndScreenParameters = {
             platform,
             core,

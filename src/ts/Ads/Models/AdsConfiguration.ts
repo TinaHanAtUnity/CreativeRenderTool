@@ -21,9 +21,6 @@ export interface IAdsConfiguration {
     cacheMode: CacheMode;
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
-    gdprEnabled: boolean;
-    optOutRecorded: boolean;
-    optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
     hidePrivacy: boolean | undefined;
 }
@@ -33,9 +30,6 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         cacheMode: ['number'],
         placements: ['object'],
         defaultPlacement: ['object'],
-        gdprEnabled: ['boolean'],
-        optOutRecorded: ['boolean'],
-        optOutEnabled: ['boolean'],
         defaultBannerPlacement: ['string', 'undefined'],
         hidePrivacy: ['boolean', 'undefined']
     };
@@ -98,30 +92,6 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return this.get('defaultBannerPlacement');
     }
 
-    public isGDPREnabled(): boolean {
-        return this.get('gdprEnabled');
-    }
-
-    public setGDPREnabled(enabled: boolean) {
-        this.set('gdprEnabled', enabled);
-    }
-
-    public isOptOutRecorded(): boolean {
-        return this.get('optOutRecorded');
-    }
-
-    public setOptOutRecorded(recorded: boolean) {
-        this.set('optOutRecorded', recorded);
-    }
-
-    public isOptOutEnabled(): boolean {
-        return this.get('optOutEnabled');
-    }
-
-    public setOptOutEnabled(optOutEnabled: boolean) {
-        this.set('optOutEnabled', optOutEnabled);
-    }
-
     public getHidePrivacy(): boolean | undefined {
         return this.get('hidePrivacy');
     }
@@ -142,9 +112,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return {
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': defaultPlacementId,
-            'optOutEnabled': this.isOptOutEnabled(),
-            'optOutRecorded': this.isOptOutEnabled()
+            'defaultPlacement': defaultPlacementId
         };
     }
 }

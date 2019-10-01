@@ -31,10 +31,12 @@ export class PrivacyParser {
         const gamePrivacy = this.parseGamePrivacy(sanitizedConfigJson.gamePrivacy, sanitizedConfigJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(sanitizedConfigJson.userPrivacy, sanitizedConfigJson.gamePrivacy,
             sanitizedConfigJson.optOutEnabled, limitAdTracking);
-
+        const gdprEnabled = sanitizedConfigJson.gdprEnabled;
+        const optOutRecorded = sanitizedConfigJson.optOutRecorded;
+        const optOutEnabled = sanitizedConfigJson.optOutEnabled;
         const ageGateLimit = sanitizedConfigJson.ageGateLimit ? sanitizedConfigJson.ageGateLimit : 0;
 
-        return new PrivacySDK(gamePrivacy, userPrivacy, ageGateLimit);
+        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit);
     }
 
     // For #incident-20190516-2

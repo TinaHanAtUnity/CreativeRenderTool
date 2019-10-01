@@ -11,9 +11,9 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 class TestHelper {
@@ -29,7 +29,7 @@ class TestHelper {
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let analytics: IAnalyticsApi;
-        let adsConfiguration: AdsConfiguration;
+        let privacySDK: PrivacySDK;
         let analyticsManager: IAnalyticsManager;
         let analyticsStorage: AnalyticsStorage;
         let coreModule: ICore;
@@ -40,13 +40,13 @@ class TestHelper {
             coreModule = TestFixtures.getCoreModule(nativeBridge);
             analytics = TestFixtures.getAnalyticsApi(nativeBridge);
             coreModule.Config.set('analytics', true);
-            adsConfiguration = TestFixtures.getAdsConfiguration();
+            privacySDK = TestFixtures.getPrivacySDK(coreModule.Api);
 
             sinon.stub(coreModule.Api.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
             sinon.stub(coreModule.RequestManager, 'post').returns(Promise.resolve());
 
             analyticsStorage = new AnalyticsStorage(coreModule.Api);
-            analyticsManager = new AnalyticsManager(coreModule, analytics, adsConfiguration, analyticsStorage);
+            analyticsManager = new AnalyticsManager(coreModule, analytics, privacySDK, analyticsStorage);
         });
 
         describe('SilentAnalyticsManager (Analytics Disabled)', () => {

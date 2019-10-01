@@ -872,7 +872,7 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
             simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
             token: this._coreConfig.getToken(),
-            legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+            legalFramework: this._privacy.isGDPREnabled() ? 'gdpr' : 'default'
         };
 
         if (this.getPreviousPlacementId()) {
@@ -963,9 +963,9 @@ export class CampaignManager {
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
                 body.gameSessionCounters = gameSessionCounters;
-                body.gdprEnabled = this._adsConfig.isGDPREnabled();
-                body.optOutEnabled = this._adsConfig.isOptOutEnabled();
-                body.optOutRecorded = this._adsConfig.isOptOutRecorded();
+                body.gdprEnabled = this._privacy.isGDPREnabled();
+                body.optOutEnabled = this._privacy.isOptOutEnabled();
+                body.optOutRecorded = this._privacy.isOptOutRecorded();
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
                 body.isLoadEnabled = this._isLoadEnabled;

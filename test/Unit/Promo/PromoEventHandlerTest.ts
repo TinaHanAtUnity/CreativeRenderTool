@@ -1,5 +1,4 @@
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -14,6 +13,7 @@ import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('PromoEventHandlersTest', () => {
     let platform: Platform;
@@ -93,29 +93,29 @@ describe('PromoEventHandlersTest', () => {
         });
 
         it ('should set the optOutRecorded flag in the configuration', () => {
-            const config = sinon.createStubInstance(AdsConfiguration);
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
 
-            config.isOptOutRecorded.returns(false);
+            privacySDK.isOptOutRecorded.returns(false);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, privacyManager);
-            sinon.assert.calledWith(<sinon.SinonSpy>config.setOptOutRecorded, true);
+            PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
+            sinon.assert.calledWith(<sinon.SinonSpy>privacySDK.setOptOutRecorded, true);
         });
 
         it('should send GDPR operative Event with skip', () => {
-            const config = sinon.createStubInstance(AdsConfiguration);
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
 
-            config.isOptOutRecorded.returns(false);
+            privacySDK.isOptOutRecorded.returns(false);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, privacyManager);
+            PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
             sinon.assert.calledWithExactly(<sinon.SinonSpy>privacyManager.sendGDPREvent, 'skip');
         });
 
         it('should not call gdpr or set optOutRecorded when already recorded', () => {
-            const config = sinon.createStubInstance(AdsConfiguration);
+            const privacySDK = sinon.createStubInstance(PrivacySDK);
 
-            config.isOptOutRecorded.returns(true);
-            PromoEventHandler.onGDPRPopupSkipped(config, privacyManager);
-            sinon.assert.notCalled(<sinon.SinonSpy>config.setOptOutRecorded);
+            privacySDK.isOptOutRecorded.returns(true);
+            PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
+            sinon.assert.notCalled(<sinon.SinonSpy>privacySDK.setOptOutRecorded);
             sinon.assert.notCalled(<sinon.SinonSpy>privacyManager.sendGDPREvent);
         });
     });

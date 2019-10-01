@@ -19,6 +19,8 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import Test = Mocha.Test;
 
 describe('UnityPurchasingPurchasingAdapter', () => {
     let platform: Platform;
@@ -30,6 +32,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let metaDataManager: MetaDataManager;
+    let privacySDK: PrivacySDK;
 
     let purchasingAdapter: IPurchasingAdapter;
 
@@ -79,6 +82,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         const request = sinon.createStubInstance(RequestManager);
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         metaDataManager = new MetaDataManager(core);
+        privacySDK = TestFixtures.getPrivacySDK(core);
 
         sinon.stub(promo.Purchasing, 'getPromoCatalog').returns(Promise.resolve());
         sinon.stub(promo.Purchasing, 'getPromoVersion').returns(Promise.resolve());
@@ -92,7 +96,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
         const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
         const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, privacySDK, clientInfo, metaDataManager);
     });
 
     afterEach(() => {
