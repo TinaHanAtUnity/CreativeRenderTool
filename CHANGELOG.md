@@ -1,3 +1,6 @@
+# Pending
+* Privacy SDK Refactor part 2 [#11181](https://github.com/Applifier/unity-ads-webview/pull/11181)
+
 # Mon Sep 30 17:14:55 UTC 2019
 
 * Hide Privacy button in China [#11388](https://github.com/Applifier/unity-ads-webview/pull/11388)
