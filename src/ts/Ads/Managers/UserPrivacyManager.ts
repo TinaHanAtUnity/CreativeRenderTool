@@ -80,6 +80,7 @@ export class UserPrivacyManager {
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
+    private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
         this._platform = platform;
@@ -277,6 +278,15 @@ export class UserPrivacyManager {
         } else {
             return <IGranularPermissions>permissions;
         }
+    }
+
+    public getUsersAgeGateChoice(): AgeGateChoice {
+        // todo: get value from the storage
+        return this._ageGateChoice;
+    }
+
+    public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
+        this._ageGateChoice = ageGateChoice;
     }
 
     private pushConsent(consent: boolean): Promise<void> {

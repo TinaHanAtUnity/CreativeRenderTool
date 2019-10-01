@@ -154,8 +154,9 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     // IConsentViewHandler
     public onAgeGateDisagree(): void {
         // todo: use storage to save user's decision
-
         this._ageGateChoice = AgeGateChoice.NO;
+
+        this._privacyManager.setUsersAgeGateChoice(this._ageGateChoice);
 
         if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
             const permissions: IPermissions = {
@@ -171,6 +172,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     public onAgeGateAgree(): void {
         this._ageGateChoice = AgeGateChoice.YES;
+
+        this._privacyManager.setUsersAgeGateChoice(this._ageGateChoice);
     }
 
     public onPrivacy(url: string): void {
