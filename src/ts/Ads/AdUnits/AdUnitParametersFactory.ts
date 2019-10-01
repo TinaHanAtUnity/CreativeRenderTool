@@ -162,9 +162,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         let privacy: AbstractPrivacy;
 
         if (this._privacySDK.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
-            privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
+            privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
-            privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
+            privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
         }
 
         const privacyEventHandlerParameters: IPrivacyEventHandlerParameters = {
@@ -190,7 +190,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             return false;
         }
 
-        return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
+        return parameters.privacySDK.isGDPREnabled() ? !parameters.privacySDK.isOptOutRecorded() : false;
     }
 
     protected getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
@@ -214,7 +214,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             showGDPRBanner: showGDPRBanner,
             adUnitStyle: undefined,
             campaignId: undefined,
-            osVersion: undefined
+            osVersion: undefined,
+            hidePrivacy: parameters.adsConfig.getHidePrivacy()
         };
     }
 }

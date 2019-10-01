@@ -135,7 +135,7 @@ describe('Vast VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -369,7 +369,7 @@ describe('Performance VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, performanceCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, performanceCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -854,7 +854,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         placement = TestFixtures.getPlacement();
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
-        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
             campaign: campaign,

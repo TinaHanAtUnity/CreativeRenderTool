@@ -39,6 +39,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IStoreApi } from 'Store/IStore';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import Test = Mocha.Test;
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
@@ -109,10 +110,10 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
                 programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+                privacySDK = TestFixtures.getPrivacySDK(core);
 
-                privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+                privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
                 mraidView = new MRAID(platform, core, deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
-                privacySDK = sinon.createStubInstance(PrivacySDK);
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                     platform,

@@ -1,6 +1,23 @@
-# Pending
+# Tue Oct  1 15:57:35 UTC 2019
+
+* Privacy SDK Refactor part 2 [#11181](https://github.com/Applifier/unity-ads-webview/pull/11181)
+
+# Mon Sep 30 17:14:55 UTC 2019
+
+* Hide Privacy button in China [#11388](https://github.com/Applifier/unity-ads-webview/pull/11388)
+* Remove unused code related to Consent Homescreen [#11337](https://github.com/Applifier/unity-ads-webview/pull/11337)
+
+# Thu Sep 26 22:28:16 UTC 2019
+
+* Enable A/B tested Consent layout for all users [#11326](https://github.com/Applifier/unity-ads-webview/pull/11326)
+* Add Updated Load Whitelist and Modify Load 3.2 Experiment [#11335](https://github.com/Applifier/unity-ads-webview/pull/11335)
+* Enable and Fix CampaignRefreshManager Tests [#11328](https://github.com/Applifier/unity-ads-webview/pull/11328)
+
+# Wed Sep 25 23:32:36 UTC 2019
 
 * Open Measurement - Add Session Start and AdPlan for IAS [#11302](https://github.com/Applifier/unity-ads-webview/pull/11302)
+* Disable Promo Cache mode to remove reliance on Storage API [#11299](https://github.com/Applifier/unity-ads-webview/pull/11299)
+* Remove slider v2.1 experiment [#11327](https://github.com/Applifier/unity-ads-webview/pull/11327)
 
 # Mon Sep 23 17:57:07 UTC 2019
 

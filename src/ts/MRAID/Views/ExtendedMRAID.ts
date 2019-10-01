@@ -28,8 +28,8 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     protected _campaign: PerformanceMRAIDCampaign;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
-        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean = false) {
+        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, hidePrivacy, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;

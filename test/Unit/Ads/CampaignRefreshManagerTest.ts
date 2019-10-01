@@ -3,7 +3,7 @@ import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IAdsApi } from 'Ads/IAds';
+import { IAdsApi, IAds } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
@@ -45,6 +45,7 @@ import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { Performance } from 'Performance/Performance';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -56,6 +57,8 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IStoreApi } from 'Store/IStore';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { IARApi } from 'AR/AR';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -100,7 +103,7 @@ export class TestAdUnit extends AbstractAdUnit {
     }
 }
 
-xdescribe('CampaignRefreshManager', () => {
+describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let vastParser: VastParserStrict;
@@ -113,7 +116,9 @@ xdescribe('CampaignRefreshManager', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let coreModule: ICore;
+    let adsModule: IAds;
     let ads: IAdsApi;
+    let ar: IARApi;
     let store: IStoreApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
@@ -144,11 +149,12 @@ xdescribe('CampaignRefreshManager', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         coreModule = TestFixtures.getCoreModule(nativeBridge);
         core = coreModule.Api;
-        ads = TestFixtures.getAdsApi(nativeBridge);
+        adsModule = TestFixtures.getAdsModule(coreModule);
+        ads = adsModule.Api;
+        ar = TestFixtures.getARApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
         privacy = sinon.createStubInstance(AbstractPrivacy);
         privacySDK = sinon.createStubInstance(PrivacySDK);
-
         storageBridge = new StorageBridge(core);
         placementManager = sinon.createStubInstance(PlacementManager);
         focusManager = new FocusManager(platform, core);
@@ -186,6 +192,14 @@ xdescribe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
+
+        const performance = new Performance(ar, coreModule, adsModule, undefined);
+        const contentTypeHandlerMap = performance.getContentTypeHandlerMap();
+        for (const contentType in contentTypeHandlerMap) {
+            if (contentTypeHandlerMap.hasOwnProperty(contentType)) {
+                campaignParserManager.addHandler(contentType, contentTypeHandlerMap[contentType]);
+            }
+        }
 
         adUnitParams = {
             platform,
@@ -518,7 +532,7 @@ xdescribe('CampaignRefreshManager', () => {
             let receivedErrorType: string;
             let receivedError: any;
 
-            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+            const diagnosticsStub = sinon.stub(SessionDiagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;
                 receivedError = error;
             });
@@ -562,7 +576,7 @@ xdescribe('CampaignRefreshManager', () => {
             let receivedErrorType: string;
             let receivedError: any;
 
-            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+            const diagnosticsStub = sinon.stub(SessionDiagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;
                 receivedError = error;
             });
@@ -580,7 +594,7 @@ xdescribe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'handle_campaign_error', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'parse_campaign_wrong_contentType_error', 'Incorrect error type');
                 assert.equal(receivedError.error.message , 'Unsupported content-type: wrong/contentType', 'Incorrect error message');
             });
         });
@@ -589,7 +603,7 @@ xdescribe('CampaignRefreshManager', () => {
             let receivedErrorType: string;
             let receivedError: any;
 
-            const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
+            const diagnosticsStub = sinon.stub(SessionDiagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;
                 receivedError = error;
             });

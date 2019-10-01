@@ -47,9 +47,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        if (this._configuration.isOptOutRecorded()) {
-            if (optOutEnabled !== this._configuration.isOptOutEnabled()) {
-                this._configuration.setOptOutEnabled(optOutEnabled);
+        if (this._privacy.isOptOutRecorded()) {
+            if (optOutEnabled !== this._privacy.isOptOutEnabled()) {
+                this._privacy.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
                     this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
@@ -58,8 +58,8 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 }
             }
         } else {
-            this._configuration.setOptOutRecorded(true);
-            this._configuration.setOptOutEnabled(optOutEnabled);
+            this._privacy.setOptOutRecorded(true);
+            this._privacy.setOptOutEnabled(optOutEnabled);
 
             // if default choice was not changed and no previous answer has been recorded, we must treat this event
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick

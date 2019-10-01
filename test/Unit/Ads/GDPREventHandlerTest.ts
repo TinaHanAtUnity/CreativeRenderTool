@@ -49,7 +49,7 @@ describe('GDPREventHandlerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
-        privacySDK = sinon.createStubInstance(PrivacySDK);
+        privacySDK = TestFixtures.getPrivacySDK(core);
         adUnitParameters = {
             platform,
             core,
@@ -82,20 +82,21 @@ describe('GDPREventHandlerTest', () => {
     });
 
     describe('When calling onGDPRPopupSkipped', () => {
+        let setOptPutRecordedStub: sinon.SinonSpy;
         beforeEach(() => {
-            adUnitParameters.adsConfig.set('optOutRecorded', false);
-            sinon.spy(adUnitParameters.adsConfig, 'setOptOutRecorded');
+            adUnitParameters.privacySDK.setOptOutRecorded(false);
+            setOptPutRecordedStub = sinon.spy(adUnitParameters.privacySDK, 'setOptOutRecorded');
         });
 
         it('should send GDPR skip event', () => {
             gdprEventHandler.onGDPRPopupSkipped();
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.adsConfig.setOptOutRecorded, true);
+            sinon.assert.calledWith(setOptPutRecordedStub, true);
             sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, GDPREventAction.SKIP);
         });
 
         it('GDPR skip event should not be sent', () => {
-            adUnitParameters.adsConfig.set('optOutRecorded', true);
+            adUnitParameters.privacySDK.setOptOutRecorded(true);
             gdprEventHandler.onGDPRPopupSkipped();
 
             sinon.assert.notCalled(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent);
