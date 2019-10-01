@@ -337,8 +337,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onAgeGateOverEvent(event: Event): void {
         // todo: with UnityConsent ConsentPage.HOMEPAGE should be shown next
         // this.showPage(ConsentPage.HOMEPAGE);
-        this._handlers.forEach(handler => handler.onAgeGateDisagree());
-        const element = (<HTMLElement> this._container.querySelector('.agree'));
+        this._handlers.forEach(handler => handler.onAgeGateAgree());
+        const element = (<HTMLElement> this._container.querySelector('.age-gate-over'));
 
         this.closeWithAnimation(element);
     }
@@ -346,7 +346,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onAgeGateUnderEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onAgeGateDisagree());
-        const element = (<HTMLElement> this._container.querySelector('.disagree'));
+        const element = (<HTMLElement> this._container.querySelector('.age-gate-under'));
 
         this.closeWithAnimation(element);
     }
