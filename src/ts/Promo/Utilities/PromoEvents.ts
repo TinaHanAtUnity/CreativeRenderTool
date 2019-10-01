@@ -9,6 +9,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 // external fields
 export interface IPurchaseCommon {
@@ -93,16 +94,16 @@ export class PromoEvents {
     private _platform: Platform;
     private _core: ICoreApi;
     private _coreConfiguration: CoreConfiguration;
-    private _adsConfiguration: AdsConfiguration;
+    private _privacySDK: PrivacySDK;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _analyticsStorage: AnalyticsStorage;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, analyticsStorage: AnalyticsStorage) {
+    constructor(platform: Platform, core: ICoreApi, coreConfiguration: CoreConfiguration, privacySDK: PrivacySDK, clientInfo: ClientInfo, deviceInfo: DeviceInfo, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._coreConfiguration = coreConfiguration;
-        this._adsConfiguration = adsConfiguration;
+        this._privacySDK = privacySDK;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._analyticsStorage = analyticsStorage;
@@ -147,7 +148,7 @@ export class PromoEvents {
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._privacySDK.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 request: 'purchase',
@@ -184,7 +185,7 @@ export class PromoEvents {
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._privacySDK.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 request: 'purchase',
@@ -224,7 +225,7 @@ export class PromoEvents {
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._privacySDK.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 iap_service: false,
@@ -260,7 +261,7 @@ export class PromoEvents {
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._privacySDK.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 iap_service: false,
@@ -293,7 +294,7 @@ export class PromoEvents {
     }
 
     private getDeviceId(): string {
-        const gdprEnabled: boolean = this._adsConfiguration.isOptOutEnabled() && this._adsConfiguration.isGDPREnabled();
+        const gdprEnabled: boolean = this._privacySDK.isOptOutEnabled() && this._privacySDK.isGDPREnabled();
         if (!gdprEnabled) {
             if (this._deviceInfo instanceof AndroidDeviceInfo) {
                 return this._deviceInfo.getDevice();

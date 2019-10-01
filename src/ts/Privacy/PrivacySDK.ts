@@ -1,23 +1,20 @@
-import {
-    CurrentUnityConsentVersion,
-    GamePrivacy, IAllPermissions, IGranularPermissions, IProfilingPermissions,
-    IRawGamePrivacy,
-    IRawUserPrivacy,
-    PrivacyMethod,
-    UserPrivacy
-} from 'Privacy/Privacy';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
     private _userPrivacy: UserPrivacy;
     private _testForceConsentUnit: boolean;
+    private _gdprEnabled: boolean;
+    private _optOutRecorded: boolean;
+    private _optOutEnabled: boolean;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
         this._testForceConsentUnit = false;
+        this._gdprEnabled = gdprEnabled;
+        this._optOutRecorded = optOutRecorded;
+        this._optOutEnabled = optOutEnabled;
     }
 
     public isConsentShowRequired(): boolean {
@@ -45,5 +42,29 @@ export class PrivacySDK {
 
     public getUserPrivacy(): UserPrivacy {
         return this._userPrivacy;
+    }
+
+    public isGDPREnabled(): boolean {
+        return this._gdprEnabled;
+    }
+
+    public setGDPREnabled(enabled: boolean) {
+        this._gdprEnabled = enabled;
+    }
+
+    public isOptOutRecorded(): boolean {
+        return this._optOutRecorded;
+    }
+
+    public setOptOutRecorded(recorded: boolean) {
+        this._optOutRecorded = recorded;
+    }
+
+    public isOptOutEnabled(): boolean {
+        return this._optOutEnabled;
+    }
+
+    public setOptOutEnabled(optOutEnabled: boolean) {
+        this._optOutEnabled = optOutEnabled;
     }
 }

@@ -399,9 +399,9 @@ export class OperativeEventManager {
                 'cached': CampaignAssetInfo.isCached(this._campaign),
                 'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
                 'token': this._coreConfig.getToken(),
-                'gdprEnabled': this._adsConfig.isGDPREnabled(),
-                'optOutEnabled': this._adsConfig.isOptOutEnabled(),
-                'optOutRecorded': this._adsConfig.isOptOutRecorded(),
+                'gdprEnabled': this._privacySDK.isGDPREnabled(),
+                'optOutEnabled': this._privacySDK.isOptOutEnabled(),
+                'optOutRecorded': this._privacySDK.isOptOutRecorded(),
                 'privacy': session.getPrivacy(),
                 'gameSessionCounters': session.getGameSessionCounters(),
                 'networkType': networkType,
@@ -410,7 +410,7 @@ export class OperativeEventManager {
                 'screenHeight': screenHeight,
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
                 'isLoadEnabled': this._campaign.isLoadEnabled(),
-                'legalFramework': this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+                'legalFramework': this._privacySDK.isGDPREnabled() ? 'gdpr' : 'default'
             };
 
             if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
