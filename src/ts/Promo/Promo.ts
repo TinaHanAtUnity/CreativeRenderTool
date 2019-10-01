@@ -38,13 +38,13 @@ export class Promo extends AbstractParserModule implements IPromo {
             Purchasing: new PurchasingApi(this._core.NativeBridge)
         };
 
-        this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo, ads.Analytics.AnalyticsStorage);
+        this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.PrivacySDK, core.ClientInfo, core.DeviceInfo, ads.Analytics.AnalyticsStorage);
         this.OrganicPurchaseManager = new OrganicPurchaseManager(core.Api.Storage, this.PromoEvents, core.RequestManager);
     }
 
     public initialize() {
         this.OrganicPurchaseManager.initialize();
-        PurchasingUtilities.initialize(this._core.Api, this.Api, this._purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, this._core.RequestManager, this._core.MetaDataManager, this._ads.Analytics.AnalyticsManager);
+        PurchasingUtilities.initialize(this._core.Api, this.Api, this._purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, this._core.RequestManager, this._core.MetaDataManager, this._ads.Analytics.AnalyticsManager, this._ads.PrivacySDK);
     }
 
 }

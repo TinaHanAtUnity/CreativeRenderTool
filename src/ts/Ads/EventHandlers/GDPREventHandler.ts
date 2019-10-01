@@ -23,8 +23,8 @@ export abstract class GDPREventHandler implements IGDPREventHandler {
     }
 
     public onGDPRPopupSkipped(): void {
-        if (!this._adsConfig.isOptOutRecorded()) {
-            this._adsConfig.setOptOutRecorded(true);
+        if (!this._privacySDK.isOptOutRecorded()) {
+            this._privacySDK.setOptOutRecorded(true);
             this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
             const userPrivacy = this._privacySDK.getUserPrivacy();
             if (userPrivacy) {

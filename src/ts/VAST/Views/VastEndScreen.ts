@@ -21,6 +21,7 @@ export interface IVastEndscreenParameters {
     campaign: VastCampaign;
     clientInfo: ClientInfo;
     country: string | undefined;
+    hidePrivacy?: boolean;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandlerView {
@@ -30,6 +31,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
     private _country: string | undefined;
+    private _hidePrivacy: boolean = false;
 
     constructor(platform: Platform, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(platform, 'vast-end-screen');
@@ -37,6 +39,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         this._campaign = parameters.campaign;
         this._country = parameters.country;
         this._privacy = privacy;
+        this._hidePrivacy = parameters.hidePrivacy || false;
 
         if (this._campaign.hasHtmlEndscreen()) {
             this._template = new Template(VastHTMLEndScreenTemplate);
@@ -100,6 +103,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement> this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
+
+        // hide privacy icon for China
+        if (this._hidePrivacy) {
+            this._container.classList.add('hidePrivacyButton');
         }
     }
 

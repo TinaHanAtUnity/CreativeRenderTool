@@ -1,5 +1,4 @@
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -14,6 +13,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { Observables } from 'Core/Utilities/Observables';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -40,16 +40,16 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private _core: ICoreApi;
     private _promo: IPromoApi;
     private _coreConfiguration: CoreConfiguration;
-    private _adsConfiguration: AdsConfiguration;
+    private _privacySDK: PrivacySDK;
     private _clientInfo: ClientInfo;
     private _initPromise: Promise<void>;
     private _isInitialized = false;
     private _metaDataManager: MetaDataManager;
 
-    constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo, metaDataManager: MetaDataManager) {
+    constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, privacySDK: PrivacySDK, clientInfo: ClientInfo, metaDataManager: MetaDataManager) {
         this._core = core;
         this._promo = promo;
-        this._adsConfiguration = adsConfiguration;
+        this._privacySDK = privacySDK;
         this._coreConfiguration = coreConfiguration;
         this._clientInfo = clientInfo;
         this._metaDataManager = metaDataManager;
@@ -96,7 +96,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         const modifiedPurchaseUrls = thirdPartyEventManager.replaceTemplateValuesAndEncodeUrls(purchaseUrls);
         const iapPayload: IPromoPayload = {
             gamerToken: this._coreConfiguration.getToken(),
-            trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
+            trackingOptOut: this._privacySDK.isOptOutEnabled(),
             iapPromo: true,
             gameId: this._clientInfo.getGameId() + '|' + this._coreConfiguration.getToken(),
             abGroup: this._coreConfiguration.getAbGroup(),
@@ -150,7 +150,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             iapPromo: true,
             abGroup: this._coreConfiguration.getAbGroup(),
             gameId: this._clientInfo.getGameId() + '|' + this._coreConfiguration.getToken(),
-            trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
+            trackingOptOut: this._privacySDK.isOptOutEnabled(),
             gamerToken: this._coreConfiguration.getToken(),
             request: IPromoRequest.SETIDS
         };
