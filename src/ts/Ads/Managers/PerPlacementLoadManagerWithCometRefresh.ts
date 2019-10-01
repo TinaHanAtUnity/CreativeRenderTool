@@ -1,7 +1,6 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
 import { Observables } from 'Core/Utilities/Observables';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -9,7 +8,7 @@ import { LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 export class PerPlacementLoadManagerWithCometRefresh extends PerPlacementLoadManager {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
-        if (LoadExperimentWithCometRefreshing.isValid(this._coreConfig.getAbGroup()) && placement.getCurrentCampaign() instanceof PerformanceCampaign) {
+        if (placement.getCurrentCampaign() instanceof PerformanceCampaign) {
             Observables.once(adUnit.onFinish, () => {
                 return this.refreshReadyPerformanceCampaigns();
             });

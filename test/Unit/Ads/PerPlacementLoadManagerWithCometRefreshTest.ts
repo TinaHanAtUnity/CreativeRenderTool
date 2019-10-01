@@ -19,7 +19,6 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -92,7 +91,6 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
     describe('setCurrentAdUnit', () => {
         let sandbox: sinon.SinonSandbox;
         let refreshReadyPerformanceCampaignStub: sinon.SinonStub;
-        let abTestStub: sinon.SinonStub;
 
         let placement: Placement;
         let adUnit: AbstractAdUnit;
@@ -100,7 +98,6 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             refreshReadyPerformanceCampaignStub = sandbox.stub(loadManager, 'refreshReadyPerformanceCampaigns');
-            abTestStub = sandbox.stub(LoadExperimentWithCometRefreshing, 'isValid');
             placement = adsConfig.getPlacement('premium');
             adUnit = sandbox.createStubInstance(AbstractAdUnit);
             (<any>adUnit).onFinish = new Observable0();
@@ -111,19 +108,17 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         });
 
         [
-            {abTest: true, campaign: TestFixtures.getCampaign(), shouldCall: true},
-            {abTest: true, campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false},
-            {abTest: true, campaign: TestFixtures.getPromoCampaign(), shouldCall: false},
-            {abTest: true, campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false},
-            {abTest: true, campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false},
-            {abTest: false, campaign: TestFixtures.getCampaign(), shouldCall: false},
-            {abTest: false, campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false},
-            {abTest: false, campaign: TestFixtures.getPromoCampaign(), shouldCall: false},
-            {abTest: false, campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false},
-            {abTest: false, campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false},
-        ].forEach(({abTest, campaign, shouldCall}) => {
-            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onFinish when ABTest is ${abTest ? 'active' : 'inactive'} but a ${campaign.getContentType()} was shown`, () => {
-                abTestStub.returns(abTest);
+            { campaign: TestFixtures.getCampaign(), shouldCall: true },
+            { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getPromoCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getPromoCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false },
+            { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false }
+        ].forEach(({ campaign, shouldCall }) => {
+            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onFinish when a ${campaign.getContentType()} was shown`, () => {
                 placement.setCurrentCampaign(campaign);
                 loadManager.setCurrentAdUnit(adUnit, placement);
 
@@ -131,10 +126,9 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
 
                 sinon.assert.callCount(refreshReadyPerformanceCampaignStub, shouldCall ? 1 : 0);
             });
-        })
+        });
 
         it('should only call refreshReadyPerformanceCampaign once when onFinish is called multiple times', () => {
-            abTestStub.returns(true);
             placement.setCurrentCampaign(TestFixtures.getCampaign());
             loadManager.setCurrentAdUnit(adUnit, placement);
 
@@ -185,7 +179,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
 
             trackingUrls = {
                 test: ['http://example.com/tracking/url']
-            }
+            };
 
             // Default to return Programmatic MRAID Campaign
             loadCampaignStub.returns(Promise.resolve({
@@ -222,7 +216,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             PlacementState.DISABLED,
             PlacementState.NOT_AVAILABLE,
             PlacementState.NO_FILL,
-            PlacementState.WAITING,
+            PlacementState.WAITING
         ].forEach((state) => {
             it(`should not refresh premium placement with state ${PlacementState[state]}`, () => {
                 premiumPlacement.setState(state);
