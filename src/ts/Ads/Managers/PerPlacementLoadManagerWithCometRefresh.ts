@@ -35,6 +35,7 @@ export class PerPlacementLoadManagerWithCometRefresh extends PerPlacementLoadMan
                             placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
                             this._pts.reportMetricEvent(LoadMetric.LoadCometRefreshFill);
                         } else {
+                            placement.setCurrentCampaign(undefined);
                             this.setPlacementState(placementId, PlacementState.NO_FILL);
                             this._pts.reportMetricEvent(LoadMetric.LoadCometRefreshNoFill);
                         }

@@ -7,6 +7,7 @@ import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManage
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
@@ -109,38 +110,39 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             sandbox.restore();
         });
 
-        it('should call refreshReadyPerformanceCampaigns onFinish when ABTest is active and a Performance Campaign was shown', () => {
-            abTestStub.returns(true);
-            placement.setCurrentCampaign(TestFixtures.getCampaign());
-            loadManager.setCurrentAdUnit(adUnit, placement);
-            adUnit.onFinish.trigger();
-            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
-        });
+        [
+            {abTest: true, campaign: TestFixtures.getCampaign(), shouldCall: true},
+            {abTest: true, campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false},
+            {abTest: true, campaign: TestFixtures.getPromoCampaign(), shouldCall: false},
+            {abTest: true, campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false},
+            {abTest: true, campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false},
+            {abTest: false, campaign: TestFixtures.getCampaign(), shouldCall: false},
+            {abTest: false, campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false},
+            {abTest: false, campaign: TestFixtures.getPromoCampaign(), shouldCall: false},
+            {abTest: false, campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false},
+            {abTest: false, campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false},
+        ].forEach(({abTest, campaign, shouldCall}) => {
+            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onFinish when ABTest is ${abTest ? 'active' : 'inactive'} but a ${campaign.getContentType()} was shown`, () => {
+                abTestStub.returns(abTest);
+                placement.setCurrentCampaign(campaign);
+                loadManager.setCurrentAdUnit(adUnit, placement);
+
+                adUnit.onFinish.trigger();
+
+                sinon.assert.callCount(refreshReadyPerformanceCampaignStub, shouldCall ? 1 : 0);
+            });
+        })
 
         it('should only call refreshReadyPerformanceCampaign once when onFinish is called multiple times', () => {
             abTestStub.returns(true);
             placement.setCurrentCampaign(TestFixtures.getCampaign());
             loadManager.setCurrentAdUnit(adUnit, placement);
+
             adUnit.onFinish.trigger();
             adUnit.onFinish.trigger();
             adUnit.onFinish.trigger();
+
             sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
-        });
-
-        it('should not call refreshReadyPerformanceCampaigns onFinish when ABTest is active but a Display Interstitial Campaign was shown', () => {
-            abTestStub.returns(true);
-            placement.setCurrentCampaign(TestFixtures.getDisplayInterstitialCampaign());
-            loadManager.setCurrentAdUnit(adUnit, placement);
-            adUnit.onFinish.trigger();
-            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
-        });
-
-        it('should not call refreshReadyPerformanceCampaigns onFinish when ABTest is disabled but a Performance Campaign was shown', () => {
-            abTestStub.returns(false);
-            placement.setCurrentCampaign(TestFixtures.getCampaign());
-            loadManager.setCurrentAdUnit(adUnit, placement);
-            adUnit.onFinish.trigger();
-            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
         });
     });
 
@@ -152,28 +154,43 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         let videoPlacement: Placement;
         let mraidPlacement: Placement;
 
+        let cometCampaign: Campaign;
+        let programmaticMRAIDCampaign: Campaign;
+        let displayInterstitialCampaign: Campaign;
+
+        let trackingUrls: ICampaignTrackingUrls;
+
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
+
+            cometCampaign = TestFixtures.getCampaign();
+            displayInterstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
+            programmaticMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
 
             premiumPlacement = adsConfig.getPlacement('premium');
             videoPlacement = adsConfig.getPlacement('video');
             mraidPlacement = adsConfig.getPlacement('mraid');
 
             // Default to a Ready Performance Campaign
-            premiumPlacement.setCurrentCampaign(TestFixtures.getCampaign());
-            videoPlacement.setCurrentCampaign(TestFixtures.getCampaign());
+            premiumPlacement.setCurrentCampaign(cometCampaign);
             premiumPlacement.setState(PlacementState.READY);
+
+            videoPlacement.setCurrentCampaign(cometCampaign);
             videoPlacement.setState(PlacementState.READY);
 
             // Default to a Ready Programmatic Campaign
-            mraidPlacement.setCurrentCampaign(TestFixtures.getDisplayInterstitialCampaign());
+            mraidPlacement.setCurrentCampaign(displayInterstitialCampaign);
             mraidPlacement.setState(PlacementState.READY);
+
+            trackingUrls = {
+                test: ['http://example.com/tracking/url']
+            }
 
             // Default to return Programmatic MRAID Campaign
             loadCampaignStub.returns(Promise.resolve({
-                campaign: TestFixtures.getProgrammaticMRAIDCampaign(),
-                trackingUrls: {}
+                campaign: programmaticMRAIDCampaign,
+                trackingUrls: trackingUrls
             }));
         });
 
@@ -182,37 +199,70 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         });
 
         it('should refresh both performance campaigns and not invalidate programmatic campaign', () => {
-            loadManager.refreshReadyPerformanceCampaigns().then(() => {
+            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
                 sinon.assert.calledTwice(loadCampaignStub);
+
+                sinon.assert.calledWith(loadCampaignStub, videoPlacement);
+                sinon.assert.calledWith(loadCampaignStub, premiumPlacement);
+
                 assert.equal(premiumPlacement.getState(), PlacementState.READY);
-                assert.equal(premiumPlacement.getCurrentCampaign(), TestFixtures.getProgrammaticMRAIDCampaign());
+                assert.equal(premiumPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
+                assert.equal(premiumPlacement.getCurrentTrackingUrls(), trackingUrls);
+
                 assert.equal(videoPlacement.getState(), PlacementState.READY);
-                assert.equal(videoPlacement.getCurrentCampaign(), TestFixtures.getProgrammaticMRAIDCampaign());
+                assert.equal(videoPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
+                assert.equal(premiumPlacement.getCurrentTrackingUrls(), trackingUrls);
+
                 assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                assert.equal(mraidPlacement.getCurrentCampaign(), TestFixtures.getDisplayInterstitialCampaign());
+                assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
             });
         });
 
-        it('should refresh a single performance campaign and not invalidate programmatic campaign', () => {
-            premiumPlacement.setState(PlacementState.NOT_AVAILABLE);
-            loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                sinon.assert.calledOnce(loadCampaignStub);
-                assert.equal(premiumPlacement.getState(), PlacementState.NOT_AVAILABLE);
-                assert.equal(videoPlacement.getState(), PlacementState.READY);
-                assert.equal(videoPlacement.getCurrentCampaign(), TestFixtures.getProgrammaticMRAIDCampaign());
-                assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                assert.equal(mraidPlacement.getCurrentCampaign(), TestFixtures.getDisplayInterstitialCampaign());
+        [
+            PlacementState.DISABLED,
+            PlacementState.NOT_AVAILABLE,
+            PlacementState.NO_FILL,
+            PlacementState.WAITING,
+        ].forEach((state) => {
+            it(`should not refresh premium placement with state ${PlacementState[state]}`, () => {
+                premiumPlacement.setState(state);
+                premiumPlacement.setCurrentCampaign(undefined);
+
+                return loadManager.refreshReadyPerformanceCampaigns().then(() => {
+                    sinon.assert.calledOnce(loadCampaignStub);
+
+                    sinon.assert.calledWith(loadCampaignStub, videoPlacement);
+
+                    assert.equal(premiumPlacement.getState(), state);
+                    assert.isUndefined(premiumPlacement.getCurrentCampaign());
+                    assert.isUndefined(premiumPlacement.getCurrentTrackingUrls());
+
+                    assert.equal(videoPlacement.getState(), PlacementState.READY);
+                    assert.equal(videoPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
+
+                    assert.equal(mraidPlacement.getState(), PlacementState.READY);
+                    assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
+                });
             });
         });
 
-        it('should fail to refresh both performance campaigns and not invalidate programmatic campaign', () => {
+        it('should not refresh both performance campaigns and not invalidate programmatic campaign', () => {
             loadCampaignStub.returns(Promise.resolve(undefined));
-            loadManager.refreshReadyPerformanceCampaigns().then(() => {
+
+            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
                 sinon.assert.calledTwice(loadCampaignStub);
+
+                sinon.assert.calledWith(loadCampaignStub, premiumPlacement);
+                sinon.assert.calledWith(loadCampaignStub, videoPlacement);
+
                 assert.equal(premiumPlacement.getState(), PlacementState.NO_FILL);
+                assert.isUndefined(premiumPlacement.getCurrentCampaign());
+
                 assert.equal(videoPlacement.getState(), PlacementState.NO_FILL);
+                assert.isUndefined(videoPlacement.getCurrentCampaign());
+
                 assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                assert.equal(mraidPlacement.getCurrentCampaign(), TestFixtures.getDisplayInterstitialCampaign());
+                assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
             });
         });
     });
