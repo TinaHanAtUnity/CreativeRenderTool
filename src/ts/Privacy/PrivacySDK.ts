@@ -95,7 +95,6 @@ export class PrivacySDK {
             if (this.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT && !this.getUserPrivacy().isRecorded()) {
                 return true;
             }
-            return true;
         }
 
         return false;

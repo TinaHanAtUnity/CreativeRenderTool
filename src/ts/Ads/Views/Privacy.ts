@@ -78,7 +78,7 @@ export class Privacy extends AbstractPrivacy {
 
         this.populateUserSummary();
 
-        if (this._gdprEnabled) {
+        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
             const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement> this._container.querySelector(`#${elId}`);
@@ -87,26 +87,27 @@ export class Privacy extends AbstractPrivacy {
             // Disables reporting for GDPR Regions by hiding the report screen from being activated
             const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
             middleLink.style.visibility = 'hidden';
-        }
 
-        const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
-        if (agreeRadioButton) {
-            agreeRadioButton.onclick = () => {
-                const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
-                confirmationContainer.classList.remove('active');
+            const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
+            if (agreeRadioButton) {
+                agreeRadioButton.onclick = () => {
+                    const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+                    confirmationContainer.classList.remove('active');
 
-                const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
-                requestContainer.classList.remove('active');
+                    const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
+                    requestContainer.classList.remove('active');
 
-                this._dataDeletionConfirmation = false;
-            };
+                    this._dataDeletionConfirmation = false;
+                };
+            }
         }
     }
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        const gdprReduceRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-refuse-radio');
-        if (this._gdprEnabled) {
+        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
+            const gdprReduceRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-refuse-radio');
+
             this._handlers.forEach(handler => {
                 if (handler.onGDPROptOut) {
                     handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation);

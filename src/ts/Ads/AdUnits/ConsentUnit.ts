@@ -166,6 +166,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             };
             this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.NO, ConsentPage.AGE_GATE);
         } else {
+            this._privacySDK.setOptOutRecorded(true);
+            this._privacySDK.setOptOutEnabled(true);
             this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.NO, GDPREventSource.USER);
         }
     }
