@@ -76,7 +76,9 @@ export class Privacy extends AbstractPrivacy {
     public show(): void {
         super.show();
 
-        this.populateUserSummary();
+        if (this._userPrivacyManager.isUserUnderAgeLimit()) {
+            this.populateUserSummary();
+        }
 
         if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
             const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';

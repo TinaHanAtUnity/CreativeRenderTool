@@ -87,6 +87,9 @@ describe('VastVideoEventHandler tests', () => {
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
+
+        privacyManager = sinon.createStubInstance(UserPrivacyManager);
+
         privacy = new Privacy(platform, campaign, privacyManager, false, false);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
@@ -145,8 +148,6 @@ describe('VastVideoEventHandler tests', () => {
             playerMetadataServerId: 'test-gamerSid',
             privacySDK: privacySDK
         });
-
-        privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         vastAdUnitParameters = {
             platform,
