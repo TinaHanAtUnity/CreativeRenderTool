@@ -56,7 +56,13 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
     }
 
     private createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
-        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
+        let showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
+
+        // hide privacy icon for China
+        if (parameters.adsConfig.getHidePrivacy()) {
+           showPrivacyDuringVideo = false;
+        }
+
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
         const overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 

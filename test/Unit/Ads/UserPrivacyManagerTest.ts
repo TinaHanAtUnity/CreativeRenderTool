@@ -712,9 +712,9 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should send selected layout with consent event', () => {
-                return sendEvent(undefined, GDPREventSource.USER, ConsentPage.HOMESCREEN).then((eventData) => {
+                return sendEvent(undefined, GDPREventSource.USER, ConsentPage.HOMEPAGE).then((eventData) => {
                     assert.isDefined(eventData);
-                    assert.equal(eventData.layout, ConsentPage.HOMESCREEN);
+                    assert.equal(eventData.layout, ConsentPage.HOMEPAGE);
                 });
             });
 

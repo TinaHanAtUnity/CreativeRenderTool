@@ -27,13 +27,15 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandlerView {
     private _privacyButtonElement: HTMLElement;
     private _showGDPRBanner: boolean;
     private _gdprPopupClicked: boolean = false;
+    private _hidePrivacy: boolean;
 
-    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean, hidePrivacy: boolean = false) {
         super(platform, 'closer');
         this._template = new Template(CloserTemplate);
         this._placement = placement;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
+        this._hidePrivacy = hidePrivacy;
 
         this._bindings = [
             {
@@ -111,6 +113,11 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandlerView {
             this._privacyButtonElement.style.visibility = 'visible';
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
+        }
+
+        if (this._hidePrivacy) {
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
         }
     }
 

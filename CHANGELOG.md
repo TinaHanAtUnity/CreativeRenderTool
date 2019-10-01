@@ -1,3 +1,8 @@
+# Mon Sep 30 17:14:55 UTC 2019
+
+* Hide Privacy button in China [#11388](https://github.com/Applifier/unity-ads-webview/pull/11388)
+* Remove unused code related to Consent Homescreen [#11337](https://github.com/Applifier/unity-ads-webview/pull/11337)
+
 # Thu Sep 26 22:28:16 UTC 2019
 
 * Enable A/B tested Consent layout for all users [#11326](https://github.com/Applifier/unity-ads-webview/pull/11326)

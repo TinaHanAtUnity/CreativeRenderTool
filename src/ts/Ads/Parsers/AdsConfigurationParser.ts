@@ -42,7 +42,8 @@ export class AdsConfigurationParser {
             cacheMode: cacheMode,
             placements: placements,
             defaultPlacement: defaultPlacement,
-            defaultBannerPlacement: defaultBannerPlacement
+            defaultBannerPlacement: defaultBannerPlacement,
+            hidePrivacy: configJson.hidePrivacy
         };
 
         return new AdsConfiguration(configurationParams);

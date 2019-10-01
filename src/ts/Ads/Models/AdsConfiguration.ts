@@ -13,6 +13,7 @@ export interface IRawAdsConfiguration {
     defaultBannerPlacement: string | undefined;
     gamePrivacy: IRawGamePrivacy | undefined;
     userPrivacy: IRawUserPrivacy | undefined;
+    hidePrivacy: boolean | undefined;
 }
 
 export interface IAdsConfiguration {
@@ -20,6 +21,7 @@ export interface IAdsConfiguration {
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
     defaultBannerPlacement: Placement | undefined;
+    hidePrivacy: boolean | undefined;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -27,7 +29,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         cacheMode: ['number'],
         placements: ['object'],
         defaultPlacement: ['object'],
-        defaultBannerPlacement: ['string', 'undefined']
+        defaultBannerPlacement: ['string', 'undefined'],
+        hidePrivacy: ['boolean', 'undefined']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -86,6 +89,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public getDefaultBannerPlacement(): Placement | undefined {
         return this.get('defaultBannerPlacement');
+    }
+
+    public getHidePrivacy(): boolean | undefined {
+        return this.get('hidePrivacy');
     }
 
     public getDTO(): { [key: string]: unknown } {
