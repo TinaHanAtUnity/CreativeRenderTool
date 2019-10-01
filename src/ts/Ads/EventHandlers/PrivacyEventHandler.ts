@@ -52,9 +52,10 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 this._privacy.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+                    // todo: add age gate choice
+                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.MISSING, GDPREventSource.USER);
                 } else {
-                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTIN);
+                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTIN, AgeGateChoice.MISSING);
                 }
             }
         } else {
@@ -65,9 +66,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
             if (optOutEnabled) {
                 // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+                this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.MISSING, GDPREventSource.USER);
             } else {
-                this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
+                this._privacyManager.sendGDPREvent(GDPREventAction.SKIP, AgeGateChoice.MISSING);
             }
         }
         const gamePrivacy = this._privacy.getGamePrivacy();

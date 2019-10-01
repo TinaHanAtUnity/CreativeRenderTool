@@ -4,11 +4,11 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AgeGateChoice, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
-import { IPermissions } from 'Privacy/Privacy';
+import { IPermissions, PrivacyMethod } from 'Privacy/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -154,12 +154,17 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     // IConsentViewHandler
     public onAgeGateDisagree(): void {
         this._ageGateChoice = AgeGateChoice.NO;
-        const permissions: IPermissions = {
-            gameExp: false,
-            ads: false,
-            external: false
-        };
-        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.NO, ConsentPage.AGE_GATE);
+
+        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
+            const permissions: IPermissions = {
+                gameExp: false,
+                ads: false,
+                external: false
+            };
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.NO, ConsentPage.AGE_GATE);
+        } else {
+            this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.NO, GDPREventSource.USER);
+        }
     }
 
     public onAgeGateAgree(): void {
@@ -192,5 +197,17 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     public description(): string {
         return 'Consent';
+    }
+
+    private getNextAction(currentPage: ConsentPage): void {
+        const gamePrivacyMethod = this._privacySDK.getGamePrivacy().getMethod();
+
+        if (gamePrivacyMethod === PrivacyMethod.LEGITIMATE_INTEREST) {
+            // return ACTION_CLOSE
+        } else if (gamePrivacyMethod === PrivacyMethod.UNITY_CONSENT) {
+            // return ACTION UNITY CONSENT
+        } else {
+            // return ACTION CLOSE
+        }
     }
 }

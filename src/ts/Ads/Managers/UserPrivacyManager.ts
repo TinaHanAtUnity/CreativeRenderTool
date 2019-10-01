@@ -95,7 +95,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
-    public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
+    public sendGDPREvent(action: GDPREventAction, ageGateChoice: AgeGateChoice, source?: GDPREventSource): Promise<void> {
         let infoJson: unknown = {
             'v': 1,
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
@@ -106,7 +106,7 @@ export class UserPrivacyManager {
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
             'legalFramework': this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
-            'agreedOverAgeLimit': AgeGateChoice.MISSING
+            'agreedOverAgeLimit': ageGateChoice
         };
         if (source) {
             infoJson = {
@@ -362,10 +362,10 @@ export class UserPrivacyManager {
     private sendGdprConsentEvent(consent: boolean): Promise<void> {
         let sendEvent;
         if (consent) {
-            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT);
+            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT, AgeGateChoice.MISSING);
         } else {
             // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
-            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
+            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.MISSING, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
             return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {

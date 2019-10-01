@@ -24,6 +24,10 @@ export class PrivacySDK {
             return true;
         }
 
+        if (this.isAgeGateShowRequired()) {
+            return true;
+        }
+
         if (!this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             return false;
         }
@@ -80,5 +84,20 @@ export class PrivacySDK {
 
     public getAgeGateLimit(): number {
         return this._ageGateLimit;
+    }
+
+    private isAgeGateShowRequired(): boolean {
+        if (this.isAgeGateEnabled()) {
+            if (this.getGamePrivacy().getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this.isGDPREnabled() && !this.isOptOutRecorded()) {
+                return true;
+            }
+
+            if (this.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT && !this.getUserPrivacy().isRecorded()) {
+                return true;
+            }
+            return true;
+        }
+
+        return false;
     }
 }

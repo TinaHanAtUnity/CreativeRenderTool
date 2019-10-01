@@ -1,4 +1,4 @@
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -107,7 +107,7 @@ describe('PromoEventHandlersTest', () => {
             privacySDK.isOptOutRecorded.returns(false);
 
             PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
-            sinon.assert.calledWithExactly(<sinon.SinonSpy>privacyManager.sendGDPREvent, 'skip');
+            sinon.assert.calledWithExactly(<sinon.SinonSpy>privacyManager.sendGDPREvent, 'skip', AgeGateChoice.MISSING);
         });
 
         it('should not call gdpr or set optOutRecorded when already recorded', () => {

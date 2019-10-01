@@ -8,7 +8,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -184,7 +184,7 @@ export class Ads implements IAds {
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
 
             if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
-                this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.SANITIZATION);
+                this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.MISSING, GDPREventSource.SANITIZATION);
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);

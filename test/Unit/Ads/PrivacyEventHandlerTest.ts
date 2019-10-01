@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -108,7 +108,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 
                 privacyEventHandler.onGDPROptOut(true);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optout', GDPREventSource.USER);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optout', AgeGateChoice.MISSING, GDPREventSource.USER);
             });
 
             it('should send operative event with action `optin`', () => {
@@ -117,7 +117,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optin');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optin', AgeGateChoice.MISSING);
             });
 
             it('should send operative event with action `skip`', () => {
@@ -126,7 +126,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'skip');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'skip', AgeGateChoice.MISSING);
             });
         });
     });

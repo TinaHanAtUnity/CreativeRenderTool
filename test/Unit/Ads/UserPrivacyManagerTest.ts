@@ -152,9 +152,9 @@ describe('UserPrivacyManagerTest', () => {
                         sinon.assert.calledOnce(onSetStub);
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                         if (t.event === 'optout') {
-                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING, GDPREventSource.METADATA);
                         } else {
-                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING);
                         }
                         sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                         sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -278,9 +278,9 @@ describe('UserPrivacyManagerTest', () => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                             if (t.event === 'optout') {
-                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING, GDPREventSource.METADATA);
                             } else {
-                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING);
                             }
                             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -355,9 +355,9 @@ describe('UserPrivacyManagerTest', () => {
                             return writePromise.then(() => {
                                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                                 if (event === 'optout') {
-                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, GDPREventSource.METADATA);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, AgeGateChoice.MISSING, GDPREventSource.METADATA);
                                 } else {
-                                    sinon.assert.calledWithExactly(sendGDPREventStub, event);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, AgeGateChoice.MISSING);
                                 }
                                 sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', userConsents);
                                 sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -639,7 +639,7 @@ describe('UserPrivacyManagerTest', () => {
                     }
                     return true;
                 };
-                return privacyManager.sendGDPREvent(t.action, t.source).then(() => {
+                return privacyManager.sendGDPREvent(t.action, AgeGateChoice.MISSING, t.source).then(() => {
                     assert.equal(httpKafkaStub.firstCall.args[0], 'ads.events.optout.v1.json', 'privacy event sent to incorrect kafka topic');
                     assert.equal(httpKafkaStub.firstCall.args[1], KafkaCommonObjectType.EMPTY, 'incorrect kafka common object for privacy event');
                     assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
