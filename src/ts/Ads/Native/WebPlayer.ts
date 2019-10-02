@@ -222,9 +222,7 @@ export class WebPlayerApi extends NativeApi {
         const promise = Promises.withTimeout(new Promise<[number, number, number, number]>((resolve) => {
                 observer = this.onGetFrameResponse.subscribe((callIdIncoming: string, frameViewId: string, x: number, y: number, width: number, height: number, alpha: number) => {
                     if (callIdIncoming === callId) {
-                        // process this call
                         resolve([x, y, width, height]);
-                        // unsubscribe
                         if (observer) {
                             this.onGetFrameResponse.unsubscribe(observer);
                         }
