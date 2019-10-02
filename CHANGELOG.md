@@ -1,6 +1,7 @@
 # Pending
 
 * Add Age Gate to Consent Flow [#11445](https://github.com/Applifier/unity-ads-webview/pull/11445)
+* Reverse Zynga Load Experiment for 15 and 16 for SDK 3.1/3.2 [#11449](https://github.com/Applifier/unity-ads-webview/pull/11449)
 * Fix force country test metadata [#11362](https://github.com/Applifier/unity-ads-webview/pull/11362)
 * Add 4 experiments to test several animations for CTA [#11333](https://github.com/Applifier/unity-ads-webview/pull/11333)
 * Change the skip icon [#11386](https://github.com/Applifier/unity-ads-webview/pull/11386)
