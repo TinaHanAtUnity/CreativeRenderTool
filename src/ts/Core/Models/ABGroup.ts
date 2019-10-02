@@ -68,6 +68,7 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
+export const ZyngaWWFLoadTest = new ABTest(13, 14);
 export const LoadExperiment = new ABTest(15, 16); // Intentionally left 15 to not backwards break experiment
 export const LoadExperimentWithCometRefreshing = new ABTest(15); // Intentionally duplicate ABGroup 15
 export const ConsentUXTest = new ABTest(18, 19);
