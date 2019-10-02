@@ -35,7 +35,7 @@ export class PrivacyParser {
         const optOutRecorded = sanitizedConfigJson.optOutRecorded;
         const optOutEnabled = sanitizedConfigJson.optOutEnabled;
 
-        let ageGateLimit = sanitizedConfigJson.ageGateLimit ? sanitizedConfigJson.ageGateLimit : 0;
+        let ageGateLimit = sanitizedConfigJson.ageGateLimit !== undefined ? sanitizedConfigJson.ageGateLimit : 0;
         if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST) {
             ageGateLimit = 0;
 
