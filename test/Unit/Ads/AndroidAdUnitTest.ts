@@ -91,7 +91,8 @@ describe('AndroidAdUnitTest', () => {
             storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign(),
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
 
         adUnitParams = {

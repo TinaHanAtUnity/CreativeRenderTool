@@ -46,8 +46,9 @@ export enum GDPREventAction {
 
 export enum LegalFramework {
     DEFAULT = 'default',
-    GDPR = 'gdpr',
-    CCPA = 'ccpa'
+    GDPR = 'gdpr', // EU
+    CCPA = 'ccpa', // California
+    PPCPI = 'ppcpi' // China
 }
 
 export enum AgeGateChoice {
@@ -107,7 +108,7 @@ export class UserPrivacyManager {
             'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
+            'legalFramework': this._privacy.getLegalFramework(),
             'agreedOverAgeLimit': this._ageGateChoice
         };
         if (source) {
@@ -200,7 +201,7 @@ export class UserPrivacyManager {
             coppa: this._coreConfig.isCoppaCompliant(),
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
-            legalFramework: this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
+            legalFramework: this._privacy.getLegalFramework(),
             agreedOverAgeLimit: this._ageGateChoice
         };
 
@@ -216,7 +217,7 @@ export class UserPrivacyManager {
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
         if (this._privacy.isGDPREnabled()) {
-            this.getAgeGateChoice();
+            this.initAgeGateChoice();
 
             // get consent only if gdpr is enabled
             return this.getConsent().then((consent: boolean) => {
@@ -298,6 +299,10 @@ export class UserPrivacyManager {
         return false;
     }
 
+    public getAgeGateChoice(): AgeGateChoice {
+        return this._ageGateChoice;
+    }
+
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
         return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
@@ -324,7 +329,7 @@ export class UserPrivacyManager {
         });
     }
 
-    private getAgeGateChoice(): void {
+    private initAgeGateChoice(): void {
         if (this._privacy.isAgeGateEnabled()) {
             this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey).then((data: unknown) => {
                 const value: boolean | undefined = this.getConsentTypeHack(data);

@@ -109,7 +109,8 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                     storageBridge: storageBridge,
                     campaign: campaign,
                     playerMetadataServerId: 'test-gamerSid',
-                    privacySDK: privacySDK
+                    privacySDK: privacySDK,
+                    userPrivacyManager: privacyManager
                 });
 
                 const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());

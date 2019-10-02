@@ -1,4 +1,5 @@
 import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
@@ -8,8 +9,9 @@ export class PrivacySDK {
     private _optOutRecorded: boolean;
     private _optOutEnabled: boolean;
     private _ageGateLimit: number;
+    private _legalFramework: LegalFramework;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, ageGateLimit: number) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
         this._testForceConsentUnit = false;
@@ -17,6 +19,7 @@ export class PrivacySDK {
         this._optOutRecorded = optOutRecorded;
         this._optOutEnabled = optOutEnabled;
         this._ageGateLimit = ageGateLimit;
+        this._legalFramework = legalFramework;
     }
 
     public isConsentShowRequired(): boolean {
@@ -84,6 +87,10 @@ export class PrivacySDK {
 
     public getAgeGateLimit(): number {
         return this._ageGateLimit;
+    }
+
+    public getLegalFramework(): LegalFramework {
+        return this._legalFramework;
     }
 
     private isAgeGateShowRequired(): boolean {

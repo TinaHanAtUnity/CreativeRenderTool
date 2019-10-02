@@ -12,6 +12,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 export class PrivacyParser {
     private static _updateUserPrivacyForIncident: boolean = false;
@@ -35,8 +36,9 @@ export class PrivacyParser {
         const optOutRecorded = sanitizedConfigJson.optOutRecorded;
         const optOutEnabled = sanitizedConfigJson.optOutEnabled;
         const ageGateLimit = sanitizedConfigJson.ageGateLimit ? sanitizedConfigJson.ageGateLimit : 0;
+        const legalFramework = sanitizedConfigJson.legalFramework ? sanitizedConfigJson.legalFramework : LegalFramework.DEFAULT;
 
-        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit);
+        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
     }
 
     // For #incident-20190516-2

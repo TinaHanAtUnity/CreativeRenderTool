@@ -146,7 +146,8 @@ describe('VastVideoEventHandler tests', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
 
         vastAdUnitParameters = {
