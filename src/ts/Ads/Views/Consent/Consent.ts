@@ -176,9 +176,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             }
         }
 
-        (<HTMLElement> this._container.querySelector('.age-limit-over')).innerHTML = `${this._ageGateLimit}`;
-        (<HTMLElement> this._container.querySelector('.age-limit-under')).innerHTML = `${this._ageGateLimit - 1}`;
-
+        if (this._ageGateLimit > 0) {
+            // todo: add localization
+            (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = `I'm ${this._ageGateLimit} or older`;
+            (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = `I'm ${this._ageGateLimit - 1} or younger`;
+        }
         this.showPage(this._landingPage);
     }
 
