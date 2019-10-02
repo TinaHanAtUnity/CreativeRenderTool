@@ -42,6 +42,10 @@ export class PrivacyParser {
             Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(sanitizedConfigJson)});
         }
 
+        if (limitAdTracking) {
+            ageGateLimit = 0;
+        }
+
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit);
     }
 
