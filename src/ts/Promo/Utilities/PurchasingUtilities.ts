@@ -23,7 +23,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { Promises } from 'Core/Utilities/Promises';
-import {CatalogRequest} from 'Promo/Models/CatalogRequest';
+import { CatalogRequest } from 'Promo/Models/CatalogRequest';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
