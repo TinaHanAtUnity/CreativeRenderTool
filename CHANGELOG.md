@@ -1,5 +1,7 @@
 # Pending
 
+* Add Age Gate to Consent Flow [#11445](https://github.com/Applifier/unity-ads-webview/pull/11445)
+* Fix force country test metadata [#11362](https://github.com/Applifier/unity-ads-webview/pull/11362)
 * Add 4 experiments to test several animations for CTA [#11333](https://github.com/Applifier/unity-ads-webview/pull/11333)
 * Change the skip icon [#11386](https://github.com/Applifier/unity-ads-webview/pull/11386)
 * Add BrainiumStudios GameId to LionStudios Whitelist [#11414](https://github.com/Applifier/unity-ads-webview/pull/11414)
