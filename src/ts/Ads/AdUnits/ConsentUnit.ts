@@ -168,6 +168,23 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         } else {
             this._privacySDK.setOptOutRecorded(true);
             this._privacySDK.setOptOutEnabled(true);
+
+            const gamePrivacy = this._privacySDK.getGamePrivacy();
+            const userPrivacy = this._privacySDK.getUserPrivacy();
+
+            if (userPrivacy) {
+                userPrivacy.update({
+                    method: gamePrivacy.getMethod(),
+                    version: 0,
+                    permissions: {
+                        all: false,
+                        ads: false,
+                        external: false,
+                        gameExp: false
+                    }
+                });
+            }
+
             this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.NO, GDPREventSource.USER);
         }
     }
@@ -176,6 +193,13 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._ageGateChoice = AgeGateChoice.YES;
 
         this._privacyManager.setUsersAgeGateChoice(this._ageGateChoice);
+
+        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
+            // todo: handle the flow inside view class
+            this._unityConsentView.showPage(ConsentPage.HOMEPAGE);
+        } else {
+            this._unityConsentView.closeAgeGateWithAgreeAnimation();
+        }
     }
 
     public onPrivacy(url: string): void {

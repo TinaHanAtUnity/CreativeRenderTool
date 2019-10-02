@@ -203,6 +203,25 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
+    public showPage(page: ConsentPage) {
+        this._currentPage = page;
+
+        const states = [ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE, ConsentPage.AGE_GATE];
+        states.forEach(state => {
+            if (state === page) {
+                this.container().classList.add(page);
+            } else {
+                this.container().classList.remove(state);
+            }
+        });
+    }
+
+    public closeAgeGateWithAgreeAnimation(): void {
+        const element = (<HTMLElement> this._container.querySelector('.age-gate-over'));
+
+        this.closeWithAnimation(element);
+    }
+
     private shouldShowSaveMyChoices() {
         return this._switchGroup.isPersonalizedExperienceChecked() ||
             this._switchGroup.isPersonalizedAdsChecked() ||
@@ -220,19 +239,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         setTimeout(() => {
             this._handlers.forEach(h => h.onClose());
         }, 1500);
-    }
-
-    private showPage(page: ConsentPage) {
-        this._currentPage = page;
-
-        const states = [ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE, ConsentPage.AGE_GATE];
-        states.forEach(state => {
-            if (state === page) {
-                this.container().classList.add(page);
-            } else {
-                this.container().classList.remove(state);
-            }
-        });
     }
 
     private onHomepageAcceptAllEvent(event: Event) {
@@ -337,12 +343,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private onAgeGateOverEvent(event: Event): void {
-        // todo: with UnityConsent ConsentPage.HOMEPAGE should be shown next
-        // this.showPage(ConsentPage.HOMEPAGE);
+        // todo: pass the next page/action to this view class
         this._handlers.forEach(handler => handler.onAgeGateAgree());
-        const element = (<HTMLElement> this._container.querySelector('.age-gate-over'));
-
-        this.closeWithAnimation(element);
     }
 
     private onAgeGateUnderEvent(event: Event): void {
