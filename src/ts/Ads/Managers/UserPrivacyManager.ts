@@ -68,6 +68,7 @@ export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
+    private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
 
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
@@ -215,6 +216,8 @@ export class UserPrivacyManager {
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
         if (this._privacy.isGDPREnabled()) {
+            this.getAgeGateChoice();
+
             // get consent only if gdpr is enabled
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
@@ -280,17 +283,16 @@ export class UserPrivacyManager {
         }
     }
 
-    public getUsersAgeGateChoice(): AgeGateChoice {
-        // todo: get value from the storage
-        return this._ageGateChoice;
-    }
-
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
         this._ageGateChoice = ageGateChoice;
+
+        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey, this.isUserUnderAgeLimit()).then(() => {
+            this._core.Storage.write(StorageType.PRIVATE);
+        });
     }
 
     public isUserUnderAgeLimit(): boolean {
-        if (this._privacy.isAgeGateEnabled() && this.getUsersAgeGateChoice() === AgeGateChoice.NO) {
+        if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.NO) {
             return true;
         }
         return false;
@@ -320,6 +322,20 @@ export class UserPrivacyManager {
                 throw new Error('gdpr.consent.value is undefined');
             }
         });
+    }
+
+    private getAgeGateChoice(): void {
+        if (this._privacy.isAgeGateEnabled()) {
+            this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey).then((data: unknown) => {
+                const value: boolean | undefined = this.getConsentTypeHack(data);
+                if (typeof(value) !== 'undefined') {
+                    this._ageGateChoice = value ? AgeGateChoice.NO : AgeGateChoice.YES;
+                } else {
+                    this._ageGateChoice = AgeGateChoice.MISSING;
+                }
+            });
+        }
+
     }
 
     private updateConfigurationWithConsent(consent: boolean) {
