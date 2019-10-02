@@ -76,7 +76,7 @@ export class Privacy extends AbstractPrivacy {
     public show(): void {
         super.show();
 
-        if (this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (!this._userPrivacyManager.isUserUnderAgeLimit()) {
             this.populateUserSummary();
         }
 
