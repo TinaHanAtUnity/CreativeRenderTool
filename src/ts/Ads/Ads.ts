@@ -654,7 +654,9 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        if (LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
+        const isZyngaReverseABGroupLoadExperiment = !(LoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId());
+        const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
+        if (isContainedLoadExperiment || isZyngaReverseABGroupLoadExperiment) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }

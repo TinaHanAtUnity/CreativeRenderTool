@@ -115,7 +115,7 @@ export class CustomFeatures {
     }
 
     /**
-     * Includes the list of games for the 3.1 Metadata Load Whitelist
+     * Returns true for the 3.1/3.2 Load Whitelist for the 90/10 Reverse Load AB Test
      */
     public static isZyngaWordsWithFriends(gameId: string): boolean {
         const wordsWithFriends = ['2895988', '2895998', '2796593', '2895987', '2896000', '2796594'];
@@ -123,7 +123,7 @@ export class CustomFeatures {
     }
 
     /**
-     * Includes the list of games for the 3.2 Load API Whitelist
+     * Includes the list of games for the 3.2 Load API Whitelist on the 10/90 Load AB Test
      */
     public static isWhiteListedForLoadApi(gameId: string): boolean {
         return this.existsInList(LoadWhitelist, gameId);
