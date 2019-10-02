@@ -1,3 +1,19 @@
+# Pending
+
+* Add 4 experiments to test several animations for CTA [#11333](https://github.com/Applifier/unity-ads-webview/pull/11333)
+* Change the skip icon [#11386](https://github.com/Applifier/unity-ads-webview/pull/11386)
+* Add BrainiumStudios GameId to LionStudios Whitelist [#11414](https://github.com/Applifier/unity-ads-webview/pull/11414)
+* Fix promo campaign workaround for all webview versions [#11389](https://github.com/Applifier/unity-ads-webview/pull/11389)
+
+# Tue Oct  1 22:39:10 UTC 2019
+
+* LoadAPI Experiment ABGroup 15 - Refresh All Ready Comet Campaigns When A Comet Campaign Finishes [#11361](https://github.com/Applifier/unity-ads-webview/pull/11361)
+* Refresh Comet Campaigns when onStartProcessed is Triggered [#11418](https://github.com/Applifier/unity-ads-webview/pull/11418)
+
+# Tue Oct  1 15:57:35 UTC 2019
+
+* Privacy SDK Refactor part 2 [#11181](https://github.com/Applifier/unity-ads-webview/pull/11181)
+
 # Mon Sep 30 17:14:55 UTC 2019
 
 * Hide Privacy button in China [#11388](https://github.com/Applifier/unity-ads-webview/pull/11388)
