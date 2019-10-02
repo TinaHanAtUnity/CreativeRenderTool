@@ -205,16 +205,4 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     public description(): string {
         return 'Consent';
     }
-
-    private getNextAction(currentPage: ConsentPage): void {
-        const gamePrivacyMethod = this._privacySDK.getGamePrivacy().getMethod();
-
-        if (gamePrivacyMethod === PrivacyMethod.LEGITIMATE_INTEREST) {
-            // return ACTION_CLOSE
-        } else if (gamePrivacyMethod === PrivacyMethod.UNITY_CONSENT) {
-            // return ACTION UNITY CONSENT
-        } else {
-            // return ACTION CLOSE
-        }
-    }
 }
