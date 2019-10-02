@@ -31,6 +31,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
     let deviceInfo: DeviceInfo;
@@ -57,6 +58,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let campaignParserManager: ContentTypeHandlerManager;
     let privacySDK: PrivacySDK;
+    let userPrivacyManager: UserPrivacyManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -84,7 +86,8 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core.Api);
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
+        userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
+        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
         loadManager = new PerPlacementLoadManagerWithCometRefresh(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 

@@ -97,7 +97,8 @@ describe('WebPlayerMraidAdUnit', () => {
             storageBridge: storageBridge,
             campaign: mraidCampaign,
             playerMetadataServerId: 'https://hi.com',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: userPrivacyManager
         });
 
         mraidAdUnitParameters = {

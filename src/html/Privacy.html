@@ -50,7 +50,19 @@
                 </p>
             </div>
         </div>
-
+        <% } else if(data.isUserUnderAgeLimit) { %>
+        <span class="under-age-limit">
+            <p>
+                This advertisement has been served by Unity Ads. As you have indicated that you are under 18 years old
+                we deliver ads to you based on contextual data (e.g., the game you are playing), and not based on your
+                personal data.
+            </p>
+            <p>
+                Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full
+                description of our data practices. You can view your privacy settings at any time by tapping the Unity
+                Data Privacy icon when or after an ad appears.
+            </p>
+        </div>
         <% } else { %>
         <span class="gdpr">
             <p>
@@ -63,7 +75,7 @@
                     device’s advertising ID
                     (<span class="gdpr-text-ios">Apple’s Advertising Identifier</span><span class="gdpr-text-android">Google
                         Ad Identifier</span>) and your IP address.
-                
+
                 <% if(data.isCoppaCompliant) { %>
                 <span id="coppaTag1">By request of this app’s publisher, we do not combine the data from this app with data from any other apps.</span>
                 <% } %>

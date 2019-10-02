@@ -52,6 +52,7 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -120,8 +121,9 @@ export class CampaignManager {
     private _auctionProtocol: AuctionProtocol;
     private _pts: ProgrammaticTrackingService;
     private _isLoadEnabled: boolean = false;
+    private _userPrivacyManager: UserPrivacyManager;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -139,6 +141,7 @@ export class CampaignManager {
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._pts = core.ProgrammaticTrackingService;
         this._privacy = privacySDK;
+        this._userPrivacyManager = userPrivacyManager;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -872,7 +875,8 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
             simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
             token: this._coreConfig.getToken(),
-            legalFramework: this._privacy.isGDPREnabled() ? 'gdpr' : 'default'
+            legalFramework: this._privacy.getLegalFramework(),
+            agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
         };
 
         if (this.getPreviousPlacementId()) {

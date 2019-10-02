@@ -27,11 +27,13 @@ export interface IConsentViewParameters {
     osVersion?: string;
     pts: ProgrammaticTrackingService;
     consentABTest: boolean;
+    ageGateLimit: number;
 }
 
 export enum ConsentPage {
     MY_CHOICES = 'mychoices',
-    HOMEPAGE = 'homepage'
+    HOMEPAGE = 'homepage',
+    AGE_GATE = 'agegate'
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -44,6 +46,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
     private _pts: ProgrammaticTrackingService;
+    private _ageGateLimit: number;
 
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
@@ -58,6 +61,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._osVersion = parameters.osVersion;
         this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
+        this._ageGateLimit = parameters.ageGateLimit;
 
         this._isABTest = parameters.consentABTest;
 
@@ -123,6 +127,16 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onHomepageAcceptAllEvent(event),
                 selector: '.homepage-accept-all'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onAgeGateOverEvent(event),
+                selector: '.age-gate-over'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onAgeGateUnderEvent(event),
+                selector: '.age-gate-under'
             }
         ];
 
@@ -162,6 +176,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             }
         }
 
+        if (this._ageGateLimit > 0) {
+            // todo: add localization
+            (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = `I'm ${this._ageGateLimit} or older`;
+            (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = `I'm ${this._ageGateLimit - 1} or younger`;
+        }
         this.showPage(this._landingPage);
     }
 
@@ -184,6 +203,25 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
+    public showPage(page: ConsentPage) {
+        this._currentPage = page;
+
+        const states = [ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE, ConsentPage.AGE_GATE];
+        states.forEach(state => {
+            if (state === page) {
+                this.container().classList.add(page);
+            } else {
+                this.container().classList.remove(state);
+            }
+        });
+    }
+
+    public closeAgeGateWithAgreeAnimation(): void {
+        const element = (<HTMLElement> this._container.querySelector('.age-gate-over'));
+
+        this.closeWithAnimation(element);
+    }
+
     private shouldShowSaveMyChoices() {
         return this._switchGroup.isPersonalizedExperienceChecked() ||
             this._switchGroup.isPersonalizedAdsChecked() ||
@@ -201,19 +239,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         setTimeout(() => {
             this._handlers.forEach(h => h.onClose());
         }, 1500);
-    }
-
-    private showPage(page: ConsentPage) {
-        this._currentPage = page;
-
-        const states = [ConsentPage.MY_CHOICES, ConsentPage.HOMEPAGE];
-        states.forEach(state => {
-            if (state === page) {
-                this.container().classList.add(page);
-            } else {
-                this.container().classList.remove(state);
-            }
-        });
     }
 
     private onHomepageAcceptAllEvent(event: Event) {
@@ -315,5 +340,18 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._pts.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
+    }
+
+    private onAgeGateOverEvent(event: Event): void {
+        // todo: pass the next page/action to this view class
+        this._handlers.forEach(handler => handler.onAgeGateAgree());
+    }
+
+    private onAgeGateUnderEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onAgeGateDisagree());
+        const element = (<HTMLElement> this._container.querySelector('.age-gate-under'));
+
+        this.closeWithAnimation(element);
     }
 }

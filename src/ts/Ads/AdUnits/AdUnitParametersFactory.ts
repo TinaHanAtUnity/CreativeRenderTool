@@ -154,7 +154,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             storageBridge: this._storageBridge,
             campaign: this._campaign,
             playerMetadataServerId: this._playerMetadataServerId,
-            privacySDK: this._privacySDK
+            privacySDK: this._privacySDK,
+            userPrivacyManager: this._privacyManager
         });
     }
 

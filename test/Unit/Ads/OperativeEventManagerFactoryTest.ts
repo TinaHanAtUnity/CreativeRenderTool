@@ -22,6 +22,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 describe('OperativeEventManagerFactoryTest', () => {
 
@@ -39,6 +40,7 @@ describe('OperativeEventManagerFactoryTest', () => {
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let privacySDK: PrivacySDK;
+    let userPrivacyManager: UserPrivacyManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -56,6 +58,7 @@ describe('OperativeEventManagerFactoryTest', () => {
         coreConfig = TestFixtures.getCoreConfiguration();
         adsConfig = TestFixtures.getAdsConfiguration();
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
     });
 
     describe('should return correct type of operative manager', () => {
@@ -75,7 +78,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
 
             assert.isTrue(manager instanceof PerformanceOperativeEventManager, 'Manager not instance of PerformanceOperativeEventManager');
@@ -97,7 +101,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
 
             assert.isTrue(manager instanceof XPromoOperativeEventManager, 'Manager not instance of XPromoOperativeEventManager');
@@ -119,7 +124,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
 
             assert.isTrue(manager instanceof MRAIDOperativeEventManager, 'Manager not instance of MRAIDOperativeEventManager');
@@ -141,7 +147,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
 
             assert.isTrue(manager instanceof OperativeEventManager, 'Manager not instance of OperativeEventManager');

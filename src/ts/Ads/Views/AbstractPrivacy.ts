@@ -64,7 +64,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
-            'buildInformation': AbstractPrivacy.buildInformation
+            'buildInformation': AbstractPrivacy.buildInformation,
+            'isUserUnderAgeLimit': privacyManager.isUserUnderAgeLimit()
         };
     }
 
