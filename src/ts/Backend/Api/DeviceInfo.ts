@@ -67,6 +67,10 @@ export class DeviceInfo extends BackendApi {
         this._manufacturer = value;
     }
 
+    public setDisplayMetricDensity(value: number) {
+        this._displayMetricDensity = value;
+    }
+
     public setScreenDensity(value: number) {
         this._screenDensity = value;
     }
@@ -279,6 +283,10 @@ export class DeviceInfo extends BackendApi {
         return this._manufacturer;
     }
 
+    public getDisplayMetricDensity() {
+        return this._displayMetricDensity;
+    }
+
     public getScreenDensity() {
         return this._screenDensity;
     }
@@ -477,6 +485,7 @@ export class DeviceInfo extends BackendApi {
     private _apiLevel: number = 23;
     private _totalSpace: number = 13162172;
     private _manufacturer: string = 'Apple';
+    private _displayMetricDensity: number = 1;
     private _screenDensity: number = 480;
     private _screenLayout: number = 268435794;
     private _connectionType: string = 'wifi';

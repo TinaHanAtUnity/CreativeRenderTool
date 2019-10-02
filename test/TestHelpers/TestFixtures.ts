@@ -1269,6 +1269,7 @@ export class TestFixtures {
             getDeviceIdWithSlot: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
             getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+            getDisplayMetricDensity: sinon.stub().returns(Promise.resolve(1)),
             getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
             getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
             getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
