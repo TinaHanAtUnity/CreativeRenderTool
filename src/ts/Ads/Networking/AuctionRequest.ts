@@ -212,6 +212,7 @@ export class AuctionRequest {
         this._pts = params.programmaticTrackingService;
         this._privacy = RequestPrivacyFactory.create(params.privacySDK.getUserPrivacy(), params.privacySDK.getGamePrivacy());
         this._privacySDK = params.privacySDK;
+        this._userPrivacyManager = params.userPrivacyManager;
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
