@@ -184,7 +184,7 @@ export class Ads implements IAds {
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
 
             if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
-                this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.MISSING, GDPREventSource.SANITIZATION);
+                this.PrivacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.SANITIZATION);
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);

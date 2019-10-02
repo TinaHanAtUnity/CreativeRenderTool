@@ -41,7 +41,6 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
     private _privacySDK: PrivacySDK;
-    private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
 
     constructor(parameters: IConsentUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -138,7 +137,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source, this._ageGateChoice, this._landingPage);
+        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
     }
 
     // IConsentViewHandler
@@ -153,9 +152,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onAgeGateDisagree(): void {
-        this._ageGateChoice = AgeGateChoice.NO;
-
-        this._privacyManager.setUsersAgeGateChoice(this._ageGateChoice);
+        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
 
         if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
             const permissions: IPermissions = {
@@ -163,7 +160,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 ads: false,
                 external: false
             };
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.NO, ConsentPage.AGE_GATE);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE);
         } else {
             this._privacySDK.setOptOutRecorded(true);
             this._privacySDK.setOptOutEnabled(true);
@@ -184,14 +181,12 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 });
             }
 
-            this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.NO, GDPREventSource.USER);
+            this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
         }
     }
 
     public onAgeGateAgree(): void {
-        this._ageGateChoice = AgeGateChoice.YES;
-
-        this._privacyManager.setUsersAgeGateChoice(this._ageGateChoice);
+        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
 
         if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
             // todo: handle the flow inside view class

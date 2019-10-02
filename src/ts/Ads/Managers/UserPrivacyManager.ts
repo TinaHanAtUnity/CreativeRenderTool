@@ -97,7 +97,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
-    public sendGDPREvent(action: GDPREventAction, ageGateChoice: AgeGateChoice, source?: GDPREventSource): Promise<void> {
+    public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
         let infoJson: unknown = {
             'v': 1,
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
@@ -108,7 +108,7 @@ export class UserPrivacyManager {
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
             'legalFramework': this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
-            'agreedOverAgeLimit': ageGateChoice
+            'agreedOverAgeLimit': this._ageGateChoice
         };
         if (source) {
             infoJson = {
@@ -122,7 +122,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, ageGateChoice: AgeGateChoice, layout? : ConsentPage): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
@@ -148,7 +148,7 @@ export class UserPrivacyManager {
         }
 
         this._userPrivacy.update(updatedPrivacy);
-        return this.sendUnityConsentEvent(permissions, source, ageGateChoice, layout);
+        return this.sendUnityConsentEvent(permissions, source, layout);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -183,7 +183,7 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, ageGateChoice: AgeGateChoice, layout = ''): Promise<INativeResponse> {
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse> {
         const infoJson: unknown = {
             'v': 1,
             adid: this._deviceInfo.getAdvertisingIdentifier(),
@@ -201,7 +201,7 @@ export class UserPrivacyManager {
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
-            agreedOverAgeLimit: ageGateChoice
+            agreedOverAgeLimit: this._ageGateChoice
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
@@ -395,10 +395,10 @@ export class UserPrivacyManager {
     private sendGdprConsentEvent(consent: boolean): Promise<void> {
         let sendEvent;
         if (consent) {
-            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT, AgeGateChoice.MISSING);
+            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT);
         } else {
             // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
-            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, AgeGateChoice.MISSING, GDPREventSource.METADATA);
+            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
             return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {
