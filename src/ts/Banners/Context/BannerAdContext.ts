@@ -155,7 +155,6 @@ export class BannerAdContext {
         if (this._adUnit) {
             return this._adUnit.onDestroy().then(() => {
                 delete this._adUnit;
-                return this._bannerNativeApi.BannerApi.destroy(this._bannerAdViewId);
             });
         } else {
             return Promise.resolve();
