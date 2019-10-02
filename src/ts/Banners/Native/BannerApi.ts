@@ -49,7 +49,6 @@ export interface IBannerApi {
 
     setRefreshRate(placementId: string, refreshRate: number): Promise<void>;
     load(bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string): Promise<void>;
-    destroy(bannerAdViewId: string): Promise<void>;
 }
 
 export class BannerApi extends NativeApi implements IBannerApi {
@@ -73,10 +72,6 @@ export class BannerApi extends NativeApi implements IBannerApi {
 
     public load(bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string): Promise<void> {
         return this._nativeBridge.invoke(this._fullApiClassName, 'load', [BannerViewType[bannerViewType], width, height, bannerAdViewId]);
-    }
-
-    public destroy(bannerAdViewId: string): Promise<void> {
-        return this._nativeBridge.invoke(this._fullApiClassName, 'destroy', [bannerAdViewId]);
     }
 
     public handleEvent(event: string, parameters: unknown[]) {

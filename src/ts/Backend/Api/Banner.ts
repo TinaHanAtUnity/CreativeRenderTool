@@ -22,8 +22,4 @@ export class BannerBackendApi extends BackendApi implements IBannerApi {
         return Promise.resolve();
     }
 
-    public destroy(bannerAdViewId: string): Promise<void> {
-        return Promise.resolve();
-    }
-
 }

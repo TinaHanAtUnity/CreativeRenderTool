@@ -1,7 +1,10 @@
 import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable2, Observable3 } from 'Core/Utilities/Observable';
+import { Observable2, Observable3, Observable5, Observable6, Observable7 } from 'Core/Utilities/Observable';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { Promises } from 'Core/Utilities/Promises';
+import { IObserver7 } from 'Core/Utilities/IObserver';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
@@ -39,7 +42,9 @@ export enum WebplayerEvent {
     FORM_RESUBMISSION,
     UNHANDLED_KEY_EVENT,
     SHOULD_INTERCEPT_REQUEST,
-    CREATE_WEBVIEW
+    CREATE_WEBVIEW,
+    FRAME_UPDATE,
+    GET_FRAME_RESPONSE
 }
 
 export interface IWebPlayerEventSettings {
@@ -176,6 +181,8 @@ export class WebPlayerApi extends NativeApi {
     public readonly onCreateWindow = new Observable2<string, string>();
     public readonly shouldOverrideUrlLoading = new Observable3<string, string, string>();
     public readonly onCreateWebView = new Observable2<string, string>();
+    public readonly onFrameUpdate = new Observable6<string, number, number, number, number, number>();
+    public readonly onGetFrameResponse = new Observable7<string, string, number, number, number, number, number>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer', ApiPackage.ADS, EventCategory.WEBPLAYER);
@@ -209,6 +216,28 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args, viewId]);
     }
 
+    public getFrame(viewId: string): Promise<[number, number, number, number, number]> {
+        const callId = JaegerUtilities.uuidv4();
+        let observer: IObserver7<string, string, number, number, number, number, number> | undefined;
+        const promise = Promises.withTimeout(new Promise<[number, number, number, number]>((resolve) => {
+                observer = this.onGetFrameResponse.subscribe((callIdIncoming: string, frameViewId: string, x: number, y: number, width: number, height: number, alpha: number) => {
+                    if (callIdIncoming === callId) {
+                        resolve([x, y, width, height]);
+                        if (observer) {
+                            this.onGetFrameResponse.unsubscribe(observer);
+                        }
+                    }
+                });
+                this._nativeBridge.invoke<void>(this._fullApiClassName, 'getFrame', [callId, viewId]);
+            }), 500);
+        return promise.catch((error) => {
+            if (observer) {
+                this.onGetFrameResponse.unsubscribe(observer);
+            }
+            return error;
+        });
+    }
+
     public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
@@ -231,6 +260,12 @@ export class WebPlayerApi extends NativeApi {
                 break;
             case WebplayerEvent[WebplayerEvent.CREATE_WEBVIEW]:
                 this.onCreateWebView.trigger(<string>parameters.pop(), <string>parameters[0]);
+                break;
+            case WebplayerEvent[WebplayerEvent.FRAME_UPDATE]:
+                this.onFrameUpdate.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <number>parameters[4], <number>parameters[5]);
+                break;
+            case WebplayerEvent[WebplayerEvent.GET_FRAME_RESPONSE]:
+                this.onGetFrameResponse.trigger(<string>parameters[0], <string>parameters[1], <number>parameters[2], <number>parameters[3], <number>parameters[4], <number>parameters[5], <number>parameters[6]);
                 break;
             default:
                 super.handleEvent(event, parameters);
