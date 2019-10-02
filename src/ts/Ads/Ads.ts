@@ -8,7 +8,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -258,7 +258,7 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
             if (this._loadApiEnabled && LoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else if (this._loadApiEnabled) {
@@ -312,7 +312,8 @@ export class Ads implements IAds {
             adsConfig: this.Config,
             core: this._core.Api,
             deviceInfo: this._core.DeviceInfo,
-            pts: this._core.ProgrammaticTrackingService
+            pts: this._core.ProgrammaticTrackingService,
+            privacySDK: this.PrivacySDK
         });
         return consentView.show(options);
     }
@@ -653,7 +654,9 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        if (LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId())) {
+        const isZyngaReverseABGroupLoadExperiment = !(LoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId());
+        const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
+        if (isContainedLoadExperiment || isZyngaReverseABGroupLoadExperiment) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }

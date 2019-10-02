@@ -169,6 +169,7 @@ describe('CampaignRefreshManager', () => {
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        privacyManager = sinon.createStubInstance(UserPrivacyManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -185,13 +186,12 @@ describe('CampaignRefreshManager', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-
-        privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         const performance = new Performance(ar, coreModule, adsModule, undefined);
         const contentTypeHandlerMap = performance.getContentTypeHandlerMap();
@@ -233,7 +233,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             privacySDK = TestFixtures.getPrivacySDK(core);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -635,7 +635,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             privacySDK = TestFixtures.getPrivacySDK(core);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
+            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 

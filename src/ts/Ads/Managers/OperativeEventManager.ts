@@ -28,6 +28,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -44,6 +45,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     campaign: T;
     playerMetadataServerId: string | undefined;
     privacySDK: PrivacySDK;
+    userPrivacyManager: UserPrivacyManager;
 }
 
 export interface IOperativeEventParams {
@@ -108,6 +110,7 @@ export interface IInfoJson {
     privacyType?: string;
     isLoadEnabled: boolean;
     legalFramework: string;
+    agreedOverAgeLimit: AgeGateChoice;
 }
 
 export class OperativeEventManager {
@@ -148,6 +151,7 @@ export class OperativeEventManager {
     protected _ads: IAdsApi;
     private _playerMetadataServerId: string | undefined;
     private _privacySDK: PrivacySDK;
+    private _userPrivacyManager: UserPrivacyManager;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         this._storageBridge = params.storageBridge;
@@ -164,6 +168,7 @@ export class OperativeEventManager {
         this._ads = params.ads;
         this._playerMetadataServerId = params.playerMetadataServerId;
         this._privacySDK = params.privacySDK;
+        this._userPrivacyManager = params.userPrivacyManager;
     }
 
     public sendStart(params: IOperativeEventParams): Promise<void> {
@@ -410,7 +415,8 @@ export class OperativeEventManager {
                 'screenHeight': screenHeight,
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
                 'isLoadEnabled': this._campaign.isLoadEnabled(),
-                'legalFramework': this._privacySDK.isGDPREnabled() ? 'gdpr' : 'default'
+                'legalFramework': this._privacySDK.getLegalFramework(),
+                'agreedOverAgeLimit': this._userPrivacyManager.getAgeGateChoice()
             };
 
             if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

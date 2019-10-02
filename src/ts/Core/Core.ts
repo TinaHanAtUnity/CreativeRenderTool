@@ -242,6 +242,10 @@ export class Core implements ICore {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
+            if (TestEnvironment.get('country')) {
+                ConfigManager.setCountry(TestEnvironment.get('country'));
+            }
+
             const abGroupNumber = parseInt(TestEnvironment.get('abGroup'), 10);
             if (!isNaN(abGroupNumber)) { // if it is a number get the group
                 const abGroup = toAbGroup(abGroupNumber);
