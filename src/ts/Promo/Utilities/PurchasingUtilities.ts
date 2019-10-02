@@ -49,6 +49,7 @@ export interface IPromoPayload {
 }
 
 export class PurchasingUtilities {
+
     public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager: IAnalyticsManager, privacySDK: PrivacySDK) {
         this._core = core;
         this._promo = promo;
@@ -62,6 +63,7 @@ export class PurchasingUtilities {
         this._request = request;
         this._metaDataManager = metaDataManager;
         this._privacySDK = privacySDK;
+
         campaignManager.onAdPlanReceived.subscribe(() => this._placementManager.clear());
         return this.getPurchasingAdapter().then((adapter) => {
             this._purchasingAdapter = adapter;
