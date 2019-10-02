@@ -24,7 +24,7 @@ export class PromoEventHandler {
         if (!privacySDK.isOptOutRecorded()) {
             privacySDK.setOptOutRecorded(true);
             // todo: add age gate choice
-            privacyManager.sendGDPREvent(GDPREventAction.SKIP, AgeGateChoice.MISSING);
+            privacyManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
 }

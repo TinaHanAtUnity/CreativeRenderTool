@@ -1,4 +1,4 @@
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -152,9 +152,9 @@ describe('UserPrivacyManagerTest', () => {
                         sinon.assert.calledOnce(onSetStub);
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                         if (t.event === 'optout') {
-                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING, GDPREventSource.METADATA);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
                         } else {
-                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
                         }
                         sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                         sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -278,9 +278,9 @@ describe('UserPrivacyManagerTest', () => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                             if (t.event === 'optout') {
-                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING, GDPREventSource.METADATA);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
                             } else {
-                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, AgeGateChoice.MISSING);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
                             }
                             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -355,9 +355,9 @@ describe('UserPrivacyManagerTest', () => {
                             return writePromise.then(() => {
                                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                                 if (event === 'optout') {
-                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, AgeGateChoice.MISSING, GDPREventSource.METADATA);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, GDPREventSource.METADATA);
                                 } else {
-                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, AgeGateChoice.MISSING);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event);
                                 }
                                 sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', userConsents);
                                 sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -639,7 +639,7 @@ describe('UserPrivacyManagerTest', () => {
                     }
                     return true;
                 };
-                return privacyManager.sendGDPREvent(t.action, AgeGateChoice.MISSING, t.source).then(() => {
+                return privacyManager.sendGDPREvent(t.action, t.source).then(() => {
                     assert.equal(httpKafkaStub.firstCall.args[0], 'ads.events.optout.v1.json', 'privacy event sent to incorrect kafka topic');
                     assert.equal(httpKafkaStub.firstCall.args[1], KafkaCommonObjectType.EMPTY, 'incorrect kafka common object for privacy event');
                     assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
@@ -666,7 +666,7 @@ describe('UserPrivacyManagerTest', () => {
 
         describe('when updating user privacy', () => {
             function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
-                return privacyManager.updateUserPrivacy(permissions, source, AgeGateChoice.MISSING, layout).then(() => {
+                return privacyManager.updateUserPrivacy(permissions, source, layout).then(() => {
                     sinon.assert.calledTwice(httpKafkaStub); // First one is temporary diagnostics
                     return httpKafkaStub.secondCall.args[2];
                 });
@@ -734,7 +734,7 @@ describe('UserPrivacyManagerTest', () => {
 
             it('if game privacy is disabled', () => {
                 gamePrivacy.isEnabled.returns(false);
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER, AgeGateChoice.MISSING).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
@@ -744,7 +744,7 @@ describe('UserPrivacyManagerTest', () => {
                 userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
                 userPrivacy.getVersion.returns(25250101);
                 userPrivacy.getPermissions.returns(permissions);
-                return privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, AgeGateChoice.MISSING).then(() => {
+                return privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
@@ -753,7 +753,7 @@ describe('UserPrivacyManagerTest', () => {
                 userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
                 userPrivacy.getVersion.returns(25250101);
                 userPrivacy.getPermissions.returns({ all: true });
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.NO_REVIEW, AgeGateChoice.MISSING).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.NO_REVIEW).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
@@ -761,7 +761,7 @@ describe('UserPrivacyManagerTest', () => {
             //TODO: remove/rephrase when old fields are deprecated
             it('if game privacy method is other than UnityConsent', () => {
                 gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER, AgeGateChoice.MISSING).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
