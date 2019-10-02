@@ -35,8 +35,18 @@ export class PrivacyParser {
         const gdprEnabled = sanitizedConfigJson.gdprEnabled;
         const optOutRecorded = sanitizedConfigJson.optOutRecorded;
         const optOutEnabled = sanitizedConfigJson.optOutEnabled;
-        const ageGateLimit = sanitizedConfigJson.ageGateLimit ? sanitizedConfigJson.ageGateLimit : 0;
         const legalFramework = sanitizedConfigJson.legalFramework ? sanitizedConfigJson.legalFramework : LegalFramework.DEFAULT;
+
+        let ageGateLimit = sanitizedConfigJson.ageGateLimit !== undefined ? sanitizedConfigJson.ageGateLimit : 0;
+        if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST) {
+            ageGateLimit = 0;
+
+            Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(sanitizedConfigJson)});
+        }
+
+        if (limitAdTracking) {
+            ageGateLimit = 0;
+        }
 
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
     }
