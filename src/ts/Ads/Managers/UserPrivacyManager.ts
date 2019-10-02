@@ -48,7 +48,7 @@ export enum LegalFramework {
     DEFAULT = 'default',
     GDPR = 'gdpr', // EU
     CCPA = 'ccpa', // California
-    PPCPI = 'ppcpi' // China
+    TC260 = 'tc260' // China
 }
 
 export enum AgeGateChoice {
