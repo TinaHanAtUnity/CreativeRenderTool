@@ -129,7 +129,8 @@ import Test = Mocha.Test;
                     storageBridge: storageBridge,
                     campaign: programmaticMraidCampaign,
                     playerMetadataServerId: 'test-gamerSid',
-                    privacySDK: privacySDK
+                    privacySDK: privacySDK,
+                    userPrivacyManager: privacyManager
                 });
 
                 programmaticMraidAdUnitParams = {

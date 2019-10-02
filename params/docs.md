@@ -95,6 +95,7 @@
 | omidJSVersion | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 | legalFramework | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | nofillRetry | boolean | Retrying after no fill | SDK | all |
+| agreedOverAgeLimit | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 
 
 
@@ -191,6 +192,7 @@
 | omidPartnerName | all | False | True | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
 | omidJSVersion | all | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
+| agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 
 
 
@@ -243,6 +245,7 @@
 | deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
+| agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 
 
 
@@ -295,4 +298,5 @@
 | deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
+| agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 

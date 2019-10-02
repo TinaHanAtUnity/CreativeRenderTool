@@ -2,6 +2,7 @@ import { IRawPlacement, Placement } from 'Ads/Models/Placement';
 import { IRawGamePrivacy, IRawUserPrivacy } from 'Privacy/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IRawAdsConfiguration {
     assetCaching: string;
@@ -15,6 +16,7 @@ export interface IRawAdsConfiguration {
     userPrivacy: IRawUserPrivacy | undefined;
     ageGateLimit: number | undefined;
     hidePrivacy: boolean | undefined;
+    legalFramework: LegalFramework | undefined;
 }
 
 export interface IAdsConfiguration {

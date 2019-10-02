@@ -1,4 +1,4 @@
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -85,6 +85,9 @@ describe('UserPrivacyManagerTest', () => {
         (<sinon.SinonStub>coreConfig.getUnityProjectId).returns(testUnityProjectId);
         (<sinon.SinonStub>privacySDK.isGDPREnabled).callsFake(() => {
             return isGDPREnabled;
+        });
+        (<sinon.SinonStub>privacySDK.getLegalFramework).callsFake(() => {
+            return isGDPREnabled ? LegalFramework.GDPR : LegalFramework.DEFAULT;
         });
 
         httpKafkaStub = sinon.stub(HttpKafka, 'sendEvent').resolves();
