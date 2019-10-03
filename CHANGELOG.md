@@ -1,4 +1,4 @@
-# Pending
+# Thu Oct  3 13:05:16 UTC 2019
 
 * Simplified Chinese for Age Gate [#11476](https://github.com/Applifier/unity-ads-webview/pull/11476)
 * Update COPPA text [#11477](https://github.com/Applifier/unity-ads-webview/pull/11477)
