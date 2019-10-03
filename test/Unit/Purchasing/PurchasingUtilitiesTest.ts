@@ -69,7 +69,7 @@ describe('PurchasingUtilitiesTest', () => {
         clientInfo = sinon.createStubInstance(ClientInfo);
         sandbox = sinon.createSandbox();
 
-        promoCatalog = IapPromoCatalog;
+        promoCatalog = JSON.stringify(IapPromoCatalog);
         (<any>purchasing).onInitialize = new Observable1<string>();
         (<any>purchasing).onCommandResult = new Observable1<string>();
         (<any>purchasing).onGetPromoVersion = new Observable1<string>();
