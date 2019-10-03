@@ -4,6 +4,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import {INativeResponse} from '../../Core/Managers/RequestManager';
 
 interface ICatalogPayload {
     country: string;
@@ -42,16 +43,12 @@ export class CatalogRequest {
         this._gameVersion = clientInfo.getApplicationVersion();
     }
     public sendCatalogPayload() {
-        const sampleSize = 100;
-        const iapEndPoint = IAPCatalogEndpoint.ENDPOINT_STG;
-        if (CustomFeatures.sampleAtGivenPercent(sampleSize)) {
-            const catalogPayload = JSON.stringify(this.constructCatalog());
-            this._core.Sdk.logDebug('Sending catalogPayload to IAP-Events: ' + catalogPayload);
-            this._request.post(iapEndPoint, catalogPayload)
+        const catalogPayload = JSON.stringify(this.constructCatalog());
+        this._core.Sdk.logDebug('Sending catalogPayload to IAP-Events: ' + catalogPayload);
+        return this._request.post(IAPCatalogEndpoint.ENDPOINT_STG, catalogPayload)
                 .catch((err) => {
                     this._core.Sdk.logError('Error, cannot send CatalogPayload to IAP-Events: ' + JSON.stringify(err));
                 });
-        }
     }
 
     private updateProducts(products: IProduct[]): IProductItem[] {
