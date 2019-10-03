@@ -109,7 +109,6 @@ export class OpenMeasurementAdViewBuilder {
 
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
-            console.log(' backgrounded', screenWidth, screenHeight);
             return this.calculateVastAdView(0, obstructionReasons, true, [obstructionRect], screenWidth, screenHeight);
         });
     }
@@ -136,7 +135,6 @@ export class OpenMeasurementAdViewBuilder {
 
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
-            console.log(' nonbackgrounded', screenWidth, screenHeight);
             if (obstructionRect) {
                 // obstructed adview
                 const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
