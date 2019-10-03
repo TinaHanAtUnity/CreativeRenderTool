@@ -53,8 +53,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private _isABTest: boolean = false;
 
+    private _localization: Localization;
+
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
+
+        this._localization = new Localization(parameters.language, 'consent');
 
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
@@ -65,7 +69,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._isABTest = parameters.consentABTest;
 
-        this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
+        this._template = new Template(ConsentTemplate, this._localization);
         this._templateData = {};
 
         this._bindings = [
@@ -177,9 +181,17 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
 
         if (this._ageGateLimit > 0) {
-            // todo: add localization
-            (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = `I'm ${this._ageGateLimit} or older`;
-            (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = `I'm ${this._ageGateLimit - 1} or younger`;
+            const formatTranslation = (str: string, arr: string[]) => {
+                return str.replace(/{(\d+)}/g, (match, number) => {
+                    return typeof arr[number] !== 'undefined' ? arr[number] : match;
+                });
+            };
+
+            const overLimitBtnText = formatTranslation(this._localization.translate('age-gate-over-age-limit-btn'), [this._ageGateLimit.toString()]);
+            const underLimitBtnText = formatTranslation(this._localization.translate('age-gate-under-age-limit-btn'), [(this._ageGateLimit - 1).toString()]);
+
+            (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = overLimitBtnText;
+            (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = underLimitBtnText;
         }
         this.showPage(this._landingPage);
     }
