@@ -211,7 +211,7 @@ export class Core implements ICore {
             this.Ads = new Ads(configJson, this);
 
             return this.Ads.initialize().then(() => {
-                this.ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewInitializationTime, Date.now() - this._initializationStartedAt, [`ads_sdk2_sdv:${this.ClientInfo.getSdkVersionName()}`]);
+                this.ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewInitializationTime, Date.now() - this._initializationStartedAt, this.Config.getCountry());
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {

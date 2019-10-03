@@ -93,7 +93,9 @@ interface IPTSEvent {
 
 export class ProgrammaticTrackingService {
     private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
-    private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/'; // Currently unused
+
+    // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
+    private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
     private metricPath = 'v1/metrics';
     private timingPath = 'v1/timing';
@@ -112,6 +114,14 @@ export class ProgrammaticTrackingService {
 
     private createMetricTags(event: PTSEvent): string[] {
         return [this.createAdsSdkTag('mevt', event)];
+    }
+
+    private createTimingTags(countryIso: string): string[] {
+        return [
+            this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
+            this.createAdsSdkTag('iso', countryIso),
+            this.createAdsSdkTag('plt', Platform[this._platform])
+        ];
     }
 
     private createErrorTags(event: PTSEvent, adType: string, seatId?: number): string[] {
@@ -157,12 +167,12 @@ export class ProgrammaticTrackingService {
         return this.postWithTags(event, 1, this.createMetricTags(event), this.metricPath);
     }
 
-    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
+    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
         return this.postWithTags(event, 1, this.createErrorTags(event, adType, seatId), this.metricPath);
     }
 
-    public reportTimingEvent(event: TimingMetric, value: number, tags: string[]): Promise<INativeResponse> {
-        return this.postWithTags(event, value, tags, this.timingPath);
+    public reportTimingEvent(event: TimingMetric, value: number, countryIso: string): Promise<INativeResponse> {
+        return this.postWithTags(event, value, this.createTimingTags(countryIso), this.timingPath);
     }
 
 }
