@@ -188,6 +188,9 @@ export class Ads implements IAds {
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
+        }).then(() => {
+            return this.setupLoadApiEnabled();
+        }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
