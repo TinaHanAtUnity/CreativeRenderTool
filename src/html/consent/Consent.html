@@ -1,10 +1,10 @@
 <div class="safe-area">
     <div id="age-gate">
         <div class="text-container">
-            <span class="title">Before you get started, verify your age</span>
+            <span class="title"><%= data.t("age-gate-title") %></span>
             <div class="main-text">
                 <p>
-                    Please confirm your age group so we can offer you the best possible in-game experience while protecting your privacy and safety
+                    <%= data.t("age-gate-text") %>
                 </p>
             </div>
             <div class="empty-block">
@@ -12,8 +12,8 @@
         </div>
 
         <div class="homepage-button-container">
-            <div class="age-gate-over consent-button"><span>I'm 18 or older</span></div>
-            <div class="age-gate-under consent-button"><span>I'm 17 or younger</span></div>
+            <div class="age-gate-over consent-button"><span><%= data.t("age-gate-over-age-limit-btn") %></span></div>
+            <div class="age-gate-under consent-button"><span><%= data.t("age-gate-under-age-limit-btn") %></span></div>
             <div class="logo-container">
                 <div class="unityads-logo"></div>
             </div>
