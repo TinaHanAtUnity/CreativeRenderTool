@@ -3,8 +3,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import {INativeResponse} from '../../Core/Managers/RequestManager';
 
 interface ICatalogPayload {
     country: string;
