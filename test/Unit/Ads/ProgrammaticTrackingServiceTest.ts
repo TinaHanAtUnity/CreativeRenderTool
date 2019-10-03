@@ -173,7 +173,7 @@ describe('ProgrammaticTrackingService', () => {
                         tags: [
                             'ads_sdk2_sdv:2300',
                             'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:${Platform[Platform.ANDROID]}`
+                            `ads_sdk2_plt:ANDROID`
                         ]
                     }
                 ]
