@@ -78,8 +78,6 @@ export class Core implements ICore {
     public Purchasing: Purchasing;
     public ProgrammaticTrackingService: ProgrammaticTrackingService;
 
-    private _initializationStartedAt: number;
-
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
 
@@ -119,7 +117,6 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        this._initializationStartedAt = Date.now();
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
 
@@ -211,7 +208,8 @@ export class Core implements ICore {
             this.Ads = new Ads(configJson, this);
 
             return this.Ads.initialize().then(() => {
-                this.ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewInitializationTime, Date.now() - this._initializationStartedAt, this.Config.getCountry());
+                const totalInitializationTime = Date.now() - this.ClientInfo.getInitTimestamp();
+                this.ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewInitializationTime, totalInitializationTime, this.Config.getCountry());
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
