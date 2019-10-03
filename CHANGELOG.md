@@ -1,3 +1,7 @@
+# Pending
+
+* Open Measurement - Handle isOmEnabled flag for Admob Creatives from Auction [#11272](https://github.com/Applifier/unity-ads-webview/pull/11272)
+
 # Wed Oct  2 21:31:03 UTC 2019
 
 * Add Age Gate to Consent Flow [#11445](https://github.com/Applifier/unity-ads-webview/pull/11445)
