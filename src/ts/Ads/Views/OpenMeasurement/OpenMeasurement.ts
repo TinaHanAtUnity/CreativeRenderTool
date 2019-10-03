@@ -111,9 +111,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._verificationVendorMap = {};
         this._clientInfo = clientInfo;
         this._campaign = campaign;
+
+        // TODO: Make vendor key non-optional
         if (vendorKey) {
             this._vendorKey = vendorKey;
         }
+
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -458,6 +461,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         });
     }
 
+    // TODO: Remove as we now capture vendor key in constuctor
     public populateVendorKey(vendorKey: string) {
         this._vendorKey = vendorKey;
     }
