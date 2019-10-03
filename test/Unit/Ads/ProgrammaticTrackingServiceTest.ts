@@ -3,7 +3,7 @@ import {
     ProgrammaticTrackingService,
     IProgrammaticTrackingData,
     AdmobMetric,
-    LoadMetric
+    TimingMetric
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -141,6 +141,50 @@ describe('ProgrammaticTrackingService', () => {
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
                 assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
+                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
+                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                return promise;
+            });
+        });
+    });
+
+    describe('reportTimingEvent', () => {
+
+        const sdkVersion = '2300';
+
+        beforeEach(() => {
+            sdkVersionStub.returns(sdkVersion);
+        });
+
+        const tests: {
+            metric: TimingMetric;
+            value: number;
+            country: string;
+            expected: IProgrammaticTrackingData;
+        }[] = [{
+            metric: TimingMetric.WebviewInitializationTime,
+            value: 18331,
+            country: 'us',
+            expected: {
+                metrics: [
+                    {
+                        name: 'webview_initialization_time',
+                        value: 18331,
+                        tags: [
+                            'ads_sdk2_sdv:2300',
+                            'ads_sdk2_iso:us',
+                            `ads_sdk2_plt:ANDROID`
+                        ]
+                    }
+                ]
+            }
+        }];
+        tests.forEach((t) => {
+            it(`should send "${t.expected}" when "${t.metric}, ${t.value} and ${t.country}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value, t.country);
+                sinon.assert.calledOnce(postStub);
+                assert.equal(postStub.firstCall.args.length, 3);
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing');
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;

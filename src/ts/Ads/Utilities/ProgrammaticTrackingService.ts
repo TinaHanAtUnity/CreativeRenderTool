@@ -75,7 +75,11 @@ export enum OMMetric {
     IASVerificatonInjectionFailed = 'ias_verification_injection_failed'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric;
+export enum TimingMetric {
+    WebviewInitializationTime = 'webview_initialization_time'
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[] | undefined;
@@ -88,8 +92,13 @@ interface IPTSEvent {
 }
 
 export class ProgrammaticTrackingService {
-    private static productionMetricServiceUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics';
-    private static stagingMetricServiceUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics'; // Currently unused
+    private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+
+    // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
+    private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
+
+    private metricPath = 'v1/metrics';
+    private timingPath = 'v1/timing';
 
     private _platform: Platform;
     private _request: RequestManager;
@@ -105,6 +114,14 @@ export class ProgrammaticTrackingService {
 
     private createMetricTags(event: PTSEvent): string[] {
         return [this.createAdsSdkTag('mevt', event)];
+    }
+
+    private createTimingTags(countryIso: string): string[] {
+        return [
+            this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
+            this.createAdsSdkTag('iso', countryIso),
+            this.createAdsSdkTag('plt', Platform[this._platform])
+        ];
     }
 
     private createErrorTags(event: PTSEvent, adType: string, seatId?: number): string[] {
@@ -127,7 +144,7 @@ export class ProgrammaticTrackingService {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
-    private postWithTags(event: PTSEvent, value: number, tags: string[]): Promise<INativeResponse> {
+    private postWithTags(event: PTSEvent, value: number, tags: string[], path: string): Promise<INativeResponse> {
         const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
@@ -137,7 +154,7 @@ export class ProgrammaticTrackingService {
                 }
             ]
         };
-        const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
+        const url: string = this.productionBaseUrl + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
 
@@ -147,11 +164,15 @@ export class ProgrammaticTrackingService {
     }
 
     public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
-        return this.postWithTags(event, 1, this.createMetricTags(event));
+        return this.postWithTags(event, 1, this.createMetricTags(event), this.metricPath);
     }
 
-    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
-        return this.postWithTags(event, 1, this.createErrorTags(event, adType, seatId));
+    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
+        return this.postWithTags(event, 1, this.createErrorTags(event, adType, seatId), this.metricPath);
+    }
+
+    public reportTimingEvent(event: TimingMetric, value: number, countryIso: string): Promise<INativeResponse> {
+        return this.postWithTags(event, value, this.createTimingTags(countryIso), this.timingPath);
     }
 
 }
