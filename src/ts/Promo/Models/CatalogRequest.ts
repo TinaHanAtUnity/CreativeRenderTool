@@ -33,7 +33,6 @@ export class CatalogRequest {
     private _time: number;
     private _core: ICoreApi;
     private _gameVersion: string;
-    private _devMode: boolean;
     constructor(core: ICoreApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, products: IProduct[]) {
         this._core = core;
         this._clientInfo = clientInfo;
@@ -41,11 +40,10 @@ export class CatalogRequest {
         this._time = Date.now();
         this._products = this.updateProducts(products);
         this._gameVersion = clientInfo.getApplicationVersion();
-        this._devMode = true;
     }
     public sendCatalogPayload() {
-        const sampleSize = this._devMode ? 2 : 100;
-        const iapEndPoint = this._devMode ? IAPCatalogEndpoint.ENDPOINT_STG : IAPCatalogEndpoint.ENDPOINT_PRD;
+        const sampleSize = 100;
+        const iapEndPoint = IAPCatalogEndpoint.ENDPOINT_STG;
         if (CustomFeatures.sampleAtGivenPercent(sampleSize)) {
             const catalogPayload = JSON.stringify(this.constructCatalog());
             this._core.Sdk.logDebug('Sending catalogPayload to IAP-Events: ' + catalogPayload);
