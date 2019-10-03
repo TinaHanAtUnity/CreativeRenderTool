@@ -1,3 +1,7 @@
+# Pending
+
+* Add Initialization Timing Support for SDK Versions and Countries [#11419](https://github.com/Applifier/unity-ads-webview/pull/11419)
+
 # Thu Oct  3 13:05:16 UTC 2019
 
 * Simplified Chinese for Age Gate [#11476](https://github.com/Applifier/unity-ads-webview/pull/11476)
