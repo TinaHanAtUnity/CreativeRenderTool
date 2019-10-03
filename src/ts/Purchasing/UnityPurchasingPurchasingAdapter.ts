@@ -14,6 +14,7 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { Observables } from 'Core/Utilities/Observables';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import {CatalogRequest} from 'Promo/Models/CatalogRequest';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -63,7 +64,8 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             .then(() => this.checkPromoVersion())
             .then(() => {
                 return this.sendPurchasingCommand(this.getInitializationPayload());
-            });
+            })
+            .then(() => this.sendIAPCatalog());
         } else {
             this._initPromise = Promise.resolve();
         }
@@ -166,6 +168,14 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         }
     }
 
+    private sendIAPCatalog(): Promise<void> {
+        return this.refreshCatalog().then((catalog) => {
+            const catalogRequest = new CatalogRequest(this._core, this._clientInfo, this._coreConfiguration, catalog);
+            catalogRequest.sendCatalogPayload()
+                .catch(() => Promise.reject(this.logIssue('Catalog failed to send', 'catalog_send_failed')));
+            return Promise.resolve();
+        });
+    }
     private checkMadeWithUnity(): Promise<void> {
         return this._metaDataManager.fetch(FrameworkMetaData).then((framework) => {
             if (framework && framework.getName() === 'Unity') {

@@ -23,7 +23,6 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { Promises } from 'Core/Utilities/Promises';
-import { CatalogRequest } from 'Promo/Models/CatalogRequest';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -248,11 +247,6 @@ export class PurchasingUtilities {
             this._catalog = new PurchasingCatalog(products);
         } catch (e) {
             this._core.Sdk.logInfo('Error, cannot create catalog: ' + JSON.stringify(e));
-        }
-        if (this._purchasingAdapter instanceof UnityPurchasingPurchasingAdapter) {
-            // only trust source as IAP, drop catalogPayload from BYOP
-            const catalogRequest = new CatalogRequest(this._core, this._clientInfo, this._coreConfig, products);
-            catalogRequest.sendCatalogPayload();
         }
     }
 }

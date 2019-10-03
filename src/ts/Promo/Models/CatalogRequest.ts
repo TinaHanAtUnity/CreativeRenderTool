@@ -1,7 +1,7 @@
 import { IProduct } from 'Purchasing/PurchasingAdapter';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 
 interface ICatalogPayload {
@@ -40,13 +40,10 @@ export class CatalogRequest {
         this._products = this.updateProducts(products);
         this._gameVersion = clientInfo.getApplicationVersion();
     }
-    public sendCatalogPayload() {
+    public sendCatalogPayload(): Promise<INativeResponse> {
         const catalogPayload = JSON.stringify(this.constructCatalog());
         this._core.Sdk.logDebug('Sending catalogPayload to IAP-Events: ' + catalogPayload);
-        return this._request.post(IAPCatalogEndpoint.ENDPOINT_STG, catalogPayload)
-                .catch((err) => {
-                    this._core.Sdk.logError('Error, cannot send CatalogPayload to IAP-Events: ' + JSON.stringify(err));
-                });
+        return this._request.post(IAPCatalogEndpoint.ENDPOINT_STG, catalogPayload);
     }
 
     private updateProducts(products: IProduct[]): IProductItem[] {
