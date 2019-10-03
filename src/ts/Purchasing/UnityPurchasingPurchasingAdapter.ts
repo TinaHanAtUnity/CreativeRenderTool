@@ -64,8 +64,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             .then(() => this.checkPromoVersion())
             .then(() => {
                 return this.sendPurchasingCommand(this.getInitializationPayload());
-            })
-            .then(() => this.sendIAPCatalog());
+            });
         } else {
             this._initPromise = Promise.resolve();
         }
@@ -162,7 +161,10 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         const jsonPayload = JSON.parse(iapPayload);
 
         if (jsonPayload.type === 'CatalogUpdated') {
-            return this.refreshCatalog().then((catalog) => this.onCatalogRefreshed.trigger(catalog));
+            return this.refreshCatalog().then((catalog) => {
+                this.onCatalogRefreshed.trigger(catalog);
+                return this.sendIAPCatalog();
+            });
         } else {
             return Promise.reject(this.logIssue('IAP Payload is incorrect', 'handle_send_event_failure'));
         }
