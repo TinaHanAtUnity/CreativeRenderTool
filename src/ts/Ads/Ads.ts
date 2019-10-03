@@ -188,6 +188,7 @@ export class Ads implements IAds {
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
+
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
