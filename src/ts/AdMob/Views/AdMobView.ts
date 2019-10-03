@@ -26,6 +26,7 @@ import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasu
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -322,8 +323,12 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
+        const popup = <HTMLElement>document.querySelector('.pop-up');
+        const gdprRect = popup.getBoundingClientRect();
+        const obstructionRect = OpenMeasurementUtilities.createRectangle(gdprRect.left, gdprRect.top, gdprRect.width, gdprRect.height);
+
         const adViewBuilder = om.getOMAdViewBuilder();
-        return adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om).then((adview) => {
+        return adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om, obstructionRect).then((adview) => {
             const viewPort = adViewBuilder.getViewPort();
             om.geometryChange(viewPort, adview);
         });
