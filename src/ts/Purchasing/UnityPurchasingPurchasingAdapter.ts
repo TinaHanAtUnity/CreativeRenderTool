@@ -14,7 +14,7 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { Observables } from 'Core/Utilities/Observables';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import {CatalogRequest} from 'Promo/Models/CatalogRequest';
+import { CatalogRequest } from 'Promo/Models/CatalogRequest';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
