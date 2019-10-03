@@ -109,10 +109,11 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                     storageBridge: storageBridge,
                     campaign: campaign,
                     playerMetadataServerId: 'test-gamerSid',
-                    privacySDK: privacySDK
+                    privacySDK: privacySDK,
+                    userPrivacyManager: privacyManager
                 });
 
-                const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+                const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
                 webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
                 (<any>webPlayerContainer).onPageStarted = new Observable1<string>();

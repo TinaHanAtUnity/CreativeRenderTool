@@ -37,6 +37,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 class SpecVerifier {
     private _platform: Platform;
@@ -206,12 +207,13 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
             const campaignParserManager = new ContentTypeHandlerManager();
+            const privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
             sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sandbox.stub(RequestPrivacyFactory, 'create').returns(<IRequestPrivacy>{});
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -244,11 +246,12 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
             const campaignParserManager = new ContentTypeHandlerManager();
+            const privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
             sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK);
+            const campaignManager: CampaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -279,6 +282,7 @@ describe('Event parameters should match specifications', () => {
             let auctionRequestParams: IAuctionRequestParams;
             let auctionRequest: AuctionRequest;
             let privacySDK: PrivacySDK;
+            let userPrivacyManager: UserPrivacyManager;
             let coreApi: ICoreApi;
 
             let requestStub: sinon.SinonStub;
@@ -301,6 +305,7 @@ describe('Event parameters should match specifications', () => {
                 clientInfo = TestFixtures.getClientInfo(platform);
                 sessionManager = new SessionManager(core.Api, requestManager, storageBridge);
                 focusManager = new FocusManager(platform, core.Api);
+                userPrivacyManager = new UserPrivacyManager(platform, coreApi, coreConfig, adsConfig, clientInfo, deviceInfo, requestManager, privacySDK);
 
                 if (platform === Platform.ANDROID) {
                     deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
@@ -328,7 +333,8 @@ describe('Event parameters should match specifications', () => {
                     deviceInfo: deviceInfo,
                     sessionManager: sessionManager,
                     programmaticTrackingService: core.ProgrammaticTrackingService,
-                    privacySDK: privacySDK
+                    privacySDK: privacySDK,
+                    userPrivacyManager: userPrivacyManager
                 };
                 auctionRequest = new AuctionRequest(auctionRequestParams);
             });
@@ -351,6 +357,8 @@ describe('Event parameters should match specifications', () => {
     describe('with click event', () => {
         it('on Android', () => {
             const platform = Platform.ANDROID;
+            const coreConfig = TestFixtures.getCoreConfiguration();
+            const adsConfig = TestFixtures.getAdsConfiguration();
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const core = TestFixtures.getCoreApi(nativeBridge);
@@ -365,6 +373,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
+            const userPrivacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform: platform,
@@ -375,12 +384,13 @@ describe('Event parameters should match specifications', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                coreConfig: TestFixtures.getCoreConfiguration(),
-                adsConfig: TestFixtures.getAdsConfiguration(),
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -402,6 +412,8 @@ describe('Event parameters should match specifications', () => {
 
         it('on iOS', () => {
             const platform = Platform.IOS;
+            const coreConfig = TestFixtures.getCoreConfiguration();
+            const adsConfig = TestFixtures.getAdsConfiguration();
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const core = TestFixtures.getCoreApi(nativeBridge);
@@ -415,6 +427,7 @@ describe('Event parameters should match specifications', () => {
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const sessionManager = new SessionManager(core, request, storageBridge);
+            const userPrivacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
             sessionManager.setGameSessionId(1234);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
             const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -426,12 +439,13 @@ describe('Event parameters should match specifications', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                coreConfig: TestFixtures.getCoreConfiguration(),
-                adsConfig: TestFixtures.getAdsConfiguration(),
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -460,6 +474,8 @@ describe('Event parameters should match specifications', () => {
         describe('on Android', () => {
             beforeEach(() => {
                 const platform = Platform.ANDROID;
+                const coreConfig = TestFixtures.getCoreConfiguration();
+                const adsConfig = TestFixtures.getAdsConfiguration();
                 const backend = TestFixtures.getBackend(platform);
                 const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 const core = TestFixtures.getCoreApi(nativeBridge);
@@ -472,6 +488,7 @@ describe('Event parameters should match specifications', () => {
                 requestSpy = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
                 const clientInfo = TestFixtures.getClientInfo(platform);
                 const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+                const userPrivacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
                 const sessionManager = new SessionManager(core, request, storageBridge);
                 sessionManager.setGameSessionId(1234);
                 const campaign = TestFixtures.getCampaign();
@@ -484,12 +501,13 @@ describe('Event parameters should match specifications', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
-                    coreConfig: TestFixtures.getCoreConfiguration(),
-                    adsConfig: TestFixtures.getAdsConfiguration(),
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
                     storageBridge: storageBridge,
                     campaign: campaign,
                     playerMetadataServerId: 'test-gamerSid',
-                    privacySDK: privacySDK
+                    privacySDK: privacySDK,
+                    userPrivacyManager: userPrivacyManager
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -556,6 +574,8 @@ describe('Event parameters should match specifications', () => {
         describe('on iOS', () => {
             beforeEach(() => {
                 const platform = Platform.IOS;
+                const coreConfig = TestFixtures.getCoreConfiguration();
+                const adsConfig = TestFixtures.getAdsConfiguration();
                 const backend = TestFixtures.getBackend(platform);
                 const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 const core = TestFixtures.getCoreApi(nativeBridge);
@@ -568,6 +588,7 @@ describe('Event parameters should match specifications', () => {
                 requestSpy = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
                 const clientInfo = TestFixtures.getClientInfo(platform);
                 const deviceInfo = TestFixtures.getIosDeviceInfo(core);
+                const userPrivacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
                 const sessionManager = new SessionManager(core, request, storageBridge);
                 sessionManager.setGameSessionId(1234);
                 const campaign = TestFixtures.getCampaign();
@@ -580,12 +601,13 @@ describe('Event parameters should match specifications', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
-                    coreConfig: TestFixtures.getCoreConfiguration(),
-                    adsConfig: TestFixtures.getAdsConfiguration(),
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
                     storageBridge: storageBridge,
                     campaign: campaign,
                     playerMetadataServerId: 'test-gamerSid',
-                    privacySDK: privacySDK
+                    privacySDK: privacySDK,
+                    userPrivacyManager: userPrivacyManager
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());

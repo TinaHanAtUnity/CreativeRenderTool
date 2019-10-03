@@ -41,6 +41,7 @@ export class AdMobVideo extends Model<IAdMobVideo> {
 export interface IAdMobCampaign extends IProgrammaticCampaign {
     dynamicMarkup: string;
     video: AdMobVideo | null;
+    isOMEnabled: boolean | undefined;
 }
 
 export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
@@ -48,8 +49,13 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
         super('AdMobCampaign', {
             ... ProgrammaticCampaign.Schema,
             dynamicMarkup: ['string'],
-            video: ['object', 'null']
+            video: ['object', 'null'],
+            isOMEnabled: ['boolean', 'undefined']
         }, campaign);
+    }
+
+    public isOMEnabled(): boolean | undefined {
+        return this.get('isOMEnabled');
     }
 
     public getDynamicMarkup(): string {

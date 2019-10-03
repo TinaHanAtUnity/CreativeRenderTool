@@ -8,6 +8,7 @@ import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('AdsConfigurationParserTest', () => {
     const platform = Platform.ANDROID;
@@ -50,18 +51,18 @@ describe('AdsConfigurationParserTest', () => {
         });
 
         context('with original GDPR opt-out fields', () => {
-            let adsConfig: AdsConfiguration;
-            beforeEach(() => adsConfig = AdsConfigurationParser.parse(configJson));
+            let privacySDK: PrivacySDK;
+            beforeEach(() => privacySDK = PrivacyParser.parse(configJson, clientInfo, deviceInfo));
             it('should have gdprEnabled parameter from configuration', () => {
-                assert.equal(adsConfig.isGDPREnabled(), false);
+                assert.equal(privacySDK.isGDPREnabled(), false);
             });
 
             it('should have optOutRecorded parameter from configuration', () => {
-                assert.equal(adsConfig.isOptOutRecorded(), false);
+                assert.equal(privacySDK.isOptOutRecorded(), false);
             });
 
             it('should have optOutEnabled parameter from configuration', () => {
-                assert.equal(adsConfig.isOptOutEnabled(), false);
+                assert.equal(privacySDK.isOptOutEnabled(), false);
             });
         });
 

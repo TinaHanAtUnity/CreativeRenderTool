@@ -17,7 +17,7 @@ export class DisplayInterstitialAdUnitParametersFactory extends AbstractAdUnitPa
 
     protected createParameters(baseParams: IAdUnitParameters<DisplayInterstitialCampaign>) {
 
-        const view = new DisplayInterstitial(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, this.showGDPRBanner(baseParams));
+        const view = new DisplayInterstitial(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, this.showGDPRBanner(baseParams), baseParams.adsConfig.getHidePrivacy());
         return  {
             ... baseParams,
             webPlayerContainer: this._webPlayerContainer,

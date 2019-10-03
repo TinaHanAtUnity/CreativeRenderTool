@@ -1,32 +1,21 @@
 <div class="safe-area">
-    <div id="consent-homescreen">
-        <div class="homescreen-container">
-            <div class="top-container">
-                <div class="privacy-logo item">
-                    <span class="icon-gdpr"></span>
-                </div>
-                <div class="title item">
-                    <span class="centered-title"><%= data.t("homepage-title") %></span>
-                </div>
-                <div class="description item">
-                    <p>
-                        <%= data.t("homepage-main-text") %>
-                    </p>
-                </div>
+    <div id="age-gate">
+        <div class="text-container">
+            <span class="title"><%= data.t("age-gate-title") %></span>
+            <div class="main-text">
+                <p>
+                    <%= data.t("age-gate-text") %>
+                </p>
             </div>
-            <div class="stripe"></div>
-            <div class="bottom-container">
-                <div class="button-container item">
-                    <div class="accept-all consent-button">
-                        <span><%= data.t("homepage-accept-all") %></span>
-                    </div>
-                    <div class="show-choices consent-button">
-                        <span><%= data.t("homepage-show-my-choices") %></span>
-                    </div>
-                </div>
-                <div class="logo-container">
-                    <div class="unityads-logo"></div>
-                </div>
+            <div class="empty-block">
+            </div>
+        </div>
+
+        <div class="homepage-button-container">
+            <div class="age-gate-over consent-button"><span><%= data.t("age-gate-over-age-limit-btn") %></span></div>
+            <div class="age-gate-under consent-button"><span><%= data.t("age-gate-under-age-limit-btn") %></span></div>
+            <div class="logo-container">
+                <div class="unityads-logo"></div>
             </div>
         </div>
     </div>

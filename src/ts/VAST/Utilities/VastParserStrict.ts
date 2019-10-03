@@ -22,6 +22,7 @@ import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Mo
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -87,12 +88,14 @@ export class VastParserStrict {
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
+    private _pts: ProgrammaticTrackingService | undefined;
 
-    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
+    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration, pts?: ProgrammaticTrackingService) {
         this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
         this._compiledCampaignErrors = [];
         this._coreConfig = coreConfig;
+        this._pts = pts;
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -200,10 +203,13 @@ export class VastParserStrict {
         const headers: [string, string][] = [];
 
         // For IAS tags to return vast instead of vpaid for Open Measurement
-        if (CustomFeatures.isIASVastTag(wrapperURL) && this._coreConfig && OpenMeasurementTest.isValid(this._coreConfig.getAbGroup())) {
+        if (CustomFeatures.isIASVastTag(wrapperURL)) {
             wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
             headers.push(['User-Agent', navigator.userAgent]);
+            if (this._pts) {
+                this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
+            }
         }
 
         wrapperURL = decodeURIComponent(wrapperURL);
@@ -412,6 +418,11 @@ export class VastParserStrict {
         // parsing ad verification in VAST 4.1
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
+            verifications.forEach((verification) => {
+                if (verification.getVerificationVendor() === 'IAS' && this._pts) {
+                    this._pts.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
+                }
+            });
             vastAd.addAdVerifications(verifications);
         });
 
@@ -420,6 +431,12 @@ export class VastParserStrict {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
+                verifications.forEach((verification) => {
+                    if (verification.getVerificationVendor() === 'IAS' && this._pts) {
+                        this._pts.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
+                    }
+                });
+
                 vastAd.addAdVerifications(verifications);
             }
         });

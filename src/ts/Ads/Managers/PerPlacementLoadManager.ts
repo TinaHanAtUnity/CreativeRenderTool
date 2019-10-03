@@ -4,7 +4,6 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -15,19 +14,18 @@ import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export class PerPlacementLoadManager extends RefreshManager {
-    private _core: ICoreApi;
     private _ads: IAdsApi;
-    private _adsConfig: AdsConfiguration;
-    private _coreConfig: CoreConfiguration;
-    private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
     private _focusManager: FocusManager;
-    private _pts: ProgrammaticTrackingService;
 
-    constructor(core: ICoreApi, ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    protected _adsConfig: AdsConfiguration;
+    protected _coreConfig: CoreConfiguration;
+    protected _campaignManager: CampaignManager;
+    protected _pts: ProgrammaticTrackingService;
+
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
-        this._core = core;
         this._ads = ads;
         this._adsConfig = adsConfig;
         this._coreConfig = coreConfig;

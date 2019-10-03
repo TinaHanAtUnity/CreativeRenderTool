@@ -5,4 +5,6 @@ export interface IConsentViewHandler {
     onConsent(consent: IPermissions, source: GDPREventSource): void;
     onClose(): void;
     onPrivacy(url: string): void;
+    onAgeGateDisagree(): void;
+    onAgeGateAgree(): void;
 }
