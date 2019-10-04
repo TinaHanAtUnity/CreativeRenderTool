@@ -13,7 +13,8 @@ export enum ProgrammaticTrackingError {
     PromoWithoutCreatives = 'promo_without_creatives',
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
-    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show'
+    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
+    TimingValueNegative = 'timing_value_negative'
 }
 
 export enum AdmobMetric {
@@ -172,7 +173,11 @@ export class ProgrammaticTrackingService {
     }
 
     public reportTimingEvent(event: TimingMetric, value: number, countryIso: string): Promise<INativeResponse> {
-        return this.postWithTags(event, value, this.createTimingTags(countryIso), this.timingPath);
+        // Gate Negative Values
+        if (value > 0) {
+            return this.postWithTags(event, value, this.createTimingTags(countryIso), this.timingPath);
+        }
+        return this.postWithTags(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event), this.metricPath);
     }
 
 }

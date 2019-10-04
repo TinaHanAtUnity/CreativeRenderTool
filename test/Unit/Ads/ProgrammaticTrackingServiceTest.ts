@@ -92,7 +92,7 @@ describe('ProgrammaticTrackingService', () => {
             }
         }];
         tests.forEach((t) => {
-            it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
+            it(`should send "${t.expected.metrics![0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
@@ -136,7 +136,7 @@ describe('ProgrammaticTrackingService', () => {
             }
         }];
         tests.forEach((t) => {
-            it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
+            it(`should send "${t.expected.metrics![0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEvent(t.input);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
@@ -160,11 +160,13 @@ describe('ProgrammaticTrackingService', () => {
             metric: TimingMetric;
             value: number;
             country: string;
+            path: string;
             expected: IProgrammaticTrackingData;
         }[] = [{
             metric: TimingMetric.WebviewInitializationTime,
             value: 18331,
             country: 'us',
+            path: '/timing',
             expected: {
                 metrics: [
                     {
@@ -178,13 +180,29 @@ describe('ProgrammaticTrackingService', () => {
                     }
                 ]
             }
+        }, {
+            metric: TimingMetric.WebviewInitializationTime,
+            value: -1,
+            country: 'hk',
+            path: '/metrics',
+            expected: {
+                metrics: [
+                    {
+                        name: 'timing_value_negative',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:webview_initialization_time' // Intentional to track which timing metrics are negative
+                        ]
+                    }
+                ]
+            }
         }];
         tests.forEach((t) => {
-            it(`should send "${t.expected}" when "${t.metric}, ${t.value} and ${t.country}" is passed in`, () => {
+            it(`should send "${t.expected.metrics![0].name}" with "${t.metric}", "${t.value}", and "${t.country}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value, t.country);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing');
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path);
                 assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
                 return promise;
