@@ -42,14 +42,6 @@
                         impression: []
                     };
 
-                    let handleEventQueue = function(event, parameters) {
-                        if (event === 'geometryChange' || event === 'impression') {
-                            adEventsQueue[event] = parameters;
-                        } else {
-                            videoEventsQueue[event] = parameters;
-                        }
-                    }
-
                     let handleEventCall = function(event, parameters) {
                         
                         /**
@@ -80,10 +72,6 @@
                         }
 
                         if (event in videoListeners) {
-                            // we never store video event since it is not fired from our sdk
-                            if (videoListeners[event].length === 0) {
-                                handleEventQueue(event, parameters);
-                            }
                             handleEventCall(event, parameters);
                         }
                     };
@@ -92,11 +80,7 @@
                     let sessionObserversMap = {};
                     let sessionStartData = {};
                     let sessionStartCalled = false;
-                    let scriptVendor = '';
-
-                    let sessionEventsQueue = {};
-                    let adEventsQueue = {};
-                    let videoEventsQueue = {};
+                    var scriptVendor = '';
 
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
@@ -297,37 +281,16 @@
                             videoListeners[type].push(listener);
                         }
 
-                        if (adEventsQueue[type] !== undefined) {
-                            trigger(type, adEventsQueue[type]);
-                        } 
+                        const adjustEventTypeString = (eventType) => {
+                            return `omid${eventType.charAt(0).toUpperCase()+eventType.slice(1)}`;
+                        };
 
-                        if (type === 'video') {
-                            videoEventRegistered = true;
-                            sendAllQueuedVideoEvents(); 
-                        } 
-
-                        if (videoEventsQueue[type] !== undefined) {
-                            trigger(type, videoEventsQueue[type]);
-                        }
+                        postMessageCallback('onEventRegistered', {
+                            eventName: adjustEventTypeString(type),
+                            vendor: scriptVendor
+                        });
                     }
 
-                    let sendAllQueuedVideoEvents = function() {
-                        if (videoEventsQueue['loaded'])                          trigger('loaded', videoEventsQueue['loaded']);
-                        if (videoEventsQueue['start'] && scriptVendor !== 'IAS') trigger('start', videoEventsQueue['start']);                 // because IAS registers video and start separately
-                        if (videoEventsQueue['firstQuartile'])                   trigger('firstQuartile', videoEventsQueue['firstQuartile']);
-                        if (videoEventsQueue['midpoint'])                        trigger('midpoint', videoEventsQueue['midpoint']);
-                        if (videoEventsQueue['thirdQuartile'])                   trigger('thirdQuartile', videoEventsQueue['thirdQuartile']);
-                        if (videoEventsQueue['complete'])                        trigger('complete', videoEventsQueue['complete']);
-                        if (videoEventsQueue['pause'])                           trigger('pause', videoEventsQueue['pause']);
-                        if (videoEventsQueue['resume'])                          trigger('resume', videoEventsQueue['resume']);
-                        if (videoEventsQueue['bufferStart'])                     trigger('bufferStart', videoEventsQueue['bufferStart']);
-                        if (videoEventsQueue['bufferFinish'])                    trigger('bufferFinish', videoEventsQueue['bufferFinish']);
-                        if (videoEventsQueue['skipped'])                         trigger('skipped', videoEventsQueue['skipped']);
-                        if (videoEventsQueue['volumeChange'])                    trigger('volumeChange', videoEventsQueue['volumeChange']);
-                        if (videoEventsQueue['playerStateChange'])               trigger('playerStateChange', videoEventsQueue['playerStateChange']);
-                        if (videoEventsQueue['adUserInteraction'])               trigger('adUserInteraction', videoEventsQueue['adUserInteraction']);
-                    }
-        
                     this.sendUrl = function(resourceUrl, successCallback, failureCallback) {}
                     this.setTimeout = function() {}
                     this.setClearTimeout = function() {}
