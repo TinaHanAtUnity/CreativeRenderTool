@@ -228,9 +228,13 @@ export class Localization {
     }
 
     public translate(phrase: string): string {
-        const languageMap = Localization.getLanguageMap(this._language, this._namespace);
+        let languageMap = Localization.getLanguageMap(this._language, this._namespace);
         if (!languageMap || !(phrase in languageMap)) {
-            return phrase;
+            // check if the phrase could be found from English map
+            languageMap = Localization.getLanguageMap('en.*', this._namespace);
+            if (!languageMap || !(phrase in languageMap)) {
+                return phrase;
+            }
         }
         return languageMap[phrase];
     }
