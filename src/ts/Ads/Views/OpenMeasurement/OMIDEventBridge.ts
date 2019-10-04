@@ -45,52 +45,7 @@ export class OMIDEventBridge {
         this._iframe3p = iframe;
         this._openMeasurement = openMeasurement;
         this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
-        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendor);
-    }
-
-    public onEventRegistered(eventName: string, vendorKey: string) {
-        if (this._adEventQueue[eventName]) {
-            this.sendQueuedAdEvent(eventName);
-        }
-
-        if (eventName === 'omidVideo') {
-            this.sendAllQueuedEvents(vendorKey);
-        }
-
-        if (this._videoEventQueue[eventName]) {
-            this.sendQueuedVideoEvent(eventName);
-        }
-    }
-
-    private sendQueuedVideoEvent(eventName: string) {
-        const event: IVerificationEvent = this._videoEventQueue[eventName];
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-    }
-
-    private sendQueuedAdEvent(eventName: string) {
-        const event: IVerificationEvent = this._adEventQueue[eventName];
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-    }
-
-    private sendAllQueuedEvents(vendorkey: string): void {
-        if (this._videoEventQueue[OMID3pEvents.OMID_LOADED]) {                          this.sendQueuedVideoEvent(OMID3pEvents.OMID_LOADED); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_START] && vendorkey !== 'IAS') {    this.sendQueuedVideoEvent(OMID3pEvents.OMID_START); }               // because IAS registers video and start separately
-        if (this._videoEventQueue[OMID3pEvents.OMID_FIRST_QUARTILE]) {                  this.sendQueuedVideoEvent(OMID3pEvents.OMID_FIRST_QUARTILE); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_MIDPOINT])      {                   this.sendQueuedVideoEvent(OMID3pEvents.OMID_MIDPOINT); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_THIRD_QUARTILE]) {                  this.sendQueuedVideoEvent(OMID3pEvents.OMID_THIRD_QUARTILE); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_COMPLETE])      {                   this.sendQueuedVideoEvent(OMID3pEvents.OMID_COMPLETE); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_PAUSE])         {                   this.sendQueuedVideoEvent(OMID3pEvents.OMID_PAUSE); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_RESUME])        {                   this.sendQueuedVideoEvent(OMID3pEvents.OMID_RESUME); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_BUFFER_START])   {                  this.sendQueuedVideoEvent(OMID3pEvents.OMID_BUFFER_START); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_BUFFER_FINISH])  {                  this.sendQueuedVideoEvent(OMID3pEvents.OMID_BUFFER_FINISH); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_SKIPPED])       {                   this.sendQueuedVideoEvent(OMID3pEvents.OMID_SKIPPED); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_VOLUME_CHANGE])  {                  this.sendQueuedVideoEvent(OMID3pEvents.OMID_VOLUME_CHANGE); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_PLAYER_STATE_CHANGE]) {             this.sendQueuedVideoEvent(OMID3pEvents.OMID_PLAYER_STATE_CHANGE); }
-        if (this._videoEventQueue[OMID3pEvents.OMID_AD_USER_INTERACTION]) {             this.sendQueuedVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION); }
+        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey);
     }
 
     public connect() {
@@ -157,5 +112,41 @@ export class OMIDEventBridge {
                 handler(message);
             }
         }
+    }
+
+    public onEventRegistered(eventName: string, vendorKey: string) {
+        if (this._adEventQueue[eventName]) {
+            this.sendQueuedAdEvent(eventName);
+        }
+
+        if (eventName === 'omidVideo') {
+            this.sendAllQueuedEvents(vendorKey);
+        }
+
+        if (this._videoEventQueue[eventName]) {
+            this.sendQueuedVideoEvent(eventName);
+        }
+    }
+
+    private sendQueuedVideoEvent(eventName: string) {
+        const event: IVerificationEvent = this._videoEventQueue[eventName];
+        if (this._iframe3p.contentWindow && this._verificationsInjected) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        }
+    }
+
+    private sendQueuedAdEvent(eventName: string) {
+        const event: IVerificationEvent = this._adEventQueue[eventName];
+        if (this._iframe3p.contentWindow && this._verificationsInjected) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        }
+    }
+
+    private sendAllQueuedEvents(vendorkey: string): void {
+        Object.keys(this._videoEventQueue).forEach((event) => {
+            if (this._videoEventQueue[event]) {
+                this.sendQueuedVideoEvent(event);
+            }
+        });
     }
 }
