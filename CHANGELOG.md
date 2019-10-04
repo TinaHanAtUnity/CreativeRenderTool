@@ -1,4 +1,4 @@
-# Pending
+# Thu Oct  3 23:56:18 UTC 2019
 
 * Add Initialization Timing Support for SDK Versions and Countries [#11419](https://github.com/Applifier/unity-ads-webview/pull/11419)
 
