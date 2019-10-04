@@ -582,7 +582,8 @@ describe('CampaignRefreshManager', () => {
             });
 
             sinon.stub(request, 'post').callsFake(() => {
-                const json = OnCometVideoPlcCampaign;
+                // TODO remove this garbage due to modifying imported json state
+                const json = JSON.parse(JSON.stringify(OnCometVideoPlcCampaign));
                 json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 'wrong/contentType';
                 return Promise.resolve(<INativeResponse> {
                     response: JSON.stringify(json),
@@ -609,7 +610,8 @@ describe('CampaignRefreshManager', () => {
             });
 
             sinon.stub(request, 'post').callsFake(() => {
-                const json = OnCometVideoPlcCampaign;
+                // TODO remove this garbage due to modifying imported json state
+                const json = JSON.parse(JSON.stringify(OnCometVideoPlcCampaign));
                 json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].contentType = 1;
                 return Promise.resolve(<INativeResponse> {
                     response: JSON.stringify(json),

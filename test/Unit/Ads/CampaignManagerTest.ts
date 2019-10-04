@@ -876,7 +876,7 @@ describe('CampaignManager', () => {
 
     describe('on PLC', () => {
         let assetManager;
-        let campaignManager: any;
+        let campaignManager: CampaignManager;
         let triggeredCampaign: Campaign;
         let triggeredError: any;
         let triggeredPlacement: string;
