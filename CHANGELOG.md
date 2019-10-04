@@ -1,4 +1,4 @@
-# Pending
+# Fri Oct  4 21:43:11 UTC 2019
 
 * Remove Zynga WWF Games from Load Whitelist [#11507](https://github.com/Applifier/unity-ads-webview/pull/11507)
 * Refresh Promo Catalog after auction parsing if needed [#11506](https://github.com/Applifier/unity-ads-webview/pull/11506)
