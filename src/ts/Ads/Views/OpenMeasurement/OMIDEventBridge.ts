@@ -144,6 +144,7 @@ export class OMIDEventBridge {
 
     private sendAllQueuedEvents(vendorkey: string): void {
         Object.keys(this._videoEventQueue).forEach((event) => {
+            // TODO: if event = omidStart and vendorkey is IAS don't fire it due to double registration
             if (this._videoEventQueue[event]) {
                 this.sendQueuedVideoEvent(event);
             }
