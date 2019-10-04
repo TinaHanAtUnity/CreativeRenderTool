@@ -147,7 +147,7 @@
 
                             if (!data.verificationParameters) {
                                 // If we've already stored data for a default key, we can send SessionStart since the params do not matter
-                                if (sessionStartData[DEFAULT_VENDOR_KEY]) {
+                                if (sessionStartData[DEFAULT_VENDOR_KEY] && !sessionStartCalled) {
                                     sendSessionStartForKey(DEFAULT_VENDOR_KEY);
                                     sessionStartCalled = true;
                                 } else {
