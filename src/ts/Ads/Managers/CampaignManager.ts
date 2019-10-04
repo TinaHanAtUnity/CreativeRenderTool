@@ -199,6 +199,9 @@ export class CampaignManager {
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
+                if (!PurchasingUtilities.isCatalogAvailable() && PurchasingUtilities.configurationIncludesPromoPlacement()) {
+                    PurchasingUtilities.refreshCatalog();
+                }
                 this._requesting = false;
             }).catch((error) => {
                 this._requesting = false;
