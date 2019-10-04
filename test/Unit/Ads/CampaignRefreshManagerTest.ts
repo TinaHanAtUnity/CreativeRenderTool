@@ -539,7 +539,7 @@ describe('CampaignRefreshManager', () => {
 
             sinon.stub(request, 'post').callsFake(() => {
                 return Promise.resolve(<INativeResponse> {
-                    response: OnCometVideoPlcCampaign,
+                    response: JSON.stringify(OnCometVideoPlcCampaign),
                     url: 'www.test.com',
                     responseCode: 200,
                     headers: []
