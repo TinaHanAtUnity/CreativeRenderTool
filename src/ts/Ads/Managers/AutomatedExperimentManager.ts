@@ -16,14 +16,18 @@ interface IParsedExperiment {
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
-        this.Experiment = experiment;
+        this._experiment = experiment;
         this.Action = action;
     }
 
-    public Experiment: AutomatedExperiment;
+    private _experiment: AutomatedExperiment;
     public Action: string;
     public SendReward = false;
     public SendAction = false;
+
+    public getExperiment(): AutomatedExperiment {
+        return this._experiment;
+    }
 }
 
 export class AutomatedExperimentManager {
@@ -154,7 +158,7 @@ export class AutomatedExperimentManager {
 
     private submit(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
         const action = {
-            experiment: item.Experiment.getName(),
+            experiment: item.getExperiment().getName(),
             action: item.Action
         };
 
