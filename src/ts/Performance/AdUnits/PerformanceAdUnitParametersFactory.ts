@@ -21,6 +21,7 @@ import {
     BouncingDownloadButtonTest,
     ShiningDownloadButtonTest
 } from 'Core/Models/ABGroup';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -65,6 +66,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
+        const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
+
         return {
             ... baseParams,
             video: video,
@@ -72,7 +75,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
             downloadManager: this._downloadManager,
-            deviceIdManager: this._deviceIdManager
+            deviceIdManager: this._deviceIdManager,
+            automatedExperimentManager: automatedExperimentManager
         };
     }
 
