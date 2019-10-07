@@ -135,7 +135,8 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: privacyManager
             });
 
             vastAdUnitParameters = {

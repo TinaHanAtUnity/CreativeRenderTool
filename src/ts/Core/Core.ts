@@ -49,7 +49,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class Core implements ICore {
 
@@ -77,9 +77,6 @@ export class Core implements ICore {
     public Ads: Ads;
     public Purchasing: Purchasing;
     public ProgrammaticTrackingService: ProgrammaticTrackingService;
-
-    private _initialized = false;
-    private _initializedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
@@ -155,8 +152,6 @@ export class Core implements ICore {
             return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
-            this._initialized = true;
-            this._initializedAt = Date.now();
 
             this.WakeUpManager.setListenConnectivity(true);
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
@@ -212,7 +207,10 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
 
-            return this.Ads.initialize();
+            return this.Ads.initialize().then(() => {
+                const totalInitializationTime = Date.now() - this.ClientInfo.getInitTimestamp();
+                this.ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewInitializationTime, totalInitializationTime, this.Config.getCountry());
+            });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
                 // tslint:disable-next-line
@@ -240,6 +238,10 @@ export class Core implements ICore {
 
             if (TestEnvironment.get('kafkaUrl')) {
                 HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
+            }
+
+            if (TestEnvironment.get('country')) {
+                ConfigManager.setCountry(TestEnvironment.get('country'));
             }
 
             const abGroupNumber = parseInt(TestEnvironment.get('abGroup'), 10);

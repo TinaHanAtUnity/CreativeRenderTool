@@ -98,6 +98,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             const privacySDK = sinon.createStubInstance(PrivacySDK);
+            const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
@@ -113,7 +114,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -274,6 +276,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             const privacySDK = sinon.createStubInstance(PrivacySDK);
+            const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -288,7 +291,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 

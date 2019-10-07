@@ -91,7 +91,8 @@ describe('IosAdUnitTest', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
 
         adUnitParams = {

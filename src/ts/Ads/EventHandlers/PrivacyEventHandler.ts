@@ -1,4 +1,4 @@
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -52,6 +52,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 this._privacy.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
+                    // todo: add age gate choice
                     this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
                 } else {
                     this._privacyManager.sendGDPREvent(GDPREventAction.OPTIN);

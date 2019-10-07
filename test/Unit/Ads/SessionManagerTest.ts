@@ -21,6 +21,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 class TestHelper {
     public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
@@ -68,6 +69,7 @@ describe('SessionManagerTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
@@ -85,7 +87,8 @@ describe('SessionManagerTest', () => {
             storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign(),
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
     });
 

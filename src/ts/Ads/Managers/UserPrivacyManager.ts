@@ -46,8 +46,9 @@ export enum GDPREventAction {
 
 export enum LegalFramework {
     DEFAULT = 'default',
-    GDPR = 'gdpr',
-    CCPA = 'ccpa'
+    GDPR = 'gdpr', // EU
+    CCPA = 'ccpa', // California
+    TC260 = 'tc260' // China
 }
 
 export enum AgeGateChoice {
@@ -68,6 +69,7 @@ export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
+    private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
 
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
@@ -80,6 +82,7 @@ export class UserPrivacyManager {
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
+    private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
         this._platform = platform;
@@ -105,8 +108,8 @@ export class UserPrivacyManager {
             'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId(),
             'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT,
-            'agreedOverAgeLimit': AgeGateChoice.MISSING
+            'legalFramework': this._privacy.getLegalFramework(),
+            'agreedOverAgeLimit': this._ageGateChoice
         };
         if (source) {
             infoJson = {
@@ -198,8 +201,8 @@ export class UserPrivacyManager {
             coppa: this._coreConfig.isCoppaCompliant(),
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
-            legalFramework: this._privacy.isGDPREnabled() ? LegalFramework.GDPR : LegalFramework.DEFAULT, // todo: retrieve detailed value from config response once config service is updated
-            agreedOverAgeLimit: AgeGateChoice.MISSING // todo: start using real values once age gate goes to production
+            legalFramework: this._privacy.getLegalFramework(),
+            agreedOverAgeLimit: this._ageGateChoice
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
@@ -214,6 +217,8 @@ export class UserPrivacyManager {
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
         if (this._privacy.isGDPREnabled()) {
+            this.initAgeGateChoice();
+
             // get consent only if gdpr is enabled
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
@@ -279,6 +284,39 @@ export class UserPrivacyManager {
         }
     }
 
+    public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
+        if (ageGateChoice === AgeGateChoice.YES) {
+            Diagnostics.trigger('age_gate_pass', {
+                legalFramework: this._privacy.getLegalFramework(),
+                method: this._gamePrivacy.getMethod(),
+                previousChoice: this._ageGateChoice
+            });
+        } else if (ageGateChoice === AgeGateChoice.NO) {
+            Diagnostics.trigger('age_gate_not_passed', {
+                legalFramework: this._privacy.getLegalFramework(),
+                method: this._gamePrivacy.getMethod(),
+                previousChoice: this._ageGateChoice
+            });
+        }
+
+        this._ageGateChoice = ageGateChoice;
+
+        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey, this.isUserUnderAgeLimit()).then(() => {
+            this._core.Storage.write(StorageType.PRIVATE);
+        });
+    }
+
+    public isUserUnderAgeLimit(): boolean {
+        if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.NO) {
+            return true;
+        }
+        return false;
+    }
+
+    public getAgeGateChoice(): AgeGateChoice {
+        return this._ageGateChoice;
+    }
+
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
         return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
@@ -303,6 +341,20 @@ export class UserPrivacyManager {
                 throw new Error('gdpr.consent.value is undefined');
             }
         });
+    }
+
+    private initAgeGateChoice(): void {
+        if (this._privacy.isAgeGateEnabled()) {
+            this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey).then((data: unknown) => {
+                const value: boolean | undefined = this.getConsentTypeHack(data);
+                if (typeof(value) !== 'undefined') {
+                    this._ageGateChoice = value ? AgeGateChoice.NO : AgeGateChoice.YES;
+                } else {
+                    this._ageGateChoice = AgeGateChoice.MISSING;
+                }
+            });
+        }
+
     }
 
     private updateConfigurationWithConsent(consent: boolean) {
