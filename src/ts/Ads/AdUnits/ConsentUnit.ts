@@ -17,6 +17,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -88,6 +89,14 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             document.body.appendChild(this._unityConsentView.container());
 
             this._unityConsentView.show();
+
+            if(this._privacySDK.getAgeGateLimit() > 0) {
+                Diagnostics.trigger('age_gate_show', {
+                    legalFramework: this._privacySDK.getLegalFramework(),
+                    method: this._privacySDK.getGamePrivacy().getMethod(),
+                    previousChoice: this._privacyManager.getAgeGateChoice()
+                });
+            }
 
             if (TestEnvironment.get('autoAcceptConsent')) {
                 const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
