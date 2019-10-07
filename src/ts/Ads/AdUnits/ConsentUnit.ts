@@ -90,7 +90,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
             this._unityConsentView.show();
 
-            if (this._privacySDK.getAgeGateLimit() > 0) {
+            if (this._privacySDK.isAgeGateEnabled()) {
                 Diagnostics.trigger('age_gate_show', {
                     legalFramework: this._privacySDK.getLegalFramework(),
                     method: this._privacySDK.getGamePrivacy().getMethod(),

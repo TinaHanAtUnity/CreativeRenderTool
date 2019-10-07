@@ -292,7 +292,7 @@ export class UserPrivacyManager {
                 previousChoice: this._ageGateChoice
             });
         } else if (ageGateChoice === AgeGateChoice.NO) {
-            Diagnostics.trigger('age_gate_fail', {
+            Diagnostics.trigger('age_gate_not_passed', {
                 legalFramework: this._privacy.getLegalFramework(),
                 method: this._gamePrivacy.getMethod(),
                 previousChoice: this._ageGateChoice
