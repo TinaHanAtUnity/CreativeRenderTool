@@ -14,6 +14,8 @@ export class PrivacySDK {
     constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
+        //TODO: ENABLED FOR DEVELOPMENT ONLY!
+        this._testForceConsentUnit = true;
         this._testForceConsentUnit = false;
         this._gdprEnabled = gdprEnabled;
         this._optOutRecorded = optOutRecorded;
