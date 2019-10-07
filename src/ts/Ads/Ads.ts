@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -90,6 +90,7 @@ import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
+import { DiagnosticCannon } from 'Ads/Utilities/DiagnosticCannon';
 
 export class Ads implements IAds {
 
@@ -173,7 +174,7 @@ export class Ads implements IAds {
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
-    public initialize(): Promise<void> {
+    public initialize(intializeCannon: DiagnosticCannon): Promise<DiagnosticCannon> {
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -279,9 +280,14 @@ export class Ads implements IAds {
         }).then(() => {
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
-            return Promises.voidResult(this.RefreshManager.initialize());
+            const initializeAuctionTimespan = Date.now();
+            return Promises.voidResult(this.RefreshManager.initialize().then(() => {
+                intializeCannon.pack(TimingMetric.AuctionRequestToFillTimespan, Date.now() - initializeAuctionTimespan);
+            }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
+        }).then(() => {
+            return intializeCannon;
         });
     }
 

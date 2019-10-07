@@ -163,7 +163,7 @@ describe('ProgrammaticTrackingService', () => {
             path: string;
             expected: IProgrammaticTrackingData;
         }[] = [{
-            metric: TimingMetric.WebviewInitializationTime,
+            metric: TimingMetric.TotalWebviewInitializationTime,
             value: 18331,
             country: 'us',
             path: '/timing',
@@ -181,7 +181,7 @@ describe('ProgrammaticTrackingService', () => {
                 ]
             }
         }, {
-            metric: TimingMetric.WebviewInitializationTime,
+            metric: TimingMetric.TotalWebviewInitializationTime,
             value: -1,
             country: 'hk',
             path: '/metrics',
