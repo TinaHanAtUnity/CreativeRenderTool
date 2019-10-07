@@ -74,7 +74,7 @@ export class IosDeviceInfoApi extends NativeApi {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
                 this.onVolumeChanged.trigger(<number>parameters[0], <number>parameters[1]);
                 break;
-            case DeviceInfoEvent[DeviceInfoEvent.IOS_MUTE_STATE_RECEIVED]:
+            case DeviceInfoEvent[DeviceInfoEvent.MUTE_STATE_RECEIVED]:
                 this.onMuteChanged.trigger(<boolean>parameters[0]);
                 break;
             default:
