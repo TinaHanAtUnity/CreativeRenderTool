@@ -162,8 +162,8 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
         if (jsonPayload.type === 'CatalogUpdated') {
             return this.refreshCatalog().then((catalog) => {
+                this.sendIAPCatalog();
                 this.onCatalogRefreshed.trigger(catalog);
-                return this.sendIAPCatalog();
             });
         } else {
             return Promise.reject(this.logIssue('IAP Payload is incorrect', 'handle_send_event_failure'));
