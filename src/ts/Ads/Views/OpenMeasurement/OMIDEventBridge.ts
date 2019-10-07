@@ -13,6 +13,7 @@ export interface IVerificationEvent {
     timestamp: number;
     adSessionId: string;
     payload?: unknown;
+    uuid?: string;
 }
 
 export interface IOMIDEventHandler {
@@ -34,8 +35,9 @@ export class OMIDEventBridge {
     private _iframe3p: HTMLIFrameElement;
     private _verificationsInjected = false;
 
-    private _adEventQueue: { [event: string]: IVerificationEvent } = {};
     private _videoEventQueue: { [event: string]: IVerificationEvent } = {};
+    private _eventHistory: { [event: string]: IVerificationEvent[] } = {};
+    private _registeredFuncs: { [eventType: string]: string[] } = {};
 
     constructor(core: ICoreApi, handler: IOMIDEventHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement) {
         this._core = core;
@@ -45,7 +47,11 @@ export class OMIDEventBridge {
         this._iframe3p = iframe;
         this._openMeasurement = openMeasurement;
         this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
-        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey);
+        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey, <string>msg.data.uuid);
+
+        this._registeredFuncs = {
+            'omidVideo': []
+        };
     }
 
     public connect() {
@@ -73,11 +79,16 @@ export class OMIDEventBridge {
             payload: payload
         };
 
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
+        if (!this._eventHistory[type]) {
+            this._eventHistory[type] = [];
         }
+        this._eventHistory[type].push(event);
 
-        this._adEventQueue[type] = event;
+        if (this._registeredFuncs[type] !== undefined) {
+            this._registeredFuncs[type].forEach((uuid) => {
+                this.postMessage(event, uuid);
+            });
+        }
     }
 
     public triggerVideoEvent(type: string, payload?: unknown) {
@@ -89,8 +100,20 @@ export class OMIDEventBridge {
             payload: payload
         };
 
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
+        if (!this._eventHistory[type]) {
+            this._eventHistory[type] = [];
+        }
+        this._eventHistory[type].push(event);
+
+        if (this._registeredFuncs[type] !== undefined) {
+            this._registeredFuncs[type].forEach((uuid) => {
+                this.postMessage(event, uuid);
+            });
+        }
+
+        if (this._registeredFuncs[OMID3pEvents.OMID_VIDEO].length > 0) {
+            const uuid = this._registeredFuncs[OMID3pEvents.OMID_VIDEO][0];
+            this.postMessage(event, uuid);
         }
 
         this._videoEventQueue[type] = event;
@@ -98,9 +121,7 @@ export class OMIDEventBridge {
 
     public triggerSessionEvent(event: ISessionEvent) {
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
-        if (this._iframe3p.contentWindow) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
+        this.postMessage(event);
     }
 
     private onMessage(e: MessageEvent) {
@@ -114,39 +135,44 @@ export class OMIDEventBridge {
         }
     }
 
-    public onEventRegistered(eventName: string, vendorKey: string) {
-        if (this._adEventQueue[eventName]) {
-            this.sendQueuedAdEvent(eventName);
+    private postMessage(event: IVerificationEvent | ISessionEvent, uuid?: string) {
+        if (uuid) {
+            event.uuid = uuid;
+        }
+
+        if (this._iframe3p.contentWindow) {
+            this._iframe3p.contentWindow.postMessage(event, '*');
+        }
+    }
+
+    public onEventRegistered(eventName: string, vendorKey: string, uuid: string) {
+        const eventDatas = this._eventHistory[eventName];
+
+        if (!this._registeredFuncs[eventName]) {
+            this._registeredFuncs[eventName] = [];
+        }
+        this._registeredFuncs[eventName].push(uuid);
+
+        if (eventDatas) {
+            eventDatas.forEach((eventData) => {
+                this.postMessage(eventData, uuid);
+            });
         }
 
         if (eventName === 'omidVideo') {
-            this.sendAllQueuedEvents(vendorKey);
-        }
-
-        if (this._videoEventQueue[eventName]) {
-            this.sendQueuedVideoEvent(eventName);
+            this.sendAllQueuedVideoEvents(vendorKey, uuid);
         }
     }
 
-    private sendQueuedVideoEvent(eventName: string) {
+    private sendQueuedVideoEvent(eventName: string, uuid: string) {
         const event: IVerificationEvent = this._videoEventQueue[eventName];
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
+        this.postMessage(event, uuid);
     }
 
-    private sendQueuedAdEvent(eventName: string) {
-        const event: IVerificationEvent = this._adEventQueue[eventName];
-        if (this._iframe3p.contentWindow && this._verificationsInjected) {
-            this._iframe3p.contentWindow.postMessage(event, '*');
-        }
-    }
-
-    private sendAllQueuedEvents(vendorkey: string): void {
+    private sendAllQueuedVideoEvents(vendorkey: string, uuid: string): void {
         Object.keys(this._videoEventQueue).forEach((event) => {
-            // TODO: if event = omidStart and vendorkey is IAS don't fire it due to double registration
             if (this._videoEventQueue[event]) {
-                this.sendQueuedVideoEvent(event);
+                this.sendQueuedVideoEvent(event, uuid);
             }
         });
     }

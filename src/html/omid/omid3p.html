@@ -9,78 +9,14 @@
                     SESSION_START = 'sessionStart',
                     SESSION_ERROR = 'sessionError',
                     SESSION_REGISTERED = 'sessionRegistered';
-                    let videoEventRegistered = false;
-        
-                    /**
-                     * Enum for ad event types.
-                     * @enum {string}
-                     */
-                    const videoListeners = {
-                        /* 
-                        * Common Video Event Types
-                        */
-                        loaded: [],
-                        start: [],
-                        firstQuartile: [],
-                        midpoint: [],
-                        thirdQuartile: [],
-                        complete: [],
-                        pause: [],
-                        resume: [],
-                        bufferStart: [],
-                        bufferFinish: [],
-                        skipped: [],
-                        volumeChange: [],
-                        playerStateChange: [],
-                        adUserInteraction: [],
-                        video: [],
-        
-                        /* 
-                        * Common Ad Event Types
-                        */
-                        geometryChange: [],
-                        impression: []
-                    };
-
-                    let handleEventCall = function(event, parameters) {
-                        
-                        /**
-                         * Calls any events passed individually
-                         */
-                        videoListeners[event].forEach(function(listener) {
-                            listener(parameters);
-                        });
-
-                        /**
-                         * Calls video events of aggregate common video event types
-                         */
-                        if (event !== 'geometryChange' && event !== 'impression' && event !== 'video') {
-                            videoListeners['video'].forEach(function(listener) {
-                                listener(parameters);
-                            });
-                        }
-                    }
-
-                    /**
-                     * Calls the corresponding listener events function for Video/Ad events
-                     * @param {string} event to send to the server
-                     * @param {Object} parameters of the event
-                     */
-                    let trigger = function(event, parameters) {
-                        if(!parameters) {
-                            parameters = [];
-                        }
-
-                        if (event in videoListeners) {
-                            handleEventCall(event, parameters);
-                        }
-                    };
-        
                     let DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
                     let sessionObserversMap = {};
                     let sessionStartData = {};
                     let sessionStartCalled = false;
                     var scriptVendor = '';
+
+                    const registeredFunctions = {};
+                    let uuid = 0;
 
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
@@ -116,6 +52,7 @@
                      */
                     let sendSessionStart = function(observer, vendorkey) {
                         observer(sessionStartData[vendorkey]);
+                        console.log('JS: session start called');
                         postMessageCallback(ON_EVENT_PROCESSED, {
                             eventType: SESSION_START,
                             vendorKey: vendorkey
@@ -172,24 +109,6 @@
                     let stripEventString = function(eventType) {
                         return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
                     }
-                
-                    let eventHandlers = {};
-                    eventHandlers['omidImpression'] = (e) => trigger('impression', e);
-                    eventHandlers['omidGeometryChange'] = (e) => trigger('geometryChange', e);
-                    eventHandlers['omidLoaded'] = (e) => trigger('loaded', e);
-                    eventHandlers['omidStart'] = (e) => trigger('start', e);
-                    eventHandlers['omidFirstQuartile'] = (e) => trigger('firstQuartile', e);
-                    eventHandlers['omidMidpoint'] = (e) => trigger('midpoint', e);
-                    eventHandlers['omidThirdQuartile'] = (e) => trigger('thirdQuartile', e);
-                    eventHandlers['omidComplete'] = (e) => trigger('complete', e);
-                    eventHandlers['omidPause'] = (e) => trigger('pause', e);
-                    eventHandlers['omidResume'] = (e) => trigger('resume', e);
-                    eventHandlers['omidBufferStart'] = (e) => trigger('bufferStart', e);
-                    eventHandlers['omidBufferFinish'] = (e) => trigger('bufferFinish', e);
-                    eventHandlers['omidSkipped'] = (e) => trigger('skipped', e);
-                    eventHandlers['omidVolumeChange'] = (e) => trigger('volumeChange', e);
-                    eventHandlers['omidPlayerStateChange'] = (e) => trigger('playerStateChange', e);
-                    eventHandlers['omidAdUserInteraction'] = (e) => trigger('adUserInteraction', e);
         
                     /**
                      * LifeCycle Event Listener
@@ -198,7 +117,7 @@
                         /*
                         * AD AND VIDEO EVENTS:
                         */
-                        if (event.data.type in eventHandlers) {
+                        if (event.data.uuid) {
                             payload = event.data.payload;
                             const eventData = {
                                     adSessionId: event.data.adSessionId,
@@ -206,10 +125,11 @@
                                     type: stripEventString(event.data.type),
                                     data: payload
                             }
-                            var handler = eventHandlers[event.data.type];
+                            var handler = registeredFunctions[event.data.uuid];
                             handler(eventData);
+                            console.log('JS sent to script', eventData.type, event.data.uuid);
                         }
-        
+
                         /* 
                         * SESSION EVENTS:
                         */
@@ -219,9 +139,6 @@
                                 break;
                             case SESSION_FINISH:
                                 triggerSessionObserver(event.data);
-                                for (var listener in videoListeners) { 
-                                    delete videoListeners[listener]; 
-                                }
                                 postMessageCallback(ON_EVENT_PROCESSED, {
                                     eventType: SESSION_FINISH,
                                     vendorKey: scriptVendor
@@ -241,14 +158,6 @@
                     this.isSupported = function() {
                         return true;
                     }
-        
-                    this.postback = function(event, data) {
-                        window.parent.postMessage({
-                            type: 'omid',
-                            event: event,
-                            data: data
-                        }, '*');
-                    };
 
                    /**
                      * Registers session events for the given vendor key
@@ -277,9 +186,8 @@
                     }
 
                     this.addEventListener = function(type, listener) {
-                        if(type in videoListeners && videoListeners[type] !== listener) {
-                            videoListeners[type].push(listener);
-                        }
+                        uuid++;
+                        registeredFunctions[uuid] = listener;
 
                         const adjustEventTypeString = (eventType) => {
                             return `omid${eventType.charAt(0).toUpperCase()+eventType.slice(1)}`;
@@ -287,7 +195,8 @@
 
                         postMessageCallback('onEventRegistered', {
                             eventName: adjustEventTypeString(type),
-                            vendorKey: scriptVendor
+                            vendorKey: scriptVendor,
+                            uuid: `${uuid}`
                         });
                     }
 
@@ -301,9 +210,10 @@
                 /**
                  * Generic Vast verification scripts attach to this:
                  */
-                window.omid3p = new OmidVerification();
-                Object.freeze(window.omid3p);
-
+                // window.omid3p = new OmidVerification();
+                // Object.freeze(window.omid3p);
+                window.OmidVerificationClient = {'omid3p': OmidVerification};
+                
                 /**
                  * Used for IAB test:
                  * window.OmidVerificationClient = {'omid3p': OmidVerification};
