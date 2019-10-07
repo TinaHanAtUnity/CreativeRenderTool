@@ -47,6 +47,7 @@ export interface IAuctionResponse {
     height: number | undefined;
     isMoatEnabled: boolean | undefined;
     statusCode: number | undefined;
+    isOMEnabled: boolean | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -73,7 +74,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             width: ['number', 'undefined'],
             height: ['number', 'undefined'],
             isMoatEnabled: ['boolean', 'undefined'],
-            statusCode: ['number', 'undefined']
+            statusCode: ['number', 'undefined'],
+            isOMEnabled: ['boolean', 'undefined']
         });
 
         this.set('placements', placements);
@@ -97,6 +99,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('height', data.height);
         this.set('isMoatEnabled', data.isMoatEnabled);
         this.set('statusCode', statusCode);
+        this.set('isOMEnabled', data.isOMEnabled);
     }
 
     public getPlacements(): AuctionPlacement[] {
@@ -185,6 +188,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getStatusCode(): number | undefined {
         return this.get('statusCode');
+    }
+
+    public isAdmobOMEnabled(): boolean | undefined {
+        return this.get('isOMEnabled');
     }
 
     public getDTO(): {[key: string]: unknown } {

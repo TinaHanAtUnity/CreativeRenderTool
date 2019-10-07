@@ -1,4 +1,5 @@
 import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
@@ -7,18 +8,26 @@ export class PrivacySDK {
     private _gdprEnabled: boolean;
     private _optOutRecorded: boolean;
     private _optOutEnabled: boolean;
+    private _ageGateLimit: number;
+    private _legalFramework: LegalFramework;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
         this._testForceConsentUnit = false;
         this._gdprEnabled = gdprEnabled;
         this._optOutRecorded = optOutRecorded;
         this._optOutEnabled = optOutEnabled;
+        this._ageGateLimit = ageGateLimit;
+        this._legalFramework = legalFramework;
     }
 
     public isConsentShowRequired(): boolean {
         if (this._testForceConsentUnit) {
+            return true;
+        }
+
+        if (this.isAgeGateShowRequired()) {
             return true;
         }
 
@@ -66,5 +75,35 @@ export class PrivacySDK {
 
     public setOptOutEnabled(optOutEnabled: boolean) {
         this._optOutEnabled = optOutEnabled;
+    }
+
+    public isAgeGateEnabled(): boolean {
+        if (this._ageGateLimit > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public getAgeGateLimit(): number {
+        return this._ageGateLimit;
+    }
+
+    public getLegalFramework(): LegalFramework {
+        return this._legalFramework;
+    }
+
+    private isAgeGateShowRequired(): boolean {
+        if (this.isAgeGateEnabled()) {
+            if (this.getGamePrivacy().getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this.isGDPREnabled() && !this.isOptOutRecorded()) {
+                return true;
+            }
+
+            if (this.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT && !this.getUserPrivacy().isRecorded()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

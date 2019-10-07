@@ -48,6 +48,7 @@ import TurkishOverlay from 'json/locale/tr/overlay.json';
 import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
 import ChineseSimplifiedLoadingScreen from 'json/locale/zh_Hans/loadingscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
+import ChineseSimplifiedConsent from 'json/locale/zh_Hans/consent.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalLoadingScreen from 'json/locale/zh_Hant/loadingscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
@@ -150,7 +151,8 @@ export class Localization {
         'zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$': {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
             'overlay': JSON.parse(ChineseSimplifiedOverlay),
-            'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen)
+            'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen),
+            'consent': JSON.parse(ChineseSimplifiedConsent)
         },
         'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),
@@ -253,7 +255,8 @@ export class Localization {
             || language.match('es.*')
             || language.match('ru.*')
             || language.match('pt.*')
-            || language.match('it.*')) {
+            || language.match('it.*')
+            || language.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
             return true;
         }
 

@@ -81,6 +81,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         const sessionManager = new SessionManager(core, request, storageBridge);
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -95,10 +96,10 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
 
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, campaign, privacyManager, false, false);
         const endScreenParams: IEndScreenParameters = {
             platform,

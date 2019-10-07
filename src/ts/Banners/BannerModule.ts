@@ -28,7 +28,7 @@ export class BannerModule implements IBannerModule {
         this.PlacementManager.sendBannersReady();
 
         this.AdUnitFactory = new BannerAdUnitFactory();
-        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK);
+        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK, ads.PrivacyManager);
         this.AdUnitParametersFactory = new BannerAdUnitParametersFactory(this, ads, core);
         this.BannerAdContextManager = new BannerAdContextManager(core, ads, this);
     }

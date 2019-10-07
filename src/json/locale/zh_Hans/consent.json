@@ -54,8 +54,8 @@
 
   "disagree": "Disagree",
 
-  "age-gate-title": "Before you get started, verify your age",
-  "age-gate-text": "Please confirm your age group so we can offer you the best possible in-game experience while protecting your privacy and safety",
-  "age-gate-over-age-limit-btn": "I'm {0} or older",
-  "age-gate-under-age-limit-btn": "I'm {0} or younger"
+  "age-gate-title": "在你开始之前, 确认你的年龄",
+  "age-gate-text": "请确认你的年龄组，这样我们可以在保护你的隐私和安全的同时给你提供最好的有可能的游戏体验",
+  "age-gate-over-age-limit-btn": "我{0}岁或者更年长",
+  "age-gate-under-age-limit-btn": "我{0}岁或者更年轻"
 }

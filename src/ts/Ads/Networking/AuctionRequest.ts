@@ -26,6 +26,7 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -65,6 +66,7 @@ export interface IAuctionRequestParams {
     sessionManager: SessionManager;
     programmaticTrackingService: ProgrammaticTrackingService;
     privacySDK: PrivacySDK;
+    userPrivacyManager: UserPrivacyManager;
 }
 
 export interface IPlacementRequestDTO {
@@ -115,6 +117,7 @@ interface IAuctionRequestBody {
     isLoadEnabled: boolean;
     omidPartnerName: string;
     omidJSVersion: string;
+    agreedOverAgeLimit: AgeGateChoice;
 }
 
 /**
@@ -188,6 +191,7 @@ export class AuctionRequest {
     private _headers: [string, string][] = [];
     private _privacy: IRequestPrivacy | undefined;
     private _privacySDK: PrivacySDK;
+    private _userPrivacyManager: UserPrivacyManager;
 
     private _requestStart: number;
     private _requestDuration: number = 0;
@@ -208,6 +212,7 @@ export class AuctionRequest {
         this._pts = params.programmaticTrackingService;
         this._privacy = RequestPrivacyFactory.create(params.privacySDK.getUserPrivacy(), params.privacySDK.getGamePrivacy());
         this._privacySDK = params.privacySDK;
+        this._userPrivacyManager = params.userPrivacyManager;
         if (this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
@@ -476,7 +481,8 @@ export class AuctionRequest {
                     isLoadEnabled: false, // TODO: When this is used for anything other than banners, pass actual flag
                     omidPartnerName: PARTNER_NAME,
                     omidJSVersion: OM_JS_VERSION,
-                    legalFramework: this._privacySDK.isGDPREnabled() ? 'gdpr' : 'default'
+                    legalFramework: this._privacySDK.getLegalFramework(),
+                    agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
                 };
             });
         });
