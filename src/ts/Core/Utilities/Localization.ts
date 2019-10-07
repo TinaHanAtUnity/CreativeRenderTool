@@ -230,7 +230,7 @@ export class Localization {
     public translate(phrase: string): string {
         let languageMap = Localization.getLanguageMap(this._language, this._namespace);
         if (!languageMap || !(phrase in languageMap)) {
-            // check if the phrase could be found from English map
+            // if translation for the phrase cannot be found, use English
             languageMap = Localization.getLanguageMap('en.*', this._namespace);
             if (!languageMap || !(phrase in languageMap)) {
                 return phrase;

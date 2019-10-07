@@ -1,5 +1,7 @@
 {
   "Learn More": "Learn More",
   "Install Now": "Install Now",
-  "privacy-legitimate-interest-pop-up": "Unity is personalizing your ads experience in this application. <span class=\"gdpr-link\">Tap here</span> to learn more about Unity and your privacy choices"
+  "privacy-legitimate-interest-pop-up-1": "Unity is personalizing your ads experience in this application. ",
+  "privacy-legitimate-interest-pop-up-2": "Tap here ",
+  "privacy-legitimate-interest-pop-up-3": "to learn more about Unity and your privacy choices"
 }
