@@ -161,7 +161,9 @@ export class ProgrammaticTrackingService {
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this._request.post(url, data, headers);
+        // TODO: uncomment once privacy uses own html container intead of MRAID, that gives PTS error
+        //return this._request.post(url, data, headers);
+        return Promise.resolve(<INativeResponse>{});
     }
 
     public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
