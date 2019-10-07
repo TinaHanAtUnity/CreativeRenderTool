@@ -285,13 +285,13 @@ export class UserPrivacyManager {
     }
 
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
-        if(ageGateChoice === AgeGateChoice.YES) {
+        if (ageGateChoice === AgeGateChoice.YES) {
             Diagnostics.trigger('age_gate_pass', {
                 legalFramework: this._privacy.getLegalFramework(),
                 method: this._gamePrivacy.getMethod(),
                 previousChoice: this._ageGateChoice
             });
-        } else if(ageGateChoice === AgeGateChoice.NO) {
+        } else if (ageGateChoice === AgeGateChoice.NO) {
             Diagnostics.trigger('age_gate_fail', {
                 legalFramework: this._privacy.getLegalFramework(),
                 method: this._gamePrivacy.getMethod(),
