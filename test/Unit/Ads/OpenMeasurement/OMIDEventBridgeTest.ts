@@ -188,11 +188,8 @@ import { assert } from 'chai';
                 omidEventBridge.triggerVideoEvent('omidStart');
                 omidEventBridge.triggerAdEvent('omidGeometryChange');
 
-                assert.equal((JSON.stringify((<sinon.SinonSpy>omidEventBridge.postMessage).getCall(0).args[0])), JSON.stringify({'type': 'omidStart', 'timestamp': 111}));
-                assert.equal((<sinon.SinonSpy>omidEventBridge.postMessage).getCall(0).args[1], '33');
-
-                assert.equal((JSON.stringify((<sinon.SinonSpy>omidEventBridge.postMessage).getCall(1).args[0])), JSON.stringify({'type': 'omidStart', 'timestamp': 111}));
-                assert.equal((<sinon.SinonSpy>omidEventBridge.postMessage).getCall(1).args[1], '23');
+                assert.equal((JSON.stringify((<sinon.SinonSpy>omidEventBridge.postMessage).getCall(0).args[0])), JSON.stringify({'type': 'omidStart', 'timestamp': 111, 'uuid': '33'}));
+                assert.equal((JSON.stringify((<sinon.SinonSpy>omidEventBridge.postMessage).getCall(1).args[0])), JSON.stringify({'type': 'omidStart', 'timestamp': 111, 'uuid': '23'}));
             });
         });
     });

@@ -13,7 +13,10 @@ export interface IVerificationEvent {
     timestamp: number;
     adSessionId: string;
     payload?: unknown;
-    uuid?: string;
+}
+
+interface IJSVerificationEvent extends IVerificationEvent {
+    uuid: string;
 }
 
 export interface IOMIDEventHandler {
@@ -86,7 +89,11 @@ export class OMIDEventBridge {
 
         if (this._registeredFuncs[type]) {
             this._registeredFuncs[type].forEach((uuid) => {
-                this.postMessage(event, uuid);
+                const jsEvent: IJSVerificationEvent = {
+                    ...event,
+                    uuid: uuid
+                };
+                this.postMessage(jsEvent);
             });
         }
     }
@@ -107,13 +114,21 @@ export class OMIDEventBridge {
 
         if (this._registeredFuncs[type]) {
             this._registeredFuncs[type].forEach((uuid) => {
-                this.postMessage(event, uuid);
+                const jsEvent: IJSVerificationEvent = {
+                    ...event,
+                    uuid: uuid
+                };
+                this.postMessage(jsEvent);
             });
         }
 
         if (this._registeredFuncs[OMID3pEvents.OMID_VIDEO].length > 0) {
             const uuid = this._registeredFuncs[OMID3pEvents.OMID_VIDEO][0];
-            this.postMessage(event, uuid);
+            const jsEvent: IJSVerificationEvent = {
+                ...event,
+                uuid: uuid
+            };
+            this.postMessage(jsEvent);
         }
 
         this._videoEventQueue[type] = event;
@@ -124,11 +139,7 @@ export class OMIDEventBridge {
         this.postMessage(event);
     }
 
-    public postMessage(event: IVerificationEvent | ISessionEvent, uuid?: string) {
-        if (uuid) {
-            event.uuid = uuid;
-        }
-
+    public postMessage(event: IJSVerificationEvent | ISessionEvent) {
         if (this._iframe3p.contentWindow) {
             this._iframe3p.contentWindow.postMessage(event, '*');
         }
@@ -144,7 +155,11 @@ export class OMIDEventBridge {
 
         if (eventDatas) {
             eventDatas.forEach((eventData) => {
-                this.postMessage(eventData, uuid);
+                const jsEvent: IJSVerificationEvent = {
+                    ...eventData,
+                    uuid: uuid
+                };
+                this.postMessage(jsEvent);
             });
         }
 
@@ -174,6 +189,10 @@ export class OMIDEventBridge {
 
     private sendQueuedVideoEvent(eventName: string, uuid: string) {
         const event: IVerificationEvent = this._videoEventQueue[eventName];
-        this.postMessage(event, uuid);
+        const jsEvent: IJSVerificationEvent = {
+            ...event,
+            uuid: uuid
+        };
+        this.postMessage(jsEvent);
     }
 }
