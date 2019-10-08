@@ -52,7 +52,6 @@
                      */
                     let sendSessionStart = function(observer, vendorkey) {
                         observer(sessionStartData[vendorkey]);
-                        console.log('JS: session start called');
                         postMessageCallback(ON_EVENT_PROCESSED, {
                             eventType: SESSION_START,
                             vendorKey: vendorkey
@@ -127,7 +126,6 @@
                             }
                             var handler = registeredFunctions[event.data.uuid];
                             handler(eventData);
-                            console.log('JS sent to script', eventData.type, event.data.uuid);
                         }
 
                         /* 
@@ -210,9 +208,8 @@
                 /**
                  * Generic Vast verification scripts attach to this:
                  */
-                // window.omid3p = new OmidVerification();
-                // Object.freeze(window.omid3p);
-                window.OmidVerificationClient = {'omid3p': OmidVerification};
+                window.omid3p = new OmidVerification();
+                Object.freeze(window.omid3p);
                 
                 /**
                  * Used for IAB test:

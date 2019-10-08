@@ -20,7 +20,7 @@ export interface IOMIDEventHandler {
     onEventProcessed(eventType: string, vendorKey?: string): void;
 }
 
-enum EventQueuePostbackEvents {
+export enum EventQueuePostbackEvents {
     ON_EVENT_REGISTERED = 'onEventRegistered',
     ON_SESSION_EVENT_REGISTERED = 'onSessionEventRegistered'
 }
@@ -31,9 +31,9 @@ export class OMIDEventBridge {
     private _handler: IOMIDEventHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
     private _openMeasurement: OpenMeasurement;
+    private _verificationInjected = false;
 
     private _iframe3p: HTMLIFrameElement;
-    private _verificationsInjected = false;
 
     private _videoEventQueue: { [event: string]: IVerificationEvent } = {};
     private _eventHistory: { [event: string]: IVerificationEvent[] } = {};
@@ -67,7 +67,7 @@ export class OMIDEventBridge {
     }
 
     public setVerificationsInjected(verificationsInjected: boolean) {
-        this._verificationsInjected = verificationsInjected;
+        this._verificationInjected = verificationsInjected;
     }
 
     public triggerAdEvent(type: string, payload?: unknown) {
@@ -84,7 +84,7 @@ export class OMIDEventBridge {
         }
         this._eventHistory[type].push(event);
 
-        if (this._registeredFuncs[type] !== undefined) {
+        if (this._registeredFuncs[type]) {
             this._registeredFuncs[type].forEach((uuid) => {
                 this.postMessage(event, uuid);
             });
@@ -105,7 +105,7 @@ export class OMIDEventBridge {
         }
         this._eventHistory[type].push(event);
 
-        if (this._registeredFuncs[type] !== undefined) {
+        if (this._registeredFuncs[type]) {
             this._registeredFuncs[type].forEach((uuid) => {
                 this.postMessage(event, uuid);
             });
@@ -124,18 +124,7 @@ export class OMIDEventBridge {
         this.postMessage(event);
     }
 
-    private onMessage(e: MessageEvent) {
-        const message = <IOMIDMessage>e.data;
-        if (message.type === 'omid') {
-            this._core.Sdk.logInfo(`omid: event=${message.event}, data=${JSON.stringify(message.data)}`);
-            if (message.event in this._omidHandlers) {
-                const handler = this._omidHandlers[message.event];
-                handler(message);
-            }
-        }
-    }
-
-    private postMessage(event: IVerificationEvent | ISessionEvent, uuid?: string) {
+    public postMessage(event: IVerificationEvent | ISessionEvent, uuid?: string) {
         if (uuid) {
             event.uuid = uuid;
         }
@@ -164,9 +153,15 @@ export class OMIDEventBridge {
         }
     }
 
-    private sendQueuedVideoEvent(eventName: string, uuid: string) {
-        const event: IVerificationEvent = this._videoEventQueue[eventName];
-        this.postMessage(event, uuid);
+    private onMessage(e: MessageEvent) {
+        const message = <IOMIDMessage>e.data;
+        if (message.type === 'omid') {
+            this._core.Sdk.logInfo(`omid: event=${message.event}, data=${JSON.stringify(message.data)}`);
+            if (message.event in this._omidHandlers) {
+                const handler = this._omidHandlers[message.event];
+                handler(message);
+            }
+        }
     }
 
     private sendAllQueuedVideoEvents(vendorkey: string, uuid: string): void {
@@ -175,5 +170,10 @@ export class OMIDEventBridge {
                 this.sendQueuedVideoEvent(event, uuid);
             }
         });
+    }
+
+    private sendQueuedVideoEvent(eventName: string, uuid: string) {
+        const event: IVerificationEvent = this._videoEventQueue[eventName];
+        this.postMessage(event, uuid);
     }
 }
