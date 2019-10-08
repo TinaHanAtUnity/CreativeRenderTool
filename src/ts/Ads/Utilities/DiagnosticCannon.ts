@@ -1,33 +1,26 @@
-import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { INativeResponse } from 'Core/Managers/RequestManager';
-import { Promises } from 'Core/Utilities/Promises';
+import { TimingMetric, IMultiMetricPayload } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class DiagnosticCannon {
 
-    private _diagnosticBundle: {
-        metric: TimingMetric;
-        value: number;
-    }[];
-    private _pts: ProgrammaticTrackingService;
+    private _diagnosticBundle: IMultiMetricPayload[];
+    private _countryIso: string;
 
-    constructor(pts: ProgrammaticTrackingService) {
+    constructor(countryIso: string) {
+        this._countryIso = countryIso;
         this._diagnosticBundle = [];
-        this._pts = pts;
     }
 
     // TODO Allow generic metrics
-    public pack(metric: TimingMetric, value: number): void {
+    public prepareCannonball(metric: TimingMetric, value: number): void {
         this._diagnosticBundle.push({
             metric: metric,
             value: value
         });
     }
 
-    public lightFuse(countryIso: string): Promise<void> {
-        const promises: Promise<INativeResponse>[] = [];
-        this._diagnosticBundle.forEach(diagnostic => {
-            promises.push(this._pts.reportTimingEvent(diagnostic.metric, diagnostic.value, countryIso));
-        });
-        return Promises.voidResult(Promise.all(promises));
+    public loadCannonball(): [IMultiMetricPayload[], string] {
+        const loadedCannonBalls: [IMultiMetricPayload[], string] = [this._diagnosticBundle, this._countryIso];
+        this._diagnosticBundle = [];
+        return loadedCannonBalls;
     }
 }

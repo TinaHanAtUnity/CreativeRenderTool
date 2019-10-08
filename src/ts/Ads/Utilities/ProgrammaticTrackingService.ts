@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { DiagnosticCannon } from 'Ads/Utilities/DiagnosticCannon';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -88,7 +89,12 @@ export enum TimingMetric {
 type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
 
 export interface IProgrammaticTrackingData {
-    metrics: IPTSEvent[] | undefined;
+    metrics: IPTSEvent[];
+}
+
+export interface IMultiMetricPayload {
+    metric: TimingMetric; // TODO allow non timing metrics here
+    value: number;
 }
 
 interface IPTSEvent {
@@ -150,16 +156,7 @@ export class ProgrammaticTrackingService {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
-    private postWithTags(event: PTSEvent, value: number, tags: string[], path: string): Promise<INativeResponse> {
-        const metricData: IProgrammaticTrackingData = {
-            metrics: [
-                {
-                    name: event,
-                    value: value,
-                    tags: tags
-                }
-            ]
-        };
+    private postToDatadog(metricData: IProgrammaticTrackingData, path: string) {
         const url: string = this.productionBaseUrl + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
@@ -169,20 +166,76 @@ export class ProgrammaticTrackingService {
         return this._request.post(url, data, headers);
     }
 
+    private createTimingMetricData(event: PTSEvent, value: number, countryIso: string): IPTSEvent[] {
+        let metrics: IPTSEvent[];
+        if (value > 0) {
+            metrics = [
+                {
+                    name: event,
+                    value: value,
+                    tags: this.createTimingTags(countryIso)
+                }
+            ];
+        } else {
+            metrics = [
+                {
+                    name: ProgrammaticTrackingError.TimingValueNegative,
+                    value: 1,
+                    tags: this.createMetricTags(event)
+                }
+            ];
+        }
+        return metrics;
+    }
+
     public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
-        return this.postWithTags(event, 1, this.createMetricTags(event), this.metricPath);
+        const data: IProgrammaticTrackingData = {
+            metrics: [
+                {
+                    name: event,
+                    value: 1,
+                    tags: this.createMetricTags(event)
+                }
+            ]
+        };
+        return this.postToDatadog(data, this.metricPath);
     }
 
     public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
-        return this.postWithTags(event, 1, this.createErrorTags(event, adType, seatId), this.metricPath);
+        const data: IProgrammaticTrackingData = {
+            metrics: [
+                {
+                    name: event,
+                    value: 1,
+                    tags: this.createErrorTags(event, adType, seatId)
+                }
+            ]
+        };
+        return this.postToDatadog(data, this.metricPath);
     }
 
     public reportTimingEvent(event: TimingMetric, value: number, countryIso: string): Promise<INativeResponse> {
-        // Gate Negative Values
-        if (value > 0) {
-            return this.postWithTags(event, value, this.createTimingTags(countryIso), this.timingPath);
-        }
-        return this.postWithTags(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event), this.metricPath);
+
+        const data: IProgrammaticTrackingData = {
+            metrics: this.createTimingMetricData(event, value, countryIso)
+        };
+
+        return this.postToDatadog(data, this.timingPath);
+    }
+
+    public fireCannon(loadedCannonball: [IMultiMetricPayload[], string]): Promise<INativeResponse> {
+        const metrics: IMultiMetricPayload[] = loadedCannonball[0];
+        const country = loadedCannonball[1];
+        const data: IProgrammaticTrackingData = {
+            metrics: []
+        };
+
+        metrics.forEach((metricPayload) => {
+            const metricData = this.createTimingMetricData(metricPayload.metric, metricPayload.value, country);
+            data.metrics = data.metrics.concat(metricData);
+        });
+
+        return this.postToDatadog(data, this.timingPath);
     }
 
 }

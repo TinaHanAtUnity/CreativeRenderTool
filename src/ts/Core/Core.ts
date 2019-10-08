@@ -118,11 +118,12 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const coreInitializeTimestamp = Date.now();
         let initCannon: DiagnosticCannon;
+        const coreInitializeTimestamp = Date.now();
+        let initCallToWebviewLoadTimestamp: number;
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
-            const initCallToWebviewLoadTimestamp = this.ClientInfo.getInitTimestamp() - coreInitializeTimestamp;
+            initCallToWebviewLoadTimestamp = coreInitializeTimestamp - this.ClientInfo.getInitTimestamp();
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
@@ -139,8 +140,6 @@ export class Core implements ICore {
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
             this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo);
-            initCannon = new DiagnosticCannon(this.ProgrammaticTrackingService);
-            initCannon.pack(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoadTimestamp);
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
@@ -197,8 +196,10 @@ export class Core implements ICore {
 
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
-            initCannon.pack(TimingMetric.WebviewLoadToConfigurationCompleteTime, coreInitializeTimestamp - Date.now());
             this.Config = coreConfig;
+            initCannon = new DiagnosticCannon(this.Config.getCountry());
+            initCannon.prepareCannonball(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoadTimestamp);
+            initCannon.prepareCannonball(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeTimestamp);
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
@@ -217,10 +218,10 @@ export class Core implements ICore {
             const adsInitializeTimestamp = Date.now();
             return this.Ads.initialize(initCannon).then((cannon) => {
                 const initializeFinishedTimestamp = Date.now();
-                cannon.pack(TimingMetric.AdsInitializeTimespan, initializeFinishedTimestamp - adsInitializeTimestamp);
-                cannon.pack(TimingMetric.CoreInitializeTimespan, initializeFinishedTimestamp - coreInitializeTimestamp);
-                cannon.pack(TimingMetric.TotalWebviewInitializationTime, initializeFinishedTimestamp - this.ClientInfo.getInitTimestamp());
-                cannon.lightFuse(this.Config.getCountry());
+                cannon.prepareCannonball(TimingMetric.AdsInitializeTimespan, initializeFinishedTimestamp - adsInitializeTimestamp);
+                cannon.prepareCannonball(TimingMetric.CoreInitializeTimespan, initializeFinishedTimestamp - coreInitializeTimestamp);
+                cannon.prepareCannonball(TimingMetric.TotalWebviewInitializationTime, initializeFinishedTimestamp - this.ClientInfo.getInitTimestamp());
+                this.ProgrammaticTrackingService.fireCannon(cannon.loadCannonball());
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
