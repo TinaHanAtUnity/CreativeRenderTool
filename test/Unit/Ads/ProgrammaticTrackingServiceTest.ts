@@ -234,7 +234,7 @@ describe('ProgrammaticTrackingService', () => {
                     }
                 ]
             };
-            programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, 999);
+            programmaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, 999);
             programmaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
             return programmaticTrackingService.sendBatchedEvents().then(() => {
                 sinon.assert.calledOnce(postStub);
@@ -245,6 +245,14 @@ describe('ProgrammaticTrackingService', () => {
                 // tslint:disable-next-line:no-string-literal
                 assert.deepEqual(programmaticTrackingService['_batchedEvents'], []);
             });
+        });
+
+        it('should fire events when 10 events are reached', () => {
+            for (let i = 0; i < 10; i++) {
+                sinon.assert.notCalled(postStub);
+                programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+            }
+            sinon.assert.calledOnce(postStub);
         });
     });
 });

@@ -199,10 +199,15 @@ export class ProgrammaticTrackingService {
 
     // TODO: Extend this to all events
     public batchEvent(metric: TimingMetric, value: number): void {
+        // Curently ignore additional negative time values
         if (value > 0) {
             this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, this.createTimingTags()).metrics);
         }
-        // Curently ignore additional negative time values
+
+        // Failsafe so we aren't storing too many events at once
+        if (this._batchedEvents.length >= 10) {
+            this.sendBatchedEvents();
+        }
     }
 
     public async sendBatchedEvents(): Promise<void> {
