@@ -25,7 +25,7 @@ const animationFrame = window.requestAnimationFrame || window.webkitRequestAnima
 let runningResizeEvent = false;
 
 const changeOrientation = () => {
-    if (window.innerWidth === window.innerHeight) {
+    if (window.innerWidth !== 0 && window.innerWidth === window.innerHeight) {
         // It is not yet know what orientation the window is.
         // Allow rendering engine to process before trying again.
         setTimeout(changeOrientation, 0);
