@@ -90,13 +90,15 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _privacyPanelOpen: boolean;
 
+    private _hidePrivacyButton: boolean;
+
     private static DebugJsConsole: boolean | undefined;
 
     public static setDebugJsConsole(debug: boolean) {
         MRAIDView.DebugJsConsole = debug;
     }
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, hidePrivacy: boolean, gameSessionId?: number) {
         super(platform, id);
 
         this._core = core;
@@ -105,6 +107,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
+        this._hidePrivacyButton = hidePrivacy;
 
         this._abGroup = abGroup;
 
@@ -263,6 +266,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this._privacyButton.style.visibility = 'visible';
             this._gdprBanner.style.pointerEvents = '1';
             this._gdprBanner.style.visibility = 'hidden';
+        }
+
+        // hide privacy for China
+        if (this._hidePrivacyButton) {
+            this._privacyButton.style.pointerEvents = '1';
+            this._privacyButton.style.visibility = 'hidden';
+            return;
         }
     }
 

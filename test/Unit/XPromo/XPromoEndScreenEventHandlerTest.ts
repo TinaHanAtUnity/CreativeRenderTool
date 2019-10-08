@@ -98,6 +98,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             const privacySDK = sinon.createStubInstance(PrivacySDK);
+            const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
@@ -113,7 +114,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -124,7 +126,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
@@ -274,6 +276,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             const privacySDK = sinon.createStubInstance(PrivacySDK);
+            const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -288,7 +291,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: userPrivacyManager
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -297,7 +301,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,

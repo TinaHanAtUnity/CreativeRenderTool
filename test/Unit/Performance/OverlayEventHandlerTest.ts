@@ -93,6 +93,7 @@ describe('OverlayEventHandlerTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -107,11 +108,11 @@ describe('OverlayEventHandlerTest', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         video = new Video('', TestFixtures.getSession());
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, campaign, privacyManager, false, false);
         const endScreenParams: IEndScreenParameters = {
             platform,

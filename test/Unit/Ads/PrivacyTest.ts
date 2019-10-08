@@ -7,6 +7,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Platform } from 'Core/Constants/Platform';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 describe('GamePrivacyTests', () => {
     it('should be disabled if PrivacyMethod.DEFAULT', () => {
@@ -81,7 +82,9 @@ describe('incident-20190516-2', () => {
         defaultPlacement: '',
         defaultBannerPlacement: '',
         gdprEnabled: true,
-        gamePrivacy: {method: 'legitimate_interest'}
+        gamePrivacy: {method: 'legitimate_interest'},
+        ageGateLimit: undefined,
+        hidePrivacy: undefined
     };
     beforeEach(() => {
         diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
@@ -106,6 +109,7 @@ describe('incident-20190516-2', () => {
                     method: 'legitimate_interest',
                     version: CurrentUnityConsentVersion
                 },
+                legalFramework: LegalFramework.GDPR,
                 ...baseAdsConf
             };
             PrivacyParser.parse(configJson, clientInfo, deviceInfo);
@@ -125,6 +129,7 @@ describe('incident-20190516-2', () => {
                     method: 'legitimate_interest',
                     version: CurrentUnityConsentVersion
                 },
+                legalFramework: LegalFramework.GDPR,
                 ...baseAdsConf
             };
             PrivacyParser.parse(configJson, clientInfo, deviceInfo);
@@ -145,6 +150,7 @@ describe('incident-20190516-2', () => {
                     method: 'legitimate_interest',
                     version: CurrentUnityConsentVersion
                 },
+                legalFramework: LegalFramework.GDPR,
                 ...baseAdsConf
             };
             PrivacyParser.parse(configJson, clientInfo, deviceInfo);
@@ -161,6 +167,7 @@ describe('incident-20190516-2', () => {
                 method: 'legitimate_interest',
                 version: CurrentUnityConsentVersion
             },
+            legalFramework: LegalFramework.GDPR,
             ...baseAdsConf
         };
         const expectedDiagnosticsData = {

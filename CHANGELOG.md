@@ -1,3 +1,54 @@
+# Pending
+
+* Add Automated Experiment Manager [#11390](https://github.com/Applifier/unity-ads-webview/pull/11390)
+* Add Age Gate Related Diagnostics [#11531](https://github.com/Applifier/unity-ads-webview/pull/11531)
+
+# Fri Oct  4 21:43:11 UTC 2019
+
+* Remove Zynga WWF Games from Load Whitelist [#11507](https://github.com/Applifier/unity-ads-webview/pull/11507)
+* Refresh Promo Catalog after auction parsing if needed [#11506](https://github.com/Applifier/unity-ads-webview/pull/11506)
+* Track Subzero Timing Metrics and Prevent Them from Firing to Timing [#11504](https://github.com/Applifier/unity-ads-webview/pull/11504)
+
+# Thu Oct  3 23:56:18 UTC 2019
+
+* Add Initialization Timing Support for SDK Versions and Countries [#11419](https://github.com/Applifier/unity-ads-webview/pull/11419)
+
+# Thu Oct  3 13:05:16 UTC 2019
+
+* Simplified Chinese for Age Gate [#11476](https://github.com/Applifier/unity-ads-webview/pull/11476)
+* Update COPPA text [#11477](https://github.com/Applifier/unity-ads-webview/pull/11477)
+* Open Measurement - Handle isOmEnabled flag for Admob Creatives from Auction [#11272](https://github.com/Applifier/unity-ads-webview/pull/11272)
+
+# Wed Oct  2 21:31:03 UTC 2019
+
+* Add Age Gate to Consent Flow [#11445](https://github.com/Applifier/unity-ads-webview/pull/11445)
+* Reverse Zynga Load Experiment for 15 and 16 for SDK 3.1/3.2 [#11449](https://github.com/Applifier/unity-ads-webview/pull/11449)
+* Fix force country test metadata [#11362](https://github.com/Applifier/unity-ads-webview/pull/11362)
+* Add 4 experiments to test several animations for CTA [#11333](https://github.com/Applifier/unity-ads-webview/pull/11333)
+* Change the skip icon [#11386](https://github.com/Applifier/unity-ads-webview/pull/11386)
+* Add BrainiumStudios GameId to LionStudios Whitelist [#11414](https://github.com/Applifier/unity-ads-webview/pull/11414)
+* Fix promo campaign workaround for all webview versions [#11389](https://github.com/Applifier/unity-ads-webview/pull/11389)
+
+# Tue Oct  1 22:39:10 UTC 2019
+
+* LoadAPI Experiment ABGroup 15 - Refresh All Ready Comet Campaigns When A Comet Campaign Finishes [#11361](https://github.com/Applifier/unity-ads-webview/pull/11361)
+* Refresh Comet Campaigns when onStartProcessed is Triggered [#11418](https://github.com/Applifier/unity-ads-webview/pull/11418)
+
+# Tue Oct  1 15:57:35 UTC 2019
+
+* Privacy SDK Refactor part 2 [#11181](https://github.com/Applifier/unity-ads-webview/pull/11181)
+
+# Mon Sep 30 17:14:55 UTC 2019
+
+* Hide Privacy button in China [#11388](https://github.com/Applifier/unity-ads-webview/pull/11388)
+* Remove unused code related to Consent Homescreen [#11337](https://github.com/Applifier/unity-ads-webview/pull/11337)
+
+# Thu Sep 26 22:28:16 UTC 2019
+
+* Enable A/B tested Consent layout for all users [#11326](https://github.com/Applifier/unity-ads-webview/pull/11326)
+* Add Updated Load Whitelist and Modify Load 3.2 Experiment [#11335](https://github.com/Applifier/unity-ads-webview/pull/11335)
+* Enable and Fix CampaignRefreshManager Tests [#11328](https://github.com/Applifier/unity-ads-webview/pull/11328)
+
 # Wed Sep 25 23:32:36 UTC 2019
 
 * Open Measurement - Add Session Start and AdPlan for IAS [#11302](https://github.com/Applifier/unity-ads-webview/pull/11302)

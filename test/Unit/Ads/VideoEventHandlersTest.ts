@@ -113,6 +113,7 @@ describe('Vast VideoEventHandlersTest', () => {
         vastCampaign = TestFixtures.getEventVastCampaign();
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         operativeEventManagerParams = {
             platform,
@@ -128,14 +129,14 @@ describe('Vast VideoEventHandlersTest', () => {
             storageBridge: storageBridge,
             campaign: vastCampaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -347,6 +348,7 @@ describe('Performance VideoEventHandlersTest', () => {
         performanceCampaign = TestFixtures.getCampaign();
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         operativeEventManagerParams = {
             platform,
@@ -362,14 +364,14 @@ describe('Performance VideoEventHandlersTest', () => {
             storageBridge: storageBridge,
             campaign: performanceCampaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, performanceCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, performanceCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -831,6 +833,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         xPromoCampaign = TestFixtures.getXPromoCampaign();
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         operativeEventManagerParams = {
             platform,
@@ -846,15 +849,15 @@ describe('xpromo VideoEventHandlersTest', () => {
             storageBridge: storageBridge,
             campaign: xPromoCampaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         };
 
         operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
-        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
             campaign: campaign,

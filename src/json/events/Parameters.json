@@ -586,5 +586,12 @@
     "description": "Retrying after no fill",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "agreedOverAgeLimit",
+    "type": "string",
+    "description": "User answer to age gate \"yes\" or \"no\", \"missing\" if no age gate has been presented",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

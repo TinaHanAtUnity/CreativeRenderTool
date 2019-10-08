@@ -104,6 +104,7 @@ describe('VastAdUnitTest', () => {
         coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         let duration = vastCampaign.getVast().getDuration();
         if (duration) {
@@ -127,11 +128,11 @@ describe('VastAdUnitTest', () => {
             storageBridge: storageBridge,
             campaign: vastCampaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
 
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
         const campaign = TestFixtures.getCampaign();
         videoOverlayParameters = {

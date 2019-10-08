@@ -5,8 +5,8 @@ import { IAnalytics, IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { ICore } from 'Core/ICore';
 import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export class Analytics implements IAnalytics {
 
@@ -18,7 +18,7 @@ export class Analytics implements IAnalytics {
     private _core: ICore;
     private _analyticsEnabled: boolean;
 
-    constructor(core: ICore, adsConfiguration: AdsConfiguration) {
+    constructor(core: ICore, privacySDK: PrivacySDK) {
         this._core = core;
         this._analyticsEnabled = core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId());
         this.Api = {
@@ -27,7 +27,7 @@ export class Analytics implements IAnalytics {
 
         this.AnalyticsStorage = new AnalyticsStorage(core.Api);
         if (this._analyticsEnabled) {
-            this.AnalyticsManager = new AnalyticsManager(core, this.Api, adsConfiguration, this.AnalyticsStorage);
+            this.AnalyticsManager = new AnalyticsManager(core, this.Api, privacySDK, this.AnalyticsStorage);
         } else {
             this.AnalyticsManager = new SilentAnalyticsManager();
         }
