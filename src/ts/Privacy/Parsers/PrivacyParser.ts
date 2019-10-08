@@ -15,33 +15,24 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 export class PrivacyParser {
-    private static _updateUserPrivacyForIncident: boolean = false;
-
     public static parse(configJson: IRawAdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo): PrivacySDK {
-
-        const sanitizedConfigJson = this.sanitizePrivacyAndOptOutDesynchronized(configJson);
-        if (sanitizedConfigJson.optOutEnabled !== configJson.optOutEnabled) {
-            this._updateUserPrivacyForIncident = true;
-        }
-
         let limitAdTracking = false;
         if (deviceInfo && deviceInfo.getLimitAdTracking()) {
             limitAdTracking = true;
         }
 
-        const gamePrivacy = this.parseGamePrivacy(sanitizedConfigJson.gamePrivacy, sanitizedConfigJson.gdprEnabled);
-        const userPrivacy = this.parseUserPrivacy(sanitizedConfigJson.userPrivacy, sanitizedConfigJson.gamePrivacy,
-            sanitizedConfigJson.optOutEnabled, limitAdTracking);
-        const gdprEnabled = sanitizedConfigJson.gdprEnabled;
-        const optOutRecorded = sanitizedConfigJson.optOutRecorded;
-        const optOutEnabled = sanitizedConfigJson.optOutEnabled;
-        const legalFramework = sanitizedConfigJson.legalFramework ? sanitizedConfigJson.legalFramework : LegalFramework.DEFAULT;
+        const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
+        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, configJson.optOutEnabled, limitAdTracking);
+        const gdprEnabled = configJson.gdprEnabled;
+        const optOutRecorded = configJson.optOutRecorded;
+        const optOutEnabled = configJson.optOutEnabled;
+        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
 
-        let ageGateLimit = sanitizedConfigJson.ageGateLimit !== undefined ? sanitizedConfigJson.ageGateLimit : 0;
+        let ageGateLimit = configJson.ageGateLimit !== undefined ? configJson.ageGateLimit : 0;
         if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST) {
             ageGateLimit = 0;
 
-            Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(sanitizedConfigJson)});
+            Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(configJson)});
         }
 
         if (limitAdTracking) {
@@ -49,57 +40,6 @@ export class PrivacyParser {
         }
 
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
-    }
-
-    // For #incident-20190516-2
-    public static isUpdateUserPrivacyForIncidentNeeded(): boolean {
-        return this._updateUserPrivacyForIncident;
-    }
-
-    // For #incident-20190516-2
-    private static sanitizePrivacyAndOptOutDesynchronized(rawAdsConfiguration: IRawAdsConfiguration): IRawAdsConfiguration {
-        const rawUserPrivacy = rawAdsConfiguration.userPrivacy;
-        const rawGamePrivacy = rawAdsConfiguration.gamePrivacy;
-        const optOutEnabled = rawAdsConfiguration.optOutEnabled;
-        const optOutRecorded = rawAdsConfiguration.optOutRecorded;
-        const sanitizedConfiguration = JSON.parse(JSON.stringify(rawAdsConfiguration));
-        if (!rawUserPrivacy) {
-            return sanitizedConfiguration;
-        }
-        if (!optOutRecorded) {
-            return sanitizedConfiguration;
-        }
-        if (!rawGamePrivacy) {
-            return sanitizedConfiguration;
-        }
-        if (rawGamePrivacy.method !== PrivacyMethod.LEGITIMATE_INTEREST) {
-            return sanitizedConfiguration;
-        }
-        const uPP = rawUserPrivacy.permissions;
-        if (uPP.hasOwnProperty('profiling') && uPP.hasOwnProperty('ads')) {
-            Diagnostics.trigger('ads_configuration_user_privacy_inconsistent', {
-                userPrivacy: JSON.stringify(rawUserPrivacy),
-                gamePrivacy: JSON.stringify(rawGamePrivacy)});
-            rawAdsConfiguration.userPrivacy = undefined;
-            return sanitizedConfiguration;
-        }
-
-        let adsAllowed = false;
-        if (uPP.hasOwnProperty('all')) {
-            adsAllowed = (<IAllPermissions>uPP).all;
-        }
-        if (uPP.hasOwnProperty('profiling')) {
-            adsAllowed = (<IProfilingPermissions>uPP).profiling;
-        }
-        if (uPP.hasOwnProperty('ads')) {
-            adsAllowed = (<IGranularPermissions>uPP).ads;
-        }
-        if (adsAllowed === false && optOutEnabled === false) {
-            Diagnostics.trigger('ads_configuration_sanitization_needed', JSON.stringify(rawAdsConfiguration));
-            sanitizedConfiguration.optOutEnabled = true;
-            return sanitizedConfiguration;
-        }
-        return sanitizedConfiguration;
     }
 
     private static parseGamePrivacy(rawGamePrivacy: IRawGamePrivacy | undefined, gdprEnabled: boolean): GamePrivacy {
