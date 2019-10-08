@@ -25,18 +25,18 @@ const animationFrame = window.requestAnimationFrame || window.webkitRequestAnima
 let runningResizeEvent = false;
 
 const changeOrientation = () => {
+    if (window.innerWidth === window.innerHeight) {
+        // It is not yet know what orientation the window is.
+        // Allow rendering engine to process before trying again.
+        setTimeout(changeOrientation, 0);
+        return;
+    }
 
     // Calculate orientation based on width and height by default
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-
-    if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
-        orientation = (Math.abs(<number>window.orientation) === 90) ? 'landscape' : 'portrait';
-    }
-
     document.body.classList.remove('landscape');
     document.body.classList.remove('portrait');
     document.body.classList.add(orientation);
-
     runningResizeEvent = false;
 };
 
