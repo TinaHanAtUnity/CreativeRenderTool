@@ -1,5 +1,20 @@
 # Pending
 
+* Add Automated Experiment Manager [#11390](https://github.com/Applifier/unity-ads-webview/pull/11390)
+* Add Age Gate Related Diagnostics [#11531](https://github.com/Applifier/unity-ads-webview/pull/11531)
+
+# Fri Oct  4 21:43:11 UTC 2019
+
+* Remove Zynga WWF Games from Load Whitelist [#11507](https://github.com/Applifier/unity-ads-webview/pull/11507)
+* Refresh Promo Catalog after auction parsing if needed [#11506](https://github.com/Applifier/unity-ads-webview/pull/11506)
+* Track Subzero Timing Metrics and Prevent Them from Firing to Timing [#11504](https://github.com/Applifier/unity-ads-webview/pull/11504)
+
+# Thu Oct  3 23:56:18 UTC 2019
+
+* Add Initialization Timing Support for SDK Versions and Countries [#11419](https://github.com/Applifier/unity-ads-webview/pull/11419)
+
+# Thu Oct  3 13:05:16 UTC 2019
+
 * Simplified Chinese for Age Gate [#11476](https://github.com/Applifier/unity-ads-webview/pull/11476)
 * Update COPPA text [#11477](https://github.com/Applifier/unity-ads-webview/pull/11477)
 * Open Measurement - Handle isOmEnabled flag for Admob Creatives from Auction [#11272](https://github.com/Applifier/unity-ads-webview/pull/11272)
