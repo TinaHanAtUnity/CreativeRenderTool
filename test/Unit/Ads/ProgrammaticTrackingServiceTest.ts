@@ -206,7 +206,7 @@ describe('ProgrammaticTrackingService', () => {
         });
 
         it('should not fire events when negative valued events are batched', () => {
-            programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTimespan, -200);
+            programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, -200);
             return programmaticTrackingService.sendBatchedEvents().then(() => {
                 sinon.assert.notCalled(postStub);
             });
@@ -234,7 +234,7 @@ describe('ProgrammaticTrackingService', () => {
                     }
                 ]
             };
-            programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTimespan, 999);
+            programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, 999);
             programmaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
             return programmaticTrackingService.sendBatchedEvents().then(() => {
                 sinon.assert.calledOnce(postStub);
@@ -242,6 +242,8 @@ describe('ProgrammaticTrackingService', () => {
                 assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing');
                 assert.deepEqual(postStub.firstCall.args[1], JSON.stringify(expected));
                 assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                // tslint:disable-next-line:no-string-literal
+                assert.deepEqual(programmaticTrackingService['_batchedEvents'], []);
             });
         });
     });

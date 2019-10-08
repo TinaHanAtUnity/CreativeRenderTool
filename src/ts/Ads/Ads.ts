@@ -281,7 +281,7 @@ export class Ads implements IAds {
         }).then(() => {
             const initializeAuctionTimespan = Date.now();
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-                this._core.ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionRequestToFillTimespan, Date.now() - initializeAuctionTimespan);
+                this._core.ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());

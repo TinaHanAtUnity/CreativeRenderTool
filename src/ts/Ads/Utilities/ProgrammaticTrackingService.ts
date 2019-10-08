@@ -80,9 +80,10 @@ export enum TimingMetric {
     TotalWebviewInitializationTime = 'webview_initialization_time',
     InitializeCallToWebviewLoadTime = 'initialization_call_to_webview_load_time',
     WebviewLoadToConfigurationCompleteTime = 'webview_load_to_configuration_complete_time',
-    AuctionRequestToFillTimespan = 'auction_request_round_trip_time',
-    AdsInitializeTimespan = 'uads_core_initialize_time',
-    CoreInitializeTimespan = 'uads_ads_initialize_time'
+    AuctionRequestTime = 'auction_request_round_trip_time',
+    AuctionToFillStatusTime = 'auction_request_to_fill_status_time',
+    CoreInitializeTime = 'uads_core_initialize_time',
+    AdsInitializeTime = 'uads_ads_initialize_time'
 }
 
 type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;

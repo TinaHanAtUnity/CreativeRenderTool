@@ -215,8 +215,8 @@ export class Core implements ICore {
             const adsInitializeStart = Date.now();
             return this.Ads.initialize().then(() => {
                 const initializeFinished = Date.now();
-                this.ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTimespan, initializeFinished - adsInitializeStart);
-                this.ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTimespan, initializeFinished - coreInitializeStart);
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
                 this.ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
                 this.ProgrammaticTrackingService.sendBatchedEvents();
             });
