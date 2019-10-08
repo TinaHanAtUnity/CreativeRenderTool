@@ -50,7 +50,6 @@ import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { DiagnosticCannon } from 'Ads/Utilities/DiagnosticCannon';
 
 export class Core implements ICore {
 
@@ -118,12 +117,11 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        let initCannon: DiagnosticCannon;
-        const coreInitializeTimestamp = Date.now();
-        let initCallToWebviewLoadTimestamp: number;
+        const coreInitializeStart = Date.now();
+        let initCallToWebviewLoad: number;
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
-            initCallToWebviewLoadTimestamp = coreInitializeTimestamp - this.ClientInfo.getInitTimestamp();
+            initCallToWebviewLoad = coreInitializeStart - this.ClientInfo.getInitTimestamp();
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
@@ -139,7 +137,6 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo);
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
@@ -197,9 +194,9 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
-            initCannon = new DiagnosticCannon(this.Config.getCountry());
-            initCannon.prepareCannonball(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoadTimestamp);
-            initCannon.prepareCannonball(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeTimestamp);
+            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+            this.ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
+            this.ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
@@ -215,13 +212,13 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
 
-            const adsInitializeTimestamp = Date.now();
-            return this.Ads.initialize(initCannon).then((cannon) => {
-                const initializeFinishedTimestamp = Date.now();
-                cannon.prepareCannonball(TimingMetric.AdsInitializeTimespan, initializeFinishedTimestamp - adsInitializeTimestamp);
-                cannon.prepareCannonball(TimingMetric.CoreInitializeTimespan, initializeFinishedTimestamp - coreInitializeTimestamp);
-                cannon.prepareCannonball(TimingMetric.TotalWebviewInitializationTime, initializeFinishedTimestamp - this.ClientInfo.getInitTimestamp());
-                this.ProgrammaticTrackingService.fireCannon(cannon.loadCannonball());
+            const adsInitializeStart = Date.now();
+            return this.Ads.initialize().then(() => {
+                const initializeFinished = Date.now();
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTimespan, initializeFinished - adsInitializeStart);
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTimespan, initializeFinished - coreInitializeStart);
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
+                this.ProgrammaticTrackingService.sendBatchedEvents();
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {

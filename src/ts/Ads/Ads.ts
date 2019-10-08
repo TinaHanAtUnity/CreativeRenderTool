@@ -90,7 +90,6 @@ import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
-import { DiagnosticCannon } from 'Ads/Utilities/DiagnosticCannon';
 
 export class Ads implements IAds {
 
@@ -174,7 +173,7 @@ export class Ads implements IAds {
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
-    public initialize(intializeCannon: DiagnosticCannon): Promise<DiagnosticCannon> {
+    public initialize(): Promise<void> {
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -282,12 +281,10 @@ export class Ads implements IAds {
         }).then(() => {
             const initializeAuctionTimespan = Date.now();
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-                intializeCannon.prepareCannonball(TimingMetric.AuctionRequestToFillTimespan, Date.now() - initializeAuctionTimespan);
+                this._core.ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionRequestToFillTimespan, Date.now() - initializeAuctionTimespan);
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
-        }).then(() => {
-            return intializeCannon;
         });
     }
 
