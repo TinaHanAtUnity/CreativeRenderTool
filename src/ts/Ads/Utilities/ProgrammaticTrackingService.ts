@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -114,7 +115,12 @@ export class ProgrammaticTrackingService {
     }
 
     private createMetricTags(event: PTSEvent): string[] {
-        return [this.createAdsSdkTag('mevt', event)];
+        const tags = [this.createAdsSdkTag('mevt', event)];
+        if (CustomFeatures.isZyngaWordsWithFriends(this._clientInfo.getGameId())) {
+            tags.push(this.createAdsSdkTag('gid', this._clientInfo.getGameId()));
+            tags.push(this.createAdsSdkTag('plt', Platform[this._platform]));
+        }
+        return tags;
     }
 
     private createTimingTags(countryIso: string): string[] {

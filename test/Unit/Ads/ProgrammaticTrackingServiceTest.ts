@@ -3,7 +3,8 @@ import {
     ProgrammaticTrackingService,
     IProgrammaticTrackingData,
     AdmobMetric,
-    TimingMetric
+    TimingMetric,
+    LoadMetric
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,6 +19,7 @@ describe('ProgrammaticTrackingService', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let osVersionStub: sinon.SinonStub;
     let sdkVersionStub: sinon.SinonStub;
+    let gameIdStub: sinon.SinonStub;
     let postStub: sinon.SinonStub;
     let platform: Platform;
 
@@ -29,6 +31,7 @@ describe('ProgrammaticTrackingService', () => {
         programmaticTrackingService = new ProgrammaticTrackingService(platform, request, clientInfo, deviceInfo);
         osVersionStub = deviceInfo.getOsVersion;
         sdkVersionStub = clientInfo.getSdkVersionName;
+        gameIdStub = clientInfo.getGameId;
         postStub = request.post;
         postStub.resolves({
             url: 'test',
@@ -105,6 +108,11 @@ describe('ProgrammaticTrackingService', () => {
     });
 
     describe('reportMetricEvent', () => {
+
+        beforeEach(() => {
+            gameIdStub.returns('1111');
+        });
+
         const tests: {
             input: AdmobMetric;
             expected: IProgrammaticTrackingData;
@@ -148,12 +156,66 @@ describe('ProgrammaticTrackingService', () => {
         });
     });
 
+    describe('reportMetricEvent with Zynga WWF Games', () => {
+
+        beforeEach(() => {
+            gameIdStub.returns('2895988');
+        });
+
+        const tests: {
+            input: LoadMetric;
+            expected: IProgrammaticTrackingData;
+        }[] = [{
+            input: LoadMetric.LoadEnabledFill,
+            expected: {
+                metrics: [
+                    {
+                        name: 'load_enabled_fill',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:load_enabled_fill',
+                            'ads_sdk2_gid:2895988',
+                            'ads_sdk2_plt:ANDROID'
+                        ]
+                    }
+                ]
+            }
+        }, {
+            input: LoadMetric.LoadEnabledShow,
+            expected: {
+                metrics: [
+                    {
+                        name: 'load_enabled_show',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:load_enabled_show',
+                            'ads_sdk2_gid:2895988',
+                            'ads_sdk2_plt:ANDROID'
+                        ]
+                    }
+                ]
+            }
+        }];
+        tests.forEach((t) => {
+            it(`should send "${t.expected.metrics![0].name}" when "${t.input}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportMetricEvent(t.input);
+                sinon.assert.calledOnce(postStub);
+                assert.equal(postStub.firstCall.args.length, 3);
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
+                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
+                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                return promise;
+            });
+        });
+    });
+
     describe('reportTimingEvent', () => {
 
         const sdkVersion = '2300';
 
         beforeEach(() => {
             sdkVersionStub.returns(sdkVersion);
+            gameIdStub.returns('1111');
         });
 
         const tests: {
