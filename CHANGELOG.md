@@ -1,4 +1,4 @@
-# Pending
+# Wed Oct  9 19:29:21 UTC 2019
 
 * Add Additional Tags to Metrics for Zynga WWF Titles [#11564](https://github.com/Applifier/unity-ads-webview/pull/11564)
 * Open Measurement - Fix Event Queue Using UUIDs [#11334](https://github.com/Applifier/unity-ads-webview/pull/11334)
