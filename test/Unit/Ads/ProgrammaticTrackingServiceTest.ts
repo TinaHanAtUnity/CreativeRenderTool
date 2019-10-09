@@ -174,7 +174,8 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:load_enabled_fill',
-                            'ads_sdk2_gid:2895988'
+                            'ads_sdk2_gid:2895988',
+                            'ads_sdk2_plt:ANDROID'
                         ]
                     }
                 ]
@@ -188,7 +189,8 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:load_enabled_show',
-                            'ads_sdk2_gid:2895988'
+                            'ads_sdk2_gid:2895988',
+                            'ads_sdk2_plt:ANDROID'
                         ]
                     }
                 ]
