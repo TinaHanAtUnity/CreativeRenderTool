@@ -24,8 +24,7 @@ export interface IOMIDEventHandler {
 }
 
 export enum EventQueuePostbackEvents {
-    ON_EVENT_REGISTERED = 'onEventRegistered',
-    ON_SESSION_EVENT_REGISTERED = 'onSessionEventRegistered'
+    ON_EVENT_REGISTERED = 'onEventRegistered'
 }
 
 export class OMIDEventBridge {
@@ -34,7 +33,7 @@ export class OMIDEventBridge {
     private _handler: IOMIDEventHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
     private _openMeasurement: OpenMeasurement;
-    private _verificationInjected = false;
+    private _verificationsInjected = false;
 
     private _iframe3p: HTMLIFrameElement;
 
@@ -70,7 +69,7 @@ export class OMIDEventBridge {
     }
 
     public setVerificationsInjected(verificationsInjected: boolean) {
-        this._verificationInjected = verificationsInjected;
+        this._verificationsInjected = verificationsInjected;
     }
 
     public triggerAdEvent(type: string, payload?: unknown) {
@@ -89,11 +88,7 @@ export class OMIDEventBridge {
 
         if (this._registeredFuncs[type]) {
             this._registeredFuncs[type].forEach((uuid) => {
-                const jsEvent: IJSVerificationEvent = {
-                    ...event,
-                    uuid: uuid
-                };
-                this.postMessage(jsEvent);
+                this.postVideoAdEventMessage(event, uuid);
             });
         }
     }
@@ -114,21 +109,13 @@ export class OMIDEventBridge {
 
         if (this._registeredFuncs[type]) {
             this._registeredFuncs[type].forEach((uuid) => {
-                const jsEvent: IJSVerificationEvent = {
-                    ...event,
-                    uuid: uuid
-                };
-                this.postMessage(jsEvent);
+                this.postVideoAdEventMessage(event, uuid);
             });
         }
 
         if (this._registeredFuncs[OMID3pEvents.OMID_VIDEO].length > 0) {
             const uuid = this._registeredFuncs[OMID3pEvents.OMID_VIDEO][0];
-            const jsEvent: IJSVerificationEvent = {
-                ...event,
-                uuid: uuid
-            };
-            this.postMessage(jsEvent);
+            this.postVideoAdEventMessage(event, uuid);
         }
 
         this._videoEventQueue[type] = event;
@@ -137,6 +124,14 @@ export class OMIDEventBridge {
     public triggerSessionEvent(event: ISessionEvent) {
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
         this.postMessage(event);
+    }
+
+    public postVideoAdEventMessage(event: IVerificationEvent, uuid: string) {
+        const jsEvent: IJSVerificationEvent = {
+            ...event,
+            uuid: uuid
+        };
+        this.postMessage(jsEvent);
     }
 
     public postMessage(event: IJSVerificationEvent | ISessionEvent) {
@@ -155,11 +150,7 @@ export class OMIDEventBridge {
 
         if (eventDatas) {
             eventDatas.forEach((eventData) => {
-                const jsEvent: IJSVerificationEvent = {
-                    ...eventData,
-                    uuid: uuid
-                };
-                this.postMessage(jsEvent);
+                this.postVideoAdEventMessage(eventData, uuid);
             });
         }
 
@@ -189,10 +180,6 @@ export class OMIDEventBridge {
 
     private sendQueuedVideoEvent(eventName: string, uuid: string) {
         const event: IVerificationEvent = this._videoEventQueue[eventName];
-        const jsEvent: IJSVerificationEvent = {
-            ...event,
-            uuid: uuid
-        };
-        this.postMessage(jsEvent);
+        this.postVideoAdEventMessage(event, uuid);
     }
 }
