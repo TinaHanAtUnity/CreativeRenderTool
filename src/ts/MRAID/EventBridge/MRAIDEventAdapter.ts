@@ -23,6 +23,8 @@ export interface IMRAIDHandler {
     onBridgeAREvent(event: MessageEvent): void;
     onBridgeArReadyToShow(event: MessageEvent): void;
     onBridgeDeviceOrientationSubscribe(): void;
+    // TODO: should this be named onBridgeUseCustomClose?
+    onUseCustomClose(hideClose: boolean): void;
 }
 
 export interface IMRAIDOrientationProperties {
@@ -36,6 +38,7 @@ export enum MRAIDEvents {
     LOADED              = 'loaded',
     ANALYTICS_EVENT     = 'analyticsEvent',
     CLOSE               = 'close',
+    USE_CUSTOM_CLOSE    = 'useCustomClose',
     STATE_CHANGE        = 'customMraidState',
     RESIZE_WEBVIEW      = 'resizeWebview',
     SEND_STATS          = 'sendStats',
@@ -57,6 +60,7 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
         this._mraidHandlers[MRAIDEvents.LOADED] = () => this.handleLoaded();
         this._mraidHandlers[MRAIDEvents.CLOSE] = () => this.handleClose();
         this._mraidHandlers[MRAIDEvents.DEVORIENTATION_SUB] = () => this.handleSubscribeDeviceOrientation();
+        this._mraidHandlers[MRAIDEvents.USE_CUSTOM_CLOSE] = (msg) => this.handleUseCustomClose(<boolean>msg['hidden']);
     }
 
     public abstract connect(): void;
@@ -104,6 +108,12 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
 
     protected handleClose() {
         this._handler.onBridgeClose();
+    }
+
+    protected handleUseCustomClose(hidden: boolean) {
+        // TODO: remove logs.
+        console.log('|-o-| MRAIDEventAdapter.handleUseCustomClose(hidden='+ hidden + ')');
+        this._handler.onUseCustomClose(hidden);
     }
 
     protected handleSendStats(totalTime: number, playTime: number, frameCount: number) {

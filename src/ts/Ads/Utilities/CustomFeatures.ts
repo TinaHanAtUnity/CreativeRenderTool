@@ -4,6 +4,7 @@ import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import LoadWhitelistSDK3200 from 'json/custom_features/LoadWhitelist.json';
+import MRAIDSeatsCustomCloseJson from 'json/custom_features/MRAIDSeatsCustomClose.json';
 
 const JsonStringArrayParser = (gameIdJson: string): string[] => {
     let gameIds: string[];
@@ -14,11 +15,23 @@ const JsonStringArrayParser = (gameIdJson: string): string[] => {
     }
     return gameIds;
 };
+
+const JsonNumberArrayParser = (data: string): number[] => {
+    let a: number[];
+    try {
+        a = JSON.parse(data);
+    } catch {
+        a = [];
+    }
+    return a;
+};
+
 const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
 const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
 const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
 const LionStudiosGameIds = JsonStringArrayParser(LionStudiosGamesJson);
 const LoadWhitelist = JsonStringArrayParser(LoadWhitelistSDK3200);
+const MRAIDSeatsCustomClose = JsonNumberArrayParser(MRAIDSeatsCustomCloseJson);
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -160,5 +173,12 @@ export class CustomFeatures {
                creativeId === 'lions_hooke_p1'   ||
                creativeId === 'gg_bounzy'        ||
                creativeId === 'social_dc';
+    }
+
+    public static seatAllowedMRAIDCustomClose(seatId: number): boolean {
+        if (MRAIDSeatsCustomClose.indexOf(seatId) === -1) {
+            return false
+        }
+        return true
     }
 }

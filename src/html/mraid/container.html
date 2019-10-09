@@ -249,8 +249,13 @@
                     trigger('error', ['not implemented', 'storePicture']);
                 };
 
-                this.useCustomClose = function() {
-                    trigger('error', ['not implemented', 'useCustomClose']);
+                this.useCustomClose = function(hidden) {
+                    // TODO: remove logs.
+                    console.log('|-o-| useCustomClose(hidden: ' + hidden + ')');
+                    window.parent.postMessage({
+                        type: 'useCustomClose',
+                        hidden: hidden,
+                    }, '*');
                 };
 
                 this.sendAnalyticsEvent = function(event, eventData) {

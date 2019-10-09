@@ -1,3 +1,4 @@
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
@@ -85,6 +86,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTimestamp: number;
 
     protected _mraidAdapterContainer: MRAIDAdapterContainer;
+    protected _mraidCustomCloseDelay: number;
+    private   _mraidCustomCloseTimeout: NodeJS.Timeout;
 
     protected _deviceorientationListener: EventListener | undefined;
 
@@ -146,6 +149,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         this._gameSessionId = gameSessionId || 0;
         this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
+        this._mraidCustomCloseDelay = 40;
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -330,28 +334,41 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     protected updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
+        // TODO: I added this setTimeout becuase sometimes when the close button
+        // is shown after being hidden, only half the progress indicator is shown.
+        // I think this fixes that issue.
+        let obj = this
+        setTimeout(function() {
+            const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
+            if (obj._platform === Platform.ANDROID && (<AndroidDeviceInfo> obj._deviceInfo).getApiLevel() < 15) {
+                wrapperElement.style.display = 'none';
+                obj._container.style.display = 'none';
+                /* tslint:disable:no-unused-expression */
+                obj._container.offsetHeight;
+                /* tslint:enable:no-unused-expression */
+                obj._container.style.display = 'block';
+                return;
+            }
 
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
+            const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
+            const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
 
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+            const degrees = value * 360;
+            leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
 
-        if (value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
+            if (value >= 0.5) {
+                wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+                rightCircleElement.style.webkitAnimationName = 'right-spin';
+            }
+        }, 0);
+    }
+
+    protected setCloseVisibility(container: HTMLElement, visible: boolean) {
+        // TODO: remove logs.
+        console.log('|-o-| MRAIDView.setCloseVisibility(visibility: ' + visible + ')');
+        const close = <HTMLElement>container.querySelector('.close');
+        close.hidden = !visible;
     }
 
     protected setAnalyticsBackgroundTime(viewable: boolean) {
@@ -470,6 +487,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeClose() {
+        // TODO: should this be gated with !== null || !== undefined?  (clearTimeout does not appear to care).
+        clearTimeout(this._mraidCustomCloseTimeout);
         this._handlers.forEach(handler => handler.onMraidClose());
     }
 
@@ -515,5 +534,56 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this._deviceorientationListener = (orientationEvent: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>orientationEvent);
             window.addEventListener('deviceorientation', this._deviceorientationListener, false);
         }
+    }
+
+    public onUseCustomClose(hidden: boolean) {
+        // TODO: remove logs.
+        console.log('|-o-| MRAIDView.onUseCustomClose(hidden=' + hidden +')');
+        // TODO: capture metrics: total number of useCustomClose calls
+
+        const seatId = this._campaign.getSeatId();
+        if (seatId === undefined || !CustomFeatures.seatAllowedMRAIDCustomClose(seatId)) {
+            // TODO: remove logs.
+            console.log('|-o-| MRAIDView.onCloseVisible: seat ' + seatId + ' not allowed to call onCustomClose');
+            // TODO: capture metrics: number of denied useCustomClose calls.
+            // TODO: figure out how to trigger the following from here:
+            // trigger('error', ['not implemented', 'onCustomClose']);
+            return;
+        }
+
+        if (!hidden) {
+            // TODO: remove logs.
+            console.log('|-o-| MRAIDView.onCloseVisible: seat ' + seatId + ' not allowed to call onCustomClose');
+            // TODO: capture metrics: number of calls to show close graphic.
+            clearTimeout(this._mraidCustomCloseTimeout);
+            this.setCloseVisibility(this._closeElement, true);
+            return;
+        }
+
+        // TODO: Set hideDuration to be relative to the time the interstitial was shown
+        //       and this._mraidCustomCloseDelay.
+        // const hideDuration = Math.floor((this._mraidCustomCloseDelay * 1000) - (now - showTime));
+        const hideDuration = this._mraidCustomCloseDelay * 1000;
+        if (hideDuration <= 0) {
+            // TODO: remove logs.
+            console.log('|-o-| MRAIDView.onCloseVisible: hideDuration expired');
+            // TODO: capture metrics: number of expired calls to hide close.
+            // TODO: setCloseHidden(visible: boolean) is confusing, rename this.
+            this.setCloseVisibility(this._closeElement, true);
+            return;
+        }
+    
+        // TODO: do something to prevent multiple calls to onUseCustomClose(true);
+        // TODO: remove logs.
+        console.log('|-o-| MRAIDView.onCloseVisible: hiding close button for seat ' + seatId);
+        // TODO: capture metrics: number of times close was hidden.
+        this.setCloseVisibility(this._closeElement, false);
+        const o = this;
+        this._mraidCustomCloseTimeout = setTimeout(function() {
+            // TODO: remove logs.
+            console.log('|-o-| MRAIDView.onCloseVisible: showing close button for seat ' + seatId);
+            // TODO: capture metrics: number of times close was shown after hideDuration elapsed.
+            o.setCloseVisibility(o._closeElement, true);
+        }, hideDuration);
     }
 }
