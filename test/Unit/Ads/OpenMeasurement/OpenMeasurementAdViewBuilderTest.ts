@@ -164,15 +164,15 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
                             percentageInView: 100,
                             geometry: {
                                 x: 0,
-                                y: 100,
-                                width: 150,
-                                height: 150
+                                y: 200,
+                                width: 300,
+                                height: 300
                             },
                             onScreenGeometry: {
                                 x: 0,
-                                y: 100,
-                                width: 150,
-                                height: 150,
+                                y: 200,
+                                width: 300,
+                                height: 300,
                                 obstructions: []
                             },
                             measuringElement: false,

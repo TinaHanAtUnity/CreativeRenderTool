@@ -14,15 +14,36 @@ export class OpenMeasurementUtilities {
         return 0;
     }
 
-    public static getAndroidViewSize(size: number, density: number): number {
+    /**
+     * Used only for sdk 3.2 and below OMID certification
+     * Converts html/css generated values to scale with device size based on estimate
+     * @param size px size to convert
+     * @param density old android density value
+     */
+    public static convertDpToPixels(size: number, density: number): number {
         return size * (density / 160);
     }
 
+    /**
+     * Will be calculated properly for sdk 3.3+ - output original px in 3.2
+     * Converts pixels from native to estimated DPs using native magic number
+     * @param px size to convert
+     * @param deviceInfo deviceinfo
+     * @param platform Android/IOS
+     */
     public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
-        if (platform === Platform.ANDROID) {
-            return Math.trunc((px / (<AndroidDeviceInfo>deviceInfo).getScreenDensity()) * 160);
-        }
+        // TODO: Use GetMetricDensity from 3.3 for this calculation
         return px;
+    }
+
+    /**
+     * Used to convert android screenview to dp for admob to
+     * enable OM geometry change on all sdk versions
+     * @param px pixel size of value
+     * @param deviceInfo deviceinfo
+     */
+    public static pxToDpAdmobScreenView(px: number, deviceInfo: DeviceInfo): number {
+        return Math.trunc((px / (<AndroidDeviceInfo>deviceInfo).getScreenDensity()) * 160);
     }
 
     public static createRectangle(x: number, y: number, width: number, height: number): IRectangle {

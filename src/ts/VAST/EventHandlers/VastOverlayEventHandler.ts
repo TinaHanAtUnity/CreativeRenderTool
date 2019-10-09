@@ -15,6 +15,8 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { platform } from 'os';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -27,6 +29,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;
+    private _deviceInfo: DeviceInfo;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -42,10 +45,21 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._om = this._vastAdUnit.getOpenMeasurementController();
+        this._deviceInfo = parameters.deviceInfo;
     }
 
     public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
         if (this._om) {
+
+            if (this._platform === Platform.ANDROID) {
+                // For 3.2 Open Measurement Certification
+                const density = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
+                x = OpenMeasurementUtilities.convertDpToPixels(x, density);
+                y = OpenMeasurementUtilities.convertDpToPixels(y, density);
+                width = OpenMeasurementUtilities.convertDpToPixels(width, density);
+                height = OpenMeasurementUtilities.convertDpToPixels(height, density);
+            }
+
             const obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
             const adViewBuilder = this._om.getOMAdViewBuilder();
             adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit, obstructionRectangle)
