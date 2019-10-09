@@ -127,7 +127,7 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(core.Android!.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
@@ -1000,7 +1000,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en');
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,

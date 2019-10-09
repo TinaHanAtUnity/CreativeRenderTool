@@ -50,6 +50,7 @@ import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
 import ChineseSimplifiedConsent from 'json/locale/zh_Hans/consent.json';
 import ChineseSimplifiedMraid from 'json/locale/zh_Hans/mraid.json';
+import ChineseSimplifiedPrivacy from 'json/locale/zh_Hans/privacy.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
 import ChineseTraditionalMraid from 'json/locale/zh_Hant/mraid.json';
@@ -157,7 +158,8 @@ export class Localization {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
             'overlay': JSON.parse(ChineseSimplifiedOverlay),
             'consent': JSON.parse(ChineseSimplifiedConsent),
-            'mraid': JSON.parse(ChineseSimplifiedMraid)
+            'mraid': JSON.parse(ChineseSimplifiedMraid),
+            'privacy': JSON.parse(ChineseSimplifiedPrivacy)
         },
         'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),

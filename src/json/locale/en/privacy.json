@@ -30,16 +30,16 @@
   "privacy-dialog-text-li-p7-2": "here",
   "privacy-dialog-text-li-p7-3": ".",
   "privacy-dialog-text-li-p7-3-coppa": ". This will also opt you out of personalized ad experiences.",
-  "privacy-dialog-text-li-p7-are-you-sure": "Are you sure?",
-  "privacy-dialog-text-li-p7-yes": "Yes",
+  "privacy-dialog-text-li-p7-are-you-sure": "Are you sure? ",
+  "privacy-dialog-text-li-p7-yes": "Yes ",
   "privacy-dialog-text-li-p7-no": "No",
   "privacy-dialog-text-li-p7-data-deletion-text": "We will process your request and your data for profile purposes will be deleted in 30 days. We will also opt you out of personalized ads immediately.  Please note we may retain your data for invoicing and fraud prevention purposes for 180 days.",
 
   "privacy-dialog-text-failed-age-gate-p1": "This advertisement has been served by Unity Ads. As you have indicated that you are under 18 years old we deliver ads to you based on contextual data (e.g., the game you are playing).",
   "privacy-dialog-text-failed-age-gate-p2-1": "Please review our ",
   "privacy-dialog-text-failed-age-gate-p2-2": "Privacy Policy",
-
   "privacy-dialog-text-failed-age-gate-p2-3": " for a full description of our data practices. You can view your privacy settings at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+
   "privacy-dialog-text-coppa-china-p1": "This advertisement has been served by Unity Ads. The developer of this game has enabled privacy controls indicating that this app is directed to children under the age of 13.  As a result, we deliver ads to you based only on contextual data (e.g., the game you are playing).",
   "privacy-dialog-text-coppa-china-p2-1": "Please review our ",
   "privacy-dialog-text-coppa-china-p2-2": "Privacy Policy",
