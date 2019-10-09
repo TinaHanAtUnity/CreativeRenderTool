@@ -132,7 +132,7 @@ describe('VastAdUnitTest', () => {
             userPrivacyManager: privacyManager
         });
 
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en');
 
         const campaign = TestFixtures.getCampaign();
         videoOverlayParameters = {
@@ -194,7 +194,7 @@ describe('VastAdUnitTest', () => {
                 vastCampaign = TestFixtures.getEventVastCampaign();
                 sinon.stub(vastCampaign, 'getVideo').returns(video);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-                const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
+                const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false, 'en');
                 videoOverlayParameters = {
                     deviceInfo: deviceInfo,
                     campaign: vastCampaign,
@@ -277,7 +277,7 @@ describe('VastAdUnitTest', () => {
                 vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
                 sinon.stub(vastCampaign, 'getVideo').returns(video);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-                const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
+                const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false, 'en');
                 videoOverlayParameters = {
                     deviceInfo: deviceInfo,
                     campaign: vastCampaign,

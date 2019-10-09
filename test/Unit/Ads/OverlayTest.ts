@@ -49,7 +49,7 @@ describe('OverlayTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
 
-        privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(UserPrivacyManager), false, false);
+        privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(UserPrivacyManager), false, false, 'en_FI');
         deviceInfo = <DeviceInfo>{ getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0' };
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));

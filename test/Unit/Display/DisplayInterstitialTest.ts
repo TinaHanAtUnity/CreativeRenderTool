@@ -50,7 +50,7 @@ describe('DisplayInterstitialTest', () => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const coreConfig = TestFixtures.getCoreConfiguration();
-            const privacy = new Privacy(platform, campaign, privacyManager, false, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, false, coreConfig.isCoppaCompliant(), 'en');
 
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);

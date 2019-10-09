@@ -140,4 +140,43 @@ describe('LocalizationTest', () => {
         });
     });
 
+    describe('Privacy view', () => {
+        // Changing your privacy choice
+        const id = 'privacy-dialog-text-li-p6-header';
+
+        it('EN. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+            const localization = new Localization('en_GB', 'privacy');
+            const phrase = 'Changing your privacy choice';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('FR. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+            const localization = new Localization('fr_FI', 'privacy');
+            const phrase = 'Changing your privacy choice'; // no French translation available, should return English phrase
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('ZH Hans. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+            const expectedTranslation = '改变你的隐私选择';
+            assert.equal(new Localization('zh', 'privacy').translate(id), expectedTranslation, 'Localization zh did not map to correct language');
+            assert.equal(new Localization('zh_CN', 'privacy').translate(id), expectedTranslation, 'Localization zh_CN did not map to correct language');
+            assert.equal(new Localization('zh_Hans', 'privacy').translate(id), expectedTranslation, 'Localization zh_Hans did not map to correct language');
+            assert.equal(new Localization('zh_Hans_CN', 'privacy').translate(id), expectedTranslation, 'Localization zh_Hans_CN did not map to correct language');
+            assert.equal(new Localization('zh_Hans_US', 'privacy').translate(id), expectedTranslation, 'Localization zh_Hans_US did not map to correct language');
+            assert.equal(new Localization('zh_#Hans_CN', 'privacy').translate(id), expectedTranslation, 'Localization zh_#Hans_CN did not map to correct language');
+            assert.equal(new Localization('zh_CN_#Hans', 'privacy').translate(id), expectedTranslation, 'Localization zh_CN_#Hans did not map to correct language');
+        });
+
+        it('ZH Hant China. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+            const expectedTranslation = 'Changing your privacy choice'; // no translation for Traditional Chinese available
+
+            assert.equal(new Localization('zh_Hant', 'privacy').translate(id), expectedTranslation, 'Localization zh_Hant did not map to correct language');
+            assert.equal(new Localization('zh_TW', 'privacy').translate(id), expectedTranslation, 'Localization zh_TW did not map to correct language');
+            assert.equal(new Localization('zh_Hant_TW', 'privacy').translate(id), expectedTranslation, 'Localization zh_Hant_TW did not map to correct language');
+            assert.equal(new Localization('zh_HK', 'privacy').translate(id), expectedTranslation, 'Localization zh_HK did not map to correct language');
+            assert.equal(new Localization('zh_MO', 'privacy').translate(id), expectedTranslation, 'Localization zh_HK did not map to correct language');
+            assert.equal(new Localization('zh_#Hant_TW', 'privacy').translate(id), expectedTranslation, 'Localization zh_#Hant_TW did not map to correct language');
+            assert.equal(new Localization('zh_TW_#Hant', 'privacy').translate(id), expectedTranslation, 'Localization zh_TW_#Hant did not map to correct language');
+        });
+    });
 });

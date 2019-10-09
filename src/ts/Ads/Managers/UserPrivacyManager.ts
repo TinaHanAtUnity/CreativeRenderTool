@@ -317,6 +317,10 @@ export class UserPrivacyManager {
         return this._ageGateChoice;
     }
 
+    public getLegalFramework(): LegalFramework {
+        return this._privacy.getLegalFramework();
+    }
+
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
         return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {

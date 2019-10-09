@@ -8,6 +8,7 @@ import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
 import EnglishConsent from 'json/locale/en/consent.json';
 import EnglishMraid from 'json/locale/en/mraid.json';
+import EnglishPrivacy from 'json/locale/en/privacy.json';
 import SpanishEndscreen from 'json/locale/es/endscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
 import SpanishConsent from 'json/locale/es/consent.json';
@@ -49,6 +50,7 @@ import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
 import ChineseSimplifiedConsent from 'json/locale/zh_Hans/consent.json';
 import ChineseSimplifiedMraid from 'json/locale/zh_Hans/mraid.json';
+import ChineseSimplifiedPrivacy from 'json/locale/zh_Hans/privacy.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
 import ChineseTraditionalMraid from 'json/locale/zh_Hant/mraid.json';
@@ -115,7 +117,8 @@ export class Localization {
             'endscreen': JSON.parse(EnglishEndscreen),
             'overlay': JSON.parse(EnglishOverlay),
             'consent': JSON.parse(EnglishConsent),
-            'mraid': JSON.parse(EnglishMraid)
+            'mraid': JSON.parse(EnglishMraid),
+            'privacy': JSON.parse(EnglishPrivacy)
         },
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
@@ -155,7 +158,8 @@ export class Localization {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
             'overlay': JSON.parse(ChineseSimplifiedOverlay),
             'consent': JSON.parse(ChineseSimplifiedConsent),
-            'mraid': JSON.parse(ChineseSimplifiedMraid)
+            'mraid': JSON.parse(ChineseSimplifiedMraid),
+            'privacy': JSON.parse(ChineseSimplifiedPrivacy)
         },
         'fi.*': {
             'endscreen': JSON.parse(FinnishEndscreen),

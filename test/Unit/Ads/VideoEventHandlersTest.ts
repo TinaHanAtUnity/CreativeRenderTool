@@ -136,7 +136,7 @@ describe('Vast VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en_FI');
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -371,7 +371,7 @@ describe('Performance VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = new Privacy(platform, performanceCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, performanceCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en_FI');
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -857,7 +857,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const campaign = TestFixtures.getCampaign();
-        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en_FI');
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
             campaign: campaign,

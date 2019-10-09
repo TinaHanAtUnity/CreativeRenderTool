@@ -755,7 +755,7 @@ export class TestFixtures {
     public static getPrivacy(platform: Platform, campaign: Campaign): Privacy {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const core = TestFixtures.getCoreApi(TestFixtures.getNativeBridge(platform, TestFixtures.getBackend(platform)));
-        return new Privacy(platform, campaign, privacyManager, TestFixtures.getPrivacySDK(core).isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
+        return new Privacy(platform, campaign, privacyManager, TestFixtures.getPrivacySDK(core).isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant(), TestFixtures.getAndroidDeviceInfo(core).getLanguage());
     }
 
     public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign, privacy: Privacy): IEndScreenParameters {
