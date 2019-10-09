@@ -90,7 +90,7 @@ describe('VastVideoEventHandler tests', () => {
 
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
-        privacy = new Privacy(platform, campaign, privacyManager, false, false);
+        privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
 

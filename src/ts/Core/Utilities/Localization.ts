@@ -8,6 +8,7 @@ import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
 import EnglishConsent from 'json/locale/en/consent.json';
 import EnglishMraid from 'json/locale/en/mraid.json';
+import EnglishPrivacy from 'json/locale/en/privacy.json';
 import SpanishEndscreen from 'json/locale/es/endscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
 import SpanishConsent from 'json/locale/es/consent.json';
@@ -115,7 +116,8 @@ export class Localization {
             'endscreen': JSON.parse(EnglishEndscreen),
             'overlay': JSON.parse(EnglishOverlay),
             'consent': JSON.parse(EnglishConsent),
-            'mraid': JSON.parse(EnglishMraid)
+            'mraid': JSON.parse(EnglishMraid),
+            'privacy': JSON.parse(EnglishPrivacy)
         },
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
