@@ -32,8 +32,8 @@ const changeOrientation = () => {
         return;
     }
 
-    // Calculate orientation based on width and height by default
-    let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+    // Calculate orientation based on width and height.
+    const orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
     document.body.classList.remove('landscape');
     document.body.classList.remove('portrait');
     document.body.classList.add(orientation);
