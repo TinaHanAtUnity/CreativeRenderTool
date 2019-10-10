@@ -1,3 +1,9 @@
+# Pending
+
+* Create and Inject Automated Experiment Manager in Performance Ad [#11533](https://github.com/Applifier/unity-ads-webview/pull/11533)
+* Open Measurement - Enable OM for Admob [#11563](https://github.com/Applifier/unity-ads-webview/pull/11563)
+* Add Initialization Stages Timing and Batched PTS Events [#11562](https://github.com/Applifier/unity-ads-webview/pull/11562)
+
 # Wed Oct  9 19:29:21 UTC 2019
 
 * Add Additional Tags to Metrics for Zynga WWF Titles [#11564](https://github.com/Applifier/unity-ads-webview/pull/11564)
