@@ -23,7 +23,6 @@ export interface IMRAIDHandler {
     onBridgeAREvent(event: MessageEvent): void;
     onBridgeArReadyToShow(event: MessageEvent): void;
     onBridgeDeviceOrientationSubscribe(): void;
-    // TODO: should this be named onBridgeUseCustomClose?
     onUseCustomClose(hideClose: boolean): void;
 }
 
@@ -111,8 +110,6 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
     }
 
     protected handleUseCustomClose(hidden: boolean) {
-        // TODO: remove logs.
-        console.log('|-o-| MRAIDEventAdapter.handleUseCustomClose(hidden='+ hidden + ')');
         this._handler.onUseCustomClose(hidden);
     }
 

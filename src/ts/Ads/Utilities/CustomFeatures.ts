@@ -17,13 +17,11 @@ const JsonStringArrayParser = (gameIdJson: string): string[] => {
 };
 
 const JsonNumberArrayParser = (data: string): number[] => {
-    let a: number[];
     try {
-        a = JSON.parse(data);
+        return JSON.parse(data);
     } catch {
-        a = [];
+        return [];
     }
-    return a;
 };
 
 const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);

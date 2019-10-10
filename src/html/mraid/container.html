@@ -250,8 +250,6 @@
                 };
 
                 this.useCustomClose = function(hidden) {
-                    // TODO: remove logs.
-                    console.log('|-o-| useCustomClose(hidden: ' + hidden + ')');
                     window.parent.postMessage({
                         type: 'useCustomClose',
                         hidden: hidden,

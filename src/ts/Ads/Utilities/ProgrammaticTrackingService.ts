@@ -80,7 +80,19 @@ export enum TimingMetric {
     WebviewInitializationTime = 'webview_initialization_time'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
+export enum MraidMetric {
+    UseCustomCloseCalled = 'mraid_use_custom_close_called',
+    UseCustomCloseRefused = 'mraid_use_custom_close_refused',
+    UseCustomCloseShowGraphic = 'mraid_use_custom_close_show_graphic',
+    UseCustomCloseCalledAgain = 'mraid_use_custom_close_called_again',
+    UseCustomCloseExpired = 'mraid_use_custom_close_expired',
+    UseCustomCloseHideGraphic = 'mraid_use_custom_close_hide_graphic',
+    UseCustomCloseHideTimeout = 'mraid_use_custom_close_hide_timeout',
+    ClosedByAd = 'mraid_closed_by_ad',
+    ClosedByUnityAds = 'mraid_closed_by_unity_ads'
+}
+
+type PTSEvent = MraidMetric | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[] | undefined;

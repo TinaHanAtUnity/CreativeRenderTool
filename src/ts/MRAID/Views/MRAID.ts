@@ -1,3 +1,4 @@
+import { ProgrammaticTrackingService, MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -24,15 +25,19 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _domContentLoaded = false;
     private _creativeId: string | undefined;
 
+    private _programmaticTrackingService: ProgrammaticTrackingService;
+    
     private _iframe: HTMLIFrameElement;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number, hidePrivcy: boolean = false) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId?: number, hidePrivcy: boolean = false) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, hidePrivcy, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._creativeId = campaign.getCreativeId();
+
+        this._programmaticTrackingService = programmaticTrackingService;
 
         this._template = new Template(MRAIDTemplate);
     }
@@ -85,6 +90,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     protected onCloseEvent(event: Event): void {
+        this._programmaticTrackingService.reportMetricEvent(MraidMetric.ClosedByUnityAds).catch();
+
         event.preventDefault();
         event.stopPropagation();
 

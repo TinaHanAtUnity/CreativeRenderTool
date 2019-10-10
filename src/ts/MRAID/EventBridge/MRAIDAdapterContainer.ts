@@ -80,8 +80,6 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
     }
 
     public onUseCustomClose(hidden: boolean) {
-        // TODO: remove logs.
-        console.log('|-o-| MRAIDAdapterContainer.onUseCustomClose(hidden='+ hidden + ')');
         this._handler.onUseCustomClose(hidden);
     }
 }
