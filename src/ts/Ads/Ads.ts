@@ -88,8 +88,9 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
+import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from './Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 
 export class Ads implements IAds {
 
@@ -261,6 +262,8 @@ export class Ads implements IAds {
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
             if (this._loadApiEnabled && LoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+            } else if (this._loadApiEnabled && LoadExperimentWithCometRefreshingAfterAnyStart.isValid(this._core.Config.getAbGroup())) {
+                this.RefreshManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else if (this._loadApiEnabled) {
                 this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else {
