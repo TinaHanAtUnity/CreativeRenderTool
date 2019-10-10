@@ -1,4 +1,4 @@
-# Pending
+# Thu Oct 10 21:19:20 UTC 2019
 
 * Create and Inject Automated Experiment Manager in Performance Ad [#11533](https://github.com/Applifier/unity-ads-webview/pull/11533)
 * Open Measurement - Enable OM for Admob [#11563](https://github.com/Applifier/unity-ads-webview/pull/11563)
