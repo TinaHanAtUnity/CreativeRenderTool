@@ -90,7 +90,7 @@ import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
-import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from './Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
+import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 
 export class Ads implements IAds {
 
