@@ -175,8 +175,8 @@ export class CustomFeatures {
 
     public static seatAllowedMRAIDCustomClose(seatId: number): boolean {
         if (MRAIDSeatsCustomClose.indexOf(seatId) === -1) {
-            return false
+            return false;
         }
-        return true
+        return true;
     }
 }

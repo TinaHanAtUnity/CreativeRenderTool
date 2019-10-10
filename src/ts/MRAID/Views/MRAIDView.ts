@@ -151,7 +151,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         this._gameSessionId = gameSessionId || 0;
         this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
-        
+
         this._mraidCustomCloseCalled = false;
         this._mraidCustomCloseDelay = 40;
     }
@@ -376,9 +376,9 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected setCloseVisibility(container: HTMLElement, visible: boolean) {
         const close = <HTMLElement>container.querySelector('.close');
         if (visible) {
-            close.style.display = 'block'    
+            close.style.display = 'block';
         } else {
-            close.style.display = 'none'
+            close.style.display = 'none';
         }
     }
 
@@ -576,7 +576,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this.setCloseVisibility(this._closeElement, true);
             return;
         }
-    
+
         this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic).catch();
         this.setCloseVisibility(this._closeElement, false);
         this.setMraidCustomCloseTimeout(this._closeElement, hideDuration);
