@@ -29,6 +29,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEventHandlerTest', () => {
@@ -72,7 +73,8 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
                 programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-                privacySDK: sinon.createStubInstance(PrivacySDK)
+                privacySDK: sinon.createStubInstance(PrivacySDK),
+                automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
             };
 
             privacyEventHandler = new PrivacyEventHandler(adUnitParameters);
