@@ -193,7 +193,7 @@ describe('ProgrammaticTrackingService', () => {
             }
         }];
         tests.forEach((t) => {
-            it(`should send "${t.expected.metrics![0].name}" when "${t.input}" is passed in`, () => {
+            it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEvent(t.input);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
