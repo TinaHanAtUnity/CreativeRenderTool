@@ -162,7 +162,7 @@ describe('PerPlacementLoadManagerTest', () => {
                             done();
                         }
                     });
-                    const loadDict: { [key: string]: number} = {};
+                    const loadDict: {[key: string]: number} = {};
                     loadDict[placementId] = 1;
                     ads.LoadApi.onLoad.trigger(loadDict);
                 });

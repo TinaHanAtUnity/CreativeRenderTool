@@ -21,7 +21,7 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
         });
 
         this.set('category', 'mediation');
-        this.set('keys', ['name', 'adapter_version', 'ordinal', 'enable_metadata_load']);
+        this.set('keys', ['name', 'version', 'adapter_version', 'ordinal', 'enable_metadata_load']);
     }
 
     public getName(): string | undefined {
