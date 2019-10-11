@@ -72,6 +72,7 @@ export const HeartbeatingDownloadButtonTest = new ZyngaFilteredABTest(5);
 export const BlinkingDownloadButtonTest = new ZyngaFilteredABTest(6);
 export const BouncingDownloadButtonTest = new ZyngaFilteredABTest(7);
 export const ShiningDownloadButtonTest = new ZyngaFilteredABTest(8);
+export const ZyngaLoadExperimentWithCometRefreshing = new ABTest(13, 14); // Equivalent test to group 15, but only on Zynga WWF Titles
 export const ZyngaLoadExperiment =  new ABTest(15, 16);
 export const LoadExperiment = new ABTest(15, 16, 17); // Intentionally left 15 and 17 to not backwards break experiment
 export const LoadExperimentWithCometRefreshing = new ABTest(15); // Intentionally duplicate ABGroup 15
