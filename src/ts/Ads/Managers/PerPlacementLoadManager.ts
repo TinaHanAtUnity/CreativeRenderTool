@@ -173,22 +173,17 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private alertPlacementReadyStatus(placement: Placement) {
-        if (placement && placement.getState() === PlacementState.READY && this.shouldSendReadyEvent()) {
-            this._ads.Listener.sendReadyEvent(placement.getId());
-        }
-    }
-
-    private shouldSendReadyEvent(): boolean {
-        let shouldSend: boolean = true;
-        this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
-            if (mediation) {
-                const mediationName = mediation.getName();
-                const mediationVersion = mediation.getVersion();
-                if (mediationName === 'MoPub' && mediationVersion === '3.3.0.0') {
-                    shouldSend = false;
+        if (placement && placement.getState() === PlacementState.READY) {
+            this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation && mediation.getName() === 'Mopub' && mediation.getAdapterVersion() === '3.2.0.1') {
+                        return;
+                } else {
+                    this._ads.Listener.sendReadyEvent(placement.getId());
                 }
-            }
-        });
-        return shouldSend;
+            }).catch(() => {
+                console.log("sending Ready Event");
+                this._ads.Listener.sendReadyEvent(placement.getId());
+            });
+        }
     }
 }
