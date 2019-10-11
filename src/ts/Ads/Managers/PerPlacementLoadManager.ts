@@ -184,7 +184,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             if (mediation) {
                 const mediationName = mediation.getName();
                 const mediationVersion = mediation.getVersion();
-                if (mediationName === "MoPub" && mediationVersion === "3.3.0.0") {
+                if (mediationName === 'MoPub' && mediationVersion === '3.3.0.0') {
                     shouldSend = false;
                 }
             }
