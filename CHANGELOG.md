@@ -1,6 +1,12 @@
+# Pending
+
+* Fix privacy template [#11591](https://github.com/Applifier/unity-ads-webview/pull/11591)
+* Experiment ABGroup 17: Load API - Refresh Filled Comet Placement on the Start of Any Campaign [#11594](https://github.com/Applifier/unity-ads-webview/pull/11594)
+
 # Fri Oct 11 11:48:55 UTC 2019
 
 * Age-gate: Update Chinese translation [#11598](https://github.com/Applifier/unity-ads-webview/pull/11598)
+* Test prints out differently for Safari vs Chrome [#11596](https://github.com/Applifier/unity-ads-webview/pull/11596)
 
 # Thu Oct 10 21:19:20 UTC 2019
 
