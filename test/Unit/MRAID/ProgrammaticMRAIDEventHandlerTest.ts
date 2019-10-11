@@ -113,7 +113,7 @@ import Test = Mocha.Test;
                 privacySDK = TestFixtures.getPrivacySDK(core);
 
                 privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
-                mraidView = new MRAID(platform, core, deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
+                mraidView = new MRAID(platform, core, deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                     platform,

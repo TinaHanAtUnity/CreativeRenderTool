@@ -1,3 +1,4 @@
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
@@ -60,8 +61,7 @@ describe('MRAID', () => {
 
     it('should render', () => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
-
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
         mraid.render();
 
         return new Promise((resolve, reject) => {
@@ -92,7 +92,7 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
 
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
@@ -108,7 +108,7 @@ describe('MRAID', () => {
         params.resource = markup;
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
@@ -125,7 +125,7 @@ describe('MRAID', () => {
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
@@ -141,7 +141,7 @@ describe('MRAID', () => {
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>(function() {window.addEventListener("deviceorientation", (event) => {console.log("data:"+event.alpha);});})()</script><div>Hello World</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notInclude(mraidSrc, '<script id=\"deviceorientation-support\"></script>', 'deviceorientation script stub not replaced with script');

@@ -1,4 +1,4 @@
-import { MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
@@ -60,6 +60,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
 
+    protected _programmaticTrackingService: ProgrammaticTrackingService;
+
     protected _gameSessionId: number;
     protected _abGroup: ABGroup;
 
@@ -103,7 +105,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         MRAIDView.DebugJsConsole = debug;
     }
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, hidePrivacy: boolean, gameSessionId?: number) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, hidePrivacy: boolean, gameSessionId?: number) {
         super(platform, id);
 
         this._core = core;
@@ -113,6 +115,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._hidePrivacyButton = hidePrivacy;
+
+        this._programmaticTrackingService = programmaticTrackingService;
 
         this._abGroup = abGroup;
 
@@ -556,7 +560,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             return;
         }
 
-        if (!hidden) {
+        if (hidden === false) {
             this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic).catch();
             this.clearMraidCustomCloseTimeout();
             this.setCloseVisibility(this._closeElement, true);
