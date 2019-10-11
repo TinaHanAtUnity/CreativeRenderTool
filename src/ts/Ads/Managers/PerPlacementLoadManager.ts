@@ -125,8 +125,6 @@ export class PerPlacementLoadManager extends RefreshManager {
                     this.setPlacementState(placementId, PlacementState.READY);
                 } else {
                     this.setPlacementState(placementId, PlacementState.NO_FILL);
-                //    this.setPlacementState(placementId, PlacementState.WAITING);
-                //    this.setPlacementState(placementId, PlacementState.NO_FILL);
                 }
             });
         } else {
@@ -175,7 +173,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     private alertPlacementReadyStatus(placement: Placement) {
         if (placement && placement.getState() === PlacementState.READY) {
             this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
-                if (mediation && mediation.getName() === 'Mopub' && mediation.getAdapterVersion() === '3.2.0.1') {
+                if (mediation && mediation.getName() === 'Mopub' && mediation.getAdapterVersion() === '3.3.0.0') {
                         return;
                 } else {
                     this._ads.Listener.sendReadyEvent(placement.getId());
