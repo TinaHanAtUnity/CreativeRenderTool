@@ -2,9 +2,9 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Placement } from 'Ads/Models/Placement';
 import { Observables } from 'Core/Utilities/Observables';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PerPlacementLoadManagerWithCometRefresBase } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshBase';
+import { PerPlacementLoadManagerWithCometRefreshBase } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshBase';
 
-export class PerPlacementLoadManagerWithCometRefresh extends PerPlacementLoadManagerWithCometRefresBase {
+export class PerPlacementLoadManagerWithCometRefresh extends PerPlacementLoadManagerWithCometRefreshBase {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         if (placement.getCurrentCampaign() instanceof PerformanceCampaign) {

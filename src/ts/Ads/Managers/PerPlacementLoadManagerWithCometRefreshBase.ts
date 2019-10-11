@@ -3,7 +3,7 @@ import { PlacementState } from 'Ads/Models/Placement';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
-export class PerPlacementLoadManagerWithCometRefresBase extends PerPlacementLoadManager {
+export class PerPlacementLoadManagerWithCometRefreshBase extends PerPlacementLoadManager {
 
     public refreshReadyPerformanceCampaigns(): Promise<void[]> {
         const loadCampaignPromises = [];

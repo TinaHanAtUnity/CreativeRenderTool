@@ -1,9 +1,9 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Placement } from 'Ads/Models/Placement';
 import { Observables } from 'Core/Utilities/Observables';
-import { PerPlacementLoadManagerWithCometRefresBase } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshBase';
+import { PerPlacementLoadManagerWithCometRefreshBase } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshBase';
 
-export class PerPlacementLoadManagerWithCometRefreshAfterAnyStart extends PerPlacementLoadManagerWithCometRefresBase {
+export class PerPlacementLoadManagerWithCometRefreshAfterAnyStart extends PerPlacementLoadManagerWithCometRefreshBase {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         Observables.once(adUnit.onStartProcessed, () => {

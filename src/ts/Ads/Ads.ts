@@ -88,7 +88,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart, ZyngaLoadExperiment } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
 import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 
@@ -660,7 +660,7 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        const isZyngaReverseABGroupLoadExperiment = !(LoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId());
+        const isZyngaReverseABGroupLoadExperiment = !(ZyngaLoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId());
         const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
         if (isContainedLoadExperiment || isZyngaReverseABGroupLoadExperiment) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
