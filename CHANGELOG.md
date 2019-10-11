@@ -2,6 +2,7 @@
 
 * Fix privacy template [#11591](https://github.com/Applifier/unity-ads-webview/pull/11591)
 * Experiment ABGroup 17: Load API - Refresh Filled Comet Placement on the Start of Any Campaign [#11594](https://github.com/Applifier/unity-ads-webview/pull/11594)
+* Add Comet Refresh to Zynga WWF Titles on Groups 13 and 14 [#11622](https://github.com/Applifier/unity-ads-webview/pull/11622)
 
 # Fri Oct 11 11:48:55 UTC 2019
 
