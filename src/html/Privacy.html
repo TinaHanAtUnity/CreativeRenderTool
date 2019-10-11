@@ -4,7 +4,7 @@
         <span class="title centered-title">A message from Unity about your privacy</span>
 
         <% if(!data.isGDPREnabled) { %>
-        <span class="not-gdpr">
+        <div class="not-gdpr">
             <div class="privacy-text">
                 <% if(data.isCoppaCompliant) { %>
                 <p>
@@ -57,7 +57,7 @@
             </div>
         </div>
         <% } else if(data.isUserUnderAgeLimit) { %>
-        <span class="under-age-limit">
+        <div class="under-age-limit">
             <p>
                 This advertisement has been served by Unity Ads. As you have indicated that you are under 18 years old
                 we deliver ads to you based on contextual data (e.g., the game you are playing), and not based on your
@@ -70,7 +70,7 @@
             </p>
         </div>
         <% } else { %>
-        <span class="gdpr">
+        <div class="gdpr">
             <p>
                 Ads allow developers to offer great apps for free. We try to show the apps and products that will be
                 most interesting to you based on the apps you use, the device you use, and the country you are in.
@@ -166,8 +166,8 @@
                 </span>
             </p>
         </div>
+        <% } %>
     </div>
-    <% } %>
     <div class="pop-up-content build-side">
         <% for (var k in data.buildInformation) { %>
         <p class="build-information-item">

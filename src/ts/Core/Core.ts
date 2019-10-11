@@ -117,8 +117,11 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
+        const coreInitializeStart = Date.now();
+        let initCallToWebviewLoad: number;
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
+            initCallToWebviewLoad = coreInitializeStart - this.ClientInfo.getInitTimestamp();
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
@@ -134,7 +137,6 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo);
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
@@ -192,6 +194,9 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
+            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+            this.ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
+            this.ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
@@ -207,9 +212,13 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
 
+            const adsInitializeStart = Date.now();
             return this.Ads.initialize().then(() => {
-                const totalInitializationTime = Date.now() - this.ClientInfo.getInitTimestamp();
-                this.ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewInitializationTime, totalInitializationTime, this.Config.getCountry());
+                const initializeFinished = Date.now();
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
+                this.ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
+                this.ProgrammaticTrackingService.sendBatchedEvents();
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
