@@ -23,7 +23,8 @@ export enum OMID3pEvents {
     OMID_VOLUME_CHANGE = 'omidVolumeChange',
     OMID_PLAYER_STATE_CHANGE = 'omidPlayerStateChange',
     OMID_AD_USER_INTERACTION = 'omidAdUserInteraction',
-    OMID_GEOMETRY_CHANGE = 'omidGeometryChange'
+    OMID_GEOMETRY_CHANGE = 'omidGeometryChange',
+    OMID_VIDEO = 'omidVideo'
 }
 
 export enum VideoPosition {
@@ -122,6 +123,7 @@ export interface ISessionEvent {
     timestamp: number;
     type: string;
     data: {[key: string]: unknown};
+    uuid?: string;
 }
 
 export interface IVerificationScriptResource {
