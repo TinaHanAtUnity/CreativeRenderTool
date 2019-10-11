@@ -1,3 +1,7 @@
+# Staged
+
+* Age-gate: Update Chinese translation [#11598](https://github.com/Applifier/unity-ads-webview/pull/11598)
+
 # Thu Oct 10 21:19:20 UTC 2019
 
 * Create and Inject Automated Experiment Manager in Performance Ad [#11533](https://github.com/Applifier/unity-ads-webview/pull/11533)
