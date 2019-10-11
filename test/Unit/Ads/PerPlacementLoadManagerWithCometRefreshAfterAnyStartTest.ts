@@ -88,7 +88,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
-        loadManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+        loadManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService, metaDataManager);
     });
 
     describe('setCurrentAdUnit', () => {
