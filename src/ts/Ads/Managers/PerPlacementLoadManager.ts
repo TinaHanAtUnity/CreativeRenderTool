@@ -12,6 +12,8 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class PerPlacementLoadManager extends RefreshManager {
     private _ads: IAdsApi;
@@ -22,8 +24,9 @@ export class PerPlacementLoadManager extends RefreshManager {
     protected _coreConfig: CoreConfiguration;
     protected _campaignManager: CampaignManager;
     protected _pts: ProgrammaticTrackingService;
+    private _metaDataManager: MetaDataManager;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService, metaDataManager: MetaDataManager) {
         super();
 
         this._ads = ads;
@@ -33,6 +36,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
         this._pts = programmaticTrackingService;
+        this._metaDataManager = metaDataManager;
 
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
@@ -121,6 +125,8 @@ export class PerPlacementLoadManager extends RefreshManager {
                     this.setPlacementState(placementId, PlacementState.READY);
                 } else {
                     this.setPlacementState(placementId, PlacementState.NO_FILL);
+                //    this.setPlacementState(placementId, PlacementState.WAITING);
+                //    this.setPlacementState(placementId, PlacementState.NO_FILL);
                 }
             });
         } else {
@@ -167,8 +173,22 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     private alertPlacementReadyStatus(placement: Placement) {
-        if (placement && placement.getState() === PlacementState.READY) {
+        if (placement && placement.getState() === PlacementState.READY && this.shouldSendReadyEvent()) {
             this._ads.Listener.sendReadyEvent(placement.getId());
         }
+    }
+
+    private shouldSendReadyEvent(): boolean {
+        let shouldSend: boolean = true;
+        this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if (mediation) {
+                const mediationName = mediation.getName();
+                const mediationVersion = mediation.getVersion();
+                if (mediationName === "MoPub" && mediationVersion === "3.3.0.0") {
+                    shouldSend = false;
+                }
+            }
+        });
+        return shouldSend;
     }
 }
