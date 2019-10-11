@@ -86,7 +86,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _omAdSessionId: string;
 
     private _verificationVendorMap: IVerificationVendorMap;
-    private _vendorKeys: string[];
+    private _vendorKey: string;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
 
@@ -111,7 +111,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._verificationVendorMap = {};
         this._clientInfo = clientInfo;
         this._campaign = campaign;
-        this._vendorKeys = [];
+
+        // TODO: Make vendor key non-optional
+        if (vendorKey) {
+            this._vendorKey = vendorKey;
+        }
+
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -242,16 +247,13 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
         this._sessionStartCalled = true;
 
-        this._vendorKeys.forEach(vendorKey => {
-            if (this._verificationVendorMap[vendorKey]) {
-                event.data.verificationParameters = this._verificationVendorMap[vendorKey];
-            }
-            const contextData: IContext = this.buildSessionContext();
-            event.data.context = contextData;
-            event.data.vendorkey = vendorKey;
-
-            this._omBridge.triggerSessionEvent(event);
-        });
+        if (this._verificationVendorMap[this._vendorKey]) {
+            event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+        }
+        const contextData: IContext = this.buildSessionContext();
+        event.data.context = contextData;
+        event.data.vendorkey = this._vendorKey;
+        this._omBridge.triggerSessionEvent(event);
     }
 
     private buildSessionContext(): IContext {
@@ -354,9 +356,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            if (this._campaign instanceof AdMobCampaign) {
-                this._omBridge.sendQueuedEvents();
-            }
+            this.sessionStart();
         }
 
         return Promise.resolve();
@@ -374,35 +374,21 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
                 if (vendorKey === 'IAS') {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
-                } else {
-                    this.loaded({
-                        isSkippable: this._placement.allowSkip(),
-                        skipOffset: this._placement.allowSkipInSeconds(),
-                        isAutoplay: true,                   // Always autoplay for video
-                        position: VideoPosition.STANDALONE  // Always standalone video
-                    });
                 }
+
+                this.loaded({
+                    isSkippable: this._placement.allowSkip(),
+                    skipOffset: this._placement.allowSkipInSeconds(),
+                    isAutoplay: true,                   // Always autoplay for video
+                    position: VideoPosition.STANDALONE  // Always standalone video
+                });
             });
     }
 
     private sendIASEvents(IASScreenWidth: number, IASScreenHeight: number) {
-        window.setTimeout(() => {
             const viewPort = OpenMeasurementUtilities.calculateViewPort(IASScreenWidth, IASScreenHeight);
             const adView = OpenMeasurementUtilities.calculateVastAdView(100, [], IASScreenWidth, IASScreenHeight, true, []);
-
-            // must be called before geometry change to avoid re-queueing and calling geometry change twice
-            this._omBridge.sendQueuedEvents();
-
             this.geometryChange(viewPort, adView);
-
-            // must be called after geometry change for IAS because they don't register other ad events until after it is called
-            this.loaded({
-                isSkippable: this._placement.allowSkip(),
-                skipOffset: this._placement.allowSkipInSeconds(),
-                isAutoplay: true,                   // Always autoplay for video
-                position: VideoPosition.STANDALONE  // Always standalone video
-            });
-        }, 1000);
     }
 
     private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
@@ -475,8 +461,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         });
     }
 
+    // TODO: Remove as we now capture vendor key in constuctor
     public populateVendorKey(vendorKey: string) {
-        this._vendorKeys.push(vendorKey);
+        this._vendorKey = vendorKey;
     }
 
     private checkVendorResourceURL(resourceUrl: string): Promise<void> {

@@ -166,7 +166,6 @@ import OMID3p from 'html/omid/omid3p.html';
                             sandbox.stub(om, 'loaded');
                             sandbox.stub(om, 'geometryChange');
                             sandbox.stub(om, 'impression');
-                            sandbox.stub(om.getOmidBridge(), 'sendQueuedEvents');
 
                             clock = sinon.useFakeTimers();
                         });
@@ -183,7 +182,6 @@ import OMID3p from 'html/omid/omid3p.html';
                             return om.onEventProcessed('sessionStart', 'IAS').then(() => {
                                 clock.tick(1000);
                                 clock.restore();
-                                sinon.assert.called(<sinon.SinonSpy>om.getOmidBridge().sendQueuedEvents);
                                 sinon.assert.called(<sinon.SinonSpy>om.impression);
                                 sinon.assert.called(<sinon.SinonSpy>om.loaded);
                                 sinon.assert.calledWith(<sinon.SinonSpy>om.geometryChange, { height: 768, width: 1280 }, {

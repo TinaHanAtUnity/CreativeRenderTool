@@ -1,4 +1,19 @@
-# Pending
+# Fri Oct 11 11:48:55 UTC 2019
+
+* Age-gate: Update Chinese translation [#11598](https://github.com/Applifier/unity-ads-webview/pull/11598)
+
+# Thu Oct 10 21:19:20 UTC 2019
+
+* Create and Inject Automated Experiment Manager in Performance Ad [#11533](https://github.com/Applifier/unity-ads-webview/pull/11533)
+* Open Measurement - Enable OM for Admob [#11563](https://github.com/Applifier/unity-ads-webview/pull/11563)
+* Add Initialization Stages Timing and Batched PTS Events [#11562](https://github.com/Applifier/unity-ads-webview/pull/11562)
+
+# Wed Oct  9 19:29:21 UTC 2019
+
+* Add Additional Tags to Metrics for Zynga WWF Titles [#11564](https://github.com/Applifier/unity-ads-webview/pull/11564)
+* Open Measurement - Fix Event Queue Using UUIDs [#11334](https://github.com/Applifier/unity-ads-webview/pull/11334)
+
+# Tue Oct  8 23:34:26 UTC 2019
 
 * Add Automated Experiment Manager [#11390](https://github.com/Applifier/unity-ads-webview/pull/11390)
 * Add Age Gate Related Diagnostics [#11531](https://github.com/Applifier/unity-ads-webview/pull/11531)
