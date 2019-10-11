@@ -560,7 +560,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             return;
         }
 
-        if (hidden === false) {
+        if (!hidden) {
             this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic).catch();
             this.clearMraidCustomCloseTimeout();
             this.setCloseVisibility(this._closeElement, true);
