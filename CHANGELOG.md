@@ -1,4 +1,4 @@
-# Pending
+# Fri Oct 11 23:01:15 UTC 2019
 
 * Fix privacy template [#11591](https://github.com/Applifier/unity-ads-webview/pull/11591)
 * Experiment ABGroup 17: Load API - Refresh Filled Comet Placement on the Start of Any Campaign [#11594](https://github.com/Applifier/unity-ads-webview/pull/11594)
