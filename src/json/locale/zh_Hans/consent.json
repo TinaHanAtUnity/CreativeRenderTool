@@ -54,8 +54,8 @@
 
   "disagree": "Disagree",
 
-  "age-gate-title": "在你开始之前, 确认你的年龄",
-  "age-gate-text": "请确认你的年龄组，这样我们可以在保护你的隐私和安全的同时给你提供最好的有可能的游戏体验",
-  "age-gate-over-age-limit-btn": "我{0}岁或者更年长",
-  "age-gate-under-age-limit-btn": "我{0}岁或者更年轻"
+  "age-gate-title": "在开始之前, 请确认您的年龄",
+  "age-gate-text": "请确认您的年龄组，以便我们可以保护您的隐私和安全，同时尽可能给您提供最好的游戏体验",
+  "age-gate-over-age-limit-btn": "{0}周岁及以上",
+  "age-gate-under-age-limit-btn": "{0}周岁及以下"
 }
