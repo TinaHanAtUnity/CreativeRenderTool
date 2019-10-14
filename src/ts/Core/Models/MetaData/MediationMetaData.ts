@@ -52,7 +52,8 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
         return {
             'mediationName': this.getName(),
             'mediationVersion': this.getVersion(),
+            'mediationAdapterVersion': this.getAdapterVersion(),
             'mediationOrdinal': this.getOrdinal()
         };
-    }
+}
 }
