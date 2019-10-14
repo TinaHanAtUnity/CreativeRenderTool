@@ -4,7 +4,7 @@
         <span class="title centered-title"><%= data.t("privacy-dialog-title") %></span>
 
         <% if(!data.isGDPREnabled) { %>
-        <span class="not-gdpr">
+        <div class="not-gdpr">
             <div class="privacy-text">
                 <% if(data.isCoppaCompliant) { %>
                 <p>
@@ -54,7 +54,7 @@
             </div>
         </div>
         <% } else if(data.isUserUnderAgeLimit) { %>
-        <span class="under-age-limit">
+        <div class="under-age-limit">
             <p>
                 <%= data.t("privacy-dialog-text-failed-age-gate-p1") %>
             </p>
@@ -76,7 +76,7 @@
             </p>
         </div>
         <% } else { %>
-        <span class="gdpr">
+        <div class="gdpr">
             <p>
                 <%= data.t("privacy-dialog-text-li-p1") %>
             </p>
@@ -164,8 +164,8 @@
                 </span>
             </p>
         </div>
+        <% } %>
     </div>
-    <% } %>
     <div class="pop-up-content build-side">
         <% for (var k in data.buildInformation) { %>
         <p class="build-information-item">

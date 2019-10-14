@@ -56,6 +56,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('Vast VideoEventHandlersTest', () => {
 
@@ -395,6 +396,7 @@ describe('Performance VideoEventHandlersTest', () => {
             targetGameName: performanceCampaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
+        const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
         performanceAdUnitParameters = {
             platform,
@@ -420,7 +422,8 @@ describe('Performance VideoEventHandlersTest', () => {
             privacy: privacy,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            automatedExperimentManager: automatedExperimentManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
