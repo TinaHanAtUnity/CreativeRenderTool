@@ -8,8 +8,7 @@ import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { Placement, PlacementState } from 'Ads/Models/Placement';
+import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -31,7 +30,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
 describe('PerPlacementLoadManagerV3', () => {
     let deviceInfo: DeviceInfo;
@@ -190,127 +188,6 @@ describe('PerPlacementLoadManagerV3', () => {
             adUnit.onFinish.trigger();
 
             sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
-        });
-    });
-
-    describe('refreshReadyPerformanceCampaigns', () => {
-        let sandbox: sinon.SinonSandbox;
-        let loadCampaignStub: sinon.SinonStub;
-
-        let premiumPlacement: Placement;
-        let videoPlacement: Placement;
-        let mraidPlacement: Placement;
-
-        let cometCampaign: Campaign;
-        let programmaticMRAIDCampaign: Campaign;
-        let displayInterstitialCampaign: Campaign;
-
-        let trackingUrls: ICampaignTrackingUrls;
-
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
-
-            cometCampaign = TestFixtures.getCampaign();
-            displayInterstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
-            programmaticMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
-
-            premiumPlacement = adsConfig.getPlacement('premium');
-            videoPlacement = adsConfig.getPlacement('video');
-            mraidPlacement = adsConfig.getPlacement('mraid');
-
-            // Default to a Ready Performance Campaign
-            premiumPlacement.setCurrentCampaign(cometCampaign);
-            premiumPlacement.setState(PlacementState.READY);
-
-            videoPlacement.setCurrentCampaign(cometCampaign);
-            videoPlacement.setState(PlacementState.READY);
-
-            // Default to a Ready Programmatic Campaign
-            mraidPlacement.setCurrentCampaign(displayInterstitialCampaign);
-            mraidPlacement.setState(PlacementState.READY);
-
-            trackingUrls = {
-                test: ['http://example.com/tracking/url']
-            };
-
-            // Default to return Programmatic MRAID Campaign
-            loadCampaignStub.returns(Promise.resolve({
-                campaign: programmaticMRAIDCampaign,
-                trackingUrls: trackingUrls
-            }));
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        it('should refresh both performance campaigns and not invalidate programmatic campaign', () => {
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                sinon.assert.calledTwice(loadCampaignStub);
-
-                sinon.assert.calledWith(loadCampaignStub, videoPlacement);
-                sinon.assert.calledWith(loadCampaignStub, premiumPlacement);
-
-                assert.equal(premiumPlacement.getState(), PlacementState.READY);
-                assert.equal(premiumPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
-                assert.equal(premiumPlacement.getCurrentTrackingUrls(), trackingUrls);
-
-                assert.equal(videoPlacement.getState(), PlacementState.READY);
-                assert.equal(videoPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
-                assert.equal(premiumPlacement.getCurrentTrackingUrls(), trackingUrls);
-
-                assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
-            });
-        });
-
-        [
-            PlacementState.DISABLED,
-            PlacementState.NOT_AVAILABLE,
-            PlacementState.NO_FILL,
-            PlacementState.WAITING
-        ].forEach((state) => {
-            it(`should not refresh premium placement with state ${PlacementState[state]}`, () => {
-                premiumPlacement.setState(state);
-                premiumPlacement.setCurrentCampaign(undefined);
-
-                return loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                    sinon.assert.calledOnce(loadCampaignStub);
-
-                    sinon.assert.calledWith(loadCampaignStub, videoPlacement);
-
-                    assert.equal(premiumPlacement.getState(), state);
-                    assert.isUndefined(premiumPlacement.getCurrentCampaign());
-                    assert.isUndefined(premiumPlacement.getCurrentTrackingUrls());
-
-                    assert.equal(videoPlacement.getState(), PlacementState.READY);
-                    assert.equal(videoPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
-
-                    assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                    assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
-                });
-            });
-        });
-
-        it('should not refresh both performance campaigns and not invalidate programmatic campaign', () => {
-            loadCampaignStub.returns(Promise.resolve(undefined));
-
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
-                sinon.assert.calledTwice(loadCampaignStub);
-
-                sinon.assert.calledWith(loadCampaignStub, premiumPlacement);
-                sinon.assert.calledWith(loadCampaignStub, videoPlacement);
-
-                assert.equal(premiumPlacement.getState(), PlacementState.NO_FILL);
-                assert.isUndefined(premiumPlacement.getCurrentCampaign());
-
-                assert.equal(videoPlacement.getState(), PlacementState.NO_FILL);
-                assert.isUndefined(videoPlacement.getCurrentCampaign());
-
-                assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
-            });
         });
     });
 });
