@@ -27,8 +27,13 @@ export class ConfigManager {
         ConfigManager.AbGroup = abGroup;
     }
 
+    public static setCountry(country: string) {
+        ConfigManager.Country = country;
+    }
+
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: ABGroup | undefined;
+    private static Country: string | undefined;
 
     private _platform: Platform;
     private _core: ICoreApi;
@@ -146,6 +151,12 @@ export class ConfigManager {
 
         if (adapter) {
             url = Url.addParameters(url, adapter.getDTO());
+        }
+
+        if (ConfigManager.Country !== undefined) {
+            url = Url.addParameters(url, {
+                force_country: ConfigManager.Country
+            });
         }
 
         return url;

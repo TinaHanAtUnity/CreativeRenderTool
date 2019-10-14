@@ -12,6 +12,7 @@ import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('PromoEventsTest', () => {
 
@@ -25,6 +26,7 @@ describe('PromoEventsTest', () => {
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let clientInfo: ClientInfo;
+    let privacySDK: PrivacySDK;
 
     beforeEach(() => {
         coreConfig = sinon.createStubInstance(CoreConfiguration);
@@ -32,8 +34,9 @@ describe('PromoEventsTest', () => {
         (<sinon.SinonStub>coreConfig.getToken).returns('unit-test-gamer-token');
 
         adsConfig = sinon.createStubInstance(AdsConfiguration);
-        (<sinon.SinonStub>adsConfig.isOptOutEnabled).returns(true);
-        (<sinon.SinonStub>adsConfig.isGDPREnabled).returns(true);
+        privacySDK = sinon.createStubInstance(PrivacySDK);
+        (<sinon.SinonStub>privacySDK.isOptOutEnabled).returns(true);
+        (<sinon.SinonStub>privacySDK.isGDPREnabled).returns(true);
 
         platform = Platform.IOS;
         backend = TestFixtures.getBackend(platform);
@@ -56,7 +59,7 @@ describe('PromoEventsTest', () => {
         (<sinon.SinonStub>analyticsStorage.getSessionId).resolves(1);
         (<sinon.SinonStub>analyticsStorage.getUserId).resolves('fake-user-id');
 
-        promoEvents = new PromoEvents(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, analyticsStorage);
+        promoEvents = new PromoEvents(platform, core, coreConfig, privacySDK, clientInfo, deviceInfo, analyticsStorage);
     });
 
     describe('getAppStoreFromReceipt', () => {

@@ -48,6 +48,7 @@ import { IChinaApi } from 'China/IChina';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -103,6 +104,7 @@ describe('EndScreenEventHandlerTest', () => {
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
             privacySDK = sinon.createStubInstance(PrivacySDK);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -117,7 +119,8 @@ describe('EndScreenEventHandlerTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: privacyManager
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -125,7 +128,6 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(core.Android!.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, false, false);
             const endScreenParams: IEndScreenParameters = {
                 platform,
@@ -151,6 +153,7 @@ describe('EndScreenEventHandlerTest', () => {
             };
             overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
             performanceAdUnitParameters = {
                 platform,
@@ -176,7 +179,8 @@ describe('EndScreenEventHandlerTest', () => {
                 privacy: privacy,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmticTrackingService,
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                automatedExperimentManager: automatedExperimentManager
             };
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
@@ -970,6 +974,7 @@ describe('EndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getIosDeviceInfo(core);
             thirdPartyEventManager = new ThirdPartyEventManager(core, request);
             sessionManager = new SessionManager(core, request, storageBridge);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -993,12 +998,12 @@ describe('EndScreenEventHandlerTest', () => {
                 storageBridge: storageBridge,
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                userPrivacyManager: privacyManager
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
@@ -1023,6 +1028,7 @@ describe('EndScreenEventHandlerTest', () => {
             };
             overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
             performanceAdUnitParameters = {
                 platform,
@@ -1048,7 +1054,8 @@ describe('EndScreenEventHandlerTest', () => {
                 privacy: privacy,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                automatedExperimentManager: automatedExperimentManager
             };
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);

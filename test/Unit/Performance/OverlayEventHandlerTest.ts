@@ -40,6 +40,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -93,6 +94,7 @@ describe('OverlayEventHandlerTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
         privacySDK = sinon.createStubInstance(PrivacySDK);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -107,11 +109,11 @@ describe('OverlayEventHandlerTest', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: privacyManager
         });
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         video = new Video('', TestFixtures.getSession());
-        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, campaign, privacyManager, false, false);
         const endScreenParams: IEndScreenParameters = {
             platform,
@@ -139,6 +141,7 @@ describe('OverlayEventHandlerTest', () => {
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
         performanceAdUnitParameters = {
             platform,
@@ -164,7 +167,8 @@ describe('OverlayEventHandlerTest', () => {
             privacy: privacy,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            automatedExperimentManager: automatedExperimentManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);

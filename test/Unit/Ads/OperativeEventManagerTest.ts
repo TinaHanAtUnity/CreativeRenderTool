@@ -32,6 +32,7 @@ import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEven
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 describe('OperativeEventManagerTest', () => {
     let platform: Platform;
@@ -70,6 +71,7 @@ describe('OperativeEventManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const configJson = JSON.parse(ConfigurationJson);
         privacySDK = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
+        const userPrivacyManager = new UserPrivacyManager(platform, core, TestFixtures.getCoreConfiguration(), TestFixtures.getAdsConfiguration(), clientInfo, deviceInfo, request, privacySDK);
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
@@ -87,7 +89,8 @@ describe('OperativeEventManagerTest', () => {
             storageBridge: storageBridge,
             campaign: campaign,
             playerMetadataServerId: 'test-gamerSid',
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            userPrivacyManager: userPrivacyManager
         };
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
     });

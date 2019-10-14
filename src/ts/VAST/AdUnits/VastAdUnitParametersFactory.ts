@@ -11,7 +11,14 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
-        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams));
+        let showPrivacyDuringVideo = true;
+
+        // hide privacy icon for China
+        if (baseParams.adsConfig.getHidePrivacy()) {
+            showPrivacyDuringVideo = false;
+        }
+
+        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams), showPrivacyDuringVideo);
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -24,7 +31,8 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: baseParams.campaign,
                 clientInfo: baseParams.clientInfo,
-                country: baseParams.coreConfig.getCountry()
+                country: baseParams.coreConfig.getCountry(),
+                hidePrivacy: baseParams.adsConfig.getHidePrivacy()
             };
 
             vastEndScreen = new VastEndScreen(baseParams.platform, vastEndscreenParameters, baseParams.privacy);

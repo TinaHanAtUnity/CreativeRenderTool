@@ -123,7 +123,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isZyngaWordsWithFriends', () => {
+    describe('isZyngaDealGame', () => {
         const tests: {
             gameId: string;
             expected: boolean;
@@ -131,145 +131,34 @@ describe('CustomFeatures', () => {
             gameId: '2895988', // WWF
             expected: true
         }, {
+            gameId: '2988494',
+            expected: true // Zynga solitaire
+        }, {
             gameId: 'scott',
             expected: false
         }];
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isZyngaWordsWithFriends(t.gameId);
+                const value = CustomFeatures.isZyngaDealGame(t.gameId);
                 assert.equal(value, t.expected);
             });
         });
     });
 
-    describe('isWhiteListedForLoadApi', () => {
+    describe('isWhitelistedForLoadApi', () => {
         const tests: {
             gameId: string;
             expected: boolean;
         }[] = [{
-            gameId: '2988495',
+            gameId: '2924747',
             expected: true
         }, {
-            gameId: '2988494',
-            expected: true
-        }, {
-            gameId: '2988443',
-            expected: true
-        }, {
-            gameId: '3054609',
-            expected: true
-        }, {
-            gameId: '3054608',
-            expected: true
-        }, {
-            gameId: '3238965',
-            expected: true
-        }, {
-            gameId: '3238964',
-            expected: true
-        }, {
-            gameId: '3238970',
-            expected: true
-        }, {
-            gameId: '3238971',
-            expected: true
-        }, {
-            gameId: '3238972',
-            expected: true
-        }, {
-            gameId: '3238973',
-            expected: true
-        }, {
-            gameId: '0001111',
-            expected: false
-        }, {
-            gameId: '',
+            gameId: '292474799999',
             expected: false
         }, {
             gameId: 'scott',
             expected: false
-        }, {
-            gameId: '1793545',
-            expected: true
-        }, {
-            gameId: '1793539',
-            expected: true
-        }, {
-            gameId: '3239343',
-            expected: true
-        }, {
-            gameId: '3239342',
-            expected: true
-        }, {
-            gameId: '3095066',
-            expected: true
-        }, {
-            gameId: '3095067',
-            expected: true
-        }, {
-            gameId: '2988442',
-            expected: true
-        }, {
-            gameId: '3248965',
-            expected: true
-        }, {
-            gameId: '3248964',
-            expected: true
-        }, {
-            gameId: '3248964',
-            expected: true
-        }, {
-            gameId: '1580822',
-            expected: true
-        }, {
-            gameId: '1047242',
-            expected: true
-        }, {
-            gameId: '1047241',
-            expected: true
-        }, {
-            gameId: '3131831',
-            expected: true
-        }, {
-            gameId: '3131830',
-            expected: true
-        }, {
-            gameId: '3089601',
-            expected: true
-        }, {
-            gameId: '3089600',
-            expected: true
-        }, {
-            gameId: '3112525',
-            expected: true
-        }, {
-            gameId: '3112524',
-            expected: true
-        }, {
-            gameId: '108057',
-            expected: true
-        }, {
-            gameId: '105361',
-            expected: true
-        }, {
-            gameId: '20721',
-            expected: true
-        }, {
-            gameId: '20723',
-            expected: true
-        }, {
-            gameId: '112873',
-            expected: true
-        }, {
-            gameId: '113115',
-            expected: true
-        }, {
-            gameId: '2784703',
-            expected: true
-        }, {
-            gameId: '3179966',
-            expected: true
         }];
 
         tests.forEach(t => {

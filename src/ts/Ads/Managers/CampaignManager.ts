@@ -47,11 +47,12 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -120,8 +121,10 @@ export class CampaignManager {
     private _auctionProtocol: AuctionProtocol;
     private _pts: ProgrammaticTrackingService;
     private _isLoadEnabled: boolean = false;
+    private _userPrivacyManager: UserPrivacyManager;
+    private _auctionRequestStart: number;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -139,6 +142,7 @@ export class CampaignManager {
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._pts = core.ProgrammaticTrackingService;
         this._privacy = privacySDK;
+        this._userPrivacyManager = userPrivacyManager;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -174,6 +178,7 @@ export class CampaignManager {
                     });
                 }
                 const headers: [string, string][] = [];
+                this._auctionRequestStart = Date.now();
                 return this._request.post(requestUrl, body, headers, {
                     retries: 2,
                     retryDelay: 10000,
@@ -181,6 +186,7 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
+                this._pts.batchEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
@@ -196,6 +202,9 @@ export class CampaignManager {
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
+                if (!PurchasingUtilities.isCatalogAvailable() && PurchasingUtilities.configurationIncludesPromoPlacement()) {
+                    PurchasingUtilities.refreshCatalog();
+                }
                 this._requesting = false;
             }).catch((error) => {
                 this._requesting = false;
@@ -872,7 +881,8 @@ export class CampaignManager {
             timeZone: this._deviceInfo.getTimeZone(),
             simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
             token: this._coreConfig.getToken(),
-            legalFramework: this._adsConfig.isGDPREnabled() ? 'gdpr' : 'default'
+            legalFramework: this._privacy.getLegalFramework(),
+            agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
         };
 
         if (this.getPreviousPlacementId()) {
@@ -963,9 +973,9 @@ export class CampaignManager {
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
                 body.gameSessionCounters = gameSessionCounters;
-                body.gdprEnabled = this._adsConfig.isGDPREnabled();
-                body.optOutEnabled = this._adsConfig.isOptOutEnabled();
-                body.optOutRecorded = this._adsConfig.isOptOutRecorded();
+                body.gdprEnabled = this._privacy.isGDPREnabled();
+                body.optOutEnabled = this._privacy.isOptOutEnabled();
+                body.optOutRecorded = this._privacy.isOptOutRecorded();
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
                 body.isLoadEnabled = this._isLoadEnabled;

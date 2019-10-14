@@ -3,7 +3,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
@@ -75,7 +75,7 @@ export interface IAnalyticsTransactionEventV1 {
 }
 
 export class AnalyticsProtocol {
-    public static getCommonObject(platform: Platform, adsAnalyticsSessionId: string, analyticsUserId: string, analyticsSessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, adsConfiguration: AdsConfiguration): IAnalyticsCommonObjectV1 {
+    public static getCommonObject(platform: Platform, adsAnalyticsSessionId: string, analyticsUserId: string, analyticsSessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, privacySDK: PrivacySDK): IAnalyticsCommonObjectV1 {
         const limitAdTracking: boolean = deviceInfo.getLimitAdTracking() ? true : false;
         const maybeOrganizationId = configuration.getOrganizationId();
         const organizationId: string = maybeOrganizationId ? maybeOrganizationId : '';
@@ -92,9 +92,9 @@ export class AnalyticsProtocol {
                 limitAdTracking: limitAdTracking,
                 coppaFlagged: configuration.isCoppaCompliant(),
                 projectId: configuration.getUnityProjectId(),
-                gdprEnabled: adsConfiguration.isGDPREnabled(),
-                optOutRecorded: adsConfiguration.isOptOutRecorded(),
-                optOutEnabled: adsConfiguration.isOptOutEnabled()
+                gdprEnabled: privacySDK.isGDPREnabled(),
+                optOutRecorded: privacySDK.isOptOutRecorded(),
+                optOutEnabled: privacySDK.isOptOutEnabled()
             }
         };
     }

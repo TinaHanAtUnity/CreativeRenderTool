@@ -52,5 +52,10 @@
   "privacy-settings-build-info": "Informations de version",
   "privacy-settings-close": "Retour",
 
-  "disagree": "Non merci"
+  "disagree": "Non merci",
+
+  "age-gate-title": "Before you get started, verify your age",
+  "age-gate-text": "Please confirm your age group so we can offer you the best possible in-game experience while protecting your privacy and safety",
+  "age-gate-over-age-limit-btn": "I'm {0} or older",
+  "age-gate-under-age-limit-btn": "I'm {0} or younger"
 }

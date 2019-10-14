@@ -27,6 +27,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -49,7 +50,7 @@ describe('GDPREventHandlerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
-        privacySDK = sinon.createStubInstance(PrivacySDK);
+        privacySDK = TestFixtures.getPrivacySDK(core);
         adUnitParameters = {
             platform,
             core,
@@ -68,13 +69,14 @@ describe('GDPREventHandlerTest', () => {
             adsConfig: TestFixtures.getAdsConfiguration(),
             request: sinon.createStubInstance(RequestManager),
             options: {},
-            endScreen: sinon.createStubInstance(PerformanceEndScreen),
+        endScreen: sinon.createStubInstance(PerformanceEndScreen),
             overlay: sinon.createStubInstance(VideoOverlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(Privacy),
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
@@ -82,20 +84,21 @@ describe('GDPREventHandlerTest', () => {
     });
 
     describe('When calling onGDPRPopupSkipped', () => {
+        let setOptPutRecordedStub: sinon.SinonSpy;
         beforeEach(() => {
-            adUnitParameters.adsConfig.set('optOutRecorded', false);
-            sinon.spy(adUnitParameters.adsConfig, 'setOptOutRecorded');
+            adUnitParameters.privacySDK.setOptOutRecorded(false);
+            setOptPutRecordedStub = sinon.spy(adUnitParameters.privacySDK, 'setOptOutRecorded');
         });
 
         it('should send GDPR skip event', () => {
             gdprEventHandler.onGDPRPopupSkipped();
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.adsConfig.setOptOutRecorded, true);
+            sinon.assert.calledWith(setOptPutRecordedStub, true);
             sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, GDPREventAction.SKIP);
         });
 
         it('GDPR skip event should not be sent', () => {
-            adUnitParameters.adsConfig.set('optOutRecorded', true);
+            adUnitParameters.privacySDK.setOptOutRecorded(true);
             gdprEventHandler.onGDPRPopupSkipped();
 
             sinon.assert.notCalled(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent);
