@@ -85,6 +85,12 @@ export class CampaignRefreshManager extends RefreshManager {
             this._focusManager.onScreenOn.subscribe(() => this.onScreenOn());
             this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
         }
+        this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
+            Object.keys(placements).forEach((placementId) => {
+                const count = placements[placementId];
+                this.loadPlacement(placementId, count);
+            });
+        });
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -167,6 +173,26 @@ export class CampaignRefreshManager extends RefreshManager {
         }
         for (const placementId of placementIds) {
             this.sendPlacementStateChanges(placementId);
+        }
+    }
+
+    private loadPlacement(placementId: string, count: number) {
+
+        const placement = this._adsConfig.getPlacement(placementId);
+        const currentState = placement.getState();
+        this.setPlacementState(placementId, PlacementState.WAITING);
+        switch (currentState) {
+            case PlacementState.READY:
+                this.setPlacementState(placementId, PlacementState.READY);
+                SdkStats.sendReadyEvent(placementId);
+            case PlacementState.NO_FILL: 
+                this.setPlacementState(placementId, PlacementState.NO_FILL);
+            case PlacementState.NOT_AVAILABLE:
+                this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
+            case PlacementState.DISABLED:
+                this.setPlacementState(placementId, PlacementState.DISABLED);
+            default:
+                this.setPlacementState(placementId, PlacementState.WAITING);
         }
     }
 
