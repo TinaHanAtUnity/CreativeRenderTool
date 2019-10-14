@@ -31,11 +31,10 @@ export class PerPlacementLoadManagerV3 extends PerPlacementLoadManagerWithCometR
         super.setCurrentAdUnit(adUnit, placement);
     }
 
-    private attemptPeformanceRefresh(): Promise<void[]> {
+    private attemptPeformanceRefresh(): void {
         if (this._shouldRefresh) {
             this._shouldRefresh = false;
-            return this.refreshReadyPerformanceCampaigns();
+            this.refreshReadyPerformanceCampaigns();
         }
-        return Promise.resolve([]);
     }
 }
