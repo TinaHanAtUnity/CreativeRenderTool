@@ -1,3 +1,8 @@
+# Pending
+
+* Align Zynga Solitaire with WWF Testing and Remove Extra PTS Tracking [#11646](https://github.com/Applifier/unity-ads-webview/pull/11646)
+* Remove privacy sanitation events [#11559](https://github.com/Applifier/unity-ads-webview/pull/11559)
+
 # Fri Oct 11 23:01:15 UTC 2019
 
 * Fix privacy template [#11591](https://github.com/Applifier/unity-ads-webview/pull/11591)
