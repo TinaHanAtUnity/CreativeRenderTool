@@ -213,7 +213,6 @@ describe('PerPlacementLoadManagerTest', () => {
 
                 sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
-                //todo:
                 sinon.assert.calledWith(sendReadyEventStub, placementId);
                 sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
             });
@@ -330,7 +329,6 @@ describe('PerPlacementLoadManagerTest', () => {
         it('should overwrite the placement state to ready', () => {
             loadManager.setPlacementState(placementID, PlacementState.READY);
             assert.isFalse(placement.getPlacementStateChanged(), 'placement state should not be unchanged after this point');
-            //todo:
             sandbox.assert.called((<sinon.SinonStub>ads.Listener.sendReadyEvent));
             sandbox.assert.called((<sinon.SinonStub>ads.Placement.setPlacementState));
             sandbox.assert.called((<sinon.SinonStub>ads.Listener.sendPlacementStateChangedEvent));
