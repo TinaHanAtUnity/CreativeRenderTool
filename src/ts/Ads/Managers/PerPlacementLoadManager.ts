@@ -12,8 +12,6 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class PerPlacementLoadManager extends RefreshManager {
     private _ads: IAdsApi;
@@ -24,9 +22,8 @@ export class PerPlacementLoadManager extends RefreshManager {
     protected _coreConfig: CoreConfiguration;
     protected _campaignManager: CampaignManager;
     protected _pts: ProgrammaticTrackingService;
-    private _metaDataManager: MetaDataManager;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService, metaDataManager: MetaDataManager) {
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
         super();
 
         this._ads = ads;
@@ -36,7 +33,6 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
         this._pts = programmaticTrackingService;
-        this._metaDataManager = metaDataManager;
 
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
@@ -172,15 +168,7 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     private alertPlacementReadyStatus(placement: Placement) {
         if (placement && placement.getState() === PlacementState.READY) {
-            this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
-                if (mediation && mediation.getName() === 'MoPub' && mediation.getAdapterVersion() === '3.3.0.0') {
-                    return;
-                } else {
-                    this._ads.Listener.sendReadyEvent(placement.getId());
-                }
-            }).catch(() => {
-                this._ads.Listener.sendReadyEvent(placement.getId());
-            });
+            this._ads.Listener.sendReadyEvent(placement.getId());
         }
     }
 }
