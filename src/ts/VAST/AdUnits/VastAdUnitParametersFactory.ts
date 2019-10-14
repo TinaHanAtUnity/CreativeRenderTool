@@ -5,7 +5,6 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';

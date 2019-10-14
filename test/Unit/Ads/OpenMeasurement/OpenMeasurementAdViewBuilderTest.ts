@@ -264,86 +264,134 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
                 });
             });
         });
-        xdescribe('VastCampaign building vast ad view', () => {
+        describe('VastCampaign building vast ad view', () => {
             const omAdViewBuilder = initOMAdViewBuilder(TestFixtures.getCompanionStaticVastCampaign());
+
             beforeEach(() => {
                 sinon.stub(deviceInfo, 'getScreenWidth').returns('1080');
                 sinon.stub(deviceInfo, 'getScreenHeight').returns('1920');
             });
 
-            const testAdView: IAdView = {
-                percentageInView: platform === Platform.ANDROID ? 49.8888888888889 : 55.55555555555556,
-                geometry: {
-                    x: 0,
-                    y: 0,
-                    width: 300,
-                    height: 300
-                },
-                onScreenGeometry: {
-                    x: 0,
-                    y: 0,
-                    width: 300,
-                    height: 300,
-                    obstructions: [{x: 0, y: 0, width: 200, height: 200}]
-                },
-                measuringElement: true,
-                reasons: [ObstructionReasons.OBSTRUCTED],
-                containerGeometry: {
-                    x: 0,
-                    y: 0,
-                    width: platform === Platform.ANDROID ? 283 : 567,
-                    height: platform === Platform.ANDROID ? 617 : 1234
-                },
-                onScreenContainerGeometry: {
-                    x: 0,
-                    y: 0,
-                    width: platform === Platform.ANDROID ? 283 : 567,
-                    height: platform === Platform.ANDROID ? 617 : 1234,
-                    obstructions: [{x: 0, y: 0, width: 200, height: 200}]
-                }
-            };
-
             describe('backgrounded adview', () => {
-                if (platform === Platform.ANDROID) {
-                    it ('should return a backgrounded adview with backgrounded reason', () => {
-                        omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
-                        const vastadunit = sinon.createStubInstance(VastAdUnit);
-                        omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], vastadunit).then((adview) => {
-                            assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                        });
+                it ('should return a backgrounded adview with backgrounded reason', () => {
+                    const testAdView: IAdView = {
+                        percentageInView: 0,
+                        geometry: {
+                            x: 0,
+                            y: 0,
+                            width: 0,
+                            height: 0
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: 0,
+                            height: 0,
+                            obstructions: [{x: 0, y: 0, width: 567, height: 1234}]
+                        },
+                        measuringElement: true,
+                        reasons: [ObstructionReasons.BACKGROUNDED],
+                        containerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: platform === Platform.ANDROID ? 567 : 567,
+                            height: platform === Platform.ANDROID ? 1234 : 1234
+                        },
+                        onScreenContainerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: platform === Platform.ANDROID ? 567 : 567,
+                            height: platform === Platform.ANDROID ? 1234 : 1234,
+                            obstructions: [{x: 0, y: 0, width: 567, height: 1234}]
+                        }
+                    };
+
+                    const vastadunit = sinon.createStubInstance(VastAdUnit);
+                    return omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], vastadunit).then((adview) => {
+                        assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
                     });
-                }
-                if (platform === Platform.IOS) {
-                    it ('should return a backgrounded adview with backgrounded reason', () => {
-                        omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
-                        const vastadunit = sinon.createStubInstance(VastAdUnit);
-                        omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], vastadunit).then((adview) => {
-                            assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                        });
-                    });
-                }
+                });
             });
+
             describe('foregrounded adview', () => {
-                if (platform === Platform.ANDROID) {
-                    it ('should return a backgrounded adview with backgrounded reason', () => {
-                        omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
-                        const vastadunit = sinon.createStubInstance(VastAdUnit);
-                        sinon.stub(vastadunit, 'getVideoViewRectangle').returns([1, 1, 200, 200]);
-                        omAdViewBuilder.buildVastAdView([], vastadunit).then((adview) => {
-                            assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                        });
+                it ('should return a 100% foregrounded adview', () => {
+                    const testAdView: IAdView = {
+                        percentageInView: 100,
+                        geometry: {
+                            x: 0,
+                            y: 200,
+                            width: 300,
+                            height: 300
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 200,
+                            width: 300,
+                            height: 300,
+                            obstructions: []
+                        },
+                        measuringElement: true,
+                        reasons: [],
+                        containerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: platform === Platform.ANDROID ? 567 : 567,
+                            height: platform === Platform.ANDROID ? 1234 : 1234
+                        },
+                        onScreenContainerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: platform === Platform.ANDROID ? 567 : 567,
+                            height: platform === Platform.ANDROID ? 1234 : 1234,
+                            obstructions: []
+                        }
+                    };
+                    const vastadunit = sinon.createStubInstance(VastAdUnit);
+                    omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
+                    return omAdViewBuilder.buildVastAdView([], vastadunit).then((adview) => {
+                        assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
                     });
-                }
-                if (platform === Platform.IOS) {
-                    it ('should return a backgrounded adview with backgrounded reason', () => {
-                        omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
-                        const vastadunit = sinon.createStubInstance(VastAdUnit);
-                        sinon.stub(vastadunit, 'getVideoViewRectangle').returns([1, 1, 200, 200]);
-                        omAdViewBuilder.buildVastAdView([], vastadunit).then((adview) => {
-                            assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                        });
+                });
+
+                it ('should return an obstructred foregrounded adview', () => {
+                    const testAdView: IAdView = {
+                        percentageInView: 57,
+                        geometry: {
+                            x: 0,
+                            y: 200,
+                            width: 600,
+                            height: 400
+                        },
+                        onScreenGeometry: {
+                            x: 0,
+                            y: 200,
+                            width: 600,
+                            height: 400,
+                            obstructions: [{x: 0, y: 200, width: 300, height: 300}]
+                        },
+                        measuringElement: true,
+                        reasons: [ObstructionReasons.OBSTRUCTED],
+                        containerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: platform === Platform.ANDROID ? 567 : 567,
+                            height: platform === Platform.ANDROID ? 1234 : 1234
+                        },
+                        onScreenContainerGeometry: {
+                            x: 0,
+                            y: 0,
+                            width: platform === Platform.ANDROID ? 567 : 567,
+                            height: platform === Platform.ANDROID ? 1234 : 1234,
+                            obstructions: [{x: 0, y: 200, width: 300, height: 300}]
+                        }
+                    };
+                    const vastadunit = sinon.createStubInstance(VastAdUnit);
+                    const obstructionRect = OpenMeasurementUtilities.createRectangle(0, 200, 300, 300);
+                    omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 600, 400));
+                    return omAdViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], vastadunit, obstructionRect).then((adview) => {
+                        assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
                     });
-                }
+                });
             });
         });
     });
