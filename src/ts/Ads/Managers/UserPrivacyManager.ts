@@ -317,6 +317,38 @@ export class UserPrivacyManager {
         return this._ageGateChoice;
     }
 
+    // this is a hack that can be invoked before age gate is about to be shown, prevents age gate from being shown twice
+    // todo: when age gate is used outside China, this needs refactoring
+    public fixAgeGateSync(): void {
+        if (this._privacy.isAgeGateEnabled() && this._ageGateChoice !== AgeGateChoice.MISSING) {
+            if (this._ageGateChoice === AgeGateChoice.YES) {
+                this._privacy.disableAgeGate();
+                // no other actions are necessary since opt-out flow will be triggered again
+            } else if (this._ageGateChoice === AgeGateChoice.NO) {
+                this._privacy.disableAgeGate();
+
+                // negative choice means opt-out message has not been recorded and new event should be sent
+                this._privacy.setOptOutRecorded(true);
+                this._privacy.setOptOutEnabled(true);
+
+                if (this._userPrivacy) {
+                    this._userPrivacy.update({
+                        method: this._gamePrivacy.getMethod(),
+                        version: 0,
+                        permissions: {
+                            all: false,
+                            ads: false,
+                            external: false,
+                            gameExp: false
+                        }
+                    });
+                }
+
+                this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+            }
+        }
+    }
+
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
         return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
