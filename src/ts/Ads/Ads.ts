@@ -262,9 +262,9 @@ export class Ads implements IAds {
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
             if (this._loadApiEnabled && LoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService, this._core.MetaDataManager);
-            } else if (this._loadApiEnabled && !CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId()) && LoadExperimentWithCometRefreshingAfterAnyStart.isValid(this._core.Config.getAbGroup())) {
+            } else if (this._loadApiEnabled && !CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId()) && LoadExperimentWithCometRefreshingAfterAnyStart.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService, this._core.MetaDataManager);
-            } else if (this._loadApiEnabled && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId()) && ZyngaLoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
+            } else if (this._loadApiEnabled && CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId()) && ZyngaLoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService, this._core.MetaDataManager);
             } else if (this._loadApiEnabled) {
                 this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService, this._core.MetaDataManager);
@@ -662,7 +662,7 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        const isZyngaReverseABGroupLoadExperiment = !(ZyngaLoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId());
+        const isZyngaReverseABGroupLoadExperiment = !(ZyngaLoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
         const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
         if (isContainedLoadExperiment || isZyngaReverseABGroupLoadExperiment) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
