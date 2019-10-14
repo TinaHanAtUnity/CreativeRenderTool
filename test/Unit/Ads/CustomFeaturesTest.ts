@@ -132,7 +132,7 @@ describe('CustomFeatures', () => {
             expected: true
         }, {
             gameId: '2988494',
-            expected: false
+            expected: true // Zynga solitaire
         }, {
             gameId: 'scott',
             expected: false
