@@ -234,7 +234,7 @@ describe('CampaignRefreshManager', () => {
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             privacySDK = TestFixtures.getPrivacySDK(core);
             campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
         });
 
         it('get campaign should return undefined', () => {
@@ -636,7 +636,7 @@ describe('CampaignRefreshManager', () => {
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             privacySDK = TestFixtures.getPrivacySDK(core);
             campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
         });
 
         afterEach(() => {

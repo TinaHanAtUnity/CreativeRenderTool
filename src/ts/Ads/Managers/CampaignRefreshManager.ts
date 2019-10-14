@@ -26,6 +26,9 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { TimeUtils } from 'Ads/Utilities/TimeUtils';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
+import { MetaData } from 'Core/Utilities/MetaData';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
@@ -46,6 +49,7 @@ export class CampaignRefreshManager extends RefreshManager {
     private _campaignCount: number;
     private _parsingErrorCount: number;
     private _noFills: number;
+    private _metaDataManager: MetaDataManager;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -53,7 +57,7 @@ export class CampaignRefreshManager extends RefreshManager {
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager, metaDataManager: MetaDataManager) {
         super();
 
         this._platform = platform;
@@ -72,6 +76,7 @@ export class CampaignRefreshManager extends RefreshManager {
         this._campaignCount = 0;
         this._parsingErrorCount = 0;
         this._noFills = 0;
+        this._metaDataManager = metaDataManager;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign, trackingUrls) => this.onCampaign(placementId, campaign, trackingUrls));
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
@@ -85,12 +90,21 @@ export class CampaignRefreshManager extends RefreshManager {
             this._focusManager.onScreenOn.subscribe(() => this.onScreenOn());
             this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
         }
-        this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
-            Object.keys(placements).forEach((placementId) => {
-                const count = placements[placementId];
-                this.loadPlacement(placementId, count);
-            });
-        });
+
+        this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if (mediation) {
+                const mediationName = mediation.getName();
+                const mediationVersion = mediation.getVersion();
+                if (mediationName === "MoPub" && mediationVersion === "3.2.0.0") {
+                    this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
+                        Object.keys(placements).forEach((placementId) => {
+                            const count = placements[placementId];
+                            this.loadPlacement(placementId, count);
+                        });
+                    });
+                }
+            }
+        }); 
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
