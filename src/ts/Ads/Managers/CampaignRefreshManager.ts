@@ -177,22 +177,28 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string, count: number) {
-
         const placement = this._adsConfig.getPlacement(placementId);
         const currentState = placement.getState();
         this.setPlacementState(placementId, PlacementState.WAITING);
+        this.sendPlacementStateChanges(placementId);
         switch (currentState) {
             case PlacementState.READY:
                 this.setPlacementState(placementId, PlacementState.READY);
-                SdkStats.sendReadyEvent(placementId);
+                this.sendPlacementStateChanges(placementId);
+                break;
             case PlacementState.NO_FILL: 
                 this.setPlacementState(placementId, PlacementState.NO_FILL);
+                this.sendPlacementStateChanges(placementId);
+                break;
             case PlacementState.NOT_AVAILABLE:
                 this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
+                this.sendPlacementStateChanges(placementId);
+                break;
             case PlacementState.DISABLED:
                 this.setPlacementState(placementId, PlacementState.DISABLED);
+                this.sendPlacementStateChanges(placementId);
+                break;
             default:
-                this.setPlacementState(placementId, PlacementState.WAITING);
         }
     }
 
