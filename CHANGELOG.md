@@ -1,6 +1,7 @@
 # Pending
 
 * Merge 3.3.0 to master and Update Releases.txt
+* Update Reporting Advertisement Copy [#11676](https://github.com/Applifier/unity-ads-webview/pull/11676)
 
 # Tue Oct 15 17:42:45 UTC 2019
 
