@@ -1,4 +1,4 @@
-# Pending
+# Tue Oct 15 17:42:45 UTC 2019
 
 * Add PerPlacementLoadManagerV3 ABTest on Group 12 for all Load Traffic [#11649](https://github.com/Applifier/unity-ads-webview/pull/11649)
 * Align Zynga Solitaire with WWF Testing and Remove Extra PTS Tracking [#11646](https://github.com/Applifier/unity-ads-webview/pull/11646)
