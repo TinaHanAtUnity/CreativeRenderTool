@@ -13,7 +13,7 @@ while IFS= read -r release
 do
     git checkout $release
     git checkout staging/$release
-    git merge master
+    git merge master --no-commit --no-ff
     if [ "$?" -eq "1" ]; then
         git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm
         echo "Resolve merge conflicts then proceed by pressing any key."
