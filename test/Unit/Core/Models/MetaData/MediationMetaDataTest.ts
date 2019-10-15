@@ -40,7 +40,7 @@ import { StorageType } from 'Core/Native/Storage';
             });
 
             const metaDataManager = new MetaDataManager(core);
-            return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
+            return metaDataManager.fetch(MediationMetaData, true, ['name', 'version', 'adapter_version']).then(metaData => {
                 if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                     assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
