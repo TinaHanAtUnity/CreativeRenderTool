@@ -22,6 +22,7 @@ do
     else
         echo "Nothing to resolve. Continue if there is nothing to edit."
         read answer < /dev/tty
+        git add -A . && git commit -m "Merged master from script without conflict"
     fi
 done <"$releases"
 
