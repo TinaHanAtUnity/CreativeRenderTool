@@ -20,6 +20,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
@@ -76,14 +77,9 @@ export class BannerCampaignManager {
         this._userPrivacyManager = userPrivacyManager;
     }
 
-    public request(placement: Placement, nofillRetry?: boolean): Promise<Campaign> {
-        // prevent having more then one ad request in flight
-        if (this._promise) {
-            return this._promise;
-        }
-
+    public request(placement: Placement, bannerSize: IBannerDimensions, nofillRetry?: boolean): Promise<Campaign> {
         GameSessionCounters.addAdRequest();
-        const request = BannerAuctionRequest.create({
+        const request = new BannerAuctionRequest({
             platform: this._platform,
             core: this._core,
             adMobSignalFactory: this._adMobSignalFactory,
@@ -95,15 +91,15 @@ export class BannerCampaignManager {
             request: this._request,
             sessionManager: this._sessionManager,
             programmaticTrackingService: this._pts,
+            bannerSize: bannerSize,
             privacySDK: this._privacySDK,
             userPrivacyManager: this._userPrivacyManager
         });
         request.addPlacement(placement);
         request.setTimeout(3000);
 
-        this._promise = request.request()
+        return request.request()
             .then((response) => {
-                this._promise = null;
                 const nativeResponse = request.getNativeResponse();
                 if (nativeResponse) {
                     if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
@@ -114,14 +110,11 @@ export class BannerCampaignManager {
                 throw new Error('Empty campaign response');
             })
             .catch((e) => {
-                this._promise = null;
                 return this.handleError(e, 'banner_auction_request_failed');
             })
             .then((campaign) => {
                 return campaign;
             });
-
-        return this._promise;
     }
 
     public setPreviousPlacementId(id: string | undefined) {

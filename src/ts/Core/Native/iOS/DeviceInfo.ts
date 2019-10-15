@@ -3,10 +3,11 @@ import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
-import { Observable2 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
 export class IosDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable2<number, number>();
+    public readonly onMuteChanged = new Observable1<boolean>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo', ApiPackage.CORE, EventCategory.DEVICEINFO);
@@ -22,6 +23,10 @@ export class IosDeviceInfoApi extends NativeApi {
 
     public getDeviceVolume(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceVolume');
+    }
+
+    public checkIsMuted(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'checkIsMuted');
     }
 
     public getFreeSpace(): Promise<number> {
@@ -68,6 +73,9 @@ export class IosDeviceInfoApi extends NativeApi {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
                 this.onVolumeChanged.trigger(<number>parameters[0], <number>parameters[1]);
+                break;
+            case DeviceInfoEvent[DeviceInfoEvent.MUTE_STATE_RECEIVED]:
+                this.onMuteChanged.trigger(<boolean>parameters[0]);
                 break;
             default:
                 super.handleEvent(event, parameters);
