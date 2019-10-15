@@ -15,6 +15,7 @@ import { Observables } from 'Core/Utilities/Observables';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { CatalogRequest } from 'Promo/Models/CatalogRequest';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -46,14 +47,16 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private _initPromise: Promise<void>;
     private _isInitialized = false;
     private _metaDataManager: MetaDataManager;
+    private _request: RequestManager;
 
-    constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, privacySDK: PrivacySDK, clientInfo: ClientInfo, metaDataManager: MetaDataManager) {
+    constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, privacySDK: PrivacySDK, clientInfo: ClientInfo, metaDataManager: MetaDataManager, request: RequestManager) {
         this._core = core;
         this._promo = promo;
         this._privacySDK = privacySDK;
         this._coreConfiguration = coreConfiguration;
         this._clientInfo = clientInfo;
         this._metaDataManager = metaDataManager;
+        this._request = request;
         promo.Purchasing.onIAPSendEvent.subscribe((eventJSON) => this.handleSendIAPEvent(eventJSON));
     }
 
@@ -162,7 +165,8 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
         if (jsonPayload.type === 'CatalogUpdated') {
             return this.refreshCatalog().then((catalog) => {
-                this.sendIAPCatalog();
+                const catalogRequest = new CatalogRequest(this._clientInfo, this._coreConfiguration, this._request, catalog);
+                catalogRequest.sendCatalogPayload();
                 this.onCatalogRefreshed.trigger(catalog);
             });
         } else {
@@ -170,14 +174,6 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         }
     }
 
-    private sendIAPCatalog(): Promise<void> {
-        return this.refreshCatalog().then((catalog) => {
-            const catalogRequest = new CatalogRequest(this._core, this._clientInfo, this._coreConfiguration, catalog);
-            catalogRequest.sendCatalogPayload()
-                .catch(() => Promise.reject(this.logIssue('Catalog failed to send', 'catalog_send_failed')));
-            return Promise.resolve();
-        });
-    }
     private checkMadeWithUnity(): Promise<void> {
         return this._metaDataManager.fetch(FrameworkMetaData).then((framework) => {
             if (framework && framework.getName() === 'Unity') {
