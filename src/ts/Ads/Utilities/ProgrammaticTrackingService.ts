@@ -125,12 +125,7 @@ export class ProgrammaticTrackingService {
     }
 
     private createMetricTags(event: PTSEvent): string[] {
-        const tags = [this.createAdsSdkTag('mevt', event)];
-        if (CustomFeatures.isZyngaWordsWithFriends(this._clientInfo.getGameId())) {
-            tags.push(this.createAdsSdkTag('gid', this._clientInfo.getGameId()));
-            tags.push(this.createAdsSdkTag('plt', Platform[this._platform]));
-        }
-        return tags;
+        return [this.createAdsSdkTag('mevt', event)];
     }
 
     private createTimingTags(): string[] {
