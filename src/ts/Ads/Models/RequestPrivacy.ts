@@ -35,7 +35,7 @@ export class RequestPrivacyFactory {
                 method: gamePrivacy.getMethod(),
                 firstRequest: true,
                 permissions: {}
-            };
+            };1
         }
         return {
             method: userPrivacy.getMethod(),

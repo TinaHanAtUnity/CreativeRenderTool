@@ -123,19 +123,17 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, layout? : ConsentPage): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage, agreedToAll: boolean = false): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
+        const firstRequest = !this._userPrivacy.isRecorded();
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
             return Promise.resolve();
         }
 
-        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
-            return Promise.resolve();
-        }
-
         if (source === GDPREventSource.NO_REVIEW) {
-            permissions = { all : true };
+            permissions = {ads: true, gameExp: true, external: true};
+            agreedToAll = true;
         }
 
         const updatedPrivacy = {
@@ -149,7 +147,7 @@ export class UserPrivacyManager {
         }
 
         this._userPrivacy.update(updatedPrivacy);
-        return this.sendUnityConsentEvent(permissions, source, layout);
+        return this.sendPrivacyEvent(permissions, source, action, layout, agreedToAll, firstRequest);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -184,21 +182,23 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse> {
+    private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', agreedAll: boolean, firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
-            'v': 1,
+            'v': 2,
             adid: this._deviceInfo.getAdvertisingIdentifier(),
             group: this._coreConfig.getAbGroup(),
             layout: layout,
-            action: GDPREventAction.CONSENT,
+            action: action,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),
             country: this._coreConfig.getCountry(),
             gameId: this._clientInfo.getGameId(),
             source: source,
-            method: PrivacyMethod.UNITY_CONSENT,
-            version: this._gamePrivacy.getVersion(),
+            method: this._gamePrivacy.getMethod(),
+            agreedVersion: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
+            firstRequest: firstRequest,
+            agreedAll: agreedAll,
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),

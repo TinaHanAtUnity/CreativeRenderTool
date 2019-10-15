@@ -1,8 +1,8 @@
-import { AgeGateChoice, GDPREventAction, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { PrivacyMethod } from 'Privacy/Privacy';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
+import {GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
+import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import {PrivacyMethod} from 'Privacy/Privacy';
+import {PrivacySDK} from 'Privacy/PrivacySDK';
 
 export interface IGDPREventHandler {
     onGDPRPopupSkipped(): void;
@@ -26,18 +26,7 @@ export abstract class GDPREventHandler implements IGDPREventHandler {
         if (!this._privacySDK.isOptOutRecorded()) {
             this._privacySDK.setOptOutRecorded(true);
             // todo: add age gate choice
-            this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
-            const userPrivacy = this._privacySDK.getUserPrivacy();
-            if (userPrivacy) {
-                userPrivacy.update({
-                    method: PrivacyMethod.LEGITIMATE_INTEREST,
-                    version: 0,
-                    permissions: {
-                        all: false,
-                        ads: true,
-                        external: false,
-                        gameExp: false}});
-            }
+            this._privacyManager.updateUserPrivacy({ads: true, external: false, gameExp: false}, GDPREventSource.NO_REVIEW, GDPREventAction.SKIP);
         }
     }
 }

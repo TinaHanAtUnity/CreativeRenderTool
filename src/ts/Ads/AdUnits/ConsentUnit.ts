@@ -169,7 +169,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 ads: false,
                 external: false
             };
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE, false);
         } else {
             this._privacySDK.setOptOutRecorded(true);
             this._privacySDK.setOptOutEnabled(true);
@@ -190,7 +190,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 });
             }
 
-            this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+            this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
         }
     }
 

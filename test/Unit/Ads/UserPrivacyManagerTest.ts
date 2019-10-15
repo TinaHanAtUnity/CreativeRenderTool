@@ -668,8 +668,8 @@ describe('UserPrivacyManagerTest', () => {
         });
 
         describe('when updating user privacy', () => {
-            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
-                return privacyManager.updateUserPrivacy(permissions, source, layout).then(() => {
+            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage, agreeToAll: boolean = false): Promise<any> {
+                return privacyManager.updateUserPrivacy(permissions, source, layout, agreeToAll).then(() => {
                     sinon.assert.calledTwice(httpKafkaStub); // First one is temporary diagnostics
                     return httpKafkaStub.secondCall.args[2];
                 });
@@ -711,6 +711,10 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.permissions, expectedPermissions);
                     assert.equal(eventData.group, expectedAbGroup);
                     assert.equal(eventData.layout, '');
+                    assert.equal(eventData.firstRequest, true);
+                    assert.equal(eventData.agreedAll, false);
+                    assert.equal(eventData.v, 2);
+                    assert.equal(eventData.agreedVersion, gamePrivacy.getVersion());
                 });
             });
 
