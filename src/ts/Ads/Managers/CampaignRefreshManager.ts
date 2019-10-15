@@ -94,8 +94,8 @@ export class CampaignRefreshManager extends RefreshManager {
         this._metaDataManager.fetch(MediationMetaData).then((mediation) => {
             if (mediation) {
                 const mediationName = mediation.getName();
-                const mediationVersion = mediation.getVersion();
-                if (mediationName === "MoPub" && mediationVersion === "3.2.0.0") {
+                const mediationAdapterVersion = mediation.getAdapterVersion();
+                if (mediationName === 'replaceThisMediationNameWhenLive' && mediationAdapterVersion === 'replaceThisVersionWhenLive') {
                     this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
                         Object.keys(placements).forEach((placementId) => {
                             const count = placements[placementId];
@@ -104,7 +104,7 @@ export class CampaignRefreshManager extends RefreshManager {
                     });
                 }
             }
-        }); 
+        });
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -200,16 +200,12 @@ export class CampaignRefreshManager extends RefreshManager {
                 this.setPlacementState(placementId, PlacementState.READY);
                 this.sendPlacementStateChanges(placementId);
                 break;
-            case PlacementState.NO_FILL: 
+            case PlacementState.NO_FILL:
                 this.setPlacementState(placementId, PlacementState.NO_FILL);
                 this.sendPlacementStateChanges(placementId);
                 break;
             case PlacementState.NOT_AVAILABLE:
                 this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
-                this.sendPlacementStateChanges(placementId);
-                break;
-            case PlacementState.DISABLED:
-                this.setPlacementState(placementId, PlacementState.DISABLED);
                 this.sendPlacementStateChanges(placementId);
                 break;
             default:
