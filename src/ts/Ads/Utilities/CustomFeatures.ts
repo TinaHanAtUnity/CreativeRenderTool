@@ -102,9 +102,10 @@ export class CustomFeatures {
     /**
      * Returns true for the 3.1/3.2 Load Whitelist for the 90/10 Reverse Load AB Test
      */
-    public static isZyngaWordsWithFriends(gameId: string): boolean {
+    public static isZyngaDealGame(gameId: string): boolean {
         const wordsWithFriends = ['2895988', '2895998', '2796593', '2895987', '2896000', '2796594'];
-        return this.existsInList(wordsWithFriends, gameId);
+        const zyngaSolitaire = ['2988442', '2988443', '2988494', '2988495'];
+        return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
     }
 
     /**

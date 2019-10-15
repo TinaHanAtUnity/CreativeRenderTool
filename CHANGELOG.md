@@ -1,3 +1,19 @@
+# Pending
+
+* Align Zynga Solitaire with WWF Testing and Remove Extra PTS Tracking [#11646](https://github.com/Applifier/unity-ads-webview/pull/11646)
+* Remove privacy sanitation events [#11559](https://github.com/Applifier/unity-ads-webview/pull/11559)
+
+# Fri Oct 11 23:01:15 UTC 2019
+
+* Fix privacy template [#11591](https://github.com/Applifier/unity-ads-webview/pull/11591)
+* Experiment ABGroup 17: Load API - Refresh Filled Comet Placement on the Start of Any Campaign [#11594](https://github.com/Applifier/unity-ads-webview/pull/11594)
+* Add Comet Refresh to Zynga WWF Titles on Groups 13 and 14 [#11622](https://github.com/Applifier/unity-ads-webview/pull/11622)
+
+# Fri Oct 11 11:48:55 UTC 2019
+
+* Age-gate: Update Chinese translation [#11598](https://github.com/Applifier/unity-ads-webview/pull/11598)
+* Test prints out differently for Safari vs Chrome [#11596](https://github.com/Applifier/unity-ads-webview/pull/11596)
+
 # Thu Oct 10 21:19:20 UTC 2019
 
 * Create and Inject Automated Experiment Manager in Performance Ad [#11533](https://github.com/Applifier/unity-ads-webview/pull/11533)
