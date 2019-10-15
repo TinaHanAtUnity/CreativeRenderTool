@@ -37,7 +37,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { Banners } from 'Banners/Banners';
+import { BannerModule } from 'Banners/BannerModule';
 import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -122,7 +122,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
 
-    public Banners: Banners;
+    public BannerModule: BannerModule;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
@@ -187,7 +187,7 @@ export class Ads implements IAds {
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
         }).then(() => {
-             return this.setupLoadApiEnabled();
+            return this.setupLoadApiEnabled();
         }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
@@ -210,7 +210,7 @@ export class Ads implements IAds {
                 }
             }
 
-            this.Banners = new Banners(this._core, this);
+            this.BannerModule = new BannerModule(this._core, this);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
@@ -412,23 +412,6 @@ export class Ads implements IAds {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
-    }
-
-    public showBanner(placementId: string, callback: INativeCallback) {
-        callback(CallbackStatus.OK);
-
-        const context = this.Banners.BannerAdContext;
-        context.load(placementId).catch((e) => {
-            this.Banners.PlacementManager.sendBannersReady();
-            this._core.Api.Sdk.logWarning(`Could not show banner due to ${e.message}`);
-        });
-    }
-
-    public hideBanner(callback: INativeCallback) {
-        callback(CallbackStatus.OK);
-
-        const context = this.Banners.BannerAdContext;
-        context.hide();
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {

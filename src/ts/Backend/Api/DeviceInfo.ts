@@ -67,6 +67,10 @@ export class DeviceInfo extends BackendApi {
         this._manufacturer = value;
     }
 
+    public setDisplayMetricDensity(value: number) {
+        this._displayMetricDensity = value;
+    }
+
     public setScreenDensity(value: number) {
         this._screenDensity = value;
     }
@@ -279,6 +283,10 @@ export class DeviceInfo extends BackendApi {
         return this._manufacturer;
     }
 
+    public getDisplayMetricDensity() {
+        return this._displayMetricDensity;
+    }
+
     public getScreenDensity() {
         return this._screenDensity;
     }
@@ -459,6 +467,10 @@ export class DeviceInfo extends BackendApi {
         return this._adbEnabled;
     }
 
+    public isMadeWithUnity() {
+        return this._isMadeWithUnity;
+    }
+
     private _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
     private _limitAdTrackingFlag: boolean = true;
     private _osVersion: string = '10.1.1';
@@ -473,6 +485,7 @@ export class DeviceInfo extends BackendApi {
     private _apiLevel: number = 23;
     private _totalSpace: number = 13162172;
     private _manufacturer: string = 'Apple';
+    private _displayMetricDensity: number = 1;
     private _screenDensity: number = 480;
     private _screenLayout: number = 268435794;
     private _connectionType: string = 'wifi';
@@ -515,6 +528,7 @@ export class DeviceInfo extends BackendApi {
     private _adbEnabled = false;
     private _deviceId: string;
     private _imei: string;
+    private _isMadeWithUnity: false;
 
     private getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {

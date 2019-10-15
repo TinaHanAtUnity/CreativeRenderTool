@@ -1,4 +1,4 @@
-import { BannerViewType } from 'Banners/Native/Banner';
+import { BannerViewType } from 'Banners/Native/BannerApi';
 
 /**
  * IBannerAdUnit defines the lifecycle for a BannerAdUnit.
@@ -26,9 +26,4 @@ export interface IBannerAdUnit {
      * banner's lifecycle.
      */
     onHide(): Promise<void>;
-
-    /**
-     * Returns a list of views that this banner will use.
-     */
-    getViews(): BannerViewType[];
 }
