@@ -14,7 +14,6 @@ const JsonStringArrayParser = (gameIdJson: string): string[] => {
     }
     return gameIds;
 };
-
 const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
 const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
 const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
