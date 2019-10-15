@@ -172,7 +172,9 @@ describe('PerPlacementLoadManagerV3', () => {
         it('should call refreshReadyPerformanceCampaign onClose', () => {
             placement.setCurrentCampaign(TestFixtures.getCampaign());
             loadManager.setCurrentAdUnit(adUnit, placement);
+
             adUnit.onClose.trigger();
+
             sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
         });
 
@@ -183,11 +185,24 @@ describe('PerPlacementLoadManagerV3', () => {
             (<any>adUnit).isCached = (() => { return true; });
 
             adUnit.onStartProcessed.trigger();
+
             clock.tick(5001);
+
             adUnit.onClose.trigger();
             adUnit.onFinish.trigger();
 
             sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+        });
+
+        it('should not call refreshReadyPerformanceCampaign once since 5 seconds have not passed since it was triggered', () => {
+            placement.setCurrentCampaign(TestFixtures.getCampaign());
+            loadManager.setCurrentAdUnit(adUnit, placement);
+
+            (<any>adUnit).isCached = (() => { return true; });
+
+            adUnit.onStartProcessed.trigger();
+
+            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
         });
     });
 });
