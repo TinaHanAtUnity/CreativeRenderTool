@@ -195,8 +195,8 @@ export class Privacy extends AbstractPrivacy {
         const reportButtonText = 'Report Ad ⚑';
         const privacyButtonText = 'Privacy info 👁';
         const buildButtonText = 'Build info ⚙';
-        const confirmText = 'Confirm';
-        const closeText = 'Close';
+        const confirmText = this._localization.translate('privacy-dialog-button-confirm');
+        const closeText = this._localization.translate('privacy-dialog-button-close');
 
         switch (this._currentState) {
             // Privacy screen showing

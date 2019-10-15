@@ -43,5 +43,8 @@
   "privacy-dialog-text-coppa-china-p1": "此广告由Unity Ads广告提供。这个游戏开发者已经启用隐私控制，说明这个应用程序会被13周岁以下的儿童使用。因此，我们仅会通过相关数据（例如您正在玩的游戏）来向您展示广告。",
   "privacy-dialog-text-coppa-china-p2-1": "请查看我们的",
   "privacy-dialog-text-coppa-china-p2-2": "隐私条款",
-  "privacy-dialog-text-coppa-china-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。"
+  "privacy-dialog-text-coppa-china-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。",
+
+  "privacy-dialog-button-confirm": "确认",
+  "privacy-dialog-button-close": "关闭"
 }
