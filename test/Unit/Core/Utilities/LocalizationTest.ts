@@ -157,7 +157,7 @@ describe('LocalizationTest', () => {
         });
 
         it('ZH Hans. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
-            const expectedTranslation = '改变你的隐私选择';
+            const expectedTranslation = '更改您的隐私选项';
             assert.equal(new Localization('zh', 'privacy').translate(id), expectedTranslation, 'Localization zh did not map to correct language');
             assert.equal(new Localization('zh_CN', 'privacy').translate(id), expectedTranslation, 'Localization zh_CN did not map to correct language');
             assert.equal(new Localization('zh_Hans', 'privacy').translate(id), expectedTranslation, 'Localization zh_Hans did not map to correct language');
