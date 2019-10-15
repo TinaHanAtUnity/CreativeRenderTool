@@ -48,6 +48,7 @@ export interface IAuctionResponse {
     isMoatEnabled: boolean | undefined;
     statusCode: number | undefined;
     isOMEnabled: boolean | undefined;
+    allowMRAIDCustomClose: boolean;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -75,7 +76,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             height: ['number', 'undefined'],
             isMoatEnabled: ['boolean', 'undefined'],
             statusCode: ['number', 'undefined'],
-            isOMEnabled: ['boolean', 'undefined']
+            isOMEnabled: ['boolean', 'undefined'],
+            allowMRAIDCustomClose: ['boolean']
         });
 
         this.set('placements', placements);
@@ -100,6 +102,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('isMoatEnabled', data.isMoatEnabled);
         this.set('statusCode', statusCode);
         this.set('isOMEnabled', data.isOMEnabled);
+        this.set('allowMRAIDCustomClose', data.allowMRAIDCustomClose || false);
     }
 
     public getPlacements(): AuctionPlacement[] {
@@ -194,6 +197,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('isOMEnabled');
     }
 
+    public getAllowMRAIDCustomClose(): boolean {
+        return this.get('allowMRAIDCustomClose');
+    }
+
     public getDTO(): {[key: string]: unknown } {
         return {
             'placements': this.getPlacements(),
@@ -209,7 +216,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'appSubCategory': this.getSubCategory(),
             'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking(),
             'buyerId': this.getBuyerId(),
-            'mediaId': this.getMediaId()
+            'mediaId': this.getMediaId(),
+            'allowMRAIDCustomClose': this.getAllowMRAIDCustomClose()
         };
     }
 }

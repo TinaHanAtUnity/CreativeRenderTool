@@ -554,8 +554,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     public onUseCustomClose(hidden: boolean) {
         this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseCalled).catch();
 
-        const seatId = this._campaign.getSeatId();
-        if (seatId === undefined || !CustomFeatures.seatAllowedMRAIDCustomClose(seatId)) {
+        if (!this._campaign.getAllowCustomClose()) {
             this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseRefused).catch();
             return;
         }
