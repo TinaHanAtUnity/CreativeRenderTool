@@ -59,6 +59,7 @@ import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { IARApi } from 'AR/AR';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -127,6 +128,7 @@ describe('CampaignRefreshManager', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
     let campaignRefreshManager: RefreshManager;
+    let loadManager: CampaignRefreshManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<Campaign>;
@@ -688,6 +690,91 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.WAITING);
+            });
+        });
+    });
+
+    describe('should handle onLoad', () => {
+        let placement: Placement;
+        let placementID: string;
+        let sandbox: sinon.SinonSandbox;
+        let sendReadyEventStub: sinon.SinonStub;
+        let sendPlacementStateChangedEventStub: sinon.SinonStub;
+
+        beforeEach(() => {
+            placementID = 'premium';
+            placement = adsConfig.getPlacement(placementID);
+            placement.setState(PlacementState.NOT_AVAILABLE);
+            sandbox = sinon.createSandbox();
+            sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
+            sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        describe('for targeted mediation and adapter version', () => {
+            beforeEach(() => {
+                backend.Api.Storage.setStorageContents(<any>{
+                    mediation: {
+                        name: {value: 'replaceThisMediationNameWhenLive'},
+                        version: {value: 'test_version'},
+                        adapter_version: {value: 'replaceThisVersionWhenLive'}
+                    }
+                });
+                return metaDataManager.fetch(MediationMetaData, true, ['name', 'version', 'adapter_version']).then(metaData => {
+                    if (metaData) {
+                        assert.equal(metaData.getName(), 'replaceThisMediationNameWhenLive', 'MediationMetaData.getName() did not pass through correctly');
+                        assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
+                        assert.equal(metaData.getAdapterVersion(), 'replaceThisVersionWhenLive', 'MediationMetaData.getAdapterVersion() did not pass through correctly');
+                    }
+                }).then(() => {
+                    loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
+                });
+            });
+
+            it('should update state for READY state', () => {
+                placement.setState(PlacementState.READY);
+                assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
+
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementID] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
+
+                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
+                sinon.assert.calledWith(sendReadyEventStub, placementID);
+                assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
+                assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be waiting');
+            });
+
+            it('should update state for NO_FILL', () => {
+                placement.setState(PlacementState.NO_FILL);
+
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementID] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
+
+                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
+                sinon.assert.notCalled(sendReadyEventStub);
+                assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
+                assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement previous state should be waiting');
+            });
+        });
+
+        describe('not targeted mediation and adapter version', () => {
+            it('should not update the placement state', () => {
+                loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
+                placement.setState(PlacementState.READY);
+
+                const loadDict: {[key: string]: number} = {};
+                loadDict[placementID] = 1;
+                ads.LoadApi.onLoad.trigger(loadDict);
+
+                sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+                sinon.assert.notCalled(sendReadyEventStub);
+                assert.equal(placement.getPreviousState(), PlacementState.NOT_AVAILABLE, 'placement previous state should be not availalbe');
+                assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be ready as no change');
             });
         });
     });
