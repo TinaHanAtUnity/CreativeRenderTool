@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IViewPort, IRectangle, ObstructionReasons, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IViewPort, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class OpenMeasurementUtilities {
 
@@ -14,8 +14,36 @@ export class OpenMeasurementUtilities {
         return 0;
     }
 
-    public static getAndroidViewSize(size: number, density: number): number {
+    /**
+     * Used only for sdk 3.2 and below OMID certification
+     * Converts html/css generated values to scale with device size based on estimate
+     * @param size px size to convert
+     * @param density old android density value
+     */
+    public static convertDpToPixels(size: number, density: number): number {
         return size * (density / 160);
+    }
+
+    /**
+     * Will be calculated properly for sdk 3.3+ - output original px in 3.2
+     * Converts pixels from native to estimated DPs using native magic number
+     * @param px size to convert
+     * @param deviceInfo deviceinfo
+     * @param platform Android/IOS
+     */
+    public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
+        // TODO: Use GetMetricDensity from 3.3 for this calculation
+        return px;
+    }
+
+    /**
+     * Used to convert android screenview to dp for admob to
+     * enable OM geometry change on all sdk versions
+     * @param px pixel size of value
+     * @param deviceInfo deviceinfo
+     */
+    public static pxToDpAdmobScreenView(px: number, deviceInfo: DeviceInfo): number {
+        return Math.trunc((px / (<AndroidDeviceInfo>deviceInfo).getScreenDensity()) * 160);
     }
 
     public static createRectangle(x: number, y: number, width: number, height: number): IRectangle {
@@ -98,85 +126,7 @@ export class OpenMeasurementUtilities {
         return adjustedObstruction;
     }
 
-    public static VideoViewRectangle: IRectangle | undefined;
-    // TODO: Double check this
-    public static campaign: Campaign;
-
-    /**
-     * All AdViews will assume fullscreen interstitial video
-     * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
-     */
-    public static calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[], videoView?: IRectangle): IAdView {
-
-        let topLeftX = 0;
-        let topLeftY = 0;
-        let videoWidth = 0;
-        let videoHeight = 0;
-
-        // For integrations SDK 3.2.0+ and Admob
-        if (this.VideoViewRectangle) {
-            topLeftX = this.VideoViewRectangle.x;
-            topLeftY = this.VideoViewRectangle.y;
-            videoWidth = this.VideoViewRectangle.width;
-            videoHeight = this.VideoViewRectangle.height;
-        } else {
-            // For integrations less than SDK 3.2.0 -> For partial om cert if needed
-            topLeftX = 0;
-            topLeftY = OpenMeasurementUtilities.estimateAdViewTopLeftYPostition(videoHeight, screenWidth, screenHeight);
-            videoWidth = OpenMeasurementUtilities.calculateAdViewVideoWidth(screenWidth, screenHeight, this.campaign);
-            videoHeight = OpenMeasurementUtilities.calculateAdViewVideoHeight(screenWidth, screenHeight, this.campaign);
-        }
-
-        if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
-            topLeftX = 0;
-            topLeftY = 0;
-            videoWidth = 0;
-            videoHeight = 0;
-        }
-
-        const adView: IAdView = {
-            percentageInView: percentInView,
-            geometry: {
-                x: topLeftX,
-                y: topLeftY,
-                width: videoWidth,
-                height: videoHeight
-            },
-            onScreenGeometry: {
-                x: topLeftX,
-                y: topLeftY,
-                width: videoWidth,
-                height: videoHeight,
-                obstructions: obstructionRectangles
-            },
-            measuringElement: measuringElementAvailable,
-            reasons: obstructionReasons
-        };
-
-        /*
-        * Only provided if both the native-layer ad view and web-layer
-        * ad element exist and are available for measurement
-        */
-        if (measuringElementAvailable) {
-            adView.containerGeometry = {
-                x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight
-            };
-            adView.onScreenContainerGeometry = {
-                x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight,
-                obstructions: obstructionRectangles
-            };
-        }
-
-        return adView;
-    }
-
-    private static calculateAdViewVideoWidth(screenWidth: number, screenHeight: number, campaign: Campaign) {
+    public static calculateAdViewVideoWidth(screenWidth: number, screenHeight: number, campaign: Campaign) {
         let videoWidth = screenWidth;
 
         const isLandscape = screenWidth > screenHeight;
@@ -196,7 +146,7 @@ export class OpenMeasurementUtilities {
         return videoWidth;
     }
 
-    private static calculateAdViewVideoHeight(screenWidth: number, screenHeight: number, campaign: Campaign) {
+    public static calculateAdViewVideoHeight(screenWidth: number, screenHeight: number, campaign: Campaign) {
         let videoHeight = screenHeight;
 
         const isLandscape = screenWidth > screenHeight;
@@ -216,7 +166,7 @@ export class OpenMeasurementUtilities {
         return videoHeight;
     }
 
-    private static estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
+    public static estimateAdViewTopLeftYPostition(videoHeight: number, screenWidth: number, screenHeight: number) {
         let topLeftY = 0;
 
         const isLandscape = screenWidth > screenHeight;

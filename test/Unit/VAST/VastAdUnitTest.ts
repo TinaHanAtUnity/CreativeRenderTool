@@ -36,6 +36,8 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 describe('VastAdUnitTest', () => {
 
@@ -56,7 +58,7 @@ describe('VastAdUnitTest', () => {
     let vastCampaign: VastCampaign;
     let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
     let coreConfig: CoreConfiguration;
-    let openMeasurement: VastOpenMeasurementController;
+    let omController: VastOpenMeasurementController | undefined;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -147,7 +149,13 @@ describe('VastAdUnitTest', () => {
         const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        openMeasurement = sinon.createStubInstance(VastOpenMeasurementController);
+        const omInstance = sinon.createStubInstance(OpenMeasurement);
+        const omViewBuilder = new OpenMeasurementAdViewBuilder(vastCampaign, deviceInfo, platform);
+        const vastOMController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+        sandbox.stub(vastOMController, 'geometryChange');
+        sandbox.stub(vastOMController, 'resume');
+        sandbox.stub(vastOMController, 'pause');
+        sandbox.stub(vastOMController, 'removeFromViewHieararchy');
 
         vastAdUnitParameters = {
             platform,
@@ -173,11 +181,12 @@ describe('VastAdUnitTest', () => {
             video: video,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            om: openMeasurement,
+            om: vastOMController,
             privacySDK: privacySDK
         };
 
         vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+        omController = vastAdUnitParameters.om;
     });
 
     afterEach(() => {
@@ -345,19 +354,18 @@ describe('VastAdUnitTest', () => {
             return new Promise((resolve, reject) => {
                 setTimeout(resolve, 500);
             }).then(() => {
-                sinon.assert.called(<sinon.SinonSpy>openMeasurement.removeFromViewHieararchy);
+                sinon.assert.called(<sinon.SinonSpy>omController!.removeFromViewHieararchy);
             });
         });
     });
 
-    // TODO: Better stubs for viewport and adview
     describe('viewability', () => {
         describe('onContainerBackground', () => {
             it('should fire open measurement pause', () => {
                 vastAdUnit.setShowing(true);
                 sinon.stub(vastAdUnit, 'canShowVideo').returns(true);
                 vastAdUnit.onContainerBackground();
-                sinon.assert.called(<sinon.SinonSpy>openMeasurement.pause);
+                sinon.assert.called(<sinon.SinonSpy>omController!.pause);
             });
         });
         describe('onContainerForeground', () => {
@@ -365,7 +373,7 @@ describe('VastAdUnitTest', () => {
                 vastAdUnit.setShowing(true);
                 sinon.stub(vastAdUnit, 'canShowVideo').returns(true);
                 vastAdUnit.onContainerForeground();
-                sinon.assert.called(<sinon.SinonSpy>openMeasurement.resume);
+                sinon.assert.called(<sinon.SinonSpy>omController!.resume);
             });
         });
     });
