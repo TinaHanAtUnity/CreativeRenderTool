@@ -101,7 +101,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             userPrivacyManager: privacyManager
         });
 
-        const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+        const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const endScreenParams: IEndScreenParameters = {
             platform,
             core,

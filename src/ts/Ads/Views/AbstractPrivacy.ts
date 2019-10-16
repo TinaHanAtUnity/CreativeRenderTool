@@ -9,7 +9,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { FinishState } from 'Core/Constants/FinishState';
 import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Observables } from 'Core/Utilities/Observables';
 
@@ -65,7 +65,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
             'buildInformation': AbstractPrivacy.buildInformation,
-            'isUserUnderAgeLimit': privacyManager.isUserUnderAgeLimit()
+            'isUserUnderAgeLimit': privacyManager.isUserUnderAgeLimit(),
+            'isCoppaAndChina': (isCoppaCompliant && (privacyManager.getLegalFramework() === LegalFramework.TC260))
         };
     }
 

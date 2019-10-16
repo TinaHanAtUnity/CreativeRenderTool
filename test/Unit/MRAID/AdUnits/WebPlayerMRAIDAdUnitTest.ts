@@ -122,7 +122,7 @@ describe('WebPlayerMraidAdUnit', () => {
             options: {},
             mraid: mraidView,
             endScreen: undefined,
-            privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
+            privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false, 'en'),
             privacyManager: userPrivacyManager,
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             webPlayerContainer: webPlayerContainer,
