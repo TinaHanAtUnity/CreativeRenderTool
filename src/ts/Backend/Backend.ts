@@ -29,6 +29,7 @@ import { Download } from 'Backend/Api/Download';
 import { BannerListener } from 'Backend/Api/BannerListener';
 import { AndroidStore } from 'Backend/Api/AndroidStore';
 import { Products } from 'Backend/Api/Products';
+import { BannerBackendApi } from 'Backend/Api/Banner';
 
 interface IInvocation {
     className: string;
@@ -67,6 +68,7 @@ interface IBackendApi {
     VideoPlayer: VideoPlayer;
     Download: Download;
     BannerListener: BannerListener;
+    Banner: BannerBackendApi;
 }
 
 export class Backend implements IWebViewBridge {
@@ -106,7 +108,8 @@ export class Backend implements IWebViewBridge {
             UrlScheme: new UrlScheme(this),
             VideoPlayer: new VideoPlayer(this),
             Download: new Download(this),
-            BannerListener: new BannerListener(this)
+            BannerListener: new BannerListener(this),
+            Banner: new BannerBackendApi(this)
         };
     }
 

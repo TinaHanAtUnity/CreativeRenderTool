@@ -123,7 +123,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isZyngaWordsWithFriends', () => {
+    describe('isZyngaDealGame', () => {
         const tests: {
             gameId: string;
             expected: boolean;
@@ -131,13 +131,16 @@ describe('CustomFeatures', () => {
             gameId: '2895988', // WWF
             expected: true
         }, {
+            gameId: '2988494',
+            expected: true // Zynga solitaire
+        }, {
             gameId: 'scott',
             expected: false
         }];
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isZyngaWordsWithFriends(t.gameId);
+                const value = CustomFeatures.isZyngaDealGame(t.gameId);
                 assert.equal(value, t.expected);
             });
         });

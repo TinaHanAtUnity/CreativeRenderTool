@@ -14,6 +14,18 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 3.3.0
+
+* Removed destroy from banner API class.
+* Removed setViewFrame from banner API class.
+* Removed setBannerFrame from banner API class.
+* Removed setViews from banner API class.
+* Removed BannerEvents.BannerAttachedStateEvent handling from banner API class.
+* Added BannerEvents.BannerLoadPlacement handling to banner API class.
+* Added BannerEvents.BannerDestroyBanner handling to banner API class.
+* Added setRefreshRate to banner API class.
+* Added getDisplayMetricDensity to Android DeviceInfo API class.
+
 ## 3.0.0
 
 * Added MonetizationListener API class.
