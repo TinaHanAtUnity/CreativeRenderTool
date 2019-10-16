@@ -64,10 +64,6 @@ export class PrivacySDK {
         return this._ageGateLimit;
     }
 
-    public disableAgeGate(): void {
-        this._ageGateLimit = 0;
-    }
-
     public getLegalFramework(): LegalFramework {
         return this._legalFramework;
     }

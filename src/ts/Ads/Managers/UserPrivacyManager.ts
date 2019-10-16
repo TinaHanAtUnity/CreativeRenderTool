@@ -119,7 +119,24 @@ export class UserPrivacyManager {
         }
 
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
+            if (this._privacy.isAgeGateEnabled()) {
+                Diagnostics.trigger('age_gate_httpkafka_success', {
+                    action: action,
+                    legalFramework: this._privacy.getLegalFramework(),
+                    method: this._gamePrivacy.getMethod(),
+                    previousChoice: this._ageGateChoice
+                });
+            }
             return Promise.resolve();
+        }).catch(() => {
+            if (this._privacy.isAgeGateEnabled()) {
+                Diagnostics.trigger('age_gate_httpkafka_failure', {
+                    action: action,
+                    legalFramework: this._privacy.getLegalFramework(),
+                    method: this._gamePrivacy.getMethod(),
+                    previousChoice: this._ageGateChoice
+                });
+            }
         });
     }
 
@@ -339,6 +356,18 @@ export class UserPrivacyManager {
             }
 
             this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+
+            Diagnostics.trigger('age_gate_desync_no', {
+                legalFramework: this._privacy.getLegalFramework(),
+                method: this._gamePrivacy.getMethod(),
+                previousChoice: this._ageGateChoice
+            });
+        } else if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.YES) {
+            Diagnostics.trigger('age_gate_desync_yes', {
+                legalFramework: this._privacy.getLegalFramework(),
+                method: this._gamePrivacy.getMethod(),
+                previousChoice: this._ageGateChoice
+            });
         }
     }
 
