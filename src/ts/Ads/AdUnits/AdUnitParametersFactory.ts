@@ -165,7 +165,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (this._privacySDK.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
-            privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
+            privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         }
 
         const privacyEventHandlerParameters: IPrivacyEventHandlerParameters = {

@@ -102,7 +102,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 privacySDK: privacySDK,
                 userPrivacyManager: privacyManager
             });
-            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
             const video = new Video('', TestFixtures.getSession());
 
             const placement = TestFixtures.getPlacement();

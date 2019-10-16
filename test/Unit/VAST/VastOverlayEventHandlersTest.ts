@@ -82,7 +82,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             campaign = TestFixtures.getEventVastCampaign();
             clientInfo = TestFixtures.getClientInfo();
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            privacy = new Privacy(platform, campaign, privacyManager, false, false);
+            privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
 
             clientInfo = TestFixtures.getClientInfo(platform);
 
