@@ -4,7 +4,6 @@ import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
     private _userPrivacy: UserPrivacy;
-    private _testForceConsentUnit: boolean;
     private _gdprEnabled: boolean;
     private _optOutRecorded: boolean;
     private _optOutEnabled: boolean;
@@ -14,35 +13,11 @@ export class PrivacySDK {
     constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
-        this._testForceConsentUnit = false;
         this._gdprEnabled = gdprEnabled;
         this._optOutRecorded = optOutRecorded;
         this._optOutEnabled = optOutEnabled;
         this._ageGateLimit = ageGateLimit;
         this._legalFramework = legalFramework;
-    }
-
-    public isConsentShowRequired(): boolean {
-        if (this._testForceConsentUnit) {
-            return true;
-        }
-
-        if (this.isAgeGateShowRequired()) {
-            return true;
-        }
-
-        if (!this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
-            return false;
-        }
-
-        if (!this._userPrivacy.isRecorded()) {
-            return true;
-        }
-
-        const methodChangedSinceConsent = this._gamePrivacy.getMethod() !== this._userPrivacy.getMethod();
-        const versionUpdatedSinceConsent = this._gamePrivacy.getVersion() > this._userPrivacy.getVersion();
-
-        return methodChangedSinceConsent || versionUpdatedSinceConsent;
     }
 
     public getGamePrivacy(): GamePrivacy {
@@ -95,19 +70,5 @@ export class PrivacySDK {
 
     public getLegalFramework(): LegalFramework {
         return this._legalFramework;
-    }
-
-    private isAgeGateShowRequired(): boolean {
-        if (this.isAgeGateEnabled()) {
-            if (this.getGamePrivacy().getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this.isGDPREnabled() && !this.isOptOutRecorded()) {
-                return true;
-            }
-
-            if (this.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT && !this.getUserPrivacy().isRecorded()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

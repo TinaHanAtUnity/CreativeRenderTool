@@ -317,36 +317,48 @@ export class UserPrivacyManager {
         return this._ageGateChoice;
     }
 
-    // this is a hack that can be invoked before age gate is about to be shown, prevents age gate from being shown twice
-    // todo: when age gate is used outside China, this needs refactoring
+    // this is a hack that will force resync age gate opt-out settings
     public fixAgeGateSync(): void {
-        if (this._privacy.isAgeGateEnabled() && this._ageGateChoice !== AgeGateChoice.MISSING) {
-            if (this._ageGateChoice === AgeGateChoice.YES) {
-                this._privacy.disableAgeGate();
-                // no other actions are necessary since opt-out flow will be triggered again
-            } else if (this._ageGateChoice === AgeGateChoice.NO) {
-                this._privacy.disableAgeGate();
+        // if recorded choice is yes, then choice will be recorded when new ad goes through opt-out flow
+        if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.NO) {
+            // negative choice means opt-out message has not been recorded and new event should be sent
+            this._privacy.setOptOutRecorded(true);
+            this._privacy.setOptOutEnabled(true);
 
-                // negative choice means opt-out message has not been recorded and new event should be sent
-                this._privacy.setOptOutRecorded(true);
-                this._privacy.setOptOutEnabled(true);
-
-                if (this._userPrivacy) {
-                    this._userPrivacy.update({
-                        method: this._gamePrivacy.getMethod(),
-                        version: 0,
-                        permissions: {
-                            all: false,
-                            ads: false,
-                            external: false,
-                            gameExp: false
-                        }
-                    });
-                }
-
-                this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+            if (this._userPrivacy) {
+                this._userPrivacy.update({
+                    method: this._gamePrivacy.getMethod(),
+                    version: 0,
+                    permissions: {
+                        all: false,
+                        ads: false,
+                        external: false,
+                        gameExp: false
+                    }
+                });
             }
+
+            this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
         }
+    }
+
+    public isConsentShowRequired(): boolean {
+        if (this.isAgeGateShowRequired()) {
+            return true;
+        }
+
+        if (!this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return false;
+        }
+
+        if (!this._userPrivacy.isRecorded()) {
+            return true;
+        }
+
+        const methodChangedSinceConsent = this._gamePrivacy.getMethod() !== this._userPrivacy.getMethod();
+        const versionUpdatedSinceConsent = this._gamePrivacy.getVersion() > this._userPrivacy.getVersion();
+
+        return methodChangedSinceConsent || versionUpdatedSinceConsent;
     }
 
     private pushConsent(consent: boolean): Promise<void> {
@@ -456,5 +468,24 @@ export class UserPrivacyManager {
                 return this._core.Storage.write(StorageType.PRIVATE);
             });
         });
+    }
+
+    private isAgeGateShowRequired(): boolean {
+        if (this._privacy.isAgeGateEnabled()) {
+            // prevent age gate from being shown twice
+            if (this._ageGateChoice !== AgeGateChoice.MISSING) {
+                return false;
+            }
+
+            if (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this._privacy.isGDPREnabled() && !this._privacy.isOptOutRecorded()) {
+                return true;
+            }
+
+            if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT && !this._userPrivacy.isRecorded()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
