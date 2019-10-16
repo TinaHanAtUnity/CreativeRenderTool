@@ -1,30 +1,31 @@
 import DanishEndscreen from 'json/locale/da_DK/endscreen.json';
 import DanishOverlay from 'json/locale/da_DK/overlay.json';
 import GermanEndscreen from 'json/locale/de/endscreen.json';
-import GermanLoadingScreen from 'json/locale/de/loadingscreen.json';
 import GermanOverlay from 'json/locale/de/overlay.json';
 import GermanConsent from 'json/locale/de/consent.json';
+import GermanMraid from 'json/locale/de/mraid.json';
 import EnglishEndscreen from 'json/locale/en/endscreen.json';
-import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
 import EnglishConsent from 'json/locale/en/consent.json';
+import EnglishMraid from 'json/locale/en/mraid.json';
+import EnglishPrivacy from 'json/locale/en/privacy.json';
 import SpanishEndscreen from 'json/locale/es/endscreen.json';
-import SpanishLoadingScreen from 'json/locale/es/loadingscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
 import SpanishConsent from 'json/locale/es/consent.json';
+import SpanishMraid from 'json/locale/es/mraid.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
-import FinnishLoadingScreen from 'json/locale/fi/loadingscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
+import FinnishMraid from 'json/locale/fi/mraid.json';
 import FrenchEndscreen from 'json/locale/fr/endscreen.json';
-import FrenchLoadingScreen from 'json/locale/fr/loadingscreen.json';
 import FrenchOverlay from 'json/locale/fr/overlay.json';
 import FrenchConsent from 'json/locale/fr/consent.json';
+import FrenchMraid from 'json/locale/fr/mraid.json';
 import IcelandicEndscreen from 'json/locale/is/endscreen.json';
 import IcelandicOverlay from 'json/locale/is/overlay.json';
 import ItalianEndscreen from 'json/locale/it/endscreen.json';
-import ItalianLoadingScreen from 'json/locale/it/loadingscreen.json';
 import ItalianOverlay from 'json/locale/it/overlay.json';
 import ItalianConsent from 'json/locale/it/consent.json';
+import ItalianMraid from 'json/locale/it/mraid.json';
 import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
 import JapaneseOverlay from 'json/locale/ja/overlay.json';
 import KoreanEndscreen from 'json/locale/ko/endscreen.json';
@@ -34,24 +35,25 @@ import LithuanianOverlay from 'json/locale/lt/overlay.json';
 import NorwegianEndscreen from 'json/locale/nb/endscreen.json';
 import NorwegianOverlay from 'json/locale/nb/overlay.json';
 import PortugueseEndscreen from 'json/locale/pt/endscreen.json';
-import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 import PortugueseOverlay from 'json/locale/pt/overlay.json';
 import PortugueseConsent from 'json/locale/pt/consent.json';
+import PortugueseMraid from 'json/locale/pt/mraid.json';
 import RomanianEndscreen from 'json/locale/ro/endscreen.json';
 import RomanianOverlay from 'json/locale/ro/overlay.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
-import RussianLoadingScreen from 'json/locale/ru/loadingscreen.json';
 import RussianOverlay from 'json/locale/ru/overlay.json';
 import RussianConsent from 'json/locale/ru/consent.json';
+import RussianMraid from 'json/locale/ru/mraid.json';
 import TurkishEndscreen from 'json/locale/tr/endscreen.json';
 import TurkishOverlay from 'json/locale/tr/overlay.json';
 import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
-import ChineseSimplifiedLoadingScreen from 'json/locale/zh_Hans/loadingscreen.json';
 import ChineseSimplifiedOverlay from 'json/locale/zh_Hans/overlay.json';
 import ChineseSimplifiedConsent from 'json/locale/zh_Hans/consent.json';
+import ChineseSimplifiedMraid from 'json/locale/zh_Hans/mraid.json';
+import ChineseSimplifiedPrivacy from 'json/locale/zh_Hans/privacy.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
-import ChineseTraditionalLoadingScreen from 'json/locale/zh_Hant/loadingscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
+import ChineseTraditionalMraid from 'json/locale/zh_Hant/mraid.json';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -114,14 +116,15 @@ export class Localization {
         'en.*': {
             'endscreen': EnglishEndscreen,
             'overlay': EnglishOverlay,
-            'loadingscreen': EnglishLoadingScreen,
-            'consent': EnglishConsent
+            'consent': EnglishConsent,
+            'mraid': EnglishMraid,
+            'privacy': EnglishPrivacy
         },
         'ru.*': {
             'endscreen': RussianEndscreen,
             'overlay': RussianOverlay,
-            'loadingscreen': RussianLoadingScreen,
-            'consent': RussianConsent
+            'consent': RussianConsent,
+            'mraid': RussianMraid
         },
         'ja.*': {
             'endscreen': JapaneseEndscreen,
@@ -134,43 +137,47 @@ export class Localization {
         'it.*': {
             'endscreen': ItalianEndscreen,
             'overlay': ItalianOverlay,
-            'loadingscreen': ItalianLoadingScreen,
-            'consent': ItalianConsent
+            'consent': ItalianConsent,
+            'mraid': ItalianMraid
+
         },
         'de.*': {
             'endscreen': GermanEndscreen,
             'overlay': GermanOverlay,
-            'loadingscreen': GermanLoadingScreen,
-            'consent': GermanConsent
+            'consent': GermanConsent,
+            'mraid': GermanMraid
+
         },
         'zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$': {
             'endscreen': ChineseTraditionalEndscreen,
             'overlay': ChineseTraditionalOverlay,
-            'loadingscreen': ChineseTraditionalLoadingScreen
+            'mraid': ChineseTraditionalMraid
+
         },
         'zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$': {
             'endscreen': ChineseSimplifiedEndscreen,
             'overlay': ChineseSimplifiedOverlay,
-            'loadingscreen': ChineseSimplifiedLoadingScreen,
-            'consent': ChineseSimplifiedConsent
+            'consent': ChineseSimplifiedConsent,
+            'mraid': ChineseSimplifiedMraid,
+            'privacy': ChineseSimplifiedPrivacy
         },
         'fi.*': {
             'endscreen': FinnishEndscreen,
             'overlay': FinnishOverlay,
-            'loadingscreen': FinnishLoadingScreen
+            'mraid': FinnishMraid
         },
         'es.*': {
             'endscreen': SpanishEndscreen,
             'overlay': SpanishOverlay,
-            'loadingscreen': SpanishLoadingScreen,
-            'consent': SpanishConsent
+            'consent': SpanishConsent,
+            'mraid': SpanishMraid
 
         },
         'fr.*': {
             'endscreen': FrenchEndscreen,
             'overlay': FrenchOverlay,
-            'loadingscreen': FrenchLoadingScreen,
-            'consent': FrenchConsent
+            'consent': FrenchConsent,
+            'mraid': FrenchMraid
         },
         'tr.*': {
             'endscreen': TurkishEndscreen,
@@ -199,8 +206,8 @@ export class Localization {
         'pt.*': {
             'endscreen': PortugueseEndscreen,
             'overlay': PortugueseOverlay,
-            'loadingscreen': PortugueseLoadingScreen,
-            'consent': PortugueseConsent
+            'consent': PortugueseConsent,
+            'mraid': PortugueseMraid
         }
     };
 
@@ -228,9 +235,13 @@ export class Localization {
     }
 
     public translate(phrase: string): string {
-        const languageMap = Localization.getLanguageMap(this._language, this._namespace);
+        let languageMap = Localization.getLanguageMap(this._language, this._namespace);
         if (!languageMap || !(phrase in languageMap)) {
-            return phrase;
+            // if translation for the phrase cannot be found, use English
+            languageMap = Localization.getLanguageMap('en.*', this._namespace);
+            if (!languageMap || !(phrase in languageMap)) {
+                return phrase;
+            }
         }
         return languageMap[phrase];
     }

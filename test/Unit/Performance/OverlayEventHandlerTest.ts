@@ -114,7 +114,7 @@ describe('OverlayEventHandlerTest', () => {
         });
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         video = new Video('', TestFixtures.getSession());
-        const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+        const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const endScreenParams: IEndScreenParameters = {
             platform,
             core,

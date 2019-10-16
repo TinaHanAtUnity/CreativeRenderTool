@@ -38,7 +38,7 @@ describe('EndScreenTest', () => {
     const createEndScreen = (language: string): PerformanceEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
-        privacy = new Privacy(platform, campaign, privacyManager, false, false);
+        privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const params: IEndScreenParameters = {
             platform,
             core,
