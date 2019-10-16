@@ -1,4 +1,4 @@
-# Pending
+# Wed Oct 16 17:36:03 UTC 2019
 
 * Force age gate resync to never show age gate twice [#11648](https://github.com/Applifier/unity-ads-webview/pull/11648)
 * Chinese translation for privacy pop-up and dialog [#11505](https://github.com/Applifier/unity-ads-webview/pull/11505)
