@@ -37,7 +37,7 @@ import { IPurchasing } from 'Purchasing/IPurchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import {ClassDetectionApi} from 'Core/Native/ClassDetection';
+import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;

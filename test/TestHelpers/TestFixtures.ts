@@ -178,7 +178,7 @@ import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/Prom
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import {ClassDetectionApi} from 'Core/Native/ClassDetection';
+import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {

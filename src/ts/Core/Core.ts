@@ -50,8 +50,8 @@ import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import {MediationDetectionInfo} from 'Core/Models/MediationDetectionInfo';
-import {ClassDetectionApi} from 'Core/Native/ClassDetection';
+import { MediationDetectionInfo } from 'Core/Models/MediationDetectionInfo';
+import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 export class Core implements ICore {
 
