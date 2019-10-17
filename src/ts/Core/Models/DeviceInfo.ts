@@ -57,7 +57,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         totalMemory: ['number'],
         cpuCount: ['integer'],
         maxVolume: ['number'],
-        headset: ['boolean'],
+        headset: ['boolean']
     };
 
     protected _platform: Platform;
