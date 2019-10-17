@@ -33,19 +33,19 @@ const changeOrientation = () => {
     // it has been called.
     const internalChangeOrientation = (callCount: number = 0) => {
         // Helper function to test if window.innerWidth/window.innerHeight have been set.
-        const windowSizeReady = () : boolean => {
+        const windowSizeReady = (): boolean => {
             if (callCount > maxCallsToChangeOrientation) {
                 // We have waited too many times, allow to proceed to prevent a
-                // infinite loop. 
+                // infinite loop.
                 return true;
             }
 
             if (window.innerWidth === 0 || window.innerHeight === 0) {
                 // Some OSs will call changeOrientation with these set to 0 before
                 // the window is shown.
-                return false;   
+                return false;
             }
-            
+
             if (window.innerWidth === window.innerHeight) {
                 // Some OSs will sometimes start with innerWidth && innerHeight equal,
                 // in this case we can't determine the orientation.
@@ -53,12 +53,12 @@ const changeOrientation = () => {
             }
 
             return true;
-        }
+        };
 
         if (!windowSizeReady()) {
             // It is not yet know what orientation the window is.
             // Allow rendering engine to process before trying again.
-            setTimeout(() => {   
+            setTimeout(() => {
                 internalChangeOrientation(callCount++);
             }, 0);
             return;
