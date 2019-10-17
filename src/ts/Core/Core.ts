@@ -159,8 +159,6 @@ export class Core implements ICore {
             return Promise.all([this.DeviceInfo.fetch(), this.MediationDetectionInfo.detectMediation(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
-            this.Api.Sdk.logInfo('duanduan isMadeWithUnity: ' + this.UnityInfo.isMadeWithUnity());
-            this.Api.Sdk.logInfo('duanduan MediationDetectionInfo json is: ' + this.MediationDetectionInfo.getMediationDetectionJSON());
             this.WakeUpManager.setListenConnectivity(true);
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.FocusManager.setListenAppForeground(true);
