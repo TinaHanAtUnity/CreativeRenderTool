@@ -17,6 +17,7 @@ import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpe
 import { ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { platform } from 'os';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -30,6 +31,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;
     private _deviceInfo: DeviceInfo;
+    private _clientInfo: ClientInfo;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -46,13 +48,14 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._om = this._vastAdUnit.getOpenMeasurementController();
         this._deviceInfo = parameters.deviceInfo;
+        this._clientInfo = parameters.clientInfo;
     }
 
     public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
         if (this._om) {
 
-            if (this._platform === Platform.ANDROID) {
-                // For 3.2 Open Measurement Certification
+            // Only use for 3.2- Open Measurement Certification - remove for 3.3+
+            if (this._platform === Platform.ANDROID && this._clientInfo.getSdkVersion() === 3200) {
                 const density = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
                 x = OpenMeasurementUtilities.convertDpToPixels(x, density);
                 y = OpenMeasurementUtilities.convertDpToPixels(y, density);

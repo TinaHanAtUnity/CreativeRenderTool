@@ -363,7 +363,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            this.sessionStart();
+            // this.sessionStart();
         }
 
         return Promise.resolve();
