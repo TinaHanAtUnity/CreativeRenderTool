@@ -45,11 +45,11 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
 
             adVerifications.forEach((adverification) => {
-                // if (adverification.getVerificationVendor() === 'IAS') {
-                const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification, baseParams.programmaticTrackingService);
-                om.setOMAdViewBuilder(omAdViewBuilder);
-                omInstances.push(om);
-                // }
+                if (adverification.getVerificationVendor() === 'IAS') {
+                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification, baseParams.programmaticTrackingService);
+                    om.setOMAdViewBuilder(omAdViewBuilder);
+                    omInstances.push(om);
+                }
             });
 
             const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);

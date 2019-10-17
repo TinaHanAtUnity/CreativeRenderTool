@@ -363,7 +363,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            // this.sessionStart();
+            if (vendorKey === 'IAS') {
+                this.sessionStart();
+            }
         }
 
         return Promise.resolve();
