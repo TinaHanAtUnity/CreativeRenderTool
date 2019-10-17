@@ -35,10 +35,10 @@ export class MediationDetectionInfo extends Model<IMediationDetectionInfo> {
 
     public detectMediation(): Promise<unknown[]> {
         const promises: Promise<unknown>[] = [];
-        promises.push(this._core.ClassDetection.isClassExisted('com.unity3d.ads.UnityAds').then(result => this.set('mediationA', result)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.ClassDetection.isClassExisted('mediationBClassName').then(result => this.set('mediationB', result)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.ClassDetection.isClassExisted('mediationCClassName').then(result => this.set('mediationC', result)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.ClassDetection.isClassExisted('mediationDClassName').then(result => this.set('mediationD', result)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._core.ClassDetection.isClassPresent('com.unity3d.ads.UnityAds').then(result => this.set('mediationA', result)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._core.ClassDetection.isClassPresent('mediationBClassName').then(result => this.set('mediationB', result)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._core.ClassDetection.isClassPresent('mediationCClassName').then(result => this.set('mediationC', result)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._core.ClassDetection.isClassPresent('mediationDClassName').then(result => this.set('mediationD', result)).catch(err => this.handleDeviceInfoError(err)));
         return Promise.all(promises);
     }
 

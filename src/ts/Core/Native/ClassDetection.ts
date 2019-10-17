@@ -7,8 +7,8 @@ export class ClassDetectionApi extends NativeApi {
         super(nativeBridge, 'ClassDetection', ApiPackage.CORE);
     }
 
-    public isClassExisted(className: string): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isClassExisted', [className]);
+    public isClassPresent(className: string): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isClassPresent', [className]);
     }
 
     public isMadeWithUnity(): Promise<boolean> {
