@@ -5,6 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 export interface IUnityInfo {
     analyticsUserId: string | undefined;
     analyticsSessionId: string | undefined; // stored as a string to avoid problems with unsigned 64 bit integers going over js max safe number limit
+    isMadeWithUnity: boolean;
 }
 
 export class UnityInfo extends Model<IUnityInfo> {
@@ -18,7 +19,8 @@ export class UnityInfo extends Model<IUnityInfo> {
     constructor(platform: Platform, core: ICoreApi) {
         super('UnityInfo', {
             analyticsUserId: ['string', 'undefined'],
-            analyticsSessionId: ['string', 'undefined']
+            analyticsSessionId: ['string', 'undefined'],
+            isMadeWithUnity: ['boolean']
         });
 
         this._platform = platform;
@@ -28,6 +30,7 @@ export class UnityInfo extends Model<IUnityInfo> {
     public fetch(applicationName: string): Promise<void[]> {
         let nativeUserIdPromise: Promise<string>;
         let nativeSessionIdPromise: Promise<string>;
+        const nativeDetectUnityPromise: Promise<boolean> = this._core.ClassDetection.isMadeWithUnity();
 
         if (this._platform === Platform.IOS) {
             nativeUserIdPromise = this._core.iOS!.Preferences.getString(UnityInfo._userIdKey);
@@ -52,7 +55,9 @@ export class UnityInfo extends Model<IUnityInfo> {
             // session id not found, do nothing
         });
 
-        return Promise.all([userIdPromise, sessionIdPromise]);
+        const detectUnityPromise = nativeDetectUnityPromise.then(isMadeWithUnity => this.set('isMadeWithUnity', isMadeWithUnity)).catch(() => this.set('isMadeWithUnity', false));
+
+        return Promise.all([userIdPromise, sessionIdPromise, detectUnityPromise]);
     }
 
     public getAnalyticsUserId(): string | undefined {
@@ -61,6 +66,10 @@ export class UnityInfo extends Model<IUnityInfo> {
 
     public getAnalyticsSessionId(): string | undefined {
         return this.get('analyticsSessionId');
+    }
+
+    public isMadeWithUnity(): boolean {
+        return this.get('isMadeWithUnity');
     }
 
     public getDTO() {

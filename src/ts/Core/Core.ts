@@ -50,6 +50,8 @@ import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import {MediationDetectionInfo} from 'Core/Models/MediationDetectionInfo';
+import {ClassDetectionApi} from 'Core/Native/ClassDetection';
 
 export class Core implements ICore {
 
@@ -71,6 +73,7 @@ export class Core implements ICore {
     public DeviceIdManager: DeviceIdManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
+    public MediationDetectionInfo: MediationDetectionInfo;
     public UnityInfo: UnityInfo;
     public Config: CoreConfiguration;
 
@@ -86,6 +89,7 @@ export class Core implements ICore {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
+            ClassDetection: new ClassDetectionApi(nativeBridge),
             Listener: new ListenerApi(nativeBridge),
             Permissions: new PermissionsApi(nativeBridge),
             Request: new RequestApi(nativeBridge),
@@ -140,6 +144,7 @@ export class Core implements ICore {
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
+            this.MediationDetectionInfo = new MediationDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
 
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
@@ -151,10 +156,11 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
+            return Promise.all([this.DeviceInfo.fetch(), this.MediationDetectionInfo.detectMediation(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
-
+            this.Api.Sdk.logInfo('duanduan isMadeWithUnity: ' + this.UnityInfo.isMadeWithUnity());
+            this.Api.Sdk.logInfo('duanduan MediationDetectionInfo json is: ' + this.MediationDetectionInfo.getMediationDetectionJSON());
             this.WakeUpManager.setListenConnectivity(true);
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.FocusManager.setListenAppForeground(true);
