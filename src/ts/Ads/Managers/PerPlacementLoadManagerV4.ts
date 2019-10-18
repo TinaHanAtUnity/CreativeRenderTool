@@ -1,26 +1,38 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { Observables } from 'Core/Utilities/Observables';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
+import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV3';
+import { PlacementState } from 'Ads/Models/Placement';
+import { LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 
-export class PerPlacementLoadManagerV4 extends PerPlacementLoadManager {
+export class PerPlacementLoadManagerV4 extends PerPlacementLoadManagerV3 {
 
-    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
-        if (placement.getCurrentCampaign() instanceof PerformanceCampaign) {
-            // Only invalidate once the ad is guaranteed to be started
-            Observables.once(adUnit.onStartProcessed, () => {
-                return this.invalidatePlacements();
-            });
-        }
-        super.setCurrentAdUnit(adUnit, placement);
-    }
-
-    private invalidatePlacements() {
+    public refreshCampaigns(): Promise<void[]> {
+        const programmaticLoadCampaignPromises: Promise<void>[] = [];
         for (const placementId of this._adsConfig.getPlacementIds()) {
             const placement = this._adsConfig.getPlacement(placementId);
-            placement.setCurrentCampaign(undefined);
-            this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
+
+            if (placement && placement.getState() === PlacementState.READY) {
+
+                const campaign = placement.getCurrentCampaign();
+
+                if (campaign && campaign instanceof ProgrammaticCampaign) {
+                    this._pts.reportMetricEvent(LoadMetric.LoadProgrammaticRefreshRequest);
+                    programmaticLoadCampaignPromises.push(this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
+                        if (loadedCampaign) {
+                            // Don't update state since this is just swapping a ready campaign for a ready campaign
+                            placement.setCurrentCampaign(loadedCampaign.campaign);
+                            placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
+                            this._pts.reportMetricEvent(LoadMetric.LoadProgrammaticFill);
+                        } else {
+                            // Use previous fill on programmatic no fill
+                            this._pts.reportMetricEvent(LoadMetric.LoadProgrammaticUsedPreviousFill);
+                        }
+                    }));
+                }
+            }
         }
+        // Refresh Comet filled placements, and then Programmatic filled placements
+        return super.refreshCampaigns().then(() => {
+            return Promise.all(programmaticLoadCampaignPromises);
+        });
     }
 }
