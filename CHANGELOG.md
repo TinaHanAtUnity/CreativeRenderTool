@@ -1,5 +1,6 @@
 # Pending
 
+* Age Gate: Change background colors and increase font sizes [#11731](https://github.com/Applifier/unity-ads-webview/pull/11731)
 * Open Measurement - AdViewBuilder[#11452](https://github.com/Applifier/unity-ads-webview/pull/11452)
 
 # Wed Oct 16 17:36:03 UTC 2019
