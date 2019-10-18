@@ -1,4 +1,4 @@
-# Pending
+# Fri Oct 18 22:56:15 UTC 2019
 
 * Revert 4 animations for CTA experiments [#11702](https://github.com/Applifier/unity-ads-webview/pull/11702)
 * Age Gate: Change background colors and increase font sizes [#11731](https://github.com/Applifier/unity-ads-webview/pull/11731)
