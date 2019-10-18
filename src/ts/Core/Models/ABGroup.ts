@@ -75,3 +75,4 @@ export const LoadExperiment = new ABTest(12, 15, 16, 17); // Intentionally left 
 export const LoadExperimentWithCometRefreshing = new ABTest(15); // Intentionally duplicate ABGroup 15
 export const LoadExperimentWithCometRefreshingAfterAnyStart = new ABTest(17); // Intentionally duplicate ABGroup 16
 export const ConsentUXTest = new ABTest(18, 19);
+export const LoadRefreshV4 = new ABTest(5, 6);
