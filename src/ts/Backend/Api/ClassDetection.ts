@@ -14,6 +14,9 @@ export class ClassDetection extends BackendApi {
     }
 
     public isClassPresent(className: string) {
+        if (className === 'UnityAppController' || className === 'com.unity3d.player.UnityPlayer') {
+            return this._unityEngineRunning;
+        }
         return this._classIsPresent;
     }
 

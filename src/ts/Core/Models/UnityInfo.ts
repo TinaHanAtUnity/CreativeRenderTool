@@ -12,6 +12,8 @@ export class UnityInfo extends Model<IUnityInfo> {
     // from Unity engine Modules/UnityAnalytics/CoreStats/UnityConnectService.cpp
     private static _userIdKey = 'unity.cloud_userid';
     private static _sessionIdKey = 'unity.player_sessionid';
+    private static _iOSUnityEngineClassName = 'UnityAppController';
+    private static _AndroidUnityEngineClassName = 'com.unity3d.player.UnityPlayer';
 
     private _platform: Platform;
     private _core: ICoreApi;
@@ -30,17 +32,18 @@ export class UnityInfo extends Model<IUnityInfo> {
     public fetch(applicationName: string): Promise<void[]> {
         let nativeUserIdPromise: Promise<string>;
         let nativeSessionIdPromise: Promise<string>;
-        const nativeDetectUnityPromise: Promise<boolean> = this._core.ClassDetection.isMadeWithUnity();
+        let nativeDetectUnityPromise: Promise<boolean>;
 
         if (this._platform === Platform.IOS) {
             nativeUserIdPromise = this._core.iOS!.Preferences.getString(UnityInfo._userIdKey);
             nativeSessionIdPromise = this._core.iOS!.Preferences.getString(UnityInfo._sessionIdKey);
+            nativeDetectUnityPromise = this._core.ClassDetection.isClassPresent(UnityInfo._iOSUnityEngineClassName);
         } else {
             // from Unity engine PlatformDependent/AndroidPlayer/Source/PlayerPrefs.cpp
             const settingsFile = applicationName + '.v2.playerprefs';
-
             nativeUserIdPromise = this._core.Android!.Preferences.getString(settingsFile, UnityInfo._userIdKey);
             nativeSessionIdPromise = this._core.Android!.Preferences.getString(settingsFile, UnityInfo._sessionIdKey);
+            nativeDetectUnityPromise = this._core.ClassDetection.isClassPresent(UnityInfo._AndroidUnityEngineClassName);
         }
 
         const userIdPromise = nativeUserIdPromise.then(userId => {
@@ -55,7 +58,11 @@ export class UnityInfo extends Model<IUnityInfo> {
             // session id not found, do nothing
         });
 
-        const detectUnityPromise = nativeDetectUnityPromise.then(isMadeWithUnity => this.set('isMadeWithUnity', isMadeWithUnity)).catch(() => this.set('isMadeWithUnity', false));
+        const detectUnityPromise = nativeDetectUnityPromise.then(isMadeWithUnity => {
+            this.set('isMadeWithUnity', isMadeWithUnity);
+        }).catch(() => {
+            this.set('isMadeWithUnity', false);
+        });
 
         return Promise.all([userIdPromise, sessionIdPromise, detectUnityPromise]);
     }
