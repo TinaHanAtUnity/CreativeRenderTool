@@ -1,5 +1,6 @@
 # Pending
 
+* Revert 4 animations for CTA experiments [#11702](https://github.com/Applifier/unity-ads-webview/pull/11702)
 * Age Gate: Change background colors and increase font sizes [#11731](https://github.com/Applifier/unity-ads-webview/pull/11731)
 * Open Measurement - AdViewBuilder[#11452](https://github.com/Applifier/unity-ads-webview/pull/11452)
 
