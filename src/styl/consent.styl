@@ -18,6 +18,8 @@
   }
 
   &.agegate {
+    background: rgba(0,0,0,0.5);
+
     #age-gate {
       display: flex;
     }
@@ -134,18 +136,18 @@
 
   .title {
     font-weight: $privacy-main-title-font-weight;
-    font-size: $consent-text-font-size;
+    font-size: $consent-title-font-size;
   }
 
   .main-text {
     color: $consent-text-font-color;
-    font-weight: $privacy-text-font-weight;
-    font-size: $privacy-text-font-size;
+    font-weight: $consent-text-font-weight;
+    font-size: $consent-text-font-size;
     line-height: $default-size;
   }
 
   .empty-block {
-    height: 5.25 * $default-size;
+    height: 6.25 * $default-size;
   }
 
   .homepage-button-container {
@@ -167,12 +169,13 @@
     position: relative;
     margin-top: .5 * $default-size;
     padding: .55 * $default-size .75 * $default-size;
-    border: 1px solid $consent-border-gray;
+    border: 1px solid $consent-blue;
     border-radius: 2 * $default-size;
-    color: $consent-disagree-button-color;
+    background: $consent-blue;
+    color: $white;
     text-align: center;
     font-weight: $privacy-main-title-font-weight;
-    font-size: $privacy-heading-font-size;
+    font-size: $consent-button-font-size;
   }
 
   .consent-button {
