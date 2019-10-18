@@ -10,8 +10,4 @@ export class ClassDetectionApi extends NativeApi {
     public isClassPresent(className: string): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isClassPresent', [className]);
     }
-
-    public isMadeWithUnity(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isMadeWithUnity');
-    }
 }
