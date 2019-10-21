@@ -69,6 +69,7 @@
             var supposedCurrentTime = 0;
             var userSeeked = false;
             var hasSentStart = false;
+            var shouldMute = false;
 
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -86,6 +87,7 @@
                     return;
                 }
 
+                videoEl.muted = shouldMute;
                 videoEl.addEventListener('error', function() {
                     var error = videoEl.error;
                     self.postMessage('tracking', {
@@ -275,7 +277,11 @@
 
             this.onReceiveMuteChange = function(isMuted) {
                 var videoEl = document.querySelector('video');
-                videoEl.muted = isMuted;
+                if (videoEl) {
+                    videoEl.muted = isMuted;
+                } else {
+                    shouldMute = isMuted;
+                }
             };
 
             this.notifyRewardedVideoStart = function() {
