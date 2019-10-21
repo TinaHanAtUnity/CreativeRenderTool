@@ -7,15 +7,15 @@ import {
 import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
-import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { IPermissions, PrivacyMethod } from 'Privacy/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ICoreApi } from 'Core/ICore';
+import { ICore, ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { PrivacyView } from 'Ads/Views/Consent/PrivacyView';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IConsentUnitParameters {
@@ -24,22 +24,28 @@ export interface IConsentUnitParameters {
     privacyManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
     adsConfig: AdsConfiguration;
-    core: ICoreApi;
+    core: ICore;
+    coreApi: ICoreApi;
     deviceInfo: DeviceInfo;
     pts: ProgrammaticTrackingService;
     privacySDK: PrivacySDK;
 }
 
-export class ConsentUnit implements IConsentViewHandler, IAdUnit {
+export interface IPrivacyViewHandler {
+    onConsent(consent: IPermissions, source: GDPREventSource): void;
+}
+
+export class ConsentUnit implements IPrivacyViewHandler, IAdUnit {
     private _donePromiseResolve: () => void;
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
-    private _unityConsentView: Consent;
+    private _unityConsentView: PrivacyView;
     private readonly _platform: Platform;
     private readonly _landingPage: ConsentPage;
+    private readonly _core: ICore;
+    private readonly _coreApi: ICoreApi;
     private _privacyManager: UserPrivacyManager;
     private _adsConfig: AdsConfiguration;
-    private _core: ICoreApi;
     private _privacySDK: PrivacySDK;
 
     constructor(parameters: IConsentUnitParameters) {
@@ -48,6 +54,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
+        this._coreApi = parameters.coreApi;
         this._privacySDK = parameters.privacySDK;
 
         this._landingPage = this._privacySDK.isAgeGateEnabled() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
@@ -59,7 +66,9 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
             consentABTest: false,
-            ageGateLimit: this._privacySDK.getAgeGateLimit()
+            ageGateLimit: this._privacySDK.getAgeGateLimit(),
+            core: this._core,
+            coreApi: this._coreApi
         };
 
         if (this._platform === Platform.ANDROID) {
@@ -73,7 +82,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 osVersion: parameters.deviceInfo.getOsVersion()
             };
         }
-        this._unityConsentView = new Consent(viewParams);
+        this._unityConsentView = new PrivacyView(viewParams);
         this._unityConsentView.addEventHandler(this);
     }
 
@@ -95,7 +104,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             }
             return donePromise;
         }).catch((e: Error) => {
-            this._core.Sdk.logWarning('Error opening Consent view ' + e);
+            this._coreApi.Sdk.logWarning('##PRIVACY: Error opening Consent view ' + e);
         });
     }
 
@@ -137,7 +146,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
+        this._privacyManager.updateUserPrivacy(permissions, source);
     }
 
     // IConsentViewHandler
@@ -187,20 +196,13 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     public onAgeGateAgree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
-
-        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            // todo: handle the flow inside view class
-            this._unityConsentView.showPage(ConsentPage.HOMEPAGE);
-        } else {
-            this._unityConsentView.closeAgeGateWithAgreeAnimation();
-        }
     }
 
     public onPrivacy(url: string): void {
         if (this._platform === Platform.IOS) {
-            this._core.iOS!.UrlScheme.open(url);
+            this._coreApi.iOS!.UrlScheme.open(url);
         } else if (this._platform === Platform.ANDROID) {
-            this._core.Android!.Intent.launch({
+            this._coreApi.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });
@@ -208,16 +210,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     }
 
     private handleAutoConsent(consent: IPermissions) {
-        setTimeout(() => {
-            if (consent.hasOwnProperty('all')) {
-                this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
-                this._unityConsentView.testAutoConsentAll();
-            }
-            if (consent.hasOwnProperty('ads')) {
-                this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
-                this._unityConsentView.testAutoConsent(consent);
-            }
-        }, 3000);
+        // TODO
     }
 
     public description(): string {
