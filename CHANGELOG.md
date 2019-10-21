@@ -1,4 +1,4 @@
-# Pending
+# Mon Oct 21 21:25:14 UTC 2019
 
 * Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)
 * Mute Admob Videos Based on Auction Flag [#11732](https://github.com/Applifier/unity-ads-webview/pull/11732)
