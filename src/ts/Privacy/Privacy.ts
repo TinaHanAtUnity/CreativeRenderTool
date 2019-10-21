@@ -17,7 +17,7 @@ export interface IGranularPermissions {
     external: boolean;
 }
 
-type IUnityConsentPermissions = IAllPermissions | IGranularPermissions;
+export type IUnityConsentPermissions = IAllPermissions | IGranularPermissions;
 
 export function isUnityConsentPermissions(permissions: IPermissions): permissions is IUnityConsentPermissions {
     return (<IAllPermissions>permissions).all === true || (
