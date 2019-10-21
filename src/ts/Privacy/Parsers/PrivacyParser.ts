@@ -37,18 +37,19 @@ export class PrivacyParser {
         const optOutEnabled = sanitizedConfigJson.optOutEnabled;
         const legalFramework = sanitizedConfigJson.legalFramework ? sanitizedConfigJson.legalFramework : LegalFramework.DEFAULT;
 
-        let ageGateLimit = sanitizedConfigJson.ageGateLimit !== undefined ? sanitizedConfigJson.ageGateLimit : 0;
-        if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST) {
-            ageGateLimit = 0;
+        // NOTE: should be removed completely
+        // let ageGateLimit = sanitizedConfigJson.ageGateLimit !== undefined ? sanitizedConfigJson.ageGateLimit : 0;
+        // if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST) {
+        //     ageGateLimit = 0;
+        //
+        //     Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(sanitizedConfigJson)});
+        // }
+        //
+        // if (limitAdTracking) {
+        //     ageGateLimit = 0;
+        // }
 
-            Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(sanitizedConfigJson)});
-        }
-
-        if (limitAdTracking) {
-            ageGateLimit = 0;
-        }
-
-        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
+        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, legalFramework);
     }
 
     // For #incident-20190516-2
