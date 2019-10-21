@@ -1,3 +1,7 @@
+# Pending
+
+* Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)
+
 # Fri Oct 18 22:56:15 UTC 2019
 
 * Revert 4 animations for CTA experiments [#11702](https://github.com/Applifier/unity-ads-webview/pull/11702)
