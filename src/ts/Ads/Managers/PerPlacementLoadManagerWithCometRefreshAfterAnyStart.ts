@@ -7,7 +7,7 @@ export class PerPlacementLoadManagerWithCometRefreshAfterAnyStart extends PerPla
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         Observables.once(adUnit.onStartProcessed, () => {
-            return this.refreshReadyPerformanceCampaigns();
+            return this.refreshCampaigns();
         });
         super.setCurrentAdUnit(adUnit, placement);
     }

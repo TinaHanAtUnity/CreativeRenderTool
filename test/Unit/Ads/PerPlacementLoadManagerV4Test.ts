@@ -1,11 +1,11 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
+import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
@@ -23,7 +23,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable0 } from 'Core/Utilities/Observable';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -31,9 +30,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
-describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
+describe('PerPlacementLoadManagerV4', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
@@ -49,7 +47,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
-    let loadManager: PerPlacementLoadManagerWithCometRefreshAfterAnyStart;
+    let loadManager: PerPlacementLoadManagerV4;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
     let adMobSignalFactory: AdMobSignalFactory;
@@ -88,59 +86,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
-        loadManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
-    });
-
-    describe('setCurrentAdUnit', () => {
-        let sandbox: sinon.SinonSandbox;
-        let refreshCampaignstub: sinon.SinonStub;
-
-        let placement: Placement;
-        let adUnit: AbstractAdUnit;
-
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            refreshCampaignstub = sandbox.stub(loadManager, 'refreshCampaigns');
-            placement = adsConfig.getPlacement('premium');
-            adUnit = sandbox.createStubInstance(AbstractAdUnit);
-            (<any>adUnit).onStartProcessed = new Observable0();
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        [
-            { campaign: TestFixtures.getCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getPromoCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getPromoCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: true }
-        ].forEach(({ campaign, shouldCall }) => {
-            it(`should ${shouldCall ? '' : 'not '}call refreshCampaigns onStartProcessed when a ${campaign.getContentType()} was shown`, () => {
-                placement.setCurrentCampaign(campaign);
-                loadManager.setCurrentAdUnit(adUnit, placement);
-
-                adUnit.onStartProcessed.trigger();
-
-                sinon.assert.callCount(refreshCampaignstub, shouldCall ? 1 : 0);
-            });
-        });
-
-        it('should only call refreshReadyPerformanceCampaign once when onStartProcessed is called multiple times', () => {
-            placement.setCurrentCampaign(TestFixtures.getCampaign());
-            loadManager.setCurrentAdUnit(adUnit, placement);
-
-            adUnit.onStartProcessed.trigger();
-            adUnit.onStartProcessed.trigger();
-            adUnit.onStartProcessed.trigger();
-
-            sinon.assert.calledOnce(refreshCampaignstub);
-        });
+        loadManager = new PerPlacementLoadManagerV4(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
     });
 
     describe('refreshCampaigns', () => {
@@ -195,12 +141,13 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
             sandbox.restore();
         });
 
-        it('should refresh both performance campaigns and not invalidate programmatic campaign', () => {
+        it('should refresh both performance campaigns and programmatic campaigns', () => {
             return loadManager.refreshCampaigns().then(() => {
-                sinon.assert.calledTwice(loadCampaignStub);
+                sinon.assert.calledThrice(loadCampaignStub);
 
                 sinon.assert.calledWith(loadCampaignStub, videoPlacement);
                 sinon.assert.calledWith(loadCampaignStub, premiumPlacement);
+                sinon.assert.calledWith(loadCampaignStub, mraidPlacement);
 
                 assert.equal(premiumPlacement.getState(), PlacementState.READY);
                 assert.equal(premiumPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
@@ -208,10 +155,11 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
 
                 assert.equal(videoPlacement.getState(), PlacementState.READY);
                 assert.equal(videoPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
-                assert.equal(premiumPlacement.getCurrentTrackingUrls(), trackingUrls);
+                assert.equal(videoPlacement.getCurrentTrackingUrls(), trackingUrls);
 
                 assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
+                assert.equal(mraidPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
+                assert.equal(mraidPlacement.getCurrentTrackingUrls(), trackingUrls);
             });
         });
 
@@ -226,9 +174,10 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
                 premiumPlacement.setCurrentCampaign(undefined);
 
                 return loadManager.refreshCampaigns().then(() => {
-                    sinon.assert.calledOnce(loadCampaignStub);
+                    sinon.assert.calledTwice(loadCampaignStub);
 
                     sinon.assert.calledWith(loadCampaignStub, videoPlacement);
+                    sinon.assert.calledWith(loadCampaignStub, mraidPlacement);
 
                     assert.equal(premiumPlacement.getState(), state);
                     assert.isUndefined(premiumPlacement.getCurrentCampaign());
@@ -238,19 +187,20 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
                     assert.equal(videoPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
 
                     assert.equal(mraidPlacement.getState(), PlacementState.READY);
-                    assert.equal(mraidPlacement.getCurrentCampaign(), displayInterstitialCampaign);
+                    assert.equal(mraidPlacement.getCurrentCampaign(), programmaticMRAIDCampaign);
                 });
             });
         });
 
-        it('should not refresh both performance campaigns and not invalidate programmatic campaign', () => {
+        it('should not refresh both performance campaigns and should retain fill for previous programmatic campaign', () => {
             loadCampaignStub.returns(Promise.resolve(undefined));
 
             return loadManager.refreshCampaigns().then(() => {
-                sinon.assert.calledTwice(loadCampaignStub);
+                sinon.assert.calledThrice(loadCampaignStub);
 
                 sinon.assert.calledWith(loadCampaignStub, premiumPlacement);
                 sinon.assert.calledWith(loadCampaignStub, videoPlacement);
+                sinon.assert.calledWith(loadCampaignStub, mraidPlacement);
 
                 assert.equal(premiumPlacement.getState(), PlacementState.NO_FILL);
                 assert.isUndefined(premiumPlacement.getCurrentCampaign());
@@ -263,4 +213,5 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
             });
         });
     });
+
 });

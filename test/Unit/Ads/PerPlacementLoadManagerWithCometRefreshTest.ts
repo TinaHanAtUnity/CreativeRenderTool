@@ -93,14 +93,14 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
 
     describe('setCurrentAdUnit', () => {
         let sandbox: sinon.SinonSandbox;
-        let refreshReadyPerformanceCampaignStub: sinon.SinonStub;
+        let refreshCampaignstub: sinon.SinonStub;
 
         let placement: Placement;
         let adUnit: AbstractAdUnit;
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            refreshReadyPerformanceCampaignStub = sandbox.stub(loadManager, 'refreshReadyPerformanceCampaigns');
+            refreshCampaignstub = sandbox.stub(loadManager, 'refreshCampaigns');
             placement = adsConfig.getPlacement('premium');
             adUnit = sandbox.createStubInstance(AbstractAdUnit);
             (<any>adUnit).onStartProcessed = new Observable0();
@@ -121,13 +121,13 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false }
         ].forEach(({ campaign, shouldCall }) => {
-            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onStartProcessed when a ${campaign.getContentType()} was shown`, () => {
+            it(`should ${shouldCall ? '' : 'not '}call refreshCampaigns onStartProcessed when a ${campaign.getContentType()} was shown`, () => {
                 placement.setCurrentCampaign(campaign);
                 loadManager.setCurrentAdUnit(adUnit, placement);
 
                 adUnit.onStartProcessed.trigger();
 
-                sinon.assert.callCount(refreshReadyPerformanceCampaignStub, shouldCall ? 1 : 0);
+                sinon.assert.callCount(refreshCampaignstub, shouldCall ? 1 : 0);
             });
         });
 
@@ -139,11 +139,11 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
             adUnit.onStartProcessed.trigger();
             adUnit.onStartProcessed.trigger();
 
-            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+            sinon.assert.calledOnce(refreshCampaignstub);
         });
     });
 
-    describe('refreshReadyPerformanceCampaigns', () => {
+    describe('refreshCampaigns', () => {
         let sandbox: sinon.SinonSandbox;
         let loadCampaignStub: sinon.SinonStub;
 
@@ -196,7 +196,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         });
 
         it('should refresh both performance campaigns and not invalidate programmatic campaign', () => {
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
+            return loadManager.refreshCampaigns().then(() => {
                 sinon.assert.calledTwice(loadCampaignStub);
 
                 sinon.assert.calledWith(loadCampaignStub, videoPlacement);
@@ -225,7 +225,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
                 premiumPlacement.setState(state);
                 premiumPlacement.setCurrentCampaign(undefined);
 
-                return loadManager.refreshReadyPerformanceCampaigns().then(() => {
+                return loadManager.refreshCampaigns().then(() => {
                     sinon.assert.calledOnce(loadCampaignStub);
 
                     sinon.assert.calledWith(loadCampaignStub, videoPlacement);
@@ -246,7 +246,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         it('should not refresh both performance campaigns and not invalidate programmatic campaign', () => {
             loadCampaignStub.returns(Promise.resolve(undefined));
 
-            return loadManager.refreshReadyPerformanceCampaigns().then(() => {
+            return loadManager.refreshCampaigns().then(() => {
                 sinon.assert.calledTwice(loadCampaignStub);
 
                 sinon.assert.calledWith(loadCampaignStub, premiumPlacement);

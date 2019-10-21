@@ -34,7 +34,7 @@ export class PerPlacementLoadManagerV3 extends PerPlacementLoadManagerWithCometR
     private attemptPeformanceRefresh(): void {
         if (this._shouldRefresh) {
             this._shouldRefresh = false;
-            this.refreshReadyPerformanceCampaigns();
+            this.refreshCampaigns();
         }
     }
 }
