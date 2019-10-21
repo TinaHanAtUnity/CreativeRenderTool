@@ -286,7 +286,9 @@ export class Ads implements IAds {
     }
 
     private showConsentIfNeeded(options: unknown): Promise<void> {
+        this._core.Api.Sdk.logDebug('##PRIVACY: entered showConsentIfNeeded');
         if (!this.PrivacySDK.isConsentShowRequired()) {
+            this._core.Api.Sdk.logDebug('##PRIVACY: no need to show privacy');
             return Promise.resolve();
         }
 
@@ -310,11 +312,13 @@ export class Ads implements IAds {
             privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,
             adsConfig: this.Config,
-            core: this._core.Api,
+            coreApi: this._core.Api,
             deviceInfo: this._core.DeviceInfo,
             pts: this._core.ProgrammaticTrackingService,
-            privacySDK: this.PrivacySDK
+            privacySDK: this.PrivacySDK,
+            core: this._core
         });
+
         return consentView.show(options);
     }
 
