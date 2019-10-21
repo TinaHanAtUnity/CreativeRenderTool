@@ -88,10 +88,11 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart, ZyngaLoadExperiment, ZyngaLoadExperimentWithCometRefreshing, LoadRefreshV3 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart, ZyngaLoadExperiment, ZyngaLoadExperimentWithCometRefreshing, LoadRefreshV3, LoadRefreshV4, LoadExperiment16Exclusive } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
 import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV3';
+import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 
 export class Ads implements IAds {
 
@@ -283,15 +284,26 @@ export class Ads implements IAds {
             const abGroup = this._core.Config.getAbGroup();
             const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
 
-            if (LoadRefreshV3.isValid(abGroup)) {
+            // AbGroup 5, 6 - V4 Refresh Load
+            if (LoadRefreshV4.isValid(abGroup)) {
+                if (abGroup === 5) {
+                    // AbGroup 5 - V4 Refresh Load
+                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else if (abGroup === 6 && !isZyngaDealGame) {
+                    // ABGroup 6 and Not Zynga game - V4 Refresh Load
+                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else if (abGroup === 6 && isZyngaDealGame) {
+                    // ABGroup 6 - Original Load
+                    this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                }
+            } else if (LoadRefreshV3.isValid(abGroup)) {
+                // AbGroup 12 - V3 Refresh Load
                 this.RefreshManager = new PerPlacementLoadManagerV3(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (LoadExperimentWithCometRefreshing.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (!isZyngaDealGame && LoadExperimentWithCometRefreshingAfterAnyStart.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (isZyngaDealGame && ZyngaLoadExperimentWithCometRefreshing.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else {
+            } else if (isZyngaDealGame) {
+                // if Zynga game not on Abgroup 5, 12 - Original Load
+                this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+            } else if (!isZyngaDealGame && LoadExperiment16Exclusive.isValid(abGroup)) {
+                // if Zynga game not on Abgroup 5, 6, 12 - use Original Load
                 this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             }
         } else {
