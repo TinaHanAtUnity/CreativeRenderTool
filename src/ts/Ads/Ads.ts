@@ -278,8 +278,6 @@ export class Ads implements IAds {
     }
 
     private configureRefreshManager(): void {
-        // Default to PreCache SDK API
-        this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
         if (this._loadApiEnabled) {
             const abGroup = this._core.Config.getAbGroup();
@@ -300,8 +298,12 @@ export class Ads implements IAds {
                     this.RefreshManager = new PerPlacementLoadManagerV3(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
                 } else if (OriginalLoadExperiment.isValid(abGroup)) {
                     this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else {
+                    this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
                 }
             }
+        } else {
+            this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
     }
 
