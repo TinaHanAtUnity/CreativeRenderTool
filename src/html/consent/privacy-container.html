@@ -1,0 +1,192 @@
+<!-- DO NOT PUT A DOCTYPE HERE! iOS will go crazy -->
+<html lang="en">
+<head>
+    <title>Unity Ads Privacy WebView</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
+
+    <script>
+        (function() {
+            var AdsPrivacyBridge = function() {
+                var listeners = {
+                    error: [],
+                    sizeChange: []
+                };
+
+                var viewable = false;
+
+                var orientationProperties = {
+                    allowOrientationChange: true,
+                    forceOrientation: 'none'
+                };
+
+                var permissions = {};
+
+                var trigger = function(event, parameters) {
+                    if(!parameters) {
+                        parameters = [];
+                    }
+                    if(event in listeners) {
+                        for (var len = listeners[event].length, i = len - 1; i >= 0; i--) {
+                            var listener = listeners[event][i];
+                            try {
+                                listener.apply(window, parameters);
+                            } catch (e) {
+                                console.log('Got error ', e);
+                                window.parent.postMessage({
+                                    type: 'diagnosticError',
+                                    error: {
+                                        message: e.message
+                                    }
+                                }, '*');
+                            }
+                        }
+                    }
+                };
+
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
+                window.addEventListener('message', function(event) {
+                    switch(event.data.type) {
+                        case 'viewable':
+                            viewable = event.data.value;
+                            trigger('viewableChange', [viewable]);
+                            break;
+
+                        case 'resize':
+                            window.innerWidth = width = event.data.width;
+                            window.innerHeight = height = event.data.height;
+                            trigger('sizeChange', [width, height]);
+                            break;
+
+                        case 'permission':
+                            permissions[event.data.value.type] = event.data.value.status;
+                            trigger('permissionChange', [event.data.value.type, event.data.value.status]);
+                            triggerExperienceType(event.data.value.type, event.data.value.status);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }, false);
+
+                window.addEventListener('resize', function(e) {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    trigger('sizeChange', [width, height]);
+                });
+
+                window.addEventListener('DOMContentLoaded', function() {
+                    window.parent.postMessage({
+                        type: 'loaded'
+                    }, '*');
+                }, false);
+
+                this.onShowFallback = function(listener) {
+                    if (permissions['Camera'] === false) {
+                        listener();
+                    } else {
+                        this.addEventListener('showFallback', listener);
+                    }
+                };
+
+                this.addEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        listeners[event].push(listener);
+                    }
+                };
+
+                this.close = function() {
+                    setState('hidden');
+                    window.parent.postMessage({
+                        type: 'close'
+                    }, '*');
+                };
+
+                this.getCurrentPosition = this.getDefaultPosition = function() {
+                    return {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getMaxSize = this.getScreenSize = function() {
+                    return {
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getOrientationProperties = function() {
+                    return orientationProperties;
+                };
+
+                this.open = function(url) {
+                    window.parent.postMessage({
+                        type: 'open',
+                        url: url
+                    }, '*');
+                };
+
+                this.removeEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        var index = listeners[event].indexOf(listener);
+                        if(index !== -1) {
+                            listeners[event].splice(index, 1);
+                        }
+                    }
+                };
+
+                this.setOrientationProperties = function(properties) {
+                    orientationProperties = properties;
+                    window.parent.postMessage({
+                        type: 'orientation',
+                        properties: properties
+                    }, '*');
+                };
+
+                this.sendAnalyticsEvent = function(event, eventData) {
+                    window.parent.postMessage({
+                        type: 'analyticsEvent',
+                        event: event,
+                        eventData: eventData
+                    }, '*');
+                };
+
+                this.onPrivacySettingsCollected = function(userPreferences) {
+                    window.parent.postMessage({
+                        type: 'privacyCollected',
+                        data: userPreferences
+                    }, '*');
+                };
+
+                this.onPrivacyLoaded = function() {
+                    window.parent.postMessage({
+                        type: 'onPrivacyCollected'
+                    }, '*');
+                }
+
+                //
+                this.getPlatform = function() {
+                    return '{{ ADS_SDK_PLATFORM }}';
+                };
+
+                this.getAdsSDKVersion = function() {
+                    return '{{ ADS_SDK_VERSION }}';
+                };
+            };
+            window.adsBridge = new AdsPrivacyBridge();
+        })();
+    </script>
+    <script id="deviceorientation-support"></script>
+    <script id="debug-js-console"></script>
+</head>
+<body></body>
+</html>
