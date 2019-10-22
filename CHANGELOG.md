@@ -1,3 +1,19 @@
+# Pending
+
+* Add AutomatedExperiment to test communications with AUI service [#11758](https://github.com/Applifier/unity-ads-webview/pull/11758)
+* Fix iOS 13 rotation with endcard issue [#11561](https://github.com/Applifier/unity-ads-webview/pull/11561)
+
+# Mon Oct 21 21:25:14 UTC 2019
+
+* Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)
+* Mute Admob Videos Based on Auction Flag [#11732](https://github.com/Applifier/unity-ads-webview/pull/11732)
+
+# Fri Oct 18 22:56:15 UTC 2019
+
+* Revert 4 animations for CTA experiments [#11702](https://github.com/Applifier/unity-ads-webview/pull/11702)
+* Age Gate: Change background colors and increase font sizes [#11731](https://github.com/Applifier/unity-ads-webview/pull/11731)
+* Open Measurement - AdViewBuilder[#11452](https://github.com/Applifier/unity-ads-webview/pull/11452)
+
 # Wed Oct 16 17:36:03 UTC 2019
 
 * Force age gate resync to never show age gate twice [#11648](https://github.com/Applifier/unity-ads-webview/pull/11648)

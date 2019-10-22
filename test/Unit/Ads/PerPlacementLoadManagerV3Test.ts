@@ -92,7 +92,7 @@ describe('PerPlacementLoadManagerV3', () => {
     describe('setCurrentAdUnit', () => {
         let sandbox: sinon.SinonSandbox;
         let clock: sinon.SinonFakeTimers;
-        let refreshReadyPerformanceCampaignStub: sinon.SinonStub;
+        let refreshCampaignstub: sinon.SinonStub;
 
         let placement: Placement;
         let adUnit: AbstractAdUnit;
@@ -100,7 +100,7 @@ describe('PerPlacementLoadManagerV3', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             clock = sandbox.useFakeTimers();
-            refreshReadyPerformanceCampaignStub = sandbox.stub(loadManager, 'refreshReadyPerformanceCampaigns');
+            refreshCampaignstub = sandbox.stub(loadManager, 'refreshCampaigns');
             placement = adsConfig.getPlacement('premium');
             adUnit = sandbox.createStubInstance(AbstractAdUnit);
             (<any>adUnit).onStartProcessed = new Observable0();
@@ -123,7 +123,7 @@ describe('PerPlacementLoadManagerV3', () => {
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: true },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: true }
         ].forEach(({ campaign, shouldCall }) => {
-            it(`should ${shouldCall ? '' : 'not '}call refreshReadyPerformanceCampaigns onStartProcessed when a ${campaign.getContentType()} was shown`, () => {
+            it(`should ${shouldCall ? '' : 'not '}call refreshCampaigns onStartProcessed when a ${campaign.getContentType()} was shown`, () => {
                 placement.setCurrentCampaign(campaign);
                 loadManager.setCurrentAdUnit(adUnit, placement);
 
@@ -132,7 +132,7 @@ describe('PerPlacementLoadManagerV3', () => {
                 adUnit.onStartProcessed.trigger();
                 clock.tick(5001);
 
-                sinon.assert.callCount(refreshReadyPerformanceCampaignStub, shouldCall ? 1 : 0);
+                sinon.assert.callCount(refreshCampaignstub, shouldCall ? 1 : 0);
             });
         });
 
@@ -147,7 +147,7 @@ describe('PerPlacementLoadManagerV3', () => {
             adUnit.onStartProcessed.trigger();
             clock.tick(5001);
 
-            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+            sinon.assert.calledOnce(refreshCampaignstub);
         });
 
         it('should not call refreshReadyPerformanceCampaign once when onStartProcessed if the ad is not cached', () => {
@@ -159,14 +159,14 @@ describe('PerPlacementLoadManagerV3', () => {
             adUnit.onStartProcessed.trigger();
             clock.tick(5001);
 
-            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
+            sinon.assert.notCalled(refreshCampaignstub);
         });
 
         it('should call refreshReadyPerformanceCampaign onFinish', () => {
             placement.setCurrentCampaign(TestFixtures.getCampaign());
             loadManager.setCurrentAdUnit(adUnit, placement);
             adUnit.onFinish.trigger();
-            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+            sinon.assert.calledOnce(refreshCampaignstub);
         });
 
         it('should call refreshReadyPerformanceCampaign onClose', () => {
@@ -175,7 +175,7 @@ describe('PerPlacementLoadManagerV3', () => {
 
             adUnit.onClose.trigger();
 
-            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+            sinon.assert.calledOnce(refreshCampaignstub);
         });
 
         it('should only call refreshReadyPerformanceCampaign once, even when triggered from multiple events', () => {
@@ -191,7 +191,7 @@ describe('PerPlacementLoadManagerV3', () => {
             adUnit.onClose.trigger();
             adUnit.onFinish.trigger();
 
-            sinon.assert.calledOnce(refreshReadyPerformanceCampaignStub);
+            sinon.assert.calledOnce(refreshCampaignstub);
         });
 
         it('should not call refreshReadyPerformanceCampaign once since 5 seconds have not passed since it was triggered', () => {
@@ -202,7 +202,7 @@ describe('PerPlacementLoadManagerV3', () => {
 
             adUnit.onStartProcessed.trigger();
 
-            sinon.assert.notCalled(refreshReadyPerformanceCampaignStub);
+            sinon.assert.notCalled(refreshCampaignstub);
         });
     });
 });

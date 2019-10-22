@@ -207,7 +207,8 @@ export class TestFixtures {
             dynamicMarkup: 'foo',
             video: null,
             useWebViewUserAgentForTracking: false,
-            isOMEnabled: false
+            isOMEnabled: false,
+            shouldMuteByDefault: false
         };
     }
 

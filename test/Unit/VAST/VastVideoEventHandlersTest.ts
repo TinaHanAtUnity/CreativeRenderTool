@@ -36,6 +36,8 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -150,6 +152,20 @@ describe('VastVideoEventHandler tests', () => {
             userPrivacyManager: privacyManager
         });
 
+        privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const omInstance = sinon.createStubInstance(OpenMeasurement);
+        const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+        const omController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+        sandbox.stub(omController, 'sessionStart');
+        sandbox.stub(omController, 'resume');
+        sandbox.stub(omController, 'completed');
+        sandbox.stub(omController, 'pause');
+        sandbox.stub(omController, 'setDeviceVolume');
+        sandbox.stub(omController, 'start');
+        sandbox.stub(omController, 'sessionFinish');
+        sandbox.stub(omController, 'volumeChange');
+        sandbox.stub(omController, 'playerStateChanged');
+
         vastAdUnitParameters = {
             platform,
             core,
@@ -174,7 +190,7 @@ describe('VastVideoEventHandler tests', () => {
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
             privacy,
-            om: sinon.createStubInstance(VastOpenMeasurementController),
+            om: omController,
             privacySDK: privacySDK
         };
 
@@ -219,6 +235,8 @@ describe('VastVideoEventHandler tests', () => {
             beforeEach(() => {
                 sandbox.stub(testAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([0, 0, 0, 0]));
                 vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+                sandbox.stub(openMeasurement!.getOMAdViewBuilder(), 'setVideoView');
+
                 return testAdUnit.getVideoViewRectangle();
             });
 
