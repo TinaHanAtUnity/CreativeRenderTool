@@ -14,4 +14,10 @@ import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 //     cacheDisabled: true
 // });
 
-export const AutomatedExperimentsList: AutomatedExperiment[] = [];
+export const CommunicationExperiment = new AutomatedExperiment({
+    name: 'CommunicationExperiment',
+    actions: ['Action1', 'Action2'],
+    defaultAction: 'Action1'
+});
+
+export const AutomatedExperimentsList: AutomatedExperiment[] = [CommunicationExperiment];
