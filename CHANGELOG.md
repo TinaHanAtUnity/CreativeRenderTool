@@ -1,3 +1,8 @@
+# Pending
+
+* Add AutomatedExperiment to test communications with AUI service [#11758](https://github.com/Applifier/unity-ads-webview/pull/11758)
+* Fix iOS 13 rotation with endcard issue [#11561](https://github.com/Applifier/unity-ads-webview/pull/11561)
+
 # Mon Oct 21 21:25:14 UTC 2019
 
 * Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)
