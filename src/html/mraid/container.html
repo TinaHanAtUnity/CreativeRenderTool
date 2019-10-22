@@ -249,10 +249,10 @@
                     trigger('error', ['not implemented', 'storePicture']);
                 };
 
-                this.useCustomClose = function(hidden) {
+                this.useCustomClose = function(hideClose) {
                     window.parent.postMessage({
                         type: 'useCustomClose',
-                        hidden: hidden,
+                        hideClose: hideClose,
                     }, '*');
                 };
 

@@ -86,7 +86,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     protected onCloseEvent(event: Event): void {
-        this._programmaticTrackingService.reportMetricEvent(MraidMetric.ClosedByUnityAds).catch();
+        this._pts.reportMetricEvent(MraidMetric.ClosedByUnityAds);
 
         event.preventDefault();
         event.stopPropagation();

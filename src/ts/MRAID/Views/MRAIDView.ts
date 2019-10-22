@@ -60,7 +60,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
 
-    protected _programmaticTrackingService: ProgrammaticTrackingService;
+    protected _pts: ProgrammaticTrackingService;
 
     protected _gameSessionId: number;
     protected _abGroup: ABGroup;
@@ -116,7 +116,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._showGDPRBanner = showGDPRBanner;
         this._hidePrivacyButton = hidePrivacy;
 
-        this._programmaticTrackingService = programmaticTrackingService;
+        this._pts = programmaticTrackingService;
 
         this._abGroup = abGroup;
 
@@ -288,14 +288,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected setMraidCustomCloseTimeout(element: HTMLElement, hideDuration: number) {
+    private setMraidCustomCloseTimeout(element: HTMLElement, hideDuration: number) {
         this._mraidCustomCloseTimeout = window.setTimeout(() => {
-            this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseHideTimeout).catch();
-            this.setCloseVisibility(element, true);
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideTimeout);
+            this.showCloseGraphic(element, true);
         }, hideDuration);
     }
 
-    protected clearMraidCustomCloseTimeout() {
+    private clearMraidCustomCloseTimeout() {
         window.clearTimeout(this._mraidCustomCloseTimeout);
     }
 
@@ -377,8 +377,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected setCloseVisibility(container: HTMLElement, visible: boolean) {
-        const close = <HTMLElement>container.querySelector('.close');
+    private showCloseGraphic(closeElement: HTMLElement, visible: boolean) {
+        const close = <HTMLElement>closeElement.querySelector('.close');
         if (visible) {
             close.style.display = 'block';
         } else {
@@ -503,7 +503,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeClose() {
         this.clearMraidCustomCloseTimeout();
-        this._programmaticTrackingService.reportMetricEvent(MraidMetric.ClosedByAd).catch();
+        this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
         this._handlers.forEach(handler => handler.onMraidClose());
     }
 
@@ -552,22 +552,22 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onUseCustomClose(hidden: boolean) {
-        this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseCalled).catch();
+        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
 
         if (!this._campaign.getAllowCustomClose()) {
-            this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseRefused).catch();
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseRefused);
             return;
         }
 
         if (!hidden) {
-            this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic).catch();
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic);
             this.clearMraidCustomCloseTimeout();
-            this.setCloseVisibility(this._closeElement, true);
+            this.showCloseGraphic(this._closeElement, true);
             return;
         }
 
         if (this._mraidCustomCloseCalled) {
-            this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseCalledAgain).catch();
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalledAgain);
             return;
         }
 
@@ -575,13 +575,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         const hideDuration = this._mraidCustomCloseDelay * 1000;
         if (hideDuration <= 0) {
-            this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseExpired).catch();
-            this.setCloseVisibility(this._closeElement, true);
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseExpired);
+            this.showCloseGraphic(this._closeElement, true);
             return;
         }
 
-        this._programmaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic).catch();
-        this.setCloseVisibility(this._closeElement, false);
+        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic);
+        this.showCloseGraphic(this._closeElement, false);
         this.setMraidCustomCloseTimeout(this._closeElement, hideDuration);
     }
 }

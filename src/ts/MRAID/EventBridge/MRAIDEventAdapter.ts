@@ -59,7 +59,7 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
         this._mraidHandlers[MRAIDEvents.LOADED] = () => this.handleLoaded();
         this._mraidHandlers[MRAIDEvents.CLOSE] = () => this.handleClose();
         this._mraidHandlers[MRAIDEvents.DEVORIENTATION_SUB] = () => this.handleSubscribeDeviceOrientation();
-        this._mraidHandlers[MRAIDEvents.USE_CUSTOM_CLOSE] = (msg) => this.handleUseCustomClose(<boolean>msg.hidden);
+        this._mraidHandlers[MRAIDEvents.USE_CUSTOM_CLOSE] = (msg) => this.handleUseCustomClose(<boolean>msg.hideClose);
     }
 
     public abstract connect(): void;
@@ -109,8 +109,8 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
         this._handler.onBridgeClose();
     }
 
-    protected handleUseCustomClose(hidden: boolean) {
-        this._handler.onUseCustomClose(hidden);
+    protected handleUseCustomClose(hideClose: boolean) {
+        this._handler.onUseCustomClose(hideClose);
     }
 
     protected handleSendStats(totalTime: number, playTime: number, frameCount: number) {
