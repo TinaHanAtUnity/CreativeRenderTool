@@ -21,6 +21,7 @@ import { ITemplateData } from 'Core/Views/View';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -303,17 +304,9 @@ export class UserPrivacyManager {
 
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
         if (ageGateChoice === AgeGateChoice.YES) {
-            Diagnostics.trigger('age_gate_pass', {
-                legalFramework: this._privacy.getLegalFramework(),
-                method: this._gamePrivacy.getMethod(),
-                previousChoice: this._ageGateChoice
-            });
+            PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
         } else if (ageGateChoice === AgeGateChoice.NO) {
-            Diagnostics.trigger('age_gate_not_passed', {
-                legalFramework: this._privacy.getLegalFramework(),
-                method: this._gamePrivacy.getMethod(),
-                previousChoice: this._ageGateChoice
-            });
+            PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
         }
 
         this._ageGateChoice = ageGateChoice;
