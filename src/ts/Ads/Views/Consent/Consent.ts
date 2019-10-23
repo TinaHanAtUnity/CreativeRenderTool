@@ -152,7 +152,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     public testAutoAgeGate(ageGate: boolean) {
         const testEvent = new Event('testAutoAgeGate');
-        if(ageGate) {
+        if (ageGate) {
             this.onAgeGateOverEvent(testEvent);
         } else {
             this.onAgeGateUnderEvent(testEvent);

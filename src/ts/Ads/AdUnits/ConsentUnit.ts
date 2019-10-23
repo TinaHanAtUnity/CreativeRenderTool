@@ -97,7 +97,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                     previousChoice: this._privacyManager.getAgeGateChoice()
                 });
             }
-            if(typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
+            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
                 const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
                 this.handleAutoAgeGate(ageGateValue);
             }
