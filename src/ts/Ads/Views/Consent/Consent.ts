@@ -150,6 +150,15 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._privacyRowItemContainer.addEventHandler(this);
     }
 
+    public testAutoAgeGate(ageGate: boolean) {
+        const testEvent = new Event('testAutoAgeGate');
+        if(ageGate) {
+            this.onAgeGateOverEvent(testEvent);
+        } else {
+            this.onAgeGateUnderEvent(testEvent);
+        }
+    }
+
     public testAutoConsentAll() {
         const testEvent = new Event('testAutoConsent');
         this.onHomepageAcceptAllEvent(testEvent);
