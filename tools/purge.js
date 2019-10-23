@@ -355,7 +355,7 @@ let purgeTencent = (urlRoot) => {
     }).then(body => {
         console.dir(body);
         console.log('Tencent CDN purge request successful');
-        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.chinanetcenter.check_url + urlRoot + path, commit)));
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.tencentcloud.check_url + urlRoot + path, commit)));
     });
 };
 
