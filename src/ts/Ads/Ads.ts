@@ -1,108 +1,96 @@
-import {AdMob} from 'AdMob/AdMob';
-import {AdMobSignalFactory} from 'AdMob/Utilities/AdMobSignalFactory';
-import {AbstractAdUnit} from 'Ads/AdUnits/AbstractAdUnit';
-import {Activity} from 'Ads/AdUnits/Containers/Activity';
-import {AdUnitContainer, Orientation} from 'Ads/AdUnits/Containers/AdUnitContainer';
-import {ViewController} from 'Ads/AdUnits/Containers/ViewController';
-import {IAds, IAdsApi} from 'Ads/IAds';
-import {AssetManager} from 'Ads/Managers/AssetManager';
-import {CampaignManager} from 'Ads/Managers/CampaignManager';
-import {ContentTypeHandlerManager} from 'Ads/Managers/ContentTypeHandlerManager';
-import {GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
-import {MissedImpressionManager} from 'Ads/Managers/MissedImpressionManager';
-import {CampaignRefreshManager} from 'Ads/Managers/CampaignRefreshManager';
-import {OperativeEventManager} from 'Ads/Managers/OperativeEventManager';
-import {PlacementManager} from 'Ads/Managers/PlacementManager';
-import {ProgrammaticOperativeEventManager} from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import {SessionManager} from 'Ads/Managers/SessionManager';
-import {AdsConfiguration, IRawAdsConfiguration} from 'Ads/Models/AdsConfiguration';
-import {IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory} from 'Ads/Managers/ThirdPartyEventManager';
-import {Campaign} from 'Ads/Models/Campaign';
-import {Placement} from 'Ads/Models/Placement';
-import {AdsPropertiesApi} from 'Ads/Native/AdsProperties';
-import {AndroidAdUnitApi} from 'Ads/Native/Android/AdUnit';
-import {AndroidVideoPlayerApi} from 'Ads/Native/Android/VideoPlayer';
-import {IosAdUnitApi} from 'Ads/Native/iOS/AdUnit';
-import {IosVideoPlayerApi} from 'Ads/Native/iOS/VideoPlayer';
-import {ListenerApi} from 'Ads/Native/Listener';
-import {PlacementApi} from 'Ads/Native/Placement';
-import {VideoPlayerApi} from 'Ads/Native/VideoPlayer';
-import {WebPlayerApi} from 'Ads/Native/WebPlayer';
-import {AdsConfigurationParser} from 'Ads/Parsers/AdsConfigurationParser';
-import {CustomFeatures} from 'Ads/Utilities/CustomFeatures';
-import {GameSessionCounters} from 'Ads/Utilities/GameSessionCounters';
-import {IosUtils} from 'Ads/Utilities/IosUtils';
-import {
-    ChinaMetric,
-    LoadMetric,
-    MiscellaneousMetric,
-    ProgrammaticTrackingError,
-    TimingMetric
-} from 'Ads/Utilities/ProgrammaticTrackingService';
-import {SdkStats} from 'Ads/Utilities/SdkStats';
-import {SessionDiagnostics} from 'Ads/Utilities/SessionDiagnostics';
-import {InterstitialWebPlayerContainer} from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
-import {VideoOverlay} from 'Ads/Views/VideoOverlay';
-import {Banners} from 'Banners/Banners';
-import {AuctionRequest} from 'Ads/Networking/AuctionRequest';
-import {FinishState} from 'Core/Constants/FinishState';
-import {Platform} from 'Core/Constants/Platform';
-import {UnityAdsError} from 'Core/Constants/UnityAdsError';
-import {DiagnosticError} from 'Core/Errors/DiagnosticError';
-import {ICore} from 'Core/ICore';
-import {AndroidDeviceInfo} from 'Core/Models/AndroidDeviceInfo';
-import {CacheMode} from 'Core/Models/CoreConfiguration';
-import {IosDeviceInfo} from 'Core/Models/IosDeviceInfo';
-import {CallbackStatus, INativeCallback} from 'Core/Native/Bridge/NativeBridge';
-import {Diagnostics} from 'Core/Utilities/Diagnostics';
-import {TestEnvironment} from 'Core/Utilities/TestEnvironment';
-import {JsonParser} from 'Core/Utilities/JsonParser';
-import {Display} from 'Display/Display';
-import {Monetization} from 'Monetization/Monetization';
-import {MRAID} from 'MRAID/MRAID';
-import {MRAIDView} from 'MRAID/Views/MRAIDView';
-import {PerformanceCampaign} from 'Performance/Models/PerformanceCampaign';
-import {Performance} from 'Performance/Performance';
-import {Promo} from 'Promo/Promo';
-import {VAST} from 'VAST/VAST';
-import {VPAID} from 'VPAID/VPAID';
-import {XPromoCampaign} from 'XPromo/Models/XPromoCampaign';
-import {XPromo} from 'XPromo/XPromo';
-import {AR} from 'AR/AR';
+import { AdMob } from 'AdMob/AdMob';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { IAds, IAdsApi } from 'Ads/IAds';
+import { AssetManager } from 'Ads/Managers/AssetManager';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
+import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
+import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
+import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
+import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
+import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
+import { ListenerApi } from 'Ads/Native/Listener';
+import { PlacementApi } from 'Ads/Native/Placement';
+import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
+import { WebPlayerApi } from 'Ads/Native/WebPlayer';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { BannerModule } from 'Banners/BannerModule';
+import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { UnityAdsError } from 'Core/Constants/UnityAdsError';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { ICore } from 'Core/ICore';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import { Display } from 'Display/Display';
+import { Monetization } from 'Monetization/Monetization';
+import { MRAID } from 'MRAID/MRAID';
+import { MRAIDView } from 'MRAID/Views/MRAIDView';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Performance } from 'Performance/Performance';
+import { Promo } from 'Promo/Promo';
+import { VAST } from 'VAST/VAST';
+import { VPAID } from 'VPAID/VPAID';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromo } from 'XPromo/XPromo';
+import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
 import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
-import {ITestCreativePack} from 'Ads/Models/CreativePack';
-import {PlayerMetaData} from 'Core/Models/MetaData/PlayerMetaData';
-import {AbstractPrivacy} from 'Ads/Views/AbstractPrivacy';
-import {ARUtil} from 'AR/Utilities/ARUtil';
-import {PermissionsUtil, PermissionTypes} from 'Core/Utilities/Permissions';
-import {AbstractParserModule} from 'Ads/Modules/AbstractParserModule';
-import {MRAIDAdUnitParametersFactory} from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
-import {PromoCampaign} from 'Promo/Models/PromoCampaign';
-import {ConsentUnit} from 'Ads/AdUnits/ConsentUnit';
-import {China} from 'China/China';
-import {IStore} from 'Store/IStore';
-import {Store} from 'Store/Store';
-import {RequestManager} from 'Core/Managers/RequestManager';
-import {AbstractAdUnitParametersFactory} from 'Ads/AdUnits/AdUnitParametersFactory';
-import {LoadApi} from 'Core/Native/LoadApi';
-import {RefreshManager} from 'Ads/Managers/RefreshManager';
-import {PerPlacementLoadManager} from 'Ads/Managers/PerPlacementLoadManager';
-import {Analytics} from 'Analytics/Analytics';
-import {PrivacySDK} from 'Privacy/PrivacySDK';
-import {PrivacyParser} from 'Privacy/Parsers/PrivacyParser';
-import {Promises} from 'Core/Utilities/Promises';
-import {
-    LoadExperiment,
-    LoadExperimentWithCometRefreshing,
-    LoadExperimentWithCometRefreshingAfterAnyStart,
-    ZyngaLoadExperiment,
-    ZyngaLoadExperimentWithCometRefreshing
-} from 'Core/Models/ABGroup';
-import {PerPlacementLoadManagerWithCometRefresh} from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
-import {PerPlacementLoadManagerWithCometRefreshAfterAnyStart} from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
+import { ITestCreativePack } from 'Ads/Models/CreativePack';
+import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
+import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
+import { China } from 'China/China';
+import { IStore } from 'Store/IStore';
+import { Store } from 'Store/Store';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { LoadApi } from 'Core/Native/LoadApi';
+import { RefreshManager } from 'Ads/Managers/RefreshManager';
+import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
+import { Analytics } from 'Analytics/Analytics';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import { Promises } from 'Core/Utilities/Promises';
+import { LoadExperiment, LoadRefreshV3, LoadRefreshV4, ZyngaLoadRefreshV4, OriginalLoadExperiment } from 'Core/Models/ABGroup';
+import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV3';
+import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 
 export class Ads implements IAds {
 
@@ -133,7 +121,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
 
-    public Banners: Banners;
+    public BannerModule: BannerModule;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
@@ -196,16 +184,18 @@ export class Ads implements IAds {
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
+<<<<<<< HEAD
 
             if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
                 // TODO: We are already not sending these in a branch that's been accepted for merge. Remove this when merging with those changes
                 this.PrivacyManager.updateUserPrivacy({ads: false, gameExp: false, external: false},  GDPREventSource.SANITIZATION, GDPREventAction.TODO_MISSING_ACTION);
             }
 
+=======
+>>>>>>> 607b7ac322226bc94fcfedfe897dffe2d64eb07c
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
-
         }).then(() => {
-             return this.setupLoadApiEnabled();
+            return this.setupLoadApiEnabled();
         }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
@@ -228,7 +218,7 @@ export class Ads implements IAds {
                 }
             }
 
-            this.Banners = new Banners(this._core, this);
+            this.BannerModule = new BannerModule(this._core, this);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
@@ -273,17 +263,7 @@ export class Ads implements IAds {
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
-            if (this._loadApiEnabled && LoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (this._loadApiEnabled && !CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId()) && LoadExperimentWithCometRefreshingAfterAnyStart.isValid(this._core.Config.getAbGroup())) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (this._loadApiEnabled && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId()) && ZyngaLoadExperimentWithCometRefreshing.isValid(this._core.Config.getAbGroup())) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (this._loadApiEnabled) {
-                this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else {
-                this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-            }
+            this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
             promo.initialize();
@@ -306,8 +286,40 @@ export class Ads implements IAds {
         });
     }
 
+    private configureRefreshManager(): void {
+
+        if (this._loadApiEnabled) {
+            const abGroup = this._core.Config.getAbGroup();
+            const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
+
+            if (isZyngaDealGame) {
+                if (ZyngaLoadRefreshV4.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else if (LoadRefreshV3.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManagerV3(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else {
+                    this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                }
+            } else {
+                if (LoadRefreshV4.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else if (LoadRefreshV3.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManagerV3(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else if (OriginalLoadExperiment.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else {
+                    this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+                }
+            }
+        } else {
+            this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+        }
+    }
+
     private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.PrivacySDK.isConsentShowRequired()) {
+        this.PrivacyManager.fixAgeGateSync();
+
+        if (!this.PrivacyManager.isConsentShowRequired()) {
             return Promise.resolve();
         }
 
@@ -419,23 +431,6 @@ export class Ads implements IAds {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
-    }
-
-    public showBanner(placementId: string, callback: INativeCallback) {
-        callback(CallbackStatus.OK);
-
-        const context = this.Banners.BannerAdContext;
-        context.load(placementId).catch((e) => {
-            this.Banners.PlacementManager.sendBannersReady();
-            this._core.Api.Sdk.logWarning(`Could not show banner due to ${e.message}`);
-        });
-    }
-
-    public hideBanner(callback: INativeCallback) {
-        callback(CallbackStatus.OK);
-
-        const context = this.Banners.BannerAdContext;
-        context.hide();
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
@@ -675,9 +670,9 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        const isZyngaReverseABGroupLoadExperiment = !(ZyngaLoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaWordsWithFriends(this._core.ClientInfo.getGameId());
+        const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
         const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
-        if (isContainedLoadExperiment || isZyngaReverseABGroupLoadExperiment) {
+        if (isContainedLoadExperiment || isZyngaDealGame) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }

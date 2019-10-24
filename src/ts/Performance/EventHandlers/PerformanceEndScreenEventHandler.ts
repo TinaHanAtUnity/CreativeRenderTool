@@ -5,6 +5,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { OptServiceCommunicationExperiment } from 'Core/Models/ABGroup';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
@@ -24,5 +25,8 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
     public onEndScreenDownload(parameters: IStoreHandlerDownloadParameters): void {
         super.onEndScreenDownload(parameters);
         this._adUnit.sendTrackingEvent(TrackingEvent.CLICK);
+        if (OptServiceCommunicationExperiment.isValid(this._coreConfig.getAbGroup())) {
+            this._automatedExperimentManager.sendReward();
+        }
     }
 }

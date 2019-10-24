@@ -15,5 +15,8 @@
   "Download already enqueued": "Download already enqueued",
   "Opening browser to complete download": "Opening browser to complete download",
   "Enqueuing is in progress": "Enqueuing is in progress",
-  "Safe to resume game" : "Safe to resume game"
+  "Safe to resume game" : "Safe to resume game",
+  "privacy-legitimate-interest-pop-up-1": "Unity is personalizing your ads experience in this application. ",
+  "privacy-legitimate-interest-pop-up-2": "Tap here ",
+  "privacy-legitimate-interest-pop-up-3": "to learn more about Unity and your privacy choices"
 }

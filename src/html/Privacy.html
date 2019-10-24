@@ -1,23 +1,22 @@
 <div class="pop-up">
     <div class="pop-up-content">
         <span class="icon-gdpr"></span>
-        <span class="title centered-title">A message from Unity about your privacy</span>
+        <span class="title centered-title"><%= data.t("privacy-dialog-title") %></span>
 
-        <% if(!data.isGDPREnabled) { %>
+        <% if(data.isCoppaCompliant) { %>
+        <div>
+            <p>
+                <%= data.t("privacy-dialog-text-coppa-p1") %>
+            </p>
+            <p>
+                <%= data.t("privacy-dialog-text-coppa-p2-1") %>
+                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-coppa-p2-2") %></a>
+                <%= data.t("privacy-dialog-text-coppa-p2-3") %>
+            </p>
+        </div>
+        <% } else if(!data.isGDPREnabled) { %>
         <div class="not-gdpr">
             <div class="privacy-text">
-                <% if(data.isCoppaCompliant) { %>
-                <p>
-                    This advertisement has been served by Unity Ads. The developer of this game has enabled privacy
-                    controls indicating that this app is directed to children under the age of 13.  As a result, we
-                    deliver ads to you based only on contextual data (e.g., the game you are playing).
-                </p>
-                <p>
-                    Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full
-                    description of our data practices. You can view privacy information at any time by tapping the Unity
-                    Data Privacy icon when or after an ad appears.
-                </p>
-                <% } else { %>
                 <p>
                     This advertisement has been served by Unity Ads. Unity Ads collects information gathered through
                     your use of apps in order to create an individualized and more relevant user experience and to show
@@ -28,141 +27,113 @@
                     other apps might interest you:
                 </p>
                 <p>
-                    <span id="phone-type"></span>
+                    <span id="phone-type"><%= data.t("privacy-using") %></span>
                 </p>
                 <p>
-                    <span id="country"></span>
-                </p>
-
-                <p>
-                    <span id="game-plays-this-week"></span>
+                    <span id="country"><%= data.t("privacy-located-in") %></span>
                 </p>
 
                 <p>
-                    <span id="ads-seen-in-game"></span>
+                    <span id="game-plays-this-week"><%= data.t("privacy-used-this-app") %></span>
                 </p>
 
                 <p>
-                    <span id="games-installed-from-ads"></span>
+                    <span id="ads-seen-in-game"><%= data.t("privacy-seen-ads") %></span>
                 </p>
+
                 <p>
-                    <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
+                    <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
                 </p>
                 <p>
                     Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for
                     a full description of our data practices. You can opt-out of Unity Ads’ personalized
                     experiences and ads through your device settings.
                 </p>
-                <% } %>
             </div>
         </div>
         <% } else if(data.isUserUnderAgeLimit) { %>
         <div class="under-age-limit">
             <p>
-                This advertisement has been served by Unity Ads. As you have indicated that you are under 18 years old
-                we deliver ads to you based on contextual data (e.g., the game you are playing), and not based on your
-                personal data.
+                <%= data.t("privacy-dialog-text-failed-age-gate-p1") %>
             </p>
             <p>
-                Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full
-                description of our data practices. You can view your privacy settings at any time by tapping the Unity
-                Data Privacy icon when or after an ad appears.
+                <%= data.t("privacy-dialog-text-failed-age-gate-p2-1") %>
+                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-failed-age-gate-p2-2") %></a>
+                <%= data.t("privacy-dialog-text-failed-age-gate-p2-3") %>
             </p>
         </div>
         <% } else { %>
         <div class="gdpr">
             <p>
-                Ads allow developers to offer great apps for free. We try to show the apps and products that will be
-                most interesting to you based on the apps you use, the device you use, and the country you are in.
+                <%= data.t("privacy-dialog-text-li-p1") %>
             </p>
 
             <p>
-                <span class="highlight">Most of the information we use for this personalization is based on your
-                    device’s advertising ID
-                    (<span class="gdpr-text-ios">Apple’s Advertising Identifier</span><span class="gdpr-text-android">Google
-                        Ad Identifier</span>) and your IP address.
-
-                <% if(data.isCoppaCompliant) { %>
-                <span id="coppaTag1">By request of this app’s publisher, we do not combine the data from this app with data from any other apps.</span>
-                <% } %>
+                <span class="highlight">
+                    <%= data.t("privacy-dialog-text-li-p2") %>
                 </span>
             </p>
 
             <p>
-                Our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> explains how we manage your
-                data and how we work with partners who serve ads.
-                <% if(data.isCoppaCompliant) { %>
-                    <span id="coppaTag2">While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third parties for ads served in this app.</span>
-                <% } else { %>
-                    <span id="coppaTag2">These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.</span>
-                <% } %>
+                <%= data.t("privacy-dialog-text-li-p3-1") %>
+                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-li-p3-2") %></a>
+                <%= data.t("privacy-dialog-text-li-p3-3") %>
             </p>
             <p>
-                From your interaction with this app, here is an example of the information we use to predict which
-                other apps might interest
-                you:
+                <%= data.t("privacy-dialog-text-li-p4") %>
             </p>
             <p>
-                <span id="phone-type"></span>
+                <span id="phone-type"><%= data.t("privacy-using") %></span>
             </p>
             <p>
-                <span id="country"></span>
-            </p>
-
-            <p>
-                <span id="game-plays-this-week"></span>
-            </p>
-
-            <p>
-                <span id="ads-seen-in-game"></span>
-            </p>
-
-            <p>
-                <span id="games-installed-from-ads"></span>
+                <span id="country"><%= data.t("privacy-located-in") %></span>
             </p>
             <p>
-                <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
+                <span id="game-plays-this-week"><%= data.t("privacy-used-this-app") %></span>
+            </p>
+            <p>
+                <span id="ads-seen-in-game"><%= data.t("privacy-seen-ads") %></span>
+            </p>
+            <p>
+                <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
             </p>
 
 
-            <p><span class="header">Selection</span></p>
+            <p><span class="header"><%= data.t("privacy-dialog-text-li-p5-header") %></span></p>
             <p>
-                You can choose to continue to have a personalized experience, or to have a generic one.
-                This will apply to both advertising that comes from Unity directly as well as from advertising
-                partners.
+                <%= data.t("privacy-dialog-text-li-p5") %>
             </p>
 
             <div class="radio-group-container">
                 <div class="radio-item-container">
                     <input id="gdpr-agree-radio" name="gdpr-radio-group" type="radio">
-                    <label for="gdpr-agree-radio">Yes, I agree to a personalized experience.</label>
+                    <label for="gdpr-agree-radio">
+                        <%= data.t("privacy-dialog-text-li-agree-radio-button") %>
+                    </label>
                 </div>
                 <div class="radio-item-container">
                     <input id="gdpr-refuse-radio" name="gdpr-radio-group" type="radio">
                     <label for="gdpr-refuse-radio">
-                        No, I do not want personalized experience.
+                        <%= data.t("privacy-dialog-text-li-disagree-radio-button") %>
                     </label>
                 </div>
             </div>
 
             <p>
-                <span class="header">Changing your privacy choice</span>
-                You can access these options at any time by tapping the Unity Data Privacy icon when or after an ad
-                appears.
+                <span class="header"><%= data.t("privacy-dialog-text-li-p6-header") %></span>
+                <%= data.t("privacy-dialog-text-li-p6") %>
             </p>
 
             <p>
-                <span class="header">Data Management</span>
+                <span class="header"><%= data.t("privacy-dialog-text-li-p7-header") %></span>
 
-                You can delete any data Unity has about your device by clicking <span class="data-deletion-link page-link">here</span>.
-                <% if(data.isCoppaCompliant) { %>
-                <span id="coppaTag3">This will also opt you out of personalized ad experiences.</span>
-                <% } %>
-                <span id="data-deletion-container">Are you sure? <span id="data-deletion-confirm" class="page-link">Yes</span>
-                    / <span class="data-deletion-reject page-link">No</span></span>
-                <span id="data-deletion-request-container">We will process your request and your data for profile purposes
-                    will be deleted in 30 days. We will also opt you out of personalized ads immediately.
-                    Please note we may retain your data for invoicing and fraud prevention purposes for 180 days.
+                <%= data.t("privacy-dialog-text-li-p7-1") %>
+                <span class="data-deletion-link page-link"><%= data.t("privacy-dialog-text-li-p7-2") %></span>
+                <%= data.t("privacy-dialog-text-li-p7-3") %>
+                <span id="data-deletion-container"><%= data.t("privacy-dialog-text-li-p7-are-you-sure") %><span id="data-deletion-confirm" class="page-link"><%= data.t("privacy-dialog-text-li-p7-yes") %></span>
+                    / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
+                <span id="data-deletion-request-container">
+                    <%= data.t("privacy-dialog-text-li-p7-data-deletion-text") %>
                 </span>
             </p>
         </div>
@@ -189,7 +160,7 @@
             </div>
             <% } %>
         </ul>
-        <span class="report-disclaimer">Disclaimer: Reporting will close your advertisement and forfeit any rewards received from watching it.</span>
+        <span class="report-disclaimer">Disclaimer: Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.</span>
         <div class="report-container">
             <div class="report-button">Report</div>
             <span class="report-confirmed-text"></span>
@@ -199,6 +170,6 @@
     <div class="pop-up-footer">
         <div class="left-side-link">Build info ⚙</div>
         <div class="middle-link">Report Ad ⚑</div>
-        <div class="close-button">Confirm</div>
+        <div class="close-button"><%= data.t("privacy-dialog-button-confirm") %></div>
     </div>
 </div>

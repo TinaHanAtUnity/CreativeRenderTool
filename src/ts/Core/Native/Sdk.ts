@@ -7,7 +7,11 @@ export enum InitErrorCode {
     Unknown = 0
 }
 
-export class SdkApi extends NativeApi {
+export interface IErrorLogger {
+    logError(message: string): Promise<void>;
+}
+
+export class SdkApi extends NativeApi implements IErrorLogger {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Sdk', ApiPackage.CORE);
     }

@@ -65,7 +65,10 @@ export enum LoadMetric {
     LoadAuctionRequestBlocked = 'load_auction_request_blocked',
     LoadCometRefreshRequest = 'load_comet_refresh_request',
     LoadCometRefreshFill = 'load_comet_refresh_fill',
-    LoadCometRefreshNoFill = 'load_comet_refresh_no_fill'
+    LoadCometRefreshNoFill = 'load_comet_refresh_no_fill',
+    LoadProgrammaticRefreshRequest = 'load_programmatic_refresh_request',
+    LoadProgrammaticFill = 'load_programmatic_fill',
+    LoadProgrammaticUsedPreviousFill = 'load_programmatic_used_previous_fill'
 }
 
 export enum OMMetric {
@@ -125,12 +128,7 @@ export class ProgrammaticTrackingService {
     }
 
     private createMetricTags(event: PTSEvent): string[] {
-        const tags = [this.createAdsSdkTag('mevt', event)];
-        if (CustomFeatures.isZyngaWordsWithFriends(this._clientInfo.getGameId())) {
-            tags.push(this.createAdsSdkTag('gid', this._clientInfo.getGameId()));
-            tags.push(this.createAdsSdkTag('plt', Platform[this._platform]));
-        }
-        return tags;
+        return [this.createAdsSdkTag('mevt', event)];
     }
 
     private createTimingTags(): string[] {

@@ -69,6 +69,7 @@
             var supposedCurrentTime = 0;
             var userSeeked = false;
             var hasSentStart = false;
+            var shouldMute = false;
 
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -86,6 +87,7 @@
                     return;
                 }
 
+                videoEl.muted = shouldMute;
                 videoEl.addEventListener('error', function() {
                     var error = videoEl.error;
                     self.postMessage('tracking', {
@@ -273,6 +275,15 @@
                 clickSignalListeners = [];
             };
 
+            this.onReceiveMuteChange = function(isMuted) {
+                var videoEl = document.querySelector('video');
+                if (videoEl) {
+                    videoEl.muted = isMuted;
+                } else {
+                    shouldMute = isMuted;
+                }
+            };
+
             this.notifyRewardedVideoStart = function() {
                 // Do nothing, but leave so Admob can continue calling it
             };
@@ -418,6 +429,9 @@
                     } else if (e.data.event === 'clickSignal') {
                         console.log('recieved click signal', e);
                         self.onReceiveClickSignal(e.data.data);
+                    } else if (e.data.event === 'muteChange') {
+                        console.log('received mute change', e);
+                        self.onReceiveMuteChange(e.data.data);
                     }
                 }
             });
