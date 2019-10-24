@@ -11,7 +11,7 @@ import { BannerModule } from 'Banners/BannerModule';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
-describe('PerPlacementLoadManagerTest', () => {
+describe('BannerAdContextManagerTest', () => {
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;

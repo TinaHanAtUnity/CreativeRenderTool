@@ -17,7 +17,7 @@ describe('BannerSizeUtil', () => {
     describe('getBannerSizeFromWidthAndHeight', () => {
         const tests: {
             input: IBannerDimensions;
-            expectedOutput: IBannerDimensions;
+            expectedOutput: IBannerDimensions | undefined;
             expectedMessage: string;
         }[] = [
             { // width greater than 728
@@ -124,10 +124,7 @@ describe('BannerSizeUtil', () => {
                     w: 319,
                     h: 50
                 },
-                expectedOutput: {
-                    w: 320,
-                    h: 50
-                },
+                expectedOutput: undefined,
                 expectedMessage: 'Invalid Banner size of 319(width) 50(height) was given to Unity Ads Sdk, defaulting to minimum size 320x50'
             },
             { // height less than 50
@@ -135,10 +132,7 @@ describe('BannerSizeUtil', () => {
                     w: 320,
                     h: 49
                 },
-                expectedOutput: {
-                    w: 320,
-                    h: 50
-                },
+                expectedOutput: undefined,
                 expectedMessage: 'Invalid Banner size of 320(width) 49(height) was given to Unity Ads Sdk, defaulting to minimum size 320x50'
             }
         ];

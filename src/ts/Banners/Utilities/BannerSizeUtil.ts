@@ -22,7 +22,7 @@ export const BannerSizeIABStandardDimensions: IBannerDimensions = {
 
 export class BannerSizeUtil {
 
-    public static getBannerSizeFromWidthAndHeight(width: number, height: number, errorLogger: IErrorLogger): IBannerDimensions {
+    public static getBannerSizeFromWidthAndHeight(width: number, height: number, errorLogger: IErrorLogger): IBannerDimensions | undefined {
         if (width >= BannerSizeLeaderboardDimensions.w && height >= BannerSizeLeaderboardDimensions.h) {
             return BannerSizeLeaderboardDimensions;
         } else if (width >= BannerSizeIABStandardDimensions.w && height >= BannerSizeIABStandardDimensions.h) {
@@ -31,8 +31,6 @@ export class BannerSizeUtil {
             return BannerSizeStandardDimensions;
         } else {
             errorLogger.logError(`Invalid Banner size of ${width}(width) ${height}(height) was given to Unity Ads Sdk, defaulting to minimum size 320x50`);
-            return BannerSizeStandardDimensions;
         }
     }
-
 }
