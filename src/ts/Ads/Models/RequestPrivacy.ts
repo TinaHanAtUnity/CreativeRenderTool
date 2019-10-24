@@ -40,33 +40,13 @@ export class RequestPrivacyFactory {
         return {
             method: userPrivacy.getMethod(),
             firstRequest: false,
-            permissions: RequestPrivacyFactory.toGranularPermissions(userPrivacy)
+            permissions: userPrivacy.getPermissions()
         };
     }
 
     private static GameUsesConsent(gamePrivacy: GamePrivacy): boolean {
         const isDeveloperConsent: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT;
         return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
-    }
-
-    // TODO-jon: remove this method, it shouldn't be needed anymore
-    private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
-        const permissions = userPrivacy.getPermissions();
-
-        if ((<IAllPermissions>permissions).all === true) {
-            return {
-                gameExp: true,
-                ads: true,
-                external: true
-            };
-        }
-
-        const { ads = false, external = false, gameExp = false} = <IGranularPermissions>permissions;
-        return {
-            gameExp,
-            ads,
-            external
-        };
     }
 
     public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {

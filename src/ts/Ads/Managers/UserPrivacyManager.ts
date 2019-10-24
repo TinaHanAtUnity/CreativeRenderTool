@@ -287,26 +287,9 @@ export class UserPrivacyManager {
         return this._privacy.isOptOutEnabled();
     }
 
-    // TODO-jon: Remove this method, should not be needed anymore
+    // TODO-jon: Refactor away this method, should not be needed anymore
     public getGranularPermissions(): IGranularPermissions {
-        const permissions = this._privacy.getUserPrivacy().getPermissions();
-        if (!isUnityConsentPermissions(permissions)) {
-            return {
-                gameExp: false,
-                ads: false,
-                external: false
-            };
-        }
-
-        if ((<IAllPermissions>permissions).all === true) {
-            return {
-                gameExp: true,
-                ads: true,
-                external: true
-            };
-        } else {
-            return <IGranularPermissions>permissions;
-        }
+        return this._privacy.getUserPrivacy().getPermissions();
     }
 
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
@@ -354,8 +337,8 @@ export class UserPrivacyManager {
                 this._userPrivacy.update({
                     method: this._gamePrivacy.getMethod(),
                     version: 0,
+                    agreedAll: false,
                     permissions: {
-                        all: false,
                         ads: false,
                         external: false,
                         gameExp: false
