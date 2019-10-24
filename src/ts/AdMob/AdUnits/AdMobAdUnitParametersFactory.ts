@@ -25,13 +25,11 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
         let om;
         const isOMEnabled = baseParams.campaign.isOMEnabled();
+        baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, `${isOMEnabled}`);
         if (isOMEnabled) {
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
             om = new AdmobOpenMeasurementController(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, omAdViewBuilder, baseParams.thirdPartyEventManager);
             om.addToViewHierarchy();
-
-            // For brandv1 and brandv2 tracking
-            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, `${isOMEnabled}`);
         }
 
         const view = new AdMobView(baseParams.platform, baseParams.core, this._adMobSignalFactory, baseParams.container, baseParams.campaign, baseParams.deviceInfo, baseParams.clientInfo.getGameId(), baseParams.privacy, showGDPRBanner, baseParams.programmaticTrackingService, om);
