@@ -125,7 +125,7 @@ describe('BannerSizeUtil', () => {
                     h: 50
                 },
                 expectedOutput: undefined,
-                expectedMessage: 'Invalid Banner size of 319(width) 50(height) was given to Unity Ads Sdk, defaulting to minimum size 320x50'
+                expectedMessage: 'Invalid Banner size of 319(width) 50(height) was given to Unity Ads Sdk, resulted in no fill'
             },
             { // height less than 50
                 input: {
@@ -133,7 +133,7 @@ describe('BannerSizeUtil', () => {
                     h: 49
                 },
                 expectedOutput: undefined,
-                expectedMessage: 'Invalid Banner size of 320(width) 49(height) was given to Unity Ads Sdk, defaulting to minimum size 320x50'
+                expectedMessage: 'Invalid Banner size of 320(width) 49(height) was given to Unity Ads Sdk, resulted in no fill'
             }
         ];
 
