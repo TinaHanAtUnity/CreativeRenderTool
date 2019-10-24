@@ -76,4 +76,3 @@ export const LoadRefreshV3 = new ABTest(12);
 export const LoadRefreshV4 = new ABTest(5, 6);
 export const OriginalLoadExperiment = new ABTest(16);
 export const ZyngaLoadRefreshV4 = new ABTest(5); // Zynga V4
-export const OptServiceCommunicationExperiment = new ABTest(7);
