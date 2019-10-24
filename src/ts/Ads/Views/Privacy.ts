@@ -79,19 +79,15 @@ export class Privacy extends AbstractPrivacy {
     public show(): void {
         super.show();
 
-        if (!this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (!this._userPrivacyManager.isUserUnderAgeLimit() &&  !this._isCoppaCompliant) {
             this.populateUserSummary();
         }
 
-        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit() && !this._isCoppaCompliant) {
             const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement> this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
-
-            // Disables reporting for GDPR Regions by hiding the report screen from being activated
-            const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
-            middleLink.style.visibility = 'hidden';
 
             const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
             if (agreeRadioButton) {
@@ -106,11 +102,17 @@ export class Privacy extends AbstractPrivacy {
                 };
             }
         }
+
+        if (this._gdprEnabled) {
+            // Disables reporting for GDPR Regions by hiding the report screen from being activated
+            const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
+            middleLink.style.visibility = 'hidden';
+        }
     }
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit() && !this._isCoppaCompliant) {
             const gdprReduceRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-refuse-radio');
 
             this._handlers.forEach(handler => {

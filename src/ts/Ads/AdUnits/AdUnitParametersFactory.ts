@@ -187,6 +187,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             return true;
         }
 
+        if (parameters.coreConfig.isCoppaCompliant()) {
+            return false;
+        }
+
         if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.privacySDK.getGamePrivacy().getMethod()) {
             return false;
         }
