@@ -6,7 +6,7 @@ import {
     IGranularPermissions,
     PrivacyMethod,
     UserPrivacy,
-    IAllPermissions, IRawGamePrivacy, IRawUserPrivacy
+    IAllPermissions, IRawGamePrivacy, IRawUserPrivacy, IPermissions
 } from 'Privacy/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -85,11 +85,8 @@ export class PrivacyParser {
         }
 
         let adsAllowed = false;
-        if (uPP.hasOwnProperty('all')) {
-            adsAllowed = (<IAllPermissions>uPP).all;
-        }
         if (uPP.hasOwnProperty('profiling')) {
-            adsAllowed = (<IProfilingPermissions>uPP).profiling;
+            adsAllowed = (<IProfilingPermissions><unknown>uPP).profiling;
         }
         if (uPP.hasOwnProperty('ads')) {
             adsAllowed = (<IGranularPermissions>uPP).ads;
@@ -119,14 +116,24 @@ export class PrivacyParser {
 
     private static parseUserPrivacy(rawUserPrivacy: IRawUserPrivacy | undefined, rawGamePrivacy: IRawGamePrivacy | undefined,
                                     optOutEnabled: boolean, limitAdTracking: boolean): UserPrivacy {
+        // handle old style 'all'-privacy
+        if (rawUserPrivacy && rawUserPrivacy.permissions && (<IAllPermissions><unknown>rawUserPrivacy.permissions).all === true) {
+            rawUserPrivacy = {
+                method: rawUserPrivacy.method,
+                version: rawUserPrivacy.version,
+                permissions: {ads: true, gameExp: true, external: true},
+                agreedAll: true
+            };
+        }
+
         // TODO: Handle limitAdTracking on Ads SDK side
         if (limitAdTracking) {
             const gPmethod = rawGamePrivacy && rawGamePrivacy.method ? rawGamePrivacy.method : undefined;
             return new UserPrivacy({
                 method: gPmethod ? gPmethod : PrivacyMethod.DEFAULT,
                 version:  gPmethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0,
+                agreedAll: false,
                 permissions: {
-                    all: false,
                     gameExp: false,
                     ads: false,
                     external: false
@@ -135,8 +142,7 @@ export class PrivacyParser {
         }
 
         if (!rawGamePrivacy || !rawUserPrivacy) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
-                    all: false,
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, agreedAll: false, permissions: {
                     gameExp: false,
                     ads: false,
                     external: false
@@ -148,8 +154,8 @@ export class PrivacyParser {
             return new UserPrivacy({
                 method: rawGamePrivacy.method,
                 version: 0,
+                agreedAll: false,
                 permissions: {
-                    all: false,
                     gameExp: false,
                     ads: !optOutEnabled,
                     external: false
@@ -160,8 +166,7 @@ export class PrivacyParser {
         // reset outdated user privacy if the game privacy method has been changed, first ad request will be contextual
         const methodHasChanged = rawUserPrivacy.method !== rawGamePrivacy.method;
         if (rawGamePrivacy.method !== PrivacyMethod.DEFAULT && methodHasChanged) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
-                    all: false,
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, agreedAll: false, permissions: {
                     gameExp: false,
                     ads: false,
                     external: false

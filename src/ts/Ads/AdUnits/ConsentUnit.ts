@@ -4,20 +4,20 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { Platform } from 'Core/Constants/Platform';
-import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
-import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
-import { IPermissions, PrivacyMethod } from 'Privacy/Privacy';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ICoreApi } from 'Core/ICore';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ABGroup } from 'Core/Models/ABGroup';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import {AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
+import {Platform} from 'Core/Constants/Platform';
+import {Consent, ConsentPage, IConsentViewParameters} from 'Ads/Views/Consent/Consent';
+import {IConsentViewHandler} from 'Ads/Views/Consent/IConsentViewHandler';
+import {IPermissions, PrivacyMethod} from 'Privacy/Privacy';
+import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {ICoreApi} from 'Core/ICore';
+import {TestEnvironment} from 'Core/Utilities/TestEnvironment';
+import {DeviceInfo} from 'Core/Models/DeviceInfo';
+import {AndroidDeviceInfo} from 'Core/Models/AndroidDeviceInfo';
+import {ProgrammaticTrackingService} from 'Ads/Utilities/ProgrammaticTrackingService';
+import {ABGroup} from 'Core/Models/ABGroup';
+import {PrivacySDK} from 'Privacy/PrivacySDK';
+import {Diagnostics} from 'Core/Utilities/Diagnostics';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -146,7 +146,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
+        this._privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.TODO_MISSING_ACTION, this._landingPage);
     }
 
     // IConsentViewHandler
@@ -169,7 +169,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 ads: false,
                 external: false
             };
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE, false);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION, ConsentPage.AGE_GATE, false);
         } else {
             this._privacySDK.setOptOutRecorded(true);
             this._privacySDK.setOptOutEnabled(true);
@@ -181,8 +181,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 userPrivacy.update({
                     method: gamePrivacy.getMethod(),
                     version: 0,
+                    agreedAll: false,
                     permissions: {
-                        all: false,
                         ads: false,
                         external: false,
                         gameExp: false

@@ -17,11 +17,10 @@ export interface IGranularPermissions {
     external: boolean;
 }
 
-type IUnityConsentPermissions = IAllPermissions | IGranularPermissions;
+type IUnityConsentPermissions = IGranularPermissions;
 
 export function isUnityConsentPermissions(permissions: IPermissions): permissions is IUnityConsentPermissions {
-    return (<IAllPermissions>permissions).all === true || (
-        (<IGranularPermissions>permissions).gameExp !== undefined &&
+    return ((<IGranularPermissions>permissions).gameExp !== undefined &&
         (<IGranularPermissions>permissions).ads !== undefined &&
         (<IGranularPermissions>permissions).external !== undefined);
 }
@@ -30,7 +29,7 @@ export interface IProfilingPermissions {
     profiling: boolean;
 }
 
-export type IPermissions = IUnityConsentPermissions | IProfilingPermissions;
+export type IPermissions = IUnityConsentPermissions;
 
 export const CurrentUnityConsentVersion = 20181106;
 
@@ -84,12 +83,14 @@ export interface IRawUserPrivacy {
     method: string;
     version: number;
     permissions: IPermissions;
+    agreedAll: boolean;
 }
 
 interface IUserPrivacy {
     method: PrivacyMethod;
     version: number;
     permissions: IPermissions;
+    agreedAll: boolean;
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
@@ -106,8 +107,8 @@ export class UserPrivacy extends Model<IUserPrivacy> {
                 return new UserPrivacy({
                     method: method,
                     version: 0,
+                    agreedAll: false,
                     permissions: {
-                        all: false,
                         gameExp: false,
                         ads: !optOutEnabled,
                         external: false
@@ -122,8 +123,8 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return new UserPrivacy({
             method: PrivacyMethod.DEFAULT,
             version: 0,
+            agreedAll: false,
             permissions: {
-                all: false,
                 gameExp: false,
                 ads: false,
                 external: false
@@ -135,12 +136,14 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         super('UserPrivacy', {
             method: ['string'],
             version: ['number'],
-            permissions: ['object']
+            permissions: ['object'],
+            agreedAll: ['boolean']
         });
 
         this.set('method', <PrivacyMethod>data.method);
         this.set('version', data.version);
         this.set('permissions', data.permissions);
+        this.set('agreedAll', data.agreedAll);
     }
 
     public isRecorded(): boolean {

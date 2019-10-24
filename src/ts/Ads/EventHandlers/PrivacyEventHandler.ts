@@ -1,11 +1,11 @@
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { IPermissions, isUnityConsentPermissions, PrivacyMethod } from 'Privacy/Privacy';
-import { ConsentPage } from 'Ads/Views/Consent/Consent';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
+import {GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
+import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {IPrivacyHandler} from 'Ads/Views/AbstractPrivacy';
+import {Platform} from 'Core/Constants/Platform';
+import {ICoreApi} from 'Core/ICore';
+import {IPermissions, isUnityConsentPermissions, PrivacyMethod} from 'Privacy/Privacy';
+import {PrivacySDK} from 'Privacy/PrivacySDK';
+import {ConsentPage} from 'Ads/Views/Consent/Consent';
 
 export interface IPrivacyEventHandlerParameters {
     platform: Platform;
@@ -78,8 +78,8 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             userPrivacy.update({
                 method: gamePrivacy.getMethod(),
                 version: 0,
+                agreedAll: false,
                 permissions: {
-                    all: false,
                     ads: !optOutEnabled,
                     external: gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT ? !optOutEnabled : false,
                     gameExp: false
@@ -91,7 +91,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     public onPersonalizedConsent(permissions: IPermissions): void {
         const gamePrivacy = this._privacy.getGamePrivacy();
         if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.MY_CHOICES, false);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION, ConsentPage.MY_CHOICES, false);
         }
     }
 }

@@ -94,18 +94,17 @@ describe('incident-20190516-2', () => {
         // tslint:disable-next-line
         PrivacyParser['_updateUserPrivacyForIncident'] = false;
     });
-    [   {profiling: false},
-        {profiling: true},
-        {ads: false, gameExp: false, external: false},
-        {ads: true, gameExp: true, external: true},
-        {all: true}]
-        .forEach((permissions) => {
+    [   [{ads: false, gameExp: false, external: false}, false],
+        [{ads: true, gameExp: true, external: true}, true],
+        [{ads: true, gameExp: true, external: true}, false]]
+        .forEach(([permissions, agreedAll]) => {
         it('AdsConfigurationParser should NOT mark privacy as desynchronized if optOutEnabled is true and UserPrivacy.permissions = ' + JSON.stringify(permissions), () => {
             const configJson = {
                 optOutRecorded: true,
                 optOutEnabled: true,
                 userPrivacy: {
                     permissions: permissions,
+                    agreedAll: agreedAll,
                     method: 'legitimate_interest',
                     version: CurrentUnityConsentVersion
                 },

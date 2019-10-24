@@ -1,96 +1,108 @@
-import { AdMob } from 'AdMob/AdMob';
-import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
-import { IAds, IAdsApi } from 'Ads/IAds';
-import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
-import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { PlacementManager } from 'Ads/Managers/PlacementManager';
-import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
-import { Campaign } from 'Ads/Models/Campaign';
-import { Placement } from 'Ads/Models/Placement';
-import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
-import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
-import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
-import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
-import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
-import { ListenerApi } from 'Ads/Native/Listener';
-import { PlacementApi } from 'Ads/Native/Placement';
-import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
-import { WebPlayerApi } from 'Ads/Native/WebPlayer';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
-import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { Banners } from 'Banners/Banners';
-import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
-import { FinishState } from 'Core/Constants/FinishState';
-import { Platform } from 'Core/Constants/Platform';
-import { UnityAdsError } from 'Core/Constants/UnityAdsError';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { ICore } from 'Core/ICore';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { CacheMode } from 'Core/Models/CoreConfiguration';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Display } from 'Display/Display';
-import { Monetization } from 'Monetization/Monetization';
-import { MRAID } from 'MRAID/MRAID';
-import { MRAIDView } from 'MRAID/Views/MRAIDView';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { Performance } from 'Performance/Performance';
-import { Promo } from 'Promo/Promo';
-import { VAST } from 'VAST/VAST';
-import { VPAID } from 'VPAID/VPAID';
-import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { XPromo } from 'XPromo/XPromo';
-import { AR } from 'AR/AR';
+import {AdMob} from 'AdMob/AdMob';
+import {AdMobSignalFactory} from 'AdMob/Utilities/AdMobSignalFactory';
+import {AbstractAdUnit} from 'Ads/AdUnits/AbstractAdUnit';
+import {Activity} from 'Ads/AdUnits/Containers/Activity';
+import {AdUnitContainer, Orientation} from 'Ads/AdUnits/Containers/AdUnitContainer';
+import {ViewController} from 'Ads/AdUnits/Containers/ViewController';
+import {IAds, IAdsApi} from 'Ads/IAds';
+import {AssetManager} from 'Ads/Managers/AssetManager';
+import {CampaignManager} from 'Ads/Managers/CampaignManager';
+import {ContentTypeHandlerManager} from 'Ads/Managers/ContentTypeHandlerManager';
+import {GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
+import {MissedImpressionManager} from 'Ads/Managers/MissedImpressionManager';
+import {CampaignRefreshManager} from 'Ads/Managers/CampaignRefreshManager';
+import {OperativeEventManager} from 'Ads/Managers/OperativeEventManager';
+import {PlacementManager} from 'Ads/Managers/PlacementManager';
+import {ProgrammaticOperativeEventManager} from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import {SessionManager} from 'Ads/Managers/SessionManager';
+import {AdsConfiguration, IRawAdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory} from 'Ads/Managers/ThirdPartyEventManager';
+import {Campaign} from 'Ads/Models/Campaign';
+import {Placement} from 'Ads/Models/Placement';
+import {AdsPropertiesApi} from 'Ads/Native/AdsProperties';
+import {AndroidAdUnitApi} from 'Ads/Native/Android/AdUnit';
+import {AndroidVideoPlayerApi} from 'Ads/Native/Android/VideoPlayer';
+import {IosAdUnitApi} from 'Ads/Native/iOS/AdUnit';
+import {IosVideoPlayerApi} from 'Ads/Native/iOS/VideoPlayer';
+import {ListenerApi} from 'Ads/Native/Listener';
+import {PlacementApi} from 'Ads/Native/Placement';
+import {VideoPlayerApi} from 'Ads/Native/VideoPlayer';
+import {WebPlayerApi} from 'Ads/Native/WebPlayer';
+import {AdsConfigurationParser} from 'Ads/Parsers/AdsConfigurationParser';
+import {CustomFeatures} from 'Ads/Utilities/CustomFeatures';
+import {GameSessionCounters} from 'Ads/Utilities/GameSessionCounters';
+import {IosUtils} from 'Ads/Utilities/IosUtils';
+import {
+    ChinaMetric,
+    LoadMetric,
+    MiscellaneousMetric,
+    ProgrammaticTrackingError,
+    TimingMetric
+} from 'Ads/Utilities/ProgrammaticTrackingService';
+import {SdkStats} from 'Ads/Utilities/SdkStats';
+import {SessionDiagnostics} from 'Ads/Utilities/SessionDiagnostics';
+import {InterstitialWebPlayerContainer} from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import {VideoOverlay} from 'Ads/Views/VideoOverlay';
+import {Banners} from 'Banners/Banners';
+import {AuctionRequest} from 'Ads/Networking/AuctionRequest';
+import {FinishState} from 'Core/Constants/FinishState';
+import {Platform} from 'Core/Constants/Platform';
+import {UnityAdsError} from 'Core/Constants/UnityAdsError';
+import {DiagnosticError} from 'Core/Errors/DiagnosticError';
+import {ICore} from 'Core/ICore';
+import {AndroidDeviceInfo} from 'Core/Models/AndroidDeviceInfo';
+import {CacheMode} from 'Core/Models/CoreConfiguration';
+import {IosDeviceInfo} from 'Core/Models/IosDeviceInfo';
+import {CallbackStatus, INativeCallback} from 'Core/Native/Bridge/NativeBridge';
+import {Diagnostics} from 'Core/Utilities/Diagnostics';
+import {TestEnvironment} from 'Core/Utilities/TestEnvironment';
+import {JsonParser} from 'Core/Utilities/JsonParser';
+import {Display} from 'Display/Display';
+import {Monetization} from 'Monetization/Monetization';
+import {MRAID} from 'MRAID/MRAID';
+import {MRAIDView} from 'MRAID/Views/MRAIDView';
+import {PerformanceCampaign} from 'Performance/Models/PerformanceCampaign';
+import {Performance} from 'Performance/Performance';
+import {Promo} from 'Promo/Promo';
+import {VAST} from 'VAST/VAST';
+import {VPAID} from 'VPAID/VPAID';
+import {XPromoCampaign} from 'XPromo/Models/XPromoCampaign';
+import {XPromo} from 'XPromo/XPromo';
+import {AR} from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
 import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
-import { ITestCreativePack } from 'Ads/Models/CreativePack';
-import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { ARUtil } from 'AR/Utilities/ARUtil';
-import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
-import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
-import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
-import { China } from 'China/China';
-import { IStore } from 'Store/IStore';
-import { Store } from 'Store/Store';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
-import { LoadApi } from 'Core/Native/LoadApi';
-import { RefreshManager } from 'Ads/Managers/RefreshManager';
-import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
-import { Analytics } from 'Analytics/Analytics';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
-import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart, ZyngaLoadExperiment, ZyngaLoadExperimentWithCometRefreshing } from 'Core/Models/ABGroup';
-import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
-import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
+import {ITestCreativePack} from 'Ads/Models/CreativePack';
+import {PlayerMetaData} from 'Core/Models/MetaData/PlayerMetaData';
+import {AbstractPrivacy} from 'Ads/Views/AbstractPrivacy';
+import {ARUtil} from 'AR/Utilities/ARUtil';
+import {PermissionsUtil, PermissionTypes} from 'Core/Utilities/Permissions';
+import {AbstractParserModule} from 'Ads/Modules/AbstractParserModule';
+import {MRAIDAdUnitParametersFactory} from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import {PromoCampaign} from 'Promo/Models/PromoCampaign';
+import {ConsentUnit} from 'Ads/AdUnits/ConsentUnit';
+import {China} from 'China/China';
+import {IStore} from 'Store/IStore';
+import {Store} from 'Store/Store';
+import {RequestManager} from 'Core/Managers/RequestManager';
+import {AbstractAdUnitParametersFactory} from 'Ads/AdUnits/AdUnitParametersFactory';
+import {LoadApi} from 'Core/Native/LoadApi';
+import {RefreshManager} from 'Ads/Managers/RefreshManager';
+import {PerPlacementLoadManager} from 'Ads/Managers/PerPlacementLoadManager';
+import {Analytics} from 'Analytics/Analytics';
+import {PrivacySDK} from 'Privacy/PrivacySDK';
+import {PrivacyParser} from 'Privacy/Parsers/PrivacyParser';
+import {Promises} from 'Core/Utilities/Promises';
+import {
+    LoadExperiment,
+    LoadExperimentWithCometRefreshing,
+    LoadExperimentWithCometRefreshingAfterAnyStart,
+    ZyngaLoadExperiment,
+    ZyngaLoadExperimentWithCometRefreshing
+} from 'Core/Models/ABGroup';
+import {PerPlacementLoadManagerWithCometRefresh} from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
+import {PerPlacementLoadManagerWithCometRefreshAfterAnyStart} from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 
 export class Ads implements IAds {
 
@@ -187,7 +199,7 @@ export class Ads implements IAds {
 
             if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
                 // TODO: We are already not sending these in a branch that's been accepted for merge. Remove this when merging with those changes
-                this.PrivacyManager.updateUserPrivacy({ads: false, gameExp: false, external: false},  GDPREventSource.SANITIZATION);
+                this.PrivacyManager.updateUserPrivacy({ads: false, gameExp: false, external: false},  GDPREventSource.SANITIZATION, GDPREventAction.TODO_MISSING_ACTION);
             }
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);

@@ -35,7 +35,7 @@ export class RequestPrivacyFactory {
                 method: gamePrivacy.getMethod(),
                 firstRequest: true,
                 permissions: {}
-            };1
+            };
         }
         return {
             method: userPrivacy.getMethod(),
@@ -49,6 +49,7 @@ export class RequestPrivacyFactory {
         return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
     }
 
+    // TODO-jon: remove this method, it shouldn't be needed anymore
     private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
         const permissions = userPrivacy.getPermissions();
 

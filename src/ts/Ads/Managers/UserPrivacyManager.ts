@@ -41,7 +41,8 @@ export enum GDPREventAction {
     SKIP = 'skip',
     CONSENT = 'consent',
     OPTOUT = 'optout',
-    OPTIN = 'optin'
+    OPTIN = 'optin',
+    TODO_MISSING_ACTION = 'todo_missing_action'
 }
 
 export enum LegalFramework {
@@ -123,7 +124,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage, agreedToAll: boolean = false): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage, agreedAll: boolean = false): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
 
@@ -132,13 +133,15 @@ export class UserPrivacyManager {
         }
 
         if (source === GDPREventSource.NO_REVIEW) {
+            console.log("no_review");
             permissions = {ads: true, gameExp: true, external: true};
-            agreedToAll = true;
+            agreedAll = true;
         }
 
         const updatedPrivacy = {
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
+            agreedAll: agreedAll,
             permissions: permissions
         };
 
@@ -147,7 +150,7 @@ export class UserPrivacyManager {
         }
 
         this._userPrivacy.update(updatedPrivacy);
-        return this.sendPrivacyEvent(permissions, source, action, layout, agreedToAll, firstRequest);
+        return this.sendPrivacyEvent(permissions, source, action, layout, agreedAll, firstRequest);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -155,29 +158,33 @@ export class UserPrivacyManager {
         if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
             return true;
         }
+        console.log("1");
 
         if (currentPrivacy.getVersion() !== updatedPrivacy.version) {
             return true;
         }
+        console.log("2");
 
         const currentPermissions = currentPrivacy.getPermissions();
         const updatedPermissions = updatedPrivacy.permissions;
 
+        console.log((<IGranularPermissions>currentPermissions).gameExp + " eq? " + (<IGranularPermissions>updatedPermissions).gameExp);
+
         if ((<IGranularPermissions>currentPermissions).gameExp !== (<IGranularPermissions>updatedPermissions).gameExp) {
             return true;
         }
+        console.log("3");
 
         if ((<IGranularPermissions>currentPermissions).ads !== (<IGranularPermissions>updatedPermissions).ads) {
             return true;
         }
+        console.log("4");
 
         if ((<IGranularPermissions>currentPermissions).external !== (<IGranularPermissions>updatedPermissions).external) {
             return true;
         }
 
-        if ((<IAllPermissions>currentPermissions).all !== (<IAllPermissions>updatedPermissions).all) {
-            return true;
-        }
+        console.log("5");
 
         return false;
     }
@@ -263,6 +270,7 @@ export class UserPrivacyManager {
         return this._privacy.isOptOutEnabled();
     }
 
+    // TODO-jon: Remove this method, should not be needed anymore
     public getGranularPermissions(): IGranularPermissions {
         const permissions = this._privacy.getUserPrivacy().getPermissions();
         if (!isUnityConsentPermissions(permissions)) {
@@ -371,8 +379,8 @@ export class UserPrivacyManager {
         userPrivacy.update({
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
+            agreedAll: false,
             permissions: {
-                all: false,
                 gameExp: false,
                 ads: consent,
                 external: consent

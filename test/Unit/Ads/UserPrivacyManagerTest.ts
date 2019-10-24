@@ -1,25 +1,25 @@
-import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
-import { Backend } from 'Backend/Backend';
-import { assert } from 'chai';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Observable2 } from 'Core/Utilities/Observable';
+import {GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
+import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
+import {GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Privacy/Privacy';
+import {Backend} from 'Backend/Backend';
+import {assert} from 'chai';
+import {Platform} from 'Core/Constants/Platform';
+import {ICoreApi} from 'Core/ICore';
+import {RequestManager} from 'Core/Managers/RequestManager';
+import {AndroidDeviceInfo} from 'Core/Models/AndroidDeviceInfo';
+import {ClientInfo} from 'Core/Models/ClientInfo';
+import {CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import {DeviceInfo} from 'Core/Models/DeviceInfo';
+import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
+import {StorageType} from 'Core/Native/Storage';
+import {Diagnostics} from 'Core/Utilities/Diagnostics';
+import {HttpKafka, KafkaCommonObjectType} from 'Core/Utilities/HttpKafka';
+import {Observable2} from 'Core/Utilities/Observable';
 import 'mocha';
 import * as sinon from 'sinon';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ConsentPage } from 'Ads/Views/Consent/Consent';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
+import {TestFixtures} from 'TestHelpers/TestFixtures';
+import {ConsentPage} from 'Ads/Views/Consent/Consent';
+import {PrivacySDK} from 'Privacy/PrivacySDK';
 
 describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
@@ -669,7 +669,7 @@ describe('UserPrivacyManagerTest', () => {
 
         describe('when updating user privacy', () => {
             function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage, agreeToAll: boolean = false): Promise<any> {
-                return privacyManager.updateUserPrivacy(permissions, source, layout, agreeToAll).then(() => {
+                return privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.CONSENT, layout, agreeToAll).then(() => {
                     sinon.assert.calledTwice(httpKafkaStub); // First one is temporary diagnostics
                     return httpKafkaStub.secondCall.args[2];
                 });
@@ -725,10 +725,11 @@ describe('UserPrivacyManagerTest', () => {
                 });
             });
 
-            it('should send permissions=all if source is NO_REVIEW', () => {
+            it('should no longer send permissions=all if source is NO_REVIEW', () => {
                 return sendEvent(undefined, GDPREventSource.NO_REVIEW).then((eventData) => {
                     assert.isDefined(eventData);
-                    assert.deepEqual(eventData.permissions, { all: true });
+                    assert.deepEqual(eventData.permissions, { ads: true, external: true, gameExp: true });
+                    assert.isTrue(eventData.agreedAll);
                 });
             });
         });
@@ -741,7 +742,7 @@ describe('UserPrivacyManagerTest', () => {
 
             it('if game privacy is disabled', () => {
                 gamePrivacy.isEnabled.returns(false);
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER, GDPREventAction.CONSENT).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
@@ -751,7 +752,7 @@ describe('UserPrivacyManagerTest', () => {
                 userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
                 userPrivacy.getVersion.returns(25250101);
                 userPrivacy.getPermissions.returns(permissions);
-                return privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER).then(() => {
+                return privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.CONSENT).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
@@ -759,8 +760,8 @@ describe('UserPrivacyManagerTest', () => {
             it('if permissions=all was not changed', () => {
                 userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
                 userPrivacy.getVersion.returns(25250101);
-                userPrivacy.getPermissions.returns({ all: true });
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.NO_REVIEW).then(() => {
+                userPrivacy.getPermissions.returns({ ads: true, gameExp: true, external: true });
+                return privacyManager.updateUserPrivacy({ ads: true, gameExp: true, external: true }, GDPREventSource.NO_REVIEW, GDPREventAction.CONSENT).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
@@ -768,7 +769,7 @@ describe('UserPrivacyManagerTest', () => {
             //TODO: remove/rephrase when old fields are deprecated
             it('if game privacy method is other than UnityConsent', () => {
                 gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
