@@ -1,5 +1,5 @@
 import { IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
-import { BannerViewType } from 'Banners/Native/Banner';
+import { BannerViewType } from 'Banners/Native/BannerApi';
 import { Platform } from 'Core/Constants/Platform';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Template } from 'Core/Utilities/Template';
@@ -14,10 +14,6 @@ export class DisplayHTMLBannerAdUnit extends HTMLBannerAdUnit {
     constructor(parameters: IBannerAdUnitParameters) {
         super(parameters);
         this._template = new Template(BannerContainer);
-    }
-
-    public getViews() {
-        return [BannerViewType.BannerPlayer];
     }
 
     public onDestroy() {

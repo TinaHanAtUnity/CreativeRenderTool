@@ -31,6 +31,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -92,7 +93,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             userPrivacyManager: privacyManager
         });
 
-        const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en');
         const endScreenParams: IEndScreenParameters = {
             platform,
             core,
@@ -116,6 +117,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         };
         overlay = new VideoOverlay(overlayParams, privacy, false, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
         performanceAdUnitParameters = {
             platform,
@@ -141,7 +143,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             video: video,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            automatedExperimentManager: automatedExperimentManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);

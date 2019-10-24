@@ -113,7 +113,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                     userPrivacyManager: privacyManager
                 });
 
-                const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+                const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en');
 
                 webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
                 (<any>webPlayerContainer).onPageStarted = new Observable1<string>();

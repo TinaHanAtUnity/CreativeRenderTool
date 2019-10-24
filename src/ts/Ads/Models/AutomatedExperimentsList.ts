@@ -1,0 +1,23 @@
+import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+
+// List experiments to run here and add them to the list
+// Examples:
+// export const FooExperiment = new AutomatedExperiment({
+//     name: 'FooExperiment',
+//     actions: ['FooAction1', 'FooAction2'],
+//     defaultAction: 'FooAction1'
+// });
+// export const BarExperiment = new AutomatedExperiment({
+//     name: 'BarExperiment',
+//     actions: ['BarAction1', 'BarAction2'],
+//     defaultAction: 'BarAction2',
+//     cacheDisabled: true
+// });
+
+export const CommunicationExperiment = new AutomatedExperiment({
+    name: 'CommunicationExperiment',
+    actions: ['Action1', 'Action2'],
+    defaultAction: 'Action1'
+});
+
+export const AutomatedExperimentsList: AutomatedExperiment[] = [CommunicationExperiment];

@@ -1,3 +1,63 @@
+# Staged
+
+* Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
+
+# Tue Oct 22 20:41:36 UTC 2019
+
+* Add AutomatedExperiment to test communications with AUI service [#11758](https://github.com/Applifier/unity-ads-webview/pull/11758)
+* Fix iOS 13 rotation with endcard issue [#11561](https://github.com/Applifier/unity-ads-webview/pull/11561)
+
+# Mon Oct 21 21:25:14 UTC 2019
+
+* Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)
+* Mute Admob Videos Based on Auction Flag [#11732](https://github.com/Applifier/unity-ads-webview/pull/11732)
+
+# Fri Oct 18 22:56:15 UTC 2019
+
+* Revert 4 animations for CTA experiments [#11702](https://github.com/Applifier/unity-ads-webview/pull/11702)
+* Age Gate: Change background colors and increase font sizes [#11731](https://github.com/Applifier/unity-ads-webview/pull/11731)
+* Open Measurement - AdViewBuilder[#11452](https://github.com/Applifier/unity-ads-webview/pull/11452)
+
+# Wed Oct 16 17:36:03 UTC 2019
+
+* Force age gate resync to never show age gate twice [#11648](https://github.com/Applifier/unity-ads-webview/pull/11648)
+* Chinese translation for privacy pop-up and dialog [#11505](https://github.com/Applifier/unity-ads-webview/pull/11505)
+* Merge 3.3.0 to master and Update Releases.txt
+* Update Reporting Advertisement Copy [#11676](https://github.com/Applifier/unity-ads-webview/pull/11676)
+
+# Tue Oct 15 17:42:45 UTC 2019
+
+* Add PerPlacementLoadManagerV3 ABTest on Group 12 for all Load Traffic [#11649](https://github.com/Applifier/unity-ads-webview/pull/11649)
+* Align Zynga Solitaire with WWF Testing and Remove Extra PTS Tracking [#11646](https://github.com/Applifier/unity-ads-webview/pull/11646)
+* Remove privacy sanitation events [#11559](https://github.com/Applifier/unity-ads-webview/pull/11559)
+
+# Fri Oct 11 23:01:15 UTC 2019
+
+* Fix privacy template [#11591](https://github.com/Applifier/unity-ads-webview/pull/11591)
+* Experiment ABGroup 17: Load API - Refresh Filled Comet Placement on the Start of Any Campaign [#11594](https://github.com/Applifier/unity-ads-webview/pull/11594)
+* Add Comet Refresh to Zynga WWF Titles on Groups 13 and 14 [#11622](https://github.com/Applifier/unity-ads-webview/pull/11622)
+
+# Fri Oct 11 11:48:55 UTC 2019
+
+* Age-gate: Update Chinese translation [#11598](https://github.com/Applifier/unity-ads-webview/pull/11598)
+* Test prints out differently for Safari vs Chrome [#11596](https://github.com/Applifier/unity-ads-webview/pull/11596)
+
+# Thu Oct 10 21:19:20 UTC 2019
+
+* Create and Inject Automated Experiment Manager in Performance Ad [#11533](https://github.com/Applifier/unity-ads-webview/pull/11533)
+* Open Measurement - Enable OM for Admob [#11563](https://github.com/Applifier/unity-ads-webview/pull/11563)
+* Add Initialization Stages Timing and Batched PTS Events [#11562](https://github.com/Applifier/unity-ads-webview/pull/11562)
+
+# Wed Oct  9 19:29:21 UTC 2019
+
+* Add Additional Tags to Metrics for Zynga WWF Titles [#11564](https://github.com/Applifier/unity-ads-webview/pull/11564)
+* Open Measurement - Fix Event Queue Using UUIDs [#11334](https://github.com/Applifier/unity-ads-webview/pull/11334)
+
+# Tue Oct  8 23:34:26 UTC 2019
+
+* Add Automated Experiment Manager [#11390](https://github.com/Applifier/unity-ads-webview/pull/11390)
+* Add Age Gate Related Diagnostics [#11531](https://github.com/Applifier/unity-ads-webview/pull/11531)
+
 # Fri Oct  4 21:43:11 UTC 2019
 
 * Remove Zynga WWF Games from Load Whitelist [#11507](https://github.com/Applifier/unity-ads-webview/pull/11507)

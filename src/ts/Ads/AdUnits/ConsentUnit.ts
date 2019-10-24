@@ -17,6 +17,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PrivacyView } from 'Ads/Views/Consent/PrivacyView';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -97,6 +98,14 @@ export class ConsentUnit implements IPrivacyViewHandler, IAdUnit {
             document.body.appendChild(this._unityConsentView.container());
 
             this._unityConsentView.show();
+
+            if (this._privacySDK.isAgeGateEnabled()) {
+                Diagnostics.trigger('age_gate_show', {
+                    legalFramework: this._privacySDK.getLegalFramework(),
+                    method: this._privacySDK.getGamePrivacy().getMethod(),
+                    previousChoice: this._privacyManager.getAgeGateChoice()
+                });
+            }
 
             if (TestEnvironment.get('autoAcceptConsent')) {
                 const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));

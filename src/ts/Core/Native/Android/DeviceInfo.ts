@@ -53,6 +53,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenLayout');
     }
 
+    public getDisplayMetricDensity(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDisplayMetricDensity');
+    }
+
     public getScreenDensity(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenDensity');
     }

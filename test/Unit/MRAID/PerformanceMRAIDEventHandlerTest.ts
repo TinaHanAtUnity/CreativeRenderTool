@@ -113,7 +113,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
+                privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false, 'en'),
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
                 webPlayerContainer: webPlayerContainer,

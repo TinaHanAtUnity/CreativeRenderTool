@@ -68,10 +68,12 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
-export const HeartbeatingDownloadButtonTest = new ZyngaFilteredABTest(5);
-export const BlinkingDownloadButtonTest = new ZyngaFilteredABTest(6);
-export const BouncingDownloadButtonTest = new ZyngaFilteredABTest(7);
-export const ShiningDownloadButtonTest = new ZyngaFilteredABTest(8);
-export const LoadExperiment = new ABTest(15, 16); // Intentionally left 15 to not backwards break experiment
-export const LoadExperimentWithCometRefreshing = new ABTest(15); // Intentionally duplicate ABGroup 15
 export const ConsentUXTest = new ABTest(18, 19);
+
+// Load ABTests
+export const LoadExperiment = new ABTest(5, 6, 12, 16); // Intentionally left 5, 6, 12, and 16 to not backwards break experiment
+export const LoadRefreshV3 = new ABTest(12);
+export const LoadRefreshV4 = new ABTest(5, 6);
+export const OriginalLoadExperiment = new ABTest(16);
+export const ZyngaLoadRefreshV4 = new ABTest(5); // Zynga V4
+export const OptServiceCommunicationExperiment = new ABTest(7);

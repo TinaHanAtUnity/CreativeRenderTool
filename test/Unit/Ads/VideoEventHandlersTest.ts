@@ -56,6 +56,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('Vast VideoEventHandlersTest', () => {
 
@@ -136,7 +137,7 @@ describe('Vast VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en_FI');
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -371,7 +372,7 @@ describe('Performance VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = new Privacy(platform, performanceCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(platform, performanceCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en_FI');
         const campaign = TestFixtures.getCampaign();
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
@@ -395,6 +396,7 @@ describe('Performance VideoEventHandlersTest', () => {
             targetGameName: performanceCampaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
+        const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
         performanceAdUnitParameters = {
             platform,
@@ -420,7 +422,8 @@ describe('Performance VideoEventHandlersTest', () => {
             privacy: privacy,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            automatedExperimentManager: automatedExperimentManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
@@ -857,7 +860,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const campaign = TestFixtures.getCampaign();
-        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en_FI');
         const videoOverlayParameters = {
             deviceInfo: deviceInfo,
             campaign: campaign,

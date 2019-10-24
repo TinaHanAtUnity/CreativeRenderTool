@@ -9,7 +9,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { FinishState } from 'Core/Constants/FinishState';
 import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Observables } from 'Core/Utilities/Observables';
 
@@ -55,11 +55,13 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
 
     protected _onReport: Observable2<Campaign, string> = new Observable2();
     protected _userPrivacyManager: UserPrivacyManager;
+    protected _isCoppaCompliant: boolean;
     private static buildInformation: IBuildInformation;
 
     constructor(platform: Platform, privacyManager: UserPrivacyManager, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string, attachTap?: boolean) {
         super(platform, id, attachTap);
 
+        this._isCoppaCompliant = isCoppaCompliant;
         this._userPrivacyManager = privacyManager;
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,

@@ -48,6 +48,7 @@ import { IChinaApi } from 'China/IChina';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -127,7 +128,7 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(core.Android!.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
@@ -152,6 +153,7 @@ describe('EndScreenEventHandlerTest', () => {
             };
             overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
             performanceAdUnitParameters = {
                 platform,
@@ -177,7 +179,8 @@ describe('EndScreenEventHandlerTest', () => {
                 privacy: privacy,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmticTrackingService,
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                automatedExperimentManager: automatedExperimentManager
             };
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
@@ -1000,7 +1003,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en');
             const endScreenParams: IEndScreenParameters = {
                 platform,
                 core,
@@ -1025,6 +1028,7 @@ describe('EndScreenEventHandlerTest', () => {
             };
             overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
             performanceAdUnitParameters = {
                 platform,
@@ -1050,7 +1054,8 @@ describe('EndScreenEventHandlerTest', () => {
                 privacy: privacy,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                privacySDK: privacySDK
+                privacySDK: privacySDK,
+                automatedExperimentManager: automatedExperimentManager
             };
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
