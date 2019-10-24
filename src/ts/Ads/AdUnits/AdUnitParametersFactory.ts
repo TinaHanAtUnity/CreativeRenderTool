@@ -126,7 +126,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
                 [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
                 [ThirdPartyEventMacro.OM_ENABLED]: this._campaign instanceof VastCampaign || this._campaign instanceof AdMobCampaign ? `${this._campaign.isOMEnabled()}` : `${false}`,
-                [ThirdPartyEventMacro.OM_VENDORS]: this._campaign instanceof VastCampaign || this._campaign instanceof AdMobCampaign ? this.arrayToPipedString(this._campaign.getOMVendors()) : '[]'
+                [ThirdPartyEventMacro.OM_VENDORS]: this._campaign instanceof VastCampaign ? this.arrayToPipedString(this._campaign.getOMVendors()) : ThirdPartyEventMacro.OM_VENDORS
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,
@@ -143,7 +143,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         };
     }
 
-    private arrayToPipedString(arr: string[]): string {
+    protected arrayToPipedString(arr: string[]): string {
         let stringBuilder = '';
         arr.forEach((str) => {
             stringBuilder += `|${str}|`;

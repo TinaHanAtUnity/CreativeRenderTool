@@ -11,6 +11,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -23,6 +24,7 @@ import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasu
         let campaign: AdMobCampaign;
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
+        let thirdPartyEventManager: ThirdPartyEventManager;
 
         const initAdMobOMManager = () => {
             placement = TestFixtures.getPlacement();
@@ -31,6 +33,8 @@ import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasu
             core = TestFixtures.getCoreApi(nativeBridge);
             clientInformation = TestFixtures.getClientInfo(platform);
             campaign = sandbox.createStubInstance(AdMobCampaign);
+            thirdPartyEventManager = sandbox.createStubInstance(ThirdPartyEventManager);
+
             if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             } else {
@@ -39,7 +43,7 @@ import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasu
             request = sinon.createStubInstance(RequestManager);
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
 
-            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder);
+            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
 
         describe('DOM Hierarchy', () => {

@@ -8,6 +8,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -61,6 +62,10 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             baseParams.campaign.setIsOMEnabled(true);
             baseParams.campaign.setOMVendors(omVendors);
             vastAdUnitParameters.om = omManager;
+
+            // For brandv1 and brandv2 tracking
+            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, `${baseParams.campaign.isOMEnabled()}`);
+            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, this.arrayToPipedString(baseParams.campaign.getOMVendors()));
         }
 
         return vastAdUnitParameters;

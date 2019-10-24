@@ -14,6 +14,7 @@ import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobO
 import * as sinon from 'sinon';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('OpenMeasurementAdViewBuilder', () => {
@@ -216,7 +217,8 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
                 }
                 const request = sinon.createStubInstance(RequestManager);
                 const adViewBuilder = sinon.createStubInstance(AdmobOpenMeasurementController);
-                return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder);
+                const thirdParty = sinon.createStubInstance(ThirdPartyEventManager);
+                return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder, thirdParty);
             };
 
             it('should output obstructed adview', () => {
