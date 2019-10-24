@@ -1,6 +1,8 @@
 # Staged
 
 * Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
+* Add initial implementation of privacy metrics [#11789](https://github.com/Applifier/unity-ads-webview/pull/11789)
+* Revert "Experiment to test communications with AUI service" [#11815](https://github.com/Applifier/unity-ads-webview/pull/11815)
 
 # Tue Oct 22 20:41:36 UTC 2019
 
