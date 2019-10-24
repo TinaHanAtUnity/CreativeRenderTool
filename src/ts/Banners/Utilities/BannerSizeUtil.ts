@@ -30,7 +30,7 @@ export class BannerSizeUtil {
         } else if (width >= BannerSizeStandardDimensions.w && height >= BannerSizeStandardDimensions.h) {
             return BannerSizeStandardDimensions;
         } else {
-            errorLogger.logError(`Invalid Banner size of ${width}(width) ${height}(height) was given to Unity Ads Sdk, resulted in no fil`);
+            errorLogger.logError(`Invalid Banner size of ${width}(width) ${height}(height) was given to Unity Ads Sdk, resulted in no fill`);
             return undefined;
         }
     }
