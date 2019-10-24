@@ -46,15 +46,10 @@ const cdnConfig = {
     },
     'tencentcloud': {
         'base_urls': [
-            'china-cdn2.unityads.unity3d.com',
-            'cdn.unityads.unity3d.com',
-            'geocdn.unityads.unity3d.com',
-            'config.unityads.unity3d.com',
-            'webview.unityads.unity3d.com',
             'config.unityads.unitychina.cn',
             'webview.unityads.unitychina.cn'
         ],
-        'check_url': 'china-cdn2.unityads.unity3d.com',
+        'check_url': 'config.unityads.unitychina.cn',
         'secret_id': process.env.TENCENT_SECRET_ID,
         'secret_key': process.env.TENCENT_SECRET_KEY
     }
