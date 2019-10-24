@@ -30,6 +30,8 @@ import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -122,7 +124,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             thirdPartyEventManager: this._thirdPartyEventManagerFactory.create({
                 [ThirdPartyEventMacro.ZONE]: this._placement.getId(),
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
-                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || ''
+                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
+                [ThirdPartyEventMacro.OM_ENABLED]: this._campaign instanceof VastCampaign || this._campaign instanceof AdMobCampaign ? `${this._campaign.isOMEnabled()}` : `${false}`,
+                [ThirdPartyEventMacro.OM_VENDORS]: this._campaign instanceof VastCampaign || this._campaign instanceof AdMobCampaign ? this.arrayToPipedString(this._campaign.getOMVendors()) : '[]'
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,
@@ -137,6 +141,15 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             privacy: this.createPrivacy(),
             privacySDK: this._privacySDK
         };
+    }
+
+    private arrayToPipedString(arr: string[]): string {
+        let stringBuilder = '';
+        arr.forEach((str) => {
+            stringBuilder += `|${str}|`;
+        });
+
+        return `[${stringBuilder}]`;
     }
 
     protected getOperativeEventManager(): OperativeEventManager {

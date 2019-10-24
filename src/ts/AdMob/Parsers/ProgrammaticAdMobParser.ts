@@ -80,6 +80,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 dynamicMarkup: markup,
                 useWebViewUserAgentForTracking: true,
                 video: video,
+                omVendors: [],
                 isOMEnabled: isOpenMeasurementEnabled,
                 shouldMuteByDefault: shouldMuteByDefault
             };

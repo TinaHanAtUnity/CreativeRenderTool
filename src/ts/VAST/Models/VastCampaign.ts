@@ -21,6 +21,8 @@ export interface IVastCampaign extends IProgrammaticCampaign {
     buyerId: string | undefined;
     impressionUrls: string[];
     isMoatEnabled: boolean | undefined;
+    isOMEnabled: boolean;
+    omVendors: string[];
 }
 
 export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
@@ -41,7 +43,9 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             advertiserBundleId: ['string', 'undefined'],
             buyerId: ['string', 'undefined'],
             impressionUrls: ['array'],
-            isMoatEnabled: ['boolean', 'undefined']
+            isMoatEnabled: ['boolean', 'undefined'],
+            isOMEnabled: ['boolean'],
+            omVendors: ['array']
         }, campaign);
 
         this.addCustomTracking(campaign.trackingUrls);
@@ -122,6 +126,22 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
 
     public isMoatEnabled(): boolean | undefined {
         return this.get('isMoatEnabled');
+    }
+
+    public isOMEnabled(): boolean {
+        return this.get('isOMEnabled');
+    }
+
+    public getOMVendors(): string[] {
+        return this.get('omVendors');
+    }
+
+    public setIsOMEnabled(isOMEnabled: boolean): void {
+        this.set('isOMEnabled', isOMEnabled);
+    }
+
+    public setOMVendors(omVendors: string[]): void {
+        this.set('omVendors', omVendors);
     }
 
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {

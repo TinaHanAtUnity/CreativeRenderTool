@@ -208,6 +208,7 @@ export class TestFixtures {
             video: null,
             useWebViewUserAgentForTracking: false,
             isOMEnabled: false,
+            omVendors: [],
             shouldMuteByDefault: false
         };
     }
@@ -452,7 +453,9 @@ export class TestFixtures {
             buyerId: 'buyerId',
             trackingUrls: {},
             impressionUrls: vast.getImpressionUrls(),
-            isMoatEnabled: true
+            isMoatEnabled: true,
+            isOMEnabled: false,
+            omVendors: []
         };
     }
 
