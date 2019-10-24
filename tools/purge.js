@@ -185,38 +185,6 @@ let purgeHighwinds = (urlRoot) => {
     });
 };
 
-let purgeChinaNetCenter = (urlRoot) => {
-    let urls = flatten(paths.map(path => {
-        return urlsFromPath(urlRoot, cdnConfig.chinanetcenter.base_urls, path, false);
-    }));
-
-    console.log('Starting ChinaNetCenter purge of: ');
-    console.dir(urls);
-
-    const prefix = 'http://wscp.lxdns.com:8080/wsCP/servlet/contReceiver?';
-    const combinedUrls = urls.join(';');
-
-    let hash = crypto.createHash('md5');
-    hash.update(cdnConfig.chinanetcenter.username + cdnConfig.chinanetcenter.password + combinedUrls);
-    let hashedPassword = hash.digest('hex');
-
-    const endpoint = prefix + querystring.stringify({
-        username: cdnConfig.chinanetcenter.username,
-        passwd: hashedPassword
-    }) + '&url=' + combinedUrls;
-
-    return fetchRetry(endpoint, {}, 5, 5000).then(res => {
-        if (res.status !== 200) {
-            throw new Error(`ChinaNetCenter purge request failed with HTTP code: ${res.status}`);
-        }
-        return res.text();
-    }).then(body => {
-        console.dir(body);
-        console.log('ChinaNetCenter purge request successful');
-        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.chinanetcenter.check_url + urlRoot + path, commit)));
-    });
-};
-
 let purgeAliBabaCloud = (urlRoot) => {
     let urls = flatten(paths.map(path => {
         return urlsFromPath(urlRoot, cdnConfig.alibabacloud.base_urls, path, false);
@@ -290,7 +258,7 @@ let purgeAliBabaCloud = (urlRoot) => {
 let purgeTencent = (urlRoot) => {
 
     let urls = flatten(paths.map(path => {
-        return urlsFromPath(urlRoot, cdnConfig.alibabacloud.base_urls, path, false);
+        return urlsFromPath(urlRoot, cdnConfig.tencentcloud.base_urls, path, false);
     }));
 
     console.log('Starting Tencent purge of: ');
