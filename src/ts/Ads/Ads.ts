@@ -184,15 +184,6 @@ export class Ads implements IAds {
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
-<<<<<<< HEAD
-
-            if (PrivacyParser.isUpdateUserPrivacyForIncidentNeeded()) {
-                // TODO: We are already not sending these in a branch that's been accepted for merge. Remove this when merging with those changes
-                this.PrivacyManager.updateUserPrivacy({ads: false, gameExp: false, external: false},  GDPREventSource.SANITIZATION, GDPREventAction.TODO_MISSING_ACTION);
-            }
-
-=======
->>>>>>> 607b7ac322226bc94fcfedfe897dffe2d64eb07c
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
         }).then(() => {
             return this.setupLoadApiEnabled();
