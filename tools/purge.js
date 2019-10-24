@@ -258,7 +258,7 @@ let purgeAliBabaCloud = (urlRoot) => {
 let purgeTencent = (urlRoot) => {
 
     let urls = flatten(paths.map(path => {
-        return urlsFromPath(urlRoot, cdnConfig.tencentcloud.base_urls, path, false);
+        return urlsFromPath(urlRoot, cdnConfig.tencentcloud.base_urls, path, true);
     }));
 
     console.log('Starting Tencent purge of: ');
