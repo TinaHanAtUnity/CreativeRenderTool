@@ -14,12 +14,21 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
+import {
+    HeartbeatingDownloadButtonTest,
+    BouncingDownloadButtonTest,
+    ShiningDownloadButtonTest,
+    MabDecisionButtonTest
+} from 'Core/Models/ABGroup';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
     private _downloadManager: DownloadManager;
     private _deviceIdManager: DeviceIdManager;
+    private _automatedExperimentManager: AutomatedExperimentManager;
 
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
@@ -27,6 +36,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
+        }
+
+        this._automatedExperimentManager = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
+        if (MabDecisionButtonTest.isValid(core.Config.getAbGroup())) {
+            this._automatedExperimentManager.initialize(AutomatedExperimentsList);
+            this._automatedExperimentManager.beginExperiment();
         }
     }
 
@@ -42,10 +57,28 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        let endScreen: PerformanceEndScreen;
+        const abGroup = baseParams.coreConfig.getAbGroup();
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
+        if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
+            endScreen = new AnimatedDownloadButtonEndScreen('heartbeating', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
+            endScreen = new AnimatedDownloadButtonEndScreen('bouncing', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
+            endScreen = new AnimatedDownloadButtonEndScreen('shining', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (MabDecisionButtonTest.isValid(abGroup)) {
+            const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
+            if (mabDecision === 'heartbeating' ||
+                    mabDecision === 'bouncing' ||
+                    mabDecision === 'shining') {
+                endScreen = new AnimatedDownloadButtonEndScreen(mabDecision, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            } else {
+                endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            }
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
 
         return {
             ... baseParams,
@@ -55,7 +88,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             adUnitStyle: adUnitStyle,
             downloadManager: this._downloadManager,
             deviceIdManager: this._deviceIdManager,
-            automatedExperimentManager: automatedExperimentManager
+            automatedExperimentManager: this._automatedExperimentManager
         };
     }
 
