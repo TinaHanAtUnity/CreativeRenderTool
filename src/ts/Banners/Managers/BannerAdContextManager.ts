@@ -64,13 +64,15 @@ export class BannerAdContextManager {
         });
         this._bannerModule.Api.BannerApi.onBannerLoadPlacement.subscribe((placementId: string, bannerAdViewId: string, width: number, height: number) => {
             const placement = this._bannerModule.PlacementManager.getPlacement(placementId);
-            if (placement) {
+            if (placement && width >= 320 && height >= 50) {
                 try {
                     const context = this.createContext(placement, bannerAdViewId, BannerSizeUtil.getBannerSizeFromWidthAndHeight(width, height, this._core.Api.Sdk));
                     context.load();
                 } catch (error) {
                     return this._bannerModule.Api.BannerListenerApi.sendErrorEvent(bannerAdViewId, BannerErrorCode.WebViewError, error.message);
                 }
+            } else if (width < 320 || height < 50) {
+                this._bannerModule.Api.BannerListenerApi.sendErrorEvent(bannerAdViewId, BannerErrorCode.NoFillError, `No fill for banner size less than 320 * 50`);
             } else {
                 this._bannerModule.Api.BannerListenerApi.sendErrorEvent(bannerAdViewId, BannerErrorCode.WebViewError, `Placement ${placementId} could not be found`);
             }
