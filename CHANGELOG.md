@@ -1,4 +1,4 @@
-# Staged
+# Fri Oct 25 06:46:51 UTC 2019
 
 * Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
 * Add initial implementation of privacy metrics [#11789](https://github.com/Applifier/unity-ads-webview/pull/11789)
