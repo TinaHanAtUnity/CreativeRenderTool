@@ -1,0 +1,73 @@
+<div class="content">
+    <div class="top-container">
+        <div class="left-corner">
+            <div class="button-left button-big">
+                <div class="skip-button">
+                  <div class="tab">
+                      <div class="icon-container">
+                          <span class="icon icon-skip"></span>
+                      </div>
+                      <div class="icon-container">
+                          <span class="icon icon-close"></span>
+                      </div>
+                  </div>
+                </div>
+            </div>
+            <div class="china-advertisement">广告</div>
+        </div>
+        <div class="right-corner">
+            <div class="timer-button button-big button-right">
+                <div class="tab">
+                    <div class="timer-container">
+                        <div class="timer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fullscreen-cta-container">
+        <div class="fullscreen-cta-text">
+            <%= data.t("Tap to Download for Free") %>
+        </div>
+    </div>
+    <div class="buffering-spinner">
+        <div class="spinner-animation"></div>
+        <div class="spinner-text">
+            <%= data.t("Buffering") %>
+        </div>
+    </div>
+    <div class="bottom-container">
+        <div class="left-corner">
+            <div class="button-big button-left">
+                <div class="mute-button <%= data.muted ? 'muted' : '' %>">
+                    <div class="tab">
+                        <div class="icon-container">
+                            <span class="icon icon-volume"></span>
+                        </div>
+                        <div class="icon-container">
+                            <span class="icon icon-volume-mute"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="gdpr-button button">
+                    <div class="tab tab-rounded gdpr-tab">
+                        <div class="icon-container">
+                            <span class="icon icon-gdpr"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="center">
+            <div class="gdpr-pop-up">
+                <div class="icon-gdpr"></div>
+                <div class="gdpr-text">
+                    <%= data.t("privacy-legitimate-interest-pop-up-1") %>
+                    <span class="gdpr-link"><%= data.t("privacy-legitimate-interest-pop-up-2") %></span>
+                    <%= data.t("privacy-legitimate-interest-pop-up-3") %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="debug-message-text"></div>
+</div>

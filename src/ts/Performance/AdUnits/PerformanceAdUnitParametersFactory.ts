@@ -15,8 +15,10 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { HalloweenThemeFreeTest } from 'Core/Models/ABGroup';
+import { HalloweenThemeFreeTest, FullscreenCTAExperiment } from 'Core/Models/ABGroup';
 import { HalloweenPerformanceEndScreen } from 'Performance/Views/HalloweenPerformanceEndScreen';
+import { VideoOverlayFullscreenCTA } from 'Ads/Views/VideoOverlayFullscreenCTA';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -78,7 +80,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         }
 
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
-        const overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        let overlay;
+        if (FullscreenCTAExperiment.isValid(parameters.coreConfig.getAbGroup()) && this._platform === Platform.ANDROID) {
+            overlay = new VideoOverlayFullscreenCTA(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        } else {
+            overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        }
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);
