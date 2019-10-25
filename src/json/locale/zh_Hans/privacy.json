@@ -3,13 +3,9 @@
 
   "privacy-dialog-text-li-p1": "广告使游戏开发者能够免费提供优秀的应用程序。我们也在尝试根据您正在使用的应用程序、设备和所在的国家/地区，来展示对您来说最有趣的应用程序和产品。",
   "privacy-dialog-text-li-p2": "我们用来提供个性化体验的信息，大部分来自于您设备的广告ID（如苹果或谷歌的广告ID）以及您的IP地址。",
-  "privacy-dialog-text-li-p2-coppa": "Most of the information we use for this personalization is based on your device’s advertising ID (Apple’s Advertising Identifier or Google Advertising Identifier) and your IP address. By request of this app’s publisher, we do not combine the data from this app with data from any other apps.",
   "privacy-dialog-text-li-p3-1": "我们的",
   "privacy-dialog-text-li-p3-2": "隐私条款",
   "privacy-dialog-text-li-p3-3": "也解释了我们将如何管理您的数据以及如何与提供广告的第三方合作。这些第三方可能会从Unity以外的其他渠道收集关于您广告ID的信息来进一步个性化推荐您会看到的广告。请查看这些第三方的隐私策略来确认其可能收集的数据。",
-  "privacy-dialog-text-li-p3-1-coppa": "Our ",
-  "privacy-dialog-text-li-p3-2-coppa": "Privacy Policy",
-  "privacy-dialog-text-li-p3-3-coppa": " explains how we manage your data and how we work with partners who serve ads. While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third parties for ads served in this app.",
   "privacy-dialog-text-li-p4": "根据您和这款应用程序之间的互动，我们收集到了一些信息。以下是我们使用这些信息预测哪个应用程序可能会吸引您的一个示例：",
   "privacy-dialog-text-li-p5-header": "请选择",
   "privacy-dialog-text-li-p5": "您可以继续使用个性化体验，或换成大众化的体验。这将应用于Unity直接推送的和其广告合作商推送的广告。",
@@ -29,7 +25,6 @@
   "privacy-dialog-text-li-p7-1": "您可以点击",
   "privacy-dialog-text-li-p7-2": "这里",
   "privacy-dialog-text-li-p7-3": "删除Unity获取的任何关于您设备的数据。",
-  "privacy-dialog-text-li-p7-3-coppa": ". This will also opt you out of personalized ad experiences.",
   "privacy-dialog-text-li-p7-are-you-sure": "您确定吗？",
   "privacy-dialog-text-li-p7-yes": "是 ",
   "privacy-dialog-text-li-p7-no": "否",
@@ -40,10 +35,10 @@
   "privacy-dialog-text-failed-age-gate-p2-2": "隐私条款",
   "privacy-dialog-text-failed-age-gate-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。",
 
-  "privacy-dialog-text-coppa-china-p1": "此广告由Unity Ads广告提供。这个游戏开发者已经启用隐私控制，说明这个应用程序会被13周岁以下的儿童使用。因此，我们仅会通过相关数据（例如您正在玩的游戏）来向您展示广告。",
-  "privacy-dialog-text-coppa-china-p2-1": "请查看我们的",
-  "privacy-dialog-text-coppa-china-p2-2": "隐私条款",
-  "privacy-dialog-text-coppa-china-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。",
+  "privacy-dialog-text-coppa-p1": "此广告由Unity Ads广告提供。这个游戏开发者已经启用隐私控制，说明这个应用程序会被13周岁以下的儿童使用。因此，我们仅会通过相关数据（例如您正在玩的游戏）来向您展示广告。",
+  "privacy-dialog-text-coppa-p2-1": "请查看我们的",
+  "privacy-dialog-text-coppa-p2-2": "隐私条款",
+  "privacy-dialog-text-coppa-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。",
 
   "privacy-dialog-button-confirm": "确认",
   "privacy-dialog-button-close": "关闭"

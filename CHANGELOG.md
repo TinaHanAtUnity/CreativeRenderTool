@@ -1,3 +1,17 @@
+# Fri Oct 25 06:46:51 UTC 2019
+
+* Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
+* Add initial implementation of privacy metrics [#11789](https://github.com/Applifier/unity-ads-webview/pull/11789)
+* Revert "Experiment to test communications with AUI service" [#11815](https://github.com/Applifier/unity-ads-webview/pull/11815)
+* Force Banners to Fail for Banner Containers smaller than 320x50 [#11788](https://github.com/Applifier/unity-ads-webview/pull/11788)
+* Temporarily Disable Jenkins Builds [#11817](https://github.com/Applifier/unity-ads-webview/pull/11817)
+* Purge Tencent URLs in Purge Script [#11785](https://github.com/Applifier/unity-ads-webview/pull/11785)
+
+# Tue Oct 22 20:41:36 UTC 2019
+
+* Add AutomatedExperiment to test communications with AUI service [#11758](https://github.com/Applifier/unity-ads-webview/pull/11758)
+* Fix iOS 13 rotation with endcard issue [#11561](https://github.com/Applifier/unity-ads-webview/pull/11561)
+
 # Mon Oct 21 21:25:14 UTC 2019
 
 * Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)

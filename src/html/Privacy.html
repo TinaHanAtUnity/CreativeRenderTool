@@ -3,21 +3,20 @@
         <span class="icon-gdpr"></span>
         <span class="title centered-title"><%= data.t("privacy-dialog-title") %></span>
 
-        <% if(!data.isGDPREnabled) { %>
+        <% if(data.isCoppaCompliant) { %>
+        <div>
+            <p>
+                <%= data.t("privacy-dialog-text-coppa-p1") %>
+            </p>
+            <p>
+                <%= data.t("privacy-dialog-text-coppa-p2-1") %>
+                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-coppa-p2-2") %></a>
+                <%= data.t("privacy-dialog-text-coppa-p2-3") %>
+            </p>
+        </div>
+        <% } else if(!data.isGDPREnabled) { %>
         <div class="not-gdpr">
             <div class="privacy-text">
-                <% if(data.isCoppaCompliant) { %>
-                <p>
-                    This advertisement has been served by Unity Ads. The developer of this game has enabled privacy
-                    controls indicating that this app is directed to children under the age of 13.  As a result, we
-                    deliver ads to you based only on contextual data (e.g., the game you are playing).
-                </p>
-                <p>
-                    Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full
-                    description of our data practices. You can view privacy information at any time by tapping the Unity
-                    Data Privacy icon when or after an ad appears.
-                </p>
-                <% } else { %>
                 <p>
                     This advertisement has been served by Unity Ads. Unity Ads collects information gathered through
                     your use of apps in order to create an individualized and more relevant user experience and to show
@@ -50,7 +49,6 @@
                     a full description of our data practices. You can opt-out of Unity Ads’ personalized
                     experiences and ads through your device settings.
                 </p>
-                <% } %>
             </div>
         </div>
         <% } else if(data.isUserUnderAgeLimit) { %>
@@ -64,17 +62,6 @@
                 <%= data.t("privacy-dialog-text-failed-age-gate-p2-3") %>
             </p>
         </div>
-        <% } else if(data.isCoppaAndChina) { %>
-        <span>
-            <p>
-                <%= data.t("privacy-dialog-text-coppa-china-p1") %>
-            </p>
-            <p>
-                <%= data.t("privacy-dialog-text-coppa-china-p2-1") %>
-                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-coppa-china-p2-2") %></a>
-                <%= data.t("privacy-dialog-text-coppa-china-p2-3") %>
-            </p>
-        </div>
         <% } else { %>
         <div class="gdpr">
             <p>
@@ -83,24 +70,14 @@
 
             <p>
                 <span class="highlight">
-                <% if(data.isCoppaCompliant) { %>
-                    <%= data.t("privacy-dialog-text-li-p2-coppa") %>
-                <% } else { %>
                     <%= data.t("privacy-dialog-text-li-p2") %>
-                <% } %>
                 </span>
             </p>
 
             <p>
-                <% if(data.isCoppaCompliant) { %>
-                    <%= data.t("privacy-dialog-text-li-p3-1-coppa") %>
-                    <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-li-p3-2-coppa") %></a>
-                    <%= data.t("privacy-dialog-text-li-p3-3-coppa") %>
-                <% } else { %>
-                    <%= data.t("privacy-dialog-text-li-p3-1") %>
-                    <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-li-p3-2") %></a>
-                    <%= data.t("privacy-dialog-text-li-p3-3") %>
-                <% } %>
+                <%= data.t("privacy-dialog-text-li-p3-1") %>
+                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-li-p3-2") %></a>
+                <%= data.t("privacy-dialog-text-li-p3-3") %>
             </p>
             <p>
                 <%= data.t("privacy-dialog-text-li-p4") %>
@@ -152,11 +129,7 @@
 
                 <%= data.t("privacy-dialog-text-li-p7-1") %>
                 <span class="data-deletion-link page-link"><%= data.t("privacy-dialog-text-li-p7-2") %></span>
-                <% if(data.isCoppaCompliant) { %>
-                    <%= data.t("privacy-dialog-text-li-p7-3-coppa") %>
-                <% } else { %>
-                    <%= data.t("privacy-dialog-text-li-p7-3") %>
-                <% } %>
+                <%= data.t("privacy-dialog-text-li-p7-3") %>
                 <span id="data-deletion-container"><%= data.t("privacy-dialog-text-li-p7-are-you-sure") %><span id="data-deletion-confirm" class="page-link"><%= data.t("privacy-dialog-text-li-p7-yes") %></span>
                     / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
                 <span id="data-deletion-request-container">
