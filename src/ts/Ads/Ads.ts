@@ -91,6 +91,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadRefreshV3, LoadRefreshV4, ZyngaLoadRefreshV4, OriginalLoadExperiment } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV3';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
+import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
 export class Ads implements IAds {
 
@@ -185,6 +186,10 @@ export class Ads implements IAds {
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
+
+            PrivacyMetrics.setGameSessionId(gameSessionId);
+            PrivacyMetrics.setPrivacy(this.PrivacySDK);
+            PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
