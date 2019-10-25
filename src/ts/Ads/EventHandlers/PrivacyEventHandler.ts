@@ -1,11 +1,11 @@
-import {GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
-import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
-import {IPrivacyHandler} from 'Ads/Views/AbstractPrivacy';
-import {Platform} from 'Core/Constants/Platform';
-import {ICoreApi} from 'Core/ICore';
-import {IPermissions, isUnityConsentPermissions, PrivacyMethod} from 'Privacy/Privacy';
-import {PrivacySDK} from 'Privacy/PrivacySDK';
-import {ConsentPage} from 'Ads/Views/Consent/Consent';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { IPermissions, isUnityConsentPermissions, PrivacyMethod } from 'Privacy/Privacy';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 export interface IPrivacyEventHandlerParameters {
     platform: Platform;

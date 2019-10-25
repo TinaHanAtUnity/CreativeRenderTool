@@ -4,20 +4,20 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import {AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
-import {Platform} from 'Core/Constants/Platform';
-import {Consent, ConsentPage, IConsentViewParameters} from 'Ads/Views/Consent/Consent';
-import {IConsentViewHandler} from 'Ads/Views/Consent/IConsentViewHandler';
-import {IPermissions, PrivacyMethod} from 'Privacy/Privacy';
-import {AdsConfiguration} from 'Ads/Models/AdsConfiguration';
-import {ICoreApi} from 'Core/ICore';
-import {TestEnvironment} from 'Core/Utilities/TestEnvironment';
-import {DeviceInfo} from 'Core/Models/DeviceInfo';
-import {AndroidDeviceInfo} from 'Core/Models/AndroidDeviceInfo';
-import {ProgrammaticTrackingService} from 'Ads/Utilities/ProgrammaticTrackingService';
-import {ABGroup} from 'Core/Models/ABGroup';
-import {PrivacySDK} from 'Privacy/PrivacySDK';
-import {Diagnostics} from 'Core/Utilities/Diagnostics';
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { Platform } from 'Core/Constants/Platform';
+import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
+import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
+import { IPermissions, PrivacyMethod } from 'Privacy/Privacy';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { ICoreApi } from 'Core/ICore';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
