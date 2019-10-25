@@ -20,10 +20,6 @@ export interface ILegacyRequestPrivacy {
     optOutEnabled: boolean;
 }
 
-function isProfilingPermissions(permissions: IPermissions | { [key: string]: never }): permissions is IProfilingPermissions {
-    return (<IProfilingPermissions>permissions).profiling !== undefined;
-}
-
 export class RequestPrivacyFactory {
     public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy | undefined {
         if (this.GameUsesConsent(gamePrivacy) === false) {
@@ -47,28 +43,5 @@ export class RequestPrivacyFactory {
     private static GameUsesConsent(gamePrivacy: GamePrivacy): boolean {
         const isDeveloperConsent: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT;
         return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
-    }
-
-    public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {
-        if (privacy.method === PrivacyMethod.DEFAULT) {
-            return {
-                gdprEnabled: false,
-                optOutRecorded: false,
-                optOutEnabled: false
-            };
-        }
-        return {
-            gdprEnabled: true,
-            optOutRecorded: !privacy.firstRequest,
-            optOutEnabled: this.IsOptOutEnabled(privacy)
-        };
-    }
-
-    private static IsOptOutEnabled(privacy: IRequestPrivacy) {
-        if (privacy.method === PrivacyMethod.LEGITIMATE_INTEREST && privacy.firstRequest) {
-            return false;
-        }
-
-        return isProfilingPermissions(privacy.permissions) ? !privacy.permissions.profiling : true;
     }
 }

@@ -391,8 +391,8 @@ describe('UserPrivacyManagerTest', () => {
                     sinon.assert.calledWith(userPrivacy.update, {
                         method: PrivacyMethod.DEVELOPER_CONSENT,
                         version: 0,
+                        agreedAll: false,
                         permissions: {
-                            all: false,
                             gameExp: false,
                             ads: false,
                             external: false
@@ -762,14 +762,6 @@ describe('UserPrivacyManagerTest', () => {
                 userPrivacy.getVersion.returns(25250101);
                 userPrivacy.getPermissions.returns({ ads: true, gameExp: true, external: true });
                 return privacyManager.updateUserPrivacy({ ads: true, gameExp: true, external: true }, GDPREventSource.NO_REVIEW, GDPREventAction.CONSENT).then(() => {
-                    sinon.assert.notCalled(httpKafkaStub);
-                });
-            });
-
-            //TODO: remove/rephrase when old fields are deprecated
-            it('if game privacy method is other than UnityConsent', () => {
-                gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
-                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });

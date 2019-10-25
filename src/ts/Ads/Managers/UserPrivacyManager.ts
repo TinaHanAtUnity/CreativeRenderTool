@@ -175,34 +175,25 @@ export class UserPrivacyManager {
         if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
             return true;
         }
-        console.log("1");
 
         if (currentPrivacy.getVersion() !== updatedPrivacy.version) {
             return true;
         }
-        console.log("2");
 
         const currentPermissions = currentPrivacy.getPermissions();
         const updatedPermissions = updatedPrivacy.permissions;
 
-        console.log((<IGranularPermissions>currentPermissions).gameExp + " eq? " + (<IGranularPermissions>updatedPermissions).gameExp);
-
-        if ((<IGranularPermissions>currentPermissions).gameExp !== (<IGranularPermissions>updatedPermissions).gameExp) {
-            return true;
-        }
-        console.log("3");
-
-        if ((<IGranularPermissions>currentPermissions).ads !== (<IGranularPermissions>updatedPermissions).ads) {
-            return true;
-        }
-        console.log("4");
-
-        if ((<IGranularPermissions>currentPermissions).external !== (<IGranularPermissions>updatedPermissions).external) {
+        if (currentPermissions.gameExp !== updatedPermissions.gameExp) {
             return true;
         }
 
-        console.log("5");
+        if (currentPermissions.ads !== updatedPermissions.ads) {
+            return true;
+        }
 
+        if (currentPermissions.external !== updatedPermissions.external) {
+            return true;
+        }
         return false;
     }
 

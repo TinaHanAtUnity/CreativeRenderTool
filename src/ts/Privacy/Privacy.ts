@@ -20,9 +20,9 @@ export interface IGranularPermissions {
 type IUnityConsentPermissions = IGranularPermissions;
 
 export function isUnityConsentPermissions(permissions: IPermissions): permissions is IUnityConsentPermissions {
-    return ((<IGranularPermissions>permissions).gameExp !== undefined &&
-        (<IGranularPermissions>permissions).ads !== undefined &&
-        (<IGranularPermissions>permissions).external !== undefined);
+    return (permissions.gameExp !== undefined &&
+        permissions.ads !== undefined &&
+        permissions.external !== undefined);
 }
 
 export interface IProfilingPermissions {

@@ -145,8 +145,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     }
 
     // IConsentViewHandler
-    public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.TODO_MISSING_ACTION, this._landingPage);
+    public onConsent(permissions: IPermissions, agreedAll: boolean, source: GDPREventSource): void {
+        this._privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.TODO_MISSING_ACTION, this._landingPage, agreedAll);
     }
 
     // IConsentViewHandler
@@ -216,15 +216,16 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         }
     }
 
-    private handleAutoConsent(consent: IPermissions) {
+    private handleAutoConsent(consent: IPermissions & {agreedAll: boolean}) {
         setTimeout(() => {
-            if (consent.hasOwnProperty('all')) {
-                this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
-                this._unityConsentView.testAutoConsentAll();
+            let agreedAll = false;
+            if (consent.hasOwnProperty('agreedAll')) {
+                agreedAll = consent.agreedAll;
+                delete consent.agreedAll;
             }
             if (consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
-                this._unityConsentView.testAutoConsent(consent);
+                this._unityConsentView.testAutoConsent(consent, agreedAll);
             }
         }, 3000);
     }

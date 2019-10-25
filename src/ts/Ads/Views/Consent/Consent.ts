@@ -155,8 +155,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this.onHomepageAcceptAllEvent(testEvent);
     }
 
-    public testAutoConsent(consent: IPermissions): void {
-        this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
+    public testAutoConsent(consent: IPermissions, agreedAll: boolean): void {
+        this._handlers.forEach(handler => handler.onConsent(consent, agreedAll, GDPREventSource.USER));
         this._handlers.forEach(handler => handler.onClose());
     }
 
@@ -257,9 +257,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         event.preventDefault();
 
         const permissions: IPermissions = {
-            all: true
+            ads: true,
+            gameExp: true,
+            external: true
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        this._handlers.forEach(handler => handler.onConsent(permissions, true, GDPREventSource.NO_REVIEW));
         const element = (<HTMLElement> this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }
@@ -274,7 +276,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: true,
             external: true
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(permissions, false, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.agree'));
         this.closeWithAnimation(element);
     }
@@ -287,7 +289,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: false,
             external: false
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(permissions, false, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.disagree'));
 
         this.closeWithAnimation(element);
@@ -301,7 +303,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: this._switchGroup.isPersonalizedAdsChecked(),
             external: this._switchGroup.isAds3rdPartyChecked()
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(permissions, false, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.save-my-choices'));
         this.closeWithAnimation(element);
     }
