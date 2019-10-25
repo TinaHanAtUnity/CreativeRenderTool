@@ -1,3 +1,7 @@
+# Staged
+
+* Create right Privacy view for COPPA games if the privacy method is Unity Consent [#11818](https://github.com/Applifier/unity-ads-webview/pull/11818)
+
 # Fri Oct 25 06:46:51 UTC 2019
 
 * Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
