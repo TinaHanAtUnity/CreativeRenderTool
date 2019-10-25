@@ -4,6 +4,8 @@
 * Add initial implementation of privacy metrics [#11789](https://github.com/Applifier/unity-ads-webview/pull/11789)
 * Revert "Experiment to test communications with AUI service" [#11815](https://github.com/Applifier/unity-ads-webview/pull/11815)
 * Force Banners to Fail for Banner Containers smaller than 320x50 [#11788](https://github.com/Applifier/unity-ads-webview/pull/11788)
+* Temporarily Disable Jenkins Builds [#11817](https://github.com/Applifier/unity-ads-webview/pull/11817)
+* Purge Tencent URLs in Purge Script [#11785](https://github.com/Applifier/unity-ads-webview/pull/11785)
 
 # Tue Oct 22 20:41:36 UTC 2019
 
