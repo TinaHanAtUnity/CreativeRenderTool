@@ -1,10 +1,10 @@
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { ISchema, Model } from 'Core/Models/Model';
+import {Platform} from 'Core/Constants/Platform';
+import {ICoreApi} from 'Core/ICore';
+import {ISchema, Model} from 'Core/Models/Model';
 
 export interface IMediationDetectionInfo {
-    mediationA: boolean;
-    mediationB: boolean;
+    mediationAdMob: boolean;
+    mediationMoPub: boolean;
     mediationC: boolean;
     mediationD: boolean;
 }
@@ -12,8 +12,8 @@ export interface IMediationDetectionInfo {
 export class MediationDetectionInfo extends Model<IMediationDetectionInfo> {
 
     public static Schema: ISchema<IMediationDetectionInfo> = {
-        mediationA: ['boolean'],
-        mediationB: ['boolean'],
+        mediationAdMob: ['boolean'],
+        mediationMoPub: ['boolean'],
         mediationC: ['boolean'],
         mediationD: ['boolean']
     };
@@ -23,8 +23,8 @@ export class MediationDetectionInfo extends Model<IMediationDetectionInfo> {
 
     constructor(platform: Platform, core: ICoreApi) {
         super('MediationDetectionInfo', {
-            mediationA: ['boolean'],
-            mediationB: ['boolean'],
+            mediationAdMob: ['boolean'],
+            mediationMoPub: ['boolean'],
             mediationC: ['boolean'],
             mediationD: ['boolean']
         });
@@ -35,10 +35,17 @@ export class MediationDetectionInfo extends Model<IMediationDetectionInfo> {
 
     public detectMediation(): Promise<unknown[]> {
         const promises: Promise<unknown>[] = [];
-        promises.push(this._core.ClassDetection.isClassPresent('com.unity3d.ads.UnityAds').then(result => this.set('mediationA', result)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.ClassDetection.isClassPresent('mediationBClassName').then(result => this.set('mediationB', result)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.ClassDetection.isClassPresent('mediationCClassName').then(result => this.set('mediationC', result)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.ClassDetection.isClassPresent('mediationDClassName').then(result => this.set('mediationD', result)).catch(err => this.handleDeviceInfoError(err)));
+        if (this._platform === Platform.ANDROID) {
+            promises.push(this._core.ClassDetection.isClassPresent('com.google.android.gms.ads.MobileAds').then(result => this.set('mediationAdMob', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('com.mopub.common.MoPub').then(result => this.set('mediationMoPub', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('mediationCClassName').then(result => this.set('mediationC', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('mediationDClassName').then(result => this.set('mediationD', result)).catch(err => this.handleDeviceInfoError(err)));
+        } else if (this._platform === Platform.IOS) {
+            promises.push(this._core.ClassDetection.isClassPresent('mediationAClassNameOnIOS').then(result => this.set('mediationAdMob', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('mediationBClassNameOnIOS').then(result => this.set('mediationMoPub', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('mediationCClassNameOnIOS').then(result => this.set('mediationC', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('mediationDClassNameOnIOS').then(result => this.set('mediationD', result)).catch(err => this.handleDeviceInfoError(err)));
+        }
         return Promise.all(promises);
     }
 
@@ -52,8 +59,8 @@ export class MediationDetectionInfo extends Model<IMediationDetectionInfo> {
 
     public getDTO() {
         return {
-            'mediationA': this.get('mediationA'),
-            'mediationB': this.get('mediationB'),
+            'mediationA': this.get('mediationAdMob'),
+            'mediationB': this.get('mediationMoPub'),
             'mediationC': this.get('mediationC'),
             'mediationD': this.get('mediationD')
         };
