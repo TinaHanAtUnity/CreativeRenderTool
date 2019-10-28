@@ -159,7 +159,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
 
         this._mraidCustomCloseCalled = false;
-        
+
         this._mraidCustomCloseDelay = 5;
         if (!placement.allowSkip()) {
             // If the placement is not skippable, extend the hide time.
