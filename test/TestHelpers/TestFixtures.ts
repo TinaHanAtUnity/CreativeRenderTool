@@ -47,6 +47,7 @@ import { MainBundleApi } from 'Core/Native/iOS/MainBundle';
 import { NotificationApi } from 'Core/Native/iOS/Notification';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { ListenerApi as CoreListenerApi } from 'Core/Native/Listener';
 import { PermissionsApi } from 'Core/Native/Permissions';
 import { RequestApi } from 'Core/Native/Request';
 import { ResolveApi } from 'Core/Native/Resolve';
@@ -1084,6 +1085,7 @@ export class TestFixtures {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
+            Listener: new CoreListenerApi(nativeBridge),
             Permissions: new PermissionsApi(nativeBridge),
             Request: new RequestApi(nativeBridge),
             Resolve: new ResolveApi(nativeBridge),
