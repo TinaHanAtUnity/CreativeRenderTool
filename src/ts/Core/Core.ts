@@ -123,7 +123,7 @@ export class Core implements ICore {
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
-                this.Api.Sdk.logError(`${UnityAdsError[UnityAdsError.INVALID_ARGUMENT]} ${message}`);
+                this.Ads.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 return Promise.reject(message);
             }
 
@@ -222,7 +222,7 @@ export class Core implements ICore {
             if (error instanceof ConfigError) {
                 // tslint:disable-next-line
                 error = { 'message': error.message, 'name': error.name };
-                this.Api.Sdk.logError(`${UnityAdsError[UnityAdsError.INITIALIZE_FAILED]} ${error.message}`);
+                this.Ads.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
             } else if (error instanceof Error && error.name === 'DisabledGame') {
                 return;
             }
