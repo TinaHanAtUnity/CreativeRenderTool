@@ -20,6 +20,7 @@ import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import JsConsoleDebugScript from 'html/DebugJsConsole.html';
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
+import { configure } from 'protobufjs';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -157,7 +158,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
 
         this._mraidCustomCloseCalled = false;
-        this._mraidCustomCloseDelay = 40;
+        this._mraidCustomCloseDelay = 5;
+        if (!placement.allowSkip) {
+            this._mraidCustomCloseDelay = 40;
+        }
     }
 
     public abstract setViewableState(viewable: boolean): void;
