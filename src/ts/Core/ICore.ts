@@ -25,7 +25,6 @@ import { MainBundleApi } from 'Core/Native/iOS/MainBundle';
 import { NotificationApi } from 'Core/Native/iOS/Notification';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { ListenerApi } from 'Core/Native/Listener';
 import { PermissionsApi } from 'Core/Native/Permissions';
 import { RequestApi } from 'Core/Native/Request';
 import { ResolveApi } from 'Core/Native/Resolve';
@@ -42,7 +41,6 @@ export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
     Connectivity: ConnectivityApi;
     DeviceInfo: DeviceInfoApi;
-    Listener: ListenerApi;
     Permissions: PermissionsApi;
     Request: RequestApi;
     Resolve: ResolveApi;
