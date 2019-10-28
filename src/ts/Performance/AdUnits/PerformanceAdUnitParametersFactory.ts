@@ -15,6 +15,8 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { HalloweenThemeFreeTest } from 'Core/Models/ABGroup';
+import { HalloweenPerformanceEndScreen } from 'Performance/Views/HalloweenPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -42,7 +44,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const abGroup = baseParams.coreConfig.getAbGroup();
+        let endScreen: PerformanceEndScreen;
+
+        if (HalloweenThemeFreeTest.isValid(abGroup)) {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new HalloweenPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
