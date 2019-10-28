@@ -25,7 +25,7 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
     appStoreId: string | undefined;
     playableConfiguration: IPlayableConfiguration | undefined;
     targetGameId: number | undefined;
-    allowCustomClose: boolean;
+    isCustomCloseEnabled: boolean;
 }
 
 export interface IPlayableConfiguration {
@@ -55,7 +55,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             videoEventUrls: ['object', 'undefined'],
             playableConfiguration: ['object', 'undefined'],
             targetGameId: ['number', 'undefined'],
-            allowCustomClose: ['boolean']
+            isCustomCloseEnabled: ['boolean']
         }, campaign);
     }
 
@@ -167,8 +167,8 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
         return this.get('targetGameId');
     }
 
-    public getAllowCustomClose(): boolean {
-        return this.get('allowCustomClose');
+    public isCustomCloseEnabled(): boolean {
+        return this.get('isCustomCloseEnabled');
     }
 
     public setPlayableConfiguration(configuration: IPlayableConfiguration) {

@@ -93,6 +93,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _mraidCustomCloseCalled: boolean;
     protected _mraidCustomCloseDelay: number;
     private _mraidCustomCloseTimeout: number;
+    private _flipClose: boolean;
 
     protected _deviceorientationListener: EventListener | undefined;
 
@@ -158,10 +159,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
 
         this._mraidCustomCloseCalled = false;
+        
         this._mraidCustomCloseDelay = 5;
-        if (!placement.allowSkip) {
+        if (!placement.allowSkip()) {
+            // If the placement is not skippable, extend the hide time.
             this._mraidCustomCloseDelay = 40;
         }
+        this._flipClose = true;
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -313,6 +317,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected prepareProgressCircle() {
         if (this._placement.allowSkip()) {
+            if (this._campaign.isCustomCloseEnabled()) {
+                // NOTE: When allowSkip is true and mraid.useCustomClose is also true,
+                // move the close button to the left.  This is a temporary test and
+                // will likely be removed in the future.
+                this._closeElement.style.removeProperty('right');
+                this._closeElement.style.left = '0';
+            }
+
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = this._CLOSE_LENGTH;
             let skipRemaining = skipLength;
@@ -558,7 +570,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     public onUseCustomClose(hidden: boolean) {
         this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
 
-        if (!this._campaign.getAllowCustomClose()) {
+        if (!this._campaign.isCustomCloseEnabled()) {
             this._pts.reportMetricEvent(MraidMetric.UseCustomCloseRefused);
             return;
         }

@@ -338,7 +338,7 @@ export class TestFixtures {
             appStoreId: mraidContentJson.appStoreId,
             playableConfiguration: undefined,
             targetGameId: mraidContentJson.gameId,
-            allowCustomClose: false
+            isCustomCloseEnabled: false
         };
     }
 
@@ -389,7 +389,7 @@ export class TestFixtures {
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             playableConfiguration: undefined,
             targetGameId: mraidContentJson.gameId,
-            allowCustomClose: false
+            isCustomCloseEnabled: false
         };
     }
 
