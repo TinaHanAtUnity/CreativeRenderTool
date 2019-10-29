@@ -1,28 +1,24 @@
-import {View} from 'Core/Views/View';
-import {ConsentPage, IConsentViewParameters} from 'Ads/Views/Consent/Consent';
-import {Template} from 'Core/Utilities/Template';
-import {PrivacyFrameEventAdapter} from 'Privacy/PrivacyFrameEventAdapter';
-import {Observable0} from 'Core/Utilities/Observable';
-import {PrivacyAdapterContainer} from 'Privacy/PrivacyAdapterContainer';
-import {ICore, ICoreApi} from 'Core/ICore';
-import {XHRequest} from 'Core/Utilities/XHRequest';
-import {WebViewError} from 'Core/Errors/WebViewError';
-import {IConsentViewHandler} from 'Ads/Views/Consent/IConsentViewHandler';
+import { View } from 'Core/Views/View';
+import { ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
+import { Template } from 'Core/Utilities/Template';
+import { PrivacyFrameEventAdapter } from 'Privacy/PrivacyFrameEventAdapter';
+import { PrivacyAdapterContainer } from 'Privacy/PrivacyAdapterContainer';
+import { ICore, ICoreApi } from 'Core/ICore';
+import { XHRequest } from 'Core/Utilities/XHRequest';
+import { WebViewError } from 'Core/Errors/WebViewError';
+import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import {
     IAllPermissions,
     IGranularPermissions, IPermissions,
-    IProfilingPermissions,
     IUnityConsentPermissions,
     PrivacyMethod
 } from 'Privacy/Privacy';
-import {AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
-import {Platform} from 'Core/Constants/Platform';
-
+import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
 
-export interface IPrivacyPermissions {
+export interface IUserPrivacySettings {
     isChild: boolean;
     acceptTracking: boolean;
     personalizedGamingExperience: boolean;
@@ -31,15 +27,14 @@ export interface IPrivacyPermissions {
 }
 
 export class PrivacyView extends View<IConsentViewHandler> {
-    private readonly onLoaded = new Observable0();
     private readonly _core: ICore;
     private readonly _coreApi: ICoreApi;
-    private readonly privacyWebviewUrl = 'http://10.35.33.171:4000/build/index.html';
+    private readonly _privacyWebViewUrl = 'http://10.35.33.171:4000/build/index.html';
     private readonly _privacyManager: UserPrivacyManager;
 
-    protected _iframeAdapterContainer: PrivacyAdapterContainer;
+    protected _iFrameAdapterContainer: PrivacyAdapterContainer;
 
-    private _iframe: HTMLIFrameElement;
+    private _iFrame: HTMLIFrameElement;
     private _domContentLoaded = false;
 
     constructor(params: IConsentViewParameters) {
@@ -48,20 +43,20 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._coreApi = params.coreApi;
         this._core = params.core;
         this._privacyManager = params.privacyManager;
-        this._iframeAdapterContainer = new PrivacyAdapterContainer(this);
+        this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
     }
 
     private loadIframe() {
-        this._iframe = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
-        this._iframeAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iframeAdapterContainer, this._iframe));
+        this._iFrame = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
+        this._iFrameAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame));
 
         this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
             this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', privacyConfig.getEnv().getJson().toString()))
                 .then((privacyHtml) => {
-                    this._iframe.srcdoc = privacyHtml;
+                    this._iFrame.srcdoc = privacyHtml;
                 });
         }).catch((e) => {
-            this._coreApi.Sdk.logError('## PRIVACY: failed to create privacy iframe: ' + e.message);
+            this._coreApi.Sdk.logError('PRIVACY: failed to create privacy iFrame: ' + e.message);
         });
     }
 
@@ -72,7 +67,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
 
     private fetchPrivacyHtml(): Promise<string> {
         //TODO: fetch from cache?
-        return XHRequest.get(this.privacyWebviewUrl);
+        return XHRequest.get(this._privacyWebViewUrl);
     }
 
     public createPrivacyFrame(container: string): Promise<string> {
@@ -82,22 +77,22 @@ export class PrivacyView extends View<IConsentViewHandler> {
                 return container.replace('<body></body>', '<body>' + privacyHtml + '</body>');
             }
 
-            throw new WebViewError('##PRIVACY: Unable to fetch privacy webview');
+            throw new WebViewError('PRIVACY: Unable to fetch privacy WebView');
         });
     }
 
     public hide() {
         super.hide();
-        this._iframeAdapterContainer.disconnect();
+        this._iFrameAdapterContainer.disconnect();
     }
 
-    public onPrivacyLoaded(): void {
+    public onPrivacyReady(): void {
         this._domContentLoaded = true;
-        this._coreApi.Sdk.logDebug('##PRIVACY: Unity Privacy has loaded!');
+        this._coreApi.Sdk.logDebug('PRIVACY: Privacy WebView is ready!');
     }
 
-    public onPrivacyCollected(userSettings: IPrivacyPermissions) {
-        console.log('##Privacy: got permissions: ' + JSON.stringify(userSettings));
+    public onPrivacyCompleted(userSettings: IUserPrivacySettings) {
+        console.log('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
         let permissions: IUnityConsentPermissions;
         let source: GDPREventSource = GDPREventSource.USER;
 

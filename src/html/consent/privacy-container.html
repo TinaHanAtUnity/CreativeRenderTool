@@ -83,7 +83,7 @@
 
                 window.addEventListener('DOMContentLoaded', function() {
                     window.parent.postMessage({
-                        type: 'loaded'
+                        type: 'onPrivacyReady'
                     }, '*');
                 }, false);
 
@@ -99,13 +99,6 @@
                     if(event in listeners) {
                         listeners[event].push(listener);
                     }
-                };
-
-                this.close = function() {
-                    setState('hidden');
-                    window.parent.postMessage({
-                        type: 'close'
-                    }, '*');
                 };
 
                 this.getCurrentPosition = this.getDefaultPosition = function() {
@@ -128,13 +121,6 @@
                     return orientationProperties;
                 };
 
-                this.open = function(url) {
-                    window.parent.postMessage({
-                        type: 'open',
-                        url: url
-                    }, '*');
-                };
-
                 this.removeEventListener = function(event, listener) {
                     if(event in listeners) {
                         var index = listeners[event].indexOf(listener);
@@ -152,16 +138,11 @@
                     }, '*');
                 };
 
-                this.onPrivacySettingsCollected = function(userPreferences) {
+                this.onPrivacyCompleted = function(userSettings) {
+                    setState('hidden');
                     window.parent.postMessage({
-                        type: 'privacyCollected',
-                        data: userPreferences
-                    }, '*');
-                };
-
-                this.onPrivacyLoaded = function() {
-                    window.parent.postMessage({
-                        type: 'onPrivacyCollected'
+                        type: 'onPrivacyCompleted',
+                        data: userSettings
                     }, '*');
                 };
 
@@ -169,6 +150,7 @@
                     return '{{ PRIVACY_ENVIRONMENT }}';
                 }
             };
+
             window.adsBridge = new AdsPrivacyBridge();
         })();
     </script>

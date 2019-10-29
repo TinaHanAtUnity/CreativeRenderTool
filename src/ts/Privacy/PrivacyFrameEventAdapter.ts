@@ -1,11 +1,9 @@
 import { ICoreApi } from 'Core/ICore';
-import { IPrivacyPermissions } from 'Ads/Views/Consent/PrivacyView';
+import { IUserPrivacySettings } from 'Ads/Views/Consent/PrivacyView';
 
 export enum IFrameEvents {
-    OPEN = 'open',
-    LOADED = 'loaded',
-    CLOSE = 'close',
-    PRIVACY_COLLECTED = 'privacyCollected'
+    PRIVACY_READY = 'onPrivacyReady',
+    PRIVACY_COMPLETED = 'onPrivacyCompleted'
 }
 
 export interface IPrivacyFrameEventAdapter {
@@ -14,31 +12,27 @@ export interface IPrivacyFrameEventAdapter {
 }
 
 export interface IPrivacyFrameHandler {
-    onPrivacyCollected(userSettings: IPrivacyPermissions): void;
-    onPrivacyLoaded(): void;
+    onPrivacyCompleted(userSettings: IUserPrivacySettings): void;
+    onPrivacyReady(): void;
 }
 
 export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
-    private _iframe: HTMLIFrameElement;
+    private _iFrame: HTMLIFrameElement;
     private _core: ICoreApi;
-
     private _messageListener: (e: Event) => void;
-
     private _handler: IPrivacyFrameHandler;
-    private _iframeHandlers: { [event: string]: (msg: { [key: string]: unknown }) => void };
+    private _iFrameHandlers: { [event: string]: (msg: { [key: string]: unknown }) => void };
 
     constructor(core: ICoreApi, handler: IPrivacyFrameHandler, iframe: HTMLIFrameElement) {
         this._handler = handler;
         this._core = core;
-        this._iframe = iframe;
+        this._iFrame = iframe;
 
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
-        this._iframeHandlers = {};
-
-        this._iframeHandlers[IFrameEvents.PRIVACY_COLLECTED] = (msg) => this.onPrivacySettingsCollected(<IPrivacyPermissions>msg.data);
-        this._iframeHandlers[IFrameEvents.LOADED] = (msg) => this.onPrivacyLoaded();
-        //TODO: other events
+        this._iFrameHandlers = {};
+        this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IUserPrivacySettings>msg.data);
+        this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = (msg) => this.onPrivacyReady();
     }
 
     public connect() {
@@ -52,27 +46,27 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
     private onMessage(e: MessageEvent) {
         const message = e.data;
         this._core.Sdk.logDebug(`privacy-iframe: event=${message.type}, data=${message}`);
-        if (message.type in this._iframeHandlers) {
-            const handler = this._iframeHandlers[message.type];
+        if (message.type in this._iFrameHandlers) {
+            const handler = this._iFrameHandlers[message.type];
             handler(message);
         }
     }
 
     private postMessage(event: string, data?: unknown) {
         console.log(`##PRIVACY: IPrivacyFrameEventAdapter postMessage: ${event}`);
-        if (this._iframe.contentWindow) {
-            this._iframe.contentWindow.postMessage({
+        if (this._iFrame.contentWindow) {
+            this._iFrame.contentWindow.postMessage({
                 type: event,
                 value: data
             }, '*');
         }
     }
 
-    private onPrivacySettingsCollected(userSettings: IPrivacyPermissions) {
-        this._handler.onPrivacyCollected(userSettings);
+    private onPrivacyCompleted(userSettings: IUserPrivacySettings) {
+        this._handler.onPrivacyCompleted(userSettings);
     }
 
-    private onPrivacyLoaded() {
-        this._handler.onPrivacyLoaded();
+    private onPrivacyReady() {
+        this._handler.onPrivacyReady();
     }
 }

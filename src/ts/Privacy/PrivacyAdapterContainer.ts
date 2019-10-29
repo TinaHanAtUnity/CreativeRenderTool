@@ -1,5 +1,5 @@
-import { IPrivacyFrameEventAdapter, IPrivacyFrameHandler } from "Privacy/PrivacyFrameEventAdapter";
-import { IPrivacyPermissions } from "Ads/Views/Consent/PrivacyView";
+import { IPrivacyFrameEventAdapter, IPrivacyFrameHandler } from 'Privacy/PrivacyFrameEventAdapter';
+import { IUserPrivacySettings } from 'Ads/Views/Consent/PrivacyView';
 
 export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
     private _eventAdapter: IPrivacyFrameEventAdapter;
@@ -23,11 +23,11 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
         this._isConnected = false;
     }
 
-    public onPrivacyCollected(userSettings: IPrivacyPermissions): void {
-        this._handler.onPrivacyCollected(userSettings);
+    public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
+        this._handler.onPrivacyCompleted(userSettings);
     }
 
-    public onPrivacyLoaded(): void {
-        this._handler.onPrivacyLoaded();
+    public onPrivacyReady(): void {
+        this._handler.onPrivacyReady();
     }
 }
