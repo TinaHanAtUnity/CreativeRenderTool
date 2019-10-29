@@ -1,6 +1,9 @@
 # Pending
 
 * Apply Halloween theme for performance end cards [#11759](https://github.com/Applifier/unity-ads-webview/pull/11759)
+* Add privacymetrics Kafka Topic Support [#11870](https://github.com/Applifier/unity-ads-webview/pull/11870)
+* Add TestEnvironment Metadata for AgeGate [#11784](https://github.com/Applifier/unity-ads-webview/pull/11784)
+* Replace Core Listener API with Ads Listener API [#11868](https://github.com/Applifier/unity-ads-webview/pull/11848)
 
 # Fri Oct 25 19:51:34 UTC 2019
 
