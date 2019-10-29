@@ -14,13 +14,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import {
-    HeartbeatingDownloadButtonTest,
-    BlinkingDownloadButtonTest,
-    BouncingDownloadButtonTest,
-    ShiningDownloadButtonTest
-} from 'Core/Models/ABGroup';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { HalloweenThemeFreeTest } from 'Core/Models/ABGroup';
+import { HalloweenPerformanceEndScreen } from 'Performance/Views/HalloweenPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -51,19 +47,15 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const abGroup = baseParams.coreConfig.getAbGroup();
         let endScreen: PerformanceEndScreen;
 
-        if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('heartbeating', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (BlinkingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('blinking', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('bouncing', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('shining', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else {
+        if (HalloweenThemeFreeTest.isValid(abGroup)) {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new HalloweenPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
+
+        const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
 
         return {
             ... baseParams,
@@ -72,7 +64,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
             downloadManager: this._downloadManager,
-            deviceIdManager: this._deviceIdManager
+            deviceIdManager: this._deviceIdManager,
+            automatedExperimentManager: automatedExperimentManager
         };
     }
 

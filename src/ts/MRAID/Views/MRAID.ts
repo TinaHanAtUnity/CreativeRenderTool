@@ -18,6 +18,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
+import { Localization } from 'Core/Utilities/Localization';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -27,6 +28,9 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _iframe: HTMLIFrameElement;
 
+
+    private _localization: Localization;
+
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId?: number, hidePrivcy: boolean = false) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, programmaticTrackingService, hidePrivcy, gameSessionId);
 
@@ -35,7 +39,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._campaign = campaign;
         this._creativeId = campaign.getCreativeId();
 
-        this._template = new Template(MRAIDTemplate);
+        this._localization = new Localization(deviceInfo.getLanguage(), 'mraid');
+        this._template = new Template(MRAIDTemplate, this._localization);
     }
 
     public render(): void {

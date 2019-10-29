@@ -36,6 +36,9 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -82,7 +85,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             campaign = TestFixtures.getEventVastCampaign();
             clientInfo = TestFixtures.getClientInfo();
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            privacy = new Privacy(platform, campaign, privacyManager, false, false);
+            privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
 
             clientInfo = TestFixtures.getClientInfo(platform);
 
@@ -139,6 +142,15 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 userPrivacyManager: privacyManager
             });
 
+            const omInstance = sinon.createStubInstance(OpenMeasurement);
+            const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+            const omController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+            sandbox.stub(omController, 'skipped');
+            sandbox.stub(omController, 'setDeviceVolume');
+            sandbox.stub(omController, 'geometryChange');
+            sandbox.stub(omController, 'sessionFinish');
+            sandbox.stub(omController, 'volumeChange');
+
             vastAdUnitParameters = {
                 platform,
                 core,
@@ -163,7 +175,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
                 privacy,
-                om: sinon.createStubInstance(VastOpenMeasurementController),
+                om: omController,
                 privacySDK: privacySDK
             };
 
@@ -345,36 +357,32 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
 
         describe('When calling onShowPrivacyPopUp', () => {
             beforeEach(() => {
-                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
-                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
-                sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
-                sinon.stub(OpenMeasurementUtilities, 'calculateViewPort');
-                sinon.stub(OpenMeasurementUtilities, 'calculateVastAdView');
-
+                sinon.stub(om!.getOMAdViewBuilder(), 'buildVastAdView').returns(Promise.resolve([]));
                 return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
             });
 
             it ('should fire geometry change as a percentage of the adview', () => {
-                sinon.assert.calledWith(<sinon.SinonStub>OpenMeasurementUtilities.calculateViewPort, 1280, 768);
-                sinon.assert.called(<sinon.SinonStub>OpenMeasurementUtilities.calculateVastAdView);
+                const obstructionReason = [ObstructionReasons.OBSTRUCTED];
+                const rect = OpenMeasurementUtilities.createRectangle(20, 20, 517, 367);
+                const convertedObstructionRect = OpenMeasurementUtilities.createRectangle(40, 40, 1034, 734);
+
+                if (platform === Platform.ANDROID) {
+                    sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, vastAdUnit, convertedObstructionRect);
+                } else {
+                    sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, vastAdUnit, rect);
+                }
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });
 
         describe('When calling onClosePrivacyPopUp', () => {
             beforeEach(() => {
-                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(1280);
-                sinon.stub(vastAdUnitParameters.deviceInfo, 'getScreenHeight').resolves(768);
-                sinon.stub(vastAdUnit, 'getVideoViewRectangle').returns(Promise.resolve([20, 20, 517, 367]));
-                sinon.stub(OpenMeasurementUtilities, 'calculateViewPort');
-                sinon.stub(OpenMeasurementUtilities, 'calculateVastAdView');
-
+                sinon.stub(om!.getOMAdViewBuilder(), 'buildVastAdView').returns(Promise.resolve([]));
                 return vastOverlayEventHandler.onClosePrivacyPopUp();
             });
 
             it ('should fire geometry change as a percentage of the adview', () => {
-                sinon.assert.calledWith(<sinon.SinonStub>OpenMeasurementUtilities.calculateViewPort, 1280, 768);
-                sinon.assert.calledWith(<sinon.SinonStub>OpenMeasurementUtilities.calculateVastAdView);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, [], vastAdUnit);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });

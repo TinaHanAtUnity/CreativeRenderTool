@@ -10,7 +10,6 @@ export class SilentAnalyticsManager implements IAnalyticsManager {
     public init(): Promise<void> {
         return Promise.resolve();
     }
-
     public getGameSessionId(): number {
         return 0;
     }

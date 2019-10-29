@@ -48,6 +48,7 @@ export interface IAuctionResponse {
     isMoatEnabled: boolean | undefined;
     statusCode: number | undefined;
     isOMEnabled: boolean | undefined;
+    shouldMuteByDefault: boolean | undefined;
     isCustomCloseEnabled: boolean;
 }
 
@@ -77,6 +78,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             isMoatEnabled: ['boolean', 'undefined'],
             statusCode: ['number', 'undefined'],
             isOMEnabled: ['boolean', 'undefined'],
+            shouldMuteByDefault: ['boolean', 'undefined'],
             isCustomCloseEnabled: ['boolean']
         });
 
@@ -102,7 +104,9 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('isMoatEnabled', data.isMoatEnabled);
         this.set('statusCode', statusCode);
         this.set('isOMEnabled', data.isOMEnabled);
+        this.set('shouldMuteByDefault', data.shouldMuteByDefault);
         this.set('isCustomCloseEnabled', data.isCustomCloseEnabled || false);
+
     }
 
     public getPlacements(): AuctionPlacement[] {
@@ -195,6 +199,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public isAdmobOMEnabled(): boolean | undefined {
         return this.get('isOMEnabled');
+    }
+
+    public shouldMuteByDefault(): boolean | undefined {
+        return this.get('shouldMuteByDefault');
     }
 
     public isCustomCloseEnabled(): boolean {

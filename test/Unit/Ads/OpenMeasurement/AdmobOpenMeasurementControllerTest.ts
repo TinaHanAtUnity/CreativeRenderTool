@@ -37,8 +37,9 @@ import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasu
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
             request = sinon.createStubInstance(RequestManager);
+            const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
 
-            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request);
+            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder);
         };
 
         describe('DOM Hierarchy', () => {

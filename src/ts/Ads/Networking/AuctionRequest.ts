@@ -23,7 +23,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { IBannerDimensions } from 'Banners/Utilities/BannerSize';
+import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';

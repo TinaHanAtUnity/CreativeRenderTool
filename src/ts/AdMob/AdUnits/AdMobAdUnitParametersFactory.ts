@@ -8,6 +8,7 @@ import { IAds } from 'Ads/IAds';
 import { AdMobView } from 'AdMob/Views/AdMobView';
 import { OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactory<AdMobCampaign, IAdMobAdUnitParameters> {
 
@@ -22,9 +23,10 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         const showGDPRBanner = this.showGDPRBanner(baseParams);
 
         let om;
-        const isOMEnabled = baseParams.campaign.isOMEnabled() && OpenMeasurementTest.isValid(baseParams.coreConfig.getAbGroup());
+        const isOMEnabled = baseParams.campaign.isOMEnabled();
         if (isOMEnabled) {
-            om = new AdmobOpenMeasurementController(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request);
+            const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
+            om = new AdmobOpenMeasurementController(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, omAdViewBuilder);
             om.addToViewHierarchy();
         }
 

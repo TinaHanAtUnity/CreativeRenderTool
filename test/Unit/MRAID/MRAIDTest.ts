@@ -56,7 +56,7 @@ describe('MRAID', () => {
         configuration = TestFixtures.getCoreConfiguration();
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         fakeCampaign = sinon.createStubInstance(Campaign);
-        privacy = new Privacy(platform, fakeCampaign, privacyManager, false, false);
+        privacy = new Privacy(platform, fakeCampaign, privacyManager, false, false, 'en');
     });
 
     it('should render', () => {

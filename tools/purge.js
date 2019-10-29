@@ -43,6 +43,16 @@ const cdnConfig = {
         'check_url': 'china-cdn2.unityads.unity3d.com',
         'access_key_id': process.env.ALIBABACLOUD_ACCESS_KEY_ID,
         'access_key_secret': process.env.ALIBABACLOUD_ACCESS_KEY_SECRET
+    },
+    'tencentcloud': {
+        'base_urls': [
+            'china-cdn3.unityads.unitychina.cn',
+            'config.unityads.unitychina.cn',
+            'webview.unityads.unitychina.cn'
+        ],
+        'check_url': 'china-cdn3.unityads.unitychina.cn',
+        'secret_id': process.env.TENCENT_SECRET_ID,
+        'secret_key': process.env.TENCENT_SECRET_KEY
     }
 };
 
@@ -176,38 +186,6 @@ let purgeHighwinds = (urlRoot) => {
     });
 };
 
-let purgeChinaNetCenter = (urlRoot) => {
-    let urls = flatten(paths.map(path => {
-        return urlsFromPath(urlRoot, cdnConfig.chinanetcenter.base_urls, path, false);
-    }));
-
-    console.log('Starting ChinaNetCenter purge of: ');
-    console.dir(urls);
-
-    const prefix = 'http://wscp.lxdns.com:8080/wsCP/servlet/contReceiver?';
-    const combinedUrls = urls.join(';');
-
-    let hash = crypto.createHash('md5');
-    hash.update(cdnConfig.chinanetcenter.username + cdnConfig.chinanetcenter.password + combinedUrls);
-    let hashedPassword = hash.digest('hex');
-
-    const endpoint = prefix + querystring.stringify({
-        username: cdnConfig.chinanetcenter.username,
-        passwd: hashedPassword
-    }) + '&url=' + combinedUrls;
-
-    return fetchRetry(endpoint, {}, 5, 5000).then(res => {
-        if (res.status !== 200) {
-            throw new Error(`ChinaNetCenter purge request failed with HTTP code: ${res.status}`);
-        }
-        return res.text();
-    }).then(body => {
-        console.dir(body);
-        console.log('ChinaNetCenter purge request successful');
-        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.chinanetcenter.check_url + urlRoot + path, commit)));
-    });
-};
-
 let purgeAliBabaCloud = (urlRoot) => {
     let urls = flatten(paths.map(path => {
         return urlsFromPath(urlRoot, cdnConfig.alibabacloud.base_urls, path, false);
@@ -278,6 +256,73 @@ let purgeAliBabaCloud = (urlRoot) => {
     });
 };
 
+let purgeTencent = (urlRoot) => {
+
+    let urls = flatten(paths.map(path => {
+        return urlsFromPath(urlRoot, cdnConfig.tencentcloud.base_urls, path, true);
+    }));
+
+    console.log('Starting Tencent purge of: ');
+    console.dir(urls);
+
+    let paramObject = {
+        Action: 'PurgeUrlsCache',
+        Nonce: Math.random() * Math.pow(10, 18),
+        Region: '',
+        SecretId: cdnConfig.tencentcloud.secret_id,
+        Timestamp: Math.floor(new Date().getTime() /1000),
+        Token: '',
+        Version: '2018-06-06'
+    };
+
+    const setupUrls = (urls, paramObject) => {
+        urls.map((url, index) => {
+            paramObject['Urls.' + index] = url;
+        });
+    };
+
+    const getCanonicalized = (params, urlEncodeValue) => {
+        const canonicalized = Object.entries(params).sort().map(([key, value]) => {
+            const val = urlEncodeValue ? encodeURIComponent(value) : value;
+            return key + '=' + val;
+        }).join('&');
+        return canonicalized;
+    };
+
+    const getStringToSign = (params) => {
+        const signatureSrc = 'GETcdn.tencentcloudapi.com/?' + getCanonicalized(params, false);
+        return signatureSrc;
+    };
+
+    const getSignedString = (signatureSrc, secretKey) => {
+        const signature = crypto.createHmac('sha1', secretKey).update(signatureSrc).digest('base64');
+        return signature;
+    };
+
+    const getRequestUrl = () => {
+
+        setupUrls(urls, paramObject);
+        const signSrc = getStringToSign(paramObject);
+        const signature = getSignedString(signSrc, cdnConfig.tencentcloud.secret_key);
+
+        paramObject['Signature'] = signature;
+        const urlCandidate = getCanonicalized(paramObject, true);
+        const signedUrl = 'https://cdn.tencentcloudapi.com/?' + urlCandidate;
+        return signedUrl;
+    };
+
+    return fetchRetry(getRequestUrl(), {}, 5, 5000).then(res => {
+        if (res.status !== 200) {
+            throw new Error(`Tencent CDN purge request failed with HTTP code: ${res.status}`);
+        }
+        return res.text();
+    }).then(body => {
+        console.dir(body);
+        console.log('Tencent CDN purge request successful');
+        return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.tencentcloud.check_url + urlRoot + path, commit)));
+    });
+};
+
 let urlRoot = '/webview/' + branch;
 if (branch === '2.0.6') {
     urlRoot = '/webview/master';
@@ -288,17 +333,20 @@ if (branch === '2.0.6') {
 let purgeList = [
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
-    purgeAliBabaCloud(urlRoot)
+    purgeAliBabaCloud(urlRoot),
+    purgeTencent(urlRoot)
 ];
 
 if (branch === '2.0.6') {
     purgeList.push(purgeAkamai('/webview/2.0.6'));
     purgeList.push(purgeHighwinds('/webview/2.0.6'));
     purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
+    purgeList.push(purgeTencent('/webview/2.0.6'));
 } else if (branch === '3.0.1') {
     purgeList.push(purgeAkamai('/webview/3.0.1'));
     purgeList.push(purgeHighwinds('/webview/3.0.1'));
     purgeList.push(purgeAliBabaCloud('/webview/3.0.1'));
+    purgeList.push(purgeTencent('/webview/3.0.1'));
 }
 
 Promise.all(purgeList).then(() => {

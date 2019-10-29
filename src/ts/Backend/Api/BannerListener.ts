@@ -1,27 +1,21 @@
 import { BackendApi } from 'Backend/BackendApi';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 export class BannerListener extends BackendApi {
 
-    public sendShowEvent(placementId: string) {
+    public sendLoadEvent(bannerAdViewId: string) {
         return;
     }
 
-    public sendLoadEvent(placementId: string) {
+    public sendClickEvent(bannerAdViewId: string) {
         return;
     }
 
-    public sendClickEvent(placementId: string) {
+    public sendLeaveApplicationEvent(bannerAdViewId: string) {
         return;
     }
 
-    public sendHideEvent(placementId: string) {
-        return;
-    }
-
-    public sendErrorEvent(error: string) {
-        return;
-    }
-    public sendUnloadEvent(placementId: string) {
+    public sendErrorEvent(bannerAdViewId: string, bannerErrorCode: BannerErrorCode, errorMessage: string) {
         return;
     }
 

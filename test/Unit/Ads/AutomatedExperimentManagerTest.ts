@@ -147,7 +147,8 @@ describe('AutomatedExperimentManager test', () => {
 
                 assert.isTrue(diagnosticTrigger.calledOnce);
                 assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_parse_automated_experiments');
-                assert.equal(diagnosticTrigger.firstCall.args[1].message, 'Unexpected token o in JSON at position 1');
+                // The error message is browser dependant, thus different between safari(iOS) and chrome(Android)
+                assert.oneOf(diagnosticTrigger.firstCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
             });
         });
     });

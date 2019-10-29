@@ -40,6 +40,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -113,7 +114,7 @@ describe('OverlayEventHandlerTest', () => {
         });
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         video = new Video('', TestFixtures.getSession());
-        const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+        const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const endScreenParams: IEndScreenParameters = {
             platform,
             core,
@@ -140,6 +141,7 @@ describe('OverlayEventHandlerTest', () => {
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        const automatedExperimentManager = new AutomatedExperimentManager(request, core.Storage);
 
         performanceAdUnitParameters = {
             platform,
@@ -165,7 +167,8 @@ describe('OverlayEventHandlerTest', () => {
             privacy: privacy,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacySDK: privacySDK
+            privacySDK: privacySDK,
+            automatedExperimentManager: automatedExperimentManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
