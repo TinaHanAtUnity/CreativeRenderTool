@@ -93,6 +93,10 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             if (this._privacySDK.isAgeGateEnabled()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
             }
+            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
+                const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
+                this.handleAutoAgeGate(ageGateValue);
+            }
 
             if (TestEnvironment.get('autoAcceptConsent')) {
                 const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
@@ -210,6 +214,18 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 'uri': url
             });
         }
+    }
+
+    private handleAutoAgeGate(ageGate: boolean) {
+        setTimeout(() => {
+            if (ageGate) {
+                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+                this._unityConsentView.testAutoAgeGate(ageGate);
+            } else {
+                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+                this._unityConsentView.testAutoAgeGate(ageGate);
+            }
+        }, 3000);
     }
 
     private handleAutoConsent(consent: IPermissions) {
