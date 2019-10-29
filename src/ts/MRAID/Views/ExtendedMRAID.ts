@@ -29,7 +29,6 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     protected _campaign: PerformanceMRAIDCampaign;
 
-
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: PerformanceMRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId: number, hidePrivacy: boolean = false) {
         super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, programmaticTrackingService, hidePrivacy, gameSessionId);
 

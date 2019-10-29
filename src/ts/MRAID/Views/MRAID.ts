@@ -28,7 +28,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _iframe: HTMLIFrameElement;
 
-
     private _localization: Localization;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId?: number, hidePrivcy: boolean = false) {
