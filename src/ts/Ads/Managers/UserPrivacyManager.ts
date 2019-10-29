@@ -1,7 +1,6 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import {
     GamePrivacy,
-    IAllPermissions,
     IGranularPermissions,
     IPermissions,
     isUnityConsentPermissions,
@@ -151,7 +150,6 @@ export class UserPrivacyManager {
         }
 
         if (source === GDPREventSource.NO_REVIEW) {
-            console.log("no_review");
             permissions = {ads: true, gameExp: true, external: true};
             agreedAll = true;
         }

@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventAction, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -94,7 +94,7 @@ describe('GDPREventHandlerTest', () => {
             gdprEventHandler.onGDPRPopupSkipped();
 
             sinon.assert.calledWith(setOptPutRecordedStub, true);
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, GDPREventAction.SKIP);
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: false, gameExp: false}, GDPREventSource.NO_REVIEW, GDPREventAction.SKIP);
         });
 
         it('GDPR skip event should not be sent', () => {
