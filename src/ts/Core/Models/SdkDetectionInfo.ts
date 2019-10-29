@@ -45,7 +45,7 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
             promises.push(this._core.ClassDetection.isClassPresent('com.fyber.FairBid').then(result => this.set('Fyber', result)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.ClassDetection.isClassPresent('com.safedk.android.SafeDK').then(result => this.set('SafeDK', result)).catch(err => this.handleDeviceInfoError(err)));
         } else if (this._platform === Platform.IOS) {
-            promises.push(this._core.ClassDetection.isClassPresent('SdkAClassNameOnIOS').then(result => this.set('AdMob', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('GADMobileAds').then(result => this.set('AdMob', result)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.ClassDetection.isClassPresent('SdkBClassNameOnIOS').then(result => this.set('MoPub', result)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.ClassDetection.isClassPresent('SdkCClassNameOnIOS').then(result => this.set('IronSource', result)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.ClassDetection.isClassPresent('SdkDClassNameOnIOS').then(result => this.set('Fyber', result)).catch(err => this.handleDeviceInfoError(err)));
