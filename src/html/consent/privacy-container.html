@@ -152,14 +152,6 @@
                     }, '*');
                 };
 
-                this.sendAnalyticsEvent = function(event, eventData) {
-                    window.parent.postMessage({
-                        type: 'analyticsEvent',
-                        event: event,
-                        eventData: eventData
-                    }, '*');
-                };
-
                 this.onPrivacySettingsCollected = function(userPreferences) {
                     window.parent.postMessage({
                         type: 'privacyCollected',
@@ -171,15 +163,6 @@
                     window.parent.postMessage({
                         type: 'onPrivacyCollected'
                     }, '*');
-                };
-
-                //
-                this.getPlatform = function() {
-                    return '{{ ADS_SDK_PLATFORM }}';
-                };
-
-                this.getAdsSDKVersion = function() {
-                    return '{{ ADS_SDK_VERSION }}';
                 };
 
                 this.getEnv = function() {
