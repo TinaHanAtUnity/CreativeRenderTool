@@ -1,5 +1,5 @@
-import { ICoreApi } from "Core/ICore";
-import { IPrivacyPermissions } from "Ads/Views/Consent/PrivacyView";
+import { ICoreApi } from 'Core/ICore';
+import { IPrivacyPermissions } from 'Ads/Views/Consent/PrivacyView';
 
 export enum IFrameEvents {
     OPEN = 'open',
@@ -64,7 +64,7 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
             this._iframe.contentWindow.postMessage({
                 type: event,
                 value: data
-            }, "*");
+            }, '*');
         }
     }
 

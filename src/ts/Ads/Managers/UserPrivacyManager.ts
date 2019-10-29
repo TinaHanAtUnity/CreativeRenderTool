@@ -21,6 +21,7 @@ import { ITemplateData } from 'Core/Views/View';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -96,6 +97,24 @@ export class UserPrivacyManager {
         this._deviceInfo = deviceInfo;
         this._request = request;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
+    }
+
+    public getPrivacyConfig(): Promise<PrivacyConfig> {
+        return Promise.resolve(new PrivacyConfig({
+            env: {
+                platform: 'android',
+                userAdvertisingId: 'user.advertisingId',
+                userUUID: 'user.UUID',
+                userLocales: 'user.locales',
+                userDefaultLocale: 'user.defaultLocale',
+                deviceAndroidId: 'device.androidId',
+                buildApiLevel: 'build.apiLevel',
+                buildOsVersion: 'build.osVersion'
+            },
+
+            webView: {
+                url: 'http://10.35.34.174:3000/'
+            }}));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {

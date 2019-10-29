@@ -1,25 +1,26 @@
-import {View} from "Core/Views/View";
-import {ConsentPage, IConsentViewParameters} from "Ads/Views/Consent/Consent";
-import PrivacyTemplate from 'html/Privacy-iframe.html';
-import PrivacyContainer from 'html/consent/privacy-container.html';
-import {Template} from "Core/Utilities/Template";
-import {PrivacyFrameEventAdapter} from "Privacy/PrivacyFrameEventAdapter";
-import {Observable0} from "Core/Utilities/Observable";
-import {PrivacyAdapterContainer} from "Privacy/PrivacyAdapterContainer";
-import {ICore, ICoreApi} from "Core/ICore";
-import {XHRequest} from "Core/Utilities/XHRequest";
-import {WebViewError} from "Core/Errors/WebViewError";
-import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
-import {IConsentViewHandler} from "Ads/Views/Consent/IConsentViewHandler";
+import {View} from 'Core/Views/View';
+import {ConsentPage, IConsentViewParameters} from 'Ads/Views/Consent/Consent';
+import {Template} from 'Core/Utilities/Template';
+import {PrivacyFrameEventAdapter} from 'Privacy/PrivacyFrameEventAdapter';
+import {Observable0} from 'Core/Utilities/Observable';
+import {PrivacyAdapterContainer} from 'Privacy/PrivacyAdapterContainer';
+import {ICore, ICoreApi} from 'Core/ICore';
+import {XHRequest} from 'Core/Utilities/XHRequest';
+import {WebViewError} from 'Core/Errors/WebViewError';
+import {IConsentViewHandler} from 'Ads/Views/Consent/IConsentViewHandler';
 import {
     IAllPermissions,
     IGranularPermissions, IPermissions,
     IProfilingPermissions,
     IUnityConsentPermissions,
     PrivacyMethod
-} from "Privacy/Privacy";
-import {AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager} from "Ads/Managers/UserPrivacyManager";
-import {Platform} from "Core/Constants/Platform";
+} from 'Privacy/Privacy';
+import {AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager} from 'Ads/Managers/UserPrivacyManager';
+import {Platform} from 'Core/Constants/Platform';
+
+import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
+import PrivacyTemplate from 'html/Privacy-iframe.html';
+import PrivacyContainer from 'html/consent/privacy-container.html';
 
 export interface IPrivacyPermissions {
     isChild: boolean;
@@ -29,7 +30,7 @@ export interface IPrivacyPermissions {
     thirdParty: boolean;
 }
 
-export class PrivacyView extends View<IConsentViewHandler>{
+export class PrivacyView extends View<IConsentViewHandler> {
     private readonly onLoaded = new Observable0();
     private readonly _core: ICore;
     private readonly _coreApi: ICoreApi;
@@ -54,14 +55,14 @@ export class PrivacyView extends View<IConsentViewHandler>{
         this._iframe = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
         this._iframeAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iframeAdapterContainer, this._iframe));
 
-        this.createPrivacyFrame(PrivacyContainer.replace('{{ ADS_SDK_PLATFORM }}', Platform[this._platform])
-            .replace('{{ ADS_SDK_VERSION }}', this._core.ClientInfo.getSdkVersionName()))
-            .then((privacyHtml) => {
-                this._iframe.srcdoc = privacyHtml;
-            })
-            .catch((e) => {
+        this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
+            this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', privacyConfig.getEnv().getJson().toString()))
+                .then((privacyHtml) => {
+                    this._iframe.srcdoc = privacyHtml;
+                });
+        }).catch((e) => {
             this._coreApi.Sdk.logError('## PRIVACY: failed to create privacy iframe: ' + e.message);
-        })
+        });
     }
 
     public render() {
@@ -120,11 +121,11 @@ export class PrivacyView extends View<IConsentViewHandler>{
         this._handlers.forEach(handler => handler.onClose());
     }
 
-    onAgeGateAgree(): void {
+    public onAgeGateAgree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
     }
 
-    onAgeGateDisagree(): void {
+    public onAgeGateDisagree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
 
         if (this._core.Ads.PrivacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {

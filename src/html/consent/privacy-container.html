@@ -171,7 +171,7 @@
                     window.parent.postMessage({
                         type: 'onPrivacyCollected'
                     }, '*');
-                }
+                };
 
                 //
                 this.getPlatform = function() {
@@ -181,6 +181,10 @@
                 this.getAdsSDKVersion = function() {
                     return '{{ ADS_SDK_VERSION }}';
                 };
+
+                this.getEnv = function() {
+                    return '{{ PRIVACY_ENVIRONMENT }}';
+                }
             };
             window.adsBridge = new AdsPrivacyBridge();
         })();
