@@ -31,10 +31,10 @@ interface IUserSummary extends ITemplateData {
 }
 
 export enum GDPREventSource {
-    METADATA = 'metadata',
-    NO_REVIEW = 'no_review',
+    DEVELOPER = 'developer',
+    USER_INDIRECT = 'user_indirect',
     USER = 'user',
-    SANITIZATION = 'sanitization'
+    SDK_SANITIZATION = 'sdk_sanitization'
 }
 
 export enum GDPREventAction {
@@ -149,7 +149,7 @@ export class UserPrivacyManager {
             return Promise.resolve();
         }
 
-        if (source === GDPREventSource.NO_REVIEW) {
+        if (source === GDPREventSource.USER_INDIRECT) {
             permissions = {ads: true, gameExp: true, external: true};
             agreedAll = true;
         }
@@ -467,7 +467,7 @@ export class UserPrivacyManager {
             sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT);
         } else {
             // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
-            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
+            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.DEVELOPER);
         }
         return sendEvent.then(() => {
             return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {

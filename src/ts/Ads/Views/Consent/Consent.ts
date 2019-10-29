@@ -261,7 +261,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             gameExp: true,
             external: true
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, true, GDPREventSource.NO_REVIEW));
+        this._handlers.forEach(handler => handler.onConsent(permissions, true, GDPREventSource.USER_INDIRECT));
         const element = (<HTMLElement> this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }

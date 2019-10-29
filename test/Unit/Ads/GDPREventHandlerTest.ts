@@ -94,7 +94,7 @@ describe('GDPREventHandlerTest', () => {
             gdprEventHandler.onGDPRPopupSkipped();
 
             sinon.assert.calledWith(setOptPutRecordedStub, true);
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: false, gameExp: false}, GDPREventSource.NO_REVIEW, GDPREventAction.SKIP);
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: false, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
         });
 
         it('GDPR skip event should not be sent', () => {

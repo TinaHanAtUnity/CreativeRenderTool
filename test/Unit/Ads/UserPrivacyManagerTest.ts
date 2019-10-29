@@ -155,7 +155,7 @@ describe('UserPrivacyManagerTest', () => {
                         sinon.assert.calledOnce(onSetStub);
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                         if (t.event === 'optout') {
-                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.DEVELOPER);
                         } else {
                             sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
                         }
@@ -281,7 +281,7 @@ describe('UserPrivacyManagerTest', () => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                             if (t.event === 'optout') {
-                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.DEVELOPER);
                             } else {
                                 sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
                             }
@@ -358,7 +358,7 @@ describe('UserPrivacyManagerTest', () => {
                             return writePromise.then(() => {
                                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                                 if (event === 'optout') {
-                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, GDPREventSource.METADATA);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, GDPREventSource.DEVELOPER);
                                 } else {
                                     sinon.assert.calledWithExactly(sendGDPREventStub, event);
                                 }
@@ -555,7 +555,7 @@ describe('UserPrivacyManagerTest', () => {
             }
         }, {
             action: GDPREventAction.OPTOUT,
-            source: GDPREventSource.METADATA,
+            source: GDPREventSource.DEVELOPER,
             infoJson: {
                 'v': 1,
                 'adid': testAdvertisingId,
@@ -564,7 +564,7 @@ describe('UserPrivacyManagerTest', () => {
                 'platform': 'android',
                 'gameId': testGameId,
                 'country': 'FF',
-                'source': 'metadata',
+                'source': 'developer',
                 'bundleId': testBundleId,
                 'legalFramework': 'gdpr',
                 'agreedOverAgeLimit': 'missing'
@@ -601,6 +601,10 @@ describe('UserPrivacyManagerTest', () => {
                 'agreedOverAgeLimit': 'missing'
             }
         }];
+
+        beforeEach(() => {
+            (<sinon.SinonStub>coreConfig.getCountry).returns('FF');
+        });
 
         tests.forEach((t) => {
             it(`should send matching payload when action is "${t.action}"`, () => {
@@ -726,7 +730,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should no longer send permissions=all if source is NO_REVIEW', () => {
-                return sendEvent(undefined, GDPREventSource.NO_REVIEW).then((eventData) => {
+                return sendEvent(undefined, GDPREventSource.USER_INDIRECT).then((eventData) => {
                     assert.isDefined(eventData);
                     assert.deepEqual(eventData.permissions, { ads: true, external: true, gameExp: true });
                     assert.isTrue(eventData.agreedAll);
@@ -761,7 +765,7 @@ describe('UserPrivacyManagerTest', () => {
                 userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
                 userPrivacy.getVersion.returns(25250101);
                 userPrivacy.getPermissions.returns({ ads: true, gameExp: true, external: true });
-                return privacyManager.updateUserPrivacy({ ads: true, gameExp: true, external: true }, GDPREventSource.NO_REVIEW, GDPREventAction.CONSENT).then(() => {
+                return privacyManager.updateUserPrivacy({ ads: true, gameExp: true, external: true }, GDPREventSource.USER_INDIRECT, GDPREventAction.CONSENT).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });

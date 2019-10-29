@@ -26,7 +26,7 @@ export abstract class GDPREventHandler implements IGDPREventHandler {
         if (!this._privacySDK.isOptOutRecorded()) {
             this._privacySDK.setOptOutRecorded(true);
             // todo: add age gate choice
-            this._privacyManager.updateUserPrivacy({ads: true, external: false, gameExp: false}, GDPREventSource.NO_REVIEW, GDPREventAction.SKIP);
+            this._privacyManager.updateUserPrivacy({ads: true, external: false, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
         }
     }
 }
