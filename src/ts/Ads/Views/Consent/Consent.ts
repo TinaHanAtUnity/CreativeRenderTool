@@ -193,6 +193,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = overLimitBtnText;
             (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = underLimitBtnText;
         }
+
+        if (this._isABTest) {
+            this._container.classList.add('background-ab-test');
+        }
+
         this.showPage(this._landingPage);
     }
 
