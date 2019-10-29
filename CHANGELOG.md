@@ -1,3 +1,7 @@
+# Pending
+
+* Apply Halloween theme for performance end cards [#11759](https://github.com/Applifier/unity-ads-webview/pull/11759)
+
 # Fri Oct 25 19:51:34 UTC 2019
 
 * Create right Privacy view for COPPA games if the privacy method is Unity Consent [#11818](https://github.com/Applifier/unity-ads-webview/pull/11818)
