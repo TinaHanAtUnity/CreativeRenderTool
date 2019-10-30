@@ -70,6 +70,7 @@ export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new ABTest(18, 19);
 export const HalloweenThemeFreeTest = new ABTest(8);
+export const FullscreenCTAExperiment = new ZyngaFilteredABTest(10, 11);
 
 // Load ABTests based on https://docs.google.com/spreadsheets/d/1-vtxnqIZ4FVusloKj4ZhaOtydSYNyk4BiQDI0Xny4qk/edit#gid=1252380516
 export const LoadExperiment = new ABTest(5, 6, 12, 16);
