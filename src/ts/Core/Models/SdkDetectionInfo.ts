@@ -49,7 +49,7 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
             promises.push(this._core.ClassDetection.isClassPresent('MoPub').then(result => this.set('MoPub', result)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.ClassDetection.isClassPresent('IronSource').then(result => this.set('IronSource', result)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.ClassDetection.isClassPresent('FyberSDK').then(result => this.set('Fyber', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('SdkEClassNameOnIOS').then(result => this.set('SafeDK', result)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.ClassDetection.isClassPresent('SafeDK').then(result => this.set('SafeDK', result)).catch(err => this.handleDeviceInfoError(err)));
         }
         return Promise.all(promises);
     }
