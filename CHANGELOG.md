@@ -1,3 +1,10 @@
+# Pending
+
+* Remove Forced Age Gate Sync [#11843](https://github.com/Applifier/unity-ads-webview/pull/11843)
+* Add Fullscreen CTA ABTest on Groups 10 and 11 [#11871](https://github.com/Applifier/unity-ads-webview/pull/11871)
+* Send Localized Price catalog to IAP backend [#11329](https://github.com/Applifier/unity-ads-webview/pull/11329)
+* Update Load Experiment [#11872](https://github.com/Applifier/unity-ads-webview/pull/11872)
+
 # Tue Oct 29 20:39:33 UTC 2019
 
 * Apply Halloween theme for performance end cards [#11759](https://github.com/Applifier/unity-ads-webview/pull/11759)
