@@ -3,6 +3,7 @@ import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 interface IMediationMetaData extends IMetaData {
     name: string | undefined;
     version: string | undefined;
+    adapter_version: string | undefined;
     ordinal: number | undefined;
     enable_metadata_load: boolean | undefined;
 }
@@ -14,12 +15,13 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
             ... BaseMetaData.Schema,
             name: ['string', 'undefined'],
             version: ['string', 'undefined'],
+            adapter_version: ['string', 'undefined'],
             ordinal: ['number', 'undefined'],
             enable_metadata_load: ['boolean', 'undefined']
         });
 
         this.set('category', 'mediation');
-        this.set('keys', ['name', 'version', 'ordinal', 'enable_metadata_load']);
+        this.set('keys', ['name', 'version', 'adapter_version', 'ordinal', 'enable_metadata_load']);
     }
 
     public getName(): string | undefined {
@@ -30,6 +32,9 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
         return this.get('version');
     }
 
+    public getAdapterVersion(): string | undefined {
+        return this.get('adapter_version');
+    }
     public setOrdinal(ordinal: number) {
         this.set('ordinal', ordinal);
     }
@@ -47,7 +52,8 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
         return {
             'mediationName': this.getName(),
             'mediationVersion': this.getVersion(),
+            'mediationAdapterVersion': this.getAdapterVersion(),
             'mediationOrdinal': this.getOrdinal()
         };
-    }
+}
 }

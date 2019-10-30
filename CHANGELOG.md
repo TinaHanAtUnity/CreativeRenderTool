@@ -4,6 +4,7 @@
 * Add Fullscreen CTA ABTest on Groups 10 and 11 [#11871](https://github.com/Applifier/unity-ads-webview/pull/11871)
 * Send Localized Price catalog to IAP backend [#11329](https://github.com/Applifier/unity-ads-webview/pull/11329)
 * Update Load Experiment [#11872](https://github.com/Applifier/unity-ads-webview/pull/11872)
+* Add Mediation Load Workaround to Behave Correctly for Old API [#11647](https://github.com/Applifier/unity-ads-webview/pull/11647)
 
 # Tue Oct 29 20:39:33 UTC 2019
 
