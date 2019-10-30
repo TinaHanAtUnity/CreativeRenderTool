@@ -74,6 +74,7 @@ export const ConsentUXTest = new ABTest(18, 19);
 export const LoadExperiment = new ABTest(5, 6, 12, 16); // Intentionally left 5, 6, 12, and 16 to not backwards break experiment
 export const LoadRefreshV3 = new ABTest(12);
 export const LoadRefreshV4 = new ABTest(5, 6);
+export const FullscreenCTAExperiment = new ZyngaFilteredABTest(10, 11);
 export const OriginalLoadExperiment = new ABTest(16);
 export const ZyngaLoadRefreshV4 = new ABTest(5); // Zynga V4
 export const HalloweenThemeFreeTest = new ABTest(8);
