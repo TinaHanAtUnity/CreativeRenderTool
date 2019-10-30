@@ -96,7 +96,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
         const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
         const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, privacySDK, clientInfo, metaDataManager);
+        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, privacySDK, clientInfo, metaDataManager, request);
     });
 
     afterEach(() => {
