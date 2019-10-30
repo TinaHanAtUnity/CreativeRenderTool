@@ -313,8 +313,6 @@ export class Ads implements IAds {
     }
 
     private showConsentIfNeeded(options: unknown): Promise<void> {
-        this.PrivacyManager.fixAgeGateSync();
-
         if (!this.PrivacyManager.isConsentShowRequired()) {
             return Promise.resolve();
         }
