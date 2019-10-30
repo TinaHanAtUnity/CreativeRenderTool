@@ -1,0 +1,45 @@
+{
+  "privacy-dialog-title": "A message from Unity about your privacy",
+
+  "privacy-dialog-text-li-p1": "Ads allow developers to offer great apps for free. We try to show the apps and products that will be most interesting to you based on the apps you use, the device you use, and the country you are in.",
+  "privacy-dialog-text-li-p2": "Most of the information we use for this personalization is based on your device’s advertising ID (Apple’s Advertising Identifier or Google Advertising Identifier) and your IP address.",
+  "privacy-dialog-text-li-p3-1": "Our ",
+  "privacy-dialog-text-li-p3-2": "Privacy Policy",
+  "privacy-dialog-text-li-p3-3": " explains how we manage your data and how we work with partners who serve ads. These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.",
+  "privacy-dialog-text-li-p4": "From your interaction with this app, here is an example of the information we use to predict which other apps might interest you:",
+  "privacy-dialog-text-li-p5-header": "Selection",
+  "privacy-dialog-text-li-p5": "You can choose to continue to have a personalized experience, or to have a generic one. This will apply to both advertising that comes from Unity directly as well as from advertising partners.",
+
+  "privacy-using": "Using {0}",
+  "privacy-located-in": "Located in {0}",
+  "privacy-used-this-app": "Used this app {0} times this week",
+  "privacy-seen-ads": "Seen {0} ads in this app",
+  "privacy-installed-based-on": "Installed {0} apps based on those ads",
+
+  "privacy-dialog-text-li-agree-radio-button": "Yes, I agree to a personalized experience.",
+  "privacy-dialog-text-li-disagree-radio-button": "No, I do not want a personalized experience.",
+
+  "privacy-dialog-text-li-p6-header": "Changing your privacy choice",
+  "privacy-dialog-text-li-p6": "You can access these options at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+  "privacy-dialog-text-li-p7-header": "Data Management",
+  "privacy-dialog-text-li-p7-1": "You can delete any data Unity has about your device by clicking ",
+  "privacy-dialog-text-li-p7-2": "here",
+  "privacy-dialog-text-li-p7-3": ".",
+  "privacy-dialog-text-li-p7-are-you-sure": "Are you sure? ",
+  "privacy-dialog-text-li-p7-yes": "Yes ",
+  "privacy-dialog-text-li-p7-no": "No",
+  "privacy-dialog-text-li-p7-data-deletion-text": "We will process your request and your data for profile purposes will be deleted in 30 days. We will also opt you out of personalized ads immediately.  Please note we may retain your data for invoicing and fraud prevention purposes for 180 days.",
+
+  "privacy-dialog-text-failed-age-gate-p1": "This advertisement has been served by Unity Ads. As you have indicated that you are under 18 years old we deliver ads to you based on contextual data (e.g., the game you are playing).",
+  "privacy-dialog-text-failed-age-gate-p2-1": "Please review our ",
+  "privacy-dialog-text-failed-age-gate-p2-2": "Privacy Policy",
+  "privacy-dialog-text-failed-age-gate-p2-3": " for a full description of our data practices. You can view your privacy settings at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+
+  "privacy-dialog-text-coppa-p1": "This advertisement has been served by Unity Ads. The developer of this game has enabled privacy controls indicating that this app is directed to children under the age of 13.  As a result, we deliver ads to you based only on contextual data (e.g., the game you are playing).",
+  "privacy-dialog-text-coppa-p2-1": "Please review our ",
+  "privacy-dialog-text-coppa-p2-2": "Privacy Policy",
+  "privacy-dialog-text-coppa-p2-3": " for a full description of our data practices. You can view privacy information at any time by tapping the Unity Data Privacy icon when or after an ad appears",
+
+  "privacy-dialog-button-confirm": "Confirm",
+  "privacy-dialog-button-close": "Close"
+}

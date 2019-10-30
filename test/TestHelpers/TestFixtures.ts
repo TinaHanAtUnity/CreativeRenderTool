@@ -22,8 +22,8 @@ import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { Backend } from 'Backend/Backend';
-import { IBannersApi, IBanners } from 'Banners/IBanners';
-import { BannerApi } from 'Banners/Native/Banner';
+import { IBannerNativeApi, IBannerModule } from 'Banners/IBannerModule';
+import { BannerApi } from 'Banners/Native/BannerApi';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
@@ -163,6 +163,7 @@ import { IStoreApi, IStore } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
+import { BannerAdContextManager } from 'Banners/Managers/BannerAdContextManager';
 import { LoadApi } from 'Core/Native/LoadApi';
 import { IAdMobCampaign, AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
@@ -206,7 +207,8 @@ export class TestFixtures {
             dynamicMarkup: 'foo',
             video: null,
             useWebViewUserAgentForTracking: false,
-            isOMEnabled: false
+            isOMEnabled: false,
+            shouldMuteByDefault: false
         };
     }
 
@@ -756,7 +758,7 @@ export class TestFixtures {
     public static getPrivacy(platform: Platform, campaign: Campaign): Privacy {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const core = TestFixtures.getCoreApi(TestFixtures.getNativeBridge(platform, TestFixtures.getBackend(platform)));
-        return new Privacy(platform, campaign, privacyManager, TestFixtures.getPrivacySDK(core).isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
+        return new Privacy(platform, campaign, privacyManager, TestFixtures.getPrivacySDK(core).isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant(), TestFixtures.getAndroidDeviceInfo(core).getLanguage());
     }
 
     public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign, privacy: Privacy): IEndScreenParameters {
@@ -1059,17 +1061,16 @@ export class TestFixtures {
 
     public static getBannerModule(ads: IAds, core: ICore) {
         const platform = core.NativeBridge.getPlatform();
-        const api = this.getBannersApi(core.NativeBridge);
-        const banners: Partial<IBanners> = {
+        const api = this.getBannerNativeApi(core.NativeBridge);
+        const banners: Partial<IBannerModule> = {
             Api: api,
-            PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
+            PlacementManager: new BannerPlacementManager(ads.Api, ads.Config, api),
             CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK, ads.PrivacyManager),
-            WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
             AdUnitFactory: new BannerAdUnitFactory()
         };
-        banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBanners>banners, ads, core);
-        banners.AdContext = new BannerAdContext(<IBanners>banners, ads, core);
-        return <IBanners>banners;
+        banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBannerModule>banners, ads, core);
+        banners.BannerAdContextManager = new BannerAdContextManager(core, ads, <IBannerModule>banners);
+        return <IBannerModule>banners;
     }
 
     public static getBannerCampaign() {
@@ -1146,10 +1147,10 @@ export class TestFixtures {
         };
     }
 
-    public static getBannersApi(nativeBridge: NativeBridge): IBannersApi {
+    public static getBannerNativeApi(nativeBridge: NativeBridge): IBannerNativeApi {
         return {
-            Banner: new BannerApi(nativeBridge),
-            Listener: new BannerListenerApi(nativeBridge)
+            BannerApi: new BannerApi(nativeBridge),
+            BannerListenerApi: new BannerListenerApi(nativeBridge)
         };
     }
 
@@ -1246,6 +1247,7 @@ export class TestFixtures {
             getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
             getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
             getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+            isMadeWithUnity: sinon.stub().returns(Promise.resolve(false)),
             getModel: sinon.stub().returns(Promise.resolve('testModel')),
             getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
             getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
@@ -1272,6 +1274,7 @@ export class TestFixtures {
             getDeviceIdWithSlot: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
             getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+            getDisplayMetricDensity: sinon.stub().returns(Promise.resolve(1)),
             getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
             getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
             getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),

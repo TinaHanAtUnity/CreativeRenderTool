@@ -3,8 +3,7 @@ import {
     IWebPlayerEventSettings,
     IWebPlayerPlayerSettingsAndroid,
     IWebPlayerWebSettingsAndroid,
-    IWebPlayerWebSettingsIos,
-    WebPlayerViewId
+    IWebPlayerWebSettingsIos
 } from 'Ads/Native/WebPlayer';
 import { Platform } from 'Core/Constants/Platform';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
@@ -24,9 +23,9 @@ export abstract class WebPlayerContainer {
 
     private _platform: Platform;
     private _ads: IAdsApi;
-    private _viewId: WebPlayerViewId;
+    private _viewId: string;
 
-    constructor(platform: Platform, ads: IAdsApi, viewId: WebPlayerViewId) {
+    constructor(platform: Platform, ads: IAdsApi, viewId: string) {
         this._platform = platform;
         this._ads = ads;
         this._viewId = viewId;

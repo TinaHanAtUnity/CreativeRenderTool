@@ -22,14 +22,6 @@ export class WebView {
         this._core.Ads.show(placementId, options, callback);
     }
 
-    public showBanner(placementId: string, callback: INativeCallback) {
-        this._core.Ads.showBanner(placementId, callback);
-    }
-
-    public hideBanner(callback: INativeCallback) {
-        this._core.Ads.hideBanner(callback);
-    }
-
     private onError(event: ErrorEvent): boolean {
         if (event.lineno && typeof event.lineno === 'number' && event.lineno > 1) {
             Diagnostics.trigger('js_error', {

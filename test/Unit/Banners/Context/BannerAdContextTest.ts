@@ -1,6 +1,6 @@
-import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { BannerAdContext, BannerLoadState } from 'Banners/Context/BannerAdContext';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IBanners } from 'Banners/IBanners';
+import { IBannerModule } from 'Banners/IBannerModule';
 import { ICore } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 import { IAds } from 'Ads/IAds';
@@ -12,6 +12,9 @@ import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { HTMLBannerAdUnit } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { asStub } from 'TestHelpers/Functions';
 import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
+import { BannerViewType } from 'Banners/Native/BannerApi';
+import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
+import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
 [
     Platform.IOS,
@@ -21,7 +24,7 @@ import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
         let backend: Backend;
         let core: ICore;
         let ads: IAds;
-        let banners: IBanners;
+        let bannerModule: IBannerModule;
         let bannerAdContext: BannerAdContext;
         let campaign: BannerCampaign;
         let sandbox: sinon.SinonSandbox;
@@ -36,9 +39,12 @@ import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreModule(nativeBridge);
             ads = TestFixtures.getAdsModule(core);
-            banners = TestFixtures.getBannerModule(ads, core);
+            bannerModule = TestFixtures.getBannerModule(ads, core);
             campaign = TestFixtures.getBannerCampaign();
-            bannerAdContext = banners.AdContext;
+            const placement = TestFixtures.getPlacement();
+            placement.set('id', placementId);
+            placement.set('adTypes', ['BANNER']);
+            bannerAdContext = bannerModule.BannerAdContextManager.createContext(placement, placementId, BannerSizeStandardDimensions);
         });
 
         afterEach(() => {
@@ -48,98 +54,79 @@ import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
 
         const loadBannerAdUnit = () => {
             adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
-            sandbox.stub(banners.CampaignManager, 'request').resolves(campaign);
-            sandbox.stub(banners.AdUnitParametersFactory, 'create').resolves();
-            sandbox.stub(banners.AdUnitFactory, 'createAdUnit').returns(adUnit);
-            sandbox.stub(banners.Api.Listener, 'sendLoadEvent');
-            sandbox.stub(banners.Api.Banner, 'load').callsFake(() => {
-                return Promise.resolve().then(() => banners.Api.Banner.onBannerLoaded.trigger());
+            sandbox.stub(bannerModule.CampaignManager, 'request').resolves(campaign);
+            sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
+            sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
+            sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
+                return Promise.resolve().then(() => bannerModule.Api.BannerApi.onBannerLoaded.trigger(bannerAdViewId));
             });
-            return bannerAdContext.load(placementId);
+            return bannerAdContext.load();
         };
 
         describe('Loading a Banner Ad', () => {
             beforeEach(loadBannerAdUnit);
 
             it('should call onLoad', () => {
-                sinon.assert.called(asStub(adUnit.onLoad));
+                sandbox.assert.called(asStub(adUnit.onLoad));
             });
 
-            context('on first load', () => {
-                it('should send the load event', () => {
-                    sinon.assert.calledWith(asStub(banners.Api.Listener.sendLoadEvent), placementId);
+            it('should call onLoad again when banner has aleady loaded', () => {
+                return bannerAdContext.load().then(() => {
+                    sandbox.assert.calledTwice(asStub(adUnit.onLoad));
+                });
+            });
+
+            it('should not call onLoad again while banner state is loading', () => {
+                // tslint:disable-next-line:no-string-literal
+                bannerAdContext['_loadState'] = BannerLoadState.Loading;
+                return bannerAdContext.load().then(() => {
+                    sandbox.assert.calledOnce(asStub(adUnit.onLoad));
                 });
             });
         });
 
-        describe('Refreshing a banner ad unit', () => {
+        const failLoadBannerAdUnit = (error: Error) => {
+            adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
+            sandbox.stub(bannerModule.CampaignManager, 'request').rejects(error);
+            sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
+            sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
+            sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
+                return Promise.resolve().then(() => bannerModule.Api.BannerApi.onBannerLoaded.trigger(bannerAdViewId));
+            });
+            return bannerAdContext.load();
+        };
+
+        describe('Fail loading a Banner Ad', () => {
             beforeEach(() => {
-                return loadBannerAdUnit();
-            });
-            context('if not shown yet', () => {
-                it('should not refresh after 30 seconds', () => {
-                    clock.tick(31 * 1000);
-                    return Promise.resolve().then(() => {
-                        sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
-                    });
-                });
-            });
-            context('after being shown', () => {
-                beforeEach(() => {
-                    banners.Api.Banner.onBannerOpened.trigger();
-                });
-
-                it('should refresh after 30 seconds', () => {
-                    clock.tick(31 * 1000);
-                    return Promise.resolve().then(() => {
-                        sinon.assert.calledTwice(asStub(banners.CampaignManager.request));
-                    });
-                });
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
+                return failLoadBannerAdUnit(new Error('failLoadBannerAdUnit'));
             });
 
-            context('after being shown', () => {
-                it('should not refresh after 30 seconds if disabled through custom feature', () => {
-                    core.ClientInfo.set('gameId', '2962474');
-                    banners.Api.Banner.onBannerOpened.trigger();
-                    clock.tick(31 * 1000);
-                    return Promise.resolve().then(() => {
-                        sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
-                    });
-                });
+            it('should call sendErrorEvent with web view error', () => {
+                sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.WebViewError, 'Banner failed to load : failLoadBannerAdUnit');
+            });
+        });
+
+        describe('Fail loading a Banner Ad with no fill', () => {
+            beforeEach(() => {
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
+                return failLoadBannerAdUnit(new NoFillError(`No fill for ${placementId}`));
             });
 
-            context('if banner refresh delay is overwritten from the dashboard', () => {
-                it('should not refresh after 30 seconds when overwritten by the dashboard', () => {
-                    banners.PlacementManager.getPlacement(placementId)!.set('bannerRefreshRate', 40);
-                    banners.Api.Banner.onBannerOpened.trigger();
-                    clock.tick(31 * 1000);
-                    return Promise.resolve().then(() => {
-                        sinon.assert.calledOnce(asStub(banners.CampaignManager.request));
-                    });
-                });
-            });
-
-            context('if banner refresh delay is overwritten from the dashboard', () => {
-                it('should refresh after 5 seconds when overwritten by the dashboard', () => {
-                    banners.PlacementManager.getPlacement(placementId)!.set('bannerRefreshRate', 5);
-                    banners.Api.Banner.onBannerOpened.trigger();
-                    clock.tick(6 * 1000);
-                    return Promise.resolve().then(() => {
-                        sinon.assert.calledTwice(asStub(banners.CampaignManager.request));
-                    });
-                });
+            it('should call sendErrorEvent with no fill', () => {
+                sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
             });
         });
 
         describe('No fill banner scenario', () => {
             beforeEach(() => {
-                sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
-                sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
+                sandbox.stub(bannerModule.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
+                sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendErrorEvent');
             });
 
             it('will fail when the banner request returns NoFillError', () => {
-                return bannerAdContext.load(placementId).catch((e) => {
-                    sinon.assert.called(asStub(banners.Api.Listener.sendErrorEvent));
+                return bannerAdContext.load().catch((e) => {
+                    sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
                 });
             });
         });

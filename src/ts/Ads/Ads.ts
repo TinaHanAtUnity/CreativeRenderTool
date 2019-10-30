@@ -37,7 +37,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { Banners } from 'Banners/Banners';
+import { BannerModule } from 'Banners/BannerModule';
 import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -88,10 +88,9 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadExperimentWithCometRefreshing, LoadExperimentWithCometRefreshingAfterAnyStart, ZyngaLoadExperiment, ZyngaLoadExperimentWithCometRefreshing, LoadRefreshV3 } from 'Core/Models/ABGroup';
-import { PerPlacementLoadManagerWithCometRefresh } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefresh';
-import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
-import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV3';
+import { LoadExperiment, LoadRefreshV4, ZyngaLoadRefreshV4 } from 'Core/Models/ABGroup';
+import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
+import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
 export class Ads implements IAds {
 
@@ -122,7 +121,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
 
-    public Banners: Banners;
+    public BannerModule: BannerModule;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
@@ -186,8 +185,12 @@ export class Ads implements IAds {
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
+
+            PrivacyMetrics.setGameSessionId(gameSessionId);
+            PrivacyMetrics.setPrivacy(this.PrivacySDK);
+            PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
         }).then(() => {
-             return this.setupLoadApiEnabled();
+            return this.setupLoadApiEnabled();
         }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
@@ -210,7 +213,7 @@ export class Ads implements IAds {
                 }
             }
 
-            this.Banners = new Banners(this._core, this);
+            this.BannerModule = new BannerModule(this._core, this);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
@@ -279,20 +282,25 @@ export class Ads implements IAds {
     }
 
     private configureRefreshManager(): void {
+
         if (this._loadApiEnabled) {
             const abGroup = this._core.Config.getAbGroup();
             const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
 
-            if (LoadRefreshV3.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerV3(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (LoadExperimentWithCometRefreshing.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (!isZyngaDealGame && LoadExperimentWithCometRefreshingAfterAnyStart.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-            } else if (isZyngaDealGame && ZyngaLoadExperimentWithCometRefreshing.isValid(abGroup)) {
-                this.RefreshManager = new PerPlacementLoadManagerWithCometRefresh(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+            if (isZyngaDealGame) {
+                if (ZyngaLoadRefreshV4.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else {
+                    this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                }
             } else {
-                this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                if (LoadRefreshV4.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else if (LoadExperiment.isValid(abGroup)) {
+                    this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
+                } else {
+                    this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+                }
             }
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager, this._core.MetaDataManager);
@@ -300,7 +308,7 @@ export class Ads implements IAds {
     }
 
     private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.PrivacySDK.isConsentShowRequired()) {
+        if (!this.PrivacyManager.isConsentShowRequired()) {
             return Promise.resolve();
         }
 
@@ -412,23 +420,6 @@ export class Ads implements IAds {
             this._showingConsent = false;
             this.showAd(placement, campaign, options);
         });
-    }
-
-    public showBanner(placementId: string, callback: INativeCallback) {
-        callback(CallbackStatus.OK);
-
-        const context = this.Banners.BannerAdContext;
-        context.load(placementId).catch((e) => {
-            this.Banners.PlacementManager.sendBannersReady();
-            this._core.Api.Sdk.logWarning(`Could not show banner due to ${e.message}`);
-        });
-    }
-
-    public hideBanner(callback: INativeCallback) {
-        callback(CallbackStatus.OK);
-
-        const context = this.Banners.BannerAdContext;
-        context.hide();
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
@@ -668,9 +659,9 @@ export class Ads implements IAds {
     }
 
     private setupLoadApiEnabled(): void {
-        const isZyngaReverseABGroupLoadExperiment = !(ZyngaLoadExperiment.isValid(this._core.Config.getAbGroup())) && CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
+        const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
         const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
-        if (isContainedLoadExperiment || isZyngaReverseABGroupLoadExperiment) {
+        if (isContainedLoadExperiment || isZyngaDealGame) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }

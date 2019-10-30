@@ -36,7 +36,7 @@ describe('VastEndScreen', () => {
     });
 
     it('should render', () => {
-        const privacy = new Privacy(platform, vastEndscreenParameters.campaign, privacyManager, false, false);
+        const privacy = new Privacy(platform, vastEndscreenParameters.campaign, privacyManager, false, false, 'en');
         const endScreen = new VastEndScreen(platform, vastEndscreenParameters, privacy);
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);

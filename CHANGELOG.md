@@ -1,5 +1,56 @@
 # Pending
 
+* Remove Forced Age Gate Sync [#11843](https://github.com/Applifier/unity-ads-webview/pull/11843)
+* Add Fullscreen CTA ABTest on Groups 10 and 11 [#11871](https://github.com/Applifier/unity-ads-webview/pull/11871)
+* Send Localized Price catalog to IAP backend [#11329](https://github.com/Applifier/unity-ads-webview/pull/11329)
+* Update Load Experiment [#11872](https://github.com/Applifier/unity-ads-webview/pull/11872)
+
+# Tue Oct 29 20:39:33 UTC 2019
+
+* Apply Halloween theme for performance end cards [#11759](https://github.com/Applifier/unity-ads-webview/pull/11759)
+* Add privacymetrics Kafka Topic Support [#11870](https://github.com/Applifier/unity-ads-webview/pull/11870)
+* Add TestEnvironment Metadata for AgeGate [#11784](https://github.com/Applifier/unity-ads-webview/pull/11784)
+* Replace Core Listener API with Ads Listener API [#11868](https://github.com/Applifier/unity-ads-webview/pull/11848)
+* Update package-lock.json [#11787](https://github.com/Applifier/unity-ads-webview/pull/11787)
+
+# Fri Oct 25 19:51:34 UTC 2019
+
+* Create right Privacy view for COPPA games if the privacy method is Unity Consent [#11818](https://github.com/Applifier/unity-ads-webview/pull/11818)
+* Add initial implementation of privacy metrics [#11789](https://github.com/Applifier/unity-ads-webview/pull/11789)
+* Revert "Experiment to test communications with AUI service" [#11815](https://github.com/Applifier/unity-ads-webview/pull/11815)
+* Force Banners to Fail for Banner Containers smaller than 320x50 [#11788](https://github.com/Applifier/unity-ads-webview/pull/11788)
+* Temporarily Disable Jenkins Builds [#11817](https://github.com/Applifier/unity-ads-webview/pull/11817)
+* Purge Tencent URLs in Purge Script [#11785](https://github.com/Applifier/unity-ads-webview/pull/11785)
+
+# Fri Oct 25 06:46:51 UTC 2019
+
+* Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
+
+# Tue Oct 22 20:41:36 UTC 2019
+
+* Add AutomatedExperiment to test communications with AUI service [#11758](https://github.com/Applifier/unity-ads-webview/pull/11758)
+* Fix iOS 13 rotation with endcard issue [#11561](https://github.com/Applifier/unity-ads-webview/pull/11561)
+
+# Mon Oct 21 21:25:14 UTC 2019
+
+* Add PerPlacementLoadManagerV4 Implementation and Update Load Experiment [#11729](https://github.com/Applifier/unity-ads-webview/pull/11729)
+* Mute Admob Videos Based on Auction Flag [#11732](https://github.com/Applifier/unity-ads-webview/pull/11732)
+
+# Fri Oct 18 22:56:15 UTC 2019
+
+* Revert 4 animations for CTA experiments [#11702](https://github.com/Applifier/unity-ads-webview/pull/11702)
+* Age Gate: Change background colors and increase font sizes [#11731](https://github.com/Applifier/unity-ads-webview/pull/11731)
+* Open Measurement - AdViewBuilder[#11452](https://github.com/Applifier/unity-ads-webview/pull/11452)
+
+# Wed Oct 16 17:36:03 UTC 2019
+
+* Force age gate resync to never show age gate twice [#11648](https://github.com/Applifier/unity-ads-webview/pull/11648)
+* Chinese translation for privacy pop-up and dialog [#11505](https://github.com/Applifier/unity-ads-webview/pull/11505)
+* Merge 3.3.0 to master and Update Releases.txt
+* Update Reporting Advertisement Copy [#11676](https://github.com/Applifier/unity-ads-webview/pull/11676)
+
+# Tue Oct 15 17:42:45 UTC 2019
+
 * Add PerPlacementLoadManagerV3 ABTest on Group 12 for all Load Traffic [#11649](https://github.com/Applifier/unity-ads-webview/pull/11649)
 * Align Zynga Solitaire with WWF Testing and Remove Extra PTS Tracking [#11646](https://github.com/Applifier/unity-ads-webview/pull/11646)
 * Remove privacy sanitation events [#11559](https://github.com/Applifier/unity-ads-webview/pull/11559)

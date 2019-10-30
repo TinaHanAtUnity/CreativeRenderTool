@@ -17,7 +17,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -91,11 +91,11 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             this._unityConsentView.show();
 
             if (this._privacySDK.isAgeGateEnabled()) {
-                Diagnostics.trigger('age_gate_show', {
-                    legalFramework: this._privacySDK.getLegalFramework(),
-                    method: this._privacySDK.getGamePrivacy().getMethod(),
-                    previousChoice: this._privacyManager.getAgeGateChoice()
-                });
+                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
+            }
+            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
+                const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
+                this.handleAutoAgeGate(ageGateValue);
             }
 
             if (TestEnvironment.get('autoAcceptConsent')) {
@@ -214,6 +214,18 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 'uri': url
             });
         }
+    }
+
+    private handleAutoAgeGate(ageGate: boolean) {
+        setTimeout(() => {
+            if (ageGate) {
+                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+                this._unityConsentView.testAutoAgeGate(ageGate);
+            } else {
+                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+                this._unityConsentView.testAutoAgeGate(ageGate);
+            }
+        }, 3000);
     }
 
     private handleAutoConsent(consent: IPermissions) {

@@ -148,6 +148,11 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
             Diagnostics.trigger('admob_ad_video_stalled', {
                 data: data
             });
+        } else if (event === TrackingEvent.LOADED) {
+            if (this._campaign.shouldMuteByDefault()) {
+                const isMuted = true;
+                this.onMuteChange(isMuted);
+            }
         }
     }
 
@@ -159,6 +164,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
             };
             this._adUnit.sendClickSignalResponse(response);
         });
+    }
+
+    public onMuteChange(isMuted: boolean) {
+        this._adUnit.sendMuteChange(isMuted);
     }
 
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {

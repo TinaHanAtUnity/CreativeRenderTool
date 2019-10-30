@@ -10,6 +10,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -28,8 +29,8 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager) {
-        super(placement);
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder) {
+        super(placement, omAdViewBuilder);
 
         this._platform = platform;
         this._core = core;

@@ -5,6 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
+import { Localization } from 'Core/Utilities/Localization';
 
 enum PrivacyCardState {
     PRIVACY,
@@ -20,17 +21,19 @@ export class Privacy extends AbstractPrivacy {
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
     private _userSummaryObtained: boolean = false;
+    private _localization: Localization;
 
     constructor(platform: Platform, campaign: Campaign,
                 privacyManager: UserPrivacyManager, gdprEnabled: boolean,
-                isCoppaCompliant: boolean) {
+                isCoppaCompliant: boolean, language: string) {
 
         super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy');
         this._templateData.reportKeys = Object.keys(ReportReason);
         // tslint:disable-next-line
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
-        this._template = new Template(PrivacyTemplate);
+        this._localization = new Localization(language, 'privacy');
+        this._template = new Template(PrivacyTemplate, this._localization);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
 
@@ -76,19 +79,15 @@ export class Privacy extends AbstractPrivacy {
     public show(): void {
         super.show();
 
-        if (!this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (!this._userPrivacyManager.isUserUnderAgeLimit() &&  !this._isCoppaCompliant) {
             this.populateUserSummary();
         }
 
-        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit() && !this._isCoppaCompliant) {
             const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement> this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
-
-            // Disables reporting for GDPR Regions by hiding the report screen from being activated
-            const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
-            middleLink.style.visibility = 'hidden';
 
             const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
             if (agreeRadioButton) {
@@ -103,11 +102,17 @@ export class Privacy extends AbstractPrivacy {
                 };
             }
         }
+
+        if (this._gdprEnabled) {
+            // Disables reporting for GDPR Regions by hiding the report screen from being activated
+            const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
+            middleLink.style.visibility = 'hidden';
+        }
     }
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit()) {
+        if (this._gdprEnabled && !this._userPrivacyManager.isUserUnderAgeLimit() && !this._isCoppaCompliant) {
             const gdprReduceRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-refuse-radio');
 
             this._handlers.forEach(handler => {
@@ -192,8 +197,8 @@ export class Privacy extends AbstractPrivacy {
         const reportButtonText = 'Report Ad ⚑';
         const privacyButtonText = 'Privacy info 👁';
         const buildButtonText = 'Build info ⚙';
-        const confirmText = 'Confirm';
-        const closeText = 'Close';
+        const confirmText = this._localization.translate('privacy-dialog-button-confirm');
+        const closeText = this._localization.translate('privacy-dialog-button-close');
 
         switch (this._currentState) {
             // Privacy screen showing
@@ -250,18 +255,28 @@ export class Privacy extends AbstractPrivacy {
 
     private populateUserSummary() {
         if (!this._userSummaryObtained) {
-            this._userPrivacyManager.retrieveUserSummary().then((userSummary) => {
-                this._userSummaryObtained = true;
-                document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-                document.getElementById('phone-type')!.innerHTML = ` - Using ${userSummary.deviceModel}`;
-                document.getElementById('country')!.innerHTML = ` - Located in ${userSummary.country}`;
-                document.getElementById('game-plays-this-week')!.innerHTML = ` - Used this app ${userSummary.gamePlaysThisWeek} times this week`;
-                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${userSummary.adsSeenInGameThisWeek} ads in this app`;
-                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${userSummary.installsFromAds} apps based on those ads`;
+            const formatTranslation = (str: string, arr: string[]) => {
+                return str.replace(/{(\d+)}/g, (match, number) => {
+                    return typeof arr[number] !== 'undefined' ? arr[number] : match;
+                });
+            };
+
+            this._userPrivacyManager.retrieveUserSummary().then((personalProperties) => {
+                document.getElementById('phone-type')!.innerHTML = formatTranslation(this._localization.translate('privacy-using'), [personalProperties.deviceModel]);
+                document.getElementById('country')!.innerHTML = formatTranslation(this._localization.translate('privacy-located-in'), [personalProperties.country]);
+                document.getElementById('game-plays-this-week')!.innerHTML = formatTranslation(this._localization.translate('privacy-used-this-app'), [personalProperties.gamePlaysThisWeek.toString()]);
+                document.getElementById('ads-seen-in-game')!.innerHTML = formatTranslation(this._localization.translate('privacy-seen-ads'), [personalProperties.adsSeenInGameThisWeek.toString()]);
+                document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), [personalProperties.installsFromAds.toString()]);
             }).catch(error => {
-                Diagnostics.trigger('user_summary_failed', error);
-                document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
+                Diagnostics.trigger('gdpr_personal_info_failed', error);
+                const hyphen = ['-'];
+                document.getElementById('phone-type')!.innerHTML = formatTranslation(this._localization.translate('privacy-using'), hyphen);
+                document.getElementById('country')!.innerHTML = formatTranslation(this._localization.translate('privacy-located-in'), hyphen);
+                document.getElementById('game-plays-this-week')!.innerHTML = formatTranslation(this._localization.translate('privacy-used-this-app'), hyphen);
+                document.getElementById('ads-seen-in-game')!.innerHTML = formatTranslation(this._localization.translate('privacy-seen-ads'), hyphen);
+                document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), hyphen);
             });
         }
+
     }
 }

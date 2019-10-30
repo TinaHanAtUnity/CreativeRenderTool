@@ -20,6 +20,7 @@ export interface IAndroidDeviceInfo extends IDeviceInfo {
     manufacturer: string;
     screenLayout: number;
     screenDensity: number;
+    displayMetricDensity: number;
     ringerMode: RingerMode;
     apkDigest: string;
     certificateFingerPrint: string;
@@ -62,6 +63,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             manufacturer: ['string'],
             screenLayout: ['number'],
             screenDensity: ['number'],
+            displayMetricDensity: ['number'],
             ringerMode: ['number'],
             apkDigest: ['string'],
             certificateFingerPrint: ['string'],
@@ -92,6 +94,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._core.DeviceInfo.Android!.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this.set('totalExternalSpace', totalExternalSpace)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getManufacturer().then(manufacturer => this.set('manufacturer', manufacturer)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getScreenDensity().then(screenDensity => this.set('screenDensity', screenDensity)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getDisplayMetricDensity().then(displayMetricDensity => this.set('displayMetricDensity', displayMetricDensity)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
@@ -171,6 +174,10 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public getScreenLayout(): number {
         return this.get('screenLayout');
+    }
+
+    public getDisplayMetricDensity(): number {
+        return this.get('displayMetricDensity');
     }
 
     public getScreenDensity(): number {
@@ -289,6 +296,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
+                'displayMetricDensity': this.getDisplayMetricDensity(),
                 'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
@@ -324,6 +332,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
+                'displayMetricDensity': this.getDisplayMetricDensity(),
                 'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
@@ -349,6 +358,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
+            'displayMetricDensity': this.getDisplayMetricDensity(),
             'totalSpaceExternal': this.getTotalSpaceExternal()
         };
 
@@ -371,6 +381,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
+            'displayMetricDensity': this.getDisplayMetricDensity(),
             'totalSpaceExternal': this.getTotalSpaceExternal()
         };
     }

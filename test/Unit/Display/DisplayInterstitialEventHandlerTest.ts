@@ -85,7 +85,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
 
             view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);
 

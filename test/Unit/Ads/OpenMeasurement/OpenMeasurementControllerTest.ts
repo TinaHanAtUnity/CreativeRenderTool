@@ -6,6 +6,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlayerState, InteractionType, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMController`, () => {
@@ -14,7 +15,8 @@ import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlay
 
         const initOMManager = (om: OpenMeasurement[]) => {
             placement = TestFixtures.getPlacement();
-            return new OpenMeasurementController(placement, om);
+            const adViewBuilder = sandbox.createStubInstance(OpenMeasurementAdViewBuilder);
+            return new OpenMeasurementController(placement, adViewBuilder, om);
         };
 
         describe('session events', () => {
