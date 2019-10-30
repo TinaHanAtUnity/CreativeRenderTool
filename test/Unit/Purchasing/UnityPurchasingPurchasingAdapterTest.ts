@@ -95,7 +95,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         (<any>promo.Purchasing).onGetPromoCatalog = new Observable1<string>();
 
         const coreConfiguration = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
-        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, privacySDK, clientInfo, metaDataManager);
+        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, privacySDK, clientInfo, metaDataManager, request);
     });
 
     afterEach(() => {

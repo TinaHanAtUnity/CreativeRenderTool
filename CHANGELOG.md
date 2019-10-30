@@ -1,3 +1,18 @@
+# Pending
+
+* Remove Forced Age Gate Sync [#11843](https://github.com/Applifier/unity-ads-webview/pull/11843)
+* Add Fullscreen CTA ABTest on Groups 10 and 11 [#11871](https://github.com/Applifier/unity-ads-webview/pull/11871)
+* Send Localized Price catalog to IAP backend [#11329](https://github.com/Applifier/unity-ads-webview/pull/11329)
+* Update Load Experiment [#11872](https://github.com/Applifier/unity-ads-webview/pull/11872)
+
+# Tue Oct 29 20:39:33 UTC 2019
+
+* Apply Halloween theme for performance end cards [#11759](https://github.com/Applifier/unity-ads-webview/pull/11759)
+* Add privacymetrics Kafka Topic Support [#11870](https://github.com/Applifier/unity-ads-webview/pull/11870)
+* Add TestEnvironment Metadata for AgeGate [#11784](https://github.com/Applifier/unity-ads-webview/pull/11784)
+* Replace Core Listener API with Ads Listener API [#11868](https://github.com/Applifier/unity-ads-webview/pull/11848)
+* Update package-lock.json [#11787](https://github.com/Applifier/unity-ads-webview/pull/11787)
+
 # Fri Oct 25 19:51:34 UTC 2019
 
 * Create right Privacy view for COPPA games if the privacy method is Unity Consent [#11818](https://github.com/Applifier/unity-ads-webview/pull/11818)

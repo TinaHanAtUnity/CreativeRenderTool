@@ -310,7 +310,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
-    private onCallButtonEvent(event: Event): void {
+    protected onCallButtonEvent(event: Event): void {
         if (!this._callButtonEnabled) {
             return;
         }
@@ -350,7 +350,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayPauseForTesting(true));
     }
 
-    private onClick(event: Event) {
+    protected onClick(event: Event) {
         this.resetFadeTimer();
 
         if (this._areControlsVisible) {
