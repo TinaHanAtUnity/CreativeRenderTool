@@ -660,7 +660,7 @@ export class Ads implements IAds {
 
     private setupLoadApiEnabled(): void {
         const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
-        const isMopubTestGame = this._core.ClientInfo.getGameId() === '1926039' ? true : false;
+        const isMopubTestGame = this._core.ClientInfo.getGameId() === '1926039' || this._core.ClientInfo.getGameId() === '1732577';
         const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
         if (isContainedLoadExperiment || isZyngaDealGame || isMopubTestGame) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
