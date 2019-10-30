@@ -718,16 +718,16 @@ describe('CampaignRefreshManager', () => {
             beforeEach(() => {
                 backend.Api.Storage.setStorageContents(<any>{
                     mediation: {
-                        name: {value: 'replaceThisMediationNameWhenLive'},
+                        name: {value: 'MoPub'},
                         version: {value: 'test_version'},
-                        adapter_version: {value: 'replaceThisVersionWhenLive'}
+                        adapter_version: {value: '3.3.0.1'}
                     }
                 });
                 return metaDataManager.fetch(MediationMetaData, true, ['name', 'version', 'adapter_version']).then(metaData => {
                     if (metaData) {
-                        assert.equal(metaData.getName(), 'replaceThisMediationNameWhenLive', 'MediationMetaData.getName() did not pass through correctly');
+                        assert.equal(metaData.getName(), 'MoPub', 'MediationMetaData.getName() did not pass through correctly');
                         assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
-                        assert.equal(metaData.getAdapterVersion(), 'replaceThisVersionWhenLive', 'MediationMetaData.getAdapterVersion() did not pass through correctly');
+                        assert.equal(metaData.getAdapterVersion(), '3.3.0.1', 'MediationMetaData.getAdapterVersion() did not pass through correctly');
                     }
                 }).then(() => {
                     loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);

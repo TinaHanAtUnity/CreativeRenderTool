@@ -95,7 +95,7 @@ export class CampaignRefreshManager extends RefreshManager {
             if (mediation) {
                 const mediationName = mediation.getName();
                 const mediationAdapterVersion = mediation.getAdapterVersion();
-                if (mediationName === 'replaceThisMediationNameWhenLive' && mediationAdapterVersion === 'replaceThisVersionWhenLive') {
+                if (mediationName === 'MoPub' && mediationAdapterVersion === '3.3.0.1') {
                     this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
                         Object.keys(placements).forEach((placementId) => {
                             const count = placements[placementId];
