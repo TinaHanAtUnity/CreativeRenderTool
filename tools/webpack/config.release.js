@@ -28,7 +28,6 @@ const plugins = [
 
 const production = {
     mode: 'production',
-    devtool: 'source-map',
     entry: {
         app: [
             '@babel/polyfill',
