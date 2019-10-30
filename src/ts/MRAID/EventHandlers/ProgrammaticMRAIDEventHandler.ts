@@ -76,4 +76,8 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
     public setJaegerSpan(jaegerSpan: JaegerSpan) {
         this._jaegerSpan = jaegerSpan;
     }
+
+    public onUseCustomClose(hideClose: boolean) {
+        return;
+    }
 }

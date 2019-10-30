@@ -1,5 +1,4 @@
-import { ProgrammaticTrackingService, MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
@@ -20,7 +19,6 @@ import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import JsConsoleDebugScript from 'html/DebugJsConsole.html';
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
-import { configure } from 'protobufjs';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -49,6 +47,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onCustomImpressionEvent(): void;
     onWebViewFullScreen(): Promise<void>;
     onWebViewReduceSize(): Promise<void>;
+    onUseCustomClose(hideClose: boolean): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
@@ -90,10 +89,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTimestamp: number;
 
     protected _mraidAdapterContainer: MRAIDAdapterContainer;
-    protected _mraidCustomCloseCalled: boolean;
-    protected _mraidCustomCloseDelay: number;
-    private _mraidCustomCloseTimeout: number;
-    private _flipClose: boolean;
 
     protected _deviceorientationListener: EventListener | undefined;
 
@@ -157,15 +152,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         this._gameSessionId = gameSessionId || 0;
         this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
-
-        this._mraidCustomCloseCalled = false;
-
-        this._mraidCustomCloseDelay = 5;
-        if (!placement.allowSkip()) {
-            // If the placement is not skippable, extend the hide time.
-            this._mraidCustomCloseDelay = 40;
-        }
-        this._flipClose = true;
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -296,17 +282,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    private setMraidCustomCloseTimeout(element: HTMLElement, hideDuration: number) {
-        this._mraidCustomCloseTimeout = window.setTimeout(() => {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideTimeout);
-            this.showCloseGraphic(element, true);
-        }, hideDuration);
-    }
-
-    private clearMraidCustomCloseTimeout() {
-        window.clearTimeout(this._mraidCustomCloseTimeout);
-    }
-
     protected updateStats(stats: IMRAIDStats): void {
         this._stats = {
             ...stats,
@@ -317,14 +292,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected prepareProgressCircle() {
         if (this._placement.allowSkip()) {
-            if (this._campaign.isCustomCloseEnabled()) {
-                // NOTE: When allowSkip is true and mraid.useCustomClose is also true,
-                // move the close button to the left.  This is a temporary test and
-                // will likely be removed in the future.
-                this._closeElement.style.removeProperty('right');
-                this._closeElement.style.left = '0';
-            }
-
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = this._CLOSE_LENGTH;
             let skipRemaining = skipLength;
@@ -390,15 +357,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if (value >= 0.5) {
             wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
             rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private showCloseGraphic(closeElement: HTMLElement, visible: boolean) {
-        const close = <HTMLElement>closeElement.querySelector('.close');
-        if (visible) {
-            close.style.display = 'block';
-        } else {
-            close.style.display = 'none';
         }
     }
 
@@ -518,8 +476,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeClose() {
-        this.clearMraidCustomCloseTimeout();
-        this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
         this._handlers.forEach(handler => handler.onMraidClose());
     }
 
@@ -567,37 +523,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    public onUseCustomClose(hidden: boolean) {
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
-
-        if (!this._campaign.isCustomCloseEnabled()) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseRefused);
-            return;
-        }
-
-        if (!hidden) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic);
-            this.clearMraidCustomCloseTimeout();
-            this.showCloseGraphic(this._closeElement, true);
-            return;
-        }
-
-        if (this._mraidCustomCloseCalled) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalledAgain);
-            return;
-        }
-
-        this._mraidCustomCloseCalled = true;
-
-        const hideDuration = this._mraidCustomCloseDelay * 1000;
-        if (hideDuration <= 0) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseExpired);
-            this.showCloseGraphic(this._closeElement, true);
-            return;
-        }
-
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic);
-        this.showCloseGraphic(this._closeElement, false);
-        this.setMraidCustomCloseTimeout(this._closeElement, hideDuration);
+    public onUseCustomClose(hideClose: boolean) {
+        return;
     }
 }

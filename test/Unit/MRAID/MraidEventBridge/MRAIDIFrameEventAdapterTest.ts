@@ -33,13 +33,13 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 onBridgeLoad: sinon.spy(),
                 onBridgeAnalyticsEvent: sinon.spy(),
                 onBridgeClose: sinon.spy(),
-                onUseCustomClose: sinon.spy(),
                 onBridgeStateChange: sinon.spy(),
                 onBridgeResizeWebview: sinon.spy(),
                 onBridgeSendStats: sinon.spy(),
                 onBridgeAREvent: sinon.spy(),
                 onBridgeArReadyToShow: sinon.spy(),
-                onBridgeDeviceOrientationSubscribe: sinon.spy()
+                onBridgeDeviceOrientationSubscribe: sinon.spy(),
+                onUseCustomClose: sinon.spy()
             };
 
             mraidAdapterContainer = new MRAIDAdapterContainer(handler);

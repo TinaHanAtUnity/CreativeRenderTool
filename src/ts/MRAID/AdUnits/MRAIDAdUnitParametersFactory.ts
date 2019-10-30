@@ -4,6 +4,7 @@ import { IMRAIDAdUnitParameters } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { MRAIDView, IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
+import { CustomCloseMRAID } from 'MRAID/Views/CustomCloseMRAID';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { MRAID } from 'MRAID/Views/MRAID';
@@ -53,6 +54,8 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
                 mraid = new ExtendedMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.programmaticTrackingService, baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else if (ARUtil.isARCreative(baseParams.campaign) || MRAIDAdUnitParametersFactory._forcedARMRAID) {
                 mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.programmaticTrackingService, baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
+            } else if (baseParams.campaign.isCustomCloseEnabled()) {
+                mraid = new CustomCloseMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.programmaticTrackingService, baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else {
                 mraid = new MRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.programmaticTrackingService, baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             }

@@ -161,4 +161,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             asset: this._campaign.getResourceUrl()
         };
     }
+
+    public onUseCustomClose(hideClose: boolean) {
+        return;
+    }
 }

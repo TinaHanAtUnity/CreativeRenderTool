@@ -69,4 +69,7 @@ export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements I
         });
     }
 
+    public onUseCustomClose(hideClose: boolean) {
+        return;
+    }
 }

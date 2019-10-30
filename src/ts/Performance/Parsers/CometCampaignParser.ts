@@ -90,7 +90,7 @@ export class CometCampaignParser extends CampaignParser {
                 appStoreId: json.appStoreId,
                 playableConfiguration: undefined,
                 targetGameId: json.gameId,
-                isCustomCloseEnabled: response.isCustomCloseEnabled()
+                isCustomCloseEnabled: response.isCustomCloseEnabled() || false
             };
             parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
