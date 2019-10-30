@@ -11,7 +11,7 @@
 
     <script>
         (function() {
-            var AdsPrivacyBridge = function() {
+            var AdsPrivacyAdapter = function() {
                 var listeners = {
                     error: [],
                     sizeChange: []
@@ -81,12 +81,6 @@
                     trigger('sizeChange', [width, height]);
                 });
 
-                window.addEventListener('DOMContentLoaded', function() {
-                    window.parent.postMessage({
-                        type: 'onPrivacyReady'
-                    }, '*');
-                }, false);
-
                 this.onShowFallback = function(listener) {
                     if (permissions['Camera'] === false) {
                         listener();
@@ -138,8 +132,20 @@
                     }, '*');
                 };
 
+                this.onPrivacyReady = function() {
+                    if (window.privacyAdapter.readyCallback) {
+                        window.privacyAdapter.readyCallback(JSON.parse(this.getEnv));
+                    }
+                    window.parent.postMessage({
+                        type: 'onPrivacyReady'
+                    }, '*');
+                };
+
                 this.onPrivacyCompleted = function(userSettings) {
                     setState('hidden');
+                    if (window.privacyAdapter.completeCallback) {
+                        window.privacyAdapter.completeCallback();
+                    }
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
                         data: userSettings
@@ -151,7 +157,7 @@
                 }
             };
 
-            window.adsBridge = new AdsPrivacyBridge();
+            window.privacyAdapter = new AdsPrivacyAdapter();
         })();
     </script>
     <script id="deviceorientation-support"></script>
