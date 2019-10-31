@@ -17,7 +17,7 @@ import {
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { ProgrammaticTrackingService, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Localization } from 'Core/Utilities/Localization';
-import { ICore, ICoreApi } from "Core/ICore";
+import { ICore, ICoreApi } from 'Core/ICore';
 
 export interface IConsentViewParameters {
     platform: Platform;
@@ -28,8 +28,8 @@ export interface IConsentViewParameters {
     osVersion?: string;
     pts: ProgrammaticTrackingService;
     consentABTest: boolean;
-    core: ICore,
-    coreApi: ICoreApi,
+    core: ICore;
+    coreApi: ICoreApi;
     ageGateLimit: number;
 }
 

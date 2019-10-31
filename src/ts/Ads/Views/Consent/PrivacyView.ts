@@ -29,7 +29,7 @@ export interface IUserPrivacySettings {
 export class PrivacyView extends View<IConsentViewHandler> {
     private readonly _core: ICore;
     private readonly _coreApi: ICoreApi;
-    private readonly _privacyWebViewUrl = 'http://10.35.33.171:4000/build/index.html';
+    private readonly _privacyWebViewUrl = 'http://10.35.35.53/';
     private readonly _privacyManager: UserPrivacyManager;
 
     protected _iFrameAdapterContainer: PrivacyAdapterContainer;
@@ -92,9 +92,9 @@ export class PrivacyView extends View<IConsentViewHandler> {
     }
 
     public onPrivacyCompleted(userSettings: IUserPrivacySettings) {
-        console.log('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
+        this._coreApi.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
         let permissions: IUnityConsentPermissions;
-        let source: GDPREventSource = GDPREventSource.USER;
+        const source: GDPREventSource = GDPREventSource.USER;
 
         if (userSettings.isChild) {
             this._handlers.forEach(handler => handler.onAgeGateDisagree());
