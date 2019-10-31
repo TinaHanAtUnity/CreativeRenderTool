@@ -6,6 +6,8 @@ import { Template } from 'Core/Utilities/Template';
 
 export class VideoOverlayFullscreenCTA extends VideoOverlay {
 
+    private _fullscreenCTA: HTMLElement;
+
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
@@ -35,16 +37,21 @@ export class VideoOverlayFullscreenCTA extends VideoOverlay {
         this.onCallButtonEvent(event);
     }
 
+    public render() {
+        super.render();
+
+        this._fullscreenCTA = <HTMLElement> this._container.querySelector('.fullscreen-cta-container');
+    }
+
     // tslint:disable-next-line: no-empty
     protected onClick(event: Event) {
     }
 
-    // The original CTA button has been removed, we need to override these method to avoid any errors because the base class still expects them to exist
-    // tslint:disable-next-line: no-empty
     protected showCallButton() {
+        this._fullscreenCTA.style.display = 'block';
     }
 
-    // tslint:disable-next-line: no-empty
     public setCallButtonVisible(value: boolean) {
+        // The original CTA button has been removed, we need to override these method to avoid any errors because the base class still expects them to exist
     }
 }
