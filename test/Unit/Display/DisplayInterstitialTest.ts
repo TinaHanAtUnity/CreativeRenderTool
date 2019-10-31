@@ -14,7 +14,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-const json = JSON.parse(DummyDisplayInterstitialCampaign);
+const json = DummyDisplayInterstitialCampaign;
 
 describe('DisplayInterstitialTest', () => {
     let view: DisplayInterstitial;

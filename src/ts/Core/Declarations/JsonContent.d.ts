@@ -1,4 +1,5 @@
 declare module '*.json' {
-    const content: string;
+    // tslint:disable-next-line:no-any
+    const content: any;
     export default content;
 }

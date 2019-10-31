@@ -94,8 +94,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         (<any>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
         (<any>promo.Purchasing).onGetPromoCatalog = new Observable1<string>();
 
-        const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-        const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+        const coreConfiguration = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
         purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, privacySDK, clientInfo, metaDataManager, request);
     });
 

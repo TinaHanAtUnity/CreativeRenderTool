@@ -11,7 +11,7 @@ export class FakeIosDeviceInfo extends IosDeviceInfo {
 
     constructor(core: ICoreApi) {
         super(core);
-        this._fakeDevice = JSON.parse(IosDefaults);
+        this._fakeDevice = IosDefaults;
     }
 
     public fetch(): Promise<any[]> {
