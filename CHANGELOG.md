@@ -1,6 +1,8 @@
 # Staged
 
 * Consent A/B test: Add semi-transparent background [#11869](https://github.com/Applifier/unity-ads-webview/pull/11869)
+* Enable Mopub GameIDs for Load Regardless of AB Group [#11897](https://github.com/Applifier/unity-ads-webview/pull/11897)
+* Make Fullscreen CTA Appear After 5 Seconds [#11923](https://github.com/Applifier/unity-ads-webview/pull/11923)
 
 # Thu Oct 31 00:30:18 UTC 2019
 
