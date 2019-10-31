@@ -1,4 +1,4 @@
-# Pending
+# Thu Oct 31 00:30:18 UTC 2019
 
 * Remove Forced Age Gate Sync [#11843](https://github.com/Applifier/unity-ads-webview/pull/11843)
 * Add Fullscreen CTA ABTest on Groups 10 and 11 [#11871](https://github.com/Applifier/unity-ads-webview/pull/11871)
