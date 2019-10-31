@@ -72,10 +72,8 @@ export class CustomCloseMRAID extends MRAID {
 
     public onBridgeClose() {
         super.onBridgeClose();
-        if (this._mraidCustomCloseCalled) {
-            this.clearCustomCloseTimeout();
-            this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
-        }
+        this.clearCustomCloseTimeout();
+        this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
     }
 
     public onUseCustomClose(hideClose: boolean) {

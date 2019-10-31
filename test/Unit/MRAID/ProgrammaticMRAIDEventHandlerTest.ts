@@ -8,6 +8,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -62,6 +63,7 @@ import Test = Mocha.Test;
         let programmaticMraidEventHandler: ProgrammaticMRAIDEventHandler;
         let programmaticMraidCampaign: MRAIDCampaign;
         let privacyManager: UserPrivacyManager;
+        let programmaticTrackingService: ProgrammaticTrackingService;
         let privacySDK: PrivacySDK;
 
         describe('with Programmatic MRAID', () => {
@@ -107,6 +109,7 @@ import Test = Mocha.Test;
                 programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
                 webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
+                programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
                 privacySDK = TestFixtures.getPrivacySDK(core);
 
                 privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, privacySDK.isGDPREnabled(), coreConfig.isCoppaCompliant(), 'en');
@@ -153,6 +156,7 @@ import Test = Mocha.Test;
                     endScreen: undefined,
                     privacy: privacy,
                     privacyManager: privacyManager,
+                    programmaticTrackingService: programmaticTrackingService,
                     webPlayerContainer: webPlayerContainer,
                     privacySDK: privacySDK
                 };
