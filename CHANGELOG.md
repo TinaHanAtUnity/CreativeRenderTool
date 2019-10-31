@@ -1,3 +1,7 @@
+# Staged
+
+* Consent A/B test: Add semi-transparent background [#11869](https://github.com/Applifier/unity-ads-webview/pull/11869)
+
 # Thu Oct 31 00:30:18 UTC 2019
 
 * Remove Forced Age Gate Sync [#11843](https://github.com/Applifier/unity-ads-webview/pull/11843)
