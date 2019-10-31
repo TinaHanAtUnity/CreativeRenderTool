@@ -22,7 +22,7 @@ export class PrivacyParser {
         }
 
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
-        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, configJson.optOutEnabled, limitAdTracking);
+        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, configJson.optOutRecorded, configJson.optOutEnabled, limitAdTracking);
         const gdprEnabled = configJson.gdprEnabled;
         const optOutRecorded = configJson.optOutRecorded;
         const optOutEnabled = configJson.optOutEnabled;
@@ -39,7 +39,7 @@ export class PrivacyParser {
             ageGateLimit = 0;
         }
 
-        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
+        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, ageGateLimit, legalFramework);
     }
 
     private static parseGamePrivacy(rawGamePrivacy: IRawGamePrivacy | undefined, gdprEnabled: boolean): GamePrivacy {
@@ -58,7 +58,7 @@ export class PrivacyParser {
     }
 
     private static parseUserPrivacy(rawUserPrivacy: IRawUserPrivacy | undefined, rawGamePrivacy: IRawGamePrivacy | undefined,
-                                    optOutEnabled: boolean, limitAdTracking: boolean): UserPrivacy {
+                                    optOutRecorded: boolean, optOutEnabled: boolean, limitAdTracking: boolean): UserPrivacy {
         // handle old style 'all'-privacy
         if (rawUserPrivacy && rawUserPrivacy.permissions && (<IAllPermissions><unknown>rawUserPrivacy.permissions).all === true) {
             rawUserPrivacy = {
@@ -85,10 +85,19 @@ export class PrivacyParser {
         }
 
         if (!rawGamePrivacy || !rawUserPrivacy) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, agreedAll: false, permissions: {
+            let consent = false;
+            let method = PrivacyMethod.DEFAULT;
+            if (rawGamePrivacy && optOutRecorded) {
+                consent = !optOutEnabled;
+                if (rawGamePrivacy.method && Object.values(PrivacyMethod).includes(rawGamePrivacy.method)) {
+                    method = <PrivacyMethod>rawGamePrivacy.method;
+                }
+            }
+
+            return new UserPrivacy({ method: method, version: 0, agreedAll: false, permissions: {
                     gameExp: false,
-                    ads: false,
-                    external: false
+                    ads: consent,
+                    external: consent
                 }});
         }
 
@@ -100,8 +109,8 @@ export class PrivacyParser {
                 agreedAll: false,
                 permissions: {
                     gameExp: false,
-                    ads: !optOutEnabled,
-                    external: false
+                    ads: optOutRecorded ? !optOutEnabled : false,
+                    external: optOutRecorded ? !optOutEnabled : false
                 }
             });
         }

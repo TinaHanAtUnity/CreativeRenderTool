@@ -49,26 +49,22 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     public onGDPROptOut(optOutEnabled: boolean): void {
         if (this._privacy.isOptOutRecorded()) {
             if (optOutEnabled !== this._privacy.isOptOutEnabled()) {
-                this._privacy.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
                     // todo: add age gate choice
-                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+                    this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
                 } else {
-                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTIN);
+                    this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTIN);
                 }
             }
         } else {
-            this._privacy.setOptOutRecorded(true);
-            this._privacy.setOptOutEnabled(optOutEnabled);
-
             // if default choice was not changed and no previous answer has been recorded, we must treat this event
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
             if (optOutEnabled) {
                 // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+                this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
             } else {
-                this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
+                this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
             }
         }
         const gamePrivacy = this._privacy.getGamePrivacy();

@@ -52,8 +52,10 @@ export class GamePrivacy extends Model<IGamePrivacy> {
     }
 
     public isEnabled(): boolean {
-        // TODO: add support for other privacy methods
-        return this.getMethod() === PrivacyMethod.UNITY_CONSENT;
+        if (!this.getMethod()) {
+            return false;
+        }
+        return this.getMethod() !== PrivacyMethod.DEFAULT;
     }
 
     public getMethod(): PrivacyMethod {
@@ -152,6 +154,10 @@ export class UserPrivacy extends Model<IUserPrivacy> {
 
     public getMethod(): PrivacyMethod {
         return this.get('method');
+    }
+
+    public setMethod(method: PrivacyMethod): void{
+        this.set('method', method);
     }
 
     public getVersion(): number {

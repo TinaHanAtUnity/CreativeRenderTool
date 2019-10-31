@@ -5,17 +5,13 @@ export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
     private _userPrivacy: UserPrivacy;
     private _gdprEnabled: boolean;
-    private _optOutRecorded: boolean;
-    private _optOutEnabled: boolean;
     private _ageGateLimit: number;
     private _legalFramework: LegalFramework;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
         this._gdprEnabled = gdprEnabled;
-        this._optOutRecorded = optOutRecorded;
-        this._optOutEnabled = optOutEnabled;
         this._ageGateLimit = ageGateLimit;
         this._legalFramework = legalFramework;
     }
@@ -37,19 +33,11 @@ export class PrivacySDK {
     }
 
     public isOptOutRecorded(): boolean {
-        return this._optOutRecorded;
-    }
-
-    public setOptOutRecorded(recorded: boolean) {
-        this._optOutRecorded = recorded;
+        return this._userPrivacy.isRecorded();
     }
 
     public isOptOutEnabled(): boolean {
-        return this._optOutEnabled;
-    }
-
-    public setOptOutEnabled(optOutEnabled: boolean) {
-        this._optOutEnabled = optOutEnabled;
+        return !this._userPrivacy.getPermissions().ads;
     }
 
     public isAgeGateEnabled(): boolean {

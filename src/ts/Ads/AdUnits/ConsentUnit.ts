@@ -159,35 +159,12 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     public onAgeGateDisagree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
 
-        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            const permissions: IPermissions = {
-                gameExp: false,
-                ads: false,
-                external: false
-            };
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION, ConsentPage.AGE_GATE, false);
-        } else {
-            this._privacySDK.setOptOutRecorded(true);
-            this._privacySDK.setOptOutEnabled(true);
-
-            const gamePrivacy = this._privacySDK.getGamePrivacy();
-            const userPrivacy = this._privacySDK.getUserPrivacy();
-
-            if (userPrivacy) {
-                userPrivacy.update({
-                    method: gamePrivacy.getMethod(),
-                    version: 0,
-                    agreedAll: false,
-                    permissions: {
-                        ads: false,
-                        external: false,
-                        gameExp: false
-                    }
-                });
-            }
-
-            this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
-        }
+        const permissions: IPermissions = {
+            gameExp: false,
+            ads: false,
+            external: false
+        };
+        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION, ConsentPage.AGE_GATE, false);
     }
 
     public onAgeGateAgree(): void {

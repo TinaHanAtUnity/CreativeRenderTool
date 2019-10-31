@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -110,7 +110,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
 
                 privacyEventHandler.onGDPROptOut(true);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optout', GDPREventSource.USER);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
             });
 
             it('should send operative event with action `optin`', () => {
@@ -119,7 +119,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optin');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTIN);
             });
 
             it('should send operative event with action `skip`', () => {
@@ -128,7 +128,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'skip');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
             });
         });
     });

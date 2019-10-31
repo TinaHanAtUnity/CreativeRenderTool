@@ -1,11 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import {
-    GamePrivacy,
-    IGranularPermissions,
-    IPermissions,
-    isUnityConsentPermissions,
-    PrivacyMethod, UserPrivacy
-} from 'Privacy/Privacy';
+import { GamePrivacy, IGranularPermissions, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -68,7 +62,6 @@ export interface IUserPrivacyStorageData {
 
 export class UserPrivacyManager {
 
-    private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
 
@@ -143,15 +136,25 @@ export class UserPrivacyManager {
 
     public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage, agreedAll: boolean = false): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
+        const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
-
-        if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
+        console.log("updateUserPrivacy");
+        if (!gamePrivacy.isEnabled()) {
+            console.log("updateUserPrivacy gamePrivacy.isEnabled() = " + gamePrivacy.isEnabled());
             return Promise.resolve();
+        }
+        console.log("updateUserPrivacy1");
+
+        if (source === GDPREventSource.DEVELOPER) {
+            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+            userPrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
 
         if (source === GDPREventSource.USER_INDIRECT) {
-            permissions = {ads: true, gameExp: true, external: true};
-            agreedAll = true;
+            if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                permissions = {ads: true, gameExp: true, external: true};
+                agreedAll = true;
+            }
         }
 
         const updatedPrivacy = {
@@ -160,35 +163,48 @@ export class UserPrivacyManager {
             agreedAll: agreedAll,
             permissions: permissions
         };
+        console.log("updateUserPrivacy2");
 
         if (!this.hasUserPrivacyChanged(updatedPrivacy)) {
             return Promise.resolve();
         }
 
-        this._userPrivacy.update(updatedPrivacy);
+        if (this._deviceInfo.getLimitAdTracking()) {
+            // only developer_consent should end up here
+            const devicePermissions = {ads: false, external: false, gameExp: false};
+            updatedPrivacy.permissions = devicePermissions;
+        }
+        userPrivacy.update(updatedPrivacy);
+
+        // TODO: should we send privacy when limitAdTracking is true?
         return this.sendPrivacyEvent(permissions, source, action, layout, agreedAll, firstRequest);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
         const currentPrivacy = this._userPrivacy;
+        console.log("hasUserPrivacyChanged checking method " + currentPrivacy.getMethod() + " !== " + updatedPrivacy.method);
         if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
             return true;
         }
+        console.log("hasUserPrivacyChanged checking version " + currentPrivacy.getVersion() + " !== " + updatedPrivacy.version);
 
-        if (currentPrivacy.getVersion() !== updatedPrivacy.version) {
+        if (updatedPrivacy.method === PrivacyMethod.UNITY_CONSENT && currentPrivacy.getVersion() !== updatedPrivacy.version) {
             return true;
         }
 
         const currentPermissions = currentPrivacy.getPermissions();
         const updatedPermissions = updatedPrivacy.permissions;
+        console.log("hasUserPrivacyChanged checking gameExp");
 
         if (currentPermissions.gameExp !== updatedPermissions.gameExp) {
             return true;
         }
+        console.log("hasUserPrivacyChanged checking ads " + currentPermissions.ads + " !== " + updatedPermissions.ads);
 
         if (currentPermissions.ads !== updatedPermissions.ads) {
             return true;
         }
+        console.log("hasUserPrivacyChanged checking external");
 
         if (currentPermissions.external !== updatedPermissions.external) {
             return true;
@@ -237,7 +253,6 @@ export class UserPrivacyManager {
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
                 if (this._privacy.isGDPREnabled()) {
-                    this.updateConfigurationWithConsent(consent);
                     this.pushConsent(consent);
                 }
                 return consent; // always return consent value
@@ -312,8 +327,6 @@ export class UserPrivacyManager {
         // if recorded choice is yes, then choice will be recorded when new ad goes through opt-out flow
         if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.NO) {
             // negative choice means opt-out message has not been recorded and new event should be sent
-            this._privacy.setOptOutRecorded(true);
-            this._privacy.setOptOutEnabled(true);
 
             if (this._userPrivacy) {
                 this._userPrivacy.update({
@@ -328,7 +341,7 @@ export class UserPrivacyManager {
                 });
             }
 
-            this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+            this.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
 
             Diagnostics.trigger('age_gate_desync_no', {
                 legalFramework: this._privacy.getLegalFramework(),
@@ -367,19 +380,11 @@ export class UserPrivacyManager {
         return this._privacy.getLegalFramework();
     }
 
-    private pushConsent(consent: boolean): Promise<void> {
-        // get last state of gdpr consent
-        return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
-            // only if consent has changed push to kafka
-            if (consentLastSentToKafka !== consent) {
-                return this.sendGdprConsentEvent(consent);
-            }
-        }).catch((error) => {
-            // there has not been last state of consent
-            // IE this is the first consent value we have seen
-            // and should push this to kafka
-            return this.sendGdprConsentEvent(consent);
-        });
+    private pushConsent(consent: boolean): Promise<INativeResponse | void> {
+        const permissions = {ads: consent, external: consent, gameExp: false};
+        const action = consent ? GDPREventAction.CONSENT : GDPREventAction.OPTOUT;
+
+        return this.updateUserPrivacy(permissions, GDPREventSource.DEVELOPER, action);
     }
 
     private getConsent(): Promise<boolean> {
@@ -407,29 +412,6 @@ export class UserPrivacyManager {
 
     }
 
-    private updateConfigurationWithConsent(consent: boolean) {
-        if (this._deviceInfo.getLimitAdTracking()) {
-            consent = false;
-        }
-
-        this._privacy.setOptOutEnabled(!consent);
-        this._privacy.setOptOutRecorded(true);
-
-        const gamePrivacy = this._privacy.getGamePrivacy();
-        gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-        const userPrivacy = this._privacy.getUserPrivacy();
-        userPrivacy.update({
-            method: gamePrivacy.getMethod(),
-            version: gamePrivacy.getVersion(),
-            agreedAll: false,
-            permissions: {
-                gameExp: false,
-                ads: consent,
-                external: consent
-            }
-        });
-    }
-
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._privacy.isGDPREnabled()) {
@@ -437,7 +419,6 @@ export class UserPrivacyManager {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
                 if (typeof(value) !== 'undefined') {
-                    this.updateConfigurationWithConsent(value);
                     this.pushConsent(value);
                 }
             }
@@ -459,21 +440,6 @@ export class UserPrivacyManager {
         }
 
         return undefined;
-    }
-
-    private sendGdprConsentEvent(consent: boolean): Promise<void> {
-        let sendEvent;
-        if (consent) {
-            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT);
-        } else {
-            // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
-            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.DEVELOPER);
-        }
-        return sendEvent.then(() => {
-            return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {
-                return this._core.Storage.write(StorageType.PRIVATE);
-            });
-        });
     }
 
     private isAgeGateShowRequired(): boolean {
