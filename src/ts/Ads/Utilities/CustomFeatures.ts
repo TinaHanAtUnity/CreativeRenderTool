@@ -130,6 +130,14 @@ export class CustomFeatures {
         return this.existsInList(LoadWhitelist, gameId);
     }
 
+    public static isMopubTestGameForLoad(gameId: string): boolean {
+        if (gameId === '1926039' || gameId === '1732577') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;
