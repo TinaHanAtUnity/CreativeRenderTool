@@ -125,7 +125,7 @@ describe('MRAID', () => {
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
@@ -141,7 +141,7 @@ describe('MRAID', () => {
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>(function() {window.addEventListener("deviceorientation", (event) => {console.log("data:"+event.alpha);});})()</script><div>Hello World</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), sinon.createStubInstance(ProgrammaticTrackingService));
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notInclude(mraidSrc, '<script id=\"deviceorientation-support\"></script>', 'deviceorientation script stub not replaced with script');
