@@ -98,6 +98,7 @@ export enum MraidMetric {
     UseCustomCloseExpired = 'mraid_use_custom_close_expired',
     UseCustomCloseHideGraphic = 'mraid_use_custom_close_hide_graphic',
     UseCustomCloseHideTimeout = 'mraid_use_custom_close_hide_timeout',
+    CloseMovedToLeft = 'mraid_close_graphic_moved_to_left',
     ClosedByAd = 'mraid_closed_by_ad',
     ClosedByUnityAds = 'mraid_closed_by_unity_ads'
 }

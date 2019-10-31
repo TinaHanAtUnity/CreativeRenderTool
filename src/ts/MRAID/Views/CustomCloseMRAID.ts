@@ -61,6 +61,7 @@ export class CustomCloseMRAID extends MRAID {
             return;
         }
 
+        this._pts.reportMetricEvent(MraidMetric.CloseMovedToLeft);
         this._closeElement.style.removeProperty('right');
         this._closeElement.style.left = '0';
     }

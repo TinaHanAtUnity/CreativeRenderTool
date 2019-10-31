@@ -68,4 +68,5 @@ export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements I
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'performance_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
         });
     }
+
 }
