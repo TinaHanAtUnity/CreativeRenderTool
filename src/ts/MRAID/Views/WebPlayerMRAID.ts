@@ -1,4 +1,3 @@
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
@@ -25,8 +24,8 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _domContentLoaded = false;
     private _jaegarSpan: JaegerSpan;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId?: number, hidePrivacy: boolean = false) {
-        super(platform, core, deviceInfo, 'webplayer-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, programmaticTrackingService, hidePrivacy, gameSessionId);
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number, hidePrivacy: boolean = false) {
+        super(platform, core, deviceInfo, 'webplayer-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, hidePrivacy, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;

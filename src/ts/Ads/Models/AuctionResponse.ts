@@ -106,7 +106,6 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('isOMEnabled', data.isOMEnabled);
         this.set('shouldMuteByDefault', data.shouldMuteByDefault);
         this.set('isCustomCloseEnabled', data.isCustomCloseEnabled || false);
-
     }
 
     public getPlacements(): AuctionPlacement[] {

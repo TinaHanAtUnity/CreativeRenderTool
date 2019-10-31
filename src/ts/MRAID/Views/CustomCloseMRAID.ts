@@ -12,10 +12,12 @@ export class CustomCloseMRAID extends MRAID {
     protected _mraidCustomCloseCalled: boolean;
     protected _mraidCustomCloseDelay: number;
     private _mraidCustomCloseTimeout: number;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId: number = 0, hidePrivacy: boolean = false) {
-        super(platform, core, deviceInfo, placement, campaign, privacy, showGDPRBanner, abGroup, programmaticTrackingService, gameSessionId, hidePrivacy);
+        super(platform, core, deviceInfo, placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId, hidePrivacy);
 
+        this._pts = programmaticTrackingService;
         this._mraidCustomCloseCalled = false;
 
         this._mraidCustomCloseDelay = 5;
@@ -63,6 +65,11 @@ export class CustomCloseMRAID extends MRAID {
         this._closeElement.style.left = '0';
     }
 
+    public onCloseEvent(event: Event) {
+        super.onCloseEvent(event);
+        this._pts.reportMetricEvent(MraidMetric.ClosedByUnityAds);
+    }
+
     public onBridgeClose() {
         super.onBridgeClose();
         if (this._mraidCustomCloseCalled) {
@@ -72,6 +79,7 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     public onUseCustomClose(hideClose: boolean) {
+        super.onUseCustomClose(hideClose);
         this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
 
         if (!this._campaign.isCustomCloseEnabled()) {

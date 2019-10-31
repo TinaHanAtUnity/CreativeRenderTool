@@ -30,7 +30,6 @@ describe('MRAID', () => {
     let privacy: Privacy;
     let privacyManager: UserPrivacyManager;
     let fakeCampaign: Campaign;
-    let programmaticTrackingService: ProgrammaticTrackingService;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -58,12 +57,11 @@ describe('MRAID', () => {
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         fakeCampaign = sinon.createStubInstance(Campaign);
         privacy = new Privacy(platform, fakeCampaign, privacyManager, false, false, 'en');
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
     });
 
     it('should render', () => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
         mraid.render();
 
         return new Promise((resolve, reject) => {
@@ -94,7 +92,7 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
 
-        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+        const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
         mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
