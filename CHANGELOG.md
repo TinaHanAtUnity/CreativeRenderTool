@@ -1,3 +1,7 @@
+# Pending
+
+* Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
+
 # Thu Oct 31 19:26:43 UTC 2019
 
 * Consent A/B test: Add semi-transparent background [#11869](https://github.com/Applifier/unity-ads-webview/pull/11869)
