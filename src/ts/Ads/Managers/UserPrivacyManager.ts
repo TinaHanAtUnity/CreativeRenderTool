@@ -112,10 +112,6 @@ export class UserPrivacyManager {
                 buildOsVersion: 'build.osVersion'
             },
 
-            user: {
-
-            },
-
             webView: {
                 url: 'http://10.35.34.174:3000/'
             }}));

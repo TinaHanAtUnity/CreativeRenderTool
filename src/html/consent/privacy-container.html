@@ -134,7 +134,11 @@
 
                 this.onPrivacyReady = function() {
                     if (window.privacyAdapter.readyCallback) {
-                        window.privacyAdapter.readyCallback(JSON.parse(this.getEnv()));
+                        const obj = {
+                            env: JSON.parse(this.getEnv()),
+                            user: {}
+                        };
+                        window.privacyAdapter.readyCallback(obj);
                     }
                     window.parent.postMessage({
                         type: 'onPrivacyReady'
