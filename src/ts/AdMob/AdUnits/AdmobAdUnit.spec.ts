@@ -73,30 +73,81 @@ describe('AdmobAdUnitTest', () => {
         await admobAdUnit.hide();
     });
 
-    it('should call rewarded placement metrics when allowSkip is false', async () => {
-        placement.allowSkip.mockReturnValue(false);
-        admobAdUnit = new AdMobAdUnit(admobAdUnitParameters);
+    describe('when creating AdmobAdUnit and allowSkip is false', () => {
+        beforeEach(async () => {
+            placement.allowSkip.mockReturnValue(false);
+            admobAdUnit = new AdMobAdUnit(admobAdUnitParameters);
 
-        await admobAdUnit.show();
+            await admobAdUnit.show();
+        });
 
-        expect(pts.reportMetricEvent).toHaveBeenCalled();
-        expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobRewardedVideoStart);
-        admobAdUnit.sendRewardEvent();
-        expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
-        admobAdUnit.sendSkipEvent();
-        expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserSkippedRewardedVideo);
+        it('should have called reportMetricEvent 1 time', () => {
+            expect(pts.reportMetricEvent).toHaveBeenCalledTimes(1);
+        });
+
+        it('should have called reportMetricEvent with AdmobMetric.AdmobRewardedVideoStart', () => {
+            expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobRewardedVideoStart);
+        });
+
+        describe('when sendRewardEvent is called', () => {
+            beforeEach(() => {
+                admobAdUnit.sendRewardEvent();
+            });
+
+            it('should have called reportMetricEvent 2 times', () => {
+                expect(pts.reportMetricEvent).toHaveBeenCalledTimes(2);
+            });
+
+            it('should have called reportMetricEvent with AdmobMetric.AdmobUserWasRewarded', () => {
+                expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
+            });
+        });
+
+        describe('when sendSkipEvent is called', () => {
+            beforeEach(() => {
+                admobAdUnit.sendSkipEvent();
+            });
+
+            it('should have called reportMetricEvent 2 times', () => {
+                expect(pts.reportMetricEvent).toHaveBeenCalledTimes(2);
+            });
+
+            it('should have called reportMetricEvent with AdmobMetric.AdmobUserWasRewarded', () => {
+                expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserSkippedRewardedVideo);
+            });
+        });
     });
 
-    it('should not call rewarded placement metrics when allowSkip is true', async () => {
-        placement.allowSkip.mockReturnValue(true);
-        admobAdUnit = new AdMobAdUnit(admobAdUnitParameters);
+    describe('when creating AdmobAdUnit and allowSkip is true', () => {
+        beforeEach(async () => {
+            placement.allowSkip.mockReturnValue(true);
+            admobAdUnit = new AdMobAdUnit(admobAdUnitParameters);
 
-        await admobAdUnit.show();
+            await admobAdUnit.show();
+        });
 
-        expect(pts.reportMetricEvent).not.toHaveBeenCalled();
-        admobAdUnit.sendRewardEvent();
-        expect(pts.reportMetricEvent).not.toHaveBeenCalled();
-        admobAdUnit.sendSkipEvent();
-        expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+        it('should not have called reportMetricEvent', () => {
+            expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+        });
+
+        describe('when sendRewardEvent is called', () => {
+            beforeEach(() => {
+                admobAdUnit.sendRewardEvent();
+            });
+
+            it('should not have called reportMetricEvent', () => {
+                expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('when sendSkipEvent is called', () => {
+            beforeEach(() => {
+                admobAdUnit.sendSkipEvent();
+            });
+
+            it('should not have called reportMetricEvent', () => {
+                expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+            });
+        });
     });
 });
