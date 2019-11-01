@@ -41,7 +41,7 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
         let bannerAdUnitParameters: IBannerAdUnitParameters;
 
         const getBannerCampaign = (session: Session) => {
-            const campaignData = JSON.parse(ValidBannerCampaignJSON);
+            const campaignData = ValidBannerCampaignJSON;
             return <IBannerCampaign>{
                 session: session,
                 markup: encodeURIComponent(campaignData.content),

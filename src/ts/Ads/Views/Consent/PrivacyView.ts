@@ -41,11 +41,10 @@ export class PrivacyView extends View<IConsentViewHandler> {
     constructor(params: IConsentViewParameters) {
         super(params.platform, 'consent');
         this._template = new Template(PrivacyTemplate);
-        this._coreApi = params.coreApi;
-        this._core = params.core;
         this._privacyManager = params.privacyManager;
         this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
         this._privacyWebViewUrl = TestEnvironment.get('privacyUrl');
+        this._coreApi = params.core;
     }
 
     private loadIframe() {

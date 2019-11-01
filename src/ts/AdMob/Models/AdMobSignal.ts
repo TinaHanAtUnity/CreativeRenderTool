@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import * as protobuf from 'protobufjs/minimal';
-import { unity_proto } from 'unity_proto';
+import { unity_proto } from 'unity_proto.js';
 
 interface IAdMobSignal {
     sdkVersion: string;

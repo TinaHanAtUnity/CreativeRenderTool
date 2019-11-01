@@ -10,15 +10,40 @@
       "*": [
         "src/ts/*",
         "src/proto/*",
+        "src/*",
         "test/*"
       ]
     },
     "outDir": "build",
     "moduleResolution": "node",
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "types": [
+      "mocha",
+      "chai",
+      "sinon",
+      "long",
+      "node",
+      "json-schema",
+      "json5",
+      "minimatch",
+      "q",
+      "stack-utils",
+      "yargs",
+      "babel__core",
+      "babel__generator",
+      "babel__template",
+      "babel__traverse",
+      "estree",
+      "events",
+      "glob"
+    ]
   },
   "include": [
     "src/ts/**/*.ts",
     "test/**/*.ts"
+  ],
+  "exclude": [
+    "src/ts/**/__mocks__/*.ts",
+    "src/ts/**/*.spec.ts"
   ]
 }

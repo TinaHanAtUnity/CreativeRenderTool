@@ -34,18 +34,21 @@ import { StorageType } from 'Core/Native/Storage';
             backend.Api.Storage.setStorageContents(<any>{
                 mediation: {
                     name: {value: 'test_name'},
-                    version: {value: 'test_version'}
+                    version: {value: 'test_version'},
+                    adapter_version: {value: 'test_adapter_version'}
                 }
             });
 
             const metaDataManager = new MetaDataManager(core);
-            return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
+            return metaDataManager.fetch(MediationMetaData, true, ['name', 'version', 'adapter_version']).then(metaData => {
                 if (metaData) {
                     assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
                     assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
+                    assert.equal(metaData.getAdapterVersion(), 'test_adapter_version', 'MediationMetaData.getAdapterVersion() did not pass through correctly');
                     assert.deepEqual(metaData.getDTO(), {
                         mediationName: 'test_name',
                         mediationVersion: 'test_version',
+                        mediationAdapterVersion: 'test_adapter_version',
                         mediationOrdinal: undefined
                     }, 'MediationMetaData.getDTO() produced invalid output');
                 } else {
@@ -79,6 +82,7 @@ import { StorageType } from 'Core/Native/Storage';
                             assert.deepEqual(metaData2.getDTO(), {
                                 mediationName: 'test_name',
                                 mediationVersion: 'test_version',
+                                mediationAdapterVersion: undefined,
                                 mediationOrdinal: 42
                             }, 'MediationMetaData.getDTO() produced invalid output');
                         } else {
