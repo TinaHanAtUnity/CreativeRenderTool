@@ -102,15 +102,32 @@ export class UserPrivacyManager {
 
     public getPrivacyConfig(): Promise<PrivacyConfig> {
         return Promise.resolve(new PrivacyConfig({
+            // todo: agree on all field names
             env: {
-                platform: 'android',
-                userAdvertisingId: 'user.advertisingId',
-                userUUID: 'user.UUID',
-                userLocales: 'user.locales',
-                userDefaultLocale: 'user.defaultLocale',
-                deviceAndroidId: 'device.androidId',
-                buildApiLevel: 'build.apiLevel',
-                buildOsVersion: 'build.osVersion'
+                userAdvertisingId: this._deviceInfo.getAdvertisingIdentifier(),
+                userLimitAdTracking: this._deviceInfo.getLimitAdTracking(),
+                buildOsVersion: this._deviceInfo.getOsVersion(),
+                platform: this._platform,
+                userLocale: this._deviceInfo.getLanguage(),
+                country: this._coreConfig.getCountry(),
+                userUUID: this._coreConfig.getToken(),
+                // todo: add other things? at least Android API level and subcountry
+
+                privacyMethod: this._gamePrivacy.getMethod(),
+                privacyVersion: this._gamePrivacy.getVersion(),
+                ageGateLimit: this._privacy.getAgeGateLimit(),
+                legalFramework: this._privacy.getLegalFramework(),
+                coppa: this._coreConfig.isCoppaCompliant()
+            },
+
+            user: {
+                // todo: permissions are waiting for privacy protocol v2 refactoring, leaving them undefined should equal to having no previous permissions (good enough for local testing?)
+                /*
+                ads: this._userPrivacy.getPermissions().ads,
+                external: this._userPrivacy.getPermissions().external,
+                gameExp: this._userPrivacy.getPermissions().gameExp,
+                */
+                agreedOverAgeLimit: this.getAgeGateChoice()
             },
 
             webView: {
