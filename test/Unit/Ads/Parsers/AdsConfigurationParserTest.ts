@@ -81,7 +81,7 @@ describe('AdsConfigurationParserTest', () => {
                     configJson.gdprEnabled = true;
                     const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
                     assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
-                    assert.equal(privacy.getGamePrivacy().isEnabled(), false);
+                    assert.equal(privacy.getGamePrivacy().isEnabled(), true);
                 });
             });
 

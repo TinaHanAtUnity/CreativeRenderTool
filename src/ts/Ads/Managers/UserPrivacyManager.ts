@@ -138,12 +138,9 @@ export class UserPrivacyManager {
         const gamePrivacy = this._gamePrivacy;
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
-        console.log("updateUserPrivacy");
         if (!gamePrivacy.isEnabled()) {
-            console.log("updateUserPrivacy gamePrivacy.isEnabled() = " + gamePrivacy.isEnabled());
             return Promise.resolve();
         }
-        console.log("updateUserPrivacy1");
 
         if (source === GDPREventSource.DEVELOPER) {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
@@ -163,7 +160,6 @@ export class UserPrivacyManager {
             agreedAll: agreedAll,
             permissions: permissions
         };
-        console.log("updateUserPrivacy2");
 
         if (!this.hasUserPrivacyChanged(updatedPrivacy)) {
             return Promise.resolve();
@@ -182,11 +178,9 @@ export class UserPrivacyManager {
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
         const currentPrivacy = this._userPrivacy;
-        console.log("hasUserPrivacyChanged checking method " + currentPrivacy.getMethod() + " !== " + updatedPrivacy.method);
         if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
             return true;
         }
-        console.log("hasUserPrivacyChanged checking version " + currentPrivacy.getVersion() + " !== " + updatedPrivacy.version);
 
         if (updatedPrivacy.method === PrivacyMethod.UNITY_CONSENT && currentPrivacy.getVersion() !== updatedPrivacy.version) {
             return true;
@@ -194,17 +188,14 @@ export class UserPrivacyManager {
 
         const currentPermissions = currentPrivacy.getPermissions();
         const updatedPermissions = updatedPrivacy.permissions;
-        console.log("hasUserPrivacyChanged checking gameExp");
 
         if (currentPermissions.gameExp !== updatedPermissions.gameExp) {
             return true;
         }
-        console.log("hasUserPrivacyChanged checking ads " + currentPermissions.ads + " !== " + updatedPermissions.ads);
 
         if (currentPermissions.ads !== updatedPermissions.ads) {
             return true;
         }
-        console.log("hasUserPrivacyChanged checking external");
 
         if (currentPermissions.external !== updatedPermissions.external) {
             return true;

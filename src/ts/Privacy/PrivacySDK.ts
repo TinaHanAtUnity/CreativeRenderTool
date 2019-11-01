@@ -37,6 +37,9 @@ export class PrivacySDK {
     }
 
     public isOptOutEnabled(): boolean {
+        if (!this.isOptOutRecorded()) {
+            return false;
+        }
         return !this._userPrivacy.getPermissions().ads;
     }
 

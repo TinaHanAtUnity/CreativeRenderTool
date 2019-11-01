@@ -2,11 +2,11 @@ import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import {
     CurrentUnityConsentVersion,
     GamePrivacy,
-    IProfilingPermissions,
-    IGranularPermissions,
+    IAllPermissions,
+    IRawGamePrivacy,
+    IRawUserPrivacy,
     PrivacyMethod,
-    UserPrivacy,
-    IAllPermissions, IRawGamePrivacy, IRawUserPrivacy, IPermissions
+    UserPrivacy
 } from 'Privacy/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -20,12 +20,11 @@ export class PrivacyParser {
         if (deviceInfo && deviceInfo.getLimitAdTracking()) {
             limitAdTracking = true;
         }
-
-        const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
-        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, configJson.optOutRecorded, configJson.optOutEnabled, limitAdTracking);
         const gdprEnabled = configJson.gdprEnabled;
         const optOutRecorded = configJson.optOutRecorded;
         const optOutEnabled = configJson.optOutEnabled;
+        const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
+        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, gdprEnabled, optOutRecorded, optOutEnabled, limitAdTracking);
         const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
 
         let ageGateLimit = configJson.ageGateLimit !== undefined ? configJson.ageGateLimit : 0;
@@ -58,7 +57,7 @@ export class PrivacyParser {
     }
 
     private static parseUserPrivacy(rawUserPrivacy: IRawUserPrivacy | undefined, rawGamePrivacy: IRawGamePrivacy | undefined,
-                                    optOutRecorded: boolean, optOutEnabled: boolean, limitAdTracking: boolean): UserPrivacy {
+                                    gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, limitAdTracking: boolean): UserPrivacy {
         // handle old style 'all'-privacy
         if (rawUserPrivacy && rawUserPrivacy.permissions && (<IAllPermissions><unknown>rawUserPrivacy.permissions).all === true) {
             rawUserPrivacy = {
@@ -87,6 +86,9 @@ export class PrivacyParser {
         if (!rawGamePrivacy || !rawUserPrivacy) {
             let consent = false;
             let method = PrivacyMethod.DEFAULT;
+            if (gdprEnabled) {
+                method = PrivacyMethod.LEGITIMATE_INTEREST;
+            }
             if (rawGamePrivacy && optOutRecorded) {
                 consent = !optOutEnabled;
                 if (rawGamePrivacy.method && Object.values(PrivacyMethod).includes(rawGamePrivacy.method)) {

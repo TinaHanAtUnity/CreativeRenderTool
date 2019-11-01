@@ -52,7 +52,7 @@ export class GamePrivacy extends Model<IGamePrivacy> {
     }
 
     public isEnabled(): boolean {
-        if (!this.getMethod()) {
+        if (!Object.values(PrivacyMethod).includes(this.getMethod())) {
             return false;
         }
         return this.getMethod() !== PrivacyMethod.DEFAULT;
