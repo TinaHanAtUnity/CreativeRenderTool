@@ -1,4 +1,4 @@
-# Pending
+# Fri Nov  1 20:40:00 UTC 2019
 
 * Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
 * Update AdmobAdUnitTest to Granular Approach [#11948](https://github.com/Applifier/unity-ads-webview/pull/11948)
