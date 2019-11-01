@@ -146,7 +146,6 @@
                 };
 
                 this.onPrivacyCompleted = function(userSettings) {
-                    setState('hidden');
                     if (window.privacyAdapter.completeCallback) {
                         window.privacyAdapter.completeCallback();
                     }
