@@ -8,7 +8,7 @@ export class Environment {
     public getJson(): { [key: string]: unknown } {
         const retObj: { [key: string]: unknown } = {};
         if (this._env) {
-            Object.keys(retObj).forEach(key => {
+            Object.keys(this._env).forEach(key => {
                 retObj[key] = this.getValueFor(this._env[key]);
             });
         }

@@ -134,7 +134,7 @@
 
                 this.onPrivacyReady = function() {
                     if (window.privacyAdapter.readyCallback) {
-                        window.privacyAdapter.readyCallback(JSON.parse(this.getEnv));
+                        window.privacyAdapter.readyCallback(JSON.parse(this.getEnv()));
                     }
                     window.parent.postMessage({
                         type: 'onPrivacyReady'
@@ -153,7 +153,7 @@
                 };
 
                 this.getEnv = function() {
-                    return '{{ PRIVACY_ENVIRONMENT }}';
+                    return '{{ PRIVACY_ENVIRONMENT }}'
                 }
             };
 

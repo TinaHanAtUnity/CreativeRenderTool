@@ -29,7 +29,7 @@ export interface IUserPrivacySettings {
 export class PrivacyView extends View<IConsentViewHandler> {
     private readonly _core: ICore;
     private readonly _coreApi: ICoreApi;
-    private readonly _privacyWebViewUrl = 'http://10.35.35.53/';
+    private readonly _privacyWebViewUrl = 'http://10.35.34.174/';
     private readonly _privacyManager: UserPrivacyManager;
 
     protected _iFrameAdapterContainer: PrivacyAdapterContainer;
@@ -51,7 +51,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._iFrameAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame));
 
         this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
-            this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', privacyConfig.getEnv().getJson().toString()))
+            this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson())))
                 .then((privacyHtml) => {
                     this._iFrame.srcdoc = privacyHtml;
                 });
