@@ -1,6 +1,5 @@
 import { IStore, IStoreApi } from 'Store/IStore';
 import { StoreManager } from 'Store/Managers/StoreManager';
-import { IApiModule } from 'Core/Modules/IApiModule';
 import { ICore } from 'Core/ICore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { GoogleStoreManager } from 'Store/Managers/GoogleStoreManager';
@@ -12,7 +11,7 @@ import { IAnalyticsManager } from 'Analytics/IAnalyticsManager';
 import { NullStoreManager } from 'Store/Managers/NullStoreManager';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 
-export class Store implements IStore, IApiModule {
+export class Store implements IStore {
     public readonly Api: Readonly<IStoreApi>;
     public StoreManager: StoreManager;
 

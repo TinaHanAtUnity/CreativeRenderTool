@@ -15,8 +15,10 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { OptServiceCommunicationExperiment } from 'Core/Models/ABGroup';
-import { AutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList';
+import { HalloweenThemeFreeTest, FullscreenCTAExperiment } from 'Core/Models/ABGroup';
+import { HalloweenPerformanceEndScreen } from 'Performance/Views/HalloweenPerformanceEndScreen';
+import { VideoOverlayFullscreenCTA } from 'Ads/Views/VideoOverlayFullscreenCTA';
+import { Platform } from 'Core/Constants/Platform';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -44,15 +46,18 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const abGroup = baseParams.coreConfig.getAbGroup();
+        let endScreen: PerformanceEndScreen;
+
+        if (HalloweenThemeFreeTest.isValid(abGroup)) {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new HalloweenPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
-
-        if (OptServiceCommunicationExperiment.isValid(baseParams.coreConfig.getAbGroup())) {
-            automatedExperimentManager.initialize(AutomatedExperimentsList);
-            automatedExperimentManager.beginExperiment();
-        }
 
         return {
             ... baseParams,
@@ -75,7 +80,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         }
 
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
-        const overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        let overlay;
+        if (FullscreenCTAExperiment.isValid(parameters.coreConfig.getAbGroup()) && this._platform === Platform.ANDROID) {
+            overlay = new VideoOverlayFullscreenCTA(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        } else {
+            overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        }
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);

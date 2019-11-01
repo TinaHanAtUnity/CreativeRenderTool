@@ -85,7 +85,7 @@ describe('MRAID', () => {
     });
 
     it('should replace placeholder with dynamic markup injected', () => {
-        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const json = OnProgrammaticMraidUrlPlcCampaign;
         const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
         params.resourceAsset = undefined;
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>';
@@ -102,7 +102,7 @@ describe('MRAID', () => {
 
     it('should remove the mraid.js placeholder when it has a query parameter', () => {
         const markup = '<script src="mraid.js?foo=bar&baz=blah><div>Hello, world!</div>';
-        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const json = OnProgrammaticMraidUrlPlcCampaign;
         const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
         params.resourceAsset = undefined;
         params.resource = markup;
@@ -119,7 +119,7 @@ describe('MRAID', () => {
     });
 
     it('should not remove string replacement patterns', () => {
-        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const json = OnProgrammaticMraidUrlPlcCampaign;
         const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
         params.resourceAsset = undefined;
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>';
@@ -135,7 +135,7 @@ describe('MRAID', () => {
     });
 
     it('should install deviceorientation support script', () => {
-        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const json = OnProgrammaticMraidUrlPlcCampaign;
         const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
         params.resourceAsset = undefined;
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>(function() {window.addEventListener("deviceorientation", (event) => {console.log("data:"+event.alpha);});})()</script><div>Hello World</div>';

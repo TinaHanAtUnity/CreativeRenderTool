@@ -1,4 +1,39 @@
-# Staged
+# Pending
+
+* Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
+
+# Thu Oct 31 19:26:43 UTC 2019
+
+* Consent A/B test: Add semi-transparent background [#11869](https://github.com/Applifier/unity-ads-webview/pull/11869)
+* Enable Mopub GameIDs for Load Regardless of AB Group [#11897](https://github.com/Applifier/unity-ads-webview/pull/11897)
+* Make Fullscreen CTA Appear After 5 Seconds [#11923](https://github.com/Applifier/unity-ads-webview/pull/11923)
+
+# Thu Oct 31 00:30:18 UTC 2019
+
+* Remove Forced Age Gate Sync [#11843](https://github.com/Applifier/unity-ads-webview/pull/11843)
+* Add Fullscreen CTA ABTest on Groups 10 and 11 [#11871](https://github.com/Applifier/unity-ads-webview/pull/11871)
+* Send Localized Price catalog to IAP backend [#11329](https://github.com/Applifier/unity-ads-webview/pull/11329)
+* Update Load Experiment [#11872](https://github.com/Applifier/unity-ads-webview/pull/11872)
+* Add Mediation Load Workaround to Behave Correctly for Old API [#11647](https://github.com/Applifier/unity-ads-webview/pull/11647)
+
+# Tue Oct 29 20:39:33 UTC 2019
+
+* Apply Halloween theme for performance end cards [#11759](https://github.com/Applifier/unity-ads-webview/pull/11759)
+* Add privacymetrics Kafka Topic Support [#11870](https://github.com/Applifier/unity-ads-webview/pull/11870)
+* Add TestEnvironment Metadata for AgeGate [#11784](https://github.com/Applifier/unity-ads-webview/pull/11784)
+* Replace Core Listener API with Ads Listener API [#11868](https://github.com/Applifier/unity-ads-webview/pull/11848)
+* Update package-lock.json [#11787](https://github.com/Applifier/unity-ads-webview/pull/11787)
+
+# Fri Oct 25 19:51:34 UTC 2019
+
+* Create right Privacy view for COPPA games if the privacy method is Unity Consent [#11818](https://github.com/Applifier/unity-ads-webview/pull/11818)
+* Add initial implementation of privacy metrics [#11789](https://github.com/Applifier/unity-ads-webview/pull/11789)
+* Revert "Experiment to test communications with AUI service" [#11815](https://github.com/Applifier/unity-ads-webview/pull/11815)
+* Force Banners to Fail for Banner Containers smaller than 320x50 [#11788](https://github.com/Applifier/unity-ads-webview/pull/11788)
+* Temporarily Disable Jenkins Builds [#11817](https://github.com/Applifier/unity-ads-webview/pull/11817)
+* Purge Tencent URLs in Purge Script [#11785](https://github.com/Applifier/unity-ads-webview/pull/11785)
+
+# Fri Oct 25 06:46:51 UTC 2019
 
 * Update Privacy texts for COPPA games [#11790](https://github.com/Applifier/unity-ads-webview/pull/11790)
 

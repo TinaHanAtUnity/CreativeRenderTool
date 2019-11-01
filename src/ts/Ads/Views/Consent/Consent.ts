@@ -28,9 +28,8 @@ export interface IConsentViewParameters {
     osVersion?: string;
     pts: ProgrammaticTrackingService;
     consentABTest: boolean;
-    core: ICore;
-    coreApi: ICoreApi;
     ageGateLimit: number;
+    core: ICoreApi;
 }
 
 export enum ConsentPage {
@@ -153,6 +152,15 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._privacyRowItemContainer.addEventHandler(this);
     }
 
+    public testAutoAgeGate(ageGate: boolean) {
+        const testEvent = new Event('testAutoAgeGate');
+        if (ageGate) {
+            this.onAgeGateOverEvent(testEvent);
+        } else {
+            this.onAgeGateUnderEvent(testEvent);
+        }
+    }
+
     public testAutoConsentAll() {
         const testEvent = new Event('testAutoConsent');
         this.onHomepageAcceptAllEvent(testEvent);
@@ -196,6 +204,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = overLimitBtnText;
             (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = underLimitBtnText;
         }
+
+        if (this._isABTest) {
+            this._container.classList.add('background-ab-test');
+        }
+
         this.showPage(this._landingPage);
     }
 
