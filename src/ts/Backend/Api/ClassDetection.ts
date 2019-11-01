@@ -2,26 +2,15 @@ import { BackendApi } from 'Backend/BackendApi';
 
 export class ClassDetection extends BackendApi {
 
-    private _unityEngineRunning: boolean = false;
-    private _classIsPresent: boolean = false;
-
-    public setUnityEngineRunning(running: boolean) {
-        this._unityEngineRunning = running;
+    private _classesArePresent: boolean = false;
+    public setClassesArePresent(present: boolean) {
+        this._classesArePresent = present;
     }
 
-    public setClassIsPresent(present: boolean) {
-        this._classIsPresent = present;
-    }
-
-    public isClassPresent(className: string) {
-        if (className === 'UnityAppController' || className === 'com.unity3d.player.UnityPlayer') {
-            return this._unityEngineRunning;
+    public areClassesPresent(className: string[]) {
+        if (this._classesArePresent) {
+            return [true, true, true, true, true, true];
         }
-        return this._classIsPresent;
+        return [false, false, false, false, false, false];
     }
-
-    public isMadeWithUnity() {
-        return this._unityEngineRunning;
-    }
-
 }

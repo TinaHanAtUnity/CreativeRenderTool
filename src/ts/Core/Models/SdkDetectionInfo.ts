@@ -8,7 +8,26 @@ export interface ISdkDetectionInfo {
     IronSource: boolean;
     Fyber: boolean;
     SafeDK: boolean;
+    UnityEngine: boolean;
 }
+
+const SdkAndroidClassMap = {
+    AdMob: 'com.google.ads.mediation.admob.AdMobAdapter',
+    MoPub: 'com.mopub.common.MoPub',
+    IronSource: 'com.ironsource.mediationsdk.IronSource',
+    Fyber: 'com.fyber.FairBid',
+    SafeDK: 'com.safedk.android.SafeDK',
+    UnityEngine: 'com.unity3d.player.UnityPlayer'
+};
+
+const SdkiOSClassMap = {
+    AdMob: 'GADMobileAds',
+    MoPub: 'MoPub',
+    IronSource: 'IronSource',
+    Fyber: 'FyberSDK',
+    SafeDK: 'SafeDK',
+    UnityEngine: 'UnityAppController'
+};
 
 export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
@@ -17,7 +36,8 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
         MoPub: ['boolean'],
         IronSource: ['boolean'],
         Fyber: ['boolean'],
-        SafeDK: ['boolean']
+        SafeDK: ['boolean'],
+        UnityEngine: ['boolean']
     };
 
     protected _platform: Platform;
@@ -29,7 +49,8 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
             MoPub: ['boolean'],
             IronSource: ['boolean'],
             Fyber: ['boolean'],
-            SafeDK: ['boolean']
+            SafeDK: ['boolean'],
+            UnityEngine: ['boolean']
         });
 
         this._platform = platform;
@@ -38,19 +59,23 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
     public detectSdks(): Promise<unknown[]> {
         const promises: Promise<unknown>[] = [];
+        let classNames: string[];
         if (this._platform === Platform.ANDROID) {
-            promises.push(this._core.ClassDetection.isClassPresent('com.google.ads.mediation.admob.AdMobAdapter').then(result => this.set('AdMob', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('com.mopub.common.MoPub').then(result => this.set('MoPub', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('com.ironsource.mediationsdk.IronSource').then(result => this.set('IronSource', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('com.fyber.FairBid').then(result => this.set('Fyber', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('com.safedk.android.SafeDK').then(result => this.set('SafeDK', result)).catch(err => this.handleDeviceInfoError(err)));
+            classNames = [SdkAndroidClassMap.AdMob, SdkAndroidClassMap.MoPub, SdkAndroidClassMap.IronSource, SdkAndroidClassMap.Fyber, SdkAndroidClassMap.SafeDK, SdkAndroidClassMap.UnityEngine];
         } else if (this._platform === Platform.IOS) {
-            promises.push(this._core.ClassDetection.isClassPresent('GADMobileAds').then(result => this.set('AdMob', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('MoPub').then(result => this.set('MoPub', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('IronSource').then(result => this.set('IronSource', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('FyberSDK').then(result => this.set('Fyber', result)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.ClassDetection.isClassPresent('SafeDK').then(result => this.set('SafeDK', result)).catch(err => this.handleDeviceInfoError(err)));
+            classNames = [SdkiOSClassMap.AdMob, SdkiOSClassMap.MoPub, SdkiOSClassMap.IronSource, SdkiOSClassMap.Fyber, SdkiOSClassMap.SafeDK, SdkiOSClassMap.UnityEngine];
+        } else {
+            classNames = [];
         }
+        promises.push(this._core.ClassDetection.areClassesPresent(classNames)
+            .then(result => {
+                this.set('AdMob', result[0]);
+                this.set('MoPub', result[1]);
+                this.set('IronSource', result[2]);
+                this.set('Fyber', result[3]);
+                this.set('SafeDK', result[4]);
+                this.set('UnityEngine', result[5]);
+            }).catch(err => this.handleDeviceInfoError(err)));
         return Promise.all(promises);
     }
 
@@ -68,7 +93,8 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
             'MoPub': this.get('MoPub'),
             'IronSource': this.get('IronSource'),
             'Fyber': this.get('Fyber'),
-            'SafeDK': this.get('SafeDK')
+            'SafeDK': this.get('SafeDK'),
+            'UnityEngine': this.get('UnityEngine')
         };
     }
 }

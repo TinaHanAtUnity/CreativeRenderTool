@@ -160,7 +160,6 @@ export class Core implements ICore {
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this.WakeUpManager.setListenConnectivity(true);
-            this.Api.Sdk.logInfo('made with Unity is: ' + this.UnityInfo.isMadeWithUnity());
             this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.FocusManager.setListenAppForeground(true);

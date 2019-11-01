@@ -25,15 +25,15 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
         it('should return false when detected class is not present', () => {
             return sdkDetectionInfo.detectSdks().then(() => {
                 const result = sdkDetectionInfo.getSdkDetectionJSON();
-                assert(result === '{"AdMob":false,"MoPub":false,"IronSource":false,"Fyber":false,"SafeDK":false}');
+                assert(result === '{"AdMob":false,"MoPub":false,"IronSource":false,"Fyber":false,"SafeDK":false,"UnityEngine":false}');
             });
         });
 
         it('should return true when detected class is present', () => {
-            backend.Api.ClassDetection.setClassIsPresent(true);
+            backend.Api.ClassDetection.setClassesArePresent(true);
             return sdkDetectionInfo.detectSdks().then(() => {
                 const result = sdkDetectionInfo.getSdkDetectionJSON();
-                assert(result === '{"AdMob":true,"MoPub":true,"IronSource":true,"Fyber":true,"SafeDK":true}');
+                assert(result === '{"AdMob":true,"MoPub":true,"IronSource":true,"Fyber":true,"SafeDK":true,"UnityEngine":true}');
             });
         });
     });

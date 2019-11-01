@@ -27,21 +27,17 @@ import { UnityInfo } from 'Core/Models/UnityInfo';
 
         it('should return undefined identifiers when Unity engine is not running', () => {
             backend.Api.Preferences.setUnityEngineRunning(false);
-            backend.Api.ClassDetection.setUnityEngineRunning(false);
             return unityInfo.fetch(appId).then(() => {
                 assert.isUndefined(unityInfo.getAnalyticsUserId(), 'analytics user id was defined when engine is not running');
                 assert.isUndefined(unityInfo.getAnalyticsSessionId(), 'analytics session id was defined when engine is not running');
-                assert.isFalse(unityInfo.isMadeWithUnity(), 'isMadeWithUnity was false when engine is not running');
             });
         });
 
         it('should return Unity Analytics identifiers when Unity engine is running', () => {
             backend.Api.Preferences.setUnityEngineRunning(true);
-            backend.Api.ClassDetection.setUnityEngineRunning(true);
             return unityInfo.fetch(appId).then(() => {
                 assert.equal(unityInfo.getAnalyticsUserId(), userId, 'analytics user id was not successfully fetched');
                 assert.equal(unityInfo.getAnalyticsSessionId(), sessionId, 'analytics session id was not successfully fetched');
-                assert.isTrue(unityInfo.isMadeWithUnity(), 'isMadeWithUnity was true when engine is running');
             });
         });
     });
