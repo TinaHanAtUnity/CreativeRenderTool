@@ -17,6 +17,7 @@ import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } f
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export interface IUserPrivacySettings {
     isChild: boolean;
@@ -29,13 +30,13 @@ export interface IUserPrivacySettings {
 export class PrivacyView extends View<IConsentViewHandler> {
     private readonly _core: ICore;
     private readonly _coreApi: ICoreApi;
-    private readonly _privacyWebViewUrl = 'http://10.35.34.174/';
     private readonly _privacyManager: UserPrivacyManager;
 
     protected _iFrameAdapterContainer: PrivacyAdapterContainer;
 
     private _iFrame: HTMLIFrameElement;
     private _domContentLoaded = false;
+    private _privacyWebViewUrl: string;
 
     constructor(params: IConsentViewParameters) {
         super(params.platform, 'consent');
@@ -44,6 +45,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._core = params.core;
         this._privacyManager = params.privacyManager;
         this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
+        this._privacyWebViewUrl = TestEnvironment.get('privacyUrl');
     }
 
     private loadIframe() {

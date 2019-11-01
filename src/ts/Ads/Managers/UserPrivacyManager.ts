@@ -22,6 +22,7 @@ import { ConsentPage } from 'Ads/Views/Consent/Consent';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -113,7 +114,7 @@ export class UserPrivacyManager {
             },
 
             webView: {
-                url: 'http://10.35.34.174:3000/'
+                url: TestEnvironment.get('privacyUrl')
             }}));
     }
 
