@@ -1,6 +1,7 @@
 # Pending
 
 * Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
+* Update AdmobAdUnitTest to Granular Approach [#11948](https://github.com/Applifier/unity-ads-webview/pull/11948)
 * Revert Fullscreen CTA Experiment [#11898](https://github.com/Applifier/unity-ads-webview/pull/11898)
 
 # Thu Oct 31 19:26:43 UTC 2019
