@@ -1,3 +1,8 @@
+# Pending
+
+* Fix Thind Analytics Endpoint [#11952](https://github.com/Applifier/unity-ads-webview/pull/11952)
+* Revert Halloween Theme Performance Endcard [#11950](https://github.com/Applifier/unity-ads-webview/pull/11950)
+
 # Fri Nov  1 20:40:00 UTC 2019
 
 * Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
