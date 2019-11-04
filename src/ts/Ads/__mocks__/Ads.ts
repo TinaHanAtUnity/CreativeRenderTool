@@ -9,7 +9,7 @@ import { VideoPlayerApi } from 'Ads/Native/__mocks__/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/__mocks__/WebPlayer';
 import { LoadApi } from 'Core/Native/__mocks__/LoadApi';
 import { AdMobSignalFactory } from 'AdMob/Utilities/__mocks__/AdMobSignalFactory';
-import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/__mocks__/InterstitialWebPlayerContainer';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/__mocks__/WebPlayer/InterstitialWebPlayerContainer';
 
 export const Ads = jest.fn(() => {
     return {
