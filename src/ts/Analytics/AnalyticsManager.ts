@@ -37,7 +37,7 @@ export class AnalyticsManager implements IAnalyticsManager {
     private _backgroundTimestamp: number;
     private _topActivity: string;
 
-    private _endpoint: string = 'https://thind.unityads.unity3d.com';
+    private _endpoint: string = 'https://thind.unityads.unity3d.com/v1/events/';
     private _newSessionThreshold: number = 1800000; // 30 minutes in milliseconds
 
     private _adsAnalyticsSessionId: string;
