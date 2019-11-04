@@ -605,9 +605,9 @@ export class Ads implements IAds {
             let response: string = '';
 
             if (platform === Platform.ANDROID) {
-                response = CreativePackResponseAndroid;
+                response = JSON.stringify(CreativePackResponseAndroid);
             } else if (platform === Platform.IOS) {
-                response = CreativePackResponseIos;
+                response = JSON.stringify(CreativePackResponseIos);
             }
 
             response = response.replace('{ICON_PLACEHOLDER}', json.gameIcon || '');
