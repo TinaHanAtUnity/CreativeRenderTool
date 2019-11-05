@@ -14,7 +14,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
+import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import {
     HeartbeatingDownloadButtonTest,
     BouncingDownloadButtonTest,
@@ -62,17 +62,16 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('heartbeating', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.heartbeating, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('bouncing', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.bouncing, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen('shining', endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.shining, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (MabDecisionButtonTest.isValid(abGroup)) {
             const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
-            if (mabDecision === 'heartbeating' ||
-                    mabDecision === 'bouncing' ||
-                    mabDecision === 'shining') {
-                endScreen = new AnimatedDownloadButtonEndScreen(mabDecision, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            if (mabDecision && mabDecision in EndScreenAnimation) {
+                endScreen = new AnimatedDownloadButtonEndScreen(<EndScreenAnimation> mabDecision,
+                    endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             } else {
                 endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             }

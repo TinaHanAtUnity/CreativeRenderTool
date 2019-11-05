@@ -1,4 +1,5 @@
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 
 // List experiments to run here and add them to the list
 // Examples:
@@ -16,8 +17,8 @@ import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
     name: 'ButtonAnimationsExperiment',
-    actions: ['static', 'heartbeating', 'bouncing', 'shining'],
-    defaultAction: 'static'
+    actions: Object.keys(EndScreenAnimation).map(k => <EndScreenAnimation> k),
+    defaultAction: EndScreenAnimation.static
 });
 
 export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
