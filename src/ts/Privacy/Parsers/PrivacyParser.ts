@@ -29,6 +29,12 @@ export class PrivacyParser {
         const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
 
         let ageGateLimit = configJson.ageGateLimit !== undefined ? configJson.ageGateLimit : 0;
+        if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST &&
+            gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            ageGateLimit = 0;
+
+            Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(configJson)});
+        }
 
         if (limitAdTracking) {
             ageGateLimit = 0;
