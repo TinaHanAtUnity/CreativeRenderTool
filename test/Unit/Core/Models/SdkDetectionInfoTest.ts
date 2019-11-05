@@ -8,7 +8,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('SDKDetectionInfoTest - ' + Platform[platform], () => {
+    describe(`MediationDetectionInfoTest - ${Platform[platform]}`, () => {
 
         let backend: Backend;
         let nativeBridge: NativeBridge;
