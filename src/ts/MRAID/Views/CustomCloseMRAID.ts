@@ -27,8 +27,58 @@ export class CustomCloseMRAID extends MRAID {
         }
     }
 
-    private showCloseGraphic(closeElement: HTMLElement, visible: boolean) {
-        const close = <HTMLElement>closeElement.querySelector('.close');
+    public show(): void {
+        super.show();
+        // NOTE: When allowSkip is true, move the close button to the left.
+        // This is a temporary test and will likely be removed in the future.
+        if (this._placement.allowSkip()) {
+            this.moveCloseGraphicLeft(this._container);
+        }
+    }
+
+    public onCloseEvent(event: Event) {
+        super.onCloseEvent(event);
+        this._pts.reportMetricEvent(MraidMetric.ClosedByUnityAds);
+    }
+
+    public onBridgeClose() {
+        super.onBridgeClose();
+        this.clearCustomCloseTimeout();
+        this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
+    }
+
+    public onUseCustomClose(hideClose: boolean) {
+        super.onUseCustomClose(hideClose);
+        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
+
+        if (!hideClose) {
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic);
+            this.clearCustomCloseTimeout();
+            this.showCloseGraphic(this._container, true);
+            return;
+        }
+
+        if (this._mraidCustomCloseCalled) {
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalledAgain);
+            return;
+        }
+
+        this._mraidCustomCloseCalled = true;
+
+        const hideDuration = this._mraidCustomCloseDelay * 1000;
+        if (hideDuration <= 0) {
+            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseExpired);
+            this.showCloseGraphic(this._container, true);
+            return;
+        }
+
+        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic);
+        this.showCloseGraphic(this._container, false);
+        this.setCustomCloseTimeout(this._container, hideDuration);
+    }
+
+    private showCloseGraphic(element: HTMLElement, visible: boolean) {
+        const close = <HTMLElement>element.querySelector('.close');
         if (visible) {
             close.style.display = 'block';
         } else {
@@ -47,68 +97,10 @@ export class CustomCloseMRAID extends MRAID {
         window.clearTimeout(this._mraidCustomCloseTimeout);
     }
 
-    protected prepareProgressCircle() {
-        super.prepareProgressCircle();
-
-        // NOTE: When allowSkip is true and mraid.useCustomClose is also true,
-        // move the close button to the left.  This is a temporary test and
-        // will likely be removed in the future.
-        if (!this._placement.allowSkip()) {
-            return;
-        }
-
-        if (!this._campaign.isCustomCloseEnabled()) {
-            return;
-        }
-
+    protected moveCloseGraphicLeft(element: HTMLElement) {
         this._pts.reportMetricEvent(MraidMetric.CloseMovedToLeft);
-        this._closeElement.style.removeProperty('right');
-        this._closeElement.style.left = '0';
-    }
-
-    public onCloseEvent(event: Event) {
-        super.onCloseEvent(event);
-        this._pts.reportMetricEvent(MraidMetric.ClosedByUnityAds);
-    }
-
-    public onBridgeClose() {
-        super.onBridgeClose();
-        this.clearCustomCloseTimeout();
-        this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
-    }
-
-    public onUseCustomClose(hideClose: boolean) {
-        super.onUseCustomClose(hideClose);
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
-
-        if (!this._campaign.isCustomCloseEnabled()) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseRefused);
-            return;
-        }
-
-        if (!hideClose) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic);
-            this.clearCustomCloseTimeout();
-            this.showCloseGraphic(this._closeElement, true);
-            return;
-        }
-
-        if (this._mraidCustomCloseCalled) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalledAgain);
-            return;
-        }
-
-        this._mraidCustomCloseCalled = true;
-
-        const hideDuration = this._mraidCustomCloseDelay * 1000;
-        if (hideDuration <= 0) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseExpired);
-            this.showCloseGraphic(this._closeElement, true);
-            return;
-        }
-
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic);
-        this.showCloseGraphic(this._closeElement, false);
-        this.setCustomCloseTimeout(this._closeElement, hideDuration);
+        const region = <HTMLElement>element.querySelector('.close-region');
+        region.style.removeProperty('right');
+        region.style.left = '0';
     }
 }
