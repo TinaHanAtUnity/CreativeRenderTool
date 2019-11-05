@@ -24,7 +24,7 @@ const SdkiOSClassMap = new Map<string, string>([
     ['GADMobileAds', 'AdMob'],
     ['MoPub', 'MoPub'],
     ['IronSource', 'IronSource'],
-    ['FyberSDK', 'FyberSDK'],
+    ['FyberSDK', 'Fyber'],
     ['SafeDK', 'SafeDK'],
     ['UnityAppController', 'UnityEngine']
 ]);

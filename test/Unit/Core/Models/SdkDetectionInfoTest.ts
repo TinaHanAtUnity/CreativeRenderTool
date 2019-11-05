@@ -8,7 +8,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('MediationDetectionInfoTest - ' + Platform[platform], () => {
+    describe('SDKDetectionInfoTest - ' + Platform[platform], () => {
 
         let backend: Backend;
         let nativeBridge: NativeBridge;
@@ -20,6 +20,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             sdkDetectionInfo = new SdkDetectionInfo(platform, core);
+            backend.Api.ClassDetection.setPlatform(platform);
         });
 
         it('should return false when detected class is not present', () => {
