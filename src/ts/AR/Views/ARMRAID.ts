@@ -551,6 +551,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         return Promise.resolve();
     }
 
+    protected onArButtonHideEvent(msg: MessageEvent): Promise<void> {
+        this.hideArAvailableButton();
+        return Promise.resolve();
+    }
+
     private onPrivacyClicked(event: Event) {
         event.stopPropagation();
         event.preventDefault();

@@ -78,4 +78,8 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
     public onBridgeDeviceOrientationSubscribe(): void {
         this._handler.onBridgeDeviceOrientationSubscribe();
     }
+
+    public onBridgeArButtonHide(event: MessageEvent): void {
+        this._handler.onBridgeArButtonHide(event);
+    }
 }
