@@ -9,7 +9,7 @@ export type SessionManagerMock = Base & {
 };
 
 export const SessionManager = jest.fn(() => {
-    return <SessionManagerMock><unknown>{
+    return <SessionManagerMock>{
         create: jest.fn(),
         startNewSession: jest.fn(),
         sendUnsentSessions: jest.fn(),

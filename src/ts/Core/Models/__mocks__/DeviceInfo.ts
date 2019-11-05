@@ -4,7 +4,7 @@ export type DeviceInfoMock = Base & {
 };
 
 export const DeviceInfo = jest.fn(() => {
-    return <DeviceInfoMock><unknown>{
+    return <DeviceInfoMock><unknown>{ // TODO: Remove unknown cast
         getAdvertisingIdentifier: jest.fn().mockImplementation(() => ''),
         getLimitedAdTracking: jest.fn().mockImplementation(() => false),
         getModel: jest.fn().mockImplementation(() => ''),

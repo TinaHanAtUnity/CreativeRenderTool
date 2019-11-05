@@ -4,6 +4,6 @@ export type RefreshManagerMock = Base & {
 };
 
 export const RefreshManager = jest.fn(() => {
-    return <RefreshManagerMock><unknown>{
+    return <RefreshManagerMock>{
     };
 });

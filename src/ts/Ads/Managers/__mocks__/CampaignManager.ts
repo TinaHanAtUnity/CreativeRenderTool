@@ -4,6 +4,6 @@ export type CampaignManagerMock = Base & {
 };
 
 export const CampaignManager = jest.fn(() => {
-    return <CampaignManagerMock><unknown>{
+    return <CampaignManagerMock>{
     };
 });

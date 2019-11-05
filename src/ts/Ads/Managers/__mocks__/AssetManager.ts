@@ -4,6 +4,6 @@ export type AssetManagerMock = Base & {
 };
 
 export const AssetManager = jest.fn(() => {
-    return <AssetManagerMock><unknown>{
+    return <AssetManagerMock>{
     };
 });

@@ -4,6 +4,6 @@ export type MissedImpressionManagerMock = Base & {
 };
 
 export const MissedImpressionManager = jest.fn(() => {
-    return <MissedImpressionManagerMock><unknown>{
+    return <MissedImpressionManagerMock>{
     };
 });
