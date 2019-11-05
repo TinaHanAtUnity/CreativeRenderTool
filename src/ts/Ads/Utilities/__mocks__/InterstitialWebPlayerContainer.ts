@@ -4,5 +4,6 @@ export type InterstitialWebPlayerContainerMock = Base & {
 };
 
 export const InterstitialWebPlayerContainer = jest.fn(() => {
-    return <InterstitialWebPlayerContainerMock>{};
+    return <InterstitialWebPlayerContainerMock><unknown>{
+    };
 });
