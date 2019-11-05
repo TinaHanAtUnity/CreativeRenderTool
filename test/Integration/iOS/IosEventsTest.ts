@@ -135,6 +135,7 @@ describe('IosEventsTest V4', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(647);
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(357);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('+0200');
+        UnityAds.getBackend().Api.DeviceInfo.setLimitAdTrackingFlag(false);
 
         AbstractAdUnit.setAutoClose(true);
 
