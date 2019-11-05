@@ -2,6 +2,7 @@ import { Environment } from 'Privacy/Environment';
 
 export interface IPrivacyConfigJson {
     env: { [key: string]: unknown };
+    user: { [key: string]: unknown };
     webView: { [key: string]: unknown };
 }
 

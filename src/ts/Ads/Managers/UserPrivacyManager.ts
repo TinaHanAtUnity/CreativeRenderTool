@@ -104,14 +104,24 @@ export class UserPrivacyManager {
     public getPrivacyConfig(): Promise<PrivacyConfig> {
         return Promise.resolve(new PrivacyConfig({
             env: {
-                platform: 'android',
-                userAdvertisingId: 'user.advertisingId',
-                userUUID: 'user.UUID',
-                userLocales: 'user.locales',
-                userDefaultLocale: 'user.defaultLocale',
-                deviceAndroidId: 'device.androidId',
-                buildApiLevel: 'build.apiLevel',
-                buildOsVersion: 'build.osVersion'
+                buildOsVersion: this._deviceInfo.getOsVersion(),
+                platform: this._platform,
+                userLocale: this._deviceInfo.getLanguage(),
+                country: this._coreConfig.getCountry(),
+                // todo: add api level
+                // todo: add subcountry
+
+                privacyMethod: this._gamePrivacy.getMethod(),
+                ageGateLimit: this._privacy.getAgeGateLimit(),
+                legalFramework: this._privacy.getLegalFramework(),
+                isCoppa: this._coreConfig.isCoppaCompliant()
+            },
+
+            user: {
+                ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
+                external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
+                gameExp: false, // todo: fetch from this._userPrivacy.getPermissions().gameExp,
+                // todo: agree on agreedOverAgeLimit field from this.getAgeGateChoice()
             },
 
             webView: {
