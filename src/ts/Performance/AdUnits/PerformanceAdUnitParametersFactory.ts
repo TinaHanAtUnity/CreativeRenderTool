@@ -62,14 +62,14 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.heartbeating, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.bouncing, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.shining, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (MabDecisionButtonTest.isValid(abGroup)) {
             const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
-            if (mabDecision && mabDecision in EndScreenAnimation) {
+            if (mabDecision && (<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
                 endScreen = new AnimatedDownloadButtonEndScreen(<EndScreenAnimation> mabDecision,
                     endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
             } else {

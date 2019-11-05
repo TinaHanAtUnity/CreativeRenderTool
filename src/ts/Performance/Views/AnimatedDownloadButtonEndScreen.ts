@@ -5,10 +5,10 @@ import { Template } from 'Core/Utilities/Template';
 import EndScreenAnimatedDownloadButton from 'html/EndScreenAnimatedDownloadButton.html';
 
 export enum EndScreenAnimation {
-  static = 'static',
-  heartbeating = 'heartbeating',
-  bouncing = 'bouncing',
-  shining = 'shining'
+  STATIC = 'static',
+  HEARTBEATING = 'heartbeating',
+  BOUNCING = 'bouncing',
+  SHINING = 'shining'
 }
 
 export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
@@ -17,11 +17,11 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
   constructor(animation: EndScreenAnimation, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
     super(parameters, campaign, country);
     this._animation = animation;
-    if (this._animation !== 'static') {
+    if (this._animation !== EndScreenAnimation.STATIC) {
       this._template = new Template(EndScreenAnimatedDownloadButton, this._localization);
       this._templateData = {
         ...this._templateData,
-        'hasShadow': animation === 'bouncing'
+        'hasShadow': animation === EndScreenAnimation.BOUNCING
       };
     }
   }
@@ -29,7 +29,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
   public render(): void {
     super.render();
 
-    if (this._animation !== 'static') {
+    if (this._animation !== EndScreenAnimation.STATIC) {
       this.container().classList.add(`${this._animation}-download-button-end-screen`);
     }
   }

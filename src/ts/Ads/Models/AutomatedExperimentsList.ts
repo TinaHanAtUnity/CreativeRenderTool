@@ -17,8 +17,8 @@ import { EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndS
 
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
     name: 'ButtonAnimationsExperiment',
-    actions: Object.keys(EndScreenAnimation).map(k => <EndScreenAnimation> k),
-    defaultAction: EndScreenAnimation.static
+    actions: Object.values(EndScreenAnimation),
+    defaultAction: EndScreenAnimation.STATIC
 });
 
 export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
