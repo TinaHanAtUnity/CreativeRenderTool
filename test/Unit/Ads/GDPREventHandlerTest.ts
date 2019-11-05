@@ -29,9 +29,12 @@ import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { PrivacyMethod } from 'Privacy/Privacy';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 describe('GDPREventHandlerTest', () => {
-
+    const sandbox = sinon.createSandbox();
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
@@ -41,6 +44,8 @@ describe('GDPREventHandlerTest', () => {
     let adUnit: PerformanceAdUnit;
     let adUnitParameters: IPerformanceAdUnitParameters;
     let privacySDK: PrivacySDK;
+    let deviceInfo: AndroidDeviceInfo;
+    let clientInfo: ClientInfo;
 
     let gdprEventHandler: OverlayEventHandler<PerformanceCampaign>;
 
@@ -51,7 +56,10 @@ describe('GDPREventHandlerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
-        privacySDK = TestFixtures.getPrivacySDK(core);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        privacySDK = PrivacyParser.parse(ConfigurationAuctionPlc, clientInfo, deviceInfo);
         adUnitParameters = {
             platform,
             core,
@@ -70,7 +78,7 @@ describe('GDPREventHandlerTest', () => {
             adsConfig: TestFixtures.getAdsConfiguration(),
             request: sinon.createStubInstance(RequestManager),
             options: {},
-        endScreen: sinon.createStubInstance(PerformanceEndScreen),
+            endScreen: sinon.createStubInstance(PerformanceEndScreen),
             overlay: sinon.createStubInstance(VideoOverlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(Privacy),
@@ -86,8 +94,8 @@ describe('GDPREventHandlerTest', () => {
 
     describe('When calling onGDPRPopupSkipped', () => {
         it('should send GDPR skip event', () => {
+            //privacySDK.getUserPrivacy().setMethod(PrivacyMethod.LEGITIMATE_INTEREST);
             gdprEventHandler.onGDPRPopupSkipped();
-
             sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: false, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
         });
 

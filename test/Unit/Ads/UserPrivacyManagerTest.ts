@@ -68,9 +68,9 @@ describe('UserPrivacyManagerTest', () => {
         adsConfig = sinon.createStubInstance(AdsConfiguration);
         gamePrivacy = sinon.createStubInstance(GamePrivacy);
         privacySDK = sinon.createStubInstance(PrivacySDK);
-        (<sinon.SinonStub>privacySDK.getGamePrivacy).returns(gamePrivacy);
+        privacySDK.getGamePrivacy.returns(gamePrivacy);
         userPrivacy = sinon.createStubInstance(UserPrivacy);
-        (<sinon.SinonStub>privacySDK.getUserPrivacy).returns(userPrivacy);
+        privacySDK.getUserPrivacy.returns(userPrivacy);
 
         request = sinon.createStubInstance(RequestManager);
 
@@ -83,10 +83,10 @@ describe('UserPrivacyManagerTest', () => {
         (<sinon.SinonStub>clientInfo.getApplicationName).returns(testBundleId);
         (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
         (<sinon.SinonStub>coreConfig.getUnityProjectId).returns(testUnityProjectId);
-        (<sinon.SinonStub>privacySDK.isGDPREnabled).callsFake(() => {
+        privacySDK.isGDPREnabled.callsFake(() => {
             return isGDPREnabled;
         });
-        (<sinon.SinonStub>privacySDK.getLegalFramework).callsFake(() => {
+        privacySDK.getLegalFramework.callsFake(() => {
             return isGDPREnabled ? LegalFramework.GDPR : LegalFramework.DEFAULT;
         });
 
@@ -187,7 +187,7 @@ describe('UserPrivacyManagerTest', () => {
                 sinon.assert.notCalled(updateUserPrivacy);
                 sinon.assert.notCalled(setStub);
                 sinon.assert.notCalled(writeStub);
-                sinon.assert.notCalled(<sinon.SinonStub>privacySDK.setGDPREnabled);
+                sinon.assert.notCalled(privacySDK.setGDPREnabled);
             });
         });
 
@@ -219,7 +219,7 @@ describe('UserPrivacyManagerTest', () => {
                 return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                     assert.fail('should throw');
                 }).catch(() => {
-                    sinon.assert.notCalled(<sinon.SinonStub>privacySDK.setGDPREnabled);
+                    sinon.assert.notCalled(privacySDK.setGDPREnabled);
                     sinon.assert.notCalled(httpKafkaSpy);
                 });
             });
@@ -366,7 +366,6 @@ describe('UserPrivacyManagerTest', () => {
                     sinon.assert.calledWith(userPrivacy.update, {
                         method: PrivacyMethod.DEVELOPER_CONSENT,
                         version: 0,
-                        agreedAll: false,
                         permissions: {
                             gameExp: false,
                             ads: false,

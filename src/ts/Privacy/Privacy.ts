@@ -85,14 +85,12 @@ export interface IRawUserPrivacy {
     method: string;
     version: number;
     permissions: IPermissions;
-    agreedAll: boolean;
 }
 
 interface IUserPrivacy {
     method: PrivacyMethod;
     version: number;
     permissions: IPermissions;
-    agreedAll: boolean;
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
@@ -109,7 +107,6 @@ export class UserPrivacy extends Model<IUserPrivacy> {
                 return new UserPrivacy({
                     method: method,
                     version: 0,
-                    agreedAll: false,
                     permissions: {
                         gameExp: false,
                         ads: !optOutEnabled,
@@ -125,7 +122,6 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return new UserPrivacy({
             method: PrivacyMethod.DEFAULT,
             version: 0,
-            agreedAll: false,
             permissions: {
                 gameExp: false,
                 ads: false,
@@ -138,17 +134,18 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         super('UserPrivacy', {
             method: ['string'],
             version: ['number'],
-            permissions: ['object'],
-            agreedAll: ['boolean']
+            permissions: ['object']
         });
 
         this.set('method', <PrivacyMethod>data.method);
         this.set('version', data.version);
         this.set('permissions', data.permissions);
-        this.set('agreedAll', data.agreedAll);
     }
 
     public isRecorded(): boolean {
+        if (!this.getMethod()) {
+            return false;
+        }
         return this.getMethod() !== PrivacyMethod.DEFAULT;
     }
 
@@ -156,7 +153,7 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return this.get('method');
     }
 
-    public setMethod(method: PrivacyMethod): void{
+    public setMethod(method: PrivacyMethod): void {
         this.set('method', method);
     }
 

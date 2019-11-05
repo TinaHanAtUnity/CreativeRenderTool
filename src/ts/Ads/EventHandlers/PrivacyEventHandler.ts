@@ -74,7 +74,6 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             userPrivacy.update({
                 method: gamePrivacy.getMethod(),
                 version: 0,
-                agreedAll: false,
                 permissions: {
                     ads: !optOutEnabled,
                     external: gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT ? !optOutEnabled : false,

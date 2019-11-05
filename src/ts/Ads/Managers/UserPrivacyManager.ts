@@ -140,7 +140,6 @@ export class UserPrivacyManager {
         const updatedPrivacy = {
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
-            agreedAll: agreedAll,
             permissions: permissions
         };
 

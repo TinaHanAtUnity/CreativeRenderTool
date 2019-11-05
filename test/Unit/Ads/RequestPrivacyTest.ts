@@ -28,7 +28,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 let result: IRequestPrivacy | undefined;
                 const expectedPermissions = { gameExp: false, ads: true, external: true };
                 beforeEach(() => {
-                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, agreedAll: false, permissions: expectedPermissions });
+                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: expectedPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
                     result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
                 });
@@ -41,7 +41,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 let result: IRequestPrivacy | undefined;
                 const anyPermissions = <IPermissions>{};
                 beforeEach(() => {
-                    userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, agreedAll: false, version: 0, permissions: anyPermissions });
+                    userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
                     result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
                 });
@@ -54,7 +54,7 @@ describe('RequestPrivacyFactoryTests', () => {
         let result: IRequestPrivacy | undefined;
         const expectedPermissions = { gameExp: true, ads: true, external: true };
         beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, agreedAll: true, permissions: expectedPermissions });
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: expectedPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
@@ -66,7 +66,7 @@ describe('RequestPrivacyFactoryTests', () => {
         let result: IRequestPrivacy | undefined;
         const anyPermissions = <IPermissions>{};
         beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, agreedAll: false, version: 0, permissions: anyPermissions });
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });

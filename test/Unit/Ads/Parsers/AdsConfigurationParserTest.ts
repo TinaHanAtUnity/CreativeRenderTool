@@ -47,7 +47,7 @@ describe('AdsConfigurationParserTest', () => {
     context('PrivacySDK', () => {
         let configJson: IRawAdsConfiguration;
         beforeEach(() => {
-            configJson = ConfigurationJson;
+            configJson = <IRawAdsConfiguration>(JSON.parse(JSON.stringify(ConfigurationJson)));
         });
 
         context('with original GDPR opt-out fields', () => {

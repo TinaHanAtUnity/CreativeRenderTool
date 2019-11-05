@@ -63,8 +63,7 @@ export class PrivacyParser {
             rawUserPrivacy = {
                 method: rawUserPrivacy.method,
                 version: rawUserPrivacy.version,
-                permissions: {ads: true, gameExp: true, external: true},
-                agreedAll: true
+                permissions: {ads: true, gameExp: true, external: true}
             };
         }
 
@@ -74,7 +73,6 @@ export class PrivacyParser {
             return new UserPrivacy({
                 method: gPmethod ? gPmethod : PrivacyMethod.DEFAULT,
                 version:  gPmethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0,
-                agreedAll: false,
                 permissions: {
                     gameExp: false,
                     ads: false,
@@ -96,7 +94,7 @@ export class PrivacyParser {
                 }
             }
 
-            return new UserPrivacy({ method: method, version: 0, agreedAll: false, permissions: {
+            return new UserPrivacy({ method: method, version: 0, permissions: {
                     gameExp: false,
                     ads: consent,
                     external: consent
@@ -108,7 +106,6 @@ export class PrivacyParser {
             return new UserPrivacy({
                 method: rawGamePrivacy.method,
                 version: 0,
-                agreedAll: false,
                 permissions: {
                     gameExp: false,
                     ads: optOutRecorded ? !optOutEnabled : false,
@@ -120,7 +117,7 @@ export class PrivacyParser {
         // reset outdated user privacy if the game privacy method has been changed, first ad request will be contextual
         const methodHasChanged = rawUserPrivacy.method !== rawGamePrivacy.method;
         if (rawGamePrivacy.method !== PrivacyMethod.DEFAULT && methodHasChanged) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, agreedAll: false, permissions: {
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
                     gameExp: false,
                     ads: false,
                     external: false
