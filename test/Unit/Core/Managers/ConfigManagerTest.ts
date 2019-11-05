@@ -42,7 +42,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             beforeEach(() => {
                 const nativeResponse: INativeResponse = {
                     url: '',
-                    response: ConfigurationAuctionPlc,
+                    response: JSON.stringify(ConfigurationAuctionPlc),
                     responseCode: 200,
                     headers: []
                 };

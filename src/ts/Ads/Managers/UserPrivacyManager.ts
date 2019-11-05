@@ -113,24 +113,7 @@ export class UserPrivacyManager {
         }
 
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
-            if (this._privacy.isAgeGateEnabled()) {
-                Diagnostics.trigger('age_gate_httpkafka_success', {
-                    action: action,
-                    legalFramework: this._privacy.getLegalFramework(),
-                    method: this._gamePrivacy.getMethod(),
-                    previousChoice: this._ageGateChoice
-                });
-            }
             return Promise.resolve();
-        }).catch(() => {
-            if (this._privacy.isAgeGateEnabled()) {
-                Diagnostics.trigger('age_gate_httpkafka_failure', {
-                    action: action,
-                    legalFramework: this._privacy.getLegalFramework(),
-                    method: this._gamePrivacy.getMethod(),
-                    previousChoice: this._ageGateChoice
-                });
-            }
         });
     }
 
@@ -313,41 +296,6 @@ export class UserPrivacyManager {
         return this._ageGateChoice;
     }
 
-    // this is a hack that will force resync age gate opt-out settings
-    public fixAgeGateSync(): void {
-        // if recorded choice is yes, then choice will be recorded when new ad goes through opt-out flow
-        if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.NO) {
-            // negative choice means opt-out message has not been recorded and new event should be sent
-
-            if (this._userPrivacy) {
-                this._userPrivacy.update({
-                    method: this._gamePrivacy.getMethod(),
-                    version: 0,
-                    agreedAll: false,
-                    permissions: {
-                        ads: false,
-                        external: false,
-                        gameExp: false
-                    }
-                });
-            }
-
-            this.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
-
-            Diagnostics.trigger('age_gate_desync_no', {
-                legalFramework: this._privacy.getLegalFramework(),
-                method: this._gamePrivacy.getMethod(),
-                previousChoice: this._ageGateChoice
-            });
-        } else if (this._privacy.isAgeGateEnabled() && this._ageGateChoice === AgeGateChoice.YES) {
-            Diagnostics.trigger('age_gate_desync_yes', {
-                legalFramework: this._privacy.getLegalFramework(),
-                method: this._gamePrivacy.getMethod(),
-                previousChoice: this._ageGateChoice
-            });
-        }
-    }
-
     public isConsentShowRequired(): boolean {
         if (this.isAgeGateShowRequired()) {
             return true;
@@ -435,11 +383,6 @@ export class UserPrivacyManager {
 
     private isAgeGateShowRequired(): boolean {
         if (this._privacy.isAgeGateEnabled()) {
-            // prevent age gate from being shown twice
-            if (this._ageGateChoice !== AgeGateChoice.MISSING) {
-                return false;
-            }
-
             if (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this._privacy.isGDPREnabled() && !this._privacy.isOptOutRecorded()) {
                 return true;
             }

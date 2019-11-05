@@ -134,8 +134,8 @@ describe('CampaignManager', () => {
     beforeEach(() => {
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
-        coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
+        adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
 
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParserStrict();
@@ -168,7 +168,7 @@ describe('CampaignManager', () => {
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticVastPlcCampaignJson
+                response: JSON.stringify(OnProgrammaticVastPlcCampaignJson)
             }));
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -200,7 +200,7 @@ describe('CampaignManager', () => {
             // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticVastPlcCampaignInsideOutsideJson
+                response: JSON.stringify(OnProgrammaticVastPlcCampaignInsideOutsideJson)
             }));
             mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: VastInlineLinear
@@ -276,13 +276,13 @@ describe('CampaignManager', () => {
             // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticVastPlcCampaignWrapped
+                response: JSON.stringify(OnProgrammaticVastPlcCampaignWrapped)
             }));
             mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
-                response: WrappedVast1
+                response: JSON.stringify(WrappedVast1)
             }));
             mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
-                response: WrappedVast2
+                response: JSON.stringify(WrappedVast2)
             }));
 
             vastParser.setMaxWrapperDepth(2);
@@ -379,7 +379,7 @@ describe('CampaignManager', () => {
             // given a valid wrapped VAST placement that points at a valid VAST with a wrapper
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticVastPlcCampaignMaxDepth
+                response: JSON.stringify(OnProgrammaticVastPlcCampaignMaxDepth)
             }));
 
             const nonWrappedVAST = NonWrappedVast;
@@ -481,14 +481,14 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a vast placement without a video url', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignNoVideo
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignNoVideo)
                 };
                 return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND]);
             });
 
             it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignNoVideoWrapped
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignNoVideoWrapped)
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrapperErrorUrls = ['http://myErrorURL/error', 'http://myErrorURL/wrapper/error'];
@@ -500,18 +500,18 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignIncorrect
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignIncorrect)
                 };
                 return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 33 at column 12: Opening and ending tag mismatch: VASTy line 0 and VAST\nBelow is a rendering of the page up to the first error.');
             });
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignIncorrect
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignIncorrect)
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.resolve({
-                    response: IncorrectWrappedVast
+                    response: JSON.stringify(IncorrectWrappedVast)
                 });
 
                 return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'VAST xml is invalid - document element must be VAST but was foo');
@@ -519,14 +519,14 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a vast placement with no vast data', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignNoData
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignNoData)
                 };
                 return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 1 at column 1: Document is empty\nBelow is a rendering of the page up to the first error.');
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignFailing
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignFailing)
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.reject(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_GENERAL_ERROR]);
@@ -537,7 +537,7 @@ describe('CampaignManager', () => {
             it('should trigger onError after requesting a vast placement with null vast data', () => {
                 // given a VAST placement with null vast
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignNullData
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignNullData)
                 };
 
                 const mockRequest = sinon.mock(request);
@@ -565,7 +565,7 @@ describe('CampaignManager', () => {
 
                 // given a valid VAST response containing a wrapper
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignTooMuchWrapping
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignTooMuchWrapping)
                 };
 
                 // when the parser's max wrapper depth is set to 0 to disallow wrapping
@@ -610,7 +610,7 @@ describe('CampaignManager', () => {
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticVastPlcCampaignCustomTracking
+                response: JSON.stringify(OnProgrammaticVastPlcCampaignCustomTracking)
             }));
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -660,10 +660,10 @@ describe('CampaignManager', () => {
         it('should trigger onMRAIDCampaign after receiving a MRAID campaign inlined', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticMraidUrlPlcCampaignJson
+                response: JSON.stringify(OnProgrammaticMraidUrlPlcCampaignJson)
             }));
 
-            const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
+            const json = OnProgrammaticMraidUrlPlcCampaignJson;
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -705,10 +705,10 @@ describe('CampaignManager', () => {
         it('should trigger onMRAIDCampaign after receiving a MRAID campaign non-inlined', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticMraidPlcCampaignJson
+                response: JSON.stringify(OnProgrammaticMraidPlcCampaignJson)
             }));
 
-            const json = JSON.parse(OnProgrammaticMraidPlcCampaignJson);
+            const json = OnProgrammaticMraidPlcCampaignJson;
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -744,7 +744,7 @@ describe('CampaignManager', () => {
 
         it('should trigger onError if mraid property is null', (done) => {
             const response = {
-                response: OnProgrammaticMraidPlcCampaignNull
+                response: JSON.stringify(OnProgrammaticMraidPlcCampaignNull)
             };
 
             const mockRequest = sinon.mock(request);
@@ -774,7 +774,7 @@ describe('CampaignManager', () => {
 
         it('should trigger onError if there is no markup', () => {
             const response = {
-                response: OnProgrammaticMraidPlcCampaignEmpty
+                response: JSON.stringify(OnProgrammaticMraidPlcCampaignEmpty)
             };
 
             const mockRequest = sinon.mock(request);
@@ -797,7 +797,7 @@ describe('CampaignManager', () => {
 
         it('should trigger onError if there is no inlinedUrl', () => {
             const response = {
-                response: OnProgrammaticMraidUrlPlcCampaignEmpty
+                response: JSON.stringify(OnProgrammaticMraidUrlPlcCampaignEmpty)
             };
 
             const mockRequest = sinon.mock(request);
@@ -823,7 +823,7 @@ describe('CampaignManager', () => {
         it('should process the programmatic/static-interstitial-html', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayHtmlCampaign
+                response: JSON.stringify(OnStaticInterstitialDisplayHtmlCampaign)
             }));
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -853,7 +853,7 @@ describe('CampaignManager', () => {
         it('should process the programmatic/static-interstitial-js', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayJsCampaign
+                response: JSON.stringify(OnStaticInterstitialDisplayJsCampaign)
             }));
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
@@ -877,7 +877,7 @@ describe('CampaignManager', () => {
 
     describe('on PLC', () => {
         let assetManager;
-        let campaignManager: any;
+        let campaignManager: CampaignManager;
         let triggeredCampaign: Campaign;
         let triggeredError: any;
         let triggeredPlacement: string;
@@ -907,7 +907,7 @@ describe('CampaignManager', () => {
         describe('performance campaign', () => {
             it('should process correct Auction comet/performance Campaign content type', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnCometVideoPlcCampaignJson
+                    response: JSON.stringify(OnCometVideoPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -923,7 +923,7 @@ describe('CampaignManager', () => {
 
             it('should process correct Auction comet/performance Campaign content type with mraidUrl', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnCometMraidPlcCampaignJson
+                    response: JSON.stringify(OnCometMraidPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -942,7 +942,7 @@ describe('CampaignManager', () => {
         describe('XPromo campaign', () => {
             it('should process correct Auction xpromo/video Campaign content type', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnXPromoPlcCampaignJson
+                    response: JSON.stringify(OnXPromoPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -960,7 +960,7 @@ describe('CampaignManager', () => {
         describe('VPAID campaign', () => {
             it('should process custom tracking urls for Auction programmatic/vpaid Campaign', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnProgrammaticVPAIDPlcCampaignJson
+                    response: JSON.stringify(OnProgrammaticVPAIDPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -988,7 +988,7 @@ describe('CampaignManager', () => {
         describe('programmatic campaign', () => {
             it('should process custom tracking urls for Auction programmatic/vast Campaign', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnProgrammaticVastPlcCampaignJson
+                    response: JSON.stringify(OnProgrammaticVastPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -1016,7 +1016,7 @@ describe('CampaignManager', () => {
 
             it('should process correct Auction programmatic/mraid-url Campaign content type', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnProgrammaticMraidUrlPlcCampaignJson
+                    response: JSON.stringify(OnProgrammaticMraidUrlPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -1051,7 +1051,7 @@ describe('CampaignManager', () => {
 
             it('should process correct Auction programmatic/mraid Campaign content type', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnProgrammaticMraidPlcCampaignJson
+                    response: JSON.stringify(OnProgrammaticMraidPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -1088,7 +1088,7 @@ describe('CampaignManager', () => {
                 });
 
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnProgrammaticMraidPlcCampaignJson
+                    response: JSON.stringify(OnProgrammaticMraidPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -1123,7 +1123,7 @@ describe('CampaignManager', () => {
                 });
 
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnProgrammaticMraidPlcCampaignJson
+                    response: JSON.stringify(OnProgrammaticMraidPlcCampaignJson)
                 }));
 
                 return campaignManager.request().then(() => {
@@ -1185,7 +1185,7 @@ describe('CampaignManager', () => {
         let assetManager;
         let campaignManager: any;
         let mockRequest: any;
-        const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
+        const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc;
 
         beforeEach(() => {
             sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V5);
@@ -1212,7 +1212,7 @@ describe('CampaignManager', () => {
             let triggeredCampaignCount: number;
 
             mockRequest.expects('post').returns(Promise.resolve({
-                response: AuctionV5Response
+                response: JSON.stringify(AuctionV5Response)
             }));
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
@@ -1281,7 +1281,7 @@ describe('CampaignManager', () => {
         let assetManager: AssetManager;
         let campaignManager: CampaignManager;
         let mockRequest: sinon.SinonMock;
-        const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
+        const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc;
 
         beforeEach(() => {
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
@@ -1297,7 +1297,7 @@ describe('CampaignManager', () => {
             const placement = TestFixtures.getPlacement();
 
             mockRequest.expects('post').returns(Promise.resolve({
-                response: LoadedCampaignResponse
+                response: JSON.stringify(LoadedCampaignResponse)
             }));
 
             sinon.stub(assetManager, 'enableCaching');
@@ -1325,7 +1325,7 @@ describe('CampaignManager', () => {
             const mediaId = '5be40c5f602f4510ec583881';
 
             mockRequest.expects('post').returns(Promise.resolve({
-                response: LoadedCampaignResponse.replace(mediaId, '')
+                response: JSON.stringify(LoadedCampaignResponse).replace(mediaId, '')
             }));
 
             sinon.stub(assetManager, 'enableCaching');
@@ -1347,7 +1347,7 @@ describe('CampaignManager', () => {
             const auctionId = 'd301fd4c-4a9e-48e4-82aa-ad8b07977ca5';
 
             mockRequest.expects('post').returns(Promise.resolve({
-                response: LoadedCampaignResponse.replace(auctionId, '')
+                response: JSON.stringify(LoadedCampaignResponse).replace(auctionId, '')
             }));
 
             sinon.stub(assetManager, 'enableCaching');

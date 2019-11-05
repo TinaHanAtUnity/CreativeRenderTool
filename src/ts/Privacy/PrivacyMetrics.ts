@@ -28,8 +28,7 @@ export class PrivacyMetrics {
             kafkaObject.abGroup = PrivacyMetrics._abGroup.valueOf();
         }
 
-        // currently reusing gdprtest topic but this might change in the future
-        HttpKafka.sendEvent('ads.sdk2.events.gdprtest.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+        HttpKafka.sendEvent('ads.sdk2.events.privacymetrics.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     public static setGameSessionId(id: number) {

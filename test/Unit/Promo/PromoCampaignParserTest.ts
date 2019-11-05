@@ -58,7 +58,7 @@ describe('PromoCampaignParser', () => {
                 sandbox = sinon.createSandbox();
                 sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
                 sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                return parse(IAPPromoCampaign.campaign1);
             });
 
             afterEach(() => {
@@ -69,7 +69,7 @@ describe('PromoCampaignParser', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof PromoCampaign, 'Campaign was not a PromoCampaign');
 
-                const json = JSON.parse(IAPPromoCampaign).campaign1;
+                const json = IAPPromoCampaign.campaign1;
                 const content = JSON.parse(json.content);
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
@@ -95,7 +95,7 @@ describe('PromoCampaignParser', () => {
                 sandbox = sinon.createSandbox();
                 sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
                 sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                return parse(JSON.parse(IAPPromoCampaign).campaign2);
+                return parse(IAPPromoCampaign.campaign2);
             });
 
             afterEach(() => {
@@ -105,7 +105,7 @@ describe('PromoCampaignParser', () => {
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof PromoCampaign, 'Campaign was not a PromoCampaign');
-                const json = JSON.parse(IAPPromoCampaign).campaign2;
+                const json = IAPPromoCampaign.campaign2;
                 const content = JSON.parse(json.content);
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
@@ -155,7 +155,7 @@ describe('PromoCampaignParser', () => {
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
                 sandbox.stub(PurchasingUtilities, 'getProductType').returns('nonConsumable');
-                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                return parse(IAPPromoCampaign.campaign1);
             });
 
             afterEach(() => {

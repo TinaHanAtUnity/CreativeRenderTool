@@ -9,7 +9,7 @@ describe('PromoCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            const json = JSON.parse(DummyPromo);
+            const json = DummyPromo;
             const campaign = TestFixtures.getPromoCampaign();
 
             assert.equal(campaign.getId(), json.promo.id);
