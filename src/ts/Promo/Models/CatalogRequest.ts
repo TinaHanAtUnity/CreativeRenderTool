@@ -42,7 +42,7 @@ export class CatalogRequest {
             return Promise.resolve();
         }
         const catalogPayload = JSON.stringify(this.constructCatalog());
-        return this._request.post(IAPCatalogEndpoint.ENDPOINT_STG, catalogPayload);
+        return this._request.post(IAPCatalogEndpoint.ENDPOINT_PRD, catalogPayload);
     }
 
     private updateProducts(products: IProduct[]): IProductItem[] {
