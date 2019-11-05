@@ -43,7 +43,6 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._template = new Template(PrivacyTemplate);
         this._privacyManager = params.privacyManager;
         this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
-        this._privacyWebViewUrl = TestEnvironment.get('privacyUrl');
         this._coreApi = params.core;
     }
 
@@ -52,7 +51,9 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._iFrameAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame));
 
         this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
-            this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson())))
+            this._privacyWebViewUrl = privacyConfig.getWebViewUrl();
+            this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson()))
+                .replace('{{ PRIVACY_USER_SETTINGS }}', JSON.stringify(privacyConfig.getUserSettings())))
                 .then((privacyHtml) => {
                     this._iFrame.srcdoc = privacyHtml;
                 });

@@ -124,9 +124,8 @@ export class UserPrivacyManager {
                 // todo: agree on agreedOverAgeLimit field from this.getAgeGateChoice()
             },
 
-            webView: {
-                url: TestEnvironment.get('privacyUrl')
-            }}));
+            webViewUrl: TestEnvironment.get('privacyUrl')
+        }));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {

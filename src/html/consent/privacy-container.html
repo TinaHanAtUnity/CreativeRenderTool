@@ -136,7 +136,7 @@
                     if (window.privacyAdapter.readyCallback) {
                         const obj = {
                             env: JSON.parse(this.getEnv()),
-                            user: {}
+                            user: JSON.parse(this.getUserSettigns())
                         };
                         window.privacyAdapter.readyCallback(obj);
                     }
@@ -157,6 +157,10 @@
 
                 this.getEnv = function() {
                     return '{{ PRIVACY_ENVIRONMENT }}'
+                }
+
+                this.getUserSettigns = function() {
+                    return '{{ PRIVACY_USER_SETTINGS }}'
                 }
             };
 
