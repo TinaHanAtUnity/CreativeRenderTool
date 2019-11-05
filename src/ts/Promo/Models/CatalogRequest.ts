@@ -19,7 +19,6 @@ interface IProductItem {
 }
 
 const IAPCatalogEndpoint: {[key: string]: string} = {
-    ENDPOINT_STG : 'https://events-iap.staging.unityads.unity3d.com/v1/catalog',
     ENDPOINT_PRD : 'https://events.iap.unity3d.com/v1/catalog'
 };
 
