@@ -60,6 +60,19 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         let endScreen: PerformanceEndScreen;
         const abGroup = baseParams.coreConfig.getAbGroup();
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
+        let endscreenAnimation = EndScreenAnimation.STATIC;
+        const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
+
+        if (mabDecision) {
+            if (Object.keys(EndScreenAnimation).includes(mabDecision)) { // Should be tested
+                endscreenAnimation = <EndScreenAnimation> mabDecision;
+            } else {
+                // Can be removed, since the developer doesn't need to know about this
+                this._core.Sdk.logError(`Invalid Endscreen animation: "${mabDecision}".`);
+                // Suggest to replace with the following to track on our datadog dashboard to get live updates if incorrect values are being sent
+                // baseParams.programmaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
+            }
+        }
 
         if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
@@ -67,14 +80,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (MabDecisionButtonTest.isValid(abGroup)) {
-            let mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
-            if (!mabDecision || !(<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
-                this._core.Sdk.logError(`Invalid Endscreen animation: "${mabDecision}".`);
-                mabDecision = EndScreenAnimation.STATIC;
-            }
-            endScreen = new AnimatedDownloadButtonEndScreen(<EndScreenAnimation> mabDecision,
-                endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (MabDecisionButtonTest.isValid(abGroup) && endscreenAnimation !== EndScreenAnimation.STATIC) {
+            endScreen = new AnimatedDownloadButtonEndScreen(endscreenAnimation, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
