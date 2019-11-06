@@ -19,24 +19,29 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
     if (!animation || !(<string[]>Object.values(EndScreenAnimation)).includes(animation)) {
       this._animation = EndScreenAnimation.STATIC;
-      this._core.Sdk.logError('Invalid Endscreen animation.');
+      this._core.Sdk.logError(`Invalid Endscreen animation: "${this._animation}".`);
+    } else {
+      this._animation = animation;
     }
 
-    this._animation = animation;
-    if (this._animation !== EndScreenAnimation.STATIC) {
-      this._template = new Template(EndScreenAnimatedDownloadButton, this._localization);
-      this._templateData = {
-        ...this._templateData,
-        'hasShadow': animation === EndScreenAnimation.BOUNCING
-      };
+    if (this._animation === EndScreenAnimation.STATIC) {
+      return;
     }
+
+    this._template = new Template(EndScreenAnimatedDownloadButton, this._localization);
+    this._templateData = {
+      ...this._templateData,
+      'hasShadow': animation === EndScreenAnimation.BOUNCING
+    };
   }
 
   public render(): void {
     super.render();
 
-    if (this._animation !== EndScreenAnimation.STATIC) {
-      this.container().classList.add(`${this._animation}-download-button-end-screen`);
+    if (this._animation === EndScreenAnimation.STATIC) {
+      return;
     }
+
+    this.container().classList.add(`${this._animation}-download-button-end-screen`);
   }
 }
