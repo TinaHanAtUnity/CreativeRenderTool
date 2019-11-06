@@ -283,7 +283,7 @@ export class UserPrivacyManager {
             return true;
         }
 
-        if (!this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+        if (this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             return false;
         }
 
