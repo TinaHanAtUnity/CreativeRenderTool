@@ -1,30 +1,28 @@
-import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
-import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Ads } from 'Ads/__mocks__/Ads';
-import { AdMobView } from 'AdMob/Views/__mocks__/AdMobView';
+import { AdMobCampaign } from 'AdMob/Models/__mocks__/AdMobCampaign';
 import { AdMobSignalFactory } from 'AdMob/Utilities/__mocks__/AdMobSignalFactory';
+import { AdMobView } from 'AdMob/Views/__mocks__/AdMobView';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AdUnitContainer } from 'Ads/AdUnits/Containers/__mocks__/AdUnitContainer';
-import { FocusManager } from 'Core/Managers/__mocks__/FocusManager';
-import { DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
-import { ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
-import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Ads/Managers/__mocks__/OperativeEventManager';
-import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { AdMobCampaign } from 'AdMob/Models/__mocks__/AdMobCampaign';
-import { CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
-import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
-import { Store } from 'Store/__mocks__/Store';
-import { Platform } from 'Core/Constants/Platform';
-import { Core } from 'Core/__mocks__/Core';
-import { RequestManager } from 'Core/Managers/__mocks__/RequestManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
-import {
-    ProgrammaticTrackingService,
-    ProgrammaticTrackingServiceMock
-} from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
+import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
+import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
+import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
+import { Ads } from 'Ads/__mocks__/Ads';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/__mocks__/FocusManager';
+import { RequestManager } from 'Core/Managers/__mocks__/RequestManager';
+import { ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
+import { DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
+import { Core } from 'Core/__mocks__/Core';
 import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
+import { Store } from 'Store/__mocks__/Store';
+
+import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 
 describe('AdmobAdUnitTest', () => {
 

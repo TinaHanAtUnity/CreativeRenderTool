@@ -7,7 +7,7 @@ export type PlacementMock = Base & {
 };
 
 export const Placement = jest.fn(() => {
-    return <PlacementMock><unknown>{
+    return <PlacementMock>{
         allowSkip: jest.fn(),
         getId: jest.fn()
     };

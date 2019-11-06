@@ -112,7 +112,8 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUn
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { ThirdPartyEventManager, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
