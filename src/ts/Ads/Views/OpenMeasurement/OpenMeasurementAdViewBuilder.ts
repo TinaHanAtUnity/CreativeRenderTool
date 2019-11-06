@@ -203,7 +203,7 @@ export class OpenMeasurementAdViewBuilder {
         }
 
         const adView: IAdView = {
-            percentageInView: percentInView,
+            percentageInView: Math.trunc(percentInView),
             geometry: {
                 x: topLeftX,
                 y: topLeftY,
