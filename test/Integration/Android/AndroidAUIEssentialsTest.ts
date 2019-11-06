@@ -78,15 +78,9 @@ describe('AndroidAUIEssentialsTest', () => {
     });
 
     const fakeARSupport = (targetSandbox: sinon.SinonSandbox) => {
-        targetSandbox.stub(ARUtil, 'isARSupported').callsFake(() => {
-            return Promise.resolve<boolean>(true);
-         });
-        targetSandbox.stub(PermissionsUtil, 'checkPermissionInManifest').callsFake(() => {
-            return Promise.resolve<boolean>(true);
-         });
-        targetSandbox.stub(PermissionsUtil, 'checkPermissions').callsFake(() => {
-            return Promise.resolve<boolean>(true);
-        });
+        targetSandbox.stub(ARUtil, 'isARSupported').returns(Promise.resolve(true));
+        targetSandbox.stub(PermissionsUtil, 'checkPermissionInManifest').returns(Promise.resolve(true));
+        targetSandbox.stub(PermissionsUtil, 'checkPermissions').returns(Promise.resolve(true));
     };
 
     const setupFakeMetadata = (targetSandbox: sinon.SinonSandbox, config: ITestMetadataConfig) => {

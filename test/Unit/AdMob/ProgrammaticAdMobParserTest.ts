@@ -78,7 +78,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
                         beforeEach(() => {
                             (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(urlNoMime));
-                            return parse(JSON.parse(ValidAdMobCampaign));
+                            return parse(ValidAdMobCampaign);
                         });
 
                         it('should FileId.setFileId without a mp4 mime type', () => {
@@ -89,7 +89,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                     describe('with a mime type in url', () => {
                         beforeEach(() => {
                             (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                            return parse(JSON.parse(ValidAdMobCampaign));
+                            return parse(ValidAdMobCampaign);
                         });
 
                         it('should FileId.setFileId without a mp4 mime type', () => {
@@ -101,7 +101,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
                         beforeEach(() => {
                             (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                            return parse(JSON.parse(ValidAdMobCampaign));
+                            return parse(ValidAdMobCampaign);
                         });
 
                         afterEach(() => {
@@ -128,7 +128,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
                         beforeEach(() => {
                             (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(urlNoMime));
-                            return parse(JSON.parse(ValidAdMobCampaign));
+                            return parse(ValidAdMobCampaign);
                         });
 
                         it('should not call FileId.setFileId', () => { // when no mime type should default to streaming
@@ -139,7 +139,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                     describe('with a mime type in url', () => {
                         beforeEach(() => {
                             (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                            return parse(JSON.parse(ValidAdMobCampaign));
+                            return parse(ValidAdMobCampaign);
                         });
 
                         it('should FileId.setFileId with a mp4 mime type', () => {
@@ -151,7 +151,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
                         beforeEach(() => {
                             (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                            return parse(JSON.parse(ValidAdMobCampaign));
+                            return parse(ValidAdMobCampaign);
                         });
 
                         afterEach(() => {
@@ -169,7 +169,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             describe('with a proper JSON payload', () => {
 
                 const validateCampaign = () => {
-                    const json = JSON.parse(ValidAdMobCampaign);
+                    const json = ValidAdMobCampaign;
                     assert.isNotNull(campaign);
                     assert.equal(campaign.getDynamicMarkup(), json.content, 'Markup is not equal');
                     assert.equal(campaign.getSession(), session, 'Session is not equal');
@@ -180,7 +180,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                     beforeEach(() => {
                         sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
                         setFileIdSpy.resetHistory();
-                        return parse(JSON.parse(ValidAdMobCampaign));
+                        return parse(ValidAdMobCampaign);
                     });
 
                     it('should have a video cached from the AdMob ad', () => {
@@ -196,7 +196,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                     beforeEach(() => {
                         sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
                         setFileIdSpy.resetHistory();
-                        return parse(JSON.parse(ValidAdMobCampaign));
+                        return parse(ValidAdMobCampaign);
                     });
 
                     it('should have a video cached from the AdMobAd', () => {

@@ -4,6 +4,7 @@ import html from 'rollup-plugin-html';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import sourcemaps from 'rollup-plugin-sourcemaps';
+import json from 'rollup-plugin-json';
 
 export default [
     sourcemaps(),
@@ -44,10 +45,15 @@ export default [
     string({
         include: [
             '**/*.xml',
-            '**/*.json',
             '**/*.css'
         ]
+    }),
+    json({
+        include: [
+            '**/*.json'
+        ],
+        namedExports: false
     })
-]
+];
 
 

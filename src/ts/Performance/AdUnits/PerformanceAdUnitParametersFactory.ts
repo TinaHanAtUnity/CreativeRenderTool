@@ -15,8 +15,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { OptServiceCommunicationExperiment } from 'Core/Models/ABGroup';
-import { AutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -48,11 +46,6 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
-
-        if (OptServiceCommunicationExperiment.isValid(baseParams.coreConfig.getAbGroup())) {
-            automatedExperimentManager.initialize(AutomatedExperimentsList);
-            automatedExperimentManager.beginExperiment();
-        }
 
         return {
             ... baseParams,

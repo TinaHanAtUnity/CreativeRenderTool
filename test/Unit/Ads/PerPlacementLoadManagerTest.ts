@@ -77,8 +77,8 @@ describe('PerPlacementLoadManagerTest', () => {
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
 
-        coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
+        adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
 
         storageBridge = new StorageBridge(core.Api);
         focusManager = new FocusManager(platform, core.Api);
@@ -96,7 +96,7 @@ describe('PerPlacementLoadManagerTest', () => {
 
     describe('getCampaign and initialize', () => {
         describe('without loading placement IDs', () => {
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
             adsConfig.getPlacementIds().forEach((placementId) => {
                 it(`should return undefined with placementID '${placementId}' before campaigns are loaded`, () => {
                     assert.isUndefined(loadManager.getCampaign(placementId), `PlacementID '${placementId}' was defined prior to loading`);

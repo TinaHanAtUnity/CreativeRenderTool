@@ -5,6 +5,7 @@ import { WKWebViewBridge } from 'Core/Native/Bridge/WKWebViewBridge';
 import { Url } from 'Core/Utilities/Url';
 import { WebView } from 'WebView';
 import 'Workarounds';
+import 'styl/main.styl';
 
 interface IExtendedWindow extends Window {
     nativebridge: NativeBridge;

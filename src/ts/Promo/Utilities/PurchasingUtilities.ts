@@ -236,10 +236,10 @@ export class PurchasingUtilities {
             if (isAvailable) {
                 return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
-                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._privacySDK, this._clientInfo, this._metaDataManager);
+                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._privacySDK, this._clientInfo, this._metaDataManager, this._request);
             }
         }).catch(() => {
-            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._privacySDK, this._clientInfo, this._metaDataManager);
+            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._privacySDK, this._clientInfo, this._metaDataManager, this._request);
         });
     }
 

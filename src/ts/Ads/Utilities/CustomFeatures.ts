@@ -3,22 +3,7 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
-import LoadWhitelistSDK3200 from 'json/custom_features/LoadWhitelist.json';
-
-const JsonStringArrayParser = (gameIdJson: string): string[] => {
-    let gameIds: string[];
-    try {
-        gameIds = JSON.parse(gameIdJson);
-    } catch {
-        gameIds = [];
-    }
-    return gameIds;
-};
-const CheetahGameIds = JsonStringArrayParser(CheetahGamesJson);
-const BitmangoGameIds = JsonStringArrayParser(BitmangoGamesJson);
-const Game7GameIds = JsonStringArrayParser(Game7GamesJson);
-const LionStudiosGameIds = JsonStringArrayParser(LionStudiosGamesJson);
-const LoadWhitelist = JsonStringArrayParser(LoadWhitelistSDK3200);
+import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -70,9 +55,9 @@ export class CustomFeatures {
         // Android back button enabled on video overlays for skipping the video ads
         // This is also applied to games by Bitmango and Game7 who requested to toggle same features as Cheetah
         // this should be cleaned once there is proper backend support for these features
-        return this.existsInList(CheetahGameIds, gameId)
-            || this.existsInList(BitmangoGameIds, gameId)
-            || this.existsInList(Game7GameIds, gameId);
+        return this.existsInList(CheetahGamesJson, gameId)
+            || this.existsInList(BitmangoGamesJson, gameId)
+            || this.existsInList(Game7GamesJson, gameId);
 
     }
 
@@ -111,7 +96,7 @@ export class CustomFeatures {
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return this.existsInList(LionStudiosGameIds, gameId);
+        return this.existsInList(LionStudiosGamesJson, gameId);
     }
 
     /**
@@ -128,6 +113,14 @@ export class CustomFeatures {
      */
     public static isWhiteListedForLoadApi(gameId: string): boolean {
         return this.existsInList(LoadWhitelist, gameId);
+    }
+
+    public static isMopubTestGameForLoad(gameId: string): boolean {
+        if (gameId === '1926039' || gameId === '1732577') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
