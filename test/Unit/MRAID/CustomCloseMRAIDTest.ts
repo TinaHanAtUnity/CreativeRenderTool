@@ -16,6 +16,7 @@ import { CustomCloseMRAID } from 'MRAID/Views/CustomCloseMRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 describe('CustomCloseMRAID', () => {
     let platform: Platform;
@@ -24,9 +25,13 @@ describe('CustomCloseMRAID', () => {
     let core: ICoreApi;
     let configuration: CoreConfiguration;
     let privacy: Privacy;
-    let privacyManager: UserPrivacyManager;
-    let fakeCampaign: Campaign;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let placement: Placement;
+    let privacyManager: UserPrivacyManager;
+    let mraidCampaign: MRAIDCampaign;
+    let clock: sinon.SinonFakeTimers;
+    let mraid: CustomCloseMRAID;
+    let container: HTMLElement;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -35,145 +40,111 @@ describe('CustomCloseMRAID', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         configuration = TestFixtures.getCoreConfiguration();
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        fakeCampaign = sinon.createStubInstance(Campaign);
-        privacy = new Privacy(platform, fakeCampaign, privacyManager, false, false, 'en');
+        mraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
+        privacy = new Privacy(platform, mraidCampaign, privacyManager, false, false, 'en');
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        placement = TestFixtures.getPlacement();
+        clock = sinon.useFakeTimers();
     });
 
-    it('should move close graphic to the left when skippable', () => {
-        const placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            skipEndCardOnClose: false,
-            disableVideoControlsFade: false,
-            useCloseIconInsteadOfSkipIcon: false,
-            adTypes: [],
-            refreshDelay: 1000,
-            muteVideo: false
+    describe('when creating CustomCloseMRAID and allowSkip returns true', () => {
+
+        beforeEach(() => {
+            placement.set('allowSkip', true);
+            mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, mraidCampaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+            mraid.render();
+            mraid.show();
+            container = mraid.container();
         });
 
-        const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
-
-        mraid.render();
-        mraid.show();
-
-        const container = mraid.container();
-        const region = <HTMLElement>container.querySelector('.close-region');
-        assert.equal(region.style.left, '0px');
-
-        mraid.hide();
-    });
-
-    it('should hide timer for 5 seconds when skippable', () => {
-        const clock = sinon.useFakeTimers();
-        const placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            skipEndCardOnClose: false,
-            disableVideoControlsFade: false,
-            useCloseIconInsteadOfSkipIcon: false,
-            adTypes: [],
-            refreshDelay: 1000,
-            muteVideo: false
+        afterEach(() => {
+            mraid.hide();
         });
 
-        const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
-
-        mraid.render();
-        mraid.show();
-        mraid.onUseCustomClose(true);
-
-        const container = mraid.container();
-        const close = <HTMLElement>container.querySelector('.close');
-        assert.equal(close.style.display, 'none');
-
-        clock.tick(4000);
-        assert.equal(close.style.display, 'none');
-
-        clock.tick(1000);
-        assert.equal(close.style.display, 'block');
-
-        mraid.hide();
-    });
-
-    it('should keep close graphic on the right when not skippable', () => {
-        const placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: false,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            skipEndCardOnClose: false,
-            disableVideoControlsFade: false,
-            useCloseIconInsteadOfSkipIcon: false,
-            adTypes: [],
-            refreshDelay: 1000,
-            muteVideo: false
+        it('should have moved the close graphic to the left', () => {
+            const region = <HTMLElement>container.querySelector('.close-region');
+            assert.equal(region.style.left, '0px');
         });
 
-        const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+        describe('when onUseCustomClose is called with true', () => {
 
-        mraid.render();
-        mraid.show();
+            let closeElement: HTMLElement;
 
-        const container = mraid.container();
-        const region = <HTMLElement>container.querySelector('.close-region');
-        assert.equal(region.style.left, '');
+            beforeEach(() => {
+                mraid.onUseCustomClose(true);
+                closeElement = <HTMLElement>container.querySelector('.close');
+            });
 
-        mraid.hide();
+            it('should not show the close button before 5 seconds', () => {
+                assert.equal(closeElement.style.display, 'none');
+            });
+
+            it('should not show the close button after 4 seconds', () => {
+                clock.tick(4000);
+                assert.equal(closeElement.style.display, 'none');
+            });
+
+            it('should show the close button after 5 seconds', () => {
+                clock.tick(5000);
+                assert.equal(closeElement.style.display, 'block');
+            });
+
+            it('should not hide the close button if onUseCustomClose is called again', () => {
+                clock.tick(5000);
+                mraid.onUseCustomClose(true);
+                assert.equal(closeElement.style.display, 'block');
+            });
+
+        });
     });
 
-    it('should hide timer for 40 seconds when not skippable', () => {
-        const clock = sinon.useFakeTimers();
-        const placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: false,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            skipEndCardOnClose: false,
-            disableVideoControlsFade: false,
-            useCloseIconInsteadOfSkipIcon: false,
-            adTypes: [],
-            refreshDelay: 1000,
-            muteVideo: false
+    describe('when creating CustomCloseMRAID and allowSkip returns false', () => {
+
+        beforeEach(() => {
+            placement.set('allowSkip', false);
+            mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, mraidCampaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+            mraid.render();
+            mraid.show();
+            container = mraid.container();
         });
 
-        const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+        afterEach(() => {
+            mraid.hide();
+        });
 
-        mraid.render();
-        mraid.show();
-        mraid.onUseCustomClose(true);
+        it('should not move the close graphic to the left', () => {
+            const region = <HTMLElement>container.querySelector('.close-region');
+            assert.equal(region.style.left, '');
+        });
 
-        const container = mraid.container();
-        const close = <HTMLElement>container.querySelector('.close');
-        assert.equal(close.style.display, 'none');
+        describe('when onUseCustomClose is called with true', () => {
 
-        clock.tick(39000);
-        assert.equal(close.style.display, 'none');
+            let closeElement: HTMLElement;
 
-        clock.tick(1000);
-        assert.equal(close.style.display, 'block');
+            beforeEach(() => {
+                mraid.onUseCustomClose(true);
+                closeElement = <HTMLElement>container.querySelector('.close');
+            });
 
-        mraid.hide();
+            it('should not show the close button before 40 seconds', () => {
+                assert.equal(closeElement.style.display, 'none');
+            });
+
+            it('should not show the close button after 39 seconds', () => {
+                clock.tick(39000);
+                assert.equal(closeElement.style.display, 'none');
+            });
+
+            it('should show the close button after 40 seconds', () => {
+                clock.tick(40000);
+                assert.equal(closeElement.style.display, 'block');
+            });
+
+            it('should not hide the close button if onUseCustomClose is called again', () => {
+                clock.tick(40000);
+                mraid.onUseCustomClose(true);
+                assert.equal(closeElement.style.display, 'block');
+            });
+        });
     });
-
 });
