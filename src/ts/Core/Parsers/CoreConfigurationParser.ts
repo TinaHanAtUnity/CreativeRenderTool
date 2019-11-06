@@ -22,7 +22,7 @@ export class CoreConfigurationParser {
         const configurationParams: ICoreConfiguration = {
             enabled: configJson.enabled,
             country: configJson.country,
-            subdivision: configJson.subdivision || '',
+            subdivision: configJson.subdivision,
             coppaCompliant: configJson.coppaCompliant,
             abGroup: toAbGroup(configJson.abGroup),
             properties: configJson.properties,
