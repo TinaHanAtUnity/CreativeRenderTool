@@ -24,7 +24,7 @@ export class PrivacyParser {
         const optOutRecorded = configJson.optOutRecorded;
         const optOutEnabled = configJson.optOutEnabled;
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
-        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, gdprEnabled, optOutRecorded, optOutEnabled, limitAdTracking);
+        const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, gamePrivacy, gdprEnabled, optOutRecorded, optOutEnabled, limitAdTracking);
         const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
 
         let ageGateLimit = configJson.ageGateLimit !== undefined ? configJson.ageGateLimit : 0;
@@ -56,7 +56,7 @@ export class PrivacyParser {
         return new GamePrivacy({ method: PrivacyMethod.DEFAULT });
     }
 
-    private static parseUserPrivacy(rawUserPrivacy: IRawUserPrivacy | undefined, rawGamePrivacy: IRawGamePrivacy | undefined,
+    private static parseUserPrivacy(rawUserPrivacy: IRawUserPrivacy | undefined, gamePrivacy: GamePrivacy,
                                     gdprEnabled: boolean, optOutRecorded: boolean, optOutEnabled: boolean, limitAdTracking: boolean): UserPrivacy {
         // handle old style 'all'-privacy
         if (rawUserPrivacy && rawUserPrivacy.permissions && (<IAllPermissions><unknown>rawUserPrivacy.permissions).all === true) {
@@ -69,9 +69,9 @@ export class PrivacyParser {
 
         // TODO: Handle limitAdTracking on Ads SDK side
         if (limitAdTracking) {
-            const gPmethod = rawGamePrivacy && rawGamePrivacy.method ? rawGamePrivacy.method : undefined;
+            const gPmethod = gamePrivacy.getMethod();
             return new UserPrivacy({
-                method: gPmethod ? gPmethod : PrivacyMethod.DEFAULT,
+                method: gPmethod || PrivacyMethod.DEFAULT,
                 version:  gPmethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0,
                 permissions: {
                     gameExp: false,
@@ -81,42 +81,34 @@ export class PrivacyParser {
             });
         }
 
-        if (!rawGamePrivacy || !rawUserPrivacy) {
-            let consent = false;
-            let method = PrivacyMethod.DEFAULT;
-            if (gdprEnabled) {
-                method = PrivacyMethod.LEGITIMATE_INTEREST;
+        if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST ||
+            gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
+            if (rawUserPrivacy && gamePrivacy.getMethod() === rawUserPrivacy.method) {
+                return new UserPrivacy(rawUserPrivacy);
+            } else {
+                return new UserPrivacy({
+                    method: optOutRecorded ? gamePrivacy.getMethod() : PrivacyMethod.DEFAULT,
+                    version: 0,
+                    permissions: {
+                        gameExp: false,
+                        ads: optOutRecorded ? !optOutEnabled : false,
+                        external: optOutRecorded ? !optOutEnabled : false
+                    }
+                });
             }
-            if (rawGamePrivacy && optOutRecorded) {
-                consent = !optOutEnabled;
-                if (rawGamePrivacy.method && Object.values(PrivacyMethod).includes(rawGamePrivacy.method)) {
-                    method = <PrivacyMethod>rawGamePrivacy.method;
-                }
-            }
+        }
 
-            return new UserPrivacy({ method: method, version: 0, permissions: {
+        if (!rawUserPrivacy) {
+            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
                     gameExp: false,
-                    ads: consent,
-                    external: consent
+                    ads: false,
+                    external: false
                 }});
         }
 
-        if (rawGamePrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST ||
-            rawGamePrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
-            return new UserPrivacy({
-                method: rawGamePrivacy.method,
-                version: 0,
-                permissions: {
-                    gameExp: false,
-                    ads: optOutRecorded ? !optOutEnabled : false,
-                    external: optOutRecorded ? !optOutEnabled : false
-                }
-            });
-        }
-
         // reset outdated user privacy if the game privacy method has been changed, first ad request will be contextual
-        const methodHasChanged = rawUserPrivacy.method !== rawGamePrivacy.method;
-        if (rawGamePrivacy.method !== PrivacyMethod.DEFAULT && methodHasChanged) {
+        const methodHasChanged = rawUserPrivacy.method !== gamePrivacy.getMethod();
+        if (gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT && methodHasChanged) {
             return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: {
                     gameExp: false,
                     ads: false,
