@@ -62,7 +62,7 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     private setCloseVisibility(visible: boolean) {
-        const closeElement = <HTMLElement>this._container.querySelector('.close');
+        const closeElement = <HTMLElement> this._container.querySelector('.close');
         if (closeElement) {
             closeElement.style.display = visible ? 'block' : 'none';
         }
@@ -84,7 +84,7 @@ export class CustomCloseMRAID extends MRAID {
 
     private moveCloseGraphicLeft() {
         this._pts.reportMetricEvent(MraidMetric.CloseMovedToLeft);
-        const closeRegionElement = <HTMLElement>this._container.querySelector('.close-region');
+        const closeRegionElement = <HTMLElement> this._container.querySelector('.close-region');
         if (closeRegionElement) {
             closeRegionElement.style.removeProperty('right');
             closeRegionElement.style.left = '0';
