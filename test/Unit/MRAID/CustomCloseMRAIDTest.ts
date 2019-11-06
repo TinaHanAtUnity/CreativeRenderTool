@@ -1,22 +1,19 @@
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { CustomCloseMRAID } from 'MRAID/Views/CustomCloseMRAID';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import 'mocha';
-import { CustomCloseMRAID } from 'MRAID/Views/CustomCloseMRAID';
-
 import * as sinon from 'sinon';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 describe('CustomCloseMRAID', () => {
     let platform: Platform;
