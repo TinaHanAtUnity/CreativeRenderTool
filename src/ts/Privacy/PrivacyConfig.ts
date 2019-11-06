@@ -13,7 +13,6 @@ export class PrivacyConfig {
 
     constructor(configJson: IPrivacyConfigJson) {
         this._env = new Environment(configJson.env);
-        console.log('WEBVIEW_URL: ' + configJson.webViewUrl);
         this._webViewUrl = configJson.webViewUrl;
         this._userSettings = configJson.user;
     }

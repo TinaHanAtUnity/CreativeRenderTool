@@ -52,7 +52,8 @@ export class PrivacyView extends View<IConsentViewHandler> {
 
         this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
             this._privacyWebViewUrl = privacyConfig.getWebViewUrl();
-            this.createPrivacyFrame(PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson()))
+            this.createPrivacyFrame(
+                PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson()))
                 .replace('{{ PRIVACY_USER_SETTINGS }}', JSON.stringify(privacyConfig.getUserSettings())))
                 .then((privacyHtml) => {
                     this._iFrame.srcdoc = privacyHtml;
@@ -95,6 +96,8 @@ export class PrivacyView extends View<IConsentViewHandler> {
 
     public onPrivacyCompleted(userSettings: IUserPrivacySettings) {
         this._coreApi.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
+        this._handlers.forEach(handler => handler.onClose());
+        /*
         let permissions: IUnityConsentPermissions;
         const source: GDPREventSource = GDPREventSource.USER;
 
@@ -115,9 +118,9 @@ export class PrivacyView extends View<IConsentViewHandler> {
         }
 
         this._handlers.forEach(handler => handler.onConsent(permissions, source));
-        this._handlers.forEach(handler => handler.onClose());
+        this._handlers.forEach(handler => handler.onClose());*/
     }
-
+/*
     public onAgeGateAgree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
     }
@@ -154,5 +157,5 @@ export class PrivacyView extends View<IConsentViewHandler> {
 
             this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
         }
-    }
+    }*/
 }
