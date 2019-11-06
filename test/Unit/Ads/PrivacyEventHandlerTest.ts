@@ -110,7 +110,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
 
                 privacyEventHandler.onGDPROptOut(true);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
             });
 
             it('should send operative event with action `optin`', () => {
@@ -119,7 +119,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTIN);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTIN);
             });
 
             it('should send operative event with action `skip`', () => {
@@ -128,7 +128,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.CLOSED_BANNER_NO_CHANGES);
             });
         });
     });

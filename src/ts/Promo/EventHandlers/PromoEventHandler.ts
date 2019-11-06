@@ -24,7 +24,7 @@ export class PromoEventHandler {
         if (!privacySDK.isOptOutRecorded()) {
             // todo: add age gate choice
             privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false},
-                GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
+                GDPREventSource.USER_INDIRECT, GDPREventAction.PROMO_SKIPPED_BANNER);
         }
     }
 }

@@ -32,11 +32,20 @@ export enum GDPREventSource {
 }
 
 export enum GDPREventAction {
-    SKIP = 'skip',
-    CONSENT = 'consent',
-    OPTOUT = 'optout',
-    OPTIN = 'optin',
-    TODO_MISSING_ACTION = 'todo_missing_action'
+    SKIPPED_BANNER = 'skipped_banner',
+    CLOSED_BANNER_NO_CHANGES = 'closed_banner_no_changes',
+    PROMO_SKIPPED_BANNER = 'promo_skipped_banner',
+    DEVELOPER_CONSENT = 'developer_consent',
+    DEVELOPER_OPTOUT = 'developer_optout',
+    BANNER_OPTOUT = 'banner_optout',
+    BANNER_OPTIN = 'banner_optin',
+    AGE_GATE_DISAGREE = 'agegate_disagree',
+    CONSENT_AGREE_ALL = 'consent_agreed_all',
+    CONSENT_DISAGREE = 'consent_disagree',
+    CONSENT_SAVE_CHOICES = 'consent_save_choices',
+    CONSENT_AGREE = 'consent_agree',
+    PERSONALIZED_PERMISSIONS = 'personalized_permissions',
+    TEST_AUTO_CONSENT = 'test_auto_consent'
 }
 
 export enum LegalFramework {
@@ -92,32 +101,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
-    public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
-        let infoJson: unknown = {
-            'v': 1,
-            'adid': this._deviceInfo.getAdvertisingIdentifier(),
-            'action': action,
-            'projectId': this._coreConfig.getUnityProjectId(),
-            'platform': Platform[this._platform].toLowerCase(),
-            'country': this._coreConfig.getCountry(),
-            'gameId': this._clientInfo.getGameId(),
-            'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._privacy.getLegalFramework(),
-            'agreedOverAgeLimit': this._ageGateChoice
-        };
-        if (source) {
-            infoJson = {
-                ... infoJson,
-                'source': source
-            };
-        }
-
-        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
-            return Promise.resolve();
-        });
-    }
-
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage, agreedAll: boolean = false): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
@@ -133,7 +117,6 @@ export class UserPrivacyManager {
         if (source === GDPREventSource.USER_INDIRECT) {
             if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
                 permissions = {ads: true, gameExp: true, external: true};
-                agreedAll = true;
             }
         }
 
@@ -155,7 +138,7 @@ export class UserPrivacyManager {
         userPrivacy.update(updatedPrivacy);
 
         // TODO: should we send privacy when limitAdTracking is true?
-        return this.sendPrivacyEvent(permissions, source, action, layout, agreedAll, firstRequest);
+        return this.sendPrivacyEvent(permissions, source, action, layout, firstRequest);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -185,23 +168,23 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', agreedAll: boolean, firstRequest: boolean): Promise<INativeResponse> {
+    private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
             'v': 2,
-            adid: this._deviceInfo.getAdvertisingIdentifier(),
-            group: this._coreConfig.getAbGroup(),
+            advertiserId: this._deviceInfo.getAdvertisingIdentifier(),
+            abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
-            action: action,
+            userAction: action,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),
             country: this._coreConfig.getCountry(),
+            subdivision: this._coreConfig.getSubdivision(),
             gameId: this._clientInfo.getGameId(),
             source: source,
             method: this._gamePrivacy.getMethod(),
             agreedVersion: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
             firstRequest: firstRequest,
-            agreedAll: agreedAll,
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
@@ -244,7 +227,8 @@ export class UserPrivacyManager {
 
         const personalPayload = {
             deviceModel: this._deviceInfo.getModel(),
-            country: this._coreConfig.getCountry()
+            country: this._coreConfig.getCountry(),
+            subdivision: this._coreConfig.getSubdivision()
         };
 
         return this._request.get(url).then((response) => {
@@ -265,8 +249,7 @@ export class UserPrivacyManager {
         return this._privacy.isOptOutEnabled();
     }
 
-    // TODO-jon: Refactor away this method, should not be needed anymore
-    public getGranularPermissions(): IGranularPermissions {
+    public getUserPrivacyPermissions(): IGranularPermissions {
         return this._privacy.getUserPrivacy().getPermissions();
     }
 
@@ -320,7 +303,7 @@ export class UserPrivacyManager {
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
         const permissions = {ads: consent, external: consent, gameExp: false};
-        const action = consent ? GDPREventAction.CONSENT : GDPREventAction.OPTOUT;
+        const action = consent ? GDPREventAction.DEVELOPER_CONSENT : GDPREventAction.DEVELOPER_OPTOUT;
 
         return this.updateUserPrivacy(permissions, GDPREventSource.DEVELOPER, action);
     }

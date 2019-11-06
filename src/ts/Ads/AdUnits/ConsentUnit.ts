@@ -145,8 +145,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     }
 
     // IConsentViewHandler
-    public onConsent(permissions: IPermissions, agreedAll: boolean, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.TODO_MISSING_ACTION, this._landingPage, agreedAll);
+    public onConsent(permissions: IPermissions, userAction: GDPREventAction, source: GDPREventSource): void {
+        this._privacyManager.updateUserPrivacy(permissions, source, userAction, this._landingPage);
     }
 
     // IConsentViewHandler
@@ -168,7 +168,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             ads: false,
             external: false
         };
-        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION, ConsentPage.AGE_GATE, false);
+        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.AGE_GATE_DISAGREE, ConsentPage.AGE_GATE);
     }
 
     public onAgeGateAgree(): void {

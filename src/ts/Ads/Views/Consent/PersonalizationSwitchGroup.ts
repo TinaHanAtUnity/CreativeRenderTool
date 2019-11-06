@@ -53,7 +53,7 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     }
 
     public show(): void {
-        const permissions: IGranularPermissions = this._userPrivacyManager.getGranularPermissions();
+        const permissions: IGranularPermissions = this._userPrivacyManager.getUserPrivacyPermissions();
 
         this._personalizedExpSwitch.checked = permissions.gameExp;
         this._personalizedAdsSwitch.checked = permissions.ads;

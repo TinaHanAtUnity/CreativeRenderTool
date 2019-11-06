@@ -52,9 +52,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
                     // todo: add age gate choice
-                    this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
+                    this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
                 } else {
-                    this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTIN);
+                    this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTIN);
                 }
             }
         } else {
@@ -62,9 +62,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
             if (optOutEnabled) {
                 // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.OPTOUT);
+                this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
             } else {
-                this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIP);
+                this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.CLOSED_BANNER_NO_CHANGES);
             }
         }
         const gamePrivacy = this._privacy.getGamePrivacy();
@@ -86,7 +86,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     public onPersonalizedConsent(permissions: IPermissions): void {
         const gamePrivacy = this._privacy.getGamePrivacy();
         if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.TODO_MISSING_ACTION, ConsentPage.MY_CHOICES, false);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.PERSONALIZED_PERMISSIONS, ConsentPage.MY_CHOICES);
         }
     }
 }
