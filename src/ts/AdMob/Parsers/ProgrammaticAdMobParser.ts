@@ -44,6 +44,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const isOpenMeasurementEnabled = response.isAdmobOMEnabled();
+        const shouldMuteByDefault = response.shouldMuteByDefault();
         const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
             this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
 
@@ -79,7 +80,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 dynamicMarkup: markup,
                 useWebViewUserAgentForTracking: true,
                 video: video,
-                isOMEnabled: isOpenMeasurementEnabled
+                isOMEnabled: isOpenMeasurementEnabled,
+                shouldMuteByDefault: shouldMuteByDefault
             };
 
             return Promise.resolve(new AdMobCampaign(adMobCampaignParams));

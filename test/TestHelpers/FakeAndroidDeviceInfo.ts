@@ -11,7 +11,7 @@ export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
 
     constructor(core: ICoreApi) {
         super(core);
-        this._fakeDevice = JSON.parse(AndroidDefaults);
+        this._fakeDevice = AndroidDefaults;
     }
 
     public fetch(): Promise<any[]> {
@@ -168,7 +168,7 @@ export class FakeXiaomiDeviceInfo extends AndroidDeviceInfo {
 
     constructor(core: ICoreApi) {
         super(core);
-        this._fakeDevice = JSON.parse(AndroidDefaults);
+        this._fakeDevice = AndroidDefaults;
     }
 
     public fetch(): Promise<any[]> {
