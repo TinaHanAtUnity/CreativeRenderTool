@@ -23,6 +23,7 @@ import {
 } from 'Core/Models/ABGroup';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
+import { AUIMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -64,13 +65,10 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
 
         if (mabDecision) {
-            if (Object.keys(EndScreenAnimation).includes(mabDecision)) { // Should be tested
+            if ((<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
                 endscreenAnimation = <EndScreenAnimation> mabDecision;
             } else {
-                // Can be removed, since the developer doesn't need to know about this
-                this._core.Sdk.logError(`Invalid Endscreen animation: "${mabDecision}".`);
-                // Suggest to replace with the following to track on our datadog dashboard to get live updates if incorrect values are being sent
-                // baseParams.programmaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
+                baseParams.programmaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
             }
         }
 
