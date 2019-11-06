@@ -11,23 +11,27 @@ export interface ISdkDetectionInfo {
     UnityEngine: boolean | undefined;
 }
 
-const SdkAndroidClassMap = new Map<string, string>([
-    ['com.google.ads.mediation.admob.AdMobAdapter', 'AdMob'],
-    ['com.mopub.common.MoPub', 'MoPub'],
-    ['com.ironsource.mediationsdk.IronSource', 'IronSource'],
-    ['com.fyber.FairBid', 'Fyber'],
-    ['com.safedk.android.SafeDK', 'SafeDK'],
-    ['com.unity3d.player.UnityPlayer', 'UnityEngine']
-]);
+interface IData {
+    [ key: string ]: string;
+}
 
-const SdkiOSClassMap = new Map<string, string>([
-    ['GADMobileAds', 'AdMob'],
-    ['MoPub', 'MoPub'],
-    ['IronSource', 'IronSource'],
-    ['FyberSDK', 'Fyber'],
-    ['SafeDK', 'SafeDK'],
-    ['UnityAppController', 'UnityEngine']
-]);
+const SdkAndroidClassMap: IData = {
+    'com.google.ads.mediation.admob.AdMobAdapter': 'AdMob',
+    'com.mopub.common.MoPub': 'MoPub',
+    'com.ironsource.mediationsdk.IronSource': 'IronSource',
+    'com.fyber.FairBid': 'Fyber',
+    'com.safedk.android.SafeDK': 'SafeDK',
+    'com.unity3d.player.UnityPlayer': 'UnityEngine'
+};
+
+const SdkiOSClassMap: IData = {
+    'GADMobileAds': 'AdMob',
+    'MoPub': 'MoPub',
+    'IronSource': 'IronSource',
+    'FyberSDK': 'Fyber',
+    'SafeDK': 'SafeDK',
+    'UnityAppController': 'UnityEngine'
+};
 
 export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
@@ -44,14 +48,7 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
     protected _core: ICoreApi;
 
     constructor(platform: Platform, core: ICoreApi) {
-        super('SdkDetectionInfo', {
-            AdMob: ['boolean', 'undefined'],
-            MoPub: ['boolean', 'undefined'],
-            IronSource: ['boolean', 'undefined'],
-            Fyber: ['boolean', 'undefined'],
-            SafeDK: ['boolean', 'undefined'],
-            UnityEngine: ['boolean', 'undefined']
-        });
+        super('SdkDetectionInfo', SdkDetectionInfo.Schema);
 
         this._platform = platform;
         this._core = core;
@@ -61,27 +58,22 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
         const promises: Promise<unknown>[] = [];
         let classNames: string[];
         if (this._platform === Platform.ANDROID) {
-            classNames = Array.from(SdkAndroidClassMap.keys());
+            classNames = Object.keys(SdkAndroidClassMap);
         } else if (this._platform === Platform.IOS) {
-            classNames = Array.from(SdkiOSClassMap.keys());
+            classNames = Object.keys(SdkiOSClassMap);
         } else {
             classNames = [];
         }
         promises.push(this._core.ClassDetection.areClassesPresent(classNames)
             .then(results => {
                 results.forEach(r => {
-                    let name: string = '';
+                    let name: keyof ISdkDetectionInfo;
                     if (this._platform === Platform.ANDROID) {
-                        name = SdkAndroidClassMap.get(r.class)!;
-                    } else if (this._platform === Platform.IOS) {
-                        name = SdkiOSClassMap.get(r.class)!;
+                        name = <keyof ISdkDetectionInfo>SdkAndroidClassMap[r.class];
+                    } else {
+                        name = <keyof ISdkDetectionInfo>SdkiOSClassMap[r.class];
                     }
-                    if (name === 'AdMob') { this.set('AdMob', r.found); }
-                    if (name === 'MoPub') { this.set('MoPub', r.found); }
-                    if (name === 'IronSource') { this.set('IronSource', r.found); }
-                    if (name === 'Fyber') { this.set('Fyber', r.found); }
-                    if (name === 'SafeDK') { this.set('SafeDK', r.found); }
-                    if (name === 'UnityEngine') { this.set('UnityEngine', r.found); }
+                    this.set(name, r.found);
                 });
             }).catch(err => this.handleDeviceInfoError(err)));
         return Promise.all(promises);
