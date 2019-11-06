@@ -4,6 +4,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
 const chai = require('chai');
+const mocha = require('mocha');
 const URL = require('url');
 
 const testUrl = process.env.TEST_URL;

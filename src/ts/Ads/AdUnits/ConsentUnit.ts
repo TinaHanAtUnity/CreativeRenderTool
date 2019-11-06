@@ -15,7 +15,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup, ConsentUXTest } from 'Core/Models/ABGroup';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
@@ -59,7 +59,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             landingPage: this._landingPage,
             pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
-            consentABTest: false,
+            consentABTest: ConsentUXTest.isValid(parameters.abGroup),
             ageGateLimit: this._privacySDK.getAgeGateLimit()
         };
 
@@ -92,6 +92,10 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
             if (this._privacySDK.isAgeGateEnabled()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
+            }
+            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
+                const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
+                this.handleAutoAgeGate(ageGateValue);
             }
 
             if (TestEnvironment.get('autoAcceptConsent')) {
@@ -210,6 +214,18 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 'uri': url
             });
         }
+    }
+
+    private handleAutoAgeGate(ageGate: boolean) {
+        setTimeout(() => {
+            if (ageGate) {
+                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+                this._unityConsentView.testAutoAgeGate(ageGate);
+            } else {
+                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+                this._unityConsentView.testAutoAgeGate(ageGate);
+            }
+        }, 3000);
     }
 
     private handleAutoConsent(consent: IPermissions) {

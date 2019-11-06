@@ -12,16 +12,16 @@ install:
 - ". $HOME/.nvm/nvm.sh"
 - nvm install 10
 - nvm use 10
+- brew install akamai dep yarn
 - pip install awscli
-- npm install
-- brew install akamai dep
+- yarn install
 - echo "N" | akamai install purge --force
 cache:
   pip: true
   directories:
   - node_modules
   - "$HOME/google-cloud-sdk/"
-script: make lint && make test-coverage && make test-integration && make build-test && make test-browser && make build-release && make deploy
+script: make lint && yarn test && make test-coverage && make test-integration && make build-test && make test-browser && make build-release && make deploy
 notifications:
   slack:
     rooms:
