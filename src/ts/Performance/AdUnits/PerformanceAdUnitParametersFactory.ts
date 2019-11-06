@@ -68,7 +68,11 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
             endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (MabDecisionButtonTest.isValid(abGroup)) {
-            const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
+            let mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
+            if (!mabDecision || !(<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
+                this._core.Sdk.logError(`Invalid Endscreen animation: "${mabDecision}".`);
+                mabDecision = EndScreenAnimation.STATIC;
+            }
             endScreen = new AnimatedDownloadButtonEndScreen(<EndScreenAnimation> mabDecision,
                 endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {

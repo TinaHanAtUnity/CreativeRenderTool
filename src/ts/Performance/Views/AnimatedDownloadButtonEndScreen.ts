@@ -16,14 +16,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
   constructor(animation: EndScreenAnimation, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
     super(parameters, campaign, country);
-
-    if (!animation || !(<string[]>Object.values(EndScreenAnimation)).includes(animation)) {
-      this._animation = EndScreenAnimation.STATIC;
-      this._core.Sdk.logError(`Invalid Endscreen animation: "${this._animation}".`);
-    } else {
-      this._animation = animation;
-    }
-
+    this._animation = animation;
     if (this._animation === EndScreenAnimation.STATIC) {
       return;
     }
