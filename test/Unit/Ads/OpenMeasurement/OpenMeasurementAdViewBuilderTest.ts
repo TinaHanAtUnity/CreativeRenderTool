@@ -229,7 +229,7 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 
                 const rect = OpenMeasurementUtilities.createRectangle(0, 0, 200, 200);
                 const testAdView: IAdView = {
-                    percentageInView: platform === Platform.ANDROID ? 49.8888888888889 : 55.55555555555556,
+                    percentageInView: platform === Platform.ANDROID ? 49 : 55,
                     geometry: {
                         x: 0,
                         y: 0,
