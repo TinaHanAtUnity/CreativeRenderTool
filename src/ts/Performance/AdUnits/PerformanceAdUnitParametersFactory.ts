@@ -69,12 +69,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (MabDecisionButtonTest.isValid(abGroup)) {
             const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
-            if (mabDecision && (<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
-                endScreen = new AnimatedDownloadButtonEndScreen(<EndScreenAnimation> mabDecision,
-                    endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-            } else {
-                endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-            }
+            endScreen = new AnimatedDownloadButtonEndScreen(<EndScreenAnimation> mabDecision,
+                endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }
