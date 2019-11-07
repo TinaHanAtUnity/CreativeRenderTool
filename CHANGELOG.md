@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov  7 18:47:59 UTC 2019
 
 * Update Yarn Dependencies [#11983](https://github.com/Applifier/unity-ads-webview/pull/11983)
 * Add Core.ts and Ads.ts Mocks for Jest Testing [#11982](https://github.com/Applifier/unity-ads-webview/pull/11983)
