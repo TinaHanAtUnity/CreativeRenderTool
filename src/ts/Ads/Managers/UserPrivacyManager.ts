@@ -33,12 +33,10 @@ export enum GDPREventSource {
 
 export enum GDPREventAction {
     SKIPPED_BANNER = 'skipped_banner',
-    CLOSED_BANNER_NO_CHANGES = 'closed_banner_no_changes',
+    BANNER_PERMISSIONS = 'banner_permissions',
     PROMO_SKIPPED_BANNER = 'promo_skipped_banner',
     DEVELOPER_CONSENT = 'developer_consent',
     DEVELOPER_OPTOUT = 'developer_optout',
-    BANNER_OPTOUT = 'banner_optout',
-    BANNER_OPTIN = 'banner_optin',
     AGE_GATE_DISAGREE = 'agegate_disagree',
     CONSENT_AGREE_ALL = 'consent_agreed_all',
     CONSENT_DISAGREE = 'consent_disagree',

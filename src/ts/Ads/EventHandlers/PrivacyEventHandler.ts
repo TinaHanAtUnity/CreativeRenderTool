@@ -47,40 +47,16 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        if (this._privacy.isOptOutRecorded()) {
-            if (optOutEnabled !== this._privacy.isOptOutEnabled()) {
-                if (optOutEnabled) {
-                    // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                    // todo: add age gate choice
-                    this._privacyManager.updateUserPrivacy(UserPrivacy.PERM_ALL_FALSE, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
-                } else {
-                    this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTIN);
-                }
-            }
-        } else {
-            // if default choice was not changed and no previous answer has been recorded, we must treat this event
-            // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
-            if (optOutEnabled) {
-                // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
+        let permissions = UserPrivacy.PERM_ALL_FALSE;
+        if (!optOutEnabled) {
+            // TODO, we could consider creating a separate view for DEVELOPER_CONSENT which does not include controls
+            if (this._privacy.getGamePrivacy().getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
+                permissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
             } else {
-                this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.CLOSED_BANNER_NO_CHANGES);
+                permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
             }
         }
-        const gamePrivacy = this._privacy.getGamePrivacy();
-        const userPrivacy = this._privacy.getUserPrivacy();
-
-        if (userPrivacy) {
-            userPrivacy.update({
-                method: gamePrivacy.getMethod(),
-                version: 0,
-                permissions: {
-                    ads: !optOutEnabled,
-                    external: gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT ? !optOutEnabled : false,
-                    gameExp: false
-                }
-            });
-        }
+        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
     }
 
     public onPersonalizedConsent(permissions: IPermissions): void {
