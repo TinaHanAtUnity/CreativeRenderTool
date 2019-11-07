@@ -234,6 +234,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                     this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
                 }
             }
+        } else {
+            // report using streaming video
+            this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
         }
     }
 
