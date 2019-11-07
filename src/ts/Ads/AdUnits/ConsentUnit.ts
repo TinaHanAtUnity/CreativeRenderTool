@@ -149,7 +149,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        if (permissions.hasOwnProperty('all')) {
+        if (permissions.hasOwnProperty('all') && permissions.hasOwnProperty('all').valueOf()) {
             PrivacyMetrics.trigger(PrivacyEvent.CONSENT_ACCEPT_ALL, permissions);
         } else if (!permissions.hasOwnProperty('ads').valueOf() && !permissions.hasOwnProperty('gameExp').valueOf() && !permissions.hasOwnProperty('external').valueOf()) {
             PrivacyMetrics.trigger(PrivacyEvent.CONSENT_NOT_ACCEPTED, permissions);
