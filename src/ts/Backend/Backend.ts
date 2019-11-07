@@ -30,6 +30,7 @@ import { BannerListener } from 'Backend/Api/BannerListener';
 import { AndroidStore } from 'Backend/Api/AndroidStore';
 import { Products } from 'Backend/Api/Products';
 import { BannerBackendApi } from 'Backend/Api/Banner';
+import { ClassDetection } from 'Backend/Api/ClassDetection';
 
 interface IInvocation {
     className: string;
@@ -52,6 +53,7 @@ interface IBackendApi {
     Cache: Cache;
     Connectivity: Connectivity;
     DeviceInfo: DeviceInfo;
+    ClassDetection: ClassDetection;
     Intent: Intent;
     Lifecycle: Lifecycle;
     Listener: Listener;
@@ -90,6 +92,7 @@ export class Backend implements IWebViewBridge {
             Connectivity: new Connectivity(this),
             CustomPurchasing: new CustomPurchasing(this),
             DeviceInfo: new DeviceInfo(this),
+            ClassDetection: new ClassDetection(this),
             Intent: new Intent(this),
             Lifecycle: new Lifecycle(this),
             Listener: new Listener(this),
