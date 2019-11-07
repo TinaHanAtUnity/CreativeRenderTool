@@ -3,7 +3,8 @@ import { IUserPrivacySettings } from 'Ads/Views/Consent/PrivacyView';
 
 export enum IFrameEvents {
     PRIVACY_READY = 'onPrivacyReady',
-    PRIVACY_COMPLETED = 'onPrivacyCompleted'
+    PRIVACY_COMPLETED = 'onPrivacyCompleted',
+    PRIVACY_EVENT = 'onPrivacyEvent'
 }
 
 export interface IPrivacyFrameEventAdapter {
@@ -14,6 +15,7 @@ export interface IPrivacyFrameEventAdapter {
 export interface IPrivacyFrameHandler {
     onPrivacyCompleted(userSettings: IUserPrivacySettings): void;
     onPrivacyReady(): void;
+    onPrivacyEvent(name: string, data: { [key: string]: unknown }): void;
 }
 
 export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
@@ -33,6 +35,7 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._iFrameHandlers = {};
         this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IUserPrivacySettings>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = (msg) => this.onPrivacyReady();
+        this._iFrameHandlers[IFrameEvents.PRIVACY_EVENT] = (msg) => this.onPrivacyEvent(<string>msg.name, <{ [key: string]: unknown }>msg.data);
     }
 
     public connect() {
@@ -62,11 +65,15 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         }
     }
 
-    private onPrivacyCompleted(userSettings: IUserPrivacySettings) {
+    private onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
         this._handler.onPrivacyCompleted(userSettings);
     }
 
-    private onPrivacyReady() {
+    private onPrivacyReady(): void {
         this._handler.onPrivacyReady();
+    }
+
+    private onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
+        this._handler.onPrivacyEvent(name, data);
     }
 }

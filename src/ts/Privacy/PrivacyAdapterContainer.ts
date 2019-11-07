@@ -30,4 +30,8 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
     public onPrivacyReady(): void {
         this._handler.onPrivacyReady();
     }
+
+    public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
+        this._handler.onPrivacyEvent(name, data);
+    }
 }

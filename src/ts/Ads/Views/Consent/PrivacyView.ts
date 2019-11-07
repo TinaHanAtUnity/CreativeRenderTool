@@ -94,7 +94,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._coreApi.Sdk.logDebug('PRIVACY: Privacy WebView is ready!');
     }
 
-    public onPrivacyCompleted(userSettings: IUserPrivacySettings) {
+    public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
         this._coreApi.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
         this._handlers.forEach(handler => handler.onClose());
         /*
@@ -158,4 +158,8 @@ export class PrivacyView extends View<IConsentViewHandler> {
             this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
         }
     }*/
+
+    public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
+        this._coreApi.Sdk.logDebug('Got event: ' + name + ' with data: ' + JSON.stringify(data));
+    }
 }
