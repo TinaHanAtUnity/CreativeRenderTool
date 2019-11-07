@@ -20,7 +20,6 @@ export class CustomCloseMRAID extends MRAID {
         this._pts = programmaticTrackingService;
         this._mraidCustomCloseCalled = false;
 
-        // If the placement is not skippable, extend the hide time
         this._mraidCustomCloseDelay = placement.allowSkip() ? 5 : 40;
     }
 
@@ -41,11 +40,12 @@ export class CustomCloseMRAID extends MRAID {
     public onBridgeClose() {
         super.onBridgeClose();
         this.clearCustomCloseTimeout();
-        this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
+        this._pts.reportMetricEvent(MraidMetric.ClosedByAdUnit);
     }
 
     public onUseCustomClose(shouldHideClose: boolean) {
         super.onUseCustomClose(shouldHideClose);
+        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
 
         if (!shouldHideClose) {
             this.clearCustomCloseTimeout();
@@ -69,11 +69,10 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     private setupCustomClose() {
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic);
+        this._pts.reportMetricEvent(MraidMetric.CloseHidden);
         this.setCloseVisibility(false);
         const hideDuration = this._mraidCustomCloseDelay * 1000;
         this._mraidCustomCloseTimeout = window.setTimeout(() => {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideTimeout);
             this.setCloseVisibility(true);
         }, hideDuration);
     }

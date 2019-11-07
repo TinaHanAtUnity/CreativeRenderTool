@@ -91,11 +91,10 @@ export enum TimingMetric {
 }
 
 export enum MraidMetric {
-    UseCustomCloseShowGraphic = 'mraid_use_custom_close_show_graphic',
-    UseCustomCloseHideGraphic = 'mraid_use_custom_close_hide_graphic',
-    UseCustomCloseHideTimeout = 'mraid_use_custom_close_hide_timeout',
+    UseCustomCloseCalled = 'mraid_use_custom_close_called',
     CloseMovedToLeft = 'mraid_close_graphic_moved_to_left',
-    ClosedByAd = 'mraid_closed_by_ad',
+    CloseHidden = 'mraid_close_graphic_hidden',
+    ClosedByAdUnit = 'mraid_closed_by_ad_unit',
     ClosedByUnityAds = 'mraid_closed_by_unity_ads'
 }
 
