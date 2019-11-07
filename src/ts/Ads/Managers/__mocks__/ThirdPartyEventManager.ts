@@ -5,7 +5,7 @@ export type ThirdPartyEventManagerMock = Base & {
 };
 
 export const ThirdPartyEventManager = jest.fn(() => {
-    return <ThirdPartyEventManagerMock><unknown>{
+    return <ThirdPartyEventManagerMock>{
         sendTrackingEvents: jest.fn().mockImplementation(() => Promise.resolve())
     };
 });

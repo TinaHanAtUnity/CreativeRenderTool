@@ -1,6 +1,20 @@
 # Pending
 
+* Update Yarn Dependencies [#11983](https://github.com/Applifier/unity-ads-webview/pull/11983)
+* Add Core.ts and Ads.ts Mocks for Jest Testing [#11982](https://github.com/Applifier/unity-ads-webview/pull/11983)
+* Direct Catalog Request to Production Endpoint [#11981](https://github.com/Applifier/unity-ads-webview/pull/11981)
+
+# Mon Nov  4 23:09:21 UTC 2019
+
+* Fix Thind Analytics Endpoint [#11952](https://github.com/Applifier/unity-ads-webview/pull/11952)
+* Revert Halloween Theme Performance Endcard [#11950](https://github.com/Applifier/unity-ads-webview/pull/11950)
+* Add Zynga Old API Holdout Experiment for Groups 13 and 14 [#11953](https://github.com/Applifier/unity-ads-webview/pull/11953)
+
+# Fri Nov  1 20:40:00 UTC 2019
+
 * Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
+* Update AdmobAdUnitTest to Granular Approach [#11948](https://github.com/Applifier/unity-ads-webview/pull/11948)
+* Revert Fullscreen CTA Experiment [#11898](https://github.com/Applifier/unity-ads-webview/pull/11898)
 
 # Thu Oct 31 19:26:43 UTC 2019
 
