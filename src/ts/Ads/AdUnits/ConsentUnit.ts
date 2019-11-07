@@ -93,6 +93,9 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             if (this._privacySDK.isAgeGateEnabled()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
             }
+            if (this._privacyManager.isConsentShowRequired()) {
+                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_REQUIRED);
+            }
             if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
                 const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
                 this.handleAutoAgeGate(ageGateValue);
@@ -146,6 +149,13 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
+        if (permissions.hasOwnProperty('all')) {
+            PrivacyMetrics.trigger(PrivacyEvent.CONSENT_ACCEPT_ALL, permissions);
+        } else if (!permissions.hasOwnProperty('ads').valueOf() && !permissions.hasOwnProperty('gameExp').valueOf() && !permissions.hasOwnProperty('external').valueOf()) {
+            PrivacyMetrics.trigger(PrivacyEvent.CONSENT_NOT_ACCEPTED, permissions);
+        } else {
+            PrivacyMetrics.trigger(PrivacyEvent.CONSENT_PARTIALLY_ACCEPTED, permissions);
+        }
         this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
     }
 

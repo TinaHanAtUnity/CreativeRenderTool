@@ -289,6 +289,9 @@ export class UserPrivacyManager {
         if (ageGateChoice === AgeGateChoice.YES) {
             PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
         } else if (ageGateChoice === AgeGateChoice.NO) {
+            if (this.isConsentShowRequired()) {
+                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_NOT_SHOWN_USER_UNDERAGE);
+            }
             PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
         }
 
