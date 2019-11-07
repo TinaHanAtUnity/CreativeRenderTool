@@ -112,7 +112,12 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         });
     }
 
+    public sendVideoCanPlayEvent() {
+        this.sendPTSCanPlay();
+    }
+
     public sendStartEvent() {
+        this.sendPTSStart();
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent(TrackingEvent.START);
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
@@ -256,23 +261,35 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         };
     }
 
+    private sendPTSCanPlay() {
+        // TODO: Add Tagging to remove the below logic
+        this._pts.reportMetricEvent(AdmobMetric.AdmobVideoCanPlay);
+        if (this.isDBMCreative() && this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMRewardedCanPlay);
+        } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedCanPlay);
+        } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedCanPlay);
+        } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedCanPlay);
+        }
+    }
+
+    private sendPTSStart() {
+        // TODO: Add Tagging to remove the below logic
+        this._pts.reportMetricEvent(AdmobMetric.AdmobVideoStarted);
+        if (this.isDBMCreative() && this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMRewardedStarted);
+        } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedStarted);
+        } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedStarted);
+        } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
+            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedStarted);
+        }
+    }
+
     private isDBMCreative(): boolean {
         return !this._campaign.getCreativeId() === undefined;
-    }
-
-    private isRewarded(): boolean {
-        return !this._placement.allowSkip();
-    }
-
-    private isNonRewarded(): boolean {
-        return this._placement.allowSkip();
-    }
-
-    private isAndroid(): boolean {
-        return this._platform === Platform.ANDROID;
-    }
-
-    private isIOS(): boolean {
-        return this._platform === Platform.IOS;
     }
 }
