@@ -18,6 +18,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { platform } from 'os';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -253,5 +254,25 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return {
             placement: this._placement
         };
+    }
+
+    private isDBMCreative(): boolean {
+        return !this._campaign.getCreativeId() === undefined;
+    }
+
+    private isRewarded(): boolean {
+        return !this._placement.allowSkip();
+    }
+
+    private isNonRewarded(): boolean {
+        return this._placement.allowSkip();
+    }
+
+    private isAndroid(): boolean {
+        return this._platform === Platform.ANDROID;
+    }
+
+    private isIOS(): boolean {
+        return this._platform === Platform.IOS;
     }
 }
