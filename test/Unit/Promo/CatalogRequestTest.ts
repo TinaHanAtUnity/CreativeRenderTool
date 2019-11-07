@@ -52,7 +52,7 @@ describe('sendCatalogPayload', () => {
     }[] = [{
         name: 'should send post request with one product',
         products: oneProduct,
-        expectedURL: 'https://events.iap.unity3d.com/v1/catalog',
+        expectedURL: 'https://events-iap.staging.unityads.unity3d.com/v1/catalog',
         expectedPayload: JSON.stringify(expectedOneProductPayload),
         expectedPostCalled: true
     },
