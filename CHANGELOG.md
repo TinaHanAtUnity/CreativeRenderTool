@@ -1,3 +1,9 @@
+# Pending
+
+* Update Yarn Dependencies [#11983](https://github.com/Applifier/unity-ads-webview/pull/11983)
+* Add Core.ts and Ads.ts Mocks for Jest Testing [#11982](https://github.com/Applifier/unity-ads-webview/pull/11983)
+* Direct Catalog Request to Production Endpoint [#11981](https://github.com/Applifier/unity-ads-webview/pull/11981)
+
 # Mon Nov  4 23:09:21 UTC 2019
 
 * Fix Thind Analytics Endpoint [#11952](https://github.com/Applifier/unity-ads-webview/pull/11952)
