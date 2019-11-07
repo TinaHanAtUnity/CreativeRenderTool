@@ -1,0 +1,35 @@
+@import "components.styl";
+
+#privacy-data-request {
+  display: flex;
+  flex-direction: column;
+  input[type=email] {
+    flex-grow: 1;
+    border: 1px solid $consent-border-gray;
+    padding: .5 * $default-size;
+    border-radius: .25 * $default-size;
+    font-size: $default-font-size * .65;
+    box-shadow: none;
+    -webkit-appearance: none;
+  }
+
+  .privacy-data-request-submit-button {
+    position: relative;
+    flex-grow: 1;
+    margin-top: .5 * $default-size;
+    padding: .5 * $default-size;
+    border-radius: .25 * $default-size;
+    // -webkit-appearance: none;
+    background: $blue;
+    box-shadow: none;
+    color: $white;
+    text-align: center;
+    font-size: $default-font-size * .75;
+  }
+
+  .privacy-data-request-submit-button {
+    &.click-animation {
+      $click-animation();
+    }
+  }
+}
