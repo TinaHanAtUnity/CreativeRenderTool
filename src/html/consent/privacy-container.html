@@ -161,6 +161,10 @@
                         name: eventName,
                         data: JSON.parse(eventData)
                     }, '*');
+
+                    if (window.privacyAdapter.eventCallback) {
+                        window.privacyAdapter.eventCallback(eventName);
+                    }
                 };
 
                 this.getEnv = function() {
