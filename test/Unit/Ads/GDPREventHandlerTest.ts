@@ -28,7 +28,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { PrivacyMethod } from 'Privacy/Privacy';
+import { PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -96,7 +96,7 @@ describe('GDPREventHandlerTest', () => {
         it('should send GDPR skip event', () => {
             //privacySDK.getUserPrivacy().setMethod(PrivacyMethod.LEGITIMATE_INTEREST);
             gdprEventHandler.onGDPRPopupSkipped();
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, {ads: true, external: false, gameExp: false}, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIPPED_BANNER);
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIPPED_BANNER);
         });
 
         it('GDPR skip event should not be sent', () => {

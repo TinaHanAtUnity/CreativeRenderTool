@@ -1,5 +1,10 @@
 import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { CurrentUnityConsentVersion, IRawGamePrivacy, IRawUserPrivacy, PrivacyMethod } from 'Privacy/Privacy';
+import {
+    CurrentUnityConsentVersion,
+    IRawGamePrivacy,
+    IRawUserPrivacy,
+    PrivacyMethod, UserPrivacy
+} from 'Privacy/Privacy';
 import { assert } from 'chai';
 import 'mocha';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
@@ -49,7 +54,7 @@ describe('PrivacyParserTest', () => {
 
         [true, false].forEach((gdprEnabled) => {
             [[true, true], [true, false], [false, false]].forEach(([optOutRecorded, optOutEnabled]) => {
-                it ('sets default privacy method with gdprEnabled ' + gdprEnabled, () => {
+                it (`sets default privacy method with gdprEnabled=${gdprEnabled}, optOutRecorded=${optOutRecorded} and optOutEnabled=${optOutEnabled}`, () => {
                     privacyPartsConfig.gdprEnabled = gdprEnabled;
                     privacyPartsConfig.optOutRecorded = optOutRecorded;
                     privacyPartsConfig.optOutEnabled = optOutEnabled;
@@ -118,7 +123,7 @@ describe('PrivacyParserTest', () => {
                     gamePrivacy: {method: privacyMethod}
                 };
             });
-            const unityConsentUserPrivacy = {method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: {ads: true, external: true, gameExp: true}};
+            const unityConsentUserPrivacy = {method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: UserPrivacy.PERM_ALL_TRUE};
             [undefined, unityConsentUserPrivacy].forEach((configUserPrivacy) => {
                 it ('sets default userPrivacy when optoutRecroded=false and configuration has userPrivacy=' + JSON.stringify(configUserPrivacy), () => {
                     privacyPartsConfig.userPrivacy = configUserPrivacy;

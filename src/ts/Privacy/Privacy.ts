@@ -94,6 +94,11 @@ interface IUserPrivacy {
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
+    public static PERM_ALL_TRUE: IGranularPermissions = {ads: true, external: true, gameExp: true};
+    public static PERM_ALL_FALSE: IGranularPermissions = {ads: false, external: false, gameExp: false};
+    public static PERM_SKIPPED_LEGITIMATE_INTEREST: IGranularPermissions = {ads: true, external: false, gameExp: true};
+    public static PERM_DEVELOPER_CONSENTED: IGranularPermissions = {ads: true, external: true, gameExp: true};
+
     public static createFromLegacy(method: PrivacyMethod, optOutRecorded: boolean, optOutEnabled: boolean): UserPrivacy {
         if (!optOutRecorded) {
             return this.createUnrecorded();

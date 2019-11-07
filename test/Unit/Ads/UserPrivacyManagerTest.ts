@@ -134,7 +134,7 @@ describe('UserPrivacyManagerTest', () => {
                 isGdprEnabled: true,
                 privacyEnabled: true,
                 privacyMethod: PrivacyMethod.DEVELOPER_CONSENT,
-                configUserPermissions: {ads: false, external: false, gameExp: false}
+                configUserPermissions: UserPrivacy.PERM_ALL_FALSE
             }, {
                 storedConsent: false,
                 event: GDPREventAction.DEVELOPER_OPTOUT,
@@ -143,7 +143,7 @@ describe('UserPrivacyManagerTest', () => {
                 isGdprEnabled: true,
                 privacyEnabled: true,
                 privacyMethod: PrivacyMethod.DEVELOPER_CONSENT,
-                configUserPermissions: {ads: true, external: true, gameExp: false}
+                configUserPermissions: UserPrivacy.PERM_DEVELOPER_CONSENTED
             }];
 
             tests.forEach((t) => {
@@ -159,7 +159,11 @@ describe('UserPrivacyManagerTest', () => {
 
                     return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
                         sinon.assert.calledOnce(onSetStub);
-                        sinon.assert.calledWithExactly(updateUserPrivacy, {ads: !t.optOutEnabled, external: !t.optOutEnabled, gameExp: false}, GDPREventSource.DEVELOPER, t.event);
+                        let expectedPermissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+                        if (t.optOutEnabled) {
+                            expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
+                        }
+                        sinon.assert.calledWithExactly(updateUserPrivacy, expectedPermissions, GDPREventSource.DEVELOPER, t.event);
                     });
                 });
             });
@@ -198,7 +202,11 @@ describe('UserPrivacyManagerTest', () => {
                     gamePrivacy.isEnabled.returns(true);
                     gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                     gamePrivacy.getVersion.returns(0);
-                    userPrivacy.getPermissions.returns({ads: b, external: b, gameExp: false});
+                    let currentPermissions = UserPrivacy.PERM_ALL_FALSE;
+                    if (b) {
+                        currentPermissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+                    }
+                    userPrivacy.getPermissions.returns(currentPermissions);
                     userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                     userPrivacy.getVersion.returns(0);
                     storageTrigger('', {gdpr: {consent: {value: b}}});
@@ -269,7 +277,15 @@ describe('UserPrivacyManagerTest', () => {
                     gamePrivacy.isEnabled.returns(true);
                     gamePrivacy.getMethod.returns(t.method);
                     gamePrivacy.getVersion.returns(0);
-                    userPrivacy.getPermissions.returns({ads: t.lastConsent, external: t.lastConsent, gameExp: false});
+                    let currentPermissions = UserPrivacy.PERM_ALL_FALSE;
+                    if (t.lastConsent) {
+                        currentPermissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+                    }
+                    let expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
+                    if (t.storedConsent) {
+                        expectedPermissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+                    }
+                    userPrivacy.getPermissions.returns(currentPermissions);
                     userPrivacy.getMethod.returns(t.method);
                     userPrivacy.getVersion.returns(0);
                     consentlastsent = t.lastConsent;
@@ -278,7 +294,7 @@ describe('UserPrivacyManagerTest', () => {
                     return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                         return (<Promise<void>>updateUserPrivacy.firstCall.returnValue).then(() => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
-                            sinon.assert.calledWithExactly(updateUserPrivacy, {ads: t.storedConsent, external: t.storedConsent, gameExp: false}, GDPREventSource.DEVELOPER, t.event);
+                            sinon.assert.calledWithExactly(updateUserPrivacy, expectedPermissions, GDPREventSource.DEVELOPER, t.event);
                         });
                     });
                 });
@@ -333,14 +349,19 @@ describe('UserPrivacyManagerTest', () => {
                         gamePrivacy.isEnabled.returns(true);
                         gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                         gamePrivacy.getVersion.returns(0);
-                        userPrivacy.getPermissions.returns({ads: false, external: false, gameExp: false});
+                        userPrivacy.getPermissions.returns(UserPrivacy.PERM_ALL_FALSE);
                         userPrivacy.getMethod.returns(PrivacyMethod.DEFAULT);
                         userPrivacy.getVersion.returns(0);
                         consent = userConsents;
 
+                        let expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
+                        if (userConsents) {
+                            expectedPermissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+                        }
+
                         return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                             return (<Promise<void>>updateUserPrivacy.firstCall.returnValue).then(() => {
-                                sinon.assert.calledWithExactly(updateUserPrivacy, {ads: userConsents, external: userConsents, gameExp: false}, GDPREventSource.DEVELOPER, event);
+                                sinon.assert.calledWithExactly(updateUserPrivacy, expectedPermissions, GDPREventSource.DEVELOPER, event);
                             });
                         });
                     });

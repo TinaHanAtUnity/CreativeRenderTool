@@ -3,7 +3,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions, isUnityConsentPermissions, PrivacyMethod } from 'Privacy/Privacy';
+import { IPermissions, isUnityConsentPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
@@ -52,7 +52,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
                     // todo: add age gate choice
-                    this._privacyManager.updateUserPrivacy({ads: false, external: false, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
+                    this._privacyManager.updateUserPrivacy(UserPrivacy.PERM_ALL_FALSE, GDPREventSource.USER, GDPREventAction.BANNER_OPTOUT);
                 } else {
                     this._privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false}, GDPREventSource.USER, GDPREventAction.BANNER_OPTIN);
                 }

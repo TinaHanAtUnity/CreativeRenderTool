@@ -4,6 +4,7 @@ import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { UserPrivacy } from 'Privacy/Privacy';
 
 export class PromoEventHandler {
 
@@ -23,7 +24,7 @@ export class PromoEventHandler {
     public static onGDPRPopupSkipped(privacySDK: PrivacySDK, privacyManager: UserPrivacyManager): void {
         if (!privacySDK.isOptOutRecorded()) {
             // todo: add age gate choice
-            privacyManager.updateUserPrivacy({ads: true, external: true, gameExp: false},
+            privacyManager.updateUserPrivacy(UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST,
                 GDPREventSource.USER_INDIRECT, GDPREventAction.PROMO_SKIPPED_BANNER);
         }
     }

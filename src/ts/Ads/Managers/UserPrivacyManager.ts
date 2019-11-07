@@ -132,7 +132,7 @@ export class UserPrivacyManager {
 
         if (this._deviceInfo.getLimitAdTracking()) {
             // only developer_consent should end up here
-            const devicePermissions = {ads: false, external: false, gameExp: false};
+            const devicePermissions = UserPrivacy.PERM_ALL_FALSE;
             updatedPrivacy.permissions = devicePermissions;
         }
         userPrivacy.update(updatedPrivacy);
@@ -302,8 +302,13 @@ export class UserPrivacyManager {
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
-        const permissions = {ads: consent, external: consent, gameExp: false};
-        const action = consent ? GDPREventAction.DEVELOPER_CONSENT : GDPREventAction.DEVELOPER_OPTOUT;
+        let permissions = UserPrivacy.PERM_ALL_FALSE;
+        let action = GDPREventAction.DEVELOPER_OPTOUT;
+
+        if (consent) {
+            permissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+            action = GDPREventAction.DEVELOPER_CONSENT;
+        }
 
         return this.updateUserPrivacy(permissions, GDPREventSource.DEVELOPER, action);
     }
