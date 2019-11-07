@@ -54,7 +54,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
             this._privacyWebViewUrl = privacyConfig.getWebViewUrl();
             this.createPrivacyFrame(
                 PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson()))
-                .replace('{{ PRIVACY_USER_SETTINGS }}', JSON.stringify(privacyConfig.getUserSettings())))
+                .replace('{{ PRIVACY_USER_SETTINGS }}', JSON.stringify(privacyConfig.getUserSettings().getJson())))
                 .then((privacyHtml) => {
                     this._iFrame.srcdoc = privacyHtml;
                 });

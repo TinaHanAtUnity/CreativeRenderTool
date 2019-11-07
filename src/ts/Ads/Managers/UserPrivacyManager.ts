@@ -24,6 +24,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { PrivacyUserSettings } from 'Privacy/PrivacyUserSettings';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -117,15 +118,13 @@ export class UserPrivacyManager {
                 isCoppa: this._coreConfig.isCoppaCompliant()
             },
 
-            user: {
+            webViewUrl: TestEnvironment.get('privacyUrl')},
+            new PrivacyUserSettings({
                 ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
                 external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
-                gameExp: false, // todo: fetch from this._userPrivacy.getPermissions().gameExp,
+                gameExp: false // todo: fetch from this._userPrivacy.getPermissions().gameExp,
                 // todo: agree on agreedOverAgeLimit field from this.getAgeGateChoice()
-            },
-
-            webViewUrl: TestEnvironment.get('privacyUrl')
-        }));
+            })));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
