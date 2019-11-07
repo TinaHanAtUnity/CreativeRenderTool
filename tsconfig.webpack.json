@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es6",
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "importHelpers": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "src/ts/*",
+        "src/proto/*",
+        "src/*",
+        "test/*"
+      ]
+    },
+    "outDir": "build",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "src/ts/**/*.ts"
+  ]
+}

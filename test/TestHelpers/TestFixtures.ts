@@ -112,7 +112,8 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUn
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { ThirdPartyEventManager, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -208,7 +209,8 @@ export class TestFixtures {
             dynamicMarkup: 'foo',
             video: null,
             useWebViewUserAgentForTracking: false,
-            isOMEnabled: false
+            isOMEnabled: false,
+            shouldMuteByDefault: false
         };
     }
 
@@ -589,58 +591,58 @@ export class TestFixtures {
     }
 
     public static getPromoCampaign(adType?: string, rewardedPromo?: boolean, timeLimitedOffer?: ILimitedTimeOffer): PromoCampaign {
-        const json = JSON.parse(DummyPromoCampaign);
+        const json = DummyPromoCampaign;
         return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo, timeLimitedOffer));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
-        const json = JSON.parse(OnCometVideoPlcCampaignFollowsRedirects);
+        const json = OnCometVideoPlcCampaignFollowsRedirects;
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
     }
 
     public static getCampaignStandaloneAndroid(): PerformanceCampaign {
-        const json = JSON.parse(OnCometVideoPlcCampaignStandaloneAndroid);
+        const json = OnCometVideoPlcCampaignStandaloneAndroid;
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.STANDALONE_ANDROID));
     }
 
     public static getCampaign(session?: Session): PerformanceCampaign {
-        const json = JSON.parse(OnCometVideoPlcCampaign);
+        const json = OnCometVideoPlcCampaign;
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE, session));
     }
 
     public static getCampaignWithSquareEndScreenAsset(): PerformanceCampaign {
-        const json = JSON.parse(OnCometVideoPlcCampaignWithSquareEndScreenAsset);
+        const json = OnCometVideoPlcCampaignWithSquareEndScreenAsset;
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
     }
 
     public static getXPromoCampaign(session?: Session): XPromoCampaign {
-        const json = JSON.parse(OnXPromoPlcCampaign);
+        const json = OnXPromoPlcCampaign;
         const xPromoJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const creativeId = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].creativeId;
         return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId, session));
     }
 
     public static getExtendedMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
-        const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
+        const json = OnCometMraidPlcCampaignFollowsRedirects;
         return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getExtendedMRAIDCampaign(session?: Session): MRAIDCampaign {
-        const json = JSON.parse(OnCometMraidPlcCampaign);
+        const json = OnCometMraidPlcCampaign;
         return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {
-        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const json = OnProgrammaticMraidUrlPlcCampaign;
         return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
     public static getPerformanceMRAIDCampaign(customParams: Partial<ICampaign> = {}): PerformanceMRAIDCampaign {
-        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const json = OnProgrammaticMraidUrlPlcCampaign;
         return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
@@ -665,7 +667,7 @@ export class TestFixtures {
     public static getCompanionVPAIDCampaign(): VPAIDCampaign {
         const vpaidParser = new VPAIDParser();
         const vpaid = vpaidParser.parse(VPAIDCompanionAdWithAdParameters);
-        const json = JSON.parse(OnProgrammaticVPAIDPlcCampaign);
+        const json = OnProgrammaticVPAIDPlcCampaign;
         return new VPAIDCampaign(this.getVPAIDCampaignParams(json, vpaid));
     }
 
@@ -698,7 +700,7 @@ export class TestFixtures {
     }
 
     public static getDisplayInterstitialCampaign(session?: Session): DisplayInterstitialCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        const json = DummyDisplayInterstitialCampaign;
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
             ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345', session),
             dynamicMarkup: json.content
@@ -1043,7 +1045,7 @@ export class TestFixtures {
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
         ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
-        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
+        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager, core.MetaDataManager);
         ads.Analytics = new Analytics(core, ads.PrivacySDK!);
         ads.Store = new Store(core, ads.Analytics.AnalyticsManager);
         return <IAds>ads;
@@ -1074,7 +1076,7 @@ export class TestFixtures {
     }
 
     public static getBannerCampaign() {
-        const json = JSON.parse(OnProgrammaticBannerCampaign);
+        const json = OnProgrammaticBannerCampaign;
         const params = this.getBannerCampaignParams(json);
         return new BannerCampaign(params);
     }
@@ -1197,17 +1199,17 @@ export class TestFixtures {
     }
 
     public static getCoreConfiguration(): CoreConfiguration {
-        const json = JSON.parse(ConfigurationAuctionPlc);
+        const json = ConfigurationAuctionPlc;
         return CoreConfigurationParser.parse(json);
     }
 
     public static getAdsConfiguration(): AdsConfiguration {
-        const json = JSON.parse(ConfigurationAuctionPlc);
+        const json = ConfigurationAuctionPlc;
         return AdsConfigurationParser.parse(json);
     }
 
     public static getPrivacySDK(core: ICoreApi): PrivacySDK {
-        const json = JSON.parse(ConfigurationAuctionPlc);
+        const json = ConfigurationAuctionPlc;
         const clientInfo = this.getClientInfo();
         const deviceInfo = this.getAndroidDeviceInfo(core);
         return PrivacyParser.parse(json, clientInfo, deviceInfo);
@@ -1237,7 +1239,7 @@ export class TestFixtures {
     }
 
     public static getDisplayMarkup(): string {
-        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        const json = DummyDisplayInterstitialCampaign;
         return decodeURIComponent(json.display.markup);
     }
 

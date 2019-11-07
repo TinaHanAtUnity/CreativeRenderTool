@@ -8,7 +8,8 @@ import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitConta
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IThirdPartyEventManagerFactory, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -162,7 +163,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._privacySDK.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
+        if (this._coreConfig.isCoppaCompliant()) {
+            privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
+        } else if (this._privacySDK.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
@@ -185,6 +188,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
         if (AbstractAdUnitParametersFactory._forceGDPRBanner) {
             return true;
+        }
+
+        if (parameters.coreConfig.isCoppaCompliant()) {
+            return false;
         }
 
         if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.privacySDK.getGamePrivacy().getMethod()) {

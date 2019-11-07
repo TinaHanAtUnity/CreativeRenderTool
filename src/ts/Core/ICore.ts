@@ -67,8 +67,8 @@ export interface ICoreApi extends IModuleApi {
 }
 
 export interface ICore extends IApiModule {
-    NativeBridge: NativeBridge;
     Api: Readonly<ICoreApi>;
+    NativeBridge: NativeBridge;
     CacheBookkeeping: CacheBookkeepingManager;
     FocusManager: FocusManager;
     MetaDataManager: MetaDataManager;

@@ -55,18 +55,19 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
 
     protected _onReport: Observable2<Campaign, string> = new Observable2();
     protected _userPrivacyManager: UserPrivacyManager;
+    protected _isCoppaCompliant: boolean;
     private static buildInformation: IBuildInformation;
 
     constructor(platform: Platform, privacyManager: UserPrivacyManager, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string, attachTap?: boolean) {
         super(platform, id, attachTap);
 
+        this._isCoppaCompliant = isCoppaCompliant;
         this._userPrivacyManager = privacyManager;
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
             'buildInformation': AbstractPrivacy.buildInformation,
-            'isUserUnderAgeLimit': privacyManager.isUserUnderAgeLimit(),
-            'isCoppaAndChina': (isCoppaCompliant && (privacyManager.getLegalFramework() === LegalFramework.TC260))
+            'isUserUnderAgeLimit': privacyManager.isUserUnderAgeLimit()
         };
     }
 

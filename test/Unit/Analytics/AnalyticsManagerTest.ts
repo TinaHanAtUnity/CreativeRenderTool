@@ -82,7 +82,7 @@ class TestHelper {
 
                 return analyticsManager.init().then(() => {
                     sinon.assert.called(requestSpy);
-                    assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
+                    assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com/v1/events/');
                     assert.equal(TestHelper.getEventType<IAnalyticsAppStartEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.appStart.v1');
                 });
             });
@@ -95,7 +95,7 @@ class TestHelper {
                     coreModule.FocusManager.onActivityPaused.trigger('com.test.activity');
 
                     sinon.assert.called(requestSpy);
-                    assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
+                    assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com/v1/events/');
                     assert.equal(TestHelper.getEventType<IAnalyticsAppRunningEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.appRunning.v1');
                 });
             });
@@ -109,7 +109,7 @@ class TestHelper {
 
                     return analyticsManager.onTransactionSuccess(fakeTransaction).then(() => {
                         sinon.assert.called(requestSpy);
-                        assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com');
+                        assert.equal(requestSpy.getCall(0).args[0], 'https://thind.unityads.unity3d.com/v1/events/');
                         assert.equal(TestHelper.getEventType<IAnalyticsTransactionEventV1>(requestSpy.getCall(0).args[1]), 'ads.analytics.transactionSuccess.v1');
                     });
                 });

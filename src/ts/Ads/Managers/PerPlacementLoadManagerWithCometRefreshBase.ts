@@ -5,7 +5,7 @@ import { LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class PerPlacementLoadManagerWithCometRefreshBase extends PerPlacementLoadManager {
 
-    public refreshReadyPerformanceCampaigns(): Promise<void[]> {
+    public refreshCampaigns(): Promise<void[]> {
         const loadCampaignPromises = [];
         for (const placementId of this._adsConfig.getPlacementIds()) {
             const placement = this._adsConfig.getPlacement(placementId);

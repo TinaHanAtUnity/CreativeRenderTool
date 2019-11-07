@@ -41,7 +41,6 @@ import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
-import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -173,7 +172,7 @@ export class Core implements ICore {
 
             let configPromise: Promise<unknown>;
             if (TestEnvironment.get('creativeUrl')) {
-                configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
+                configPromise = Promise.resolve(CreativeUrlConfiguration);
             } else {
                 configPromise = this.ConfigManager.getConfig();
             }

@@ -52,7 +52,7 @@ describe('ProgrammaticVPAIDParser', () => {
             };
 
             beforeEach(() => {
-                return parse(JSON.parse(ProgrammaticVPAIDCampaign));
+                return parse(ProgrammaticVPAIDCampaign);
             });
 
             it('should have valid data', () => {

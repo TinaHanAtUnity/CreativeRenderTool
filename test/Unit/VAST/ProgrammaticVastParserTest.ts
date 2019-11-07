@@ -64,7 +64,7 @@ describe('ProgrammaticVastParser', () => {
             };
 
             beforeEach(() => {
-                return parse(JSON.parse(ProgrammaticVastCampaignFlat));
+                return parse(ProgrammaticVastCampaignFlat);
             });
 
             it('should have valid data', () => {
@@ -72,7 +72,7 @@ describe('ProgrammaticVastParser', () => {
                 assert.isTrue(campaign instanceof VastCampaign, 'Campaign was not an VastCampaign');
 
                 const vastParser = new VastParserStrict();
-                const json = JSON.parse(ProgrammaticVastCampaignFlat);
+                const json = ProgrammaticVastCampaignFlat;
                 const vast = vastParser.parseVast(decodeURIComponent(json.content));
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
@@ -87,7 +87,7 @@ describe('ProgrammaticVastParser', () => {
         describe('with a VPAID ad inside a VAST ad', () => {
             it('should throw ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error', () => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
-                const response = new AuctionResponse([auctionPlacement], JSON.parse(ProgrammaticVastCampaignWithVpaidAd), mediaId, correlationId);
+                const response = new AuctionResponse([auctionPlacement], ProgrammaticVastCampaignWithVpaidAd, mediaId, correlationId);
                 return parser.parse(response, session).then(() => {
                     assert.fail('An error should have been thrown');
                 }).catch((error) => {
@@ -107,7 +107,7 @@ describe('ProgrammaticVastParser', () => {
                     response: VastCompanionAdXml
                 }));
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
-                const response = new AuctionResponse([auctionPlacement], JSON.parse(ProgrammaticVastCampaignWithEncodedUrl), mediaId, correlationId);
+                const response = new AuctionResponse([auctionPlacement], ProgrammaticVastCampaignWithEncodedUrl, mediaId, correlationId);
                 return parser.parse(response, session).then((parsedCampaign) => {
                     const vastCampaign: VastCampaign = <VastCampaign>parsedCampaign;
                     assert.isNotNull(vastCampaign);
