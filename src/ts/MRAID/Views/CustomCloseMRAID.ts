@@ -1,12 +1,12 @@
-import { ProgrammaticTrackingService, MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Placement } from 'Ads/Models/Placement';
+import { MraidMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class CustomCloseMRAID extends MRAID {
     protected _mraidCustomCloseCalled: boolean;
@@ -20,11 +20,8 @@ export class CustomCloseMRAID extends MRAID {
         this._pts = programmaticTrackingService;
         this._mraidCustomCloseCalled = false;
 
-        this._mraidCustomCloseDelay = 5;
-        if (!placement.allowSkip()) {
-            // If the placement is not skippable, extend the hide time.
-            this._mraidCustomCloseDelay = 40;
-        }
+        // If the placement is not skippable, extend the hide time
+        this._mraidCustomCloseDelay = placement.allowSkip() ? 5 : 40;
     }
 
     public show(): void {
@@ -32,7 +29,7 @@ export class CustomCloseMRAID extends MRAID {
         // NOTE: When allowSkip is true, move the close button to the left.
         // This is a temporary test and will likely be removed in the future.
         if (this._placement.allowSkip()) {
-            this.moveCloseGraphicLeft(this._container);
+            this.moveCloseGraphicLeft();
         }
     }
 
@@ -47,49 +44,37 @@ export class CustomCloseMRAID extends MRAID {
         this._pts.reportMetricEvent(MraidMetric.ClosedByAd);
     }
 
-    public onUseCustomClose(hideClose: boolean) {
-        super.onUseCustomClose(hideClose);
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
+    public onUseCustomClose(shouldHideClose: boolean) {
+        super.onUseCustomClose(shouldHideClose);
 
-        if (!hideClose) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseShowGraphic);
+        if (!shouldHideClose) {
             this.clearCustomCloseTimeout();
-            this.showCloseGraphic(this._container, true);
+            this.setCloseVisibility(true);
             return;
         }
 
         if (this._mraidCustomCloseCalled) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalledAgain);
             return;
         }
-
         this._mraidCustomCloseCalled = true;
 
-        const hideDuration = this._mraidCustomCloseDelay * 1000;
-        if (hideDuration <= 0) {
-            this._pts.reportMetricEvent(MraidMetric.UseCustomCloseExpired);
-            this.showCloseGraphic(this._container, true);
-            return;
-        }
+        this.setupCustomClose();
+    }
 
+    private setCloseVisibility(visible: boolean) {
+        const closeElement = <HTMLElement> this._container.querySelector('.close');
+        if (closeElement) {
+            closeElement.style.display = visible ? 'block' : 'none';
+        }
+    }
+
+    private setupCustomClose() {
         this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideGraphic);
-        this.showCloseGraphic(this._container, false);
-        this.setCustomCloseTimeout(this._container, hideDuration);
-    }
-
-    private showCloseGraphic(element: HTMLElement, visible: boolean) {
-        const close = <HTMLElement>element.querySelector('.close');
-        if (visible) {
-            close.style.display = 'block';
-        } else {
-            close.style.display = 'none';
-        }
-    }
-
-    private setCustomCloseTimeout(element: HTMLElement, hideDuration: number) {
+        this.setCloseVisibility(false);
+        const hideDuration = this._mraidCustomCloseDelay * 1000;
         this._mraidCustomCloseTimeout = window.setTimeout(() => {
             this._pts.reportMetricEvent(MraidMetric.UseCustomCloseHideTimeout);
-            this.showCloseGraphic(element, true);
+            this.setCloseVisibility(true);
         }, hideDuration);
     }
 
@@ -97,10 +82,12 @@ export class CustomCloseMRAID extends MRAID {
         window.clearTimeout(this._mraidCustomCloseTimeout);
     }
 
-    protected moveCloseGraphicLeft(element: HTMLElement) {
+    private moveCloseGraphicLeft() {
         this._pts.reportMetricEvent(MraidMetric.CloseMovedToLeft);
-        const region = <HTMLElement>element.querySelector('.close-region');
-        region.style.removeProperty('right');
-        region.style.left = '0';
+        const closeRegionElement = <HTMLElement> this._container.querySelector('.close-region');
+        if (closeRegionElement) {
+            closeRegionElement.style.removeProperty('right');
+            closeRegionElement.style.left = '0';
+        }
     }
 }
