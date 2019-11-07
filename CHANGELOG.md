@@ -1,3 +1,7 @@
+# Thu Nov  7 20:54:44 UTC 2019
+
+* Revert "Direct Catalog Request to Production Endpoint" [#12014](https://github.com/Applifier/unity-ads-webview/pull/12014)
+
 # Thu Nov  7 18:47:59 UTC 2019
 
 * Update Yarn Dependencies [#11983](https://github.com/Applifier/unity-ads-webview/pull/11983)
