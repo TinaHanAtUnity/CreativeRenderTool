@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions } from 'Privacy/Privacy';
+import { IPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
@@ -270,12 +270,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onHomepageAcceptAllEvent(event: Event) {
         event.preventDefault();
 
-        const permissions: IPermissions = {
-            ads: true,
-            gameExp: true,
-            external: true
-        };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventAction.CONSENT_AGREE_ALL, GDPREventSource.USER_INDIRECT));
+        this._handlers.forEach(handler => handler.onConsent(UserPrivacy.PERM_ALL_TRUE, GDPREventAction.CONSENT_AGREE_ALL, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }
@@ -298,12 +293,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onDisagreeEvent(event: Event) {
         event.preventDefault();
 
-        const permissions: IPermissions = {
-            gameExp: false,
-            ads: false,
-            external: false
-        };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventAction.CONSENT_DISAGREE, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(UserPrivacy.PERM_ALL_FALSE, GDPREventAction.CONSENT_DISAGREE, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.disagree'));
 
         this.closeWithAnimation(element);
