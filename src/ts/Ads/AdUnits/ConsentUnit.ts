@@ -92,10 +92,10 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
             if (this._privacySDK.isAgeGateEnabled()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
+            } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
             }
-            if (this._privacyManager.isConsentShowRequired()) {
-                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_REQUIRED);
-            }
+
             if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
                 const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
                 this.handleAutoAgeGate(ageGateValue);

@@ -7,11 +7,10 @@ export enum PrivacyEvent {
     AGE_GATE_SHOW = 'age_gate_show',
     AGE_GATE_PASS = 'age_gate_pass',
     AGE_GATE_NOT_PASSED = 'age_gate_not_passed',
-    CONSENT_REQUIRED = 'consent_required',
+    CONSENT_SHOW = 'consent_show',
     CONSENT_ACCEPT_ALL = 'consent_accept_all',
     CONSENT_NOT_ACCEPTED = 'consent_not_accepted',
-    CONSENT_PARTIALLY_ACCEPTED = 'consent_partially_accepted',
-    CONSENT_NOT_SHOWN_USER_UNDERAGE = 'consent_not_shown_user_underage'
+    CONSENT_PARTIALLY_ACCEPTED = 'consent_partially_accepted'
 }
 
 export class PrivacyMetrics {
