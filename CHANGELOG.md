@@ -1,4 +1,4 @@
-# Pending
+# Fri Nov  8 23:41:18 UTC 2019
 
 * Add Custom Close MRAID Functionality [#11566](https://github.com/Applifier/unity-ads-webview/pull/11566)
 * Add Groups 13 and 14 to Zynga Load V4 Experiment [#12065](https://github.com/Applifier/unity-ads-webview/pull/12065)
