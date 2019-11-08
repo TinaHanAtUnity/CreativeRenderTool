@@ -26,7 +26,7 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
+import { PrivacySettings } from 'Ads/Views/Privacy/PrivacySettings';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';

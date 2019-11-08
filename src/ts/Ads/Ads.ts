@@ -75,7 +75,7 @@ import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
+import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
@@ -311,7 +311,7 @@ export class Ads implements IAds {
     }
 
     private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.PrivacyManager.isConsentShowRequired()) {
+        if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
         }
 
@@ -329,7 +329,7 @@ export class Ads implements IAds {
 
         this._showingConsent = true;
 
-        const consentView = new ConsentUnit({
+        const privacyView = new PrivacyUnit({
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
@@ -340,7 +340,7 @@ export class Ads implements IAds {
             pts: this._core.ProgrammaticTrackingService,
             privacySDK: this.PrivacySDK
         });
-        return consentView.show(options);
+        return privacyView.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
