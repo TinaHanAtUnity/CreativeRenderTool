@@ -289,6 +289,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private isDBMCreative(): boolean {
-        return !this._campaign.getCreativeId() === undefined;
+        return this._campaign.getCreativeId() !== undefined;
     }
 }
