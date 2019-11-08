@@ -109,10 +109,11 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
-    InvalidEndscreenAnimation = 'invalid_endscreen_animation'
+    InvalidEndscreenAnimation = 'invalid_endscreen_animation',
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];

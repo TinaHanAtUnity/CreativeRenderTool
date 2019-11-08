@@ -7,17 +7,12 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
-import { ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
     downloadManager?: DownloadManager;
     deviceIdManager?: DeviceIdManager;
-    automatedExperimentManager: AutomatedExperimentManager;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
@@ -26,8 +21,6 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     private _privacy: AbstractPrivacy;
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _automatedExperimentManager: AutomatedExperimentManager;
-    private _coreConfig: CoreConfiguration;
 
     constructor(parameters: IPerformanceAdUnitParameters) {
         super(parameters);
@@ -42,16 +35,6 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         this._privacy = parameters.privacy;
         this._performanceCampaign = parameters.campaign;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._coreConfig = parameters.coreConfig;
-        this._automatedExperimentManager = parameters.automatedExperimentManager;
-    }
-
-    public show(): Promise<void> {
-        if (MabDecisionButtonTest.isValid(this._coreConfig.getAbGroup())) {
-            this._automatedExperimentManager.sendAction(ButtonAnimationsExperiment);
-        }
-
-        return super.show();
     }
 
     public hide(): Promise<void> {
@@ -68,10 +51,6 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
             if (privacyContainer && privacyContainer.parentElement) {
                 privacyContainer.parentElement.removeChild(privacyContainer);
             }
-        }
-
-        if (MabDecisionButtonTest.isValid(this._coreConfig.getAbGroup())) {
-            this._automatedExperimentManager.endExperiment();
         }
 
         return super.hide();

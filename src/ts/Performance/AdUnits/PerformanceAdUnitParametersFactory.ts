@@ -18,31 +18,19 @@ import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance
 import {
     HeartbeatingDownloadButtonTest,
     BouncingDownloadButtonTest,
-    ShiningDownloadButtonTest,
-    MabDecisionButtonTest
+    ShiningDownloadButtonTest
 } from 'Core/Models/ABGroup';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
-import { AUIMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
-    private _downloadManager: DownloadManager;
-    private _deviceIdManager: DeviceIdManager;
-    private _automatedExperimentManager: AutomatedExperimentManager;
+    protected _downloadManager: DownloadManager;
+    protected _deviceIdManager: DeviceIdManager;
 
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
-
         this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
-        }
-
-        this._automatedExperimentManager = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        if (MabDecisionButtonTest.isValid(core.Config.getAbGroup())) {
-            this._automatedExperimentManager.initialize(AutomatedExperimentsList);
-            this._automatedExperimentManager.beginExperiment();
         }
     }
 
@@ -58,31 +46,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        let endScreen: PerformanceEndScreen;
-        const abGroup = baseParams.coreConfig.getAbGroup();
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
-        let endscreenAnimation = EndScreenAnimation.STATIC;
-        const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
-
-        if (mabDecision) {
-            if ((<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
-                endscreenAnimation = <EndScreenAnimation> mabDecision;
-            } else {
-                baseParams.programmaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            }
-        }
-
-        if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
-            endScreen = new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (MabDecisionButtonTest.isValid(abGroup) && endscreenAnimation !== EndScreenAnimation.STATIC) {
-            endScreen = new AnimatedDownloadButtonEndScreen(endscreenAnimation, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else {
-            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        }
+        const endScreen = this.getEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,
@@ -91,12 +56,24 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
             downloadManager: this._downloadManager,
-            deviceIdManager: this._deviceIdManager,
-            automatedExperimentManager: this._automatedExperimentManager
+            deviceIdManager: this._deviceIdManager
         };
     }
 
-    private createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
+    private getEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
+        const abGroup = endScreenParameters.abGroup;
+        if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
+            return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, campaign, country);
+        } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
+            return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, endScreenParameters, campaign, country);
+        } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
+            return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, campaign, country);
+        } else {
+            return new PerformanceEndScreen(endScreenParameters, campaign, country);
+        }
+    }
+
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
         let showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
 
         // hide privacy icon for China
