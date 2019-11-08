@@ -1,5 +1,5 @@
 import { View } from 'Core/Views/View';
-import { ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
+import { IConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { Template } from 'Core/Utilities/Template';
 import { PrivacyFrameEventAdapter } from 'Privacy/PrivacyFrameEventAdapter';
 import { PrivacyAdapterContainer } from 'Privacy/PrivacyAdapterContainer';
@@ -7,17 +7,10 @@ import { ICore, ICoreApi } from 'Core/ICore';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
-import {
-    IAllPermissions,
-    IGranularPermissions, IPermissions,
-    IUnityConsentPermissions,
-    PrivacyMethod
-} from 'Privacy/Privacy';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export interface IUserPrivacySettings {
     isChild: boolean;
@@ -97,67 +90,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
     public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
         this._coreApi.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
         this._handlers.forEach(handler => handler.onClose());
-        /*
-        let permissions: IUnityConsentPermissions;
-        const source: GDPREventSource = GDPREventSource.USER;
-
-        if (userSettings.isChild) {
-            this._handlers.forEach(handler => handler.onAgeGateDisagree());
-            this._handlers.forEach(handler => handler.onClose());
-            return;
-        } else {
-            this._handlers.forEach(handler => handler.onAgeGateAgree());
-        }
-
-        if (userSettings.acceptTracking) {
-            permissions = <IAllPermissions> {all: true};
-        } else {
-            permissions = <IGranularPermissions> { ads: userSettings.personalizedAds,
-                gameExp: userSettings.personalizedGamingExperience,
-                external: userSettings.thirdParty };
-        }
-
-        this._handlers.forEach(handler => handler.onConsent(permissions, source));
-        this._handlers.forEach(handler => handler.onClose());*/
     }
-/*
-    public onAgeGateAgree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
-    }
-
-    public onAgeGateDisagree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
-
-        if (this._core.Ads.PrivacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            const permissions: IPermissions = {
-                gameExp: false,
-                ads: false,
-                external: false
-            };
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE);
-        } else {
-            this._core.Ads.PrivacySDK.setOptOutRecorded(true);
-            this._core.Ads.PrivacySDK.setOptOutEnabled(true);
-
-            const gamePrivacy = this._core.Ads.PrivacySDK.getGamePrivacy();
-            const userPrivacy = this._core.Ads.PrivacySDK.getUserPrivacy();
-
-            if (userPrivacy) {
-                userPrivacy.update({
-                    method: gamePrivacy.getMethod(),
-                    version: 0,
-                    permissions: {
-                        all: false,
-                        ads: false,
-                        external: false,
-                        gameExp: false
-                    }
-                });
-            }
-
-            this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
-        }
-    }*/
 
     public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
         this._coreApi.Sdk.logDebug('Got event: ' + name + ' with data: ' + JSON.stringify(data));

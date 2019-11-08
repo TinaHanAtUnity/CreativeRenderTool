@@ -4,13 +4,12 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
-import { IPermissions, PrivacyMethod } from 'Privacy/Privacy';
+import { IPermissions } from 'Privacy/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -98,15 +97,7 @@ export class ConsentUnit implements IPrivacyViewHandler, IAdUnit {
             if (this._privacySDK.isAgeGateEnabled()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
             }
-            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
-                const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
-                this.handleAutoAgeGate(ageGateValue);
-            }
 
-            if (TestEnvironment.get('autoAcceptConsent')) {
-                const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
-                this.handleAutoConsent(consentValues);
-            }
             return donePromise;
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Consent view ' + e);
@@ -164,61 +155,16 @@ export class ConsentUnit implements IPrivacyViewHandler, IAdUnit {
         });
     }
 
-    // IConsentViewHandler
+    public onPrivacy(url: string): void {
+        // BLANK
+    }
+
     public onAgeGateDisagree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
-
-        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            const permissions: IPermissions = {
-                gameExp: false,
-                ads: false,
-                external: false
-            };
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.AGE_GATE);
-        } else {
-            this._privacySDK.setOptOutRecorded(true);
-            this._privacySDK.setOptOutEnabled(true);
-
-            const gamePrivacy = this._privacySDK.getGamePrivacy();
-            const userPrivacy = this._privacySDK.getUserPrivacy();
-
-            if (userPrivacy) {
-                userPrivacy.update({
-                    method: gamePrivacy.getMethod(),
-                    version: 0,
-                    permissions: {
-                        all: false,
-                        ads: false,
-                        external: false,
-                        gameExp: false
-                    }
-                });
-            }
-
-            this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
-        }
+        // BLANK
     }
 
     public onAgeGateAgree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
-    }
-
-    public onPrivacy(url: string): void {
-        if (this._platform === Platform.IOS) {
-            this._core.iOS!.UrlScheme.open(url);
-        } else if (this._platform === Platform.ANDROID) {
-            this._core.Android!.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
-        }
-    }
-
-    private handleAutoAgeGate(ageGate: boolean) {
-    }
-
-    private handleAutoConsent(consent: IPermissions) {
-        // TODO
+        // BLANK
     }
 
     public description(): string {
