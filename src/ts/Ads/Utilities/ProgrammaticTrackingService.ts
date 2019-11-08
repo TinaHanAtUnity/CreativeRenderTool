@@ -24,7 +24,17 @@ export enum AdmobMetric {
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
     AdmobUserWasRewarded = 'admob_user_was_rewarded',
-    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video'
+    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video',
+    AdmobDBMRewardedCanPlay = 'admob_dbm_rewarded_canplay',
+    AdmobDBMRewardedStarted = 'admob_dbm_rewarded_started',
+    AdmobDBMNonRewardedCanPlay = 'admob_dbm_nonrewarded_canplay',
+    AdmobDBMNonRewardedStarted = 'admob_dbm_nonrewarded_started',
+    AdmobNonDBMRewardedCanPlay = 'admob_nondbm_rewarded_canplay',
+    AdmobNonDBMRewardedStarted = 'admob_nondbm_rewarded_started',
+    AdmobNonDBMNonRewardedCanPlay = 'admob_nondbm_nonrewarded_canplay',
+    AdmobNonDBMNonRewardedStarted = 'admob_nondbm_nonrewarded_started',
+    AdmobVideoCanPlay = 'admob_video_canplay',
+    AdmobVideoStarted = 'admob_video_started'
 }
 
 export enum BannerMetric {
@@ -136,7 +146,8 @@ export class ProgrammaticTrackingService {
     }
 
     private createMetricTags(event: PTSEvent): string[] {
-        return [this.createAdsSdkTag('mevt', event)];
+        return [this.createAdsSdkTag('mevt', event),
+                this.createAdsSdkTag('plt', Platform[this._platform])];
     }
 
     private createTimingTags(): string[] {
