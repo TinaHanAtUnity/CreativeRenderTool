@@ -15,6 +15,9 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { OmnivirtExperiment } from 'Core/Models/ABGroup';
+import { OmnivirtPerformanceEndScreen } from 'Performance/Views/OmnivirtPerformanceEndScreen';
+import OmnivirtGameIdToAIDLink from 'json/experiments/omnivirt.json';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -42,7 +45,22 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        const endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const abGroup = baseParams.coreConfig.getAbGroup();
+        let endScreen: PerformanceEndScreen;
+
+        if (OmnivirtExperiment.isValid(abGroup)) {
+            const gameId = baseParams.campaign.getGameId().toString();
+            const omnivirtAid = OmnivirtGameIdToAIDLink[gameId];
+
+            if (omnivirtAid) {
+                endScreen = new OmnivirtPerformanceEndScreen(endScreenParameters, baseParams.campaign, omnivirtAid, baseParams.coreConfig.getCountry());
+            } else {
+                endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            }
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
+
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
