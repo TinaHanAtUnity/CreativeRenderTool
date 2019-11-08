@@ -1,6 +1,9 @@
 # Pending
 
 * Add Custom Close MRAID Functionality [#11566](https://github.com/Applifier/unity-ads-webview/pull/11566)
+* Add Groups 13 and 14 to Zynga Load V4 Experiment [#12065](https://github.com/Applifier/unity-ads-webview/pull/12065)
+* AR MRAID - Fix Click Behavior [#12064](https://github.com/Applifier/unity-ads-webview/pull/12064)
+* Add Granular Metrics for Tracking Admob Behavior [#12039](https://github.com/Applifier/unity-ads-webview/pull/12039)
 
 # Thu Nov  7 20:54:44 UTC 2019
 
