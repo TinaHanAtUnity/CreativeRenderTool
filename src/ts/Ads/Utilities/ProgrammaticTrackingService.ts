@@ -90,7 +90,15 @@ export enum TimingMetric {
     AdsInitializeTime = 'uads_ads_initialize_time'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
+export enum MraidMetric {
+    UseCustomCloseCalled = 'mraid_use_custom_close_called',
+    CloseMovedToLeft = 'mraid_close_graphic_moved_to_left',
+    CloseHidden = 'mraid_close_graphic_hidden',
+    ClosedByAdUnit = 'mraid_closed_by_ad_unit',
+    ClosedByUnityAds = 'mraid_closed_by_unity_ads'
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];

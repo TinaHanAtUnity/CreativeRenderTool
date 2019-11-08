@@ -78,4 +78,8 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
     public onBridgeDeviceOrientationSubscribe(): void {
         this._handler.onBridgeDeviceOrientationSubscribe();
     }
+
+    public onUseCustomClose(hidden: boolean) {
+        this._handler.onUseCustomClose(hidden);
+    }
 }
