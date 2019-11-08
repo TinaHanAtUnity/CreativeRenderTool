@@ -146,10 +146,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected arrayToPipedString(arr: string[]): string {
         let stringBuilder = '';
         arr.forEach((str) => {
-            stringBuilder += `|${str}|`;
+            stringBuilder += `${str}|`;
         });
 
-        return `[${stringBuilder}]`;
+        return stringBuilder.slice(0, -1);
     }
 
     protected getOperativeEventManager(): OperativeEventManager {

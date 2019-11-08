@@ -85,10 +85,10 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private arrayToPipedString(arr: string[]): string {
         let stringBuilder = '';
         arr.forEach((str) => {
-            stringBuilder += `|${str}|`;
+            stringBuilder += `${str}|`;
         });
 
-        return `[${stringBuilder}]`;
+        return stringBuilder.slice(0, -1);
     }
 
     public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
