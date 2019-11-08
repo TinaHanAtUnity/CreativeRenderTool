@@ -1,3 +1,7 @@
+# Pending
+
+* Add Custom Close MRAID Functionality [#11566](https://github.com/Applifier/unity-ads-webview/pull/11566)
+
 # Thu Nov  7 20:54:44 UTC 2019
 
 * Revert "Direct Catalog Request to Production Endpoint" [#12014](https://github.com/Applifier/unity-ads-webview/pull/12014)
