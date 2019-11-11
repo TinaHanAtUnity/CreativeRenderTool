@@ -547,8 +547,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this._arCameraAlreadyAccepted = true;
                     }
 
-                    this._arAvailableButton.classList.remove('hidden');
-                    this._arAvailableButton.classList.remove('collapsed');
+                    this._arAvailableButton.classList.remove('hidden', 'collapsed', 'expanded');
                     this._arAvailableButton.style.display = 'block';
                     this._arAvailableButtonShown = true;
                     this.collapseArAvailableButtonDelayed();
