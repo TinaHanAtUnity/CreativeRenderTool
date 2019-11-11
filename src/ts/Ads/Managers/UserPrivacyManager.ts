@@ -169,7 +169,7 @@ export class UserPrivacyManager {
     private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
             'v': 2,
-            advertiserId: this._deviceInfo.getAdvertisingIdentifier(),
+            advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
             abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
             userAction: action,

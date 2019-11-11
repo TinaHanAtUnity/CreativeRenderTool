@@ -531,7 +531,7 @@ describe('UserPrivacyManagerTest', () => {
         it ('with proper fields', () => {
             const expectedKafkaObject = {
                 v: 2,
-                advertiserId: testAdvertisingId,
+                advertisingId: testAdvertisingId,
                 abGroup: abGroup,
                 layout: layout,
                 userAction: action,
@@ -594,7 +594,7 @@ describe('UserPrivacyManagerTest', () => {
             it('should send backwards-compatible event data', () => {
                 return sendEvent(undefined, GDPREventSource.USER).then((eventData) => {
                     assert.isDefined(eventData);
-                    assert.equal(eventData.advertiserId, testAdvertisingId);
+                    assert.equal(eventData.advertisingId, testAdvertisingId);
                     assert.equal(eventData.userAction, GDPREventAction.PERSONALIZED_PERMISSIONS);
                     assert.equal(eventData.projectId, testUnityProjectId);
                     assert.equal(eventData.platform, 'android');
