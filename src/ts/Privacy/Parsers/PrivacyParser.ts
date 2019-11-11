@@ -29,8 +29,12 @@ export class PrivacyParser {
     }
 
     private static parseAgeGateLimit(ageGateLimit: number | undefined, gamePrivacy: GamePrivacy, configJson: IRawAdsConfiguration, limitAdTracking: boolean): number {
-        ageGateLimit = ageGateLimit !== undefined ? ageGateLimit : 0;
-        if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST &&
+        ageGateLimit = ageGateLimit ? ageGateLimit : 0;
+        if (ageGateLimit === 0) {
+            return 0;
+        }
+
+        if (gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST &&
             gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             ageGateLimit = 0;
 
