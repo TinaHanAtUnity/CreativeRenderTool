@@ -70,7 +70,13 @@
                             triggerExperienceType(event.data.value.type, event.data.value.status);
                             break;
 
+                        case 'readyCallback':
+                            if (window.privacyAdapter.readyCallback) {
+                                window.privacyAdapter.readyCallback(event.data.value);
+                            }
+                            break;
                         default:
+                            console.log('Unhandled message: ' + event.data.type);
                             break;
                     }
                 }, false);
@@ -133,13 +139,6 @@
                 };
 
                 this.onPrivacyReady = function() {
-                    if (window.privacyAdapter.readyCallback) {
-                        const obj = {
-                            env: JSON.parse(this.getEnv()),
-                            user: JSON.parse(this.getUserSettings())
-                        };
-                        window.privacyAdapter.readyCallback(obj);
-                    }
                     window.parent.postMessage({
                         type: 'onPrivacyReady'
                     }, '*');
@@ -166,14 +165,6 @@
                         window.privacyAdapter.eventCallback(eventName);
                     }
                 };
-
-                this.getEnv = function() {
-                    return '{{ PRIVACY_ENVIRONMENT }}'
-                };
-
-                this.getUserSettings = function() {
-                    return '{{ PRIVACY_USER_SETTINGS }}'
-                }
             };
 
             window.privacyAdapter = new AdsPrivacyAdapter();

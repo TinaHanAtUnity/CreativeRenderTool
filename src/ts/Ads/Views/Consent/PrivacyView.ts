@@ -8,6 +8,7 @@ import { XHRequest } from 'Core/Utilities/XHRequest';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
@@ -30,6 +31,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
     private _iFrame: HTMLIFrameElement;
     private _domContentLoaded = false;
     private _privacyWebViewUrl: string;
+    private _privacyConfig: PrivacyConfig;
 
     constructor(params: IConsentViewParameters) {
         super(params.platform, 'consent');
@@ -44,10 +46,10 @@ export class PrivacyView extends View<IConsentViewHandler> {
         this._iFrameAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame));
 
         this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
+            this._privacyConfig = privacyConfig;
             this._privacyWebViewUrl = privacyConfig.getWebViewUrl();
-            this.createPrivacyFrame(
-                PrivacyContainer.replace('{{ PRIVACY_ENVIRONMENT }}', JSON.stringify(privacyConfig.getEnv().getJson()))
-                .replace('{{ PRIVACY_USER_SETTINGS }}', JSON.stringify(privacyConfig.getUserSettings().getJson())))
+
+            this.createPrivacyFrame(PrivacyContainer)
                 .then((privacyHtml) => {
                     this._iFrame.srcdoc = privacyHtml;
                 });
@@ -84,6 +86,16 @@ export class PrivacyView extends View<IConsentViewHandler> {
 
     public onPrivacyReady(): void {
         this._domContentLoaded = true;
+        if (this._iFrame && this._iFrame.contentWindow) {
+            this._iFrame.contentWindow.postMessage({
+                type: 'readyCallback',
+                value: {
+                    env: this._privacyConfig.getEnv().getJson(),
+                    flow: this._privacyConfig.getFlow(),
+                    user: this._privacyConfig.getUserSettings().getJson()
+                }
+            }, '*');
+        }
         this._coreApi.Sdk.logDebug('PRIVACY: Privacy WebView is ready!');
     }
 

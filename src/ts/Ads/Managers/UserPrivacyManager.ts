@@ -103,28 +103,32 @@ export class UserPrivacyManager {
     }
 
     public getPrivacyConfig(): Promise<PrivacyConfig> {
-        return Promise.resolve(new PrivacyConfig({
-            env: {
-                buildOsVersion: this._deviceInfo.getOsVersion(),
-                platform: this._platform,
-                userLocale: this._deviceInfo.getLanguage(),
-                country: this._coreConfig.getCountry(),
-                // todo: add api level
-                // todo: add subcountry
+        return this._request.get('http://10.35.34.174/api/v1/flows/create').then((response) => {
+            return Promise.resolve(new PrivacyConfig({
+                    env: {
+                        buildOsVersion: this._deviceInfo.getOsVersion(),
+                        platform: this._platform,
+                        userLocale: this._deviceInfo.getLanguage(),
+                        country: this._coreConfig.getCountry(),
+                        // todo: add api level
+                        // todo: add subcountry
 
-                privacyMethod: this._gamePrivacy.getMethod(),
-                ageGateLimit: this._privacy.getAgeGateLimit(),
-                legalFramework: this._privacy.getLegalFramework(),
-                isCoppa: this._coreConfig.isCoppaCompliant()
-            },
+                        privacyMethod: this._gamePrivacy.getMethod(),
+                        ageGateLimit: this._privacy.getAgeGateLimit(),
+                        legalFramework: this._privacy.getLegalFramework(),
+                        isCoppa: this._coreConfig.isCoppaCompliant()
+                    },
 
-            webViewUrl: TestEnvironment.get('privacyUrl')},
-            new PrivacyUserSettings({
-                ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
-                external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
-                gameExp: false // todo: fetch from this._userPrivacy.getPermissions().gameExp,
-                // todo: agree on agreedOverAgeLimit field from this.getAgeGateChoice()
-            })));
+                    flow: JSON.parse(response.response),
+
+                    webViewUrl: TestEnvironment.get('privacyUrl')},
+                new PrivacyUserSettings({
+                    ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
+                    external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
+                    gameExp: false // todo: fetch from this._userPrivacy.getPermissions().gameExp,
+                    // todo: agree on agreedOverAgeLimit field from this.getAgeGateChoice()
+                })));
+        });
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
