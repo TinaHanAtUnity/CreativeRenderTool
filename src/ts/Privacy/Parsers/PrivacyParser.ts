@@ -28,7 +28,7 @@ export class PrivacyParser {
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
     }
 
-    private static parseAgeGateLimit(ageGateLimit: number | undefined, gamePrivacy: GamePrivacy, configJson: IRawAdsConfiguration, limitAdTracking: boolean) : number {
+    private static parseAgeGateLimit(ageGateLimit: number | undefined, gamePrivacy: GamePrivacy, configJson: IRawAdsConfiguration, limitAdTracking: boolean): number {
         ageGateLimit = ageGateLimit !== undefined ? ageGateLimit : 0;
         if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST &&
             gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
