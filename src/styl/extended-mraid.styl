@@ -309,6 +309,32 @@ $ar-available-button-color = #0c292feb;
     }
   }
 
+  @keyframes collapseArButton {
+    from {
+      right: 0;
+      opacity: 1;
+      padding: 0 1.7em 0 1.3em;
+    }
+    to {
+      right: -7.5em;
+      opacity: 0.8;
+      padding: 0 1.7em 0 1.0em;
+    }
+  }
+
+  @keyframes expandArButton {
+    from {
+      right: -7.5em;
+      opacity: 0.8;
+      padding: 0 1.7em 0 1.0em;
+    }
+    to {
+      right: 0;
+      opacity: 1;
+      padding: 0 1.7em 0 1.3em;
+    }
+  }
+
   .ar-available-button {
       position: fixed;
       top: 70vh;
@@ -325,12 +351,36 @@ $ar-available-button-color = #0c292feb;
       animation: bounceInRight 1s;
   }
 
+  .ar-available-button.collapsed {
+    right: -7.5em;
+    opacity: 0.8;
+    padding: 0 1.7em 0 1.0em;
+    animation: collapseArButton 0.5s;
+  }
+
+  .ar-available-button.expanded {
+    right: 0;
+    opacity: 1;
+    padding: 0 1.7em 0 1.3em;
+    animation: expandArButton 0.5s;
+  }
+
   .ar-available-button p {
     display: inline;
     vertical-align: middle;
     line-height: 1;
 
     -webkit-font-smoothing: antialiased;
+  }
+
+  .ar-available-button.collapsed p{
+    opacity: 0;
+    transition: opacity 0.5s linear;
+  }
+
+  .ar-available-button.expanded p{
+    opacity: 1;
+    transition: opacity 0.5s linear;
   }
 
   .icon-ar-camera {
