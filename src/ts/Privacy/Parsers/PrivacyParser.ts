@@ -67,7 +67,6 @@ export class PrivacyParser {
             };
         }
 
-        // TODO: Handle limitAdTracking on Ads SDK side
         if (limitAdTracking) {
             const gPmethod = gamePrivacy.getMethod();
             return new UserPrivacy({
@@ -83,9 +82,7 @@ export class PrivacyParser {
 
         if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST ||
             gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
-            if (rawUserPrivacy && gamePrivacy.getMethod() === rawUserPrivacy.method) {
-                return new UserPrivacy(rawUserPrivacy);
-            } else {
+            if (!rawUserPrivacy || gamePrivacy.getMethod() !== rawUserPrivacy.method) {
                 return new UserPrivacy({
                     method: optOutRecorded ? gamePrivacy.getMethod() : PrivacyMethod.DEFAULT,
                     version: 0,

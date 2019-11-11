@@ -112,12 +112,6 @@ export class UserPrivacyManager {
             userPrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
 
-        if (source === GDPREventSource.USER_INDIRECT) {
-            if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-                permissions = {ads: true, gameExp: true, external: true};
-            }
-        }
-
         const updatedPrivacy = {
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
