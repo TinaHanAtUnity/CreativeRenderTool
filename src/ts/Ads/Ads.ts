@@ -117,7 +117,7 @@ export class Ads implements IAds {
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
-    private _showingConsent: boolean = false;
+    private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
 
@@ -310,7 +310,7 @@ export class Ads implements IAds {
         }
     }
 
-    private showConsentIfNeeded(options: unknown): Promise<void> {
+    private showPrivacyIfNeeded(options: unknown): Promise<void> {
         if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
         }
@@ -327,7 +327,7 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        this._showingConsent = true;
+        this._showingPrivacy = true;
 
         const privacyView = new PrivacyUnit({
             abGroup: this._core.Config.getAbGroup(),
@@ -361,7 +361,7 @@ export class Ads implements IAds {
         const contentType = campaign.getContentType();
         const seatId = campaign.getSeatId();
 
-        if (this._showing || this._showingConsent) {
+        if (this._showing || this._showingPrivacy) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
@@ -419,8 +419,8 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        this.showConsentIfNeeded(options).then(() => {
-            this._showingConsent = false;
+        this.showPrivacyIfNeeded(options).then(() => {
+            this._showingPrivacy = false;
             this.showAd(placement, campaign, options);
         });
     }

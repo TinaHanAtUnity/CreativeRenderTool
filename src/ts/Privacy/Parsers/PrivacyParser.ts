@@ -19,12 +19,17 @@ export class PrivacyParser {
 
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, configJson.optOutEnabled, limitAdTracking);
+        const ageGateLimit =  this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
         const gdprEnabled = configJson.gdprEnabled;
         const optOutRecorded = configJson.optOutRecorded;
         const optOutEnabled = configJson.optOutEnabled;
         const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
 
-        let ageGateLimit = configJson.ageGateLimit !== undefined ? configJson.ageGateLimit : 0;
+        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
+    }
+
+    private static parseAgeGateLimit(ageGateLimit: number | undefined, gamePrivacy: GamePrivacy, configJson: IRawAdsConfiguration, limitAdTracking: boolean) : number {
+        ageGateLimit = ageGateLimit !== undefined ? ageGateLimit : 0;
         if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST &&
             gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             ageGateLimit = 0;
@@ -35,8 +40,7 @@ export class PrivacyParser {
         if (limitAdTracking) {
             ageGateLimit = 0;
         }
-
-        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
+        return ageGateLimit;
     }
 
     private static parseGamePrivacy(rawGamePrivacy: IRawGamePrivacy | undefined, gdprEnabled: boolean): GamePrivacy {

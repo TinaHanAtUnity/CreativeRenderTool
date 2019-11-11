@@ -218,13 +218,8 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
     private handleAutoAgeGate(ageGate: boolean) {
         setTimeout(() => {
-            if (ageGate) {
-                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
-                this._unityPrivacyView.testAutoAgeGate(ageGate);
-            } else {
-                this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
-                this._unityPrivacyView.testAutoAgeGate(ageGate);
-            }
+            this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
+            this._unityPrivacyView.testAutoAgeGate(ageGate);
         }, 3000);
     }
 
