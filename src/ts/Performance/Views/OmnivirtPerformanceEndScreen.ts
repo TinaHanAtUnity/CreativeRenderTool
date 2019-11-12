@@ -33,8 +33,11 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     public render() {
         super.render();
-        this.createIframe();
-        this.injectOmnivirtCode();
+
+        if (!this._omnivirtContainer) {
+            this.createIframe();
+            this.injectOmnivirtCode();
+        }
     }
 
     private createIframe() {
