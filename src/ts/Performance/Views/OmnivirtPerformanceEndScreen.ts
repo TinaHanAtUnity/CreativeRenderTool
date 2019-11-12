@@ -49,10 +49,8 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
         omnivirtFrame.id = 'omnivirt-RMg-' + this._omnivirtAid;
         omnivirtFrame.frameBorder = '0';
 
-        const container = document.getElementById('omnivirt-container');
-        if (container) {
-            container.appendChild(omnivirtFrame);
-        }
+        const container = document.getElementById('omnivirt-container')!;
+        container.appendChild(omnivirtFrame);
     }
 
     private injectOmnivirtCode() {
