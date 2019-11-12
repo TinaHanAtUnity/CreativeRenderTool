@@ -103,7 +103,12 @@ export class UserPrivacyManager {
     }
 
     public getPrivacyConfig(): Promise<PrivacyConfig> {
-        return this._request.get('http://10.35.34.174/api/v1/flows/create').then((response) => {
+        const privacyUrl = TestEnvironment.get<string>('privacyUrl');
+        if (!privacyUrl) {
+            return Promise.reject(new Error('No privacy url'));
+        }
+
+        return this._request.get(privacyUrl + 'api/v1/flows/create').then((response) => {
             return Promise.resolve(new PrivacyConfig({
                     env: {
                         buildOsVersion: this._deviceInfo.getOsVersion(),
@@ -121,7 +126,8 @@ export class UserPrivacyManager {
 
                     flow: JSON.parse(response.response),
 
-                    webViewUrl: TestEnvironment.get('privacyUrl')},
+                    webViewUrl: privacyUrl
+                },
                 new PrivacyUserSettings({
                     ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
                     external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
