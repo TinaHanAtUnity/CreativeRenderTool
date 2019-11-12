@@ -68,7 +68,7 @@ describe('AutomatedExperimentManager test', () => {
             });
 
         const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([]).then(() => {
+        return aem.initialize([], core).then(() => {
             assert.isFalse(postStub.called);
             assert.isFalse(getStub.called);
             assert.isFalse(setStub.called);
@@ -101,7 +101,7 @@ describe('AutomatedExperimentManager test', () => {
                 });
 
             const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment]).then(() => {
+            return aem.initialize([FooExperiment], core).then(() => {
                 assert.isTrue(postStub.called);
                 assert.isTrue(getStub.called);
                 assert.isTrue(setStub.called);
@@ -137,7 +137,7 @@ describe('AutomatedExperimentManager test', () => {
                 });
 
             const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment]).then(() => {
+            return aem.initialize([FooExperiment], core).then(() => {
                 assert.isTrue(postStub.called);
                 assert.isTrue(getStub.called);
                 assert.isFalse(setStub.called);
@@ -177,7 +177,7 @@ describe('AutomatedExperimentManager test', () => {
             });
 
         const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([FooExperiment]).then(() => {
+        return aem.initialize([FooExperiment], core).then(() => {
             assert.isTrue(postStub.called);
             assert.isTrue(getStub.called);
             assert.isFalse(setStub.called);
@@ -207,7 +207,7 @@ describe('AutomatedExperimentManager test', () => {
             const postStub = sandbox.stub(core.RequestManager, 'post');
 
             const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment]).then(() => {
+            return aem.initialize([FooExperiment], core).then(() => {
                 assert.isFalse(postStub.called);
                 assert.isTrue(getStub.called);
                 assert.isFalse(setStub.called);
@@ -243,7 +243,7 @@ describe('AutomatedExperimentManager test', () => {
                 });
 
             const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperimentNoCache]).then(() => {
+            return aem.initialize([FooExperimentNoCache], core).then(() => {
                 assert.isTrue(postStub.called);
                 assert.isFalse(getStub.called);
                 assert.isTrue(setStub.called);
@@ -288,7 +288,7 @@ describe('AutomatedExperimentManager test', () => {
         });
 
         const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([FooExperiment]).then(() => {
+        return aem.initialize([FooExperiment], core).then(() => {
             aem.beginExperiment();
             const variant = aem.getExperimentAction(FooExperiment);
 
@@ -338,7 +338,7 @@ describe('AutomatedExperimentManager test', () => {
         });
 
         const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([FooExperiment]).then(() => {
+        return aem.initialize([FooExperiment], core).then(() => {
             aem.beginExperiment();
             const variant = aem.getExperimentAction(FooExperiment);
 
@@ -357,7 +357,7 @@ describe('AutomatedExperimentManager test', () => {
 
     it('EndExperiment should fail if called before beginExperiment', (done) => {
         const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        aem.initialize([]).then(() => {
+        aem.initialize([], core).then(() => {
             aem.endExperiment().catch(() => { done(); });
         });
     });
