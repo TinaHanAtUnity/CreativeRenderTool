@@ -2,7 +2,6 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import OmnivirtEndScreenTemplate from 'html/EndScreenOmnivirt.html';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
