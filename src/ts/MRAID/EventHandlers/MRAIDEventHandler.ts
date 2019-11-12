@@ -14,6 +14,7 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -160,5 +161,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
+    }
+
+    public onUseCustomClose(hideClose: boolean) {
+        this._mraidView.onUseCustomClose(hideClose);
     }
 }

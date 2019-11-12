@@ -1,4 +1,15 @@
-# Pending
+# Fri Nov  8 23:41:18 UTC 2019
+
+* Add Custom Close MRAID Functionality [#11566](https://github.com/Applifier/unity-ads-webview/pull/11566)
+* Add Groups 13 and 14 to Zynga Load V4 Experiment [#12065](https://github.com/Applifier/unity-ads-webview/pull/12065)
+* AR MRAID - Fix Click Behavior [#12064](https://github.com/Applifier/unity-ads-webview/pull/12064)
+* Add Granular Metrics for Tracking Admob Behavior [#12039](https://github.com/Applifier/unity-ads-webview/pull/12039)
+
+# Thu Nov  7 20:54:44 UTC 2019
+
+* Revert "Direct Catalog Request to Production Endpoint" [#12014](https://github.com/Applifier/unity-ads-webview/pull/12014)
+
+# Thu Nov  7 18:47:59 UTC 2019
 
 * Update Yarn Dependencies [#11983](https://github.com/Applifier/unity-ads-webview/pull/11983)
 * Add Core.ts and Ads.ts Mocks for Jest Testing [#11982](https://github.com/Applifier/unity-ads-webview/pull/11983)
