@@ -1,12 +1,29 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 import 'mocha';
-import {ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory} from 'Ads/Models/RequestPrivacy';
-import {GamePrivacy, IPermissions, IProfilingPermissions, PrivacyMethod, UserPrivacy} from 'Privacy/Privacy';
-import {toAbGroup} from 'Core/Models/ABGroup';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import {
+    CurrentUnityConsentVersion,
+    GamePrivacy,
+    IPermissions,
+    PrivacyMethod,
+    UserPrivacy
+} from 'Privacy/Privacy';
+
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from 'Core/Constants/Platform';
+import * as sinon from 'sinon';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('RequestPrivacyFactoryTests', () => {
     let userPrivacy: UserPrivacy;
     let gamePrivacy: GamePrivacy;
+    const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+    const deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
+    (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(false);
 
     const consentMethods = [PrivacyMethod.UNITY_CONSENT, PrivacyMethod.DEVELOPER_CONSENT];
 
@@ -71,5 +88,49 @@ describe('RequestPrivacyFactoryTests', () => {
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
         it('should return undefined', () => assert.isUndefined(result));
+    });
+
+    context('when userPrivacy is modified', () => {
+        const privacyParts = {
+            gdprEnabled: true,
+            optOutRecorded: false,
+            optOutEnabled: false,
+            gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT},
+            legalFramework: LegalFramework.GDPR
+        };
+        const newUserPrivacy = {
+            method: PrivacyMethod.UNITY_CONSENT,
+            permissions: {
+                ads: true,
+                external: true,
+                gameExp: true},
+            version: CurrentUnityConsentVersion};
+        let privacySDK: PrivacySDK;
+        beforeEach(() => {
+            privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyParts, clientInfo, deviceInfo);
+        });
+
+        it('requestPrivacy should be unaltered by privacy changes', () => {
+            const requestPrivacy = RequestPrivacyFactory.create(privacySDK.getUserPrivacy(), privacySDK.getGamePrivacy());
+            assert.exists(requestPrivacy);
+            assert.equal(requestPrivacy!.method, PrivacyMethod.UNITY_CONSENT);
+            assert.equal(requestPrivacy!.firstRequest, true);
+            assert.deepEqual(requestPrivacy!.permissions, {});
+            privacySDK.getUserPrivacy().update(newUserPrivacy);
+            assert.equal(requestPrivacy!.method, PrivacyMethod.UNITY_CONSENT);
+            assert.equal(requestPrivacy!.firstRequest, true);
+            assert.deepEqual(requestPrivacy!.permissions, {});
+        });
+
+        it('legacyRequestPrivacy should be unaltered by privacy changes', () => {
+            const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(privacySDK);
+            assert.equal(legacyRequestPrivacy.optOutRecorded, false);
+            assert.equal(legacyRequestPrivacy.optOutEnabled, false);
+            assert.equal(legacyRequestPrivacy.gdprEnabled, true);
+            privacySDK.getUserPrivacy().update(newUserPrivacy);
+            assert.equal(legacyRequestPrivacy.optOutRecorded, false);
+            assert.equal(legacyRequestPrivacy.optOutEnabled, false);
+            assert.equal(legacyRequestPrivacy.gdprEnabled, true);
+        });
     });
 });

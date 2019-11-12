@@ -1,12 +1,10 @@
 import {
     GamePrivacy,
-    IAllPermissions,
-    IGranularPermissions,
     IPermissions,
-    IProfilingPermissions,
     PrivacyMethod,
     UserPrivacy
 } from 'Privacy/Privacy';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -37,6 +35,14 @@ export class RequestPrivacyFactory {
             method: userPrivacy.getMethod(),
             firstRequest: false,
             permissions: userPrivacy.getPermissions()
+        };
+    }
+
+    public static createLegacy(privacySDK: PrivacySDK): ILegacyRequestPrivacy {
+        return {
+            gdprEnabled: privacySDK.isGDPREnabled(),
+            optOutRecorded: privacySDK.isOptOutRecorded(),
+            optOutEnabled: privacySDK.isOptOutEnabled()
         };
     }
 
