@@ -3,9 +3,11 @@
 #privacy-data-request {
   display: flex;
   flex-direction: column;
+
   input[type=email] {
     flex-grow: 1;
     border: 1px solid $consent-border-gray;
+    margin-top: .75 * $default-size;
     padding: .5 * $default-size;
     border-radius: .25 * $default-size;
     font-size: $default-font-size * .65;
@@ -25,6 +27,7 @@
     color: $white;
     text-align: center;
     font-size: $default-font-size * .75;
+    font-weight: $privacy-title-font-weight
   }
 
   .privacy-data-request-submit-button {
