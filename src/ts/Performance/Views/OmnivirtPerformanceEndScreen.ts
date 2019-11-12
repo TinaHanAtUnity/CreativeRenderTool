@@ -29,14 +29,6 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
     public show() {
         super.show();
         this.showOmnivirt();
-
-        const kafkaObject: { [key: string]: unknown } = {};
-        kafkaObject.type = 'omnivirt_endscreen_loaded';
-        kafkaObject.auctionId = this._campaign.getSession().getId();
-        kafkaObject.gameId = this._campaign.getGameId();
-        kafkaObject.omnivirtAid = this._omnivirtAid;
-
-        HttpKafka.sendEvent('aui.experiments.omnivirt', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     private showOmnivirt() {
