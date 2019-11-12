@@ -22,6 +22,7 @@ INLINE := $(BIN)/inline-source
 SOURCE_DIR := src
 TEST_DIR := test
 BUILD_DIR := build
+DIST_DIR := dist
 SOURCE_BUILD_DIR := $(BUILD_DIR)/$(SOURCE_DIR)
 TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
 ADMOB_CONTAINER_DIR := $(SOURCE_DIR)/html/admob
@@ -306,7 +307,7 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/release
 	mkdir -p deploy/test
 	mkdir -p deploy/$(COMMIT_ID)
-	cp build/release/index.html deploy/release/index.html
+	cp $(DIST_DIR)/index.html deploy/release/index.html
 	cp build/release/config.json deploy/release/config.json
 	cp $(TEST_BUILD_DIR)/index.html deploy/test/index.html
 	cp $(TEST_BUILD_DIR)/config.json deploy/test/config.json
@@ -316,7 +317,7 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy-china/release
 	mkdir -p deploy-china/test
 	mkdir -p deploy-china/$(COMMIT_ID)
-	cp build/release/index.html deploy-china/release/index.html
+	cp $(DIST_DIR)/index.html deploy-china/release/index.html
 	cp build/release/config.json.cn deploy-china/release/config.json
 	cp $(TEST_BUILD_DIR)/index.html deploy-china/test/index.html
 	cp $(TEST_BUILD_DIR)/config.json.cn deploy-china/test/config.json
