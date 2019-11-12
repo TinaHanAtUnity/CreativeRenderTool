@@ -47,7 +47,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected _platform: Platform;
     protected _core: ICoreApi;
     protected _osVersion: string;
-    protected _programmaticTrackingService: ProgrammaticTrackingService;
     private _ads: IAdsApi;
     private _store: IStoreApi;
     private _focusManager: FocusManager;
@@ -61,6 +60,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _coreConfig: CoreConfiguration;
     private _sessionManager: SessionManager;
     private _privacyManager: UserPrivacyManager;
+    protected _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
     private _privacySDK: PrivacySDK;
 
