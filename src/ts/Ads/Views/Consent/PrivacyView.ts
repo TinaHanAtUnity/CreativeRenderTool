@@ -85,18 +85,19 @@ export class PrivacyView extends View<IConsentViewHandler> {
     }
 
     public onPrivacyReady(): void {
-        this._domContentLoaded = true;
         if (this._iFrame && this._iFrame.contentWindow) {
             this._iFrame.contentWindow.postMessage({
                 type: 'readyCallback',
-                value: {
+                data: {
                     env: this._privacyConfig.getEnv().getJson(),
                     flow: this._privacyConfig.getFlow(),
                     user: this._privacyConfig.getUserSettings().getJson()
                 }
             }, '*');
         }
+
         this._coreApi.Sdk.logDebug('PRIVACY: Privacy WebView is ready!');
+        this._domContentLoaded = true;
     }
 
     public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
