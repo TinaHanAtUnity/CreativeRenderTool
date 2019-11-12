@@ -20,8 +20,6 @@ export class PerformanceAdUnitWithAutomatedExperimentFactory extends Performance
         const useIOSPerformanceAdUnit = parameters.platform === Platform.IOS;
         const performanceAdUnit = useIOSPerformanceAdUnit ? new IOSPerformanceAdUnitWithAutomatedExperiment(parameters) : new PerformanceAdUnitWithAutomatedExperiment(parameters);
 
-        let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
-
         const storeHandlerParameters: IStoreHandlerParameters = {
             platform: parameters.platform,
             core: parameters.core,
@@ -40,28 +38,11 @@ export class PerformanceAdUnitWithAutomatedExperimentFactory extends Performance
         };
         const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
-        parameters.overlay.addEventHandler(performanceOverlayEventHandler);
+        const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
         const endScreenEventHandler = new MabDecisionPerformanceEndScreenEventHandler(performanceAdUnit, parameters, storeHandler);
-        parameters.endScreen.addEventHandler(endScreenEventHandler);
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(performanceAdUnit, parameters.video, parameters.adUnitStyle, parameters);
-        this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
+        this.initializeHandlers(parameters, performanceAdUnit, performanceOverlayEventHandler, endScreenEventHandler);
 
-        if (parameters.platform === Platform.ANDROID) {
-            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
-                endScreenEventHandler.onKeyEvent(keyCode);
-
-                if (CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
-                    performanceOverlayEventHandler.onKeyEvent(keyCode);
-                }
-            });
-            performanceAdUnit.onClose.subscribe(() => {
-                if (onBackKeyObserver) {
-                    parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-                }
-            });
-        }
         return performanceAdUnit;
     }
 
