@@ -6,6 +6,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     private _omnivirtAid: string;
+    private _omnivirtContainer: HTMLElement | null;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, omnivirtAid: string, country?: string) {
         super(parameters, campaign, country);
@@ -27,10 +28,11 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     public show() {
         super.show();
-        this.showOmnivirt();
+        this._omnivirtContainer!.style.visibility = 'visible';
     }
 
-    private showOmnivirt() {
+    public render() {
+        super.render();
         this.createIframe();
         this.injectOmnivirtCode();
     }
@@ -40,8 +42,9 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
         omnivirtFrame.id = 'omnivirt-RMg-' + this._omnivirtAid;
         omnivirtFrame.frameBorder = '0';
 
-        const container = document.getElementById('omnivirt-container')!;
-        container.appendChild(omnivirtFrame);
+        this._omnivirtContainer = this._container.querySelector('.omnivirt-container');
+        this._omnivirtContainer!.style.visibility = 'hidden';
+        this._omnivirtContainer!.appendChild(omnivirtFrame);
     }
 
     private injectOmnivirtCode() {
