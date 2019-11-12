@@ -131,8 +131,8 @@ export class UserPrivacyManager {
                 new PrivacyUserSettings({
                     ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
                     external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
-                    gameExp: false // todo: fetch from this._userPrivacy.getPermissions().gameExp,
-                    // todo: agree on agreedOverAgeLimit field from this.getAgeGateChoice()
+                    gameExp: false, // todo: fetch from this._userPrivacy.getPermissions().gameExp,
+                    agreedOverAgeLimit: false // todo:  field from this.getAgeGateChoice()
                 })));
         });
     }

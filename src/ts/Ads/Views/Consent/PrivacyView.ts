@@ -32,6 +32,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
     private _domContentLoaded = false;
     private _privacyWebViewUrl: string;
     private _privacyConfig: PrivacyConfig;
+    private _frameEventAdapter: PrivacyFrameEventAdapter;
 
     constructor(params: IConsentViewParameters) {
         super(params.platform, 'consent');
@@ -43,7 +44,8 @@ export class PrivacyView extends View<IConsentViewHandler> {
 
     private loadIframe() {
         this._iFrame = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
-        this._iFrameAdapterContainer.connect(new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame));
+        this._frameEventAdapter = new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame);
+        this._iFrameAdapterContainer.connect(this._frameEventAdapter);
 
         this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
             this._privacyConfig = privacyConfig;
@@ -54,7 +56,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
                     this._iFrame.srcdoc = privacyHtml;
                 });
         }).catch((e) => {
-            this._coreApi.Sdk.logError('PRIVACY: failed to create privacy iFrame: ' + e.message);
+            this._coreApi.Sdk.logError('PRIVACY: Failed to create privacy iFrame: ' + e.message);
         });
     }
 
@@ -75,7 +77,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
                 return container.replace('<body></body>', '<body>' + privacyHtml + '</body>');
             }
 
-            throw new WebViewError('PRIVACY: Unable to fetch privacy WebView');
+            throw new WebViewError('Unable to fetch privacy WebView!');
         });
     }
 
@@ -85,19 +87,14 @@ export class PrivacyView extends View<IConsentViewHandler> {
     }
 
     public onPrivacyReady(): void {
-        if (this._iFrame && this._iFrame.contentWindow) {
-            this._iFrame.contentWindow.postMessage({
-                type: 'readyCallback',
-                data: {
-                    env: this._privacyConfig.getEnv().getJson(),
-                    flow: this._privacyConfig.getFlow(),
-                    user: this._privacyConfig.getUserSettings().getJson()
-                }
-            }, '*');
-        }
+        this._frameEventAdapter.postMessage('readyCallback', {
+            env: this._privacyConfig.getEnv().getJson(),
+            flow: this._privacyConfig.getFlow(),
+            user: this._privacyConfig.getUserSettings().getJson()
+        });
 
-        this._coreApi.Sdk.logDebug('PRIVACY: Privacy WebView is ready!');
         this._domContentLoaded = true;
+        this._coreApi.Sdk.logDebug('PRIVACY: Privacy ready');
     }
 
     public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
@@ -106,6 +103,6 @@ export class PrivacyView extends View<IConsentViewHandler> {
     }
 
     public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
-        this._coreApi.Sdk.logDebug('Got event: ' + name + ' with data: ' + JSON.stringify(data));
+        this._coreApi.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
     }
 }

@@ -17,59 +17,8 @@
                     sizeChange: []
                 };
 
-                var viewable = false;
-
-                var orientationProperties = {
-                    allowOrientationChange: true,
-                    forceOrientation: 'none'
-                };
-
-                var permissions = {};
-
-                var trigger = function(event, parameters) {
-                    if(!parameters) {
-                        parameters = [];
-                    }
-                    if(event in listeners) {
-                        for (var len = listeners[event].length, i = len - 1; i >= 0; i--) {
-                            var listener = listeners[event][i];
-                            try {
-                                listener.apply(window, parameters);
-                            } catch (e) {
-                                console.log('Got error ', e);
-                                window.parent.postMessage({
-                                    type: 'diagnosticError',
-                                    error: {
-                                        message: e.message
-                                    }
-                                }, '*');
-                            }
-                        }
-                    }
-                };
-
-                var width = window.innerWidth;
-                var height = window.innerHeight;
-
                 window.addEventListener('message', function(event) {
                     switch(event.data.type) {
-                        case 'viewable':
-                            viewable = event.data.value;
-                            trigger('viewableChange', [viewable]);
-                            break;
-
-                        case 'resize':
-                            window.innerWidth = width = event.data.width;
-                            window.innerHeight = height = event.data.height;
-                            trigger('sizeChange', [width, height]);
-                            break;
-
-                        case 'permission':
-                            permissions[event.data.value.type] = event.data.value.status;
-                            trigger('permissionChange', [event.data.value.type, event.data.value.status]);
-                            triggerExperienceType(event.data.value.type, event.data.value.status);
-                            break;
-
                         case 'readyCallback':
                             if (window.privacyAdapter.readyCallback) {
                                 window.privacyAdapter.readyCallback(event.data.data);
@@ -81,46 +30,6 @@
                     }
                 }, false);
 
-                window.addEventListener('resize', function(e) {
-                    width = window.innerWidth;
-                    height = window.innerHeight;
-                    trigger('sizeChange', [width, height]);
-                });
-
-                this.onShowFallback = function(listener) {
-                    if (permissions['Camera'] === false) {
-                        listener();
-                    } else {
-                        this.addEventListener('showFallback', listener);
-                    }
-                };
-
-                this.addEventListener = function(event, listener) {
-                    if(event in listeners) {
-                        listeners[event].push(listener);
-                    }
-                };
-
-                this.getCurrentPosition = this.getDefaultPosition = function() {
-                    return {
-                        x: 0,
-                        y: 0,
-                        width: width,
-                        height: height
-                    };
-                };
-
-                this.getMaxSize = this.getScreenSize = function() {
-                    return {
-                        width: width,
-                        height: height
-                    };
-                };
-
-                this.getOrientationProperties = function() {
-                    return orientationProperties;
-                };
-
                 this.removeEventListener = function(event, listener) {
                     if(event in listeners) {
                         var index = listeners[event].indexOf(listener);
@@ -128,14 +37,6 @@
                             listeners[event].splice(index, 1);
                         }
                     }
-                };
-
-                this.setOrientationProperties = function(properties) {
-                    orientationProperties = properties;
-                    window.parent.postMessage({
-                        type: 'orientation',
-                        properties: properties
-                    }, '*');
                 };
 
                 this.onPrivacyReady = function() {

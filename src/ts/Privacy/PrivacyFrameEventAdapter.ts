@@ -48,19 +48,17 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
 
     private onMessage(e: MessageEvent) {
         const message = e.data;
-        this._core.Sdk.logDebug(`privacy-iframe: event=${message.type}, data=${message}`);
         if (message.type in this._iFrameHandlers) {
             const handler = this._iFrameHandlers[message.type];
             handler(message);
         }
     }
 
-    private postMessage(event: string, data?: unknown) {
-        this._core.Sdk.logDebug(`##PRIVACY: IPrivacyFrameEventAdapter postMessage: ${event}`);
+    public postMessage(event: string, data?: unknown) {
         if (this._iFrame.contentWindow) {
             this._iFrame.contentWindow.postMessage({
                 type: event,
-                value: data
+                data: data
             }, '*');
         }
     }
