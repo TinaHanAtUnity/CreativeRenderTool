@@ -51,13 +51,6 @@ export class GamePrivacy extends Model<IGamePrivacy> {
         this.set('method', <PrivacyMethod>data.method);
     }
 
-    public isEnabled(): boolean {
-        if (!Object.values(PrivacyMethod).includes(this.getMethod())) {
-            return false;
-        }
-        return this.getMethod() !== PrivacyMethod.DEFAULT;
-    }
-
     public getMethod(): PrivacyMethod {
         return this.get('method');
     }

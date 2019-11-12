@@ -103,13 +103,14 @@ export class UserPrivacyManager {
         const gamePrivacy = this._gamePrivacy;
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
-        if (!gamePrivacy.isEnabled()) {
-            return Promise.resolve();
-        }
 
         if (source === GDPREventSource.DEVELOPER) {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
             userPrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+        }
+
+        if (gamePrivacy.getMethod() === PrivacyMethod.DEFAULT) {
+            return Promise.resolve();
         }
 
         const updatedPrivacy = {

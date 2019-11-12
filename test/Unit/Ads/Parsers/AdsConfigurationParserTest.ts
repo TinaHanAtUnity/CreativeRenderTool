@@ -74,14 +74,12 @@ describe('AdsConfigurationParserTest', () => {
                     configJson.gdprEnabled = false;
                     const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
                     assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
-                    assert.equal(privacy.getGamePrivacy().isEnabled(), false);
                 });
 
                 it('should set to LEGITIMATE_INTEREST if GDPR enabled', () => {
                     configJson.gdprEnabled = true;
                     const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
                     assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
-                    assert.equal(privacy.getGamePrivacy().isEnabled(), true);
                 });
             });
 
@@ -89,7 +87,6 @@ describe('AdsConfigurationParserTest', () => {
                 configJson.gamePrivacy!.method = 'unity_consent';
                 const privacy = PrivacyParser.parse(configJson, clientInfo, deviceInfo);
                 assert.equal(privacy.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
-                assert.equal(privacy.getGamePrivacy().isEnabled(), true);
             });
 
             it('should mark as not recorded if userPrivacy is undefined', () => {

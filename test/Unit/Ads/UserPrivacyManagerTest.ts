@@ -148,7 +148,6 @@ describe('UserPrivacyManagerTest', () => {
 
             tests.forEach((t) => {
                 beforeEach(() => {
-                    gamePrivacy.isEnabled.returns(t.privacyEnabled);
                     userPrivacy.getPermissions.returns(t.configUserPermissions);
                     userPrivacy.getMethod.returns(t.privacyMethod);
                     userPrivacy.getVersion.returns(0);
@@ -199,7 +198,6 @@ describe('UserPrivacyManagerTest', () => {
             [true, false].forEach((b) => {
                 it(`should not send anything for value "${b}"`, () => {
                     isGDPREnabled = true;
-                    gamePrivacy.isEnabled.returns(true);
                     gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                     gamePrivacy.getVersion.returns(0);
                     let currentPermissions = UserPrivacy.PERM_ALL_FALSE;
@@ -274,7 +272,6 @@ describe('UserPrivacyManagerTest', () => {
             tests.forEach((t) => {
                 it(`should send "${t.event}" when "${t.storedConsent}"`, () => {
                     isGDPREnabled = true;
-                    gamePrivacy.isEnabled.returns(true);
                     gamePrivacy.getMethod.returns(t.method);
                     gamePrivacy.getVersion.returns(0);
                     let currentPermissions = UserPrivacy.PERM_ALL_FALSE;
@@ -346,7 +343,6 @@ describe('UserPrivacyManagerTest', () => {
                 [[false, GDPREventAction.DEVELOPER_OPTOUT], [true, GDPREventAction.DEVELOPER_CONSENT]].forEach(([userConsents, event]) => {
                     it(`should send the last consent for ${userConsents}`, () => {
                         isGDPREnabled = true;
-                        gamePrivacy.isEnabled.returns(true);
                         gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                         gamePrivacy.getVersion.returns(0);
                         userPrivacy.getPermissions.returns(UserPrivacy.PERM_ALL_FALSE);
@@ -373,7 +369,6 @@ describe('UserPrivacyManagerTest', () => {
             beforeEach(() => {
                 let gamePrivacyMethod = PrivacyMethod.DEFAULT;
                 isGDPREnabled = true;
-                gamePrivacy.isEnabled.returns(true);
                 gamePrivacy.getMethod.callsFake(() => gamePrivacyMethod);
                 gamePrivacy.setMethod.callsFake((value) => gamePrivacyMethod = value);
                 gamePrivacy.getVersion.returns(0);
@@ -400,7 +395,6 @@ describe('UserPrivacyManagerTest', () => {
         describe('when game uses UNITY_CONSENT', () => {
             beforeEach(() => {
                 isGDPREnabled = true;
-                gamePrivacy.isEnabled.returns(true);
                 gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
             });
 
@@ -514,7 +508,6 @@ describe('UserPrivacyManagerTest', () => {
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(gamePrivacyMethod);
             gamePrivacy.getVersion.returns(agreedVersion);
             sandbox.stub(Math, 'random').returns(1);
@@ -565,7 +558,6 @@ describe('UserPrivacyManagerTest', () => {
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
             sandbox.stub(Math, 'random').returns(0);
             (<sinon.SinonStub>coreConfig.getCountry).returns('FI');
@@ -640,7 +632,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('if game privacy is disabled', () => {
-                gamePrivacy.isEnabled.returns(false);
+                gamePrivacy.getMethod.returns(PrivacyMethod.DEFAULT);
                 return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER, GDPREventAction.PERSONALIZED_PERMISSIONS).then(() => {
                     sinon.assert.notCalled(httpKafkaSpy);
                 });
