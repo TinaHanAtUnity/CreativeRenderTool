@@ -54,18 +54,23 @@ export class PrivacyDataRequest extends View<{}> {
             emailInputElement.disabled = true;
 
             this.sendDataRequestEvent().then(() => {
-                submitButton.classList.remove('click-animation');
-                buttonSpinner.container().classList.add('stop');
-                emailInputElement.disabled = false;
+                if (this.container() && this.container().parentElement) {
+                    submitButton.classList.remove('click-animation');
+                    buttonSpinner.container().classList.add('stop');
+                    emailInputElement.disabled = false;
 
-                // show success msg
+                    const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-msg');
+                    msgElement.classList.add('show-msg');
+                }
 
             }).catch(() => {
-                submitButton.classList.remove('click-animation');
-                buttonSpinner.container().classList.add('stop');
-                emailInputElement.disabled = false;
+                if (this.container() && this.container().parentElement) {
+                    submitButton.classList.remove('click-animation');
+                    buttonSpinner.container().classList.add('stop');
+                    emailInputElement.disabled = false;
 
-                // show failure msg
+                    // show failure msg
+                }
             });
         } else {
             // todo: triggers browser's built-in ui pop-up, could be replaced with something else

@@ -3,6 +3,7 @@
 #privacy-data-request {
   display: flex;
   flex-direction: column;
+  text-align: center;
 
   input[type=email] {
     flex-grow: 1;
@@ -33,6 +34,18 @@
   .privacy-data-request-submit-button {
     &.click-animation {
       $click-animation();
+    }
+  }
+
+  .privacy-data-request-msg {
+    display: none;
+    flex-grow: 1;
+    margin-top: .5 * $default-size;
+    padding: 2 * $default-size;
+    background: $white-smoke;
+
+    &.show-msg {
+      display: block;
     }
   }
 }
