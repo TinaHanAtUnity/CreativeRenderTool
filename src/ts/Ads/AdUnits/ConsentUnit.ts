@@ -59,7 +59,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             landingPage: this._landingPage,
             pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
-            consentABTest: ConsentUXTest.isValid(parameters.abGroup),
+            consentABTest: false,
             ageGateLimit: this._privacySDK.getAgeGateLimit()
         };
 
