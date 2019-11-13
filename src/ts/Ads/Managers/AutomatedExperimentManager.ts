@@ -5,10 +5,11 @@ import { StorageType, StorageApi } from 'Core/Native/Storage';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { Double } from 'Core/Utilities/Double';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: string };
-    metadata : { [key: string]: string }
+    metadata: { [key: string]: string };
 }
 
 interface IParsedExperiment {
@@ -34,15 +35,14 @@ class StateItem {
     }
 }
 
-class CachableExperimentData
-{
+class CachableExperimentData {
     constructor(action: string, metadata: string) {
         this.Action = action;
         this.Metadata = metadata;
     }
 
-    public Action : string;
-    public Metadata : string;
+    public Action: string;
+    public Metadata: string;
 }
 
 export class AutomatedExperimentManager {
@@ -51,7 +51,7 @@ export class AutomatedExperimentManager {
 
     private readonly _state: { [key: string]: StateItem } = {};
     private _experimentBegan = false;
-    private _ABGroup : ABGroup= -1;
+    private _ABGroup: ABGroup = -1;
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
     private static readonly _createEndPoint = 'experiment';
@@ -71,19 +71,19 @@ export class AutomatedExperimentManager {
                 .then((storedExperimentData) => ({ experiment, data : storedExperimentData }))
                 .catch(() => ({experiment, data: null}))
             );
-            
-        const contextualFeatPromise = this.CollectContextualFeatures( core );
+
+        const contextualFeatPromise = this.CollectContextualFeatures(core);
 
         experiments.forEach(experiment => {
             this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
         });
 
-        return contextualFeatPromise.then( features => {
+        return contextualFeatPromise.then(features => {
               this._ABGroup = core.Config.getAbGroup();
 
               Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
-                    .filter(storedExperiment => storedExperiment.data !== null )
+                    .filter(storedExperiment => storedExperiment.data !== null)
                     .forEach((storedExperiment) => {
                         const stateItem = this._state[storedExperiment.experiment.getName()];
                         if (stateItem) {
@@ -98,7 +98,7 @@ export class AutomatedExperimentManager {
                         .map(storedExperiment => storedExperiment.experiment),
                     ...experiments.filter(experiment => experiment.isCacheDisabled())
                 ];
-                
+
                 if (experimentsToRequest.length > 0) {
                     const body = AutomatedExperimentManager.createRequestBody(experimentsToRequest, features, this._ABGroup);
                     const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
@@ -110,7 +110,7 @@ export class AutomatedExperimentManager {
                             Diagnostics.trigger('failed_to_fetch_automated_experiments', err);
                         });
                 }
-            }) 
+            });
         });
     }
 
@@ -138,7 +138,7 @@ export class AutomatedExperimentManager {
                 if (this._state[stateKey].SendAction) {
                     promises.push(this.submit(this._state[stateKey], AutomatedExperimentManager._actionEndPoint));
                 }
-                
+
                 promises.push(this.submitExperimentOutcome(this._state[stateKey], AutomatedExperimentManager._rewardEndPoint));
             }
         }
@@ -191,9 +191,11 @@ export class AutomatedExperimentManager {
     }
 
     private submitExperimentOutcome(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
-        var rewardVal = 0
-        if( item.SendReward ) rewardVal = 1
-        
+        let rewardVal = 0;
+        if (item.SendReward) {
+            rewardVal = 1;
+        }
+
         const outcome = {
             user_info: { ab_Group: this._ABGroup },
             experiment: item.getExperiment().getName(),
@@ -205,7 +207,7 @@ export class AutomatedExperimentManager {
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
         const body = JSON.stringify(outcome);
         return this._requestManager.post(url, body);
-    }    
+    }
 
     private loadExperiments(experiments: IParsedExperiment[]): Promise<void> {
         experiments.forEach(experiment => {
@@ -220,7 +222,7 @@ export class AutomatedExperimentManager {
 
     private storeExperiments(experiments: IParsedExperiment[]): Promise<void> {
         experiments.forEach(experiment => {
-            this.storeExperimentData(experiment.name,new CachableExperimentData( experiment.action, experiment.metadata) )
+            this.storeExperimentData(experiment.name, new CachableExperimentData(experiment.action, experiment.metadata));
         });
         return Promise.resolve();
     }
@@ -244,13 +246,13 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private CollectContextualFeatures( core : ICore ): Promise<{ [key: string]: unknown }> {
+    private CollectContextualFeatures(core: ICore): Promise<{ [key: string]: unknown }> {
         return Promise.all<unknown>([
-            core.DeviceInfo.getHeadset().catch((err) => {Diagnostics.trigger('failed_to_determine_headset_presence', err); return null;}),
-            core.DeviceInfo.getDeviceVolume().catch((err) => {Diagnostics.trigger('failed_to_determine_volume_level', err); return null;}),
+            core.DeviceInfo.getHeadset().catch((err) => { Diagnostics.trigger('failed_to_determine_headset_presence', err); return null; }),
+            core.DeviceInfo.getDeviceVolume().catch((err) => { Diagnostics.trigger('failed_to_determine_volume_level', err); return null; })
         ]).then(([
             headset,
-            deviceVolume,
+            deviceVolume
         ]) => {
             return {
                 'timeZone': core.DeviceInfo.getTimeZone(),
@@ -259,9 +261,9 @@ export class AutomatedExperimentManager {
                 'deviceVolume': deviceVolume
             };
         });
-    }    
+    }
 
-    private static createRequestBody(experiments: AutomatedExperiment[], contextualFeatures : { [key:string]: any }, abGroup : ABGroup): string {
+    private static createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: string | Double | number }, abGroup: ABGroup): string {
         return JSON.stringify({
             user_info: { ab_Group: abGroup },
             experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
@@ -272,7 +274,7 @@ export class AutomatedExperimentManager {
     private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableExperimentData> {
         return this._storageApi.get<CachableExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
     }
-  
+
     private storeExperimentData(experimentName: string, data: CachableExperimentData) {
         this._storageApi.set<CachableExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
         this._storageApi.write(StorageType.PRIVATE);
