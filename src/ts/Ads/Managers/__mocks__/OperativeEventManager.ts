@@ -7,7 +7,7 @@ export type OperativeEventManagerMock = Base & {
 };
 
 export const OperativeEventManager = jest.fn(() => {
-    return <OperativeEventManagerMock><unknown>{
+    return <OperativeEventManagerMock>{
         sendSkip: jest.fn().mockImplementation(() => Promise.resolve()),
         sendThirdQuartile: jest.fn().mockImplementation(() => Promise.resolve()),
         sendView: jest.fn().mockImplementation(() => Promise.resolve())

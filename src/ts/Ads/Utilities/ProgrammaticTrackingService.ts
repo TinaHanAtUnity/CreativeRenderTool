@@ -24,7 +24,17 @@ export enum AdmobMetric {
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
     AdmobUserWasRewarded = 'admob_user_was_rewarded',
-    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video'
+    AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video',
+    AdmobDBMRewardedCanPlay = 'admob_dbm_rewarded_canplay',
+    AdmobDBMRewardedStarted = 'admob_dbm_rewarded_started',
+    AdmobDBMNonRewardedCanPlay = 'admob_dbm_nonrewarded_canplay',
+    AdmobDBMNonRewardedStarted = 'admob_dbm_nonrewarded_started',
+    AdmobNonDBMRewardedCanPlay = 'admob_nondbm_rewarded_canplay',
+    AdmobNonDBMRewardedStarted = 'admob_nondbm_rewarded_started',
+    AdmobNonDBMNonRewardedCanPlay = 'admob_nondbm_nonrewarded_canplay',
+    AdmobNonDBMNonRewardedStarted = 'admob_nondbm_nonrewarded_started',
+    AdmobVideoCanPlay = 'admob_video_canplay',
+    AdmobVideoStarted = 'admob_video_started'
 }
 
 export enum BannerMetric {
@@ -90,7 +100,15 @@ export enum TimingMetric {
     AdsInitializeTime = 'uads_ads_initialize_time'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
+export enum MraidMetric {
+    UseCustomCloseCalled = 'mraid_use_custom_close_called',
+    CloseMovedToLeft = 'mraid_close_graphic_moved_to_left',
+    CloseHidden = 'mraid_close_graphic_hidden',
+    ClosedByAdUnit = 'mraid_closed_by_ad_unit',
+    ClosedByUnityAds = 'mraid_closed_by_unity_ads'
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
@@ -128,7 +146,8 @@ export class ProgrammaticTrackingService {
     }
 
     private createMetricTags(event: PTSEvent): string[] {
-        return [this.createAdsSdkTag('mevt', event)];
+        return [this.createAdsSdkTag('mevt', event),
+                this.createAdsSdkTag('plt', Platform[this._platform])];
     }
 
     private createTimingTags(): string[] {

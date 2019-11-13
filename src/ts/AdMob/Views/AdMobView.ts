@@ -221,13 +221,22 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                     cachedFileURL = this.encodeURLForHTML(cachedFileURL);
                     const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
                     scriptEl.textContent = replacedSrc;
-                    // report using cached video
-                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo).catch();
+
+                    if (scriptEl.textContent.includes(cachedFileURL)) {
+                        // report using cached video
+                        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo);
+                    } else {
+                        // report using streaming video
+                        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+                    }
                 } else {
                     // report using streaming video
-                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo).catch();
+                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
                 }
             }
+        } else {
+            // report using streaming video
+            this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
         }
     }
 

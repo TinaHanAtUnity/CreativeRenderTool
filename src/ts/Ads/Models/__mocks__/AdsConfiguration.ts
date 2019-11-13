@@ -4,6 +4,6 @@ export type AdsConfigurationMock = Base & {
 };
 
 export const AdsConfiguration = jest.fn(() => {
-    return <AdsConfigurationMock><unknown>{
+    return <AdsConfigurationMock>{
     };
 });
