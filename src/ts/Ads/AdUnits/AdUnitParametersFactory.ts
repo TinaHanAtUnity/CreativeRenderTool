@@ -31,9 +31,6 @@ import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { Url } from 'Core/Utilities/Url';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
