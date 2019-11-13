@@ -159,12 +159,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
     }
 
-    public testAutoConsentAll() {
-        const testEvent = new Event('testAutoConsent');
-        this.onHomepageAcceptAllEvent(testEvent);
-    }
-
-    public testAutoConsent(consent: IPermissions, agreedAll: boolean): void {
+    public testAutoConsent(consent: IPermissions): void {
         this._handlers.forEach(handler => handler.onConsent(consent, GDPREventAction.TEST_AUTO_CONSENT, GDPREventSource.USER));
         this._handlers.forEach(handler => handler.onClose());
     }
