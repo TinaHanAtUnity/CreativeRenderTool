@@ -80,11 +80,12 @@ INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(
 BROWSER_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js $(SOURCE_BUILD_DIR)/styl/main.css $(BUILD_DIR)/browser/index.html $(BUILD_DIR)/browser/iframe.html
 DEV_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.js $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
 RELEASE_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(BUILD_DIR)/release/index.html $(BUILD_DIR)/release/config.json
+WEBPACK_RELEASE_BUILD_TARGETS := $(DIST_DIR)/index.html $(DIST_DIR)/config.json
 TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(TEST_BUILD_DIR)/index.html $(TEST_BUILD_DIR)/config.json
 
 # Built-in targets
 
-.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
+.PHONY: all static build-browser build-dev build-release webpack-build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
 .PHONY: $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
@@ -99,6 +100,8 @@ build-browser: all $(BROWSER_BUILD_TARGETS)
 build-dev: all $(DEV_BUILD_TARGETS)
 
 build-release: all $(RELEASE_BUILD_TARGETS)
+
+webpack-build-release: all $(WEBPACK_RELEASE_BUILD_TARGETS)
 
 build-test: all $(TEST_BUILD_TARGETS)
 
@@ -164,6 +167,9 @@ $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html $(SOURCE_BUILD_DI
 
 $(BUILD_DIR)/release/config.json:
 	INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
+
+$(DIST_DIR)/index.html:
+	npm run build:release
 
 $(DIST_DIR)/config.json:
 	INPUT=$(DIST_DIR)/index.html OUTPUT=$(DIST_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
