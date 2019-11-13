@@ -24,7 +24,7 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         const showGDPRBanner = this.showGDPRBanner(baseParams);
 
         let om;
-        const isOMEnabled = baseParams.campaign.isOMEnabled();
+        const isOMEnabled = baseParams.campaign.isOMEnabled() ? true : false;
         baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, `${isOMEnabled}`);
         if (isOMEnabled) {
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
