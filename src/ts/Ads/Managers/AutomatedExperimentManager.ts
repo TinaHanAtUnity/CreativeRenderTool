@@ -18,6 +18,8 @@ interface IParsedExperiment {
     metadata: string;
 }
 
+type ContextualFeature = string | Double | number | boolean;
+
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
         this._experiment = experiment;
@@ -246,10 +248,10 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private CollectContextualFeatures(core: ICore): Promise<{ [key: string]: unknown }> {
-        return Promise.all<unknown>([
-            core.DeviceInfo.getHeadset().catch((err) => { Diagnostics.trigger('failed_to_determine_headset_presence', err); return null; }),
-            core.DeviceInfo.getDeviceVolume().catch((err) => { Diagnostics.trigger('failed_to_determine_volume_level', err); return null; })
+    private CollectContextualFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }> {
+        return Promise.all<ContextualFeature>([
+            <Promise<boolean>>core.DeviceInfo.getHeadset().catch((err) => { Diagnostics.trigger('failed_to_determine_headset_presence', err); return null; }),
+            <Promise<number>>core.DeviceInfo.getDeviceVolume().catch((err) => { Diagnostics.trigger('failed_to_determine_volume_level', err); return null; })
         ]).then(([
             headset,
             deviceVolume
@@ -263,7 +265,7 @@ export class AutomatedExperimentManager {
         });
     }
 
-    private static createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: string | Double | number }, abGroup: ABGroup): string {
+    private static createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}, abGroup: ABGroup): string {
         return JSON.stringify({
             user_info: { ab_Group: abGroup },
             experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
