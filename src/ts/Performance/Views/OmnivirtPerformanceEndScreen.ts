@@ -3,6 +3,8 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import OmnivirtEndScreenTemplate from 'html/EndScreenOmnivirt.html';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
+const SQUARE_END_SCREEN = 'square-end-screen';
+
 export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     private _omnivirtAid: string;
@@ -24,6 +26,10 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     protected getTemplate() {
         return OmnivirtEndScreenTemplate;
+    }
+
+    protected getEndscreenAlt(): string | undefined {
+        return SQUARE_END_SCREEN;
     }
 
     public show() {
