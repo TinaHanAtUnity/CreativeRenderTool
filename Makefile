@@ -345,6 +345,8 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/$(COMMIT_ID)
 	cp $(DIST_DIR)/index.html deploy/release/index.html
 	cp $(DIST_DIR)/config.json deploy/release/config.json
+	cp $(TEST_BUILD_DIR)/index.html deploy/test/index.html
+	cp $(TEST_BUILD_DIR)/config.json deploy/test/config.json
 	rsync -r deploy/release deploy/$(COMMIT_ID)
 	rsync -r deploy/test deploy/$(COMMIT_ID)
 
