@@ -55,7 +55,8 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (this._om) {
 
             // Only use for 3.2- Open Measurement Certification - remove for 3.3+
-            if (this._platform === Platform.ANDROID && this._clientInfo.getSdkVersion() === 3200) {
+            // 3.2 OM cert made use of absolute pixels so we convert dp to absolutes here
+            if (this._platform === Platform.ANDROID) {
                 const density = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
                 x = OpenMeasurementUtilities.convertDpToPixels(x, density);
                 y = OpenMeasurementUtilities.convertDpToPixels(y, density);
