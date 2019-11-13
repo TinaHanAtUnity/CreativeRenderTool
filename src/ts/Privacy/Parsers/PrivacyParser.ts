@@ -73,6 +73,21 @@ export class PrivacyParser {
             return undefined;
         }
 
+        // Handle current granular permissions
+        if (rawUserPrivacy.permissions.ads !== undefined &&
+            rawUserPrivacy.permissions.external !== undefined &&
+            rawUserPrivacy.permissions.gameExp !== undefined) {
+            return {
+                method: rawUserPrivacy.method,
+                version: rawUserPrivacy.version,
+                permissions: {
+                    ads: rawUserPrivacy.permissions.ads,
+                    external: rawUserPrivacy.permissions.external,
+                    gameExp: rawUserPrivacy.permissions.gameExp
+                }
+            };
+        }
+
         // Handle old style 'all'-privacy
         if ((<IAllPermissions><unknown>rawUserPrivacy.permissions).all === true) {
             return {
@@ -106,16 +121,6 @@ export class PrivacyParser {
             }
         }
 
-        // Handle current granular permissions
-        if (rawUserPrivacy.permissions.ads !== undefined &&
-            rawUserPrivacy.permissions.external !== undefined &&
-            rawUserPrivacy.permissions.gameExp !== undefined) {
-            return {
-                method: rawUserPrivacy.method,
-                version: rawUserPrivacy.version,
-                permissions: rawUserPrivacy.permissions
-            };
-        }
         return undefined;
     }
 
