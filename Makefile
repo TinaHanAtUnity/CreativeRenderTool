@@ -163,7 +163,10 @@ $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html $(SOURCE_BUILD_DI
 	mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/release/config.json:
-	INPUT=$(DIST_DIR)/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
+	INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
+
+$(DIST_DIR)/config.json:
+	INPUT=$(DIST_DIR)/index.html OUTPUT=$(DIST_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
 $(TEST_BUILD_DIR)/index.html: $(SOURCE_DIR)/hybrid-test-index.html $(TEST_BUILD_DIR)/UnitBundle.min.js test-utils/reporter.js test-utils/setup.js
 	mkdir -p $(dir $@) && $(INLINE) $< $@
@@ -308,7 +311,7 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/test
 	mkdir -p deploy/$(COMMIT_ID)
 	cp $(DIST_DIR)/index.html deploy/release/index.html
-	cp build/release/config.json deploy/release/config.json
+	cp $(DIST_DIR)/config.json deploy/release/config.json
 	cp $(TEST_BUILD_DIR)/index.html deploy/test/index.html
 	cp $(TEST_BUILD_DIR)/config.json deploy/test/config.json
 	rsync -r deploy/release deploy/$(COMMIT_ID)
@@ -318,7 +321,7 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy-china/test
 	mkdir -p deploy-china/$(COMMIT_ID)
 	cp $(DIST_DIR)/index.html deploy-china/release/index.html
-	cp build/release/config.json.cn deploy-china/release/config.json
+	cp $(DIST_DIR)/config.json.cn deploy-china/release/config.json
 	cp $(TEST_BUILD_DIR)/index.html deploy-china/test/index.html
 	cp $(TEST_BUILD_DIR)/config.json.cn deploy-china/test/config.json
 	rsync -r deploy-china/release deploy-china/$(COMMIT_ID)
