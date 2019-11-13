@@ -33,6 +33,7 @@ import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { Url } from 'Core/Utilities/Url';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -126,8 +127,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
                 [ThirdPartyEventMacro.ZONE]: this._placement.getId(),
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
                 [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
-                [ThirdPartyEventMacro.OM_ENABLED]: this._campaign instanceof VastCampaign || this._campaign instanceof AdMobCampaign ? `${this._campaign.isOMEnabled()}` : `${false}`,
-                [ThirdPartyEventMacro.OM_VENDORS]: this._campaign instanceof VastCampaign ? this.arrayToPipedString(this._campaign.getOMVendors()) : ThirdPartyEventMacro.OM_VENDORS
+                [ThirdPartyEventMacro.OM_ENABLED]: `${false}`,
+                [ThirdPartyEventMacro.OM_VENDORS]: ''
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,
@@ -142,15 +143,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             privacy: this.createPrivacy(),
             privacySDK: this._privacySDK
         };
-    }
-
-    protected arrayToPipedString(arr: string[]): string {
-        let stringBuilder = '';
-        arr.forEach((str) => {
-            stringBuilder += `${str}|`;
-        });
-
-        return stringBuilder.slice(0, -1);
     }
 
     protected getOperativeEventManager(): OperativeEventManager {

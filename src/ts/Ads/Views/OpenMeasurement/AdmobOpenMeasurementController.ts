@@ -12,6 +12,7 @@ import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasure
 import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { Url } from 'Core/Utilities/Url';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -79,16 +80,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             omVendors.push(resource.vendorKey);
         });
         this._campaign.setOMVendors(omVendors);
-        this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, this.arrayToPipedString(omVendors));
-    }
-
-    private arrayToPipedString(arr: string[]): string {
-        let stringBuilder = '';
-        arr.forEach((str) => {
-            stringBuilder += `${str}|`;
-        });
-
-        return stringBuilder.slice(0, -1);
+        this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, Url.arrayToPipedString(omVendors));
     }
 
     public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
