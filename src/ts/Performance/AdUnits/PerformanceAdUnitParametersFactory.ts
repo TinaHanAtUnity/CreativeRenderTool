@@ -47,7 +47,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         };
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
-        const endScreen = this.getEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const endScreen = this.createEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,
@@ -60,7 +60,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         };
     }
 
-    private getEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
+    private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
         const abGroup = endScreenParameters.abGroup;
         if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
             return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, campaign, country);
