@@ -25,8 +25,6 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
         const useIOSPerformanceAdUnit = parameters.platform === Platform.IOS;
         const performanceAdUnit = useIOSPerformanceAdUnit ? new IOSPerformanceAdUnit(parameters) : new PerformanceAdUnit(parameters);
 
-        let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
-
         const storeHandlerParameters: IStoreHandlerParameters = {
             platform: parameters.platform,
             core: parameters.core,
@@ -45,9 +43,16 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
         };
         const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
-        parameters.overlay.addEventHandler(performanceOverlayEventHandler);
+        const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, parameters, storeHandler);
+
+        this.initializeHandlers(parameters, performanceAdUnit, performanceOverlayEventHandler, endScreenEventHandler);
+
+        return performanceAdUnit;
+    }
+
+    protected initializeHandlers(parameters: IPerformanceAdUnitParameters, performanceAdUnit: PerformanceAdUnit, performanceOverlayEventHandler: PerformanceOverlayEventHandler, endScreenEventHandler: PerformanceEndScreenEventHandler) {
+        parameters.overlay.addEventHandler(performanceOverlayEventHandler);
         parameters.endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(performanceAdUnit, parameters.video, parameters.adUnitStyle, parameters);
@@ -67,7 +72,5 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
                 }
             });
         }
-        return performanceAdUnit;
     }
-
 }
