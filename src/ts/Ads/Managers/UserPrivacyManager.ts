@@ -147,18 +147,7 @@ export class UserPrivacyManager {
         const currentPermissions = currentPrivacy.getPermissions();
         const updatedPermissions = updatedPrivacy.permissions;
 
-        if (currentPermissions.gameExp !== updatedPermissions.gameExp) {
-            return true;
-        }
-
-        if (currentPermissions.ads !== updatedPermissions.ads) {
-            return true;
-        }
-
-        if (currentPermissions.external !== updatedPermissions.external) {
-            return true;
-        }
-        return false;
+        return !UserPrivacy.permissionsEql(currentPermissions, updatedPermissions);
     }
 
     private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {

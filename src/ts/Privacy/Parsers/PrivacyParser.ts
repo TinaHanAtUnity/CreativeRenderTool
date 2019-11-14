@@ -169,13 +169,13 @@ export class PrivacyParser {
         }
 
         if (!rawUserPrivacy) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: UserPrivacy.PERM_ALL_FALSE});
+            return UserPrivacy.createUnrecorded();
         }
 
         // reset outdated user privacy if the game privacy method has been changed, first ad request will be contextual
         const methodHasChanged = rawUserPrivacy.method !== gamePrivacy.getMethod();
         if (gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT && methodHasChanged) {
-            return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: UserPrivacy.PERM_ALL_FALSE});
+            return UserPrivacy.createUnrecorded();
         }
 
         return new UserPrivacy(rawUserPrivacy);
