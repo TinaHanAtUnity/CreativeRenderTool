@@ -1,12 +1,8 @@
 import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import {
-    CurrentUnityConsentVersion,
-    GamePrivacy,
-    IProfilingPermissions,
-    IGranularPermissions,
-    PrivacyMethod,
-    UserPrivacy,
-    IAllPermissions, IRawGamePrivacy, IRawUserPrivacy
+    CurrentUnityConsentVersion, GamePrivacy,
+    PrivacyMethod, UserPrivacy,
+    IRawGamePrivacy, IRawUserPrivacy
 } from 'Privacy/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -23,13 +19,23 @@ export class PrivacyParser {
 
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, configJson.gamePrivacy, configJson.optOutEnabled, limitAdTracking);
+        const ageGateLimit =  this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
         const gdprEnabled = configJson.gdprEnabled;
         const optOutRecorded = configJson.optOutRecorded;
         const optOutEnabled = configJson.optOutEnabled;
         const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
 
-        let ageGateLimit = configJson.ageGateLimit !== undefined ? configJson.ageGateLimit : 0;
-        if (ageGateLimit > 0 && gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST) {
+        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
+    }
+
+    private static parseAgeGateLimit(ageGateLimit: number | undefined, gamePrivacy: GamePrivacy, configJson: IRawAdsConfiguration, limitAdTracking: boolean): number {
+        ageGateLimit = ageGateLimit ? ageGateLimit : 0;
+        if (ageGateLimit === 0) {
+            return 0;
+        }
+
+        if (gamePrivacy.getMethod() !== PrivacyMethod.LEGITIMATE_INTEREST &&
+            gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             ageGateLimit = 0;
 
             Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(configJson)});
@@ -38,8 +44,7 @@ export class PrivacyParser {
         if (limitAdTracking) {
             ageGateLimit = 0;
         }
-
-        return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, optOutRecorded, optOutEnabled, ageGateLimit, legalFramework);
+        return ageGateLimit;
     }
 
     private static parseGamePrivacy(rawGamePrivacy: IRawGamePrivacy | undefined, gdprEnabled: boolean): GamePrivacy {

@@ -1,4 +1,8 @@
 {
+  "privacy-legitimate-interest-pop-up-1": "Unity正在当前应用程序中个性化定制您的广告体验。",
+  "privacy-legitimate-interest-pop-up-2": "请点击这里",
+  "privacy-legitimate-interest-pop-up-3": "来了解详情和管理您的隐私设置。",
+
   "privacy-dialog-title": "Unity发布的有助于保护您隐私的消息",
 
   "privacy-dialog-text-li-p1": "广告使游戏开发者能够免费提供优秀的应用程序。我们也在尝试根据您正在使用的应用程序、设备和所在的国家/地区，来展示对您来说最有趣的应用程序和产品。",
