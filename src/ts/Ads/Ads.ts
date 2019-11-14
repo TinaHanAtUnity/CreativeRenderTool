@@ -577,6 +577,9 @@ export class Ads implements IAds {
         }
 
         if (TestEnvironment.get('creativeUrl')) {
+            // reset auction protocol to allow changing between creativeUrl and creativePack modes
+            RequestManager.setTestAuctionProtocol(undefined);
+
             const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
@@ -597,6 +600,9 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
+            // reset auction protocol to allow changing between creativeUrl and creativePack modes
+            RequestManager.setTestAuctionProtocol(undefined);
+
             const platform = this._core.NativeBridge.getPlatform();
             const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
 
