@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 
 import CloserTemplate from 'html/closer.html';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface ICloseHandler extends IGDPREventHandler {
     onClose(skipped: boolean): void;
@@ -29,9 +30,9 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandlerView {
     private _gdprPopupClicked: boolean = false;
     private _hidePrivacy: boolean;
 
-    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean, hidePrivacy: boolean = false) {
+    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, language: string, showGDPRBanner: boolean, hidePrivacy: boolean = false) {
         super(platform, 'closer');
-        this._template = new Template(CloserTemplate);
+        this._template = new Template(CloserTemplate, new Localization(language, 'privacy'));
         this._placement = placement;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
