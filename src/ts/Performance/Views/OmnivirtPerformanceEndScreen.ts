@@ -34,7 +34,9 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     public show() {
         super.show();
-        this._omnivirtContainer!.style.visibility = 'visible';
+        if (this._omnivirtContainer) {
+            this._omnivirtContainer.style.visibility = 'visible';
+        }
     }
 
     public render() {
@@ -52,8 +54,10 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
         omnivirtFrame.frameBorder = '0';
 
         this._omnivirtContainer = this._container.querySelector('.omnivirt-container');
-        this._omnivirtContainer!.style.visibility = 'hidden';
-        this._omnivirtContainer!.appendChild(omnivirtFrame);
+        if (this._omnivirtContainer) {
+            this._omnivirtContainer.style.visibility = 'hidden';
+            this._omnivirtContainer.appendChild(omnivirtFrame);
+        }
     }
 
     private injectOmnivirtCode() {
@@ -66,6 +70,9 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
             OmniVirt3D.setup(`#omnivirt-RMg-${this._omnivirtAid}`, { aid: this._omnivirtAid, insideIframe: true });
         };
         omnivirtScript.src = `https://cdn.omnivirt.com/3d-photo/script/${this._omnivirtAid}.js`;
-        firstScriptTag.parentNode!.insertBefore(omnivirtScript, firstScriptTag);
+
+        if (firstScriptTag.parentNode) {
+            firstScriptTag.parentNode.insertBefore(omnivirtScript, firstScriptTag);
+        }
     }
 }
