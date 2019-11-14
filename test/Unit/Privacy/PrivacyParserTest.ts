@@ -30,7 +30,7 @@ const assertDefaultUserPrivacy = (privacySDK: PrivacySDK) => {
     const userPrivacy = privacySDK.getUserPrivacy();
     assert.equal(userPrivacy.getMethod(), PrivacyMethod.DEFAULT);
     assert.equal(userPrivacy.getVersion(), 0);
-    assert.deepEqual(userPrivacy.getPermissions(), {ads: false, external: false, gameExp: false});
+    assert.deepEqual(userPrivacy.getPermissions(), UserPrivacy.PERM_ALL_FALSE);
     assert.equal(privacySDK.isOptOutRecorded(), false);
     assert.equal(privacySDK.isOptOutEnabled(), false);
 };
@@ -234,10 +234,43 @@ describe('PrivacyParserTest', () => {
                     const userPrivacy = privacySDK.getUserPrivacy();
                     assert.equal(userPrivacy.getMethod(), expectedGamePrivacyMethod);
                     assert.equal(userPrivacy.getVersion(), privacyMethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0);
-                    assert.deepEqual(userPrivacy.getPermissions(), {ads: false, external: false, gameExp: false});
+                    assert.deepEqual(userPrivacy.getPermissions(), UserPrivacy.PERM_ALL_FALSE);
                     assert.equal(privacySDK.isOptOutRecorded(), expectedOptOutRecorded);
                     assert.equal(privacySDK.isOptOutEnabled(), expectedOptOutRecorded ? true : false);
                 });
+            });
+        });
+    });
+
+    context ('userPrivacy.method is DEVELOPER_CONSENT', () => {
+        let privacyPartsConfig: IPrivacyPartsConfig;
+        const otherPrivacyMethods = [PrivacyMethod.LEGITIMATE_INTEREST, PrivacyMethod.UNITY_CONSENT, PrivacyMethod.DEFAULT];
+
+        beforeEach(() => {
+            privacyPartsConfig = {
+                gdprEnabled: true,
+                optOutRecorded: false,
+                optOutEnabled: false,
+                gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT},
+                userPrivacy: {method: PrivacyMethod.DEVELOPER_CONSENT, version: 0, permissions: UserPrivacy.PERM_DEVELOPER_CONSENTED}
+            };
+            (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(false);
+        });
+
+        otherPrivacyMethods.forEach((gamePrivacyMethod) => {
+            it (`and gamePrivacy.method is ${gamePrivacyMethod}, gamePrivacy.method should be updated to DEVELOPER_CONSENT`, () => {
+                privacyPartsConfig.gamePrivacy = {method: gamePrivacyMethod};
+                const expectedGamePrivacyMethod = PrivacyMethod.DEVELOPER_CONSENT;
+                const privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyPartsConfig, clientInfo, deviceInfo);
+                const gamePrivacy = privacySDK.getGamePrivacy();
+                assert.equal(gamePrivacy.getMethod(), expectedGamePrivacyMethod);
+                assert.equal(privacySDK.isGDPREnabled(), true);
+                const userPrivacy = privacySDK.getUserPrivacy();
+                assert.equal(userPrivacy.getMethod(), PrivacyMethod.DEVELOPER_CONSENT);
+                assert.equal(userPrivacy.getVersion(), 0);
+                assert.deepEqual(userPrivacy.getPermissions(), UserPrivacy.PERM_DEVELOPER_CONSENTED);
+                assert.equal(privacySDK.isOptOutRecorded(), true);
+                assert.equal(privacySDK.isOptOutEnabled(), false);
             });
         });
     });

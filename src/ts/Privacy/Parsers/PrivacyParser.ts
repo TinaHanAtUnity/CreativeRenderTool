@@ -2,7 +2,9 @@ import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import {
     CurrentUnityConsentVersion,
     GamePrivacy,
-    IAllPermissions, IGranularPermissions, IProfilingPermissions,
+    IAllPermissions,
+    IGranularPermissions,
+    IProfilingPermissions,
     IRawGamePrivacy,
     IRawUserPrivacy,
     PrivacyMethod,
@@ -135,6 +137,10 @@ export class PrivacyParser {
                 version:  gPmethod === PrivacyMethod.UNITY_CONSENT ? CurrentUnityConsentVersion : 0,
                 permissions: UserPrivacy.PERM_ALL_FALSE
             });
+        }
+
+        if (rawUserPrivacy && rawUserPrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
+            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
 
         if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST ||
