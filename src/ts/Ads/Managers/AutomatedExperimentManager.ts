@@ -18,7 +18,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | Double | number | boolean;
+type ContextualFeature = string | Double | number | boolean | undefined;
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
@@ -37,7 +37,7 @@ class StateItem {
     }
 }
 
-class CachableExperimentData {
+export class CachableAutomatedExperimentData {
     constructor(action: string, metadata: string) {
         this.Action = action;
         this.Metadata = metadata;
@@ -83,7 +83,7 @@ export class AutomatedExperimentManager {
         return contextualFeatPromise.then(features => {
               this._ABGroup = core.Config.getAbGroup();
 
-              Promise.all(storedExperimentsPromise).then(storedExperiments => {
+              return Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
                     .filter(storedExperiment => storedExperiment.data !== null)
                     .forEach((storedExperiment) => {
@@ -224,7 +224,7 @@ export class AutomatedExperimentManager {
 
     private storeExperiments(experiments: IParsedExperiment[]): Promise<void> {
         experiments.forEach(experiment => {
-            this.storeExperimentData(experiment.name, new CachableExperimentData(experiment.action, experiment.metadata));
+            this.storeExperimentData(experiment.name, new CachableAutomatedExperimentData(experiment.action, experiment.metadata));
         });
         return Promise.resolve();
     }
@@ -234,10 +234,11 @@ export class AutomatedExperimentManager {
             let json: IAutomatedExperimentResponse;
             try {
                 json = JsonParser.parse<IAutomatedExperimentResponse>(response.response);
+
                 return Object.keys(json.experiments).map(experiment => ({
                     name: experiment,
                     action: json.experiments[experiment],
-                    metadata: json.metadata[experiment]
+                    metadata: (json.metadata === undefined ? '' : json.metadata[experiment])
                 }));
             } catch (e) {
                 Diagnostics.trigger('failed_to_parse_automated_experiments', e);
@@ -273,12 +274,12 @@ export class AutomatedExperimentManager {
         });
     }
 
-    private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableExperimentData> {
-        return this._storageApi.get<CachableExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
+    private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableAutomatedExperimentData> {
+        return this._storageApi.get<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
     }
 
-    private storeExperimentData(experimentName: string, data: CachableExperimentData) {
-        this._storageApi.set<CachableExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
+    private storeExperimentData(experimentName: string, data: CachableAutomatedExperimentData) {
+        this._storageApi.set<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
         this._storageApi.write(StorageType.PRIVATE);
     }
 }

@@ -7,7 +7,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentManager, CachableAutomatedExperimentData } from 'Ads/Managers/AutomatedExperimentManager';
 import { StorageType } from 'Core/Native/Storage';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -48,6 +48,17 @@ describe('AutomatedExperimentManager test', () => {
         sandbox.restore();
     });
 
+    const defaultContextualFeatures = {
+         headset: false,
+         deviceVolume: 1
+    };
+
+    const requestBodyText = JSON.stringify({
+        user_info: {ab_Group: 99},
+        experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}],
+        contextual_features: defaultContextualFeatures
+    });
+
     it(`initialize with request ok, no experiments`, () => {
         const getStub = sandbox.stub(core.Api.Storage, 'get')
             .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment')
@@ -83,14 +94,13 @@ describe('AutomatedExperimentManager test', () => {
                 .rejects();
 
             const setStub = sandbox.stub(core.Api.Storage, 'set')
-                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', action)
+                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData(action, ''))
                 .resolves();
 
             const writeStub = sandbox.stub(core.Api.Storage, 'write')
                 .resolves();
 
             const postUrl = baseUrl + createEndPoint;
-            const requestBodyText = JSON.stringify({experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}]});
             const responseText = JSON.stringify({experiments: {FooExperiment: action}});
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
@@ -119,14 +129,13 @@ describe('AutomatedExperimentManager test', () => {
                 .rejects();
 
             const setStub = sandbox.stub(core.Api.Storage, 'set')
-                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', action)
+                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData(action, ''))
                 .resolves();
 
             const writeStub = sandbox.stub(core.Api.Storage, 'write')
                 .resolves();
 
             const postUrl = baseUrl + createEndPoint;
-            const requestBodyText = JSON.stringify({experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}]});
             const responseText = 'not json';
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
@@ -159,14 +168,13 @@ describe('AutomatedExperimentManager test', () => {
             .rejects();
 
         const setStub = sandbox.stub(core.Api.Storage, 'set')
-            .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', 'FooAction1')
+            .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData('FooAction1', ''))
             .resolves();
 
         const writeStub = sandbox.stub(core.Api.Storage, 'write')
             .resolves();
 
         const postUrl = baseUrl + createEndPoint;
-        const requestBodyText = JSON.stringify({experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}]});
         const responseText = JSON.stringify({});
 
         const postStub = sandbox.stub(core.RequestManager, 'post')
@@ -193,12 +201,14 @@ describe('AutomatedExperimentManager test', () => {
 
     ['FooAction1', 'FooAction2'].forEach((action) => {
         it(`initialize with cached action ${action}`, () => {
+            const storedData = new CachableAutomatedExperimentData(action, '');
+
             const getStub = sandbox.stub(core.Api.Storage, 'get')
                 .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment')
-                .resolves(action);
+                .resolves(storedData);
 
             const setStub = sandbox.stub(core.Api.Storage, 'set')
-                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', 'FooAction1')
+                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', storedData)
                 .rejects();
 
             const writeStub = sandbox.stub(core.Api.Storage, 'write')
@@ -220,19 +230,20 @@ describe('AutomatedExperimentManager test', () => {
 
     [['FooAction1', 'FooAction2'], ['FooAction2', 'FooAction1']].forEach(([action, expected]) => {
         it(`initialize with cached experiment, ignore cached action ${action}`, () => {
+            const storableData = new CachableAutomatedExperimentData(expected, '');
+
             const getStub = sandbox.stub(core.Api.Storage, 'get')
                 .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment')
-                .resolves(action);
+                .resolves(storableData);
 
             const setStub = sandbox.stub(core.Api.Storage, 'set')
-                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', expected)
+                .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', storableData)
                 .resolves();
 
             const writeStub = sandbox.stub(core.Api.Storage, 'write')
                 .resolves();
 
             const postUrl = baseUrl + createEndPoint;
-            const requestBodyText = JSON.stringify({experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}]});
             const responseText = JSON.stringify({experiments: {FooExperiment: expected}});
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
@@ -254,104 +265,58 @@ describe('AutomatedExperimentManager test', () => {
         });
     });
 
-    it('experiment, rewarded', () => {
-        let getStub = sandbox.stub(core.Api.Storage, 'get');
-        getStub = getStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment').rejects();
+    [0, 1].forEach((rewarded) => {
+        it(`experiment, rewarded(${rewarded})`, () => {
+            let getStub = sandbox.stub(core.Api.Storage, 'get');
+            getStub = getStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment').rejects();
 
-        let setStub = sandbox.stub(core.Api.Storage, 'set');
-        setStub = setStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', 'FooAction1');
+            let setStub = sandbox.stub(core.Api.Storage, 'set');
+            setStub = setStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData('FooAction1', ''));
 
-        sandbox.stub(core.Api.Storage, 'write').resolves();
+            sandbox.stub(core.Api.Storage, 'write').resolves();
 
-        const postStub = sandbox.stub(core.RequestManager, 'post');
+            const postStub = sandbox.stub(core.RequestManager, 'post');
 
-        const responseText = JSON.stringify({experiments: {FooExperiment: 'FooAction1'}});
-        postStub.onCall(0).resolves(<INativeResponse>{
-            responseCode: 200,
-            response: responseText
-        });
+            const responseText = JSON.stringify({experiments: {FooExperiment: 'FooAction1'}});
+            postStub.onCall(0).resolves(<INativeResponse>{
+                responseCode: 200,
+                response: responseText
+            });
 
-        const actionPostUrl = baseUrl + actionEndPoint;
-        const actionRequestBodyText = JSON.stringify({experiment: 'FooExperiment', action: 'FooAction1'});
-        const actionResponseText = JSON.stringify({success: true});
-        const postStubAction = postStub.onCall(1).resolves(<INativeResponse>{
-            responseCode: 200,
-            response: actionResponseText
-        });
+            const actionPostUrl = baseUrl + actionEndPoint;
+            const actionRequestBodyText = JSON.stringify({experiment: 'FooExperiment', action: 'FooAction1'});
+            const actionResponseText = JSON.stringify({success: true});
+            const postStubAction = postStub.onCall(1).resolves(<INativeResponse>{
+                responseCode: 200,
+                response: actionResponseText
+            });
 
-        const rewardPostUrl = baseUrl + rewardEndPoint;
-        const rewardRequestBodyText = JSON.stringify({experiment: 'FooExperiment', action: 'FooAction1'});
-        const rewardResponseText = JSON.stringify({success: true});
-        const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
-            responseCode: 200,
-            response: rewardResponseText
-        });
+            const rewardPostUrl = baseUrl + rewardEndPoint;
+            const rewardRequestBodyText = JSON.stringify({user_info: {ab_Group: 99}, experiment: 'FooExperiment', action: 'FooAction1', Reward: rewarded, metadata: ''});
+            const rewardResponseText = JSON.stringify({success: true});
+            const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
+                responseCode: 200,
+                response: rewardResponseText
+            });
 
-        const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([FooExperiment], core).then(() => {
-            aem.beginExperiment();
-            const variant = aem.getExperimentAction(FooExperiment);
+            const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
+            return aem.initialize([FooExperiment], core).then(() => {
+                aem.beginExperiment();
+                const variant = aem.getExperimentAction(FooExperiment);
 
-            assert.equal(variant, 'FooAction1', 'Wrong variant name');
+                assert.equal(variant, 'FooAction1', 'Wrong variant name');
 
-            aem.sendAction(FooExperiment);
-            aem.sendReward();
-
-        }).then(() => {
-            return aem.endExperiment();
-        }).then(() => {
-            assert(postStub.calledThrice);
-            assert(postStubAction.calledWith(actionPostUrl, actionRequestBodyText));
-            assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
-        });
-    });
-
-    it('experiment, non-rewarded', () => {
-        let getStub = sandbox.stub(core.Api.Storage, 'get');
-        getStub = getStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment').rejects();
-
-        let setStub = sandbox.stub(core.Api.Storage, 'set');
-        setStub = setStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', 'FooAction1');
-
-        sandbox.stub(core.Api.Storage, 'write').resolves();
-
-        const postStub = sandbox.stub(core.RequestManager, 'post');
-
-        const responseText = JSON.stringify({experiments: {FooExperiment: 'FooAction1'}});
-        postStub.onCall(0).resolves(<INativeResponse>{
-            responseCode: 200,
-            response: responseText
-        });
-
-        const actionPostUrl = baseUrl + actionEndPoint;
-        const actionRequestBodyText = JSON.stringify({experiment: 'FooExperiment', action: 'FooAction1'});
-        const actionResponseText = JSON.stringify({success: true});
-        const postStubAction = postStub.onCall(1).resolves(<INativeResponse>{
-            responseCode: 200,
-            response: actionResponseText
-        });
-
-        const rewardResponseText = JSON.stringify({success: true});
-        const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
-            responseCode: 200,
-            response: rewardResponseText
-        });
-
-        const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([FooExperiment], core).then(() => {
-            aem.beginExperiment();
-            const variant = aem.getExperimentAction(FooExperiment);
-
-            assert.equal(variant, 'FooAction1', 'Wrong variant name');
-
-            aem.sendAction(FooExperiment);
-
-        }).then(() => {
-            return aem.endExperiment();
-        }).then(() => {
-            assert(postStub.calledTwice);
-            assert(postStubAction.calledWith(actionPostUrl, actionRequestBodyText));
-            assert.isFalse(postStubReward.notCalled);
+                aem.sendAction(FooExperiment);
+                if (rewarded) {
+                    aem.sendReward();
+                }
+            }).then(() => {
+                return aem.endExperiment();
+            }).then(() => {
+                assert(postStub.calledThrice);
+                assert(postStubAction.calledWith(actionPostUrl, actionRequestBodyText));
+                assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
+            });
         });
     });
 
