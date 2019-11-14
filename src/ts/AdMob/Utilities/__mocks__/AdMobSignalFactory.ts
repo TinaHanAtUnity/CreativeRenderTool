@@ -4,5 +4,5 @@ export type AdMobSignalFactoryMock = Base & {
 };
 
 export const AdMobSignalFactory = jest.fn(() => {
-    return <AdMobSignalFactoryMock><unknown>{};
+    return <AdMobSignalFactoryMock>{};
 });

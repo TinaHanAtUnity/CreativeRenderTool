@@ -116,7 +116,7 @@ export class CustomFeatures {
     }
 
     public static isMopubTestGameForLoad(gameId: string): boolean {
-        if (gameId === '1926039' || gameId === '1732577') {
+        if (gameId === '1926039' || gameId === '1732577' || gameId === '3206806' || gameId === '2788221') {
             return true;
         } else {
             return false;

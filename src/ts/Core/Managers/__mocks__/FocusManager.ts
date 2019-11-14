@@ -4,5 +4,5 @@ export type FocusManagerMock = Base & {
 };
 
 export const FocusManager = jest.fn(() => {
-    return <FocusManagerMock><unknown>{};
+    return <FocusManagerMock>{};
 });
