@@ -50,7 +50,6 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
@@ -65,9 +64,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
-import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
-import { ITestCreativePack } from 'Ads/Models/CreativePack';
+import { CampaignResponseUtils } from 'Ads/Utilities/CampaignResponseUtils';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -600,28 +597,8 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
-            const json = JsonParser.parse<ITestCreativePack>(creativePack);
             const platform = this._core.NativeBridge.getPlatform();
-            let response: string = '';
-
-            if (platform === Platform.ANDROID) {
-                response = JSON.stringify(CreativePackResponseAndroid);
-            } else if (platform === Platform.IOS) {
-                response = JSON.stringify(CreativePackResponseIos);
-            }
-
-            response = response.replace('{ICON_PLACEHOLDER}', json.gameIcon || '');
-            response = response.replace('{ENDSCREEN_PLACEHOLDER}', json.endScreen || '');
-            response = response.replace('{ENDSCREEN_LANDSCAPE_PLACEHOLDER}', json.endScreenLandscape || '');
-            response = response.replace('{ENDSCREEN_PORTRAIT_PLACEHOLDER}', json.endScreenPortrait || '');
-            response = response.replace('{TRAILER_DOWNLOADABLE_PLACEHOLDER}', json.trailerDownloadable || '');
-            response = response.replace('{TRAILER_DOWNLOADABLE_SIZE}', json.trailerDownloadableSize ? json.trailerDownloadableSize.toString() : '1');
-            response = response.replace('{TRAILER_STREAMING_PLACEHOLDER}', json.trailerStreaming || '');
-            response = response.replace('{TRAILER_PORTRAIT_DOWNLOADABLE_PLACEHOLDER}', json.trailerPortraitDownloadable || '');
-            response = response.replace('{TRAILER_PORTRAIT_DOWNLOADABLE_SIZE}', json.trailerPortraitDownloadableSize ? json.trailerPortraitDownloadableSize.toString() : '1');
-            response = response.replace('{TRAILER_PORTRAIT_STREAMING_PLACEHOLDER}', json.trailerPortraitStreaming || '');
-            response = response.replace('{APPSTORE_ID_PLACEHOLDER}', json.appStoreId || '');
-            response = response.replace('{APPSTORE_NAME_PLACEHOLDER}', json.appStoreName || '');
+            const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
 
             CampaignManager.setCampaignResponse(response);
         }
