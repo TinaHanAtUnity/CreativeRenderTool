@@ -4,8 +4,8 @@ import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { IPermissions, isUnityConsentPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 export interface IPrivacyEventHandlerParameters {
     platform: Platform;

@@ -21,7 +21,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
@@ -29,7 +29,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -74,8 +73,7 @@ import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
                 programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-                privacySDK: sinon.createStubInstance(PrivacySDK),
-                automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
+                privacySDK: sinon.createStubInstance(PrivacySDK)
             };
 
             privacyEventHandler = new PrivacyEventHandler(adUnitParameters);

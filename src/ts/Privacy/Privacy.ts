@@ -12,6 +12,7 @@ export interface IAllPermissions {
 }
 
 export interface IGranularPermissions {
+    [key: string]: boolean;
     gameExp: boolean;
     ads: boolean;
     external: boolean;
@@ -127,6 +128,16 @@ export class UserPrivacy extends Model<IUserPrivacy> {
                 external: false
             }
         });
+    }
+
+    public static permissionsEql(permissions1: IGranularPermissions, permissions2: IGranularPermissions): boolean {
+        const properties = ['ads', 'external', 'gameExp'];
+        for (const property of properties) {
+            if (permissions1[property] !== permissions2[property]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     constructor(data: IRawUserPrivacy) {
