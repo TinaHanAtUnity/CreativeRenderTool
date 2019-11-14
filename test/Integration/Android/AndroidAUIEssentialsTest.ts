@@ -18,6 +18,12 @@ import { PermissionsUtil } from 'Core/Utilities/Permissions';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { MRAIDView } from 'MRAID/Views/MRAIDView';
+import { ITestCreativePack } from 'Ads/Models/CreativePack';
+import { CampaignResponseUtils } from 'Ads/Utilities/CampaignResponseUtils';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
+import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
 
 class TestListener implements IUnityAdsListener {
 
@@ -53,15 +59,26 @@ class TestListener implements IUnityAdsListener {
 }
 
 interface ITestMetadataConfig {
+    forcePlayable: boolean;
     forceAR: boolean;
     forceGDPRBanner: boolean;
     debugJSConsole: boolean;
+    creativePack?: string;
 }
 
 describe('AndroidAUIEssentialsTest', () => {
     const sandbox = sinon.createSandbox();
     const playableTestUrl = 'https://fake-ads-backend.unityads.unity3d.com/get_file/mraids/game_of_war/android/index_android.html';
     const arTestUrl = 'https://fake-ads-backend.unityads.unity3d.com/get_file/ar/test_bridge_index.html';
+    const testCreativePack = JSON.stringify({
+        gameIcon: 'http://cdn.unityads.unity3d.com/impact/11017/test_game_icon.png',
+        endScreenLandscape: 'http://cdn.unityads.unity3d.com/impact/11017/test_endscreen_landscape.png',
+        endScreenPortrait: 'http://cdn.unityads.unity3d.com/impact/11017/test_endscreen_portrait.png',
+        trailerDownloadable: 'http://cdn.unityads.unity3d.com/impact/11017/blue_test_trailer.mp4',
+        trailerStreaming: 'http://cdn.unityads.unity3d.com/impact/11017/blue_test_trailer.mp4',
+        appStoreId: '1463016906',
+        appStoreName: 'Creative Testing'
+    });
 
     let listener: TestListener;
     let iframeSrc: string;
@@ -71,10 +88,11 @@ describe('AndroidAUIEssentialsTest', () => {
         sandbox.restore();
     });
 
-    // Reset Autoclose settings after tests
+    // Reset settings after tests
     after(() => {
         AbstractAdUnit.setAutoCloseDelay(0);
         AbstractAdUnit.setAutoClose(false);
+        RequestManager.setTestAuctionProtocol(undefined);
     });
 
     const fakeARSupport = (targetSandbox: sinon.SinonSandbox) => {
@@ -84,19 +102,29 @@ describe('AndroidAUIEssentialsTest', () => {
     };
 
     const setupFakeMetadata = (targetSandbox: sinon.SinonSandbox, config: ITestMetadataConfig) => {
+        let creativeUrl;
+        if (config.forceAR) {
+            creativeUrl = arTestUrl;
+        } else if (config.forcePlayable) {
+            creativeUrl = playableTestUrl;
+        } else {
+            creativeUrl = '';
+        }
+
         targetSandbox.stub(TestEnvironment, 'get')
             .withArgs('debugJsConsole').returns(config.debugJSConsole)
-            .withArgs('forcedPlayableMRAID').returns(!config.forceAR)
+            .withArgs('forcedPlayableMRAID').returns(config.forcePlayable)
             .withArgs('forcedARMRAID').returns(config.forceAR)
             .withArgs('forcedGDPRBanner').returns(config.forceGDPRBanner)
-            .withArgs('creativeUrl').returns(config.forceAR ? arTestUrl : playableTestUrl)
+            .withArgs('creativeUrl').returns(creativeUrl)
             .withArgs('serverUrl').returns('')
             .withArgs('auctionUrl').returns('')
             .withArgs('forceAuctionProtocol').returns('')
             .withArgs('forceAuthorization').returns('')
             .withArgs('abGroup').returns('')
             .withArgs('campaignId').returns('')
-            .withArgs('country').returns('');
+            .withArgs('country').returns('')
+            .withArgs('creativePack').returns(config.creativePack);
     };
 
     const initialize = async () => {
@@ -175,10 +203,33 @@ describe('AndroidAUIEssentialsTest', () => {
         });
     };
 
+    const showAndResolve = async () => {
+        listener = new TestListener();
+        return new Promise((resolve) => {
+            const readyListener = listener.onReady.subscribe((placement) => {
+                listener.onReady.unsubscribe(readyListener);
+                UnityAds.show(placement);
+            });
+
+            const startListener = listener.onStart.subscribe((placement) => {
+                listener.onStart.unsubscribe(startListener);
+                setTimeout(() => UnityAds.getBackend().Api.AdUnit.close(), 250);
+            });
+
+            const finishListener = listener.onFinish.subscribe((placement) => {
+                listener.onFinish.unsubscribe(finishListener);
+                resolve();
+            });
+
+            initialize();
+        });
+    };
+
     describe('Analysing playable container, AR Mode', () => {
         before(async function(this: Mocha.ITestCallbackContext) {
             this.timeout(35000);
             setupFakeMetadata(sandbox, {
+                forcePlayable: false,
                 forceAR: true,
                 forceGDPRBanner: true,
                 debugJSConsole: true
@@ -225,6 +276,7 @@ describe('AndroidAUIEssentialsTest', () => {
         before(async function(this: Mocha.ITestCallbackContext) {
             this.timeout(35000);
             setupFakeMetadata(sandbox, {
+                forcePlayable: true,
                 forceAR: false,
                 forceGDPRBanner: false,
                 debugJSConsole: false
@@ -264,6 +316,28 @@ describe('AndroidAUIEssentialsTest', () => {
 
             const privacyButton = <HTMLElement>dom.querySelector('.privacy-button');
             assert.strictEqual(privacyButton.style.visibility, 'visible');
+        });
+    });
+
+    describe('Forcing video creative pack', () => {
+        let setCampaignResponseSpy: sinon.SinonSpy;
+
+        before(async function(this: Mocha.ITestCallbackContext) {
+            this.timeout(35000);
+            setupFakeMetadata(sandbox, {
+                forcePlayable: false,
+                forceAR: false,
+                forceGDPRBanner: false,
+                debugJSConsole: false,
+                creativePack: testCreativePack
+            });
+            setCampaignResponseSpy = sandbox.spy(CampaignManager, 'setCampaignResponse');
+            await showAndResolve();
+        });
+
+        it('should have set correct campaign response', () => {
+            const response = CampaignResponseUtils.getVideoCreativePackResponse(Platform.ANDROID, testCreativePack);
+            assert.isTrue(setCampaignResponseSpy.calledWith(response));
         });
     });
 });
