@@ -108,7 +108,12 @@ export enum MraidMetric {
     ClosedByUnityAds = 'mraid_closed_by_unity_ads'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric;
+export enum AUIMetric {
+    InvalidEndscreenAnimation = 'invalid_endscreen_animation',
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
