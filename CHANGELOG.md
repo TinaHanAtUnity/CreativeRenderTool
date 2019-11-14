@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 14 22:01:01 UTC 2019
 
 * Add Support for Webpack Release Builds (Only being deployed on 2.1.0) [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
 * Add Omnivirt widget Square Endcard Experiment [#12067](https://github.com/Applifier/unity-ads-webview/pull/12067)
