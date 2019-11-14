@@ -61,7 +61,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             onVideoElement: (element: HTMLElement) => { this._admobVideoElement = element; },
             onElementBounds: (elementBounds: IRectangle) => { this._admobElementBounds = elementBounds; },
             onInjectVerificationResources: (verifcationResources: IVerificationScriptResource[]) => this.injectVerificationResources(verifcationResources),
-            onSessionStart: (sessionEvent: ISessionEvent) => this.sessionStart(),
+            onSessionStart: (sessionEvent: ISessionEvent) => this.sessionStart(sessionEvent),
             onSessionFinish: (sessionEvent: ISessionEvent) => this.sessionFinish(),
             onSessionError: (sessionEvent: ISessionEvent) => this.sessionError(sessionEvent)
         }, this);

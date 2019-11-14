@@ -31,7 +31,7 @@ enum AdSessionType {
 }
 
 interface IOmidJsInfo {
-    omidImplementor: string;
+    omidImplementer: string;
     serviceVersion: string;
     sessionClientVersion: string;
     partnerName: string;
@@ -93,6 +93,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
+    private _sessionStartEventData: ISessionEvent;
     private _sessionStartProcessedByOmidScript = false;
     private _sessionFinishProcessedByOmidScript = false;
     private _adVerification: VastAdVerification;
@@ -245,36 +246,42 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart() {
-        const event: ISessionEvent = {
-            adSessionId: this.getOMAdSessionId(),
-            timestamp: Date.now(),
-            type: 'sessionStart',
-            data: {}
-        };
-        this._sessionStartCalled = true;
+    public sessionStart(sessionEvent?: ISessionEvent) {
+        if (!sessionEvent) {
+            const event: ISessionEvent = {
+                adSessionId: this.getOMAdSessionId(),
+                timestamp: Date.now(),
+                type: 'sessionStart',
+                data: {}
+            };
+            this._sessionStartCalled = true;
 
-        if (this._verificationVendorMap[this._vendorKey]) {
-            event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+            if (this._verificationVendorMap[this._vendorKey]) {
+                event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+            }
+            const contextData: IContext = this.buildSessionContext();
+            event.data.context = contextData;
+            event.data.vendorkey = this._vendorKey;
+            this._omBridge.triggerSessionEvent(event);
+        } else {
+            this._sessionStartEventData = sessionEvent;
+            this._sessionStartEventData.data.vendorkey = this._vendorKey;
+            this._omBridge.triggerSessionEvent(this._sessionStartEventData);
         }
-        const contextData: IContext = this.buildSessionContext();
-        event.data.context = contextData;
-        event.data.vendorkey = this._vendorKey;
-        this._omBridge.triggerSessionEvent(event);
     }
 
     private buildSessionContext(): IContext {
         const contextData: IContext = {
-            apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
+            apiVersion: OM_JS_VERSION,                            // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,
+            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             omidJsInfo: {
-                omidImplementor: PARTNER_NAME,
+                omidImplementer: PARTNER_NAME,
                 serviceVersion: this._clientInfo.getSdkVersionName(),
                 sessionClientVersion: OMID_P,
                 partnerName: PARTNER_NAME,
@@ -363,7 +370,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            this.sessionStart();
+            this.sessionStart(this._sessionStartEventData);
         }
 
         return Promise.resolve();

@@ -51,6 +51,7 @@
                      * @param {string} vendorkey
                      */
                     let sendSessionStart = function(observer, vendorkey) {
+                        delete sessionStartData[vendorkey].data.vendorkey;
                         observer(sessionStartData[vendorkey]);
                         postMessageCallback(ON_EVENT_PROCESSED, {
                             eventType: SESSION_START,
