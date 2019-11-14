@@ -18,7 +18,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
-import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
@@ -313,7 +313,7 @@ export class UserPrivacyManager {
         return this._ageGateChoice;
     }
 
-    public isConsentShowRequired(): boolean {
+    public isPrivacyShowRequired(): boolean {
         if (this.isAgeGateShowRequired()) {
             return true;
         }

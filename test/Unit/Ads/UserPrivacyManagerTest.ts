@@ -18,7 +18,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('UserPrivacyManagerTest', () => {
