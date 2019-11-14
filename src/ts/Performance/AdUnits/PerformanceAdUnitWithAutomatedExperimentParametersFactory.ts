@@ -19,7 +19,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads, china);
         this._automatedExperimentManager = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        this._automatedExperimentManager.initialize(AutomatedExperimentsList).catch(() => {
+        this._automatedExperimentManager.initialize(AutomatedExperimentsList, core).catch(() => {
             this._programmaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
         });
         this._automatedExperimentManager.beginExperiment();
