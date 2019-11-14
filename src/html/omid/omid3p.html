@@ -122,7 +122,9 @@
                                     adSessionId: event.data.adSessionId,
                                     timestamp: event.data.timestamp,
                                     type: stripEventString(event.data.type),
-                                    data: payload
+                            }
+                            if (payload) {
+                                eventData.data = payload;
                             }
                             var handler = registeredFunctions[event.data.uuid];
                             handler(eventData);
