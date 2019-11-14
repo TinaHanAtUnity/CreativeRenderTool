@@ -34,6 +34,7 @@ export class OmnivirtPerformanceEndScreen extends PerformanceEndScreen {
 
     public show() {
         super.show();
+
         if (this._omnivirtContainer) {
             this._omnivirtContainer.style.visibility = 'visible';
         }
