@@ -60,7 +60,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _coreConfig: CoreConfiguration;
     private _sessionManager: SessionManager;
     private _privacyManager: UserPrivacyManager;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
+    protected _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
     private _privacySDK: PrivacySDK;
 
