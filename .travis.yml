@@ -17,6 +17,7 @@ install:
 - npm i yarn
 - pip install awscli
 - yarn install
+- echo "N" | akamai install purge --force
 cache:
   pip: true
   directories:
