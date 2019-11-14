@@ -1,5 +1,6 @@
 # Pending
 
+* Enable age gate for consent flow [#11979](https://github.com/Applifier/unity-ads-webview/pull/11979)
 * Add some diagnostics for Consent views [#12013](https://github.com/Applifier/unity-ads-webview/pull/12013)
 * Translate privacy pop-up for AdMob, Display and VPAID ad units [#12071](https://github.com/Applifier/unity-ads-webview/pull/12071)
 * Add Additional Mopub GameIDs for Load Testing [#12068](https://github.com/Applifier/unity-ads-webview/pull/12068)
