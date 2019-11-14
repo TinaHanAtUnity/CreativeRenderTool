@@ -112,7 +112,8 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUn
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { ThirdPartyEventManager, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -177,7 +178,6 @@ import { Store } from 'Store/Store';
 import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -340,7 +340,8 @@ export class TestFixtures {
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
             playableConfiguration: undefined,
-            targetGameId: mraidContentJson.gameId
+            targetGameId: mraidContentJson.gameId,
+            isCustomCloseEnabled: false
         };
     }
 
@@ -390,7 +391,8 @@ export class TestFixtures {
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             playableConfiguration: undefined,
-            targetGameId: mraidContentJson.gameId
+            targetGameId: mraidContentJson.gameId,
+            isCustomCloseEnabled: false
         };
     }
 
@@ -869,8 +871,7 @@ export class TestFixtures {
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            privacySDK: sinon.createStubInstance(PrivacySDK),
-            automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
 

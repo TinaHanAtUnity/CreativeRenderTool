@@ -1,4 +1,8 @@
 {
+  "privacy-legitimate-interest-pop-up-1": "Unity is personalizing your ads experience in this application. ",
+  "privacy-legitimate-interest-pop-up-2": "Tap here ",
+  "privacy-legitimate-interest-pop-up-3": "to learn more about Unity and your privacy choices",
+
   "privacy-dialog-title": "A message from Unity about your privacy",
 
   "privacy-dialog-text-li-p1": "Ads allow developers to offer great apps for free. We try to show the apps and products that will be most interesting to you based on the apps you use, the device you use, and the country you are in.",

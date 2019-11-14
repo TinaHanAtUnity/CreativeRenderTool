@@ -27,7 +27,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -75,8 +74,7 @@ describe('GDPREventHandlerTest', () => {
             privacy: sinon.createStubInstance(Privacy),
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            privacySDK: privacySDK,
-            automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
+            privacySDK: privacySDK
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);

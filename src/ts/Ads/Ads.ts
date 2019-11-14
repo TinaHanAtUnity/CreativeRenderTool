@@ -16,7 +16,7 @@ import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';

@@ -5,4 +5,3 @@ export type UserPrivacyManagerMock = Base & {};
 export const UserPrivacyManager = jest.fn(() => {
     return <UserPrivacyManagerMock>{};
 });
-

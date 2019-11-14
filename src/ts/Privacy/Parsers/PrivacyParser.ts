@@ -1,12 +1,8 @@
 import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import {
-    CurrentUnityConsentVersion,
-    GamePrivacy,
-    IProfilingPermissions,
-    IGranularPermissions,
-    PrivacyMethod,
-    UserPrivacy,
-    IAllPermissions, IRawGamePrivacy, IRawUserPrivacy
+    CurrentUnityConsentVersion, GamePrivacy,
+    PrivacyMethod, UserPrivacy,
+    IRawGamePrivacy, IRawUserPrivacy
 } from 'Privacy/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';

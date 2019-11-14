@@ -19,7 +19,7 @@ export class VPAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     protected createParameters(baseParams: IAdUnitParameters<VPAIDCampaign>) {
         const showGDPRBanner = this.showGDPRBanner(baseParams);
-        const closer = new Closer(baseParams.platform, baseParams.placement, baseParams.privacy, showGDPRBanner, baseParams.adsConfig.getHidePrivacy());
+        const closer = new Closer(baseParams.platform, baseParams.placement, baseParams.privacy, baseParams.deviceInfo.getLanguage(), showGDPRBanner, baseParams.adsConfig.getHidePrivacy());
         const vpaid = new VPAID(baseParams.platform, baseParams.core, this._webPlayerContainer, this._campaign, this._placement);
         let endScreen: VPAIDEndScreen | undefined;
 

@@ -1,3 +1,33 @@
+# Pending
+
+* Add some diagnostics for Consent views [#12013](https://github.com/Applifier/unity-ads-webview/pull/12013)
+* Translate privacy pop-up for AdMob, Display and VPAID ad units [#12071](https://github.com/Applifier/unity-ads-webview/pull/12071)
+* Add Additional Mopub GameIDs for Load Testing [#12068](https://github.com/Applifier/unity-ads-webview/pull/12068)
+* Add Experiment with button animations and MA bandit [#11978](https://github.com/Applifier/unity-ads-webview/pull/11978)
+
+# Fri Nov  8 23:41:18 UTC 2019
+
+* Add Custom Close MRAID Functionality [#11566](https://github.com/Applifier/unity-ads-webview/pull/11566)
+* Add Groups 13 and 14 to Zynga Load V4 Experiment [#12065](https://github.com/Applifier/unity-ads-webview/pull/12065)
+* AR MRAID - Fix Click Behavior [#12064](https://github.com/Applifier/unity-ads-webview/pull/12064)
+* Add Granular Metrics for Tracking Admob Behavior [#12039](https://github.com/Applifier/unity-ads-webview/pull/12039)
+
+# Thu Nov  7 20:54:44 UTC 2019
+
+* Revert "Direct Catalog Request to Production Endpoint" [#12014](https://github.com/Applifier/unity-ads-webview/pull/12014)
+
+# Thu Nov  7 18:47:59 UTC 2019
+
+* Update Yarn Dependencies [#11983](https://github.com/Applifier/unity-ads-webview/pull/11983)
+* Add Core.ts and Ads.ts Mocks for Jest Testing [#11982](https://github.com/Applifier/unity-ads-webview/pull/11983)
+* Direct Catalog Request to Production Endpoint [#11981](https://github.com/Applifier/unity-ads-webview/pull/11981)
+
+# Mon Nov  4 23:09:21 UTC 2019
+
+* Fix Thind Analytics Endpoint [#11952](https://github.com/Applifier/unity-ads-webview/pull/11952)
+* Revert Halloween Theme Performance Endcard [#11950](https://github.com/Applifier/unity-ads-webview/pull/11950)
+* Add Zynga Old API Holdout Experiment for Groups 13 and 14 [#11953](https://github.com/Applifier/unity-ads-webview/pull/11953)
+
 # Fri Nov  1 20:40:00 UTC 2019
 
 * Add Jest-based Testing and Webpack Build System [#11149](https://github.com/Applifier/unity-ads-webview/pull/11149)
