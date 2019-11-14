@@ -288,6 +288,9 @@ export class UserPrivacyManager {
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
         if (ageGateChoice === AgeGateChoice.YES) {
             PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
+            if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+            }
         } else if (ageGateChoice === AgeGateChoice.NO) {
             PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
         }
