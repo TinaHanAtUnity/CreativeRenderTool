@@ -14,12 +14,15 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import {
+    OmnivirtExperiment,
     HeartbeatingDownloadButtonTest,
     BouncingDownloadButtonTest,
     ShiningDownloadButtonTest
 } from 'Core/Models/ABGroup';
+import { OmnivirtPerformanceEndScreen } from 'Performance/Views/OmnivirtPerformanceEndScreen';
+import OmnivirtGameIdToAIDLink from 'json/experiments/omnivirt.json';
+import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -62,7 +65,12 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
     private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
         const abGroup = endScreenParameters.abGroup;
-        if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
+        const gameId = campaign.getGameId().toString();
+        const omnivirtAid = OmnivirtGameIdToAIDLink[gameId];
+
+        if (OmnivirtExperiment.isValid(abGroup) && omnivirtAid) {
+            return new OmnivirtPerformanceEndScreen(endScreenParameters, campaign, omnivirtAid, country);
+        } else if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
             return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, campaign, country);
         } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
             return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, endScreenParameters, campaign, country);
