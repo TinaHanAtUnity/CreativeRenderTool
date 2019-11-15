@@ -155,6 +155,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         if (this._privacy) {
             this._privacy.hide();
         }
+
+        if (this._admobOMController) {
+            this.sendUnObstructedOMGeometryChange(this._admobOMController);
+        }
     }
 
     public onBackPressed() {
@@ -328,7 +332,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy.show();
 
         if (this._admobOMController) {
-            this.sendOMGeometryChange(this._admobOMController);
+            this.sendObstructedOMGeometryChange(this._admobOMController);
         }
     }
 
@@ -337,17 +341,26 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy.show();
 
         if (this._admobOMController) {
-            this.sendOMGeometryChange(this._admobOMController);
+            this.sendObstructedOMGeometryChange(this._admobOMController);
         }
     }
 
-    private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
+    private sendObstructedOMGeometryChange(om: AdmobOpenMeasurementController) {
         const popup = <HTMLElement>document.querySelector('.pop-up');
         const gdprRect = popup.getBoundingClientRect();
         const obstructionRect = OpenMeasurementUtilities.createRectangle(gdprRect.left, gdprRect.top, gdprRect.width, gdprRect.height);
 
         const adViewBuilder = om.getOMAdViewBuilder();
         return adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om, obstructionRect).then((adview) => {
+            const viewPort = adViewBuilder.getViewPort();
+            om.geometryChange(viewPort, adview);
+        });
+    }
+
+    private sendUnObstructedOMGeometryChange(om: AdmobOpenMeasurementController) {
+        const adViewBuilder = om.getOMAdViewBuilder();
+        const obstructionRect = { x: 0, y: 0, width: 0, height: 0 };
+        return adViewBuilder.buildAdmobAdView([], om, obstructionRect).then((adview) => {
             const viewPort = adViewBuilder.getViewPort();
             om.geometryChange(viewPort, adview);
         });

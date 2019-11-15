@@ -227,7 +227,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             adViewBuilder.buildAdmobAdView([], omController, rect).then((adView) => {
                 if (omController) {
                     const viewPort = adViewBuilder.getViewPort();
-                    this.debounce(viewPort, adView, omController);
+                    this.geometryChangeDebounce(viewPort, adView, omController);
                 }
             });
         }
@@ -254,13 +254,13 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             adViewBuilder.buildAdmobAdView([ObstructionReasons.BACKGROUNDED], omController, rect).then((adView) => {
                 if (omController) {
                     const viewPort = adViewBuilder.getViewPort();
-                    this.debounce(viewPort, adView, omController);
+                    this.geometryChangeDebounce(viewPort, adView, omController);
                 }
             });
         }
     }
 
-    private debounce(viewPort: IViewPort, adView: IAdView, omController: OpenMeasurementController): void {
+    private geometryChangeDebounce(viewPort: IViewPort, adView: IAdView, omController: OpenMeasurementController): void {
         const later = () => {
             if (!this._geometryCalled) {
                 omController.geometryChange(viewPort, adView);
