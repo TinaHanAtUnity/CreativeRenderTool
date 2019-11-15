@@ -19,6 +19,7 @@ import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StreamType } from 'Core/Constants/Android/StreamType';
+import { ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -212,15 +213,21 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.startAccelerometerUpdates();
 
         const omController = this._view.getOpenMeasurementController();
-
-        // if (omController) {
-        //     adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
-        //         if (this._vastOMController) {
-        //             const viewPort = adViewBuilder.getViewPort();
-        //             this._vastOMController.geometryChange(viewPort, adView);
-        //         }
-        //     });
-        // }
+        if (omController && this.isShowing()) {
+            const adViewBuilder = omController.getOMAdViewBuilder();
+            const rect: IRectangle = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+            adViewBuilder.buildAdmobAdView([], omController, rect).then((adView) => {
+                if (omController) {
+                    const viewPort = adViewBuilder.getViewPort();
+                    omController.geometryChange(viewPort, adView);
+                }
+            });
+        }
     }
 
     public onContainerBackground(): void {
@@ -232,14 +239,21 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         const omController = this._view.getOpenMeasurementController();
-        // if (omController) {
-        //     adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
-        //         if (this._vastOMController) {
-        //             const viewPort = adViewBuilder.getViewPort();
-        //             this._vastOMController.geometryChange(viewPort, adView);
-        //         }
-        //     });
-        // }
+        if (omController) {
+            const adViewBuilder = omController.getOMAdViewBuilder();
+            const rect: IRectangle = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+            adViewBuilder.buildAdmobAdView([ObstructionReasons.BACKGROUNDED], omController, rect).then((adView) => {
+                if (omController) {
+                    const viewPort = adViewBuilder.getViewPort();
+                    omController.geometryChange(viewPort, adView);
+                }
+            });
+        }
     }
 
     public onContainerDestroy(): void {
