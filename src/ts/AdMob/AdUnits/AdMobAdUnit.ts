@@ -210,6 +210,17 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerForeground(): void {
         this._foregroundTime = Date.now();
         this.startAccelerometerUpdates();
+
+        const omController = this._view.getOpenMeasurementController();
+
+        // if (omController) {
+        //     adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
+        //         if (this._vastOMController) {
+        //             const viewPort = adViewBuilder.getViewPort();
+        //             this._vastOMController.geometryChange(viewPort, adView);
+        //         }
+        //     });
+        // }
     }
 
     public onContainerBackground(): void {
@@ -219,6 +230,16 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
+
+        const omController = this._view.getOpenMeasurementController();
+        // if (omController) {
+        //     adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
+        //         if (this._vastOMController) {
+        //             const viewPort = adViewBuilder.getViewPort();
+        //             this._vastOMController.geometryChange(viewPort, adView);
+        //         }
+        //     });
+        // }
     }
 
     public onContainerDestroy(): void {

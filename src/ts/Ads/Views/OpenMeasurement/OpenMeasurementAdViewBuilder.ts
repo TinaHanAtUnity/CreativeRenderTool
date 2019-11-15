@@ -63,6 +63,25 @@ export class OpenMeasurementAdViewBuilder {
         return this.calculateVastAdView(percentageInView, obstructionReasons, measuringElementAvailable, [], screenWidth, screenHeight);
     }
 
+    public buildAdmobImpressionView(om: AdmobOpenMeasurementController, screenWidth: number, screenHeight: number) {
+        const videoView =  om.getAdmobVideoElementBounds();
+        this.setVideoView(videoView);
+        let screenView;
+        let percentageInView = 100;
+
+        if (this._platform === Platform.ANDROID) {
+            screenWidth = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo);
+            screenHeight = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo);
+        }
+
+        screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
+        percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(this.getVideoView(), screenView);
+
+        const obstructionReasons: ObstructionReasons[] = [];
+
+        return this.calculateVastAdView(percentageInView, obstructionReasons, true, [], screenWidth, screenHeight);
+    }
+
     public buildAdmobAdView(obstructionReasons: ObstructionReasons[], om: AdmobOpenMeasurementController, obstructionRect: IRectangle): Promise<IAdView> {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 

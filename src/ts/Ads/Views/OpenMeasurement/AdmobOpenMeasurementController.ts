@@ -1,4 +1,4 @@
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurement, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AdMobSessionInterfaceEventBridge } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
@@ -9,8 +9,9 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
-import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent, MediaType, VideoEventAdaptorType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -127,6 +128,20 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
     public getSDKVersion(): string {
         return this._clientInfo.getSdkVersionName();
+    }
+
+    public impression(impressionValues: IImpressionValues) {
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+            const impressionObject: IImpressionValues = {
+                mediaType: MediaType.VIDEO,
+                videoEventAdaptorType: VideoEventAdaptorType.JS_CUSTOM,
+                videoEventAdaptorVersion: OMID_P
+            };
+            const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this._campaign, this._deviceInfo, this._platform);
+            impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+            super.impression(impressionObject);
+        });
     }
 
     /**
