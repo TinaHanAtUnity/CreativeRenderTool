@@ -1,10 +1,13 @@
-# Pending
+# Thu Nov 14 22:01:01 UTC 2019
 
+* Add Support for Webpack Release Builds (Only being deployed on 2.1.0) [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+* Add Omnivirt widget Square Endcard Experiment [#12067](https://github.com/Applifier/unity-ads-webview/pull/12067)
 * Enable age gate for consent flow [#11979](https://github.com/Applifier/unity-ads-webview/pull/11979)
 * Add some diagnostics for Consent views [#12013](https://github.com/Applifier/unity-ads-webview/pull/12013)
 * Translate privacy pop-up for AdMob, Display and VPAID ad units [#12071](https://github.com/Applifier/unity-ads-webview/pull/12071)
 * Add Additional Mopub GameIDs for Load Testing [#12068](https://github.com/Applifier/unity-ads-webview/pull/12068)
 * Add Experiment with button animations and MA bandit [#11978](https://github.com/Applifier/unity-ads-webview/pull/11978)
+* Remove A/B test and enable semi-transparent background in all groups [#12070](https://github.com/Applifier/unity-ads-webview/pull/12070)
 
 # Fri Nov  8 23:41:18 UTC 2019
 
