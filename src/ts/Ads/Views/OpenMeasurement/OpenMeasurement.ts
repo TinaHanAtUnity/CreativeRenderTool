@@ -248,6 +248,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     */
     public sessionStart(sessionEvent?: ISessionEvent) {
         if (!sessionEvent) {
+            // Non-Admob code path
             const event: ISessionEvent = {
                 adSessionId: this.getOMAdSessionId(),
                 timestamp: Date.now(),
@@ -264,6 +265,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             event.data.vendorkey = this._vendorKey;
             this._omBridge.triggerSessionEvent(event);
         } else {
+            // TODO: Refactor. Admob Code Path
             this._sessionStartEventData = sessionEvent;
             this._sessionStartEventData.data.vendorkey = this._vendorKey;
             this._omBridge.triggerSessionEvent(this._sessionStartEventData);
@@ -272,7 +274,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private buildSessionContext(): IContext {
         const contextData: IContext = {
-            apiVersion: OM_JS_VERSION,                            // Version code of official OMID JS Verification Client API
+            apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
             adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason

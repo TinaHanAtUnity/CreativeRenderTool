@@ -43,7 +43,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
         this._omSessionInterfaceBridge = new AdMobSessionInterfaceEventBridge(core, {
-            onImpression: (impressionValues: IImpressionValues) => this.impression(impressionValues),
+            onImpression: (impressionValues: IImpressionValues) => this.impression(),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
             onSendFirstQuartile: () => this.sendFirstQuartile(),
@@ -130,7 +130,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
-    public impression(impressionValues: IImpressionValues) {
+    public impression() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO,

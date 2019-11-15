@@ -141,6 +141,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setVolume(volume / maxVolume);
         const omController = this._view.getOpenMeasurementController();
         if (omController) {
+            // TODO: Add volume change for muted value 0
             omController.setDeviceVolume(this._deviceVolume);
             omController.volumeChange(1);
         }
