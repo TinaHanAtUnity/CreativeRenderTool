@@ -103,6 +103,8 @@ export class OpenMeasurementAdViewBuilder {
                 obstructionRects = [];
             } else if (!obstructionReasons.includes(ObstructionReasons.OBSTRUCTED)) {
                 obstructionRects = [];
+            } else {
+                percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
             }
 
             return this.calculateVastAdView(percentInView, obstructionReasons, true, obstructionRects, screenWidth, screenHeight);
