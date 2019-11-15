@@ -173,6 +173,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._afmaBridge.sendMuteChange(isMuted);
     }
 
+    public getOpenMeasurementController() {
+        return this._admobOMController;
+    }
+
     private choosePrivacyShown(): void {
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
