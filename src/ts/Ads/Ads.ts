@@ -16,7 +16,7 @@ import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
@@ -75,7 +75,7 @@ import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
+import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
@@ -117,7 +117,7 @@ export class Ads implements IAds {
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
-    private _showingConsent: boolean = false;
+    private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
 
@@ -310,8 +310,8 @@ export class Ads implements IAds {
         }
     }
 
-    private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.PrivacyManager.isConsentShowRequired()) {
+    private showPrivacyIfNeeded(options: unknown): Promise<void> {
+        if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
         }
 
@@ -327,9 +327,9 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        this._showingConsent = true;
+        this._showingPrivacy = true;
 
-        const consentView = new ConsentUnit({
+        const privacyView = new PrivacyUnit({
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
@@ -340,8 +340,7 @@ export class Ads implements IAds {
             pts: this._core.ProgrammaticTrackingService,
             privacySDK: this.PrivacySDK
         });
-
-        return consentView.show(options);
+        return privacyView.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
@@ -362,7 +361,7 @@ export class Ads implements IAds {
         const contentType = campaign.getContentType();
         const seatId = campaign.getSeatId();
 
-        if (this._showing || this._showingConsent) {
+        if (this._showing || this._showingPrivacy) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
@@ -420,8 +419,8 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        this.showConsentIfNeeded(options).then(() => {
-            this._showingConsent = false;
+        this.showPrivacyIfNeeded(options).then(() => {
+            this._showingPrivacy = false;
             this.showAd(placement, campaign, options);
         });
     }

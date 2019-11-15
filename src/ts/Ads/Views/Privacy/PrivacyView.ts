@@ -1,14 +1,15 @@
 import { View } from 'Core/Views/View';
-import { IConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { Template } from 'Core/Utilities/Template';
 import { PrivacyFrameEventAdapter } from 'Privacy/PrivacyFrameEventAdapter';
 import { PrivacyAdapterContainer } from 'Privacy/PrivacyAdapterContainer';
-import { ICore, ICoreApi } from 'Core/ICore';
+import { ICoreApi } from 'Core/ICore';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
+import { IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
+import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
+
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
@@ -21,8 +22,7 @@ export interface IUserPrivacySettings {
     thirdParty: boolean;
 }
 
-export class PrivacyView extends View<IConsentViewHandler> {
-    private readonly _core: ICore;
+export class PrivacyView extends View<IPrivacyViewHandler> {
     private readonly _coreApi: ICoreApi;
     private readonly _privacyManager: UserPrivacyManager;
 
@@ -34,7 +34,7 @@ export class PrivacyView extends View<IConsentViewHandler> {
     private _privacyConfig: PrivacyConfig;
     private _frameEventAdapter: PrivacyFrameEventAdapter;
 
-    constructor(params: IConsentViewParameters) {
+    constructor(params: IPrivacyViewParameters) {
         super(params.platform, 'consent');
         this._template = new Template(PrivacyTemplate);
         this._privacyManager = params.privacyManager;

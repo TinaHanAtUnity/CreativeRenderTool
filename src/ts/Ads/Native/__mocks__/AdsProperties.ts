@@ -5,7 +5,7 @@ export type AdsPropertiesMock = Base & {
 };
 
 export const AdsPropertiesApi = jest.fn(() => {
-    return <AdsPropertiesMock><unknown>{
-        setShowTimeout: jest.fn()
+    return <AdsPropertiesMock>{
+        setShowTimeout: jest.fn().mockImplementation(() => Promise.resolve())
     };
 });

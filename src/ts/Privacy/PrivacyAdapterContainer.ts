@@ -1,5 +1,5 @@
 import { IPrivacyFrameEventAdapter, IPrivacyFrameHandler } from 'Privacy/PrivacyFrameEventAdapter';
-import { IUserPrivacySettings } from 'Ads/Views/Consent/PrivacyView';
+import { IUserPrivacySettings } from 'Ads/Views/Privacy/PrivacyView';
 
 export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
     private _eventAdapter: IPrivacyFrameEventAdapter;

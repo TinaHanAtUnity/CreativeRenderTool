@@ -14,20 +14,23 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { HalloweenThemeFreeTest, FullscreenCTAExperiment } from 'Core/Models/ABGroup';
-import { HalloweenPerformanceEndScreen } from 'Performance/Views/HalloweenPerformanceEndScreen';
-import { VideoOverlayFullscreenCTA } from 'Ads/Views/VideoOverlayFullscreenCTA';
-import { Platform } from 'Core/Constants/Platform';
+import {
+    OmnivirtExperiment,
+    HeartbeatingDownloadButtonTest,
+    BouncingDownloadButtonTest,
+    ShiningDownloadButtonTest
+} from 'Core/Models/ABGroup';
+import { OmnivirtPerformanceEndScreen } from 'Performance/Views/OmnivirtPerformanceEndScreen';
+import OmnivirtGameIdToAIDLink from 'json/experiments/omnivirt.json';
+import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
-    private _downloadManager: DownloadManager;
-    private _deviceIdManager: DeviceIdManager;
+    protected _downloadManager: DownloadManager;
+    protected _deviceIdManager: DeviceIdManager;
 
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
-
         this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
@@ -46,18 +49,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             osVersion: baseParams.deviceInfo.getOsVersion()
         };
 
-        const abGroup = baseParams.coreConfig.getAbGroup();
-        let endScreen: PerformanceEndScreen;
-
-        if (HalloweenThemeFreeTest.isValid(abGroup)) {
-            endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else {
-            endScreen = new HalloweenPerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        }
-
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
-
-        const automatedExperimentManager = new AutomatedExperimentManager(baseParams.request, baseParams.core.Storage);
+        const endScreen = this.createEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,
@@ -66,12 +59,29 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
             downloadManager: this._downloadManager,
-            deviceIdManager: this._deviceIdManager,
-            automatedExperimentManager: automatedExperimentManager
+            deviceIdManager: this._deviceIdManager
         };
     }
 
-    private createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
+    private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
+        const abGroup = endScreenParameters.abGroup;
+        const gameId = campaign.getGameId().toString();
+        const omnivirtAid = OmnivirtGameIdToAIDLink[gameId];
+
+        if (OmnivirtExperiment.isValid(abGroup) && omnivirtAid) {
+            return new OmnivirtPerformanceEndScreen(endScreenParameters, campaign, omnivirtAid, country);
+        } else if (HeartbeatingDownloadButtonTest.isValid(abGroup)) {
+            return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.HEARTBEATING, endScreenParameters, campaign, country);
+        } else if (BouncingDownloadButtonTest.isValid(abGroup)) {
+            return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, endScreenParameters, campaign, country);
+        } else if (ShiningDownloadButtonTest.isValid(abGroup)) {
+            return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.SHINING, endScreenParameters, campaign, country);
+        } else {
+            return new PerformanceEndScreen(endScreenParameters, campaign, country);
+        }
+    }
+
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
         let showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
 
         // hide privacy icon for China
@@ -80,12 +90,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         }
 
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
-        let overlay;
-        if (FullscreenCTAExperiment.isValid(parameters.coreConfig.getAbGroup()) && this._platform === Platform.ANDROID) {
-            overlay = new VideoOverlayFullscreenCTA(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
-        } else {
-            overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
-        }
+        const overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);

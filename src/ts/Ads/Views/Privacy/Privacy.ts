@@ -3,23 +3,23 @@ import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPermissions } from 'Privacy/Privacy';
-import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
-import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
+import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
+import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
 import {
     IPersonalizationSwitchGroupHandler,
     PersonalizationSwitchGroup
-} from 'Ads/Views/Consent/PersonalizationSwitchGroup';
+} from 'Ads/Views/Privacy/PersonalizationSwitchGroup';
 import {
     IPrivacyRowItemContainerHandler,
     PrivacyRowItemContainer,
     PrivacyTextParagraph
-} from 'Ads/Views/Consent/PrivacyRowItemContainer';
+} from 'Ads/Views/Privacy/PrivacyRowItemContainer';
 import { ProgrammaticTrackingService, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Localization } from 'Core/Utilities/Localization';
 import { ICore, ICoreApi } from 'Core/ICore';
 
-export interface IConsentViewParameters {
+export interface IPrivacyViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
     landingPage: ConsentPage;
@@ -38,7 +38,7 @@ export enum ConsentPage {
     AGE_GATE = 'agegate'
 }
 
-export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
+export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
 
     private _apiLevel?: number;
     private _osVersion?: string;
@@ -57,7 +57,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private _localization: Localization;
 
-    constructor(parameters: IConsentViewParameters) {
+    constructor(parameters: IPrivacyViewParameters) {
         super(parameters.platform, 'consent');
 
         this._localization = new Localization(parameters.language, 'consent');
@@ -203,10 +203,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
             (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = overLimitBtnText;
             (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = underLimitBtnText;
-        }
-
-        if (this._isABTest) {
-            this._container.classList.add('background-ab-test');
         }
 
         this.showPage(this._landingPage);

@@ -149,6 +149,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
                 data: data
             });
         } else if (event === TrackingEvent.LOADED) {
+            this._adUnit.sendVideoCanPlayEvent();
             if (this._campaign.shouldMuteByDefault()) {
                 const isMuted = true;
                 this.onMuteChange(isMuted);
