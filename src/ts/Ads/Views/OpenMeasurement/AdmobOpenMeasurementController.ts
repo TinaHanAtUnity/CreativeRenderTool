@@ -139,6 +139,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             };
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this._campaign, this._deviceInfo, this._platform);
             impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            if (this._platform === Platform.ANDROID) {
+                impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
+            }
             impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
             super.impression(impressionObject);
         });
