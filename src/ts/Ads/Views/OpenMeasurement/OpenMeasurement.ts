@@ -290,7 +290,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             app: {
-                libraryVersion: '1.0.0',
+                libraryVersion: OM_JS_VERSION,
                 appId: this._clientInfo.getApplicationName()
             },
             deviceInfo: {

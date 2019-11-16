@@ -133,9 +133,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     public impression() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const impressionObject: IImpressionValues = {
-                mediaType: MediaType.VIDEO,
-                videoEventAdaptorType: VideoEventAdaptorType.JS_CUSTOM,
-                videoEventAdaptorVersion: OMID_P
+                mediaType: MediaType.VIDEO
             };
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this._campaign, this._deviceInfo, this._platform);
             impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
