@@ -30,7 +30,6 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
 
     private _iFrame: HTMLIFrameElement;
     private _domContentLoaded = false;
-    private _privacyWebViewUrl: string;
     private _privacyConfig: PrivacyConfig;
     private _frameEventAdapter: PrivacyFrameEventAdapter;
 
@@ -46,18 +45,14 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
         this._iFrame = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
         this._frameEventAdapter = new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame);
         this._iFrameAdapterContainer.connect(this._frameEventAdapter);
+        this.createPrivacyFrame(PrivacyContainer)
+            .then((privacyHtml) => {
+                this._iFrame.srcdoc = privacyHtml;
+            });
+    }
 
-        this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
-            this._privacyConfig = privacyConfig;
-            this._privacyWebViewUrl = privacyConfig.getWebViewUrl();
-
-            this.createPrivacyFrame(PrivacyContainer)
-                .then((privacyHtml) => {
-                    this._iFrame.srcdoc = privacyHtml;
-                });
-        }).catch((e) => {
-            this._coreApi.Sdk.logError('PRIVACY: Failed to create privacy iFrame: ' + e.message);
-        });
+    public setPrivacyConfig(privacyConfig: PrivacyConfig): void {
+        this._privacyConfig = privacyConfig;
     }
 
     public render() {
@@ -67,7 +62,7 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
 
     private fetchPrivacyHtml(): Promise<string> {
         //TODO: fetch from cache?
-        return XHRequest.get(this._privacyWebViewUrl);
+        return XHRequest.get(this._privacyConfig.getWebViewUrl());
     }
 
     public createPrivacyFrame(container: string): Promise<string> {
@@ -87,22 +82,31 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
     }
 
     public onPrivacyReady(): void {
-        this._frameEventAdapter.postMessage('readyCallback', {
-            env: this._privacyConfig.getEnv().getJson(),
-            flow: this._privacyConfig.getFlow(),
-            user: this._privacyConfig.getUserSettings().getJson()
-        });
-
         this._domContentLoaded = true;
-        this._coreApi.Sdk.logDebug('PRIVACY: Privacy ready');
+        this._handlers.forEach(handler => handler.onPrivacyReady());
+    }
+
+    public readyCallback(data: { [key: string]: unknown }): void {
+        this._frameEventAdapter.postMessage('readyCallback', data);
     }
 
     public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
-        this._coreApi.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
-        this._handlers.forEach(handler => handler.onClose());
+        this._handlers.forEach(handler => handler.onPrivacyCompleted(userSettings));
+    }
+
+    public completeCallback(): void {
+        this._frameEventAdapter.postMessage('completeCallback');
     }
 
     public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
-        this._coreApi.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
+        this._handlers.forEach(handler => handler.onPrivacyEvent(name, data));
+    }
+
+    public eventCallback(eventName: string): void {
+        this._frameEventAdapter.postMessage('eventCallback', eventName);
+    }
+
+    public postMessage(event: string, data?: unknown) {
+        this._frameEventAdapter.postMessage(event, data);
     }
 }

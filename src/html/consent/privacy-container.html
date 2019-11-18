@@ -24,6 +24,16 @@
                                 window.privacyAdapter.readyCallback(event.data.data);
                             }
                             break;
+                        case 'completeCallback':
+                            if (window.privacyAdapter.completeCallback) {
+                                window.privacyAdapter.completeCallback(event.data.data);
+                            }
+                            break;
+                        case 'eventCallback':
+                            if (window.privacyAdapter.eventCallback) {
+                                window.privacyAdapter.eventCallback(event.data.data);
+                            }
+                            break;
                         default:
                             console.log('Unhandled message: ' + event.data.type);
                             break;
@@ -46,9 +56,6 @@
                 };
 
                 this.onPrivacyCompleted = function(userSettings) {
-                    if (window.privacyAdapter.completeCallback) {
-                        window.privacyAdapter.completeCallback();
-                    }
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
                         data: JSON.parse(userSettings)
@@ -61,10 +68,6 @@
                         name: eventName,
                         data: JSON.parse(eventData)
                     }, '*');
-
-                    if (window.privacyAdapter.eventCallback) {
-                        window.privacyAdapter.eventCallback(eventName);
-                    }
                 };
             };
 

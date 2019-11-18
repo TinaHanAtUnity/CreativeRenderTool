@@ -15,9 +15,10 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { PrivacyView } from 'Ads/Views/Privacy/PrivacyView';
+import { PrivacyView, IUserPrivacySettings } from 'Ads/Views/Privacy/PrivacyView';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -42,6 +43,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
     private _privacySDK: PrivacySDK;
+    private _privacyConfig: PrivacyConfig;
 
     constructor(parameters: IConsentUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -81,28 +83,35 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
     public show(options: unknown): Promise<void> {
         this._showing = true;
-        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
-            const donePromise = new Promise<void>((resolve) => {
-                this._donePromiseResolve = resolve;
-            });
-            this._adUnitContainer.addEventHandler(this);
-            this._unityPrivacyView.render();
-            document.body.appendChild(this._unityPrivacyView.container());
+        return this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
+            this._privacyConfig = privacyConfig;
+            this._unityPrivacyView.setPrivacyConfig(privacyConfig);
+            // blank
+        }).then(() => {
+            return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, true, true, false, options)
+                .then(() => {
+                    const donePromise = new Promise<void>((resolve) => {
+                        this._donePromiseResolve = resolve;
+                    });
+                    this._adUnitContainer.addEventHandler(this);
+                    this._unityPrivacyView.render();
+                    document.body.appendChild(this._unityPrivacyView.container());
 
-            this._unityPrivacyView.show();
-/*
-            if (this._privacySDK.isAgeGateEnabled()) {
-                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
-            } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
-            }
+                    this._unityPrivacyView.show();
+                    /*
+                    if (this._privacySDK.isAgeGateEnabled()) {
+                        PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
+                    } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                        PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+                    }
 
-            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
-                const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
-                this.handleAutoAgeGate(ageGateValue);
-            }*/
+                    if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
+                        const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
+                        this.handleAutoAgeGate(ageGateValue);
+                    }*/
 
-            return donePromise;
+                    return donePromise;
+                });
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Privacy view ' + e);
         });
@@ -221,5 +230,26 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
     public description(): string {
         return 'Privacy';
+    }
+
+    public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
+        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
+        this._unityPrivacyView.completeCallback();
+        this.onClose();
+    }
+
+    public onPrivacyReady(): void {
+        this._unityPrivacyView.readyCallback({
+            env: this._privacyConfig.getEnv().getJson(),
+            flow: this._privacyConfig.getFlow(),
+            user: this._privacyConfig.getUserSettings().getJson()
+        });
+
+        this._core.Sdk.logDebug('PRIVACY: Privacy ready');
+    }
+
+    public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
+        this._unityPrivacyView.eventCallback(name);
+        this._core.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
     }
 }
