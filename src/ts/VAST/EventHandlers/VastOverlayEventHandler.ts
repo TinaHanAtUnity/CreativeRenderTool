@@ -54,16 +54,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
         if (this._om) {
 
-            // Only use for 3.2- Open Measurement Certification - remove for 3.3+
-            // 3.2 OM cert made use of absolute pixels so we convert dp to absolutes here
-            if (this._platform === Platform.ANDROID) {
-                const density = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
-                x = OpenMeasurementUtilities.convertDpToPixels(x, density);
-                y = OpenMeasurementUtilities.convertDpToPixels(y, density);
-                width = OpenMeasurementUtilities.convertDpToPixels(width, density);
-                height = OpenMeasurementUtilities.convertDpToPixels(height, density);
-            }
-
             const obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
             const adViewBuilder = this._om.getOMAdViewBuilder();
             adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit, obstructionRectangle)
