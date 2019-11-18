@@ -1,5 +1,5 @@
 import {
-    GamePrivacy, IGranularPermissions,
+    GamePrivacy,
     IPermissions,
     PrivacyMethod,
     UserPrivacy
@@ -9,7 +9,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IGranularPermissions;
+    permissions: IPermissions | { [key: string]: never };;
 }
 
 export interface ILegacyRequestPrivacy {
