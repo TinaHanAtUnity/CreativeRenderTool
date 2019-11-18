@@ -9,7 +9,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IPermissions | { [key: string]: never };;
+    permissions: IPermissions | { [key: string]: never };
 }
 
 export interface ILegacyRequestPrivacy {
