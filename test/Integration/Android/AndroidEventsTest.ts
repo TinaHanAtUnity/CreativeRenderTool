@@ -133,6 +133,7 @@ describe('AndroidEventsTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1776);
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1080);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
+        UnityAds.getBackend().Api.DeviceInfo.setLimitAdTrackingFlag(true);
 
         AbstractAdUnit.setAutoClose(true);
 

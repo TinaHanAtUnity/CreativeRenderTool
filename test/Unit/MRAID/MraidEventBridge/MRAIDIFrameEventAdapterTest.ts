@@ -39,6 +39,7 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 onBridgeAREvent: sinon.spy(),
                 onBridgeArReadyToShow: sinon.spy(),
                 onBridgeDeviceOrientationSubscribe: sinon.spy(),
+                onUseCustomClose: sinon.spy(),
                 onBridgeArButtonHide: sinon.spy()
             };
 

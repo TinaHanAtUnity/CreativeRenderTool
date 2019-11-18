@@ -593,5 +593,12 @@
     "description": "User answer to age gate \"yes\" or \"no\", \"missing\" if no age gate has been presented",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "privacyType",
+    "type": "string",
+    "description": "Privacy method, only sent if it is developer_consent or legitimate_interest",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

@@ -79,6 +79,10 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
         this._handler.onBridgeDeviceOrientationSubscribe();
     }
 
+    public onUseCustomClose(hidden: boolean) {
+        this._handler.onUseCustomClose(hidden);
+    }
+
     public onBridgeArButtonHide(event: MessageEvent): void {
         this._handler.onBridgeArButtonHide(event);
     }

@@ -4,5 +4,5 @@ export type ClientInfoMock = Base & {
 };
 
 export const ClientInfo = jest.fn(() => {
-    return <ClientInfoMock><unknown>{};
+    return <ClientInfoMock>{};
 });

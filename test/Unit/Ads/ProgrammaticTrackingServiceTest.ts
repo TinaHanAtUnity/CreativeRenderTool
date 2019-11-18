@@ -113,7 +113,8 @@ describe('ProgrammaticTrackingService', () => {
                         name: 'admob_used_cached_video',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:admob_used_cached_video'
+                            'ads_sdk2_mevt:admob_used_cached_video',
+                            'ads_sdk2_plt:ANDROID'
                         ]
                     }
                 ]
@@ -126,7 +127,8 @@ describe('ProgrammaticTrackingService', () => {
                         name: 'admob_used_streamed_video',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:admob_used_streamed_video'
+                            'ads_sdk2_mevt:admob_used_streamed_video',
+                            'ads_sdk2_plt:ANDROID'
                         ]
                     }
                 ]
@@ -179,7 +181,8 @@ describe('ProgrammaticTrackingService', () => {
                         name: 'timing_value_negative',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:webview_initialization_time' // Intentional to track which timing metrics are negative
+                            'ads_sdk2_mevt:webview_initialization_time', // Intentional to track which timing metrics are negative
+                            'ads_sdk2_plt:ANDROID'
                         ]
                     }
                 ]

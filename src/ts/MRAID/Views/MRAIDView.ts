@@ -46,6 +46,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onCustomImpressionEvent(): void;
     onWebViewFullScreen(): Promise<void>;
     onWebViewReduceSize(): Promise<void>;
+    onUseCustomClose(hideClose: boolean): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
@@ -523,5 +524,9 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this._deviceorientationListener = (orientationEvent: Event) => this.handleDeviceOrientation(<DeviceOrientationEvent>orientationEvent);
             window.addEventListener('deviceorientation', this._deviceorientationListener, false);
         }
+    }
+
+    public onUseCustomClose(hideClose: boolean) {
+        return;
     }
 }

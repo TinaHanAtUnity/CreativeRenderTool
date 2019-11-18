@@ -8,7 +8,7 @@ export type NativeBridgeMock = Base & {
 };
 
 export const NativeBridge = jest.fn(() => {
-    return <NativeBridgeMock><unknown>{
+    return <NativeBridgeMock><unknown>{ // TODO: Remove unknown cast
         handleCallback: jest.fn(),
         handleEvent: jest.fn(),
         handleInvocation: jest.fn(),
