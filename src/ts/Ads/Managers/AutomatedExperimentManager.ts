@@ -61,7 +61,7 @@ export class AutomatedExperimentManager {
     private static readonly _rewardEndPoint = 'reward';
     private static readonly _settingsPrefix = 'AUI_OPT_EXPERIMENT';
 
-        constructor(requestManager: RequestManager, storageApi: StorageApi) {
+    constructor(requestManager: RequestManager, storageApi: StorageApi) {
         this._requestManager = requestManager;
         this._storageApi = storageApi;
     }
