@@ -130,7 +130,11 @@ export class UserPrivacyManager {
         }
         userPrivacy.update(updatedPrivacy);
 
-        // TODO: should we send privacy when limitAdTracking is true?
+        // TODO: this needs more investigation, how should limit ad tracking cases be handled? since iOS sends all zeroes for advertising ID, for now events will be disabled
+        if (this._deviceInfo.getLimitAdTracking()) {
+            return Promise.resolve();
+        }
+
         return this.sendPrivacyEvent(permissions, source, action, layout, firstRequest);
     }
 
