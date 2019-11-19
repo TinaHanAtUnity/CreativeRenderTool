@@ -1,4 +1,4 @@
-# Pending
+# Tue Nov 19 10:40:27 UTC 2019
 
 * Protocol update of DSE privacy events to V2 [12012](https://github.com/Applifier/unity-ads-webview/pull/12012)
 
