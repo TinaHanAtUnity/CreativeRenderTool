@@ -89,6 +89,7 @@ export class VastParserStrict {
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
     private _pts: ProgrammaticTrackingService | undefined;
+    private _isPublica: boolean;
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration, pts?: ProgrammaticTrackingService) {
         this._domParser = domParser || new DOMParser();
@@ -96,6 +97,7 @@ export class VastParserStrict {
         this._compiledCampaignErrors = [];
         this._coreConfig = coreConfig;
         this._pts = pts;
+        this._isPublica = false;
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -166,7 +168,7 @@ export class VastParserStrict {
         }
 
         // return vast ads with generated non-severe errors
-        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors, this._isPublica);
     }
 
     // default to https: for relative urls
@@ -210,6 +212,7 @@ export class VastParserStrict {
             if (this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             }
+            this._isPublica = true;
         }
 
         wrapperURL = decodeURIComponent(wrapperURL);

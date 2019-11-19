@@ -56,6 +56,11 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 }
             });
 
+            if (baseParams.campaign.getVast().isPublicaTag()) {
+                // adds publica as an om vendor to use for billing
+                omVendors.push('publica');
+            }
+
             const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
             omManager.addToViewHierarchy();
             omManager.injectVerifications();
