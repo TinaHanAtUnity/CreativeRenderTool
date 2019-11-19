@@ -4,7 +4,7 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Privacy, ConsentPage, IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
@@ -155,7 +155,6 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        /*
         if (permissions.hasOwnProperty('all') && permissions.hasOwnProperty('all').valueOf()) {
             PrivacyMetrics.trigger(PrivacyEvent.CONSENT_ACCEPT_ALL, permissions);
         } else if (!permissions.hasOwnProperty('ads').valueOf() && !permissions.hasOwnProperty('gameExp').valueOf() && !permissions.hasOwnProperty('external').valueOf()) {
@@ -163,7 +162,8 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         } else {
             PrivacyMetrics.trigger(PrivacyEvent.CONSENT_PARTIALLY_ACCEPTED, permissions);
         }
-        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);*/
+
+        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
     }
 
     // IConsentViewHandler
@@ -175,37 +175,17 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
             }
         });
     }
-/*
-    public onPrivacy(url: string): void {
-        // BLANK
-    }
-*/
+
     public onAgeGateDisagree(): void {
         // BLANK
     }
 
     public onAgeGateAgree(): void {
-        /*
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
-
-        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            // todo: handle the flow inside view class
-            this._unityPrivacyView.showPage(ConsentPage.HOMEPAGE);
-        } else {
-            this._unityPrivacyView.closeAgeGateWithAgreeAnimation();
-        }*/
     }
 
     public onPrivacy(url: string): void {
-        /*
-        if (this._platform === Platform.IOS) {
-            this._core.iOS!.UrlScheme.open(url);
-        } else if (this._platform === Platform.ANDROID) {
-            this._core.Android!.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
-        }*/
+        // BLANK
     }
 /*
     private handleAutoAgeGate(ageGate: boolean) {
@@ -235,6 +215,16 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
         this._unityPrivacyView.completeCallback();
+
+        this.onConsent({
+            ... userSettings.user,
+            profiling: false
+        }, GDPREventSource.USER);
+
+        if (userSettings.user.agreedOverAgeLimit) {
+            this.onAgeGateAgree();
+        }
+
         this.onClose();
     }
 
@@ -251,5 +241,16 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
         this._unityPrivacyView.eventCallback(name);
         this._core.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
+    }
+
+    public onPrivacyOpenUrl(url: string): void {
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }

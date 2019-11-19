@@ -15,11 +15,13 @@ import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
 
 export interface IUserPrivacySettings {
-    isChild: boolean;
-    acceptTracking: boolean;
-    personalizedGamingExperience: boolean;
-    personalizedAds: boolean;
-    thirdParty: boolean;
+    user: {
+        agreedOverAgeLimit: boolean;
+        personalizedGamingExperience: boolean;
+        personalizedAds: boolean;
+        thirdParty: boolean;
+    };
+    env: { [key: string]: unknown };
 }
 
 export class PrivacyView extends View<IPrivacyViewHandler> {
