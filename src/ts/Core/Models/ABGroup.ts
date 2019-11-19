@@ -69,7 +69,6 @@ export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new DisabledABTest();
-export const OmnivirtExperiment = new ZyngaFilteredABTest(10, 11);
 export const HeartbeatingDownloadButtonTest = new ABTest(7);
 export const BouncingDownloadButtonTest = new ABTest(8);
 export const ShiningDownloadButtonTest = new ABTest(15);
