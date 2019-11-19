@@ -1,3 +1,7 @@
+# Pending
+
+* Protocol update of DSE privacy events to V2 [12012](https://github.com/Applifier/unity-ads-webview/pull/12012)
+
 # Fri Nov 15 21:55:35 UTC 2019
 
 * Deploy Support for Webpack Release Build on 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
