@@ -216,15 +216,6 @@ export class Url {
         return appStoreUrlTemplates;
     }
 
-    public static arrayToPipedString(arr: string[]): string {
-        let stringBuilder = '';
-        arr.forEach((str) => {
-            stringBuilder += `${str}|`;
-        });
-
-        return stringBuilder.slice(0, -1);
-    }
-
     private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
     private static androidWhitelistedProtocols = ['market', 'http', 'https'];
     private static iosAppStoreUrlTemplates = ['https://itunes.apple.com'];
