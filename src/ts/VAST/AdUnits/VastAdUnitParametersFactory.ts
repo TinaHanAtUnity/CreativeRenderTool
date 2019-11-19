@@ -62,7 +62,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
 
                 // removes duplicate IAS vendor keys for reporting
                 const deedop = (vendors: string[]) => {
-                    const ob: {[id: string] : boolean} = {};
+                    const ob: {[id: string]: boolean} = {};
                     vendors.forEach((vendor) => {
                         ob[vendor] = true;
                     });
