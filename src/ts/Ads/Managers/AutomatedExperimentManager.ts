@@ -5,7 +5,6 @@ import { StorageType, StorageApi } from 'Core/Native/Storage';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { Double } from 'Core/Utilities/Double';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: string };
@@ -18,7 +17,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | Double | number | boolean | undefined;
+type ContextualFeature = string | number | boolean | undefined;
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
@@ -80,9 +79,9 @@ export class AutomatedExperimentManager {
             this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
         });
 
-        return contextualFeatPromise.then(features => {
-              this._ABGroup = core.Config.getAbGroup();
+        this._ABGroup = core.Config.getAbGroup();
 
+        return contextualFeatPromise.then(features => {
               return Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
                     .filter(storedExperiment => storedExperiment.data !== null)
@@ -202,7 +201,7 @@ export class AutomatedExperimentManager {
             user_info: { ab_Group: this._ABGroup },
             experiment: item.getExperiment().getName(),
             action: item.Action,
-            Reward: rewardVal,
+            reward: rewardVal,
             metadata: item.MetaData
         };
 
@@ -268,7 +267,7 @@ export class AutomatedExperimentManager {
 
     private static createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}, abGroup: ABGroup): string {
         return JSON.stringify({
-            user_info: { ab_Group: abGroup },
+            user_info: { ab_group: abGroup },
             experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
             contextual_features: contextualFeatures
         });
