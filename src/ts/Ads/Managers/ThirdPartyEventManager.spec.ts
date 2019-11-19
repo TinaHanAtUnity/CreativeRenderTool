@@ -9,26 +9,18 @@ describe('ThirdPartyEventManagerTest', () => {
     let request: RequestManagerMock;
 
     beforeEach(() => {
-        const platform = Platform.ANDROID;
         const core: ICoreApi = new Core().Api;
         request = new RequestManager();
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
     });
 
-    it('should replace "%25OM_ENABLED%25" in the url with the flag of whether OM is enabled', () => {
-
-        const urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25';
-        thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.OM_ENABLED]: 'true'});
-        thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
-
-        expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=true', [], {'followRedirects': true, 'retries': 0, 'retryDelay': 0, 'retryWithConnectionEvents': false});
-    });
-
-    it('should replace "%25OM_VENDORS%25" in the url with the array of vendor keys', () => {
-        const urlTemplate = 'http://foo.biz/123?om_vendors=%25OM_VENDORS%25';
-        thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.OM_VENDORS]: 'value1|value2|value3'});
-        thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
-
-        expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?om_vendors=value1%7Cvalue2%7Cvalue3', [], {'followRedirects': true, 'retries': 0, 'retryDelay': 0, 'retryWithConnectionEvents': false});
+    describe('when replacing Open Measurement Macros', () => {
+        it('should replace om_enabled and omVendors macros correctly', () => {
+            const urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
+            thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
+            thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, 'value1|value2|value3');
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=true&om_vendors=value1%7Cvalue2%7Cvalue3', [], {'followRedirects': true, 'retries': 0, 'retryDelay': 0, 'retryWithConnectionEvents': false});
+        });
     });
 });
