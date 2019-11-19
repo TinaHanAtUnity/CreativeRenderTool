@@ -21,8 +21,7 @@ export class PerPlacementLoadAdapter extends RefreshManager {
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
-                const count = placements[placementId];
-                this.loadPlacement(placementId, count);
+                this.sendLoadAPIEvent(placementId);
             });
         });
     }
@@ -36,7 +35,7 @@ export class PerPlacementLoadAdapter extends RefreshManager {
     }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
-        return this._refreshManager.refresh();
+        return this._refreshManager.refresh(nofillRetry);
     }
 
     public initialize(): Promise<INativeResponse | void> {
@@ -51,32 +50,18 @@ export class PerPlacementLoadAdapter extends RefreshManager {
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
-        const placement = this._adsConfig.getPlacement(placementId);
-        placement.setState(placementState);
+       this._refreshManager.setPlacementState(placementId, placementState);
     }
 
     public sendPlacementStateChanges(placementId: string): void {
-        const placement = this._adsConfig.getPlacement(placementId);
-        if (placement.getPlacementStateChanged()) {
-            placement.setPlacementStateChanged(false);
-            this._ads.Placement.setPlacementState(placementId, placement.getState());
-            this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
-        }
-        if (placement.getState() === PlacementState.READY) {
-            this._ads.Listener.sendReadyEvent(placementId);
-        }
+       this._refreshManager.sendPlacementStateChanges(placementId);
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
-        for (const placementId of placementIds) {
-            this.setPlacementState(placementId, placementState);
-        }
-        for (const placementId of placementIds) {
-            this.sendPlacementStateChanges(placementId);
-        }
+       this._refreshManager.setPlacementStates(placementState, placementIds);
     }
 
-    private loadPlacement(placementId: string, count: number) {
+    private sendLoadAPIEvent(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
         const currentState = placement.getState();
         this.setPlacementState(placementId, PlacementState.WAITING);
