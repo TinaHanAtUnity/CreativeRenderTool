@@ -198,7 +198,7 @@ export class AutomatedExperimentManager {
         }
 
         const outcome = {
-            user_info: { ab_Group: this._ABGroup },
+            user_info: { ab_group: this._ABGroup },
             experiment: item.getExperiment().getName(),
             action: item.Action,
             reward: rewardVal,

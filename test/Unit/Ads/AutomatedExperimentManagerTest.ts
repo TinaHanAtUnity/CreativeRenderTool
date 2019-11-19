@@ -54,7 +54,7 @@ describe('AutomatedExperimentManager test', () => {
     };
 
     const requestBodyText = JSON.stringify({
-        user_info: {ab_Group: 99},
+        user_info: {ab_group: 99},
         experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}],
         contextual_features: defaultContextualFeatures
     });
@@ -292,7 +292,7 @@ describe('AutomatedExperimentManager test', () => {
             });
 
             const rewardPostUrl = baseUrl + rewardEndPoint;
-            const rewardRequestBodyText = JSON.stringify({user_info: {ab_Group: 99}, experiment: 'FooExperiment', action: 'FooAction1', Reward: rewarded, metadata: ''});
+            const rewardRequestBodyText = JSON.stringify({user_info: {ab_group: 99}, experiment: 'FooExperiment', action: 'FooAction1', reward: rewarded, metadata: ''});
             const rewardResponseText = JSON.stringify({success: true});
             const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
                 responseCode: 200,
