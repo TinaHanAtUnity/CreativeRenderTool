@@ -1,3 +1,10 @@
+# Pending
+
+* Use npm over LinuxBrew Installation in Travis CI [#12097](https://github.com/Applifier/unity-ads-webview/pull/12097)
+* Open Measurement - Remove null or {} data fields [#12101](https://github.com/Applifier/unity-ads-webview/pull/12101)
+* End Omnivirt Endcard Experiment [#12103](https://github.com/Applifier/unity-ads-webview/pull/12103)
+* Update COPPA text [#12099](https://github.com/Applifier/unity-ads-webview/pull/12099)
+
 # Tue Nov 19 10:40:27 UTC 2019
 
 * Hotfix for privacy protocol v2 [commit](https://github.com/Applifier/unity-ads-webview/commit/f1c00b6a6a27f7ac2f3b670bbe01a7494a6b7be9)
