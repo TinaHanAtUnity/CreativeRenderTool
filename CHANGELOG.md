@@ -1,3 +1,11 @@
+# Tue Nov 19 10:40:27 UTC 2019
+
+* Hotfix for privacy protocol v2 [commit](https://github.com/Applifier/unity-ads-webview/commit/f1c00b6a6a27f7ac2f3b670bbe01a7494a6b7be9)
+
+# Tue Nov 19 10:40:27 UTC 2019
+
+* Protocol update of DSE privacy events to V2 [#12012](https://github.com/Applifier/unity-ads-webview/pull/12012)
+
 # Fri Nov 15 21:55:35 UTC 2019
 
 * Deploy Support for Webpack Release Build on 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
