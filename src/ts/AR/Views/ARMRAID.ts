@@ -40,6 +40,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
+    private _arButtonCollapseTimeout?: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -95,8 +96,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
-                    this.hideArAvailableButton();
-                    this.showARPermissionPanel();
+                    if (this._arAvailableButton.classList.contains('collapsed')) {
+                        this.expandArAvailableButton();
+                    } else {
+                        this.hideArAvailableButton();
+                        this.showARPermissionPanel();
+                    }
                 },
                 selector: '.ar-available-button'
             },
@@ -502,6 +507,10 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private hideArAvailableButton() {
+        if (this._arButtonCollapseTimeout) {
+            clearTimeout(this._arButtonCollapseTimeout);
+            this._arButtonCollapseTimeout = undefined;
+        }
         this._arAvailableButton.classList.add('hidden');
         this._arAvailableButton.style.display = 'none';
     }
@@ -540,12 +549,30 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this._arCameraAlreadyAccepted = true;
                     }
 
-                    this._arAvailableButton.classList.remove('hidden');
+                    this._arAvailableButton.classList.remove('hidden', 'collapsed', 'expanded');
                     this._arAvailableButton.style.display = 'block';
                     this._arAvailableButtonShown = true;
+                    this.collapseArAvailableButtonDelayed();
                 }
             });
         });
+    }
+
+    private collapseArAvailableButtonDelayed(delayInMilliseconds: number = 5000) {
+        if (this._arButtonCollapseTimeout) {
+            clearTimeout(this._arButtonCollapseTimeout);
+            this._arButtonCollapseTimeout = undefined;
+        }
+        this._arButtonCollapseTimeout = window.setTimeout(() => {
+            this._arAvailableButton.classList.add('collapsed');
+            this._arAvailableButton.classList.remove('expanded');
+        }, delayInMilliseconds);
+    }
+
+    private expandArAvailableButton() {
+        this._arAvailableButton.classList.remove('collapsed');
+        this._arAvailableButton.classList.add('expanded');
+        this.collapseArAvailableButtonDelayed();
     }
 
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
