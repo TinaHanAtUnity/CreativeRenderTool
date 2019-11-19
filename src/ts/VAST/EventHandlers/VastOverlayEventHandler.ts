@@ -15,9 +15,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { platform } from 'os';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -31,7 +29,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;
     private _deviceInfo: DeviceInfo;
-    private _clientInfo: ClientInfo;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -48,7 +45,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._om = this._vastAdUnit.getOpenMeasurementController();
         this._deviceInfo = parameters.deviceInfo;
-        this._clientInfo = parameters.clientInfo;
     }
 
     public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
