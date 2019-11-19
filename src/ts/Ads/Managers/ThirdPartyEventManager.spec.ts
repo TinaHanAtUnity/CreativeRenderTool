@@ -15,7 +15,7 @@ describe('ThirdPartyEventManagerTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
     });
 
-    it('should replace "%25OM_ENABLED%25" in the url with the placement id', () => {
+    it('should replace "%25OM_ENABLED%25" in the url with the flag of whether OM is enabled', () => {
 
         const urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25';
         thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.OM_ENABLED]: 'true'});
@@ -24,7 +24,7 @@ describe('ThirdPartyEventManagerTest', () => {
         expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=true', [], {'followRedirects': true, 'retries': 0, 'retryDelay': 0, 'retryWithConnectionEvents': false});
     });
 
-    it('should replace "%25OM_VENDORS%25" in the url with the placement id', () => {
+    it('should replace "%25OM_VENDORS%25" in the url with the array of vendor keys', () => {
         const urlTemplate = 'http://foo.biz/123?om_vendors=%25OM_VENDORS%25';
         thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.OM_VENDORS]: 'value1|value2|value3'});
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
