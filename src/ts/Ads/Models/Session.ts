@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
+import { ILegacyRequestPrivacy, IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 
 export enum EventType {
     START,
@@ -20,6 +20,7 @@ export interface ISession {
     eventSent: { [key: number]: boolean };
     gameSessionCounters: IGameSessionCounters;
     privacy: IRequestPrivacy | undefined;
+    legacyPrivacy: ILegacyRequestPrivacy | undefined;
     deviceFreeSpace: number;
 }
 
@@ -32,6 +33,7 @@ export class Session extends Model<ISession> {
             eventSent: ['object'],
             gameSessionCounters: ['object'],
             privacy: ['object', 'undefined'],
+            legacyPrivacy: ['object', 'undefined'],
             deviceFreeSpace: ['number']
         });
 
@@ -81,6 +83,14 @@ export class Session extends Model<ISession> {
 
     public getPrivacy(): IRequestPrivacy | undefined {
         return this.get('privacy');
+    }
+
+    public setLegacyPrivacy(privacy?: ILegacyRequestPrivacy) {
+        this.set('legacyPrivacy', privacy);
+    }
+
+    public getLegacyPrivacy(): ILegacyRequestPrivacy | undefined {
+        return this.get('legacyPrivacy');
     }
 
     public setDeviceFreeSpace(freeSpace: number) {

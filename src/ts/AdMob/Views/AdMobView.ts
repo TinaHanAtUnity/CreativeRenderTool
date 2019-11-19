@@ -27,6 +27,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -68,7 +69,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         super(platform, 'admob');
 
         this._campaign = campaign;
-        this._template = new Template(AdMobContainer);
+        this._template = new Template(AdMobContainer, new Localization(deviceInfo.getLanguage(), 'privacy'));
         this._adMobSignalFactory = adMobSignalFactory;
         this._programmaticTrackingService = programmaticTrackingService;
 
@@ -106,7 +107,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-gdpr'
+                selector: '.privacy-button'
             }
         ];
 

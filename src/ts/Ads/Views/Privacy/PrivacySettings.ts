@@ -5,8 +5,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
-import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
-import { PersonalizationSwitchGroup } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
+import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Privacy/PrivacyRowItemContainer';
+import { PersonalizationSwitchGroup } from 'Ads/Views/Privacy/PersonalizationSwitchGroup';
 import { IPermissions } from 'Privacy/Privacy';
 import { Localization } from 'Core/Utilities/Localization';
 

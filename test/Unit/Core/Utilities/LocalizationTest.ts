@@ -87,7 +87,7 @@ describe('LocalizationTest', () => {
         assert.equal(new Localization('zh_TW_#Hant', 'endscreen').translate(phrase), '免費下載', 'Localization zh_TW_#Hant did not map to correct language');
     });
 
-    describe('Consent', () => {
+    describe('Privacy', () => {
         // What information we collect and how we use it
         const id = 'privacy-what-we-collect-title';
 
