@@ -513,12 +513,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
         this._arAvailableButton.classList.add('hidden');
         this._arAvailableButton.style.display = 'none';
+        this._arAvailableButton.classList.remove('collapsed', 'expanded');
     }
 
     private showArAvailableButton() {
         if (this._arAvailableButtonShown) {
             this._arAvailableButton.classList.remove('hidden');
             this._arAvailableButton.style.display = 'block';
+            this.collapseArAvailableButtonDelayed();
             return;
         }
 
