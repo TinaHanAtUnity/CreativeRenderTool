@@ -78,10 +78,6 @@ export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
         return this._fakeDevice.screenLayout;
     }
 
-    public getDisplayMetricDensity(): number {
-        return this._fakeDevice.displayMetricDensity;
-    }
-
     public getScreenDensity(): number {
         return this._fakeDevice.screenDensity;
     }

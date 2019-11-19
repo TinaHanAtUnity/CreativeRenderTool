@@ -32,11 +32,6 @@ export class OpenMeasurementUtilities {
      * @param platform Android/IOS
      */
     public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
-        // Use this to return diP for Android on 3.3+ OM integration
-        if (platform === Platform.ANDROID) {
-            return px / ((<AndroidDeviceInfo> deviceInfo).getDisplayMetricDensity());
-        }
-
         // Use this to return standard pix for Android on 3.2- OM integration
         return px;
     }
