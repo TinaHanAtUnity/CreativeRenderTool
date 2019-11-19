@@ -42,7 +42,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
-        const omVendors: string[] = [];
+        let omVendors: string[] = [];
         if (adVerifications) {
             const omInstances: OpenMeasurement[] = [];
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
@@ -57,8 +57,19 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             });
 
             if (baseParams.campaign.getVast().isPublicaTag()) {
-                // adds publica as an om vendor to use for billing
+                // adds publica as an om vendor to use for reporting
                 omVendors.push('publica');
+
+                // removes duplicate IAS vendor keys for reporting
+                const deedop = (vendors: string[]) => {
+                    const ob: {[id: string] : boolean} = {};
+                    vendors.forEach((vendor) => {
+                        ob[vendor] = true;
+                    });
+                    return Object.keys(ob);
+                };
+
+                omVendors = deedop(omVendors);
             }
 
             const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
