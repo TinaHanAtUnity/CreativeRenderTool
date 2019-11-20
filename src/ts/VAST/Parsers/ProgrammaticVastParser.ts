@@ -36,7 +36,6 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _deviceInfo: DeviceInfo;
     protected _vastParserStrict: VastParserStrict;
     protected _coreConfig: CoreConfiguration;
-    protected _core: ICore;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -44,11 +43,10 @@ export class ProgrammaticVastParser extends CampaignParser {
         this._coreApi = core.Api;
         this._requestManager = core.RequestManager;
         this._coreConfig = core.Config;
+        this._vastParserStrict = new VastParserStrict(undefined, undefined, this._coreConfig, core.ProgrammaticTrackingService);
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
-
-        this._vastParserStrict = new VastParserStrict(undefined, undefined, this._coreConfig, this._core.ProgrammaticTrackingService);
 
         if (ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);

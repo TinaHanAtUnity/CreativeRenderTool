@@ -8,7 +8,6 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
@@ -21,9 +20,6 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
-
-        this._vastParserStrict = new VastParserStrict(undefined, undefined, this._coreConfig, this._core.ProgrammaticTrackingService);
-
         return this.retrieveVast(response).then((vast): Promise<Campaign> => {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);
             if (vpaidMediaFile) {
