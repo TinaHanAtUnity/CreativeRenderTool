@@ -1,24 +1,24 @@
 import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions } from 'Privacy/Privacy';
-import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
-import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { IPermissions, UserPrivacy } from 'Privacy/Privacy';
+import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
+import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
 import {
     IPersonalizationSwitchGroupHandler,
     PersonalizationSwitchGroup
-} from 'Ads/Views/Consent/PersonalizationSwitchGroup';
+} from 'Ads/Views/Privacy/PersonalizationSwitchGroup';
 import {
     IPrivacyRowItemContainerHandler,
     PrivacyRowItemContainer,
     PrivacyTextParagraph
-} from 'Ads/Views/Consent/PrivacyRowItemContainer';
-import { ProgrammaticTrackingService, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+} from 'Ads/Views/Privacy/PrivacyRowItemContainer';
+import { MiscellaneousMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Localization } from 'Core/Utilities/Localization';
 
-export interface IConsentViewParameters {
+export interface IPrivacyViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
     landingPage: ConsentPage;
@@ -36,7 +36,7 @@ export enum ConsentPage {
     AGE_GATE = 'agegate'
 }
 
-export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
+export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
 
     private _apiLevel?: number;
     private _osVersion?: string;
@@ -55,7 +55,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private _localization: Localization;
 
-    constructor(parameters: IConsentViewParameters) {
+    constructor(parameters: IPrivacyViewParameters) {
         super(parameters.platform, 'consent');
 
         this._localization = new Localization(parameters.language, 'consent');
@@ -159,13 +159,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
     }
 
-    public testAutoConsentAll() {
-        const testEvent = new Event('testAutoConsent');
-        this.onHomepageAcceptAllEvent(testEvent);
-    }
-
     public testAutoConsent(consent: IPermissions): void {
-        this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(consent, GDPREventAction.TEST_AUTO_CONSENT, GDPREventSource.USER));
         this._handlers.forEach(handler => handler.onClose());
     }
 
@@ -201,10 +196,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
             (<HTMLElement> this._container.querySelector('.age-gate-over')).innerHTML = overLimitBtnText;
             (<HTMLElement> this._container.querySelector('.age-gate-under')).innerHTML = underLimitBtnText;
-        }
-
-        if (this._isABTest) {
-            this._container.classList.add('background-ab-test');
         }
 
         this.showPage(this._landingPage);
@@ -270,10 +261,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onHomepageAcceptAllEvent(event: Event) {
         event.preventDefault();
 
-        const permissions: IPermissions = {
-            all: true
-        };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        this._handlers.forEach(handler => handler.onConsent(UserPrivacy.PERM_ALL_TRUE, GDPREventAction.CONSENT_AGREE_ALL, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.homepage-accept-all'));
         this.closeWithAnimation(element);
     }
@@ -288,7 +276,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: true,
             external: true
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventAction.CONSENT_AGREE, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.agree'));
         this.closeWithAnimation(element);
     }
@@ -296,12 +284,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onDisagreeEvent(event: Event) {
         event.preventDefault();
 
-        const permissions: IPermissions = {
-            gameExp: false,
-            ads: false,
-            external: false
-        };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(UserPrivacy.PERM_ALL_FALSE, GDPREventAction.CONSENT_DISAGREE, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.disagree'));
 
         this.closeWithAnimation(element);
@@ -315,7 +298,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: this._switchGroup.isPersonalizedAdsChecked(),
             external: this._switchGroup.isAds3rdPartyChecked()
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventAction.CONSENT_SAVE_CHOICES, GDPREventSource.USER));
         const element = (<HTMLElement> this._container.querySelector('.save-my-choices'));
         this.closeWithAnimation(element);
     }

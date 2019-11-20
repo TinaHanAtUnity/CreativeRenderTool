@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -21,7 +21,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
@@ -29,7 +29,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEventHandlerTest', () => {
@@ -73,8 +73,7 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
                 programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-                privacySDK: sinon.createStubInstance(PrivacySDK),
-                automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
+                privacySDK: sinon.createStubInstance(PrivacySDK)
             };
 
             privacyEventHandler = new PrivacyEventHandler(adUnitParameters);
@@ -104,31 +103,34 @@ import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentMana
         });
 
         describe('on onGDPROptOut', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+            });
 
-            it('should send operative event with action `optout`', () => {
+            it('should send operative event with action BANNER_PERMISSIONS', () => {
                 (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(false);
 
                 privacyEventHandler.onGDPROptOut(true);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optout', GDPREventSource.USER);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_ALL_FALSE, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
             });
 
-            it('should send operative event with action `optin`', () => {
+            it('should send operative event with action BANNER_PERMISSIONS', () => {
                 (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(true);
                 (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(true);
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optin');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
             });
 
-            it('should send operative event with action `skip`', () => {
+            it('should send operative event with action BANNER_PERMISSIONS', () => {
                 (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(true);
                 (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(false);
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'skip');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
             });
         });
     });
