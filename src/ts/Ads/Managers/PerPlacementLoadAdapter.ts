@@ -39,7 +39,7 @@ export class PerPlacementLoadAdapter extends RefreshManager {
     }
 
     public initialize(): Promise<INativeResponse | void> {
-        return Promise.resolve();
+        return this._refreshManager.initialize();
     }
     public shouldRefill(timestamp: number): boolean {
         return this._refreshManager.shouldRefill(timestamp);
