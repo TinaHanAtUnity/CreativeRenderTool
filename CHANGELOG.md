@@ -4,6 +4,8 @@
 * Open Measurement - Remove null or {} data fields [#12101](https://github.com/Applifier/unity-ads-webview/pull/12101)
 * End Omnivirt Endcard Experiment [#12103](https://github.com/Applifier/unity-ads-webview/pull/12103)
 * Update COPPA text [#12099](https://github.com/Applifier/unity-ads-webview/pull/12099)
+* Open Measurement - Add macros for Brand tracking [#11816](https://github.com/Applifier/unity-ads-webview/pull/11816)
+* Fix Thind Ads Analytics Path [#12161](https://github.com/Applifier/unity-ads-webview/pull/12161)
 
 # Tue Nov 19 10:40:27 UTC 2019
 
