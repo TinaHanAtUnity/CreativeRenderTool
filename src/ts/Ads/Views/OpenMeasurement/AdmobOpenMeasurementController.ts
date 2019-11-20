@@ -11,6 +11,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { Url } from 'Core/Utilities/Url';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -28,8 +30,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private _campaign: AdMobCampaign;
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder, thirdPartyEventManager: ThirdPartyEventManager) {
         super(placement, omAdViewBuilder);
 
         this._platform = platform;
@@ -38,6 +41,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._campaign = campaign;
         this._deviceInfo = deviceInfo;
         this._request = request;
+        this._thirdPartyEventManager = thirdPartyEventManager;
 
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
@@ -68,11 +72,15 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
+        const omVendors: string[] = [];
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
             this._omInstances.push(om);
             this.setupOMInstance(om, resource);
+            omVendors.push(resource.vendorKey);
         });
+        this._campaign.setOMVendors(omVendors);
+        this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
     }
 
     public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {

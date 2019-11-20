@@ -157,7 +157,9 @@ export class ProgrammaticVastParser extends CampaignParser {
             advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
             advertiserBundleId: response.getAdvertiserBundleId() || undefined,
             impressionUrls: vastImpressionUrls,
-            isMoatEnabled: response.isMoatEnabled() || undefined
+            isMoatEnabled: response.isMoatEnabled() || undefined,
+            isOMEnabled: false,
+            omVendors: []
         };
 
         const campaign = new VastCampaign(vastCampaignParms);
