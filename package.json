@@ -28,6 +28,7 @@
     "chokidar": "2.1.0",
     "eslint": "5.16.0",
     "google-closure-compiler": "20190121.0.0",
+    "handlebars": "^4.5.3",
     "html-minifier": "3.5.21",
     "inline-source-cli": "^2.0.0",
     "mocha": "5.2.0",
