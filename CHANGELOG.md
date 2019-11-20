@@ -1,4 +1,4 @@
-# Pending
+# Wed Nov 20 21:53:12 UTC 2019
 
 * Use npm over LinuxBrew Installation in Travis CI [#12097](https://github.com/Applifier/unity-ads-webview/pull/12097)
 * Open Measurement - Remove null or {} data fields [#12101](https://github.com/Applifier/unity-ads-webview/pull/12101)
