@@ -218,6 +218,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                 const request = sinon.createStubInstance(RequestManager);
                 const adViewBuilder = sinon.createStubInstance(AdmobOpenMeasurementController);
                 const thirdParty = sinon.createStubInstance(ThirdPartyEventManager);
+
+                // TODO: Remove the open measurement controller as a dependency for the adview builder - future refactor
                 return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder, thirdParty);
             };
 

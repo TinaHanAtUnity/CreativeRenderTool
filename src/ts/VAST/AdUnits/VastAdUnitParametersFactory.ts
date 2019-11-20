@@ -60,7 +60,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             omManager.addToViewHierarchy();
             omManager.injectVerifications();
 
-            baseParams.campaign.setIsOMEnabled(true);
+            baseParams.campaign.setOmEnabled(true);
             baseParams.campaign.setOMVendors(omVendors);
             vastAdUnitParameters.om = omManager;
 
