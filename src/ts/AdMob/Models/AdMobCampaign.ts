@@ -66,7 +66,7 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
         return this.get('omVendors');
     }
 
-    public setIsOMEnabled(isOMEnabled: boolean): void {
+    public setOmEnabled(isOMEnabled: boolean): void {
         this.set('isOMEnabled', isOMEnabled);
     }
 

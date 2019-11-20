@@ -80,7 +80,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             omVendors.push(resource.vendorKey);
         });
         this._campaign.setOMVendors(omVendors);
-        this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, Url.arrayToPipedString(omVendors));
+        this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
     }
 
     public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
