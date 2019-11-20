@@ -61,7 +61,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 omVendors.push('publica');
 
                 // removes duplicate IAS vendor keys for reporting
-                const deedop = (vendors: string[]) => {
+                const dedupe = (vendors: string[]) => {
                     const ob: {[id: string]: boolean} = {};
                     vendors.forEach((vendor) => {
                         ob[vendor] = true;
@@ -69,7 +69,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                     return Object.keys(ob);
                 };
 
-                omVendors = deedop(omVendors);
+                omVendors = dedupe(omVendors);
             }
 
             const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
