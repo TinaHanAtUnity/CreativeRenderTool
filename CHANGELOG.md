@@ -1,3 +1,32 @@
+# Pending
+
+* Update Dependencies [#12163](https://github.com/Applifier/unity-ads-webview/pull/12163)
+* Remove Yarn.lock Package Dependencies [#12162](https://github.com/Applifier/unity-ads-webview/pull/12162)
+* Deploy Support for Webpack Release Build on Versions other than 2.1.0 and 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+* Open Measurement - Check data is null/undefined before Object check [#12190](https://github.com/Applifier/unity-ads-webview/pull/12190)
+* Fix IAP Promo Tracking for Promos Waiting for Catalog [#12164](https://github.com/Applifier/unity-ads-webview/pull/12190)
+
+# Wed Nov 20 21:53:12 UTC 2019
+
+* Use npm over LinuxBrew Installation in Travis CI [#12097](https://github.com/Applifier/unity-ads-webview/pull/12097)
+* Open Measurement - Remove null or {} data fields [#12101](https://github.com/Applifier/unity-ads-webview/pull/12101)
+* End Omnivirt Endcard Experiment [#12103](https://github.com/Applifier/unity-ads-webview/pull/12103)
+* Update COPPA text [#12099](https://github.com/Applifier/unity-ads-webview/pull/12099)
+* Open Measurement - Add macros for Brand tracking [#11816](https://github.com/Applifier/unity-ads-webview/pull/11816)
+* Fix Thind Ads Analytics Path [#12161](https://github.com/Applifier/unity-ads-webview/pull/12161)
+
+# Tue Nov 19 10:40:27 UTC 2019
+
+* Hotfix for privacy protocol v2 [commit](https://github.com/Applifier/unity-ads-webview/commit/f1c00b6a6a27f7ac2f3b670bbe01a7494a6b7be9)
+
+# Tue Nov 19 10:40:27 UTC 2019
+
+* Protocol update of DSE privacy events to V2 [#12012](https://github.com/Applifier/unity-ads-webview/pull/12012)
+
+# Fri Nov 15 21:55:35 UTC 2019
+
+* Deploy Support for Webpack Release Build on 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+
 # Thu Nov 14 22:01:01 UTC 2019
 
 * Add Support for Webpack Release Builds (Only being deployed on 2.1.0) [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)

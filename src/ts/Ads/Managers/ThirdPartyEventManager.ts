@@ -16,7 +16,9 @@ enum ThirdPartyEventMethod {
 export enum ThirdPartyEventMacro {
     ZONE = '%ZONE%',
     SDK_VERSION = '%SDK_VERSION%',
-    GAMER_SID = '%GAMER_SID%'
+    GAMER_SID = '%GAMER_SID%',
+    OM_ENABLED = '%25OM_ENABLED%25',
+    OM_VENDORS = '%25OM_VENDORS%25'
 }
 
 export enum TrackingEvent {
