@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 21 21:05:32 UTC 2019
 
 * Update Dependencies [#12163](https://github.com/Applifier/unity-ads-webview/pull/12163)
 * Remove Yarn.lock Package Dependencies [#12162](https://github.com/Applifier/unity-ads-webview/pull/12162)
