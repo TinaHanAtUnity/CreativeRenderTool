@@ -20,6 +20,7 @@ import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/Programmati
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -196,7 +197,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         super.render();
 
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
+        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY });
 
         this._omIframe.id += this._omAdSessionId;
         this._omIframe.style.position = 'absolute';

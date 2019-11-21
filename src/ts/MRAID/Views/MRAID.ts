@@ -18,6 +18,7 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 import { Localization } from 'Core/Utilities/Localization';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -112,7 +113,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         this.createMRAID(
-            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MRAIDContainer.replace('{{ CREATIVE_URL }}', originalUrl)
+            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, {'{{ CREATIVE_URL }}': originalUrl})
         ).then(mraid => {
             this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
