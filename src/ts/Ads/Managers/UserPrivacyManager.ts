@@ -24,7 +24,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { PrivacyUserSettings } from 'Privacy/PrivacyUserSettings';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -109,8 +108,18 @@ export class UserPrivacyManager {
         }
 
         return this._request.get(privacyUrl + 'api/v1/flows/create').then((response) => {
-            return Promise.resolve(new PrivacyConfig({
-                    env: {
+            return this._request.get(privacyUrl).then((privacyHtml) => {
+                return Promise.resolve(new PrivacyConfig({
+                        flow: JSON.parse(response.response),
+                        webViewUrl: privacyUrl
+                    },
+                    {
+                        ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
+                        external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
+                        gameExp: false, // todo: fetch from this._userPrivacy.getPermissions().gameExp,
+                        agreedOverAgeLimit: false // todo:  field from this.getAgeGateChoice()
+                    },
+                    {
                         buildOsVersion: this._deviceInfo.getOsVersion(),
                         platform: this._platform,
                         userLocale: this._deviceInfo.getLanguage(),
@@ -123,17 +132,8 @@ export class UserPrivacyManager {
                         legalFramework: this._privacy.getLegalFramework(),
                         isCoppa: this._coreConfig.isCoppaCompliant()
                     },
-
-                    flow: JSON.parse(response.response),
-
-                    webViewUrl: privacyUrl
-                },
-                new PrivacyUserSettings({
-                    ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
-                    external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
-                    gameExp: false, // todo: fetch from this._userPrivacy.getPermissions().gameExp,
-                    agreedOverAgeLimit: false // todo:  field from this.getAgeGateChoice()
-                })));
+                    privacyHtml.response));
+            });
         });
     }
 

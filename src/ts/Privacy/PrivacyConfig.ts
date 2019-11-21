@@ -1,38 +1,40 @@
-import { Environment } from 'Privacy/Environment';
-import { PrivacyUserSettings } from 'Privacy/PrivacyUserSettings';
+import { IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyConfigJson {
-    env: { [key: string]: unknown };
     flow: { [key: string]: unknown };
     webViewUrl: string;
 }
 
 export class PrivacyConfig {
-    private _env: Environment;
-    private _webViewUrl: string;
-    private _userSettings: PrivacyUserSettings;
-    private _flow: { [key: string]: unknown };
+    private _env: { [key: string]: unknown };
+    private _userSettings: IUserPrivacySettings;
+    private _configJson: IPrivacyConfigJson;
+    private _html: string;
 
-    constructor(configJson: IPrivacyConfigJson, userSettings: PrivacyUserSettings) {
-        this._env = new Environment(configJson.env);
-        this._webViewUrl = configJson.webViewUrl;
+    constructor(configJson: IPrivacyConfigJson, userSettings: IUserPrivacySettings, env: { [key: string]: unknown }, privacyHtml: string) {
+        this._env = env;
+        this._configJson = configJson;
         this._userSettings = userSettings;
-        this._flow = configJson.flow;
+        this._html = privacyHtml;
     }
 
-    public getEnv(): Environment {
+    public getEnv(): { [key: string]: unknown } {
         return this._env;
     }
 
     public getFlow(): { [key: string]: unknown } {
-        return this._flow;
+        return this._configJson.flow;
     }
 
     public getWebViewUrl(): string {
-        return this._webViewUrl;
+        return this._configJson.webViewUrl;
     }
 
-    public getUserSettings(): PrivacyUserSettings {
+    public getUserSettings(): IUserPrivacySettings {
         return this._userSettings;
+    }
+
+    public getHtml(): string {
+        return this._html;
     }
 }

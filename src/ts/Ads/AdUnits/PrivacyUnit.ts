@@ -15,10 +15,11 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { PrivacyView, IUserPrivacySettings } from 'Ads/Views/Privacy/PrivacyView';
+import { PrivacyView } from 'Ads/Views/Privacy/PrivacyView';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
+import { IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -212,7 +213,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         return 'Privacy';
     }
 
-    public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
+    public onPrivacyCompleted(userSettings: IPrivacySettings): void {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
         this._unityPrivacyView.completeCallback();
 
@@ -230,9 +231,9 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
     public onPrivacyReady(): void {
         this._unityPrivacyView.readyCallback({
-            env: this._privacyConfig.getEnv().getJson(),
+            env: this._privacyConfig.getEnv(),
             flow: this._privacyConfig.getFlow(),
-            user: this._privacyConfig.getUserSettings().getJson()
+            user: this._privacyConfig.getUserSettings()
         });
 
         this._core.Sdk.logDebug('PRIVACY: Privacy ready');

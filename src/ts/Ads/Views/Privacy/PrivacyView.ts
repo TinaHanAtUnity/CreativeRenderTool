@@ -3,26 +3,16 @@ import { Template } from 'Core/Utilities/Template';
 import { PrivacyFrameEventAdapter } from 'Privacy/PrivacyFrameEventAdapter';
 import { PrivacyAdapterContainer } from 'Privacy/PrivacyAdapterContainer';
 import { ICoreApi } from 'Core/ICore';
-import { XHRequest } from 'Core/Utilities/XHRequest';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
+import { IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
-
-export interface IUserPrivacySettings {
-    user: {
-        agreedOverAgeLimit: boolean;
-        personalizedGamingExperience: boolean;
-        personalizedAds: boolean;
-        thirdParty: boolean;
-    };
-    env: { [key: string]: unknown };
-}
 
 export class PrivacyView extends View<IPrivacyViewHandler> {
     private readonly _coreApi: ICoreApi;
@@ -47,10 +37,7 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
         this._iFrame = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
         this._frameEventAdapter = new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame);
         this._iFrameAdapterContainer.connect(this._frameEventAdapter);
-        this.createPrivacyFrame(PrivacyContainer)
-            .then((privacyHtml) => {
-                this._iFrame.srcdoc = privacyHtml;
-            });
+        this._iFrame.srcdoc = this.createPrivacyFrame(PrivacyContainer);
     }
 
     public setPrivacyConfig(privacyConfig: PrivacyConfig): void {
@@ -62,20 +49,15 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
         this.loadIframe();
     }
 
-    private fetchPrivacyHtml(): Promise<string> {
-        //TODO: fetch from cache?
-        return XHRequest.get(this._privacyConfig.getWebViewUrl());
-    }
+    public createPrivacyFrame(container: string): string {
+        const privacyHtml = this._privacyConfig.getHtml();
 
-    public createPrivacyFrame(container: string): Promise<string> {
-        return this.fetchPrivacyHtml().then((privacyHtml) => {
-            if (privacyHtml) {
-                container = container.replace('<script id=\"deviceorientation-support\"></script>', DeviceOrientationScript);
-                return container.replace('<body></body>', '<body>' + privacyHtml + '</body>');
-            }
+        if (privacyHtml) {
+            container = container.replace('<script id=\"deviceorientation-support\"></script>', DeviceOrientationScript);
+            return container.replace('<body></body>', '<body>' + privacyHtml + '</body>');
+        }
 
-            throw new WebViewError('Unable to fetch privacy WebView!');
-        });
+        throw new WebViewError('Unable to fetch privacy WebView!');
     }
 
     public hide() {
@@ -92,7 +74,7 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
         this._frameEventAdapter.postMessage('readyCallback', data);
     }
 
-    public onPrivacyCompleted(userSettings: IUserPrivacySettings): void {
+    public onPrivacyCompleted(userSettings: IPrivacySettings): void {
         this._handlers.forEach(handler => handler.onPrivacyCompleted(userSettings));
     }
 

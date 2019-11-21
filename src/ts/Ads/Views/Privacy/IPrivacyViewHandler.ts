@@ -1,6 +1,6 @@
 import { IPermissions } from 'Privacy/Privacy';
 import { GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
-import { IUserPrivacySettings } from 'Ads/Views/Privacy/PrivacyView';
+import { IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyViewHandler {
     onConsent(consent: IPermissions, source: GDPREventSource): void;
@@ -10,7 +10,7 @@ export interface IPrivacyViewHandler {
     onAgeGateAgree(): void;
 
     // TODO: Temporary
-    onPrivacyCompleted(userSettings: IUserPrivacySettings): void;
+    onPrivacyCompleted(userSettings: IPrivacySettings): void;
     onPrivacyReady(): void;
     onPrivacyEvent(name: string, data: { [key: string]: unknown }): void;
 }
