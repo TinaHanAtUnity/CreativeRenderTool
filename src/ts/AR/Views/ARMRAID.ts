@@ -560,7 +560,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
     }
 
-    private collapseArAvailableButtonDelayed(delayInMilliseconds: number = 5000) {
+    private collapseArAvailableButtonDelayed() {
         if (this._arButtonCollapseTimeout) {
             clearTimeout(this._arButtonCollapseTimeout);
             this._arButtonCollapseTimeout = undefined;
@@ -568,7 +568,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._arButtonCollapseTimeout = window.setTimeout(() => {
             this._arAvailableButton.classList.add('collapsed');
             this._arAvailableButton.classList.remove('expanded');
-        }, delayInMilliseconds);
+        }, 5000);
     }
 
     private expandArAvailableButton() {
