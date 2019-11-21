@@ -1,5 +1,5 @@
 import { ICoreApi } from 'Core/ICore';
-import { IPrivacySettings } from 'Ads/Views/Privacy/PrivacyView';
+import { IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export enum IFrameEvents {
     PRIVACY_READY = 'onPrivacyReady',

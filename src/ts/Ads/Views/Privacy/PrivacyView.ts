@@ -8,7 +8,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacySettings, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
@@ -70,8 +70,11 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
         this._handlers.forEach(handler => handler.onPrivacyReady());
     }
 
-    public readyCallback(data: { [key: string]: unknown }): void {
-        this._frameEventAdapter.postMessage('readyCallback', data);
+    public readyCallback(flow: { [key: string]: unknown }, data: { env: { [key: string]: unknown }; user: IUserPrivacySettings }): void {
+        this._frameEventAdapter.postMessage('readyCallback', {
+            ... data,
+            flow
+        });
     }
 
     public onPrivacyCompleted(userSettings: IPrivacySettings): void {

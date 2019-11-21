@@ -230,9 +230,8 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     }
 
     public onPrivacyReady(): void {
-        this._unityPrivacyView.readyCallback({
+        this._unityPrivacyView.readyCallback(this._privacyConfig.getFlow(), {
             env: this._privacyConfig.getEnv(),
-            flow: this._privacyConfig.getFlow(),
             user: this._privacyConfig.getUserSettings()
         });
 
