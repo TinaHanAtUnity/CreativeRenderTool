@@ -6,7 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 import { Localization } from 'Core/Utilities/Localization';
-import { PrivacyDataRequest } from 'Ads/Views/Consent/PrivacyDataRequest';
+import { PrivacyDataRequest } from 'Ads/Views/Privacy/PrivacyDataRequest';
 
 enum PrivacyCardState {
     PRIVACY,

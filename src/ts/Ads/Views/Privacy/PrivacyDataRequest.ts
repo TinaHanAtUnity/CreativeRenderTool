@@ -4,11 +4,23 @@ import { Template } from 'Core/Utilities/Template';
 import { Localization } from 'Core/Utilities/Localization';
 
 import DataRequestTemplate from 'html/consent/privacy-data-request.html';
-import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
+import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
+import { Captcha } from 'Ads/Views/Privacy/Captcha';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+
+type UrlResponse = { 'imageURLs': string[] };
 
 export class PrivacyDataRequest extends View<{}> {
 
+    public static setRequest(request: RequestManager): void {
+        PrivacyDataRequest.REQUEST = request;
+    }
+
+    private static REQUEST: RequestManager;
+
     private readonly _localization: Localization;
+
+    private _captchaView: Captcha;
 
     constructor(platform: Platform, language: string) {
         super(platform, 'privacy-data-request');
@@ -36,14 +48,30 @@ export class PrivacyDataRequest extends View<{}> {
         }
     }
 
+    public hide(): void {
+        super.hide();
+
+        if (this._captchaView) {
+            this._captchaView.hide();
+
+            const captchaContainer = this._captchaView.container();
+            if (captchaContainer.parentElement) {
+                captchaContainer.parentElement.removeChild(captchaContainer);
+            }
+        }
+    }
+
     private onDataRequestSubmitEvent(event: Event): void {
         event.preventDefault();
+        this.sendDataRequestEvent();
+    }
 
+    private sendDataRequestEvent(): void {
         const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
         const emailInput = emailInputElement.value;
 
         // copied from https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email
-        if (emailInput.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
+        if (emailInput.length > 0 && emailInput.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
             const submitButton = <HTMLElement> this.container().querySelector('.privacy-data-request-submit-button');
             const buttonSpinner = new ButtonSpinner(this._platform);
             buttonSpinner.render();
@@ -52,8 +80,10 @@ export class PrivacyDataRequest extends View<{}> {
             submitButton.appendChild(buttonSpinner.container());
 
             emailInputElement.disabled = true;
+            emailInputElement.blur();
 
-            this.sendDataRequestEvent().then(() => {
+            PrivacyDataRequest.REQUEST.post('https://us-central1-ads-debot.cloudfunctions.net/debot/init', JSON.stringify({ idfa: 'dsfs-efsd-ssss-ffss', email: emailInput })
+            ).then((response: INativeResponse) => {
                 if (this.container() && this.container().parentElement) {
                     submitButton.classList.remove('click-animation');
                     buttonSpinner.container().classList.add('stop');
@@ -61,9 +91,12 @@ export class PrivacyDataRequest extends View<{}> {
 
                     const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-msg');
                     msgElement.classList.add('show-msg');
+
+                    this.showCaptcha(JSON.parse(response.response).imageURLs);
                 }
 
-            }).catch(() => {
+            }).catch((error) => {
+                console.log(JSON.stringify(error));
                 if (this.container() && this.container().parentElement) {
                     submitButton.classList.remove('click-animation');
                     buttonSpinner.container().classList.add('stop');
@@ -78,12 +111,11 @@ export class PrivacyDataRequest extends View<{}> {
         }
     }
 
-    private sendDataRequestEvent(): Promise<void> {
-        // fixme: add a real request
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 3000);
-        });
+    private showCaptcha(urls: string[]): void {
+        const captcha = new Captcha(this._platform);
+        captcha.setElements(urls);
+
+        captcha.render();
+        document.body.appendChild(captcha.container());
     }
 }
