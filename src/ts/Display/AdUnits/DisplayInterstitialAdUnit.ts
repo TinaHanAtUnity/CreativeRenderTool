@@ -68,7 +68,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         } else {
             this._topWebViewAreaHeight = this._topWebViewAreaMinHeight;
         }
-
     }
 
     public show(): Promise<void> {
