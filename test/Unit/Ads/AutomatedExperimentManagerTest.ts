@@ -55,40 +55,40 @@ describe('AutomatedExperimentManager test', () => {
     // exhaustive list so that if ever something appears, or changes type (to a point), we will catch it in the tests.
     // as that could signify a breaking change for the AutomatedExperimentManager back end (CDP schema).
     const defaultContextualFeatures: {[key: string]: any} = {
-        bundleId: 'com.unity3d.ads.example',
-        gameId: '12345',
-        coppaCompliant: false,
-        limitAdTracking: true,
-        gdprEnabled: false,
-        optOutRecorded: false,
-        optOutEnabled: false,
+        bundle_id: 'com.unity3d.ads.example',
+        game_id: '12345',
+        coppa_compliant: false,
+        limit_ad_tracking: true,
+        gdpr_enabled: false,
+        opt_out_Recorded: false,
+        opt_out_enabled: false,
         country: 'FI',
         language: 'en_US',
-        timeZone: '+0200',
+        time_zone: '+0200',
         platform: 'ANDROID',
-        osVersion: '10.1.1',
-        deviceModel: 'iPhone7,2',
-        deviceMake: 'Apple',
-        screenWidth: 647,
-        screenHeight: 357,
-        screenDensity: 480,
+        os_version: '10.1.1',
+        device_model: 'iPhone7,2',
+        device_make: 'Apple',
+        screen_width: 647,
+        screen_height: 357,
+        screen_density: 480,
         stores: 'google',
         rooted: false,
-        connectionType: 'wifi',
-        deviceFreeSpace: 10159440,
+        connection_type: 'wifi',
+        device_free_space: 10159440,
         headset: false,
-        deviceVolume: 1,
-        maxVolume: 1,
-        totalInternalSpace: 13162172,
-        freeExternalSpace: 10159440,
-        batteryLevel: 1,
-        batteryStatus: 'BATTERY_STATUS_UNKNOWN',
-        usbConnected: false,
-        freeMemory: 1000000,
-        totalMemory: 1899508,
-        ringerMode: 'RINGER_MODE_SILENT',
-        networkMetered: false,
-        screenBrightness: 1
+        device_volume: 1,
+        max_volume: 1,
+        total_internal_space: 13162172,
+        free_external_space: 10159440,
+        battery_level: 1,
+        battery_status: 'BATTERY_STATUS_UNKNOWN',
+        usb_connected: false,
+        free_memory: 1000000,
+        total_memory: 1899508,
+        ringer_mode: 'RINGER_MODE_SILENT',
+        network_metered: false,
+        screen_brightness: 1
     };
 
     const requestBodyText = JSON.stringify({
@@ -105,24 +105,23 @@ describe('AutomatedExperimentManager test', () => {
         }
 
         const features = json.contextual_features;
-        if (features.length === 0) {
-            return false;
-        }
-
         const allowedFeatures = Object.getOwnPropertyNames(defaultContextualFeatures);
         const postedFeatures = Object.getOwnPropertyNames(features);
 
-        postedFeatures.forEach(element => {
-            if (allowedFeatures.findIndex((s) => element !== s) === -1) {
+        if (postedFeatures.length === 0) {
+            return false;
+        }
+
+        return postedFeatures.every((feature) => {
+            if (allowedFeatures.findIndex((s) => feature !== s) === -1) {
                 return false;
             }
 
-            if (typeof features[element] !== typeof (defaultContextualFeatures[element])) {
+            if (typeof features[feature] !== typeof (defaultContextualFeatures[feature])) {
                 return false;
             }
+            return true;
         });
-
-        return true;
     }
 
     it(`initialize with request ok, no experiments`, () => {

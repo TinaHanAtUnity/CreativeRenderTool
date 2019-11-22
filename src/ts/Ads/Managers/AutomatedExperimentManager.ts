@@ -275,17 +275,50 @@ export class AutomatedExperimentManager {
     private async CollectStaticContextualFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
-            'bundleId', 'gameId',
+            { l: 'bundleId', c: 'bundle_id'},
+            { l: 'gameId', c: 'game_id' },
+
             //PRIVACY & OPT-OUTS
-            'coppaCompliant', 'limitAdTracking', 'gdprEnabled', 'optOutRecorded', 'optOutEnabled',
+            { l: 'coppaCompliant', c: 'coppa_compliant' },
+            { l: 'limitAdTracking', c: 'limit_ad_tracking' },
+            { l: 'gdpr_enabled', c: undefined },
+            { l: 'opt_out_Recorded', c: undefined },
+            { l: 'opt_out_enabled', c: undefined },
+
             //DEMOGRAPHIC
-            'country', 'language', 'timeZone',
+            { l: 'country', c: undefined },
+            { l: 'language', c: undefined },
+            { l: 'timeZone', c: 'time_zone' },
+
             //DEVICE -- STATIC
-            'platform', 'osVersion', 'deviceModel', 'deviceMake', 'screenWidth', 'screenHeight', 'screenDensity', 'simulator', 'stores',
+            { l: 'platform',  c: undefined },
+            { l: 'osVersion', c: 'os_version' },
+            { l: 'deviceModel', c: 'device_model' },
+            { l: 'deviceMake', c: 'device_make' },
+            { l: 'screenWidth', c: 'screen_width' },
+            { l: 'screenHeight', c: 'screen_height' },
+            { l: 'screenDensity', c: 'screen_density' },
+            { l: 'simulator',  c: undefined },
+            { l: 'stores', c: undefined },
+
             //DEVICE -- BEHAVIOUR
-            'rooted', 'connectionType', 'deviceFreeSpace', 'wiredHeadset', 'headset', 'deviceVolume', 'maxVolume',
-            'totalInternalSpace', 'freeExternalSpace', 'totalExternalSpace', 'batteryLevel', 'batteryStatus', 'usbConnected',
-            'freeMemory', 'totalMemory', 'ringerMode', 'networkMetered', 'screenBrightness'
+            { l: 'rooted',  c: undefined },
+            { l: 'connectionType', c: 'connection_type' },
+            { l: 'device_free_space', c: undefined },
+            { l: 'headset', c: undefined },
+            { l: 'deviceVolume', c: 'device_volume' },
+            { l: 'max_volume', c: undefined },
+            { l: 'freeMemory', c: 'free_memory' },
+            { l: 'totalMemory', c: 'total_memory' },
+            { l: 'total_internal_space', c: undefined },
+            { l: 'free_external_space', c: undefined },
+            { l: 'total_external_space', c: undefined },
+            { l: 'batteryLevel', c: 'battery_level' },
+            { l: 'batteryStatus', c: 'battery_status' },
+            { l: 'usb_connected', c: undefined },
+            { l: 'ringer_mode', c: undefined },
+            { l: 'network_metered', c: undefined },
+            { l: 'screenBrightness', c: 'screen_brightness' }
         ];
 
         const undefinedValue = new Promise(() => undefined);
@@ -304,20 +337,20 @@ export class AutomatedExperimentManager {
                ...res[1],
                ...core.ClientInfo.getDTO(),
                ...core.Config.getDTO(),
-               'gdprEnabled': privacySdk.isGDPREnabled(),
-               'optOutRecorded': privacySdk.isOptOutRecorded(),
-               'optOutEnabled': privacySdk.isOptOutEnabled(),
+               'gdpr_enabled': privacySdk.isGDPREnabled(),
+               'opt_out_Recorded': privacySdk.isOptOutRecorded(),
+               'opt_out_enabled': privacySdk.isOptOutEnabled(),
                'platform': Platform[core.NativeBridge.getPlatform()],
                'stores': core.DeviceInfo.getStores(),
                'simulator': core.DeviceInfo instanceof IosDeviceInfo ? core.DeviceInfo.isSimulator() : undefined,
-               'totalInternalSpace': core.DeviceInfo.getTotalSpace(),
-               'deviceFreeSpace': res[2],
-               'freeExternalSpace': <number | undefined>res[3],
-               'totalExternalSpace': <number | undefined>res[4],
-               'networkMetered' : <boolean | undefined>res[5],
-               'ringerMode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
-               'usbConnected' : <boolean | undefined>res[7],
-               'maxVolume': core.DeviceInfo.get('maxVolume')
+               'total_internal_space': core.DeviceInfo.getTotalSpace(),
+               'device_free_space': res[2],
+               'free_external_space': <number | undefined>res[3],
+               'total_external_space': <number | undefined>res[4],
+               'network_metered' : <boolean | undefined>res[5],
+               'ringer_mode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
+               'usb_connected' : <boolean | undefined>res[7],
+               'max_volume': core.DeviceInfo.get('maxVolume')
             };
 
             // do some enum conversions
@@ -326,9 +359,10 @@ export class AutomatedExperimentManager {
             }
 
             const features: { [key: string]: ContextualFeature } = {};
-            filter.forEach(name => {
-               if (rawData[name] !== undefined) {
-                   features[name] = rawData[name];
+            filter.forEach(item => {
+               if (rawData[item.l] !== undefined) {
+                   const name = (item.c !== undefined) ? item.c : item.l;
+                   features[ name ] = rawData[item.l] ;
                }
             });
 
