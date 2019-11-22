@@ -1,10 +1,18 @@
+import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
 import { StorageType, StorageApi } from 'Core/Native/Storage';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ABGroup } from 'Core/Models/ABGroup';
+import { Double } from 'Core/Utilities/Double';
+import { Campaign } from 'Ads/Models/Campaign';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { RingerMode } from 'Core/Constants/Android/RingerMode';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: string };
@@ -17,7 +25,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | number | boolean | undefined;
+type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform;
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
@@ -36,6 +44,12 @@ class StateItem {
     }
 }
 
+class UserInfo {
+    public ABGroup: number;
+    public AuctionID: string | undefined;
+    public GameSessionID: number;
+}
+
 export class CachableAutomatedExperimentData {
     constructor(action: string, metadata: string) {
         this.Action = action;
@@ -52,7 +66,7 @@ export class AutomatedExperimentManager {
 
     private readonly _state: { [key: string]: StateItem } = {};
     private _experimentBegan = false;
-    private _ABGroup: ABGroup = -1;
+    private _userInfo: UserInfo = new UserInfo();
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
     private static readonly _createEndPoint = 'experiment';
@@ -73,15 +87,14 @@ export class AutomatedExperimentManager {
                 .catch(() => ({experiment, data: null}))
             );
 
-        const contextualFeatPromise = this.CollectContextualFeatures(core);
-
         experiments.forEach(experiment => {
             this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
         });
 
-        this._ABGroup = core.Config.getAbGroup();
+        this._userInfo.ABGroup = core.Config.getAbGroup();
+        this._userInfo.GameSessionID = core.Ads.SessionManager.getGameSessionId();
 
-        return contextualFeatPromise.then(features => {
+        return this.CollectStaticContextualFeatures(core).then(features => {
               return Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
                     .filter(storedExperiment => storedExperiment.data !== null)
@@ -101,7 +114,7 @@ export class AutomatedExperimentManager {
                 ];
 
                 if (experimentsToRequest.length > 0) {
-                    const body = AutomatedExperimentManager.createRequestBody(experimentsToRequest, features, this._ABGroup);
+                    const body = this.createRequestBody(experimentsToRequest, features);
                     const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
 
                     return this._requestManager.post(url, body)
@@ -147,7 +160,7 @@ export class AutomatedExperimentManager {
         return Promise.all(promises).then((ignored) => Promise.resolve());
     }
 
-    public sendAction(experiment: AutomatedExperiment) {
+    public sendAction(experiment: AutomatedExperiment, campaign? : Campaign) {
         if (!this._experimentBegan) {
             return;
         }
@@ -155,6 +168,7 @@ export class AutomatedExperimentManager {
         const stateItem = this._state[experiment.getName()];
         if (stateItem) {
             stateItem.SendAction = true;
+            this._userInfo.AuctionID = campaign ? campaign.getSession().getId() : undefined; // happens to also be the auction ID. Horrible but that all I could find so far.
         }
     }
 
@@ -183,12 +197,18 @@ export class AutomatedExperimentManager {
 
     private submit(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
         const action = {
+            user_info: {
+                ab_group: this._userInfo.ABGroup,
+                auction_id: this._userInfo.AuctionID,
+                game_session_id: this._userInfo.GameSessionID
+            },
             experiment: item.getExperiment().getName(),
             action: item.Action
         };
 
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
-        return this._requestManager.post(url, JSON.stringify(action));
+        const body = JSON.stringify(action);
+        return this._requestManager.post(url, body);
     }
 
     private submitExperimentOutcome(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
@@ -198,7 +218,11 @@ export class AutomatedExperimentManager {
         }
 
         const outcome = {
-            user_info: { ab_group: this._ABGroup },
+            user_info: {
+                ab_group: this._userInfo.ABGroup,
+                auction_id: this._userInfo.AuctionID,
+                game_session_id: this._userInfo.GameSessionID
+            },
             experiment: item.getExperiment().getName(),
             action: item.Action,
             reward: rewardVal,
@@ -248,26 +272,109 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private CollectContextualFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }> {
-        return Promise.all<ContextualFeature>([
-            <Promise<boolean>>core.DeviceInfo.getHeadset().catch((err) => { Diagnostics.trigger('failed_to_determine_headset_presence', err); return null; }),
-            <Promise<number>>core.DeviceInfo.getDeviceVolume().catch((err) => { Diagnostics.trigger('failed_to_determine_volume_level', err); return null; })
-        ]).then(([
-            headset,
-            deviceVolume
-        ]) => {
-            return {
-                'timeZone': core.DeviceInfo.getTimeZone(),
-                'headset': headset,
-                'language': core.DeviceInfo.getLanguage(),
-                'deviceVolume': deviceVolume
+    private async CollectStaticContextualFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
+        const filter = [
+            //GAMES, CAMPAIGN, THE AD
+            'bundleId', 'gameId',
+            //PRIVACY & OPT-OUTS
+            'coppaCompliant', 'limitAdTracking', 'gdprEnabled', 'optOutRecorded', 'optOutEnabled',
+            //DEMOGRAPHIC
+            'country', 'language', 'timeZone',
+            //DEVICE -- STATIC
+            'platform', 'osVersion', 'deviceModel', 'deviceMake', 'screenWidth', 'screenHeight', 'screenDensity', 'simulator', 'stores',
+            //DEVICE -- BEHAVIOUR
+            'rooted', 'connectionType', 'deviceFreeSpace', 'wiredHeadset', 'headset', 'deviceVolume', 'maxVolume',
+            'totalInternalSpace', 'freeExternalSpace', 'totalExternalSpace', 'batteryLevel', 'batteryStatus', 'usbConnected',
+            'freeMemory', 'totalMemory', 'ringerMode', 'networkMetered', 'screenBrightness'
+        ];
+
+        const undefinedValue = new Promise(() => undefined);
+        return Promise.all([
+            core.DeviceInfo.fetch(),
+            core.DeviceInfo.getDTO(),
+            core.DeviceInfo.getFreeSpace(),
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getFreeSpaceExternal() : undefinedValue,
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getTotalSpaceExternal() : undefinedValue,
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getNetworkMetered() : undefinedValue,
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getRingerMode() : undefinedValue,
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.isUSBConnected() : undefinedValue
+        ]).then((res) => {
+            const privacySdk = core.Ads.PrivacySDK;
+            const rawData: { [key: string]: ContextualFeature } = {
+               ...res[1],
+               ...core.ClientInfo.getDTO(),
+               ...core.Config.getDTO(),
+               'gdprEnabled': privacySdk.isGDPREnabled(),
+               'optOutRecorded': privacySdk.isOptOutRecorded(),
+               'optOutEnabled': privacySdk.isOptOutEnabled(),
+               'platform': Platform[core.NativeBridge.getPlatform()],
+               'stores': core.DeviceInfo.getStores(),
+               'simulator': core.DeviceInfo instanceof IosDeviceInfo ? core.DeviceInfo.isSimulator() : undefined,
+               'totalInternalSpace': core.DeviceInfo.getTotalSpace(),
+               'deviceFreeSpace': res[2],
+               'freeExternalSpace': <number | undefined>res[3],
+               'totalExternalSpace': <number | undefined>res[4],
+               'networkMetered' : <boolean | undefined>res[5],
+               'ringerMode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
+               'usbConnected' : <boolean | undefined>res[7],
+               'maxVolume': core.DeviceInfo.get('maxVolume')
             };
+
+            // do some enum conversions
+            if (rawData.hasOwnProperty('batteryStatus')) {
+                rawData.batteryStatus = BatteryStatus[<BatteryStatus>rawData.batteryStatus];
+            }
+
+            const features: { [key: string]: ContextualFeature } = {};
+            filter.forEach(name => {
+               if (rawData[name] !== undefined) {
+                   features[name] = rawData[name];
+               }
+            });
+
+            return features;
         });
     }
 
-    private static createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}, abGroup: ABGroup): string {
+    // not used at the moment. but will be soon: when we do an inference / ad display.
+    // incomplete implementation
+    private async CollectAdRelatedFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
+        const filter = [
+            // CAMPAIGN, THE AD
+            'campaignId', 'targetGameId', 'rating', 'ratingCount', 'gameSessionCounters', 'cached',
+
+            // MISC
+            'videoOrientation'
+        ];
+
+        const undefinedValue = new Promise(() => undefined);
+        return Promise.all([
+            core.DeviceInfo.getScreenWidth(),
+            core.DeviceInfo.getScreenHeight()
+        ]).then((res) => {
+                const privacySdk = core.Ads.PrivacySDK;
+                const rawData: { [key: string]: ContextualFeature } = {
+                    'videoOrientation': Orientation[  res[0] >= res[1] ? Orientation.LANDSCAPE : Orientation.PORTRAIT]
+            };
+
+            const features: { [key: string]: ContextualFeature } = {};
+            filter.forEach(name => {
+               if (rawData[name] !== undefined) {
+                   features[name] = rawData[name];
+               }
+            });
+
+            return features;
+        });
+    }
+
+    private createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}): string {
         return JSON.stringify({
-            user_info: { ab_group: abGroup },
+            user_info: {
+                ab_group: this._userInfo.ABGroup,
+                game_session_id: this._userInfo.GameSessionID
+                // auction_id: Left out on purpose, as experiments are used accross multiple actions at the moment
+            },
             experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
             contextual_features: contextualFeatures
         });

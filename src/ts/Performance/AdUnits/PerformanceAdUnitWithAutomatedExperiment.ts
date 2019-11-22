@@ -15,7 +15,7 @@ export class PerformanceAdUnitWithAutomatedExperiment extends PerformanceAdUnit 
     }
 
     public show(): Promise<void> {
-        this._automatedExperimentManager.sendAction(ButtonAnimationsExperiment);
+        this._automatedExperimentManager.sendAction(ButtonAnimationsExperiment, this.getCampaign());
         return super.show();
     }
 

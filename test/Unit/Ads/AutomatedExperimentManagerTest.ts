@@ -1,6 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
+import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
@@ -35,12 +36,15 @@ describe('AutomatedExperimentManager test', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICore;
+    let ads: IAds;
     let diagnosticTrigger: sinon.SinonStub;
 
     beforeEach(() => {
         backend = TestFixtures.getBackend(Platform.ANDROID);
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID, backend);
         core = TestFixtures.getCoreModule(nativeBridge);
+        ads = TestFixtures.getAdsModule(core);
+        core.Ads = ads;
         diagnosticTrigger = sandbox.stub(Diagnostics, 'trigger');
     });
 
@@ -48,9 +52,43 @@ describe('AutomatedExperimentManager test', () => {
         sandbox.restore();
     });
 
-    const defaultContextualFeatures = {
-         headset: false,
-         deviceVolume: 1
+    // exhaustive list so that if ever something appears, or changes type (to a point), we will catch it in the tests.
+    // as that could signify a breaking change for the AutomatedExperimentManager back end (CDP schema).
+    const defaultContextualFeatures: {[key: string]: any} = {
+        bundleId: 'com.unity3d.ads.example',
+        gameId: '12345',
+        coppaCompliant: false,
+        limitAdTracking: true,
+        gdprEnabled: false,
+        optOutRecorded: false,
+        optOutEnabled: false,
+        country: 'FI',
+        language: 'en_US',
+        timeZone: '+0200',
+        platform: 'ANDROID',
+        osVersion: '10.1.1',
+        deviceModel: 'iPhone7,2',
+        deviceMake: 'Apple',
+        screenWidth: 647,
+        screenHeight: 357,
+        screenDensity: 480,
+        stores: 'google',
+        rooted: false,
+        connectionType: 'wifi',
+        deviceFreeSpace: 10159440,
+        headset: false,
+        deviceVolume: 1,
+        maxVolume: 1,
+        totalInternalSpace: 13162172,
+        freeExternalSpace: 10159440,
+        batteryLevel: 1,
+        batteryStatus: 'BATTERY_STATUS_UNKNOWN',
+        usbConnected: false,
+        freeMemory: 1000000,
+        totalMemory: 1899508,
+        ringerMode: 'RINGER_MODE_SILENT',
+        networkMetered: false,
+        screenBrightness: 1
     };
 
     const requestBodyText = JSON.stringify({
@@ -58,6 +96,34 @@ describe('AutomatedExperimentManager test', () => {
         experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}],
         contextual_features: defaultContextualFeatures
     });
+
+    function ValidateFeaturesInRequestBody(body: string): boolean {
+        const json = JSON.parse(body);
+
+        if (!json.hasOwnProperty('contextual_features')) {
+            return false;
+        }
+
+        const features = json.contextual_features;
+        if (features.length === 0) {
+            return false;
+        }
+
+        const allowedFeatures = Object.getOwnPropertyNames(defaultContextualFeatures);
+        const postedFeatures = Object.getOwnPropertyNames(features);
+
+        postedFeatures.forEach(element => {
+            if (allowedFeatures.findIndex((s) => element !== s) === -1) {
+                return false;
+            }
+
+            if (typeof features[element] !== typeof (defaultContextualFeatures[element])) {
+                return false;
+            }
+        });
+
+        return true;
+    }
 
     it(`initialize with request ok, no experiments`, () => {
         const getStub = sandbox.stub(core.Api.Storage, 'get')
@@ -104,7 +170,7 @@ describe('AutomatedExperimentManager test', () => {
             const responseText = JSON.stringify({experiments: {FooExperiment: action}});
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
-                .withArgs(postUrl, requestBodyText)
+                .withArgs(postUrl)
                 .resolves(<INativeResponse>{
                     responseCode: 200,
                     response: responseText
@@ -113,6 +179,7 @@ describe('AutomatedExperimentManager test', () => {
             const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
             return aem.initialize([FooExperiment], core).then(() => {
                 assert.isTrue(postStub.called);
+                assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
                 assert.isTrue(getStub.called);
                 assert.isTrue(setStub.called);
                 assert.isTrue(writeStub.called);
@@ -139,7 +206,7 @@ describe('AutomatedExperimentManager test', () => {
             const responseText = 'not json';
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
-                .withArgs(postUrl, requestBodyText)
+                .withArgs(postUrl)
                 .resolves(<INativeResponse>{
                     responseCode: 200,
                     response: responseText
@@ -152,12 +219,16 @@ describe('AutomatedExperimentManager test', () => {
                 assert.isFalse(setStub.called);
                 assert.isFalse(writeStub.called);
 
+                assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
+
                 assert.equal(aem.getExperimentAction(FooExperiment), 'FooAction2', 'Wrong variant...');
 
-                assert.isTrue(diagnosticTrigger.calledOnce);
-                assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_parse_automated_experiments');
+                assert.equal(diagnosticTrigger.callCount, 2, 'missing an error...');
+                assert.equal(diagnosticTrigger.firstCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
+
+                assert.equal(diagnosticTrigger.secondCall.args[0], 'failed_to_parse_automated_experiments');
                 // The error message is browser dependant, thus different between safari(iOS) and chrome(Android)
-                assert.oneOf(diagnosticTrigger.firstCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
+                assert.oneOf(diagnosticTrigger.secondCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
             });
         });
     });
@@ -178,7 +249,7 @@ describe('AutomatedExperimentManager test', () => {
         const responseText = JSON.stringify({});
 
         const postStub = sandbox.stub(core.RequestManager, 'post')
-            .withArgs(postUrl, requestBodyText)
+            .withArgs(postUrl)
             .resolves(<INativeResponse>{
                 responseCode: 500,
                 response: responseText
@@ -191,11 +262,15 @@ describe('AutomatedExperimentManager test', () => {
             assert.isFalse(setStub.called);
             assert.isFalse(writeStub.called);
 
+            assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
+
             assert.equal(aem.getExperimentAction(FooExperiment), 'FooAction2', 'Wrong variant...');
 
-            assert.isTrue(diagnosticTrigger.calledOnce);
-            assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_fetch_automated_experiments');
-            assert.equal(diagnosticTrigger.firstCall.args[1].message, 'Failed to fetch response from aui service');
+            assert.equal(diagnosticTrigger.callCount, 2, 'missing an error...');
+            assert.equal(diagnosticTrigger.firstCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
+
+            assert.equal(diagnosticTrigger.secondCall.args[0], 'failed_to_fetch_automated_experiments');
+            assert.equal(diagnosticTrigger.secondCall.args[1].message, 'Failed to fetch response from aui service');
         });
     });
 
@@ -247,7 +322,7 @@ describe('AutomatedExperimentManager test', () => {
             const responseText = JSON.stringify({experiments: {FooExperiment: expected}});
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
-                .withArgs(postUrl, requestBodyText)
+                .withArgs(postUrl)
                 .resolves(<INativeResponse>{
                     responseCode: 200,
                     response: responseText
@@ -259,7 +334,7 @@ describe('AutomatedExperimentManager test', () => {
                 assert.isFalse(getStub.called);
                 assert.isTrue(setStub.called);
                 assert.isTrue(writeStub.called);
-
+                assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
                 assert.equal(aem.getExperimentAction(FooExperimentNoCache), expected, 'Wrong variant...');
             });
         });
@@ -284,7 +359,7 @@ describe('AutomatedExperimentManager test', () => {
             });
 
             const actionPostUrl = baseUrl + actionEndPoint;
-            const actionRequestBodyText = JSON.stringify({experiment: 'FooExperiment', action: 'FooAction1'});
+            const actionRequestBodyText = JSON.stringify({user_info: {ab_group: 99}, experiment: 'FooExperiment', action: 'FooAction1'});
             const actionResponseText = JSON.stringify({success: true});
             const postStubAction = postStub.onCall(1).resolves(<INativeResponse>{
                 responseCode: 200,
@@ -292,7 +367,9 @@ describe('AutomatedExperimentManager test', () => {
             });
 
             const rewardPostUrl = baseUrl + rewardEndPoint;
-            const rewardRequestBodyText = JSON.stringify({user_info: {ab_group: 99}, experiment: 'FooExperiment', action: 'FooAction1', reward: rewarded, metadata: ''});
+            const rewardRequestBodyText = JSON.stringify({
+                user_info: {ab_group: 99}, experiment: 'FooExperiment', action: 'FooAction1', reward: rewarded, metadata: ''
+            });
             const rewardResponseText = JSON.stringify({success: true});
             const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
                 responseCode: 200,

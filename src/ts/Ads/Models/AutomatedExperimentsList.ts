@@ -19,7 +19,7 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
     name: 'ButtonAnimationsExperiment',
     actions: Object.values(EndScreenAnimation),
     defaultAction: EndScreenAnimation.STATIC,
-    cacheDisabled: false
+    cacheDisabled: true
 });
 
 export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
