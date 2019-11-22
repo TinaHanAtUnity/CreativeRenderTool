@@ -234,7 +234,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
      * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
-     * TODO: Calculate Geometry change for Privacy coverage
      */
     public geometryChange(viewport: IViewPort, adView: IAdView) {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
