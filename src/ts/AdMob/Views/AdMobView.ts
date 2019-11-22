@@ -44,7 +44,7 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
-const omidImplementerMacro = '{{ OMID_IMPLEMENTOR }}';
+const OMIDImplementerMacro = '{{ OMID_IMPLEMENTOR }}';
 const OMIDApiVersionMacro = '{{ OMID_API_VERSION }}';
 
 export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandlerView {
@@ -200,7 +200,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             iframe.srcdoc = markup;
 
             if (this._admobOMController) {
-                iframe.srcdoc += OMIDSessionClient.replace(omidImplementerMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
+                iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementerMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
                 this._admobOMController.getAdmobBridge().setAdmobIframe(iframe);
             }
         });

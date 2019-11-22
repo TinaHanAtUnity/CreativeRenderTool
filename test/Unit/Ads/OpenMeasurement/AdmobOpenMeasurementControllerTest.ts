@@ -10,11 +10,14 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
+import { assert } from 'chai';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${platform} AdmobOpenMeasurementContoller`, () => {
+    describe(`${'platform'} AdmobOpenMeasurementContoller`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
         let backend: Backend;
@@ -107,6 +110,59 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
             it('sessionFinish should should pass to admob session interface bridge', () => {
                 omManager.sessionFinish();
                 sinon.assert.calledOnce(<sinon.SinonStub>omManager.getAdmobBridge().sendSessionFinish);
+            });
+        });
+
+        describe('impression event handling', () => {
+            let omManager: AdmobOpenMeasurementController;
+
+            beforeEach(() => {
+                omManager = initAdMobOMManager();
+                sinon.stub(deviceInfo, 'getScreenWidth').returns(1080);
+                sinon.stub(deviceInfo, 'getScreenHeight').returns(1920);
+                sandbox.stub(OpenMeasurementController.prototype, 'impression');
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('impression should build adview and om impression object', () => {
+                const impressionDataAndroid = {'mediaType': 'video', 'viewport': {'width': 540, 'height': 960},
+                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
+                const impressionDataIOS = {'mediaType': 'video', 'viewport': {'width': 1080, 'height': 1920},
+                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
+                const testAdView: IAdView = {
+                    percentageInView: 100,
+                    geometry: {
+                        x: 0,
+                        y: 200,
+                        width: 300,
+                        height: 300
+                    },
+                    onScreenGeometry: {
+                        x: 0,
+                        y: 200,
+                        width: 300,
+                        height: 300,
+                        obstructions: []
+                    },
+                    measuringElement: false,
+                    reasons: []
+                };
+
+                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+
+                sandbox.stub(omAdViewBuilder, 'buildAdmobImpressionView').returns(testAdView);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.called(<sinon.SinonStub>OpenMeasurementController.prototype.impression);
+                    if (platform === Platform.ANDROID) {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>OpenMeasurementController.prototype.impression).getCall(0).args[0]), JSON.stringify(impressionDataAndroid));
+                    } else {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>OpenMeasurementController.prototype.impression).getCall(0).args[0]), JSON.stringify(impressionDataIOS));
+                    }
+                });
             });
         });
     });

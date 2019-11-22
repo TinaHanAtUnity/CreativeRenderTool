@@ -46,7 +46,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
         this._omSessionInterfaceBridge = new AdMobSessionInterfaceEventBridge(core, {
-            onImpression: (impressionValues: IImpressionValues) => this.impression(),
+            onImpression: (impressionValues: IImpressionValues) => this.admobImpression(omAdViewBuilder),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
             onSendFirstQuartile: () => this.sendFirstQuartile(),
@@ -137,12 +137,12 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
-    public impression() {
+    public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO
             };
-            const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this._campaign, this._deviceInfo, this._platform);
+
             impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             if (this._platform === Platform.ANDROID) {
                 impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
