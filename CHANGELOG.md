@@ -1,3 +1,7 @@
+# Fri Nov 22 07:50:17 UTC 2019
+
+* Rollback Webpack Release Build [#12193](https://github.com/Applifier/unity-ads-webview/pull/12193)
+
 # Thu Nov 21 21:05:32 UTC 2019
 
 * Update Dependencies [#12163](https://github.com/Applifier/unity-ads-webview/pull/12163)
