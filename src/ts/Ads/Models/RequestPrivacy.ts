@@ -1,12 +1,10 @@
 import {
     GamePrivacy,
-    IAllPermissions,
-    IGranularPermissions,
     IPermissions,
-    IProfilingPermissions,
     PrivacyMethod,
     UserPrivacy
 } from 'Privacy/Privacy';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -18,10 +16,6 @@ export interface ILegacyRequestPrivacy {
     gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
-}
-
-function isProfilingPermissions(permissions: IPermissions | { [key: string]: never }): permissions is IProfilingPermissions {
-    return (<IProfilingPermissions>permissions).profiling !== undefined;
 }
 
 export class RequestPrivacyFactory {
@@ -40,54 +34,20 @@ export class RequestPrivacyFactory {
         return {
             method: userPrivacy.getMethod(),
             firstRequest: false,
-            permissions: RequestPrivacyFactory.toGranularPermissions(userPrivacy)
+            permissions: userPrivacy.getPermissions()
+        };
+    }
+
+    public static createLegacy(privacySDK: PrivacySDK): ILegacyRequestPrivacy {
+        return {
+            gdprEnabled: privacySDK.isGDPREnabled(),
+            optOutRecorded: privacySDK.isOptOutRecorded(),
+            optOutEnabled: privacySDK.isOptOutEnabled()
         };
     }
 
     private static GameUsesConsent(gamePrivacy: GamePrivacy): boolean {
         const isDeveloperConsent: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT;
         return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
-    }
-
-    private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
-        const permissions = userPrivacy.getPermissions();
-
-        if ((<IAllPermissions>permissions).all === true) {
-            return {
-                gameExp: true,
-                ads: true,
-                external: true
-            };
-        }
-
-        const { ads = false, external = false, gameExp = false} = <IGranularPermissions>permissions;
-        return {
-            gameExp,
-            ads,
-            external
-        };
-    }
-
-    public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {
-        if (privacy.method === PrivacyMethod.DEFAULT) {
-            return {
-                gdprEnabled: false,
-                optOutRecorded: false,
-                optOutEnabled: false
-            };
-        }
-        return {
-            gdprEnabled: true,
-            optOutRecorded: !privacy.firstRequest,
-            optOutEnabled: this.IsOptOutEnabled(privacy)
-        };
-    }
-
-    private static IsOptOutEnabled(privacy: IRequestPrivacy) {
-        if (privacy.method === PrivacyMethod.LEGITIMATE_INTEREST && privacy.firstRequest) {
-            return false;
-        }
-
-        return isProfilingPermissions(privacy.permissions) ? !privacy.permissions.profiling : true;
     }
 }

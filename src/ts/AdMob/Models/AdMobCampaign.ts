@@ -41,6 +41,7 @@ export class AdMobVideo extends Model<IAdMobVideo> {
 export interface IAdMobCampaign extends IProgrammaticCampaign {
     dynamicMarkup: string;
     video: AdMobVideo | null;
+    omVendors: string[];
     isOMEnabled: boolean | undefined;
     shouldMuteByDefault: boolean | undefined;
 }
@@ -51,6 +52,7 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
             ... ProgrammaticCampaign.Schema,
             dynamicMarkup: ['string'],
             video: ['object', 'null'],
+            omVendors: ['array'],
             isOMEnabled: ['boolean', 'undefined'],
             shouldMuteByDefault: ['boolean', 'undefined']
         }, campaign);
@@ -58,6 +60,18 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
 
     public isOMEnabled(): boolean | undefined {
         return this.get('isOMEnabled');
+    }
+
+    public getOMVendors(): string[] {
+        return this.get('omVendors');
+    }
+
+    public setOmEnabled(isOMEnabled: boolean): void {
+        this.set('isOMEnabled', isOMEnabled);
+    }
+
+    public setOMVendors(omVendors: string[]): void {
+        this.set('omVendors', omVendors);
     }
 
     public shouldMuteByDefault(): boolean | undefined {

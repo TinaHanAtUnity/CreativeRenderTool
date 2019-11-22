@@ -383,6 +383,18 @@ export class OperativeEventManager {
             this._metaDataManager.fetch(MediationMetaData),
             this._metaDataManager.fetch(FrameworkMetaData)
         ]).then(([networkType, connectionType, screenWidth, screenHeight, mediation, framework]: [number, string, number, number, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
+            let legacyRequestPrivacy = session.getLegacyPrivacy();
+            if (!legacyRequestPrivacy) {
+                Diagnostics.trigger('legacy_request_missing', {
+                    userPrivacy: this._privacySDK.getUserPrivacy(),
+                    gamePrivacy: this._privacySDK.getGamePrivacy()
+                });
+                legacyRequestPrivacy = {
+                    gdprEnabled: this._privacySDK.isGDPREnabled(),
+                    optOutEnabled: this._privacySDK.isOptOutEnabled(),
+                    optOutRecorded: this._privacySDK.isOptOutRecorded()
+                };
+            }
             let infoJson: IInfoJson = {
                 'eventId': eventId,
                 'auctionId': session.getId(),
@@ -404,9 +416,9 @@ export class OperativeEventManager {
                 'cached': CampaignAssetInfo.isCached(this._campaign),
                 'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
                 'token': this._coreConfig.getToken(),
-                'gdprEnabled': this._privacySDK.isGDPREnabled(),
-                'optOutEnabled': this._privacySDK.isOptOutEnabled(),
-                'optOutRecorded': this._privacySDK.isOptOutRecorded(),
+                'gdprEnabled': legacyRequestPrivacy.gdprEnabled,
+                'optOutEnabled': legacyRequestPrivacy.optOutEnabled,
+                'optOutRecorded': legacyRequestPrivacy.optOutRecorded,
                 'privacy': session.getPrivacy(),
                 'gameSessionCounters': session.getGameSessionCounters(),
                 'networkType': networkType,

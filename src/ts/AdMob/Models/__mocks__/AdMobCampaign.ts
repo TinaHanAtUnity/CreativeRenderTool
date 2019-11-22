@@ -4,6 +4,6 @@ export type AdMobCampaignMock = Base & {
 };
 
 export const AdMobCampaign = jest.fn(() => {
-    return <AdMobCampaignMock><unknown>{
+    return <AdMobCampaignMock>{
     };
 });

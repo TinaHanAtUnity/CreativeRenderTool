@@ -2,13 +2,14 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Placement } from 'Ads/Models/Placement';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi, ICore } from 'Core/ICore';
-import { IAdsApi, IAds } from 'Ads/IAds';
+import { ICore, ICoreApi } from 'Core/ICore';
+import { IAds, IAdsApi } from 'Ads/IAds';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IThirdPartyEventManagerFactory, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -20,13 +21,13 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { Privacy } from 'Ads/Views/Privacy';
-import { PrivacyEventHandler, IPrivacyEventHandlerParameters } from 'Ads/EventHandlers/PrivacyEventHandler';
+import { IPrivacyEventHandlerParameters, PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { Video } from 'Ads/Models/Assets/Video';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
+import { PrivacySettings } from 'Ads/Views/Privacy/PrivacySettings';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -59,7 +60,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _coreConfig: CoreConfiguration;
     private _sessionManager: SessionManager;
     private _privacyManager: UserPrivacyManager;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
+    protected _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
     private _privacySDK: PrivacySDK;
 
@@ -122,7 +123,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             thirdPartyEventManager: this._thirdPartyEventManagerFactory.create({
                 [ThirdPartyEventMacro.ZONE]: this._placement.getId(),
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
-                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || ''
+                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
+                [ThirdPartyEventMacro.OM_ENABLED]: 'false',
+                [ThirdPartyEventMacro.OM_VENDORS]: ''
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,
@@ -162,9 +165,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._coreConfig.isCoppaCompliant()) {
+        if (this._coreConfig.isCoppaCompliant() ||  this._privacyManager.isUserUnderAgeLimit()) {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
-        } else if (this._privacySDK.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
+        } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT || AbstractAdUnitParametersFactory._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());

@@ -16,7 +16,9 @@ enum ThirdPartyEventMethod {
 export enum ThirdPartyEventMacro {
     ZONE = '%ZONE%',
     SDK_VERSION = '%SDK_VERSION%',
-    GAMER_SID = '%GAMER_SID%'
+    GAMER_SID = '%GAMER_SID%',
+    OM_ENABLED = '%25OM_ENABLED%25',
+    OM_VENDORS = '%25OM_VENDORS%25'
 }
 
 export enum TrackingEvent {
@@ -178,24 +180,5 @@ export class ThirdPartyEventManager {
         }
 
         return Url.encode(url);
-    }
-}
-
-export interface IThirdPartyEventManagerFactory {
-    create(templateValues: ITemplateValueMap): ThirdPartyEventManager;
-}
-
-export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
-
-    private _core: ICoreApi;
-    private _requestManager: RequestManager;
-
-    constructor(core: ICoreApi, requestManager: RequestManager) {
-        this._core = core;
-        this._requestManager = requestManager;
-    }
-
-    public create(templateValues: ITemplateValueMap): ThirdPartyEventManager {
-        return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
     }
 }

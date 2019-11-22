@@ -11,6 +11,7 @@ export enum CacheMode {
 export interface ICoreConfiguration {
     enabled: boolean;
     country: string;
+    subdivision: string;
     coppaCompliant: boolean;
     abGroup: ABGroup;
     properties: string;
@@ -27,6 +28,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
     public static Schema: ISchema<ICoreConfiguration> = {
         enabled: ['boolean'],
         country: ['string'],
+        subdivision: ['string'],
         coppaCompliant: ['boolean'],
         abGroup: ['number'],
         properties: ['string'],
@@ -49,6 +51,10 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
 
     public getCountry(): string {
         return this.get('country');
+    }
+
+    public getSubdivision(): string {
+        return this.get('subdivision');
     }
 
     public isCoppaCompliant(): boolean {

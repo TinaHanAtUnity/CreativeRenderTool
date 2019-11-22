@@ -651,7 +651,8 @@ describe('CampaignRefreshManager', () => {
             sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
+                const promoCampaign = TestFixtures.getPromoCampaign('purchasing/iap');
+                campaignManager.onCampaign.trigger('promoPlacement', promoCampaign, promoCampaign.getTrackingUrls());
                 return Promise.resolve();
             });
 
@@ -667,6 +668,25 @@ describe('CampaignRefreshManager', () => {
                 }
 
                 assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.READY);
+                // Should set tracking urls on placement
+                const trackingUrls = adsConfig.getPlacement('promoPlacement').getCurrentTrackingUrls();
+                assert.deepEqual(trackingUrls, {
+                    impression: [
+                        'http://test.impression.com/blah1',
+                        'http://test.impression.com/blah2',
+                        'http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%'
+                    ],
+                    complete: [
+                        'http://test.complete.com/complete1'
+                    ],
+                    click: [
+                        'http://test.complete.com/click1'
+                    ],
+                    purchase: [
+                        'https://events.iap.unity3d.com/events/v1/purchase',
+                        'http://test.purchase.com/purchase'
+                    ]
+                });
             });
         });
 
@@ -686,12 +706,32 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as waiting if IAP catalog is not fetched yet', () => {
             sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(false);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
+                const promoCampaign = TestFixtures.getPromoCampaign('purchasing/iap');
+                campaignManager.onCampaign.trigger('promoPlacement', promoCampaign, promoCampaign.getTrackingUrls());
                 return Promise.resolve();
             });
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.WAITING);
+                // Should set tracking urls on placement
+                const trackingUrls = adsConfig.getPlacement('promoPlacement').getCurrentTrackingUrls();
+                assert.deepEqual(trackingUrls, {
+                    impression: [
+                        'http://test.impression.com/blah1',
+                        'http://test.impression.com/blah2',
+                        'http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%'
+                    ],
+                    complete: [
+                        'http://test.complete.com/complete1'
+                    ],
+                    click: [
+                        'http://test.complete.com/click1'
+                    ],
+                    purchase: [
+                        'https://events.iap.unity3d.com/events/v1/purchase',
+                        'http://test.purchase.com/purchase'
+                    ]
+                });
             });
         });
     });
