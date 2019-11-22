@@ -15,6 +15,7 @@ import * as sinon from 'sinon';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('OpenMeasurementAdViewBuilder', () => {
@@ -218,9 +219,10 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                 const request = sinon.createStubInstance(RequestManager);
                 const adViewBuilder = sinon.createStubInstance(AdmobOpenMeasurementController);
                 const thirdParty = sinon.createStubInstance(ThirdPartyEventManager);
+                const pts = sinon.createStubInstance(ProgrammaticTrackingService);
 
                 // TODO: Remove the open measurement controller as a dependency for the adview builder - future refactor
-                return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder, thirdParty);
+                return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder, thirdParty, pts);
             };
 
             it('should output obstructed adview', () => {
