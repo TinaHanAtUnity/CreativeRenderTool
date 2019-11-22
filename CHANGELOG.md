@@ -1,4 +1,16 @@
-# Pending
+# Fri Nov 22 07:50:17 UTC 2019
+
+* Rollback Webpack Release Build [#12193](https://github.com/Applifier/unity-ads-webview/pull/12193)
+
+# Thu Nov 21 21:05:32 UTC 2019
+
+* Update Dependencies [#12163](https://github.com/Applifier/unity-ads-webview/pull/12163)
+* Remove Yarn.lock Package Dependencies [#12162](https://github.com/Applifier/unity-ads-webview/pull/12162)
+* Deploy Support for Webpack Release Build on Versions other than 2.1.0 and 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+* Open Measurement - Check data is null/undefined before Object check [#12190](https://github.com/Applifier/unity-ads-webview/pull/12190)
+* Fix IAP Promo Tracking for Promos Waiting for Catalog [#12164](https://github.com/Applifier/unity-ads-webview/pull/12190)
+
+# Wed Nov 20 21:53:12 UTC 2019
 
 * Use npm over LinuxBrew Installation in Travis CI [#12097](https://github.com/Applifier/unity-ads-webview/pull/12097)
 * Open Measurement - Remove null or {} data fields [#12101](https://github.com/Applifier/unity-ads-webview/pull/12101)
