@@ -87,7 +87,7 @@ describe('UserPrivacyManagerTest', () => {
             return isGDPREnabled;
         });
         privacySDK.getLegalFramework.callsFake(() => {
-            return isGDPREnabled ? LegalFramework.GDPR : LegalFramework.DEFAULT;
+            return isGDPREnabled ? LegalFramework.GDPR : LegalFramework.NONE;
         });
 
         httpKafkaSpy = sinon.stub(HttpKafka, 'sendEvent').resolves();
@@ -540,7 +540,7 @@ describe('UserPrivacyManagerTest', () => {
                 firstRequest: firstRequest,
                 bundleId: testBundleId,
                 permissions: permissions,
-                legalFramework: 'default',
+                legalFramework: 'none',
                 agreedOverAgeLimit: 'missing' };
 
             return privacyManager.updateUserPrivacy(permissions, source, action, layout).then(() => {

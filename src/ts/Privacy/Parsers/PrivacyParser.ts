@@ -27,7 +27,7 @@ export class PrivacyParser {
         const optOutEnabled = configJson.optOutEnabled;
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, gamePrivacy, optOutRecorded, optOutEnabled, limitAdTracking);
-        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
+        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.NONE;
         const ageGateLimit =  this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
 
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, ageGateLimit, legalFramework);
