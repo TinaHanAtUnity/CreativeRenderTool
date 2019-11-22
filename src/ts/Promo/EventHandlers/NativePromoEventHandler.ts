@@ -1,5 +1,6 @@
 import { IAdsApi } from 'Ads/IAds';
-import { ThirdPartyEventManager, ThirdPartyEventMacro, IThirdPartyEventManagerFactory, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';

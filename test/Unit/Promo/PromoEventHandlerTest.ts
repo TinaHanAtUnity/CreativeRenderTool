@@ -1,4 +1,4 @@
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -14,6 +14,7 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { UserPrivacy } from 'Privacy/Privacy';
 
 describe('PromoEventHandlersTest', () => {
     let platform: Platform;
@@ -92,13 +93,13 @@ describe('PromoEventHandlersTest', () => {
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
         });
 
-        it ('should set the optOutRecorded flag in the configuration', () => {
+        it ('should update privacy', () => {
             const privacySDK = sinon.createStubInstance(PrivacySDK);
 
             privacySDK.isOptOutRecorded.returns(false);
 
             PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
-            sinon.assert.calledWith(<sinon.SinonSpy>privacySDK.setOptOutRecorded, true);
+            sinon.assert.called(<sinon.SinonSpy>privacyManager.updateUserPrivacy);
         });
 
         it('should send GDPR operative Event with skip', () => {
@@ -107,7 +108,7 @@ describe('PromoEventHandlersTest', () => {
             privacySDK.isOptOutRecorded.returns(false);
 
             PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
-            sinon.assert.calledWithExactly(<sinon.SinonSpy>privacyManager.sendGDPREvent, 'skip');
+            sinon.assert.calledWithExactly(<sinon.SinonSpy>privacyManager.updateUserPrivacy, UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST, GDPREventSource.USER_INDIRECT, GDPREventAction.PROMO_SKIPPED_BANNER);
         });
 
         it('should not call gdpr or set optOutRecorded when already recorded', () => {
@@ -115,8 +116,7 @@ describe('PromoEventHandlersTest', () => {
 
             privacySDK.isOptOutRecorded.returns(true);
             PromoEventHandler.onGDPRPopupSkipped(privacySDK, privacyManager);
-            sinon.assert.notCalled(<sinon.SinonSpy>privacySDK.setOptOutRecorded);
-            sinon.assert.notCalled(<sinon.SinonSpy>privacyManager.sendGDPREvent);
+            sinon.assert.notCalled(<sinon.SinonSpy>privacyManager.updateUserPrivacy);
         });
     });
 });

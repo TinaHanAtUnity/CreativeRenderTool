@@ -4,5 +4,5 @@ export type CoreConfigurationMock = Base & {
 };
 
 export const CoreConfiguration = jest.fn(() => {
-    return <CoreConfigurationMock><unknown>{};
+    return <CoreConfigurationMock>{};
 });
