@@ -61,15 +61,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 omVendors.push('publica');
 
                 // removes duplicate IAS vendor keys for reporting
-                const dedupe = (vendors: string[]) => {
-                    const ob: {[id: string]: boolean} = {};
-                    vendors.forEach((vendor) => {
-                        ob[vendor] = true;
-                    });
-                    return Object.keys(ob);
-                };
-
-                omVendors = dedupe(omVendors);
+                omVendors = this.dedupe(omVendors);
             }
 
             const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
@@ -86,5 +78,13 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         return vastAdUnitParameters;
+    }
+
+    public dedupe(arr: string[]): string[] {
+        const ob: {[id: string]: boolean} = {};
+        arr.forEach((vendor) => {
+            ob[vendor] = true;
+        });
+        return Object.keys(ob);
     }
 }
