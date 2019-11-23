@@ -31,8 +31,8 @@ export class OpenMeasurementUtilities {
      * @param deviceInfo deviceinfo
      * @param platform Android/IOS
      */
-    public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
-        return px / ((<AndroidDeviceInfo> deviceInfo).getDisplayMetricDensity());
+    public static pxToDp(px: number, deviceInfo: AndroidDeviceInfo): number {
+        return px / deviceInfo.getDisplayMetricDensity();
     }
 
     /**

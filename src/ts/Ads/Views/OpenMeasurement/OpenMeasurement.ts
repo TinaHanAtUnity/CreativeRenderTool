@@ -20,6 +20,7 @@ import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/Programmati
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -388,8 +389,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
                 if (this._platform === Platform.ANDROID) {
-                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, this._deviceInfo, this._platform);
-                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, this._deviceInfo, this._platform);
+                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo>this._deviceInfo);
+                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo>this._deviceInfo);
                 }
 
                 IASScreenWidth = screenWidth;
