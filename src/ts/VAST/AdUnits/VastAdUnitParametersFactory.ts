@@ -81,10 +81,6 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
     }
 
     public dedupe(arr: string[]): string[] {
-        const ob: {[id: string]: boolean} = {};
-        arr.forEach((vendor) => {
-            ob[vendor] = true;
-        });
-        return Object.keys(ob);
+        return arr.filter((val, index) => arr.indexOf(val) === index);
     }
 }
