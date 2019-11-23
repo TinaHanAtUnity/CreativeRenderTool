@@ -389,8 +389,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
                 if (this._platform === Platform.ANDROID) {
-                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo>this._deviceInfo);
-                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo>this._deviceInfo);
+                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo> this._deviceInfo);
+                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo> this._deviceInfo);
                 }
 
                 IASScreenWidth = screenWidth;
