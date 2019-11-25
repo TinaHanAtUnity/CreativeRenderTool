@@ -6,7 +6,7 @@ describe('MacroUtilTest', () => {
     const macroReplace3 = '';
 
     it('should replace CREATIVE_URL correctly', () => {
-        expect(MacroUtil.replaceMacro(macroReplace1, {'':''})).toBe('');
+        expect(MacroUtil.replaceMacro(macroReplace1, {'': ' '})).toBe('');
     });
 
 });
