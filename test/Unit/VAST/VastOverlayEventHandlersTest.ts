@@ -364,11 +364,12 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             it ('should fire geometry change as a percentage of the adview', () => {
                 const obstructionReason = [ObstructionReasons.OBSTRUCTED];
                 const rect = OpenMeasurementUtilities.createRectangle(20, 20, 517, 367);
-                const convertedObstructionRect = OpenMeasurementUtilities.createRectangle(40, 40, 1034, 734);
 
                 if (platform === Platform.ANDROID) {
+                    // Test only for 3.2
+                    const convertedObstructionRect = OpenMeasurementUtilities.createRectangle(40, 40, 1034, 734);
                     sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, vastAdUnit, convertedObstructionRect);
-                } else {
+                } else if (platform === Platform.IOS) {
                     sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, vastAdUnit, rect);
                 }
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);

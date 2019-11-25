@@ -15,7 +15,6 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { ObstructionReasons, InteractionType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { platform } from 'os';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
@@ -51,8 +50,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
         if (this._om) {
 
+            // Only use for 3.2- Open Measurement Certification
+            // 3.2 OM cert made use of absolute pixels so we convert dp to absolutes here
             if (this._platform === Platform.ANDROID) {
-                // For 3.2 Open Measurement Certification
                 const density = OpenMeasurementUtilities.getScreenDensity(this._platform, this._deviceInfo);
                 x = OpenMeasurementUtilities.convertDpToPixels(x, density);
                 y = OpenMeasurementUtilities.convertDpToPixels(y, density);
