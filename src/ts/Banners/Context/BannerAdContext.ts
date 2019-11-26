@@ -127,6 +127,7 @@ export class BannerAdContext {
                 this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
                     this._adUnit = adUnit;
+                    this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdFill);
                     return this.loadBanner().then(() => {
                         this._adUnit.onLoad();
                     });
