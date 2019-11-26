@@ -15,6 +15,15 @@ export class Captcha extends View<{}> implements IGridItemClickedListener {
         this._template = new Template(CaptchaTemplate);
 
         this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event)
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => event.stopPropagation(),
+                selector: '.privacy-captcha-grid-container'
+            }
         ];
     }
 
@@ -25,7 +34,7 @@ export class Captcha extends View<{}> implements IGridItemClickedListener {
     public render(): void {
         super.render();
 
-        const gridItemContainer = <HTMLElement>this.container().querySelector('.privacy-captcha-grid');
+        const gridItemContainer = <HTMLElement> this.container().querySelector('.privacy-captcha-grid');
 
         for (const item of this.getGridItems()) {
             gridItemContainer.appendChild(item.getElement());
@@ -45,8 +54,15 @@ export class Captcha extends View<{}> implements IGridItemClickedListener {
     }
 
     public onGridItemClick(url: string): void {
-        console.log(url);
+        // todo: send verify request
 
         this.hide();
+    }
+
+    private onCloseEvent(event: Event): void {
+        event.preventDefault();
+
+        this.hide();
+
     }
 }

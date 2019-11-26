@@ -88,7 +88,6 @@ export class PrivacyDataRequest extends View<{}> {
                 }
 
             }).catch((error) => {
-                console.log(JSON.stringify(error));
                 if (this.container() && this.container().parentElement) {
                     submitButton.classList.remove('click-animation');
                     buttonSpinner.container().classList.add('stop');

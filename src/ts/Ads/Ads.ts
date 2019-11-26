@@ -91,6 +91,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadRefreshV4, ZyngaLoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 
 export class Ads implements IAds {
 
@@ -189,6 +190,9 @@ export class Ads implements IAds {
             PrivacyMetrics.setGameSessionId(gameSessionId);
             PrivacyMetrics.setPrivacy(this.PrivacySDK);
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
+
+            PrivacyDataRequestHelper.setRequest(this._core.RequestManager);
+            PrivacyDataRequestHelper.setAdvertisingIdentifier(this._core.DeviceInfo.getAdvertisingIdentifier());
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {

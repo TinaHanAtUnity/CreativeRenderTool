@@ -4,10 +4,10 @@
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -23,12 +23,12 @@
   }
 
   .privacy-captcha-title {
-    font-size: .75 * $default-font-size;
-    font-weight: $privacy-main-title-font-weight;
     padding: $default-size .5 * $default-size .75 * $default-size .5 * $default-size;
-    background: $privacy-light-gray;
     border-bottom: 1px solid $consent-border-gray;
     border-radius: .5 * $default-size .5 * $default-size 0 0;
+    background: $privacy-light-gray;
+    font-weight: $privacy-main-title-font-weight;
+    font-size: .75 * $default-font-size;
   }
 
   .privacy-captcha-grid {
@@ -46,14 +46,14 @@
 
   .privacy-captcha-grid-item {
     border: 1px solid $consent-border-gray;
-    background: $white;
     border-radius: .25 * $default-size;
+    background: $white;
   }
 
   .privacy-captcha-grid {
     display: grid;
-    grid-gap: .25 * $default-size;
-    grid-template-columns: repeat(4, auto);
+    grid-gap: .25 * $default-size; // @stylint ignore;
+    grid-template-columns: repeat(4, auto); // @stylint ignore;
   }
 }
 
