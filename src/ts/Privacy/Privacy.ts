@@ -88,11 +88,11 @@ interface IUserPrivacy {
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
-    public static PERM_ALL_TRUE: IGranularPermissions = {ads: true, external: true, gameExp: true};
-    public static PERM_ALL_FALSE: IGranularPermissions = {ads: false, external: false, gameExp: false};
-    public static PERM_SKIPPED_LEGITIMATE_INTEREST: IGranularPermissions = {ads: true, external: false, gameExp: true};
-    public static PERM_OPTIN_LEGITIMATE_INTEREST: IGranularPermissions = {ads: true, external: false, gameExp: true};
-    public static PERM_DEVELOPER_CONSENTED: IGranularPermissions = {ads: true, external: true, gameExp: true};
+    public static readonly PERM_ALL_TRUE: IGranularPermissions = Object.freeze({ads: true, external: true, gameExp: true});
+    public static readonly PERM_ALL_FALSE: IGranularPermissions = Object.freeze({ads: false, external: false, gameExp: false});
+    public static readonly PERM_SKIPPED_LEGITIMATE_INTEREST: IGranularPermissions = Object.freeze({ads: true, external: false, gameExp: true});
+    public static readonly PERM_OPTIN_LEGITIMATE_INTEREST: IGranularPermissions = Object.freeze({ads: true, external: false, gameExp: true});
+    public static readonly PERM_DEVELOPER_CONSENTED: IGranularPermissions = Object.freeze({ads: true, external: true, gameExp: true});
 
     public static createFromLegacy(method: PrivacyMethod, optOutRecorded: boolean, optOutEnabled: boolean): UserPrivacy {
         if (!optOutRecorded) {
@@ -145,7 +145,7 @@ export class UserPrivacy extends Model<IUserPrivacy> {
 
         this.set('method', <PrivacyMethod>data.method);
         this.set('version', data.version);
-        this.set('permissions', data.permissions);
+        this.setPermissions(data.permissions);
     }
 
     public isRecorded(): boolean {
@@ -171,10 +171,19 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return this.get('permissions');
     }
 
+    public setPermissions(permissions: IPermissions): void {
+        const newPermissions: IPermissions = {
+            ads: permissions.ads,
+            external: permissions.external,
+            gameExp: permissions.gameExp
+        };
+        this.set('permissions', newPermissions);
+    }
+
     public update(data: IUserPrivacy): void {
         this.set('method', data.method);
         this.set('version', data.version);
-        this.set('permissions', data.permissions);
+        this.setPermissions(data.permissions);
     }
 
     public getDTO(): { [key: string]: unknown } {

@@ -1,8 +1,6 @@
 import {
-    GamePrivacy,
     IPermissions,
-    PrivacyMethod,
-    UserPrivacy
+    PrivacyMethod
 } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
@@ -19,22 +17,13 @@ export interface ILegacyRequestPrivacy {
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy | undefined {
-        if (this.GameUsesConsent(gamePrivacy) === false) {
-            return undefined;
-        }
-
-        if (!userPrivacy.isRecorded()) {
-            return {
-                method: gamePrivacy.getMethod(),
-                firstRequest: true,
-                permissions: {}
-            };
-        }
+    public static create(privacySDK: PrivacySDK, limitAdTracking: boolean | undefined): IRequestPrivacy {
+        const requestUserPrivacy = privacySDK.getSubmittablePrivacy(limitAdTracking);
+        const isRecorded = privacySDK.getUserPrivacy().isRecorded();
         return {
-            method: userPrivacy.getMethod(),
-            firstRequest: false,
-            permissions: userPrivacy.getPermissions()
+            method: requestUserPrivacy.getMethod(),
+            firstRequest: !isRecorded,
+            permissions: requestUserPrivacy.getPermissions()
         };
     }
 
@@ -44,10 +33,5 @@ export class RequestPrivacyFactory {
             optOutRecorded: privacySDK.isOptOutRecorded(),
             optOutEnabled: privacySDK.isOptOutEnabled()
         };
-    }
-
-    private static GameUsesConsent(gamePrivacy: GamePrivacy): boolean {
-        const isDeveloperConsent: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT;
-        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
     }
 }
