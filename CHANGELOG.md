@@ -1,4 +1,4 @@
-# Tue Nov 26 00:36:58 UTC 2019
+# Pending
 
 * Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
 
