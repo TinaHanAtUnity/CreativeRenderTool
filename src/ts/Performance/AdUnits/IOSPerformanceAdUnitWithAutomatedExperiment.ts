@@ -17,8 +17,7 @@ export class IOSPerformanceAdUnitWithAutomatedExperiment extends IOSPerformanceA
     }
 
     public show(): Promise<void> {
-        this._automatedExperimentManager.sendAction(ButtonAnimationsExperiment, this.getCampaign());
-
+        this._automatedExperimentManager.sendAction(ButtonAnimationsExperiment, this.getCampaign() ? this.getCampaign().getSession().getId() : undefined);
         return super.show();
     }
 

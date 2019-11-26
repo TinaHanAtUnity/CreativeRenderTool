@@ -382,7 +382,7 @@ describe('AutomatedExperimentManager test', () => {
 
                 assert.equal(variant, 'FooAction1', 'Wrong variant name');
 
-                aem.sendAction(FooExperiment);
+                aem.sendAction(FooExperiment, undefined);
                 if (rewarded) {
                     aem.sendReward();
                 }

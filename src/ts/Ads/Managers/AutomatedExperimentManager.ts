@@ -94,7 +94,7 @@ export class AutomatedExperimentManager {
         this._userInfo.ABGroup = core.Config.getAbGroup();
         this._userInfo.GameSessionID = core.Ads.SessionManager.getGameSessionId();
 
-        return this.CollectStaticContextualFeatures(core).then(features => {
+        return this.collectStaticContextualFeatures(core).then(features => {
               return Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
                     .filter(storedExperiment => storedExperiment.data !== null)
@@ -160,7 +160,7 @@ export class AutomatedExperimentManager {
         return Promise.all(promises).then((ignored) => Promise.resolve());
     }
 
-    public sendAction(experiment: AutomatedExperiment, campaign? : Campaign) {
+    public sendAction(experiment: AutomatedExperiment, sessionId : string | undefined) {
         if (!this._experimentBegan) {
             return;
         }
@@ -168,7 +168,7 @@ export class AutomatedExperimentManager {
         const stateItem = this._state[experiment.getName()];
         if (stateItem) {
             stateItem.SendAction = true;
-            this._userInfo.AuctionID = campaign ? campaign.getSession().getId() : undefined; // happens to also be the auction ID. Horrible but that all I could find so far.
+            this._userInfo.AuctionID = sessionId; // happens to also be the auction ID. Horrible but that all I could find so far.
         }
     }
 
@@ -272,7 +272,7 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private async CollectStaticContextualFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
+    private async collectStaticContextualFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id'},
@@ -321,16 +321,15 @@ export class AutomatedExperimentManager {
             { l: 'screenBrightness', c: 'screen_brightness' }
         ];
 
-        const undefinedValue = new Promise(() => undefined);
         return Promise.all([
             core.DeviceInfo.fetch(),
             core.DeviceInfo.getDTO(),
             core.DeviceInfo.getFreeSpace(),
-            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getFreeSpaceExternal() : undefinedValue,
-            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getTotalSpaceExternal() : undefinedValue,
-            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getNetworkMetered() : undefinedValue,
-            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getRingerMode() : undefinedValue,
-            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.isUSBConnected() : undefinedValue
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getFreeSpaceExternal() : Promise.resolve<number | undefined>(undefined),
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getTotalSpaceExternal() : Promise.resolve<number | undefined>(undefined),
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getNetworkMetered() : Promise.resolve<boolean | undefined>(undefined),
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getRingerMode() : Promise.resolve<number | undefined>(undefined),
+            core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.isUSBConnected() : Promise.resolve<boolean | undefined>(undefined)
         ]).then((res) => {
             const privacySdk = core.Ads.PrivacySDK;
             const rawData: { [key: string]: ContextualFeature } = {
@@ -345,11 +344,11 @@ export class AutomatedExperimentManager {
                'simulator': core.DeviceInfo instanceof IosDeviceInfo ? core.DeviceInfo.isSimulator() : undefined,
                'total_internal_space': core.DeviceInfo.getTotalSpace(),
                'device_free_space': res[2],
-               'free_external_space': <number | undefined>res[3],
-               'total_external_space': <number | undefined>res[4],
-               'network_metered' : <boolean | undefined>res[5],
+               'free_external_space': res[3],
+               'total_external_space': res[4],
+               'network_metered' : res[5],
                'ringer_mode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
-               'usb_connected' : <boolean | undefined>res[7],
+               'usb_connected' : res[7],
                'max_volume': core.DeviceInfo.get('maxVolume')
             };
 
@@ -372,7 +371,7 @@ export class AutomatedExperimentManager {
 
     // not used at the moment. but will be soon: when we do an inference / ad display.
     // incomplete implementation
-    private async CollectAdRelatedFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
+    private async collectAdRelatedFeatures(core: ICore): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             // CAMPAIGN, THE AD
             'campaignId', 'targetGameId', 'rating', 'ratingCount', 'gameSessionCounters', 'cached',
