@@ -1,3 +1,7 @@
+# Tue Nov 26 00:36:58 UTC 2019
+
+* Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
+
 # Fri Nov 22 07:50:17 UTC 2019
 
 * Rollback Webpack Release Build [#12193](https://github.com/Applifier/unity-ads-webview/pull/12193)
