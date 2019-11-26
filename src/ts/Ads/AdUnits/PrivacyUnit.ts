@@ -18,6 +18,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { ABGroup, ConsentUXTest } from 'Core/Models/ABGroup';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -42,6 +43,8 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
     private _privacySDK: PrivacySDK;
+
+    private _useTransparency: boolean;
 
     constructor(parameters: IConsentUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -76,11 +79,17 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         }
         this._unityPrivacyView = new Privacy(viewParams);
         this._unityPrivacyView.addEventHandler(this);
+
+        this._useTransparency = true;
+        if (this._platform === Platform.IOS && IosUtils.isAdUnitTransparencyBroken(parameters.deviceInfo.getOsVersion())) {
+            this._useTransparency = false;
+        }
     }
 
     public show(options: unknown): Promise<void> {
         this._showing = true;
-        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
+
+        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, this._useTransparency, true, false, options).then(() => {
             const donePromise = new Promise<void>((resolve) => {
                 this._donePromiseResolve = resolve;
             });
