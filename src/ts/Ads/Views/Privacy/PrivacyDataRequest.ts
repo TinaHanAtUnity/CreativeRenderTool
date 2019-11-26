@@ -6,17 +6,9 @@ import { Localization } from 'Core/Utilities/Localization';
 import DataRequestTemplate from 'html/consent/privacy-data-request.html';
 import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
 import { Captcha } from 'Ads/Views/Privacy/Captcha';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-
-type UrlResponse = { 'imageURLs': string[] };
+import { IDataRequestResponse, PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 
 export class PrivacyDataRequest extends View<{}> {
-
-    public static setRequest(request: RequestManager): void {
-        PrivacyDataRequest.REQUEST = request;
-    }
-
-    private static REQUEST: RequestManager;
 
     private readonly _localization: Localization;
 
@@ -82,8 +74,7 @@ export class PrivacyDataRequest extends View<{}> {
             emailInputElement.disabled = true;
             emailInputElement.blur();
 
-            PrivacyDataRequest.REQUEST.post('https://us-central1-ads-debot.cloudfunctions.net/debot/init', JSON.stringify({ idfa: 'dsfs-efsd-ssss-ffss', email: emailInput })
-            ).then((response: INativeResponse) => {
+            PrivacyDataRequestHelper.sendInitRequest(emailInput).then((response: IDataRequestResponse) => {
                 if (this.container() && this.container().parentElement) {
                     submitButton.classList.remove('click-animation');
                     buttonSpinner.container().classList.add('stop');
@@ -92,7 +83,8 @@ export class PrivacyDataRequest extends View<{}> {
                     const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-msg');
                     msgElement.classList.add('show-msg');
 
-                    this.showCaptcha(JSON.parse(response.response).imageURLs);
+                    const imageUrls = response.imageUrls ? response.imageUrls : [];
+                    this.showCaptcha(imageUrls);
                 }
 
             }).catch((error) => {

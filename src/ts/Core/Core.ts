@@ -49,7 +49,6 @@ import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { PrivacyDataRequest } from 'Ads/Views/Privacy/PrivacyDataRequest';
 
 export class Core implements ICore {
 
@@ -144,8 +143,6 @@ export class Core implements ICore {
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
             HttpKafka.setClientInfo(this.ClientInfo);
-
-            PrivacyDataRequest.setRequest(this.RequestManager);
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.Api.Request.Android!.setKeepAliveTime(10000);
