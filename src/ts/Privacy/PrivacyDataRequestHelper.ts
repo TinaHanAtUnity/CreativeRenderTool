@@ -1,4 +1,5 @@
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { RequestError } from 'Core/Errors/RequestError';
 
 export enum DataRequestResponseStatus {
     SUCCESS,
@@ -49,17 +50,21 @@ export class PrivacyDataRequestHelper {
         return PrivacyDataRequestHelper.Request.post(url, data).then((response: INativeResponse) => {
             if (response.responseCode === 200) {
                 return { status: DataRequestResponseStatus.SUCCESS, imageUrls: JSON.parse(response.response).imageURLs };
-            } else if (response.responseCode === 403) {
-                return { status: DataRequestResponseStatus.FAILED_VERIFICATION };
-            } else if (response.responseCode === 409) {
-                return { status: DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS };
             } else {
                 return { status: DataRequestResponseStatus.GENERIC_ERROR };
             }
         }).catch((error) => {
+            if (error instanceof RequestError && error.nativeResponse) {
+                if (error.nativeResponse.responseCode === 403) {
+                    return { status: DataRequestResponseStatus.FAILED_VERIFICATION };
+                } else if (error.nativeResponse.responseCode === 409) {
+                    return { status: DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS };
+                } else {
+                    return { status: DataRequestResponseStatus.GENERIC_ERROR };
+                }
+            }
             return { status: DataRequestResponseStatus.GENERIC_ERROR };
+
         });
-
     }
-
 }

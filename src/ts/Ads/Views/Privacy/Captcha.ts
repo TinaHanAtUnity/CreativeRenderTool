@@ -5,14 +5,21 @@ import { Template } from 'Core/Utilities/Template';
 
 import CaptchaTemplate from 'html/consent/captcha.html';
 
-export class Captcha extends View<{}> implements IGridItemClickedListener {
+export interface ICaptchaHandler {
+    onItemSelected(url: string): void;
+    onCloseEvent(): void;
 
-    private _urls: string[];
+}
+export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedListener {
 
-    constructor(platform: Platform) {
+    private _gridItems: CaptchaGridItem[] = [];
+
+    constructor(platform: Platform, urls: string[]) {
         super(platform, 'privacy-captcha', false);
 
         this._template = new Template(CaptchaTemplate);
+
+        this._gridItems = this.createGridItems(urls);
 
         this._bindings = [
             {
@@ -27,8 +34,15 @@ export class Captcha extends View<{}> implements IGridItemClickedListener {
         ];
     }
 
-    public setElements(urls: string[]): void {
-        this._urls = urls;
+    public resetElements(urls: string[]): void {
+
+        if (urls.length === this._gridItems.length) {
+            for (const [index, value] of urls.entries()) {
+                if (this._gridItems[index]) {
+                    this._gridItems[index].resetElement(value);
+                }
+            }
+        }
     }
 
     public render(): void {
@@ -36,33 +50,32 @@ export class Captcha extends View<{}> implements IGridItemClickedListener {
 
         const gridItemContainer = <HTMLElement> this.container().querySelector('.privacy-captcha-grid');
 
-        for (const item of this.getGridItems()) {
+        for (const item of this._gridItems) {
             gridItemContainer.appendChild(item.getElement());
         }
     }
 
-    private getGridItems(): CaptchaGridItem[] {
+    private createGridItems(urls: string[]): CaptchaGridItem[] {
 
-        const elements: CaptchaGridItem[] = [];
+        this._gridItems = [];
 
-        for (const [index, value] of this._urls.entries()) {
+        for (const [index, value] of urls.entries()) {
             const gridItem = new CaptchaGridItem(`captcha-grid-item-${index}`, value, this);
-            elements.push(gridItem);
+            this._gridItems.push(gridItem);
         }
-        return elements;
+        return this._gridItems;
 
     }
 
     public onGridItemClick(url: string): void {
-        // todo: send verify request
-
-        this.hide();
+        this._handlers.forEach(handler => handler.onItemSelected(url));
     }
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
 
         this.hide();
+        this._handlers.forEach(handler => handler.onCloseEvent());
 
     }
 }

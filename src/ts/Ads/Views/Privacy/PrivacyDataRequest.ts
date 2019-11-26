@@ -5,14 +5,19 @@ import { Localization } from 'Core/Utilities/Localization';
 
 import DataRequestTemplate from 'html/consent/privacy-data-request.html';
 import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
-import { Captcha } from 'Ads/Views/Privacy/Captcha';
-import { IDataRequestResponse, PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
+import { Captcha, ICaptchaHandler } from 'Ads/Views/Privacy/Captcha';
+import {
+    DataRequestResponseStatus,
+    IDataRequestResponse,
+    PrivacyDataRequestHelper
+} from 'Privacy/PrivacyDataRequestHelper';
 
-export class PrivacyDataRequest extends View<{}> {
+export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     private readonly _localization: Localization;
 
     private _captchaView: Captcha;
+    private _email: string;
 
     constructor(platform: Platform, language: string) {
         super(platform, 'privacy-data-request');
@@ -28,6 +33,7 @@ export class PrivacyDataRequest extends View<{}> {
             }
         ];
 
+        PrivacyDataRequestHelper.sendDebugResetRequest();
     }
 
     public render(): void {
@@ -43,14 +49,27 @@ export class PrivacyDataRequest extends View<{}> {
     public hide(): void {
         super.hide();
 
-        if (this._captchaView) {
-            this._captchaView.hide();
+        this.hideAndCloseCaptcha();
+    }
 
-            const captchaContainer = this._captchaView.container();
-            if (captchaContainer.parentElement) {
-                captchaContainer.parentElement.removeChild(captchaContainer);
+    public onCloseEvent(): void {
+        this.hideAndCloseCaptcha();
+    }
+
+    public onItemSelected(url: string): void {
+        PrivacyDataRequestHelper.sendVerifyRequest(this._email, url).then((response) => {
+            if (response.status === DataRequestResponseStatus.SUCCESS) {
+                // todo show success message
+                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-msg');
+                msgElement.classList.add('show-msg');
+
+                this.hideAndCloseCaptcha();
+            } else if (response.status === DataRequestResponseStatus.FAILED_VERIFICATION) {
+                this.sendDataRequestEvent();
+            } else {
+                // todo: show generic error
             }
-        }
+        });
     }
 
     private onDataRequestSubmitEvent(event: Event): void {
@@ -60,10 +79,10 @@ export class PrivacyDataRequest extends View<{}> {
 
     private sendDataRequestEvent(): void {
         const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
-        const emailInput = emailInputElement.value;
+        this._email = emailInputElement.value;
 
         // copied from https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email
-        if (emailInput.length > 0 && emailInput.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
+        if (this._email.length > 0 && this._email.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
             const submitButton = <HTMLElement> this.container().querySelector('.privacy-data-request-submit-button');
             const buttonSpinner = new ButtonSpinner(this._platform);
             buttonSpinner.render();
@@ -74,15 +93,11 @@ export class PrivacyDataRequest extends View<{}> {
             emailInputElement.disabled = true;
             emailInputElement.blur();
 
-            PrivacyDataRequestHelper.sendInitRequest(emailInput).then((response: IDataRequestResponse) => {
+            PrivacyDataRequestHelper.sendInitRequest(this._email).then((response: IDataRequestResponse) => {
                 if (this.container() && this.container().parentElement) {
                     submitButton.classList.remove('click-animation');
                     buttonSpinner.container().classList.add('stop');
                     emailInputElement.disabled = false;
-
-                    const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-msg');
-                    msgElement.classList.add('show-msg');
-
                     const imageUrls = response.imageUrls ? response.imageUrls : [];
                     this.showCaptcha(imageUrls);
                 }
@@ -103,10 +118,25 @@ export class PrivacyDataRequest extends View<{}> {
     }
 
     private showCaptcha(urls: string[]): void {
-        const captcha = new Captcha(this._platform);
-        captcha.setElements(urls);
+        if (!this._captchaView) {
+            this._captchaView = new Captcha(this._platform, urls);
+            this._captchaView.addEventHandler(this);
+            this._captchaView.render();
+            document.body.appendChild(this._captchaView.container());
+        } else {
+            this._captchaView.resetElements(urls);
+        }
+    }
 
-        captcha.render();
-        document.body.appendChild(captcha.container());
+    private hideAndCloseCaptcha(): void {
+        if (this._captchaView) {
+            this._captchaView.hide();
+
+            const captchaContainer = this._captchaView.container();
+            if (captchaContainer.parentElement) {
+                captchaContainer.parentElement.removeChild(captchaContainer);
+            }
+            delete this._captchaView;
+        }
     }
 }
