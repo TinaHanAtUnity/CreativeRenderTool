@@ -1,3 +1,8 @@
+# Pending
+
+* Add banner fill metric event [#12196](https://github.com/Applifier/unity-ads-webview/pull/12196)
+* Open Measurement - Add basic OM metrics for Admob [#12192](https://github.com/Applifier/unity-ads-webview/pull/12192)
+
 # Tue Nov 26 18:53:05 UTC 2019
 
 * Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
