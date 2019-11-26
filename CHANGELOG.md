@@ -1,4 +1,4 @@
-# Pending
+# Tue Nov 26 18:53:05 UTC 2019
 
 * Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
 * Disable transparent privacy ad unit for iOS 13 [12197](https://github.com/Applifier/unity-ads-webview/pull/12197)
