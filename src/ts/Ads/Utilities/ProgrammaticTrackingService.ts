@@ -44,6 +44,7 @@ export enum AdmobMetric {
 export enum BannerMetric {
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
+    BannerAdFill = 'banner_ad_fill',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
 }
 
