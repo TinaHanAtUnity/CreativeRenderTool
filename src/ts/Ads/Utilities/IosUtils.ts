@@ -39,6 +39,14 @@ export class IosUtils {
         return true;
     }
 
+    public static isAdUnitTransparencyBroken(osVersion: string): boolean {
+        if (osVersion.match(/^13\./)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static hasVideoStallingApi(osVersion: string): boolean {
         if (osVersion.match(/^1/)) {
             return true;
