@@ -160,7 +160,7 @@ export class AutomatedExperimentManager {
         return Promise.all(promises).then((ignored) => Promise.resolve());
     }
 
-    public sendAction(experiment: AutomatedExperiment, sessionId : string | undefined) {
+    public sendAction(experiment: AutomatedExperiment, sessionId: string | undefined) {
         if (!this._experimentBegan) {
             return;
         }
