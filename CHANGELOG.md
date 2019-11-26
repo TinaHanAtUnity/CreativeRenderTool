@@ -1,4 +1,4 @@
-# Pending
+# Tue Nov 26 23:55:06 UTC 2019
 
 * Add banner fill metric event [#12196](https://github.com/Applifier/unity-ads-webview/pull/12196)
 * Open Measurement - Add basic OM metrics for Admob [#12192](https://github.com/Applifier/unity-ads-webview/pull/12192)
