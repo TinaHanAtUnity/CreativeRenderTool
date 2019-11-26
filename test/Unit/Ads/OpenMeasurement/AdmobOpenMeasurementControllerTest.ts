@@ -12,7 +12,7 @@ import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -26,6 +26,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
         let thirdPartyEventManager: ThirdPartyEventManager;
+        let programmaticTrackingService: ProgrammaticTrackingService;
 
         const initAdMobOMManager = () => {
             placement = TestFixtures.getPlacement();
@@ -43,9 +44,9 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             }
             request = sinon.createStubInstance(RequestManager);
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager, pts);
+            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager, programmaticTrackingService);
         };
 
         describe('DOM Hierarchy', () => {
@@ -80,6 +81,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                     omManager.injectVerificationResources([verificationResource, verificationResource1]);
                     sinon.assert.calledTwice(<sinon.SinonStub>omManager.setupOMInstance);
                     sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.setTemplateValue, '%25OM_VENDORS%25', 'scoot|scoot1');
+                    sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_injected');
                 });
             });
 
@@ -109,6 +112,20 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             it('sessionFinish should should pass to admob session interface bridge', () => {
                 omManager.sessionFinish();
                 sinon.assert.calledOnce(<sinon.SinonStub>omManager.getAdmobBridge().sendSessionFinish);
+            });
+
+            it('sessionFinish should report to pts', () => {
+                (<sinon.SinonStub>programmaticTrackingService.reportMetricEvent).reset();
+                omManager.sessionFinish();
+                sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_finish');
+            });
+
+            it('sessionStart should report to pts', () => {
+                (<sinon.SinonStub>programmaticTrackingService.reportMetricEvent).reset();
+                omManager.sessionStart();
+                sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_start');
             });
         });
     });
