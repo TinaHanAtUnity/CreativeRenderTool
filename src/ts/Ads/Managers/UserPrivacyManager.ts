@@ -102,6 +102,18 @@ export class UserPrivacyManager {
     }
 
     public getPrivacyConfig(): Promise<PrivacyConfig> {
+        let agreedOverAgeLimit = false;
+        switch (this.getAgeGateChoice()) {
+            case AgeGateChoice.YES:
+                agreedOverAgeLimit = true;
+                break;
+            case AgeGateChoice.NO:
+            case AgeGateChoice.MISSING:
+                agreedOverAgeLimit = false;
+            default:
+                agreedOverAgeLimit = false;
+        }
+
         const privacyUrl = TestEnvironment.get<string>('privacyUrl');
         if (!privacyUrl) {
             return Promise.reject(new Error('No privacy url'));
@@ -114,10 +126,10 @@ export class UserPrivacyManager {
                         webViewUrl: privacyUrl
                     },
                     {
-                        ads: false, // todo: fetch from this._userPrivacy.getPermissions().ads,
-                        external: false, // todo: fetch from this._userPrivacy.getPermissions().external,
-                        gameExp: false, // todo: fetch from this._userPrivacy.getPermissions().gameExp,
-                        agreedOverAgeLimit: false // todo:  field from this.getAgeGateChoice()
+                        ads: (<IGranularPermissions>this._userPrivacy.getPermissions()).ads,
+                        external: (<IGranularPermissions>this._userPrivacy.getPermissions()).external,
+                        gameExp: (<IGranularPermissions>this._userPrivacy.getPermissions()).gameExp,
+                        agreedOverAgeLimit: agreedOverAgeLimit
                     },
                     {
                         buildOsVersion: this._deviceInfo.getOsVersion(),

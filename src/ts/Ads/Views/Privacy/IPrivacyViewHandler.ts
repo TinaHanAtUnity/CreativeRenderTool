@@ -12,5 +12,6 @@ export interface IPrivacyViewHandler {
     // TODO: Temporary
     onPrivacyCompleted(userSettings: IPrivacySettings): void;
     onPrivacyReady(): void;
+    onPrivacyOpenUrl(url: string): void;
     onPrivacyEvent(name: string, data: { [key: string]: unknown }): void;
 }

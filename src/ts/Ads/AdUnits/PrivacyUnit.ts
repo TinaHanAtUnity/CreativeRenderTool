@@ -238,11 +238,6 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         this._core.Sdk.logDebug('PRIVACY: Privacy ready');
     }
 
-    public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
-        this._unityPrivacyView.eventCallback(name);
-        this._core.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
-    }
-
     public onPrivacyOpenUrl(url: string): void {
         if (this._platform === Platform.IOS) {
             this._core.iOS!.UrlScheme.open(url);
@@ -252,5 +247,12 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
                 'uri': url
             });
         }
+
+        this._unityPrivacyView.openUrlCallback(url);
+    }
+
+    public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
+        this._unityPrivacyView.eventCallback(name);
+        this._core.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
     }
 }

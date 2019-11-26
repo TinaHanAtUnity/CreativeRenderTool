@@ -37,6 +37,11 @@
                                 window.privacyAdapter.eventCallback(event.data.data);
                             }
                             break;
+                        case 'openUrlCallback':
+                            if (window.privacyAdapter.openUrlCallback) {
+                                window.privacyAdapter.openUrlCallback(event.data.data);
+                            }
+                            break;
                         default:
                             console.log('Unhandled message: ' + event.data.type);
                             break;
@@ -62,6 +67,13 @@
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
                         data: JSON.parse(userSettings)
+                    }, '*');
+                };
+
+                this.onPrivacyOpenUrl = function(url) {
+                    window.parent.postMessage({
+                        type: 'onPrivacyOpenUrl',
+                        data: url
                     }, '*');
                 };
 

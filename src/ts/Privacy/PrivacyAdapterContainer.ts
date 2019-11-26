@@ -31,6 +31,10 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
         this._handler.onPrivacyReady();
     }
 
+    public onPrivacyOpenUrl(url: string): void {
+        this._handler.onPrivacyOpenUrl(url);
+    }
+
     public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
         this._handler.onPrivacyEvent(name, data);
     }

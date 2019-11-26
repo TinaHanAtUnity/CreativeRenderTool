@@ -4,6 +4,7 @@ import { IPrivacySettings } from 'Privacy/IPrivacySettings';
 export enum IFrameEvents {
     PRIVACY_READY = 'onPrivacyReady',
     PRIVACY_COMPLETED = 'onPrivacyCompleted',
+    PRIVACY_OPENURL = 'onPrivacyOpenUrl',
     PRIVACY_EVENT = 'onPrivacyEvent'
 }
 
@@ -15,6 +16,7 @@ export interface IPrivacyFrameEventAdapter {
 export interface IPrivacyFrameHandler {
     onPrivacyCompleted(userSettings: IPrivacySettings): void;
     onPrivacyReady(): void;
+    onPrivacyOpenUrl(url: string): void;
     onPrivacyEvent(name: string, data: { [key: string]: unknown }): void;
 }
 
@@ -35,6 +37,7 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._iFrameHandlers = {};
         this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IPrivacySettings>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = (msg) => this.onPrivacyReady();
+        this._iFrameHandlers[IFrameEvents.PRIVACY_OPENURL] = (msg) => this.onPrivacyOpenUrl(<string>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_EVENT] = (msg) => this.onPrivacyEvent(<string>msg.name, <{ [key: string]: unknown }>msg.data);
     }
 
@@ -69,6 +72,10 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
 
     private onPrivacyReady(): void {
         this._handler.onPrivacyReady();
+    }
+
+    private onPrivacyOpenUrl(url: string): void {
+        this._handler.onPrivacyOpenUrl(url);
     }
 
     private onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {

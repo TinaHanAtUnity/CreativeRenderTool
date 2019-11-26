@@ -85,6 +85,14 @@ export class PrivacyView extends View<IPrivacyViewHandler> {
         this._frameEventAdapter.postMessage('completeCallback');
     }
 
+    public onPrivacyOpenUrl(url: string): void {
+        this._handlers.forEach(handler => handler.onPrivacyOpenUrl(url));
+    }
+
+    public openUrlCallback(url: string): void {
+        this._frameEventAdapter.postMessage('openUrlCallback', url);
+    }
+
     public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
         this._handlers.forEach(handler => handler.onPrivacyEvent(name, data));
     }
