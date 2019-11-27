@@ -24,7 +24,9 @@ describe ('UserPrivacy', () => {
             assert.isFrozen(UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST);
             assert.isFrozen(UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST);
             assert.isFrozen(UserPrivacy.PERM_DEVELOPER_CONSENTED);
-            assert.throws(() => {UserPrivacy.PERM_ALL_TRUE.ads = false});
+            assert.throws(() => {
+                UserPrivacy.PERM_ALL_TRUE.ads = false;
+            });
         });
     });
 });

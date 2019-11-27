@@ -70,16 +70,32 @@ describe('RequestPrivacyFactoryTests', () => {
         context('for a game using ' + method, () => {
             context('when a recorded user privacy exists', () => {
                 let result: IRequestPrivacy | undefined;
-                const expectedPermissions = { gameExp: false, ads: true, external: true };
+                const userPermissions = { gameExp: false, ads: true, external: true };
+
                 beforeEach(() => {
-                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: expectedPermissions });
+                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: userPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
                     privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
-                    result = RequestPrivacyFactory.create(privacySDK, false);
                 });
-                it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
-                it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
-                it('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
+
+                context('and limitAdTracking is false', () => {
+                    beforeEach(() => {
+                        result = RequestPrivacyFactory.create(privacySDK, false);
+                    });
+                    it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
+                    it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
+                    it('should set recorded permissions', () => assert.deepEqual(result!.permissions, userPermissions));
+                });
+
+                context('and limitAdTracking is true', () => {
+                    beforeEach(() => {
+                        result = RequestPrivacyFactory.create(privacySDK, true);
+                    });
+                    it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
+                    it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
+                    it('should set recorded permissions', () => assert.deepEqual(result!.permissions, UserPrivacy.PERM_ALL_FALSE));
+                });
+
             });
 
             context('if game privacy method has changed since last privacy store', () => {

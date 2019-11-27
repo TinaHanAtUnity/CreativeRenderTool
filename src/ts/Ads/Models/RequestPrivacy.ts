@@ -28,20 +28,21 @@ export class RequestPrivacyFactory {
             permissions = userPrivacy.getPermissions();
         } else {
             const gamePrivacyMethod = privacySDK.getGamePrivacy().getMethod();
-            if (!limitAdTracking) {
-                switch (gamePrivacyMethod) {
-                    case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
-                        break;
-                    case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
-                        break;
-                    case PrivacyMethod.DEVELOPER_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
-                        break;
-                    case PrivacyMethod.DEFAULT: permissions = UserPrivacy.PERM_ALL_TRUE;
-                        break;
-                    default: permissions = UserPrivacy.PERM_ALL_FALSE;
-                }
+            switch (gamePrivacyMethod) {
+                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
+                    break;
+                case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
+                    break;
+                case PrivacyMethod.DEVELOPER_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
+                    break;
+                case PrivacyMethod.DEFAULT: permissions = UserPrivacy.PERM_ALL_TRUE;
+                    break;
+                default: permissions = UserPrivacy.PERM_ALL_FALSE;
             }
             method = gamePrivacyMethod;
+        }
+        if (limitAdTracking) {
+            permissions = UserPrivacy.PERM_ALL_FALSE;
         }
 
         return {
