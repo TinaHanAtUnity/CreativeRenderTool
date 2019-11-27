@@ -145,7 +145,11 @@ export class UserPrivacy extends Model<IUserPrivacy> {
 
         this.set('method', <PrivacyMethod>data.method);
         this.set('version', data.version);
-        this.setPermissions(data.permissions);
+        this.set('permissions', {
+            ads: data.permissions.ads,
+            external: data.permissions.external,
+            gameExp: data.permissions.gameExp
+        });
     }
 
     public isRecorded(): boolean {
@@ -172,12 +176,10 @@ export class UserPrivacy extends Model<IUserPrivacy> {
     }
 
     public setPermissions(permissions: IPermissions): void {
-        const newPermissions: IPermissions = {
-            ads: permissions.ads,
-            external: permissions.external,
-            gameExp: permissions.gameExp
-        };
-        this.set('permissions', newPermissions);
+        const thesePermissions = this.get('permissions');
+        thesePermissions.ads = permissions.ads;
+        thesePermissions.external = permissions.external;
+        thesePermissions.gameExp = permissions.gameExp;
     }
 
     public update(data: IUserPrivacy): void {
