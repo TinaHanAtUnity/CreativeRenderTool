@@ -58,27 +58,4 @@ export class PrivacySDK {
     public getLegalFramework(): LegalFramework {
         return this._legalFramework;
     }
-
-    public getSubmittablePrivacy(limitAdTracking: boolean | undefined): UserPrivacy {
-        if (this.isOptOutRecorded()) {
-            return this.getUserPrivacy();
-        }
-        const gamePrivacyMethod = this.getGamePrivacy().getMethod();
-        let permissions = UserPrivacy.PERM_ALL_FALSE;
-
-        if (!limitAdTracking) {
-            switch (gamePrivacyMethod) {
-                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
-                    break;
-                case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
-                    break;
-                case PrivacyMethod.DEVELOPER_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
-                    break;
-                case PrivacyMethod.DEFAULT: permissions = UserPrivacy.PERM_ALL_TRUE;
-                    break;
-                default: permissions = UserPrivacy.PERM_ALL_FALSE;
-            }
-        }
-        return new UserPrivacy({method: gamePrivacyMethod, permissions: permissions, version: 0});
-    }
 }

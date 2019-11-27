@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import 'mocha';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
-import { CurrentUnityConsentVersion, GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { CurrentUnityConsentVersion, GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 
 import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
@@ -84,7 +84,7 @@ describe('RequestPrivacyFactoryTests', () => {
 
             context('if game privacy method has changed since last privacy store', () => {
                 let result: IRequestPrivacy | undefined;
-                const anyPermissions = <IPermissions>{};
+                const anyPermissions = <IPrivacyPermissions>{};
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
