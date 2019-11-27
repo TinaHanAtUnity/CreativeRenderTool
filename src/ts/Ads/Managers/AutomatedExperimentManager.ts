@@ -25,7 +25,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform;
+type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
@@ -340,7 +340,7 @@ export class AutomatedExperimentManager {
                'opt_out_Recorded': privacySdk.isOptOutRecorded(),
                'opt_out_enabled': privacySdk.isOptOutEnabled(),
                'platform': Platform[core.NativeBridge.getPlatform()],
-               'stores': core.DeviceInfo.getStores(),
+               'stores':  core.DeviceInfo.getStores() !== undefined ? core.DeviceInfo.getStores().split(',') : undefined,
                'simulator': core.DeviceInfo instanceof IosDeviceInfo ? core.DeviceInfo.isSimulator() : undefined,
                'total_internal_space': core.DeviceInfo.getTotalSpace(),
                'device_free_space': res[2],

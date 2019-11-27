@@ -72,7 +72,7 @@ describe('AutomatedExperimentManager test', () => {
         screen_width: 647,
         screen_height: 357,
         screen_density: 480,
-        stores: 'google',
+        stores: ['google'],
         rooted: false,
         connection_type: 'wifi',
         device_free_space: 10159440,
