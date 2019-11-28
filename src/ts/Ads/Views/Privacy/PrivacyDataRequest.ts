@@ -15,6 +15,7 @@ import {
 export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     private readonly _localization: Localization;
+    private readonly _language: string;
 
     private _captchaView: Captcha;
     private _email: string;
@@ -22,6 +23,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
     constructor(platform: Platform, language: string) {
         super(platform, 'privacy-data-request');
 
+        this._language = language;
         this._localization = new Localization(language, 'privacy');
         this._template = new Template(DataRequestTemplate, this._localization);
 
@@ -42,7 +44,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
         const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
 
         if (emailInputElement) {
-            emailInputElement.placeholder = this._localization.translate('privacy-dialog-email-input-placeholder');
+            emailInputElement.placeholder = this._localization.translate('privacy-data-request-email-input-placeholder');
         }
     }
 
@@ -59,8 +61,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
     public onItemSelected(url: string): void {
         PrivacyDataRequestHelper.sendVerifyRequest(this._email, url).then((response) => {
             if (response.status === DataRequestResponseStatus.SUCCESS) {
-                // todo show success message
-                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-msg');
+                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-confirm-msg');
                 msgElement.classList.add('show-msg');
 
                 this.hideAndCloseCaptcha();
@@ -119,7 +120,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     private showCaptcha(urls: string[]): void {
         if (!this._captchaView) {
-            this._captchaView = new Captcha(this._platform, urls);
+            this._captchaView = new Captcha(this._platform, this._language, urls);
             this._captchaView.addEventHandler(this);
             this._captchaView.render();
             document.body.appendChild(this._captchaView.container());

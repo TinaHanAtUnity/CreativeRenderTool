@@ -4,6 +4,7 @@ import { CaptchaGridItem, IGridItemClickedListener } from 'Ads/Views/Privacy/Cap
 import { Template } from 'Core/Utilities/Template';
 
 import CaptchaTemplate from 'html/consent/captcha.html';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface ICaptchaHandler {
     onItemSelected(url: string): void;
@@ -14,10 +15,10 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
 
     private _gridItems: CaptchaGridItem[] = [];
 
-    constructor(platform: Platform, urls: string[]) {
+    constructor(platform: Platform, language: string, urls: string[]) {
         super(platform, 'privacy-captcha', false);
 
-        this._template = new Template(CaptchaTemplate);
+        this._template = new Template(CaptchaTemplate, new Localization(language, 'privacy'));
 
         this._gridItems = this.createGridItems(urls);
 
@@ -29,19 +30,23 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
             {
                 event: 'click',
                 listener: (event: Event) => event.stopPropagation(),
-                selector: '.privacy-captcha-grid-container'
+                selector: '.privacy-captcha-container'
             }
         ];
     }
 
     public resetElements(urls: string[]): void {
-
         if (urls.length === this._gridItems.length) {
             for (const [index, value] of urls.entries()) {
                 if (this._gridItems[index]) {
                     this._gridItems[index].resetElement(value);
                 }
             }
+        }
+
+        if (this.container()) {
+            const spinner = <HTMLElement> this.container().querySelector('.privacy-captcha-spinner-container');
+            spinner.classList.remove('show');
         }
     }
 
@@ -68,6 +73,9 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
     }
 
     public onGridItemClick(url: string): void {
+        const spinner = <HTMLElement> this.container().querySelector('.privacy-captcha-spinner-container');
+        spinner.classList.add('show');
+
         this._handlers.forEach(handler => handler.onItemSelected(url));
     }
 
