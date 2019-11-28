@@ -67,8 +67,17 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
                 this.hideAndCloseCaptcha();
             } else if (response.status === DataRequestResponseStatus.FAILED_VERIFICATION) {
                 this.sendDataRequestEvent();
+            } else if (response.status === DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS) {
+                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
+                msgElement.classList.add('show-msg');
+
+                this.hideAndCloseCaptcha();
             } else {
-                // todo: show generic error
+                // todo: add generic error message
+                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
+                msgElement.classList.add('show-msg');
+
+                this.hideAndCloseCaptcha();
             }
         });
     }
