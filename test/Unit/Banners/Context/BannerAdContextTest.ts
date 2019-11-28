@@ -41,6 +41,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreModule(nativeBridge);
             programmaticTrackingService = core.ProgrammaticTrackingService;
+            (<sinon.SinonStub>programmaticTrackingService.createAdsSdkTag).restore();
             ads = TestFixtures.getAdsModule(core);
             bannerModule = TestFixtures.getBannerModule(ads, core);
             campaign = TestFixtures.getBannerCampaign();
@@ -60,6 +61,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             sandbox.stub(bannerModule.CampaignManager, 'request').resolves(campaign);
             sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
             sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
+            sandbox.stub(bannerModule.Api.BannerListenerApi, 'sendLoadEvent');
             sandbox.stub(bannerModule.Api.BannerApi, 'load').callsFake((bannerViewType: BannerViewType, width: number, height: number, bannerAdViewId: string) => {
                 return Promise.resolve().then(() => bannerModule.Api.BannerApi.onBannerLoaded.trigger(bannerAdViewId));
             });
@@ -71,6 +73,19 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
             it('should call onLoad', () => {
                 sandbox.assert.called(asStub(adUnit.onLoad));
+            });
+
+            it('should call sendLoadEvent', () => {
+                sandbox.assert.calledOnce(<sinon.SinonStub>bannerModule.Api.BannerListenerApi.sendLoadEvent);
+                sandbox.assert.calledWith(<sinon.SinonStub>bannerModule.Api.BannerListenerApi.sendLoadEvent, placementId);
+            });
+
+            it('should report banner ad unit loaded', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'banner_ad_unit_loaded');
+            });
+
+            it('should report banner load', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
             });
 
             it('should report banner ad request', () => {
@@ -113,6 +128,10 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 return failLoadBannerAdUnit(new Error('failLoadBannerAdUnit'));
             });
 
+            it('should report banner load', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+            });
+
             it('should call sendErrorEvent with web view error', () => {
                 sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.WebViewError, 'Banner failed to load : failLoadBannerAdUnit');
             });
@@ -128,12 +147,16 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 return failLoadBannerAdUnit(new NoFillError(`No fill for ${placementId}`));
             });
 
+            it('should report banner load', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+            });
+
             it('should call sendErrorEvent with no fill', () => {
                 sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
             });
 
-            it('should report banner ad request error', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportErrorEvent, 'banner_request_error');
+            it('should report banner ad no fill metric', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'banner_ad_no_fill');
             });
         });
 
