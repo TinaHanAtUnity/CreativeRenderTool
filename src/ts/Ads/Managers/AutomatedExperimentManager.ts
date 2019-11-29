@@ -261,7 +261,7 @@ export class AutomatedExperimentManager {
                 return Object.keys(json.experiments).map(experiment => ({
                     name: experiment,
                     action: json.experiments[experiment],
-                    metadata: (json.metadata === null ? '' : json.metadata[experiment])
+                    metadata: (json.metadata === null || json.metadata === undefined ? '' : json.metadata[experiment])
                 }));
             } catch (e) {
                 Diagnostics.trigger('failed_to_parse_automated_experiments', e);
