@@ -50,6 +50,12 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
         }
     }
 
+    public showTryAgainMessage(): void {
+        if (this.container()) {
+            this.container().classList.add('show-retry-message');
+        }
+    }
+
     public render(): void {
         super.render();
 
@@ -57,6 +63,14 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
 
         for (const item of this._gridItems) {
             gridItemContainer.appendChild(item.getElement());
+        }
+    }
+
+    public show(): void {
+        super.show();
+
+        if (this.container()) {
+            this.container().classList.remove('show-retry-message');
         }
     }
 
@@ -73,6 +87,8 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
     }
 
     public onGridItemClick(url: string): void {
+        this.container().classList.remove('show-retry-message');
+
         const spinner = <HTMLElement> this.container().querySelector('.privacy-captcha-spinner-container');
         spinner.classList.add('show');
 

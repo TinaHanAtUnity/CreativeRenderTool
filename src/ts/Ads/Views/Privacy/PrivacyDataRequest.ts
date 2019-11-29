@@ -67,6 +67,9 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
                 this.hideAndCloseCaptcha();
             } else if (response.status === DataRequestResponseStatus.FAILED_VERIFICATION) {
                 this.sendDataRequestEvent();
+                if (this._captchaView) {
+                    this._captchaView.showTryAgainMessage();
+                }
             } else if (response.status === DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS) {
                 const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
                 msgElement.classList.add('show-msg');
@@ -133,6 +136,8 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
             this._captchaView.addEventHandler(this);
             this._captchaView.render();
             document.body.appendChild(this._captchaView.container());
+
+            this._captchaView.show();
         } else {
             this._captchaView.resetElements(urls);
         }
