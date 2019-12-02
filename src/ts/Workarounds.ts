@@ -32,14 +32,16 @@ if (!Object.values) {
 }
 
 declare global {
-    // tslint:disable-next-line
-    interface Array<T> {
-        // tslint:disable-next-line
-        unique(): Array<T>;
+
+    // tslint:disable
+    interface Array<T> {    // eslint-disable-line
+        unique(): Array<T>; // eslint-disable-line
     }
+    // tslint:enable
 }
 
 Array.prototype.unique = function () {
-    // tslint:disable-next-line
+    // tslint:disable
     return this.filter((val, index) => this.indexOf(val) === index);
+    // tslint:enable
 };
