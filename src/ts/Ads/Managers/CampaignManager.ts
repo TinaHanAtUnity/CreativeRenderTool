@@ -41,7 +41,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
-import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
@@ -156,13 +156,14 @@ export class CampaignManager {
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
+        const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
 
         this._requesting = true;
 
-        return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -191,11 +192,11 @@ export class CampaignManager {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if (this._auctionProtocol === AuctionProtocol.V5) {
-                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
+                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
-                        return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
+                        return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_campaigns_error');
                         });
                     }
@@ -232,8 +233,9 @@ export class CampaignManager {
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
         const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
+        const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
-        return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
+        return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
@@ -245,7 +247,7 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: 10000
             }).then(response => {
-                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy);
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
                     this._pts.reportMetricEvent(LoadMetric.LoadEnabledFill);
@@ -278,7 +280,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionResponse>(response.response);
@@ -299,6 +301,7 @@ export class CampaignManager {
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
+        session.setLegacyPrivacy(legacyRequestPrivacy);
         session.setDeviceFreeSpace(this._deviceFreeSpace);
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
@@ -394,7 +397,7 @@ export class CampaignManager {
         }
     }
 
-    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy): Promise<void[]> {
+    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -415,6 +418,7 @@ export class CampaignManager {
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
+        session.setLegacyPrivacy(legacyRequestPrivacy);
         session.setDeviceFreeSpace(this._deviceFreeSpace);
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
@@ -530,7 +534,7 @@ export class CampaignManager {
         return Promise.all(promises);
     }
 
-    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, deviceFreeSpace: number, requestPrivacy?: IRequestPrivacy): Promise<ILoadedCampaign | undefined> {
+    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, deviceFreeSpace: number, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<ILoadedCampaign | undefined> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -549,6 +553,7 @@ export class CampaignManager {
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
+        session.setLegacyPrivacy(legacyRequestPrivacy);
         session.setDeviceFreeSpace(deviceFreeSpace);
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
@@ -869,7 +874,7 @@ export class CampaignManager {
     }
 
     // todo: refactor requestedPlacement to something more sensible
-    private createRequestBody(gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
+    private createRequestBody(gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         const body: { [key: string]: unknown } = {
@@ -968,14 +973,26 @@ export class CampaignManager {
                     });
                 }
 
+                if (!legacyRequestPrivacy) {
+                    Diagnostics.trigger('legacy_request_missing', {
+                        userPrivacy: this._privacy.getUserPrivacy(),
+                        gamePrivacy: this._privacy.getGamePrivacy()
+                    });
+                    legacyRequestPrivacy = {
+                        gdprEnabled: this._privacy.isGDPREnabled(),
+                        optOutEnabled: this._privacy.isOptOutEnabled(),
+                        optOutRecorded: this._privacy.isOptOutRecorded()
+                    };
+                }
+
                 body.placements = placementRequest;
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
                 body.gameSessionCounters = gameSessionCounters;
-                body.gdprEnabled = this._privacy.isGDPREnabled();
-                body.optOutEnabled = this._privacy.isOptOutEnabled();
-                body.optOutRecorded = this._privacy.isOptOutRecorded();
+                body.gdprEnabled = legacyRequestPrivacy.gdprEnabled;
+                body.optOutEnabled = legacyRequestPrivacy.optOutEnabled;
+                body.optOutRecorded = legacyRequestPrivacy.optOutRecorded;
                 body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
                 body.isLoadEnabled = this._isLoadEnabled;

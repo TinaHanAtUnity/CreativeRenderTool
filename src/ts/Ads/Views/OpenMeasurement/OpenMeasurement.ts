@@ -363,7 +363,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            this.sessionStart();
+            /**
+             * Edge Case:
+             * This check is here to ensure the impression values for native/vast videos are correct when fired
+             * Because IAS registers late and because admob does not use our native video player
+             * the video view data will be accurate by impression time. For non-ias/admob vendors, however,
+             * we must wait for that data to return which is why we dont call session start as soon as the
+             * om session is registered.
+             * admob-session-interface - calls session start for admob
+             * vast video event handler - calls session start for vast
+             */
+            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
+                this.sessionStart();
+            }
         }
 
         return Promise.resolve();

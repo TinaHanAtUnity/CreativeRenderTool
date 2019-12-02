@@ -15,6 +15,7 @@ import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerViewType } from 'Banners/Native/BannerApi';
 import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [
     Platform.IOS,
@@ -31,6 +32,7 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
         let adUnit: IBannerAdUnit;
         const placementId = 'banner';
         let clock: sinon.SinonFakeTimers;
+        let programmaticTrackingService: ProgrammaticTrackingService;
 
         beforeEach(() => {
             clock = sinon.useFakeTimers();
@@ -38,6 +40,7 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
             backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreModule(nativeBridge);
+            programmaticTrackingService = core.ProgrammaticTrackingService;
             ads = TestFixtures.getAdsModule(core);
             bannerModule = TestFixtures.getBannerModule(ads, core);
             campaign = TestFixtures.getBannerCampaign();
@@ -68,6 +71,14 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
             it('should call onLoad', () => {
                 sandbox.assert.called(asStub(adUnit.onLoad));
+            });
+
+            it('should report banner ad request', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'banner_ad_request');
+            });
+
+            it('should report banner ad fill', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'banner_ad_fill');
             });
 
             it('should call onLoad again when banner has aleady loaded', () => {
@@ -105,6 +116,10 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
             it('should call sendErrorEvent with web view error', () => {
                 sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.WebViewError, 'Banner failed to load : failLoadBannerAdUnit');
             });
+
+            it('should report banner ad request error', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportErrorEvent, 'banner_request_error');
+            });
         });
 
         describe('Fail loading a Banner Ad with no fill', () => {
@@ -115,6 +130,10 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
 
             it('should call sendErrorEvent with no fill', () => {
                 sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
+            });
+
+            it('should report banner ad request error', () => {
+                sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportErrorEvent, 'banner_request_error');
             });
         });
 
@@ -127,6 +146,12 @@ import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
             it('will fail when the banner request returns NoFillError', () => {
                 return bannerAdContext.load().catch((e) => {
                     sandbox.assert.calledWith(asStub(bannerModule.Api.BannerListenerApi.sendErrorEvent), placementId, BannerErrorCode.NoFillError, `Placement ${placementId} failed to fill!`);
+                });
+            });
+
+            it('should report banner ad request error', () => {
+                return bannerAdContext.load().catch((e) => {
+                    sandbox.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportErrorEvent, 'banner_request_error');
                 });
             });
         });

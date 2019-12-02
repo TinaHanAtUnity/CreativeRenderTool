@@ -34,12 +34,17 @@ export enum AdmobMetric {
     AdmobNonDBMNonRewardedCanPlay = 'admob_nondbm_nonrewarded_canplay',
     AdmobNonDBMNonRewardedStarted = 'admob_nondbm_nonrewarded_started',
     AdmobVideoCanPlay = 'admob_video_canplay',
-    AdmobVideoStarted = 'admob_video_started'
+    AdmobVideoStarted = 'admob_video_started',
+    AdmobOMEnabled = 'admob_om_enabled',
+    AdmobOMInjected = 'admob_om_injected',
+    AdmobOMSessionStart = 'admob_om_session_start',
+    AdmobOMSessionFinish = 'admob_om_session_finish'
 }
 
 export enum BannerMetric {
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
+    BannerAdFill = 'banner_ad_fill',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
 }
 

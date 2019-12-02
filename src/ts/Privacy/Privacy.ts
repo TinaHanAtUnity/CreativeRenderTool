@@ -12,25 +12,25 @@ export interface IAllPermissions {
 }
 
 export interface IGranularPermissions {
+    [key: string]: boolean;
     gameExp: boolean;
     ads: boolean;
     external: boolean;
 }
 
-export type IUnityConsentPermissions = IAllPermissions | IGranularPermissions;
+type IUnityConsentPermissions = IGranularPermissions;
 
 export function isUnityConsentPermissions(permissions: IPermissions): permissions is IUnityConsentPermissions {
-    return (<IAllPermissions>permissions).all === true || (
-        (<IGranularPermissions>permissions).gameExp !== undefined &&
-        (<IGranularPermissions>permissions).ads !== undefined &&
-        (<IGranularPermissions>permissions).external !== undefined);
+    return (permissions.gameExp !== undefined &&
+        permissions.ads !== undefined &&
+        permissions.external !== undefined);
 }
 
 export interface IProfilingPermissions {
     profiling: boolean;
 }
 
-export type IPermissions = IUnityConsentPermissions | IProfilingPermissions;
+export type IPermissions = IUnityConsentPermissions;
 
 export const CurrentUnityConsentVersion = 20181106;
 
@@ -50,11 +50,6 @@ export class GamePrivacy extends Model<IGamePrivacy> {
         });
 
         this.set('method', <PrivacyMethod>data.method);
-    }
-
-    public isEnabled(): boolean {
-        // TODO: add support for other privacy methods
-        return this.getMethod() === PrivacyMethod.UNITY_CONSENT;
     }
 
     public getMethod(): PrivacyMethod {
@@ -93,6 +88,12 @@ interface IUserPrivacy {
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
+    public static PERM_ALL_TRUE: IGranularPermissions = {ads: true, external: true, gameExp: true};
+    public static PERM_ALL_FALSE: IGranularPermissions = {ads: false, external: false, gameExp: false};
+    public static PERM_SKIPPED_LEGITIMATE_INTEREST: IGranularPermissions = {ads: true, external: false, gameExp: true};
+    public static PERM_OPTIN_LEGITIMATE_INTEREST: IGranularPermissions = {ads: true, external: false, gameExp: true};
+    public static PERM_DEVELOPER_CONSENTED: IGranularPermissions = {ads: true, external: true, gameExp: true};
+
     public static createFromLegacy(method: PrivacyMethod, optOutRecorded: boolean, optOutEnabled: boolean): UserPrivacy {
         if (!optOutRecorded) {
             return this.createUnrecorded();
@@ -107,7 +108,6 @@ export class UserPrivacy extends Model<IUserPrivacy> {
                     method: method,
                     version: 0,
                     permissions: {
-                        all: false,
                         gameExp: false,
                         ads: !optOutEnabled,
                         external: false
@@ -122,13 +122,18 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return new UserPrivacy({
             method: PrivacyMethod.DEFAULT,
             version: 0,
-            permissions: {
-                all: false,
-                gameExp: false,
-                ads: false,
-                external: false
-            }
+            permissions: this.PERM_ALL_FALSE
         });
+    }
+
+    public static permissionsEql(permissions1: IGranularPermissions, permissions2: IGranularPermissions): boolean {
+        const properties = ['ads', 'external', 'gameExp'];
+        for (const property of properties) {
+            if (permissions1[property] !== permissions2[property]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     constructor(data: IRawUserPrivacy) {
@@ -144,11 +149,18 @@ export class UserPrivacy extends Model<IUserPrivacy> {
     }
 
     public isRecorded(): boolean {
+        if (!this.getMethod()) {
+            return false;
+        }
         return this.getMethod() !== PrivacyMethod.DEFAULT;
     }
 
     public getMethod(): PrivacyMethod {
         return this.get('method');
+    }
+
+    public setMethod(method: PrivacyMethod): void {
+        this.set('method', method);
     }
 
     public getVersion(): number {

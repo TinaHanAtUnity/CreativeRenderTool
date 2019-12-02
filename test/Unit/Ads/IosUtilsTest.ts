@@ -77,4 +77,35 @@ describe('IosUtilsTest', () => {
             });
         });
     });
+
+    describe('isAdUnitTransparencyBroken', () => {
+        const transparencyTests: {
+            osVersion: string;
+            expectedResult: boolean;
+        }[] = [{
+            osVersion: '12.4',
+            expectedResult: false
+        }, {
+            osVersion: '11.4',
+            expectedResult: false
+        }, {
+            osVersion: '12.4.4.4.4.4',
+            expectedResult: false
+        }, {
+            osVersion: '13.0',
+            expectedResult: true // First broken version
+        }, {
+            osVersion: '13.1.1',
+            expectedResult: true
+        }, {
+            osVersion: '1a.4',
+            expectedResult: false
+        }];
+
+        transparencyTests.forEach(t => {
+            it(`should return ${t.expectedResult} for osVersion ${t.osVersion}`, () => {
+                assert.equal(t.expectedResult, IosUtils.isAdUnitTransparencyBroken(t.osVersion));
+            });
+        });
+    });
 });

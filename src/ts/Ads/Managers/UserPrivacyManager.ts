@@ -1,12 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import {
-    GamePrivacy,
-    IAllPermissions,
-    IGranularPermissions,
-    IPermissions,
-    isUnityConsentPermissions,
-    PrivacyMethod, UserPrivacy
-} from 'Privacy/Privacy';
+import { GamePrivacy, IGranularPermissions, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -34,17 +27,25 @@ interface IUserSummary extends ITemplateData {
 }
 
 export enum GDPREventSource {
-    METADATA = 'metadata',
-    NO_REVIEW = 'no_review',
+    DEVELOPER = 'developer',
+    USER_INDIRECT = 'user_indirect',
     USER = 'user',
-    SANITIZATION = 'sanitization'
+    SDK_SANITIZATION = 'sdk_sanitization'
 }
 
 export enum GDPREventAction {
-    SKIP = 'skip',
-    CONSENT = 'consent',
-    OPTOUT = 'optout',
-    OPTIN = 'optin'
+    SKIPPED_BANNER = 'skipped_banner',
+    BANNER_PERMISSIONS = 'banner_permissions',
+    PROMO_SKIPPED_BANNER = 'promo_skipped_banner',
+    DEVELOPER_CONSENT = 'developer_consent',
+    DEVELOPER_OPTOUT = 'developer_optout',
+    AGE_GATE_DISAGREE = 'agegate_disagree',
+    CONSENT_AGREE_ALL = 'consent_agreed_all',
+    CONSENT_DISAGREE = 'consent_disagree',
+    CONSENT_SAVE_CHOICES = 'consent_save_choices',
+    CONSENT_AGREE = 'consent_agree',
+    PERSONALIZED_PERMISSIONS = 'personalized_permissions',
+    TEST_AUTO_CONSENT = 'test_auto_consent'
 }
 
 export enum LegalFramework {
@@ -70,7 +71,6 @@ export interface IUserPrivacyStorageData {
 
 export class UserPrivacyManager {
 
-    private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
 
@@ -174,19 +174,18 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, layout? : ConsentPage): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
+        const userPrivacy = this._userPrivacy;
+        const firstRequest = !this._userPrivacy.isRecorded();
 
-        if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
-            return Promise.resolve();
+        if (source === GDPREventSource.DEVELOPER) {
+            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+            userPrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
 
-        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+        if (gamePrivacy.getMethod() === PrivacyMethod.DEFAULT) {
             return Promise.resolve();
-        }
-
-        if (source === GDPREventSource.NO_REVIEW) {
-            permissions = { all : true };
         }
 
         const updatedPrivacy = {
@@ -199,8 +198,19 @@ export class UserPrivacyManager {
             return Promise.resolve();
         }
 
-        this._userPrivacy.update(updatedPrivacy);
-        return this.sendUnityConsentEvent(permissions, source, layout);
+        if (this._deviceInfo.getLimitAdTracking()) {
+            // only developer_consent should end up here
+            const devicePermissions = UserPrivacy.PERM_ALL_FALSE;
+            updatedPrivacy.permissions = devicePermissions;
+        }
+        userPrivacy.update(updatedPrivacy);
+
+        // TODO: this needs more investigation, how should limit ad tracking cases be handled? since iOS sends all zeroes for advertising ID, for now events will be disabled
+        if (this._deviceInfo.getLimitAdTracking()) {
+            return Promise.resolve();
+        }
+
+        return this.sendPrivacyEvent(permissions, source, action, layout, firstRequest);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -209,47 +219,33 @@ export class UserPrivacyManager {
             return true;
         }
 
-        if (currentPrivacy.getVersion() !== updatedPrivacy.version) {
+        if (updatedPrivacy.method === PrivacyMethod.UNITY_CONSENT && currentPrivacy.getVersion() !== updatedPrivacy.version) {
             return true;
         }
 
         const currentPermissions = currentPrivacy.getPermissions();
         const updatedPermissions = updatedPrivacy.permissions;
 
-        if ((<IGranularPermissions>currentPermissions).gameExp !== (<IGranularPermissions>updatedPermissions).gameExp) {
-            return true;
-        }
-
-        if ((<IGranularPermissions>currentPermissions).ads !== (<IGranularPermissions>updatedPermissions).ads) {
-            return true;
-        }
-
-        if ((<IGranularPermissions>currentPermissions).external !== (<IGranularPermissions>updatedPermissions).external) {
-            return true;
-        }
-
-        if ((<IAllPermissions>currentPermissions).all !== (<IAllPermissions>updatedPermissions).all) {
-            return true;
-        }
-
-        return false;
+        return !UserPrivacy.permissionsEql(currentPermissions, updatedPermissions);
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse> {
+    private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
-            'v': 1,
-            adid: this._deviceInfo.getAdvertisingIdentifier(),
-            group: this._coreConfig.getAbGroup(),
+            'v': 2,
+            advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
+            abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
-            action: GDPREventAction.CONSENT,
+            userAction: action,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),
             country: this._coreConfig.getCountry(),
+            subdivision: this._coreConfig.getSubdivision(),
             gameId: this._clientInfo.getGameId(),
             source: source,
-            method: PrivacyMethod.UNITY_CONSENT,
-            version: this._gamePrivacy.getVersion(),
+            method: this._gamePrivacy.getMethod(),
+            agreedVersion: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
+            firstRequest: firstRequest,
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
@@ -274,7 +270,6 @@ export class UserPrivacyManager {
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
                 if (this._privacy.isGDPREnabled()) {
-                    this.updateConfigurationWithConsent(consent);
                     this.pushConsent(consent);
                 }
                 return consent; // always return consent value
@@ -293,7 +288,8 @@ export class UserPrivacyManager {
 
         const personalPayload = {
             deviceModel: this._deviceInfo.getModel(),
-            country: this._coreConfig.getCountry()
+            country: this._coreConfig.getCountry(),
+            subdivision: this._coreConfig.getSubdivision()
         };
 
         return this._request.get(url).then((response) => {
@@ -314,25 +310,8 @@ export class UserPrivacyManager {
         return this._privacy.isOptOutEnabled();
     }
 
-    public getGranularPermissions(): IGranularPermissions {
-        const permissions = this._privacy.getUserPrivacy().getPermissions();
-        if (!isUnityConsentPermissions(permissions)) {
-            return {
-                gameExp: false,
-                ads: false,
-                external: false
-            };
-        }
-
-        if ((<IAllPermissions>permissions).all === true) {
-            return {
-                gameExp: true,
-                ads: true,
-                external: true
-            };
-        } else {
-            return <IGranularPermissions>permissions;
-        }
+    public getUserPrivacyPermissions(): IGranularPermissions {
+        return this._privacy.getUserPrivacy().getPermissions();
     }
 
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
@@ -368,7 +347,7 @@ export class UserPrivacyManager {
             return true;
         }
 
-        if (!this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+        if (this._gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             return false;
         }
 
@@ -386,19 +365,16 @@ export class UserPrivacyManager {
         return this._privacy.getLegalFramework();
     }
 
-    private pushConsent(consent: boolean): Promise<void> {
-        // get last state of gdpr consent
-        return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
-            // only if consent has changed push to kafka
-            if (consentLastSentToKafka !== consent) {
-                return this.sendGdprConsentEvent(consent);
-            }
-        }).catch((error) => {
-            // there has not been last state of consent
-            // IE this is the first consent value we have seen
-            // and should push this to kafka
-            return this.sendGdprConsentEvent(consent);
-        });
+    private pushConsent(consent: boolean): Promise<INativeResponse | void> {
+        let permissions = UserPrivacy.PERM_ALL_FALSE;
+        let action = GDPREventAction.DEVELOPER_OPTOUT;
+
+        if (consent) {
+            permissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
+            action = GDPREventAction.DEVELOPER_CONSENT;
+        }
+
+        return this.updateUserPrivacy(permissions, GDPREventSource.DEVELOPER, action);
     }
 
     private getConsent(): Promise<boolean> {
@@ -426,29 +402,6 @@ export class UserPrivacyManager {
 
     }
 
-    private updateConfigurationWithConsent(consent: boolean) {
-        if (this._deviceInfo.getLimitAdTracking()) {
-            consent = false;
-        }
-
-        this._privacy.setOptOutEnabled(!consent);
-        this._privacy.setOptOutRecorded(true);
-
-        const gamePrivacy = this._privacy.getGamePrivacy();
-        gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-        const userPrivacy = this._privacy.getUserPrivacy();
-        userPrivacy.update({
-            method: gamePrivacy.getMethod(),
-            version: gamePrivacy.getVersion(),
-            permissions: {
-                all: false,
-                gameExp: false,
-                ads: consent,
-                external: consent
-            }
-        });
-    }
-
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._privacy.isGDPREnabled()) {
@@ -456,7 +409,6 @@ export class UserPrivacyManager {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
                 if (typeof(value) !== 'undefined') {
-                    this.updateConfigurationWithConsent(value);
                     this.pushConsent(value);
                 }
             }
@@ -478,21 +430,6 @@ export class UserPrivacyManager {
         }
 
         return undefined;
-    }
-
-    private sendGdprConsentEvent(consent: boolean): Promise<void> {
-        let sendEvent;
-        if (consent) {
-            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT);
-        } else {
-            // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
-            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
-        }
-        return sendEvent.then(() => {
-            return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {
-                return this._core.Storage.write(StorageType.PRIVATE);
-            });
-        });
     }
 
     private isAgeGateShowRequired(): boolean {
