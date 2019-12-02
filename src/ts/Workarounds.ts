@@ -30,3 +30,16 @@ import { Polyfiller } from 'Core/Utilities/Polyfiller';
 if (!Object.values) {
     Object.values = Polyfiller.getObjectValuesFunction();
 }
+
+declare global {
+    // tslint:disable-next-line
+    interface Array<T> {
+        // tslint:disable-next-line
+        unique(): Array<T>;
+    }
+}
+
+Array.prototype.unique = function () {
+    // tslint:disable-next-line
+    return this.filter((val, index) => this.indexOf(val) === index);
+};
