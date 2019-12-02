@@ -12,6 +12,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import 'mocha';
 import * as sinon from 'sinon';
+import { expression } from '@babel/template';
 
 describe('ProgrammaticTrackingService', () => {
 
@@ -39,6 +40,29 @@ describe('ProgrammaticTrackingService', () => {
             response: 'test',
             responseCode: 200,
             headers: []
+        });
+    });
+
+    describe('createAdsSdkTag', () => {
+        const tests: {
+            inputSuffix: string;
+            inputValue: string;
+            expected: string;
+        }[] = [{
+            inputSuffix: 'blt',
+            inputValue: '3.0.0',
+            expected: 'ads_sdk2_blt:3.0.0'
+        }, {
+            inputSuffix: '',
+            inputValue: '',
+            expected: 'ads_sdk2_:'
+        }];
+
+        tests.forEach((t) => {
+            it(`should send "${t.expected}" with suffix "${t.inputSuffix}" and value "${t.inputValue}"`, () => {
+                const tag = programmaticTrackingService.createAdsSdkTag(t.inputSuffix, t.inputValue);
+                assert.equal(tag, t.expected);
+            });
         });
     });
 
@@ -114,6 +138,7 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_cached_video',
+                            `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_plt:ANDROID'
                         ]
                     }
@@ -128,6 +153,7 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_streamed_video',
+                            `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_plt:ANDROID'
                         ]
                     }
@@ -137,6 +163,60 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEvent(t.input);
+                sinon.assert.calledOnce(postStub);
+                assert.equal(postStub.firstCall.args.length, 3);
+                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
+                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
+                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                return promise;
+            });
+        });
+    });
+
+    describe('reportMetricEventWithTags', () => {
+
+        const tests: {
+            input: AdmobMetric;
+            inputTags: string[];
+            expected: IProgrammaticTrackingData;
+        }[] = [{
+            input: AdmobMetric.AdmobUsedCachedVideo,
+            inputTags: ['ads_sdk2_blt:3.0.0'],
+            expected: {
+                metrics: [
+                    {
+                        name: 'admob_used_cached_video',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:admob_used_cached_video',
+                            'ads_sdk2_sdv:2300',
+                            'ads_sdk2_plt:ANDROID',
+                            'ads_sdk2_blt:3.0.0'
+                        ]
+                    }
+                ]
+            }
+        }, {
+            input: AdmobMetric.AdmobUsedStreamedVideo,
+            inputTags: ['ads_sdk2_test:testValue'],
+            expected: {
+                metrics: [
+                    {
+                        name: 'admob_used_streamed_video',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:admob_used_streamed_video',
+                            'ads_sdk2_sdv:2300',
+                            'ads_sdk2_plt:ANDROID',
+                            'ads_sdk2_test:testValue'
+                        ]
+                    }
+                ]
+            }
+        }];
+        tests.forEach((t) => {
+            it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
                 sinon.assert.calledOnce(postStub);
                 assert.equal(postStub.firstCall.args.length, 3);
                 assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
@@ -182,6 +262,7 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:webview_initialization_time', // Intentional to track which timing metrics are negative
+                            'ads_sdk2_sdv:2300',
                             'ads_sdk2_plt:ANDROID'
                         ]
                     }
