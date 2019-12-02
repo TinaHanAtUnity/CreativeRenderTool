@@ -1,7 +1,7 @@
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { IPermissions } from 'Privacy/Privacy';
+import { IPrivacyPermissions } from 'Privacy/Privacy';
 
 export enum PrivacyEvent {
     AGE_GATE_SHOW = 'age_gate_show',
@@ -14,7 +14,7 @@ export enum PrivacyEvent {
 }
 
 export class PrivacyMetrics {
-    public static trigger(event: PrivacyEvent, permissions?: IPermissions) {
+    public static trigger(event: PrivacyEvent, permissions?: IPrivacyPermissions) {
         const kafkaObject: { [key: string]: unknown } = {};
 
         kafkaObject.type = event;

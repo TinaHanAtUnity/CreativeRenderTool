@@ -210,7 +210,7 @@ export class AuctionRequest {
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
         this._pts = params.programmaticTrackingService;
-        this._privacy = RequestPrivacyFactory.create(params.privacySDK.getUserPrivacy(), params.privacySDK.getGamePrivacy());
+        this._privacy = RequestPrivacyFactory.create(params.privacySDK, this._deviceInfo.getLimitAdTracking());
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
         if (this._coreConfig.getTestMode()) {

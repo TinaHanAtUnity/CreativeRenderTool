@@ -1,3 +1,7 @@
+# Pending
+
+* Privacy protocol V2 changes to AuctionRequests and Operative events [#12247](https://github.com/Applifier/unity-ads-webview/pull/12247)
+
 # Tue Nov 26 23:55:06 UTC 2019
 
 * Add banner fill metric event [#12196](https://github.com/Applifier/unity-ads-webview/pull/12196)

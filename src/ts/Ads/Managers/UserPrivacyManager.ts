@@ -1,5 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IGranularPermissions, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -99,7 +99,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
@@ -138,7 +138,7 @@ export class UserPrivacyManager {
         return this.sendPrivacyEvent(permissions, source, action, layout, firstRequest);
     }
 
-    private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
+    private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPrivacyPermissions }) {
         const currentPrivacy = this._userPrivacy;
         if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
             return true;
@@ -154,7 +154,7 @@ export class UserPrivacyManager {
         return !UserPrivacy.permissionsEql(currentPermissions, updatedPermissions);
     }
 
-    private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
+    private sendPrivacyEvent(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
             'v': 2,
             advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
@@ -235,7 +235,7 @@ export class UserPrivacyManager {
         return this._privacy.isOptOutEnabled();
     }
 
-    public getUserPrivacyPermissions(): IGranularPermissions {
+    public getUserPrivacyPermissions(): IPrivacyPermissions {
         return this._privacy.getUserPrivacy().getPermissions();
     }
 
