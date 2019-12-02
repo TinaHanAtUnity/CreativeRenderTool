@@ -4,7 +4,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ITemplateData, View } from 'Core/Views/View';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IPermissions } from 'Privacy/Privacy';
+import { IPrivacyPermissions } from 'Privacy/Privacy';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -25,14 +25,14 @@ export interface IPrivacyHandlerView {
     onPrivacyClose(): void;
     onPrivacy?(url: string): void;
     onGDPROptOut?(optOutEnabled: boolean): void;
-    onPersonalizedConsent?(permissions: IPermissions): void;
+    onPersonalizedConsent?(permissions: IPrivacyPermissions): void;
 }
 
 export interface IPrivacyHandler extends IPrivacyHandlerView {
     onPrivacy(url: string): void;
     onGDPROptOut(optOutEnabled: boolean): void;
     // todo: replace onGDPROptout with this new method
-    onPersonalizedConsent(permissions: IPermissions): void;
+    onPersonalizedConsent(permissions: IPrivacyPermissions): void;
 }
 
 export interface IBuildInformation extends ITemplateData {

@@ -3,7 +3,7 @@ import {
     CurrentUnityConsentVersion,
     GamePrivacy,
     IAllPermissions,
-    IGranularPermissions,
+    IPrivacyPermissions,
     IProfilingPermissions,
     IRawGamePrivacy,
     IRawUserPrivacy,
@@ -112,7 +112,7 @@ export class PrivacyParser {
         // Handle old style 'profiling'-privacy
         const profiling = (<IProfilingPermissions><unknown>rawUserPrivacy.permissions).profiling;
         if (profiling !== undefined) {
-            let permissions: IGranularPermissions | undefined;
+            let permissions: IPrivacyPermissions | undefined;
             if (profiling) {
                 if (rawUserPrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST) {
                     permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
