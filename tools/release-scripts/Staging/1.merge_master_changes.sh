@@ -20,10 +20,10 @@ do
     if [ "$?" -eq "1" ]; then
         git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm
         git status | grep 'added by them' | sed 's/^.*added by them: //g' | xargs git rm
-        echo -e "\n ${RED}Resolve merge conflicts then proceed by pressing any key."
+        echo -e "\n${RED}Resolve merge conflicts then proceed by pressing any key."
         read answer < /dev/tty
     else
-        echo -e "\n ${GREEN}Nothing to resolve. Continue if there is nothing to edit."
+        echo -e "\n${GREEN}Nothing to resolve. Continue if there is nothing to edit."
         read answer < /dev/tty
         git add -A . && git commit -m "Merged master from script without conflict"
     fi
