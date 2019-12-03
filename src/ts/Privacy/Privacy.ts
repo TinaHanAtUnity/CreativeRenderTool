@@ -86,6 +86,7 @@ interface IUserPrivacy {
 export class UserPrivacy extends Model<IUserPrivacy> {
     public static readonly PERM_ALL_TRUE: IPrivacyPermissions = Object.freeze({ads: true, external: true, gameExp: true});
     public static readonly PERM_ALL_FALSE: IPrivacyPermissions = Object.freeze({ads: false, external: false, gameExp: false});
+    public static readonly PERM_UNITY_CONSENT_FIRST_REQ: IPrivacyPermissions = Object.freeze({ads: true, external: false, gameExp: false});
     public static readonly PERM_SKIPPED_LEGITIMATE_INTEREST: IPrivacyPermissions = Object.freeze({ads: true, external: false, gameExp: true});
     public static readonly PERM_OPTIN_LEGITIMATE_INTEREST: IPrivacyPermissions = Object.freeze({ads: true, external: false, gameExp: true});
     public static readonly PERM_DEVELOPER_CONSENTED: IPrivacyPermissions = Object.freeze({ads: true, external: true, gameExp: true});
