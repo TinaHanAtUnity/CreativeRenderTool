@@ -88,7 +88,8 @@ describe('AutomatedExperimentManager test', () => {
         total_memory: 1899508,
         ringer_mode: 'RINGER_MODE_SILENT',
         network_metered: false,
-        screen_brightness: 1
+        screen_brightness: 1,
+        local_day_time: 10.5
     };
 
     const requestBodyText = JSON.stringify({
