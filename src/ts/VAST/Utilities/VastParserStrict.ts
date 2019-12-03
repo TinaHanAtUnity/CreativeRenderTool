@@ -89,7 +89,6 @@ export class VastParserStrict {
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
     private _pts: ProgrammaticTrackingService | undefined;
-    private _isPublica: boolean;
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration, pts?: ProgrammaticTrackingService) {
         this._domParser = domParser || new DOMParser();
@@ -97,7 +96,6 @@ export class VastParserStrict {
         this._compiledCampaignErrors = [];
         this._coreConfig = coreConfig;
         this._pts = pts;
-        this._isPublica = false;
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -168,7 +166,7 @@ export class VastParserStrict {
         }
 
         // return vast ads with generated non-severe errors
-        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors, this._isPublica);
+        return new Vast(ads, parseErrorURLTemplates, this._compiledCampaignErrors);
     }
 
     // default to https: for relative urls
@@ -190,11 +188,16 @@ export class VastParserStrict {
 
         this.applyParentURLs(parsedVast, parent);
 
-        let wrapperURL = parsedVast.getWrapperURL();
+        const wrapperURL = parsedVast.getWrapperURL();
+
         if (!wrapperURL) {
-            this._isPublica = false;
             return Promise.resolve(parsedVast);
         }
+
+        return this.retrieveWrappedVast(wrapperURL, depth, parsedVast, core, request, bundleId);
+    }
+
+    private retrieveWrappedVast(wrapperURL: string, depth: number, parsedVast: Vast, core: ICoreApi, request: RequestManager, bundleId?: string): Promise<Vast> {
 
         if (depth >= this._maxWrapperDepth) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
@@ -213,9 +216,6 @@ export class VastParserStrict {
             if (this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             }
-            this._isPublica = true;
-        } else {
-            this._isPublica = false;
         }
 
         wrapperURL = decodeURIComponent(wrapperURL);

@@ -18,6 +18,7 @@ import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import { HigherOrderVastParserStrict } from 'VAST/Utilities/HigherOrderVastParserStrict';
 
 export class ProgrammaticVastParser extends CampaignParser {
 
@@ -36,6 +37,8 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _deviceInfo: DeviceInfo;
     protected _vastParserStrict: VastParserStrict;
     protected _coreConfig: CoreConfiguration;
+
+    private _higherOrderVastParser: HigherOrderVastParserStrict;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -74,7 +77,9 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager, response.getAdvertiserBundleId());
+
+        this._higherOrderVastParser = new HigherOrderVastParserStrict(this._vastParserStrict);
+        return this._higherOrderVastParser.retrieveVast(decodedVast, this._coreApi, this._requestManager, response.getAdvertiserBundleId());
     }
 
     protected parseVastToCampaign(vast: Vast, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {

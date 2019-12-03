@@ -34,6 +34,10 @@ export class Vast extends Model<IVast> {
         this._isPublica = isPublica ? true : false;
     }
 
+    public setIsPublicaTag(isPublica: boolean) {
+        this._isPublica = isPublica;
+    }
+
     public isPublicaTag(): boolean {
         return this._isPublica;
     }
