@@ -29,6 +29,11 @@
     text-align: center;
     font-weight: $privacy-title-font-weight;
     font-size: $default-font-size * .75;
+
+    &.disabled {
+      opacity: .3;
+      pointer-events: none;
+    }
   }
 
   .privacy-data-request-submit-button {
@@ -37,28 +42,24 @@
     }
   }
 
-  .privacy-data-request-confirm-msg {
+  .privacy-data-request-msg {
     display: none;
     flex-grow: 1;
     margin-top: .5 * $default-size;
     padding: .5 * $default-size;
     background: $white-smoke;
+    font-weight: 400;
 
     &.show-msg {
       display: block;
     }
   }
 
-  .privacy-data-request-error-msg {
-    display: none;
-    flex-grow: 1;
-    margin-top: .5 * $default-size;
-    padding: .5 * $default-size;
-    background: $white-smoke;
-    color: $privacy-red;
+  .privacy-data-request-confirm-msg {
+    color: $black;
+  }
 
-    &.show-msg {
-      display: block;
-    }
+  .privacy-data-request-error-msg {
+    color: $privacy-red;
   }
 }

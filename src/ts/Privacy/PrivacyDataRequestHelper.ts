@@ -57,7 +57,7 @@ export class PrivacyDataRequestHelper {
             if (error instanceof RequestError && error.nativeResponse) {
                 if (error.nativeResponse.responseCode === 403) {
                     return { status: DataRequestResponseStatus.FAILED_VERIFICATION };
-                } else if (error.nativeResponse.responseCode === 409) {
+                } else if (error.nativeResponse.responseCode === 429) {
                     return { status: DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS };
                 } else {
                     return { status: DataRequestResponseStatus.GENERIC_ERROR };

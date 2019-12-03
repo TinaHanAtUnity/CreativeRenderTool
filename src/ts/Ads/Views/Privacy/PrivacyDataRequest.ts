@@ -74,6 +74,12 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
                 const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
                 msgElement.classList.add('show-msg');
 
+                const submitButton = <HTMLElement> this.container().querySelector('.privacy-data-request-submit-button');
+                submitButton.classList.add('disabled');
+
+                const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
+                emailInputElement.disabled = true;
+
                 this.hideAndCloseCaptcha();
             } else {
                 // todo: add generic error message
