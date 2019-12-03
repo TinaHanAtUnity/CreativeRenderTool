@@ -29,12 +29,12 @@ import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 
 export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
-    private _core: ICoreApi;
-    private _ads: IAdsApi;
+    protected _core: ICoreApi;
+    protected _ads: IAdsApi;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
     private _coreConfig: CoreConfiguration;
-    private _adsConfig: AdsConfiguration;
+    protected _adsConfig: AdsConfiguration;
     private _currentAdUnit: AbstractAdUnit;
     private _focusManager: FocusManager;
     private _sessionManager: SessionManager;
@@ -191,7 +191,6 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaignExpired(): Promise<INativeResponse | void> {
-        this._core.Sdk.logDebug('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL, this._adsConfig.getPlacementIds());
         this.invalidateCampaigns(false, this._adsConfig.getPlacementIds());
         return this._campaignManager.request();

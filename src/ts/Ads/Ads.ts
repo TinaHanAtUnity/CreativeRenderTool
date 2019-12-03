@@ -296,7 +296,7 @@ export class Ads implements IAds {
                 this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             }
         } else if (this._loadApiEnabled) {
-            this.RefreshManager = new PerPlacementLoadAdapter(new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager), this.Api, this.Config);
+            this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
@@ -484,7 +484,7 @@ export class Ads implements IAds {
             this.CampaignManager.setPreviousPlacementId(placement.getId());
 
             this._currentAdUnit.show().then(() => {
-                if (this._loadApiEnabled) {
+                if (this._loadApiEnabled && this._webViewEnabledLoad) {
                     this._core.ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
                 }
             });

@@ -1,23 +1,25 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
-import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
+import { PlacementState } from 'Ads/Models/Placement';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
-export class PerPlacementLoadAdapter extends RefreshManager {
-    private _ads: IAdsApi;
-    private _adsConfig: AdsConfiguration;
-    private _refreshManager: RefreshManager;
+export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
-    constructor(refreshManager: CampaignRefreshManager, ads: IAdsApi, adsConfig: AdsConfiguration) {
-        super();
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
+        super(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+
         this._ads = ads;
         this._adsConfig = adsConfig;
-        this._refreshManager = refreshManager;
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
@@ -26,58 +28,39 @@ export class PerPlacementLoadAdapter extends RefreshManager {
         });
     }
 
-    public getCampaign(placementId: string): Campaign | undefined {
-        return this._refreshManager.getCampaign(placementId);
-    }
-
-    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
-        return this._refreshManager.setCurrentAdUnit(adUnit, placement);
-    }
-
-    public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
-        return this._refreshManager.refresh(nofillRetry);
-    }
-
-    public initialize(): Promise<INativeResponse | void> {
-        return this._refreshManager.initialize();
-    }
-    public shouldRefill(timestamp: number): boolean {
-        return this._refreshManager.shouldRefill(timestamp);
-    }
-
-    public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
-        this._refreshManager.subscribeNativePromoEvents(eventHandler);
-    }
-
-    public setPlacementState(placementId: string, placementState: PlacementState): void {
-       this._refreshManager.setPlacementState(placementId, placementState);
-    }
-
     public sendPlacementStateChanges(placementId: string): void {
-       this._refreshManager.sendPlacementStateChanges(placementId);
+        return;
     }
 
-    public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
-       this._refreshManager.setPlacementStates(placementState, placementIds);
+    public sendPlacementStateChangesLoadAdapter(placementId: string): void {
+        const placement = this._adsConfig.getPlacement(placementId);
+        if (placement.getPlacementStateChanged()) {
+            placement.setPlacementStateChanged(false);
+            this._ads.Placement.setPlacementState(placementId, placement.getState());
+            this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
+        }
+        if (placement.getState() === PlacementState.READY) {
+            this._ads.Listener.sendReadyEvent(placementId);
+        }
     }
 
     private sendLoadAPIEvent(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
         const currentState = placement.getState();
         this.setPlacementState(placementId, PlacementState.WAITING);
-        this.sendPlacementStateChanges(placementId);
+        this.sendPlacementStateChangesLoadAdapter(placementId);
         switch (currentState) {
             case PlacementState.READY:
                 this.setPlacementState(placementId, PlacementState.READY);
-                this.sendPlacementStateChanges(placementId);
+                this.sendPlacementStateChangesLoadAdapter(placementId);
                 break;
             case PlacementState.NO_FILL:
                 this.setPlacementState(placementId, PlacementState.NO_FILL);
-                this.sendPlacementStateChanges(placementId);
+                this.sendPlacementStateChangesLoadAdapter(placementId);
                 break;
             case PlacementState.NOT_AVAILABLE:
                 this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
-                this.sendPlacementStateChanges(placementId);
+                this.sendPlacementStateChangesLoadAdapter(placementId);
                 break;
             default:
         }

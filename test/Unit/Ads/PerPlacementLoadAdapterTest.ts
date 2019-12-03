@@ -57,7 +57,6 @@ describe('PerPlacementLoadAdapterTest', () => {
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let privacySDK: PrivacySDK;
-    let campaignRefreshManager: CampaignRefreshManager;
     let perPlacementLoadAdapter: PerPlacementLoadAdapter;
     let adMobSignalFactory: AdMobSignalFactory;
     let metaDataManager: MetaDataManager;
@@ -110,8 +109,7 @@ describe('PerPlacementLoadAdapterTest', () => {
             sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
             sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
 
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
-            perPlacementLoadAdapter = new PerPlacementLoadAdapter(campaignRefreshManager, ads, adsConfig);
+            perPlacementLoadAdapter = new PerPlacementLoadAdapter(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         afterEach(() => {
