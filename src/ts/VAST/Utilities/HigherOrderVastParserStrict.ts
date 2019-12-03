@@ -30,6 +30,8 @@ export class HigherOrderVastParserStrict {
             throw campaignError;
         }
 
+        this._vastParserStrict.applyParentURLs(parsedVast, parent);
+
         const wrapperURL = parsedVast.getWrapperURL();
         if (wrapperURL) {
             if (CustomFeatures.isIASVastTag(wrapperURL)) {
@@ -38,6 +40,6 @@ export class HigherOrderVastParserStrict {
         }
 
         parsedVast.setIsPublicaTag(this._isPublicaResponse);
-        return this._vastParserStrict.retrieveVast(vast, core, request, bundleId, parent, depth, urlProtocol);
+        return this._vastParserStrict.retrieveVast(vast, core, request, bundleId, parsedVast, depth, urlProtocol);
     }
 }

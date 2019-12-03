@@ -186,7 +186,10 @@ export class VastParserStrict {
             throw campaignError;
         }
 
-        this.applyParentURLs(parsedVast, parent);
+        if (parent) {
+            this.applyParentURLs(parsedVast, parent);
+            parsedVast.setIsPublicaTag(parent.isPublicaTag());
+        }
 
         const wrapperURL = parsedVast.getWrapperURL();
 
@@ -271,7 +274,7 @@ export class VastParserStrict {
         return rootNode.querySelector(name);
     }
 
-    private applyParentURLs(parsedVast: Vast, parent?: Vast) {
+    public applyParentURLs(parsedVast: Vast, parent?: Vast) {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
