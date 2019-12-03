@@ -1,6 +1,7 @@
 # Pending
 
 * Privacy protocol V2 changes to AuctionRequests and Operative events [#12247](https://github.com/Applifier/unity-ads-webview/pull/12247)
+* Privacy protocol V2 update auctionReq and operativeEvents, amendment for unity_consent first request [#12278](https://github.com/Applifier/unity-ads-webview/pull/12278)
 
 # Tue Nov 26 23:55:06 UTC 2019
 
