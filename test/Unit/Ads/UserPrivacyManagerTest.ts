@@ -1,6 +1,6 @@
 import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IGranularPermissions, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -125,7 +125,7 @@ describe('UserPrivacyManagerTest', () => {
                 isGdprEnabled: boolean;
                 privacyEnabled: boolean;
                 privacyMethod: PrivacyMethod;
-                configUserPermissions: IGranularPermissions;
+                configUserPermissions: IPrivacyPermissions;
             }[] = [{
                 storedConsent: true,
                 event: GDPREventAction.DEVELOPER_CONSENT,
@@ -553,7 +553,7 @@ describe('UserPrivacyManagerTest', () => {
     });
 
     describe('updateUserPrivacy', () => {
-        const anyConsent: IPermissions = { gameExp: false, ads: false, external: false };
+        const anyConsent: IPrivacyPermissions = { gameExp: false, ads: false, external: false };
         let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
@@ -568,7 +568,7 @@ describe('UserPrivacyManagerTest', () => {
         });
 
         describe('when updating user privacy', () => {
-            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
+            function sendEvent(permissions: IPrivacyPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
                 return privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.PERSONALIZED_PERMISSIONS, layout).then(() => {
                     sinon.assert.calledTwice(httpKafkaSpy); // First one is temporary diagnostics
                     return httpKafkaSpy.secondCall.args[2];
@@ -597,7 +597,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should send new privacy fields', () => {
-                const expectedPermissions: IPermissions = { gameExp: false, ads: true, external: true };
+                const expectedPermissions: IPrivacyPermissions = { gameExp: false, ads: true, external: true };
                 (<sinon.SinonStub>coreConfig.isCoppaCompliant).returns(false);
 
                 const expectedAbGroup = 19;

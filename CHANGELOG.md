@@ -1,5 +1,28 @@
 # Pending
 
+* Open Measurement - Fix/om dp iab android SDK 3.3 [#12279](https://github.com/Applifier/unity-ads-webview/pull/12279) [#12107](https://github.com/Applifier/unity-ads-webview/pull/12107)
+
+# Tue Dec  3 15:51:44 UTC 2019
+
+* Privacy protocol V2 changes to AuctionRequests and Operative events [#12247](https://github.com/Applifier/unity-ads-webview/pull/12247)
+* Privacy protocol V2 update auctionReq and operativeEvents, amendment for unity_consent first request [#12278](https://github.com/Applifier/unity-ads-webview/pull/12278)
+
+# Tue Nov 26 23:55:06 UTC 2019
+
+* Add banner fill metric event [#12196](https://github.com/Applifier/unity-ads-webview/pull/12196)
+* Open Measurement - Add basic OM metrics for Admob [#12192](https://github.com/Applifier/unity-ads-webview/pull/12192)
+
+# Tue Nov 26 18:53:05 UTC 2019
+
+* Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
+* Disable transparent privacy ad unit for iOS 13 [12197](https://github.com/Applifier/unity-ads-webview/pull/12197)
+
+# Fri Nov 22 07:50:17 UTC 2019
+
+* Rollback Webpack Release Build [#12193](https://github.com/Applifier/unity-ads-webview/pull/12193)
+
+# Thu Nov 21 21:05:32 UTC 2019
+
 * Update Dependencies [#12163](https://github.com/Applifier/unity-ads-webview/pull/12163)
 * Remove Yarn.lock Package Dependencies [#12162](https://github.com/Applifier/unity-ads-webview/pull/12162)
 * Deploy Support for Webpack Release Build on Versions other than 2.1.0 and 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)

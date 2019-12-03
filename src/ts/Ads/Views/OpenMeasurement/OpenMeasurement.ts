@@ -20,6 +20,7 @@ import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/Programmati
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -371,7 +372,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            this.sessionStart(this._sessionStartEventData);
+            /**
+             * Edge Case:
+             * This check is here to ensure the impression values for native/vast videos are correct when fired
+             * Because IAS registers late and because admob does not use our native video player
+             * the video view data will be accurate by impression time. For non-ias/admob vendors, however,
+             * we must wait for that data to return which is why we dont call session start as soon as the
+             * om session is registered.
+             * admob-session-interface - calls session start for admob
+             * vast video event handler - calls session start for vast
+             */
+            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
+                this.sessionStart(this._sessionStartEventData);
+            }
         }
 
         return Promise.resolve();
@@ -384,8 +397,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
                 if (this._platform === Platform.ANDROID) {
-                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, this._deviceInfo, this._platform);
-                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, this._deviceInfo, this._platform);
+                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo> this._deviceInfo);
+                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo> this._deviceInfo);
                 }
 
                 IASScreenWidth = screenWidth;

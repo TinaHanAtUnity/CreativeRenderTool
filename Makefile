@@ -311,7 +311,7 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 start-server:
 	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || ([ -z "$$CI" ] && (open tools/serverLauncher.command || gnome-open tools/serverLauncher.command || xdg-open tools/serverLauncher.command) || python3 -m http.server 8000 >/dev/null 2>&1 &)
 
-deploy-legacy:
+deploy:
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/release
 	mkdir -p deploy/test
@@ -338,7 +338,7 @@ else
 	echo 'Skipping deployment for pull requests'
 endif
 
-deploy:
+deploy-webpack:
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/release
 	mkdir -p deploy/test

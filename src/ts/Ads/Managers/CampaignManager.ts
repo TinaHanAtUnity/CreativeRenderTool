@@ -155,7 +155,7 @@ export class CampaignManager {
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
-        const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._privacy, this._deviceInfo.getLimitAdTracking());
         const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
         this._assetManager.enableCaching();
@@ -232,7 +232,7 @@ export class CampaignManager {
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
-        const requestPrivacy = RequestPrivacyFactory.create(this._privacy.getUserPrivacy(), this._privacy.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._privacy, this._deviceInfo.getLimitAdTracking());
         const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
