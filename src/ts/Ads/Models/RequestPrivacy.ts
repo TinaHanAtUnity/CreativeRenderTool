@@ -29,7 +29,7 @@ export class RequestPrivacyFactory {
         } else {
             const gamePrivacyMethod = privacySDK.getGamePrivacy().getMethod();
             switch (gamePrivacyMethod) {
-                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
+                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ;
                     break;
                 case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
                     break;
@@ -41,6 +41,7 @@ export class RequestPrivacyFactory {
             }
             method = gamePrivacyMethod;
         }
+
         if (limitAdTracking) {
             permissions = UserPrivacy.PERM_ALL_FALSE;
         }
