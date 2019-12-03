@@ -321,7 +321,7 @@ export class AutomatedExperimentManager {
             { l: 'screenBrightness', c: 'screen_brightness' },
 
             // NOT REALLY STATIC, BUT CONCIDERED SO FOR NOW
-            { l: 'local_day_time', c: undefined }  
+            { l: 'local_day_time', c: undefined }
         ];
 
         return Promise.all([
@@ -333,7 +333,7 @@ export class AutomatedExperimentManager {
             core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getNetworkMetered() : Promise.resolve<boolean | undefined>(undefined),
             core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.getRingerMode() : Promise.resolve<number | undefined>(undefined),
             core.DeviceInfo instanceof AndroidDeviceInfo ? core.DeviceInfo.isUSBConnected() : Promise.resolve<boolean | undefined>(undefined),
-            new Date( Date.now() )
+            new Date(Date.now())
         ]).then((res) => {
             const privacySdk = core.Ads.PrivacySDK;
             const rawData: { [key: string]: ContextualFeature } = {
@@ -354,7 +354,7 @@ export class AutomatedExperimentManager {
                'ringer_mode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
                'usb_connected' : res[7],
                'max_volume': core.DeviceInfo.get('maxVolume'),
-               'local_day_time': (<Date>res[8]).getHours() + (<Date>res[8]).getMinutes() / 60.0
+               'local_day_time': res[8].getHours() + res[8].getMinutes() / 60
             };
 
             // do some enum conversions
