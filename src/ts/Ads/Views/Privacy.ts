@@ -1,4 +1,4 @@
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy, ReportReason } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -82,9 +82,7 @@ export class Privacy extends AbstractPrivacy {
     public render(): void {
         super.render();
 
-        // fixme: check is the data request feature enabled
-        const isDataReqquestFeatureEnabled = true;
-        if (isDataReqquestFeatureEnabled) {
+        if (this._userPrivacyManager.isDataRequestEnabled()) {
             const dataRequestContainer = this._container.querySelector('.data-request-container');
             if (dataRequestContainer) {
                 const dataRequestView = new PrivacyDataRequest(this._platform, this._language);

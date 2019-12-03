@@ -286,8 +286,8 @@ export class UserPrivacyManager {
         return methodChangedSinceConsent || versionUpdatedSinceConsent;
     }
 
-    public getLegalFramework(): LegalFramework {
-        return this._privacy.getLegalFramework();
+    public isDataRequestEnabled(): boolean {
+        return this._privacy.getLegalFramework() === LegalFramework.CCPA;
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
