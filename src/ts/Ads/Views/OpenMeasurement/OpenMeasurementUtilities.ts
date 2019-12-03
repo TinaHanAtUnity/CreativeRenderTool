@@ -32,7 +32,7 @@ export class OpenMeasurementUtilities {
      * @param platform Android/IOS
      */
     public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
-        // TODO: Use GetMetricDensity from 3.3 for this calculation
+        // Use this to return standard pix for Android on 3.2- OM integration
         return px;
     }
 

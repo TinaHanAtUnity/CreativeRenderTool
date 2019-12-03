@@ -1,15 +1,13 @@
 import {
-    GamePrivacy,
-    IPermissions,
-    PrivacyMethod,
-    UserPrivacy
+    IPrivacyPermissions,
+    PrivacyMethod, UserPrivacy
 } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IPermissions | { [key: string]: never };
+    permissions: IPrivacyPermissions | { [key: string]: never };
 }
 
 export interface ILegacyRequestPrivacy {
@@ -19,22 +17,42 @@ export interface ILegacyRequestPrivacy {
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy | undefined {
-        if (this.GameUsesConsent(gamePrivacy) === false) {
-            return undefined;
+    public static create(privacySDK: PrivacySDK, limitAdTracking: boolean | undefined): IRequestPrivacy {
+        let method: PrivacyMethod;
+        let permissions: IPrivacyPermissions = UserPrivacy.PERM_ALL_FALSE;
+        const isRecorded = privacySDK.isOptOutRecorded();
+
+        if (isRecorded) {
+            const userPrivacy = privacySDK.getUserPrivacy();
+            method = userPrivacy.getMethod();
+            permissions = userPrivacy.getPermissions();
+        } else {
+            const gamePrivacyMethod = privacySDK.getGamePrivacy().getMethod();
+            switch (gamePrivacyMethod) {
+                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
+                    break;
+                case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
+                    break;
+                case PrivacyMethod.DEVELOPER_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
+                    break;
+                case PrivacyMethod.DEFAULT: permissions = UserPrivacy.PERM_ALL_TRUE;
+                    break;
+                default: permissions = UserPrivacy.PERM_ALL_FALSE;
+            }
+            method = gamePrivacyMethod;
+        }
+        if (limitAdTracking) {
+            permissions = UserPrivacy.PERM_ALL_FALSE;
         }
 
-        if (!userPrivacy.isRecorded()) {
-            return {
-                method: gamePrivacy.getMethod(),
-                firstRequest: true,
-                permissions: {}
-            };
-        }
         return {
-            method: userPrivacy.getMethod(),
-            firstRequest: false,
-            permissions: userPrivacy.getPermissions()
+            method: method,
+            firstRequest: !isRecorded,
+            permissions: {
+                ads: permissions.ads,
+                external: permissions.external,
+                gameExp: permissions.gameExp
+            }
         };
     }
 
@@ -44,10 +62,5 @@ export class RequestPrivacyFactory {
             optOutRecorded: privacySDK.isOptOutRecorded(),
             optOutEnabled: privacySDK.isOptOutEnabled()
         };
-    }
-
-    private static GameUsesConsent(gamePrivacy: GamePrivacy): boolean {
-        const isDeveloperConsent: boolean = gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT;
-        return gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT || isDeveloperConsent;
     }
 }

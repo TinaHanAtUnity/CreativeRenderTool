@@ -276,6 +276,11 @@ export class CampaignRefreshManager extends RefreshManager {
                 this.onDisable(placementId);
                 break;
             case ProductState.WAITING_FOR_CATALOG:
+                // Set the tracking urls on the placement to be used later once the placement is ready
+                const placement = this._adsConfig.getPlacement(placementId);
+                if (placement) {
+                    placement.setCurrentTrackingUrls(trackingUrls);
+                }
                 this.setPlacementState(placementId, PlacementState.WAITING);
                 break;
             default:

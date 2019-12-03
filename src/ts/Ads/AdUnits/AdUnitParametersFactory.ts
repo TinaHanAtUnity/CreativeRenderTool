@@ -123,7 +123,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             thirdPartyEventManager: this._thirdPartyEventManagerFactory.create({
                 [ThirdPartyEventMacro.ZONE]: this._placement.getId(),
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
-                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || ''
+                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
+                [ThirdPartyEventMacro.OM_ENABLED]: 'false',
+                [ThirdPartyEventMacro.OM_VENDORS]: ''
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,

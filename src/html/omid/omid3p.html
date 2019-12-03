@@ -28,7 +28,7 @@
                         });
                         const sessionObservers = [].concat.apply([], observerList);
                         sessionObservers.forEach(function(sessionObserver) {
-                            if (Object.keys(eventData.data).length === 0 || !eventData.data) {
+                            if (!eventData.data || Object.keys(eventData.data).length === 0) {
                                 delete eventData.data;
                             }
                             sessionObserver(eventData);
