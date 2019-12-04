@@ -153,21 +153,6 @@ export class PrivacyParser {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
 
-        if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST ||
-            gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
-            if (!rawUserPrivacy || gamePrivacy.getMethod() !== rawUserPrivacy.method) {
-                return new UserPrivacy({
-                    method: optOutRecorded ? gamePrivacy.getMethod() : PrivacyMethod.DEFAULT,
-                    version: 0,
-                    permissions: {
-                        gameExp: false,
-                        ads: optOutRecorded ? !optOutEnabled : false,
-                        external: optOutRecorded ? !optOutEnabled : false
-                    }
-                });
-            }
-        }
-
         if (!rawUserPrivacy) {
             return UserPrivacy.createUnrecorded();
         }
