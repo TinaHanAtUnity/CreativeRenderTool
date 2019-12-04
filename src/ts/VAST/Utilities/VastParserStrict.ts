@@ -194,10 +194,10 @@ export class VastParserStrict {
             return Promise.resolve(parsedVast);
         }
 
-        return this.retrieveWrappedVast(wrapperURL, depth, parsedVast, core, request, bundleId);
+        return this.retrieveWrappedVast(wrapperURL, depth, parsedVast, core, request, isPublica, bundleId);
     }
 
-    private retrieveWrappedVast(wrapperURL: string, depth: number, parsedVast: Vast, core: ICoreApi, request: RequestManager, bundleId?: string): Promise<Vast> {
+    private retrieveWrappedVast(wrapperURL: string, depth: number, parsedVast: Vast, core: ICoreApi, request: RequestManager, isPublica: boolean | undefined, bundleId?: string): Promise<Vast> {
 
         if (depth >= this._maxWrapperDepth) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
@@ -220,7 +220,7 @@ export class VastParserStrict {
 
         wrapperURL = decodeURIComponent(wrapperURL);
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
+            return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol, isPublica);
         });
     }
 
