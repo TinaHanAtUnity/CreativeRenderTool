@@ -47,7 +47,7 @@ export enum GDPREventAction {
 }
 
 export enum LegalFramework {
-    DEFAULT = 'default',
+    NONE = 'none',
     GDPR = 'gdpr', // EU
     CCPA = 'ccpa', // California
     TC260 = 'tc260' // China
