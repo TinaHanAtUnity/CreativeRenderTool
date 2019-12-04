@@ -103,7 +103,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private loadIframe(): void {
-        console.log("here is to laod iframe");
         const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
@@ -112,10 +111,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         if (htmlResource) {
             originalUrl = htmlResource.getOriginalUrl();
         }
-        console.log("originalURL: ", originalUrl);
-        console.log(MRAIDContainer);
-        console.log(MacroUtil.replaceMacro(MRAIDContainer, {'{{ CREATIVE_URL }}': originalUrl}));
-        
         this.createMRAID(
             this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, {'{{ CREATIVE_URL }}': originalUrl})
         ).then(mraid => {
