@@ -1,6 +1,7 @@
 # Pending
 
 * Open Measurement - Fix/om dp iab android SDK 3.3 [#12279](https://github.com/Applifier/unity-ads-webview/pull/12279) [#12107](https://github.com/Applifier/unity-ads-webview/pull/12107)
+* Add Support for AUI Contextual Features [#12100](https://github.com/Applifier/unity-ads-webview/pull/12100)
 
 # Tue Dec  3 15:51:44 UTC 2019
 
