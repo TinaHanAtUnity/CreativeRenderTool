@@ -46,7 +46,7 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
-const replaceMacros = {
+const omidMacroMap = {
     '{{ OMID_IMPLEMENTOR }}': PARTNER_NAME,
     '{{ OMID_API_VERSION }}': OM_JS_VERSION
 };
@@ -196,7 +196,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             iframe.srcdoc = markup;
 
             if (this._admobOMController) {
-                iframe.srcdoc += MacroUtil.replaceMacro(OMIDSessionClient, replaceMacros);
+                iframe.srcdoc += MacroUtil.replaceMacro(OMIDSessionClient, omidMacroMap);
                 this._admobOMController.getAdmobBridge().setAdmobIframe(iframe);
             }
         });
