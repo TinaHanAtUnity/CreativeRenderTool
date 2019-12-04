@@ -1,20 +1,20 @@
-import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { JsonParser } from 'Core/Utilities/JsonParser';
-import { ICore } from 'Core/ICore';
-import { StorageType, StorageApi } from 'Core/Native/Storage';
-import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Platform } from 'Core/Constants/Platform';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Platform } from 'Core/Constants/Platform';
+import { ICore } from 'Core/ICore';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: string };
@@ -27,7 +27,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
+export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
@@ -63,12 +63,18 @@ export class CachableAutomatedExperimentData {
 }
 
 export class AutomatedExperimentManager {
+    private readonly _deviceInfo: DeviceInfo;
+    private readonly _clientInfo: ClientInfo;
+    private readonly _coreConfig: CoreConfiguration;
+    private readonly _privacySDK: PrivacySDK;
+    private readonly _nativeBridge: NativeBridge;
     private readonly _requestManager: RequestManager;
     private readonly _storageApi: StorageApi;
 
     private readonly _state: { [key: string]: StateItem };
     private _experimentBegan: boolean;
     private _userInfo: UserInfo;
+    private _gameSessionId: number;
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
     private static readonly _createEndPoint = 'experiment';
@@ -76,15 +82,21 @@ export class AutomatedExperimentManager {
     private static readonly _rewardEndPoint = 'reward';
     private static readonly _settingsPrefix = 'AUI_OPT_EXPERIMENT';
 
-    constructor(requestManager: RequestManager, storageApi: StorageApi) {
-        this._requestManager = requestManager;
-        this._storageApi = storageApi;
+    constructor(core: ICore) {
+        this._deviceInfo = core.DeviceInfo;
+        this._clientInfo = core.ClientInfo;
+        this._coreConfig = core.Config;
+        this._privacySDK = core.Ads.PrivacySDK;
+        this._nativeBridge = core.NativeBridge;
+        this._requestManager = core.RequestManager;
+        this._storageApi = core.Api.Storage;
+        this._gameSessionId = core.Ads.SessionManager.getGameSessionId();
         this._state = {};
         this._experimentBegan = false;
         this._userInfo = new UserInfo();
     }
 
-    public initialize(experiments: AutomatedExperiment[], core: ICore): Promise<void> {
+    public initialize(experiments: AutomatedExperiment[]): Promise<void> {
         const storedExperimentsPromise = experiments
             .filter(experiment => !experiment.isCacheDisabled())
             .map(experiment => this.getStoredExperimentData(experiment)
@@ -96,10 +108,10 @@ export class AutomatedExperimentManager {
             this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
         });
 
-        this._userInfo.ABGroup = core.Config.getAbGroup();
-        this._userInfo.GameSessionID = core.Ads.SessionManager.getGameSessionId();
+        this._userInfo.ABGroup = this._coreConfig.getAbGroup();
+        this._userInfo.GameSessionID = this._gameSessionId;
 
-        return this.collectStaticContextualFeatures(core.DeviceInfo, core.ClientInfo, core.Config, core.Ads.PrivacySDK, core.NativeBridge).then(features => {
+        return this.collectStaticContextualFeatures().then(features => {
               return Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
                     .filter(storedExperiment => storedExperiment.data !== null)
@@ -277,7 +289,7 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private async collectStaticContextualFeatures(deviceInfo: DeviceInfo, clientInfo: ClientInfo, coreConfig: CoreConfiguration, privacySDK: PrivacySDK, nativeBridge: NativeBridge): Promise<{ [key: string]: ContextualFeature }>  {
+    private async collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id'},
@@ -330,34 +342,34 @@ export class AutomatedExperimentManager {
         ];
 
         return Promise.all([
-            deviceInfo.fetch(),
-            deviceInfo.getDTO(),
-            deviceInfo.getFreeSpace(),
-            deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getFreeSpaceExternal() : Promise.resolve<number | undefined>(undefined),
-            deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getTotalSpaceExternal() : Promise.resolve<number | undefined>(undefined),
-            deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getNetworkMetered() : Promise.resolve<boolean | undefined>(undefined),
-            deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getRingerMode() : Promise.resolve<number | undefined>(undefined),
-            deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.isUSBConnected() : Promise.resolve<boolean | undefined>(undefined),
+            this._deviceInfo.fetch(),
+            this._deviceInfo.getDTO(),
+            this._deviceInfo.getFreeSpace(),
+            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getFreeSpaceExternal() : Promise.resolve<number | undefined>(undefined),
+            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getTotalSpaceExternal() : Promise.resolve<number | undefined>(undefined),
+            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getNetworkMetered() : Promise.resolve<boolean | undefined>(undefined),
+            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getRingerMode() : Promise.resolve<number | undefined>(undefined),
+            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.isUSBConnected() : Promise.resolve<boolean | undefined>(undefined),
             new Date(Date.now())
         ]).then((res) => {
             const rawData: { [key: string]: ContextualFeature } = {
                ...res[1],
-               ...clientInfo.getDTO(),
-               ...coreConfig.getDTO(),
-               'gdpr_enabled': privacySDK.isGDPREnabled(),
-               'opt_out_Recorded': privacySDK.isOptOutRecorded(),
-               'opt_out_enabled': privacySDK.isOptOutEnabled(),
-               'platform': Platform[nativeBridge.getPlatform()],
-               'stores':  deviceInfo.getStores() !== undefined ? deviceInfo.getStores().split(',') : undefined,
-               'simulator': deviceInfo instanceof IosDeviceInfo ? deviceInfo.isSimulator() : undefined,
-               'total_internal_space': deviceInfo.getTotalSpace(),
+               ...this._clientInfo.getDTO(),
+               ...this._coreConfig.getDTO(),
+               'gdpr_enabled': this._privacySDK.isGDPREnabled(),
+               'opt_out_Recorded': this._privacySDK.isOptOutRecorded(),
+               'opt_out_enabled': this._privacySDK.isOptOutEnabled(),
+               'platform': Platform[this._nativeBridge.getPlatform()],
+               'stores':  this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
+               'simulator': this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
+               'total_internal_space': this._deviceInfo.getTotalSpace(),
                'device_free_space': res[2],
                'free_external_space': res[3],
                'total_external_space': res[4],
                'network_metered' : res[5],
                'ringer_mode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
                'usb_connected' : res[7],
-               'max_volume': deviceInfo.get('maxVolume'),
+               'max_volume': this._deviceInfo.get('maxVolume'),
                'local_day_time': res[8].getHours() + res[8].getMinutes() / 60
             };
 

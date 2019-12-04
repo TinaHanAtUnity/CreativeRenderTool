@@ -1,17 +1,18 @@
+import { IAds } from 'Ads/IAds';
+import { AutomatedExperimentManager, CachableAutomatedExperimentData, ContextualFeature } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { Backend } from 'Backend/Backend';
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICore } from 'Core/ICore';
+import { INativeResponse } from 'Core/Managers/RequestManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageType } from 'Core/Native/Storage';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { IAds } from 'Ads/IAds';
-import { ICore } from 'Core/ICore';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
-import { AutomatedExperimentManager, CachableAutomatedExperimentData } from 'Ads/Managers/AutomatedExperimentManager';
-import { StorageType } from 'Core/Native/Storage';
-import { INativeResponse } from 'Core/Managers/RequestManager';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 const FooExperiment = new AutomatedExperiment({
     name: 'FooExperiment',
@@ -26,7 +27,7 @@ const FooExperimentNoCache = new AutomatedExperiment({
     cacheDisabled: true
 });
 
-describe('AutomatedExperimentManager test', () => {
+describe('AutomatedExperimentManagerTest', () => {
     const baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
     const createEndPoint = 'experiment';
     const actionEndPoint = 'action';
@@ -54,7 +55,7 @@ describe('AutomatedExperimentManager test', () => {
 
     // exhaustive list so that if ever something appears, or changes type (to a point), we will catch it in the tests.
     // as that could signify a breaking change for the AutomatedExperimentManager back end (CDP schema).
-    const defaultContextualFeatures: {[key: string]: any} = {
+    const defaultContextualFeatures: { [key: string]: ContextualFeature } = {
         bundle_id: 'com.unity3d.ads.example',
         game_id: '12345',
         coppa_compliant: false,
@@ -91,12 +92,6 @@ describe('AutomatedExperimentManager test', () => {
         screen_brightness: 1,
         local_day_time: 10.5
     };
-
-    const requestBodyText = JSON.stringify({
-        user_info: {ab_group: 99},
-        experiments: [{name: 'FooExperiment', actions: ['FooAction1', 'FooAction2']}],
-        contextual_features: defaultContextualFeatures
-    });
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
         const json = JSON.parse(body);
@@ -144,8 +139,8 @@ describe('AutomatedExperimentManager test', () => {
                 response: ''
             });
 
-        const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([], core).then(() => {
+        const aem = new AutomatedExperimentManager(core);
+        return aem.initialize([]).then(() => {
             assert.isFalse(postStub.called);
             assert.isFalse(getStub.called);
             assert.isFalse(setStub.called);
@@ -176,8 +171,8 @@ describe('AutomatedExperimentManager test', () => {
                     response: responseText
                 });
 
-            const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment], core).then(() => {
+            const aem = new AutomatedExperimentManager(core);
+            return aem.initialize([FooExperiment]).then(() => {
                 assert.isTrue(postStub.called);
                 assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
                 assert.isTrue(getStub.called);
@@ -212,8 +207,8 @@ describe('AutomatedExperimentManager test', () => {
                     response: responseText
                 });
 
-            const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment], core).then(() => {
+            const aem = new AutomatedExperimentManager(core);
+            return aem.initialize([FooExperiment]).then(() => {
                 assert.isTrue(postStub.called);
                 assert.isTrue(getStub.called);
                 assert.isFalse(setStub.called);
@@ -255,8 +250,8 @@ describe('AutomatedExperimentManager test', () => {
                 response: responseText
             });
 
-        const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        return aem.initialize([FooExperiment], core).then(() => {
+        const aem = new AutomatedExperimentManager(core);
+        return aem.initialize([FooExperiment]).then(() => {
             assert.isTrue(postStub.called);
             assert.isTrue(getStub.called);
             assert.isFalse(setStub.called);
@@ -291,8 +286,8 @@ describe('AutomatedExperimentManager test', () => {
 
             const postStub = sandbox.stub(core.RequestManager, 'post');
 
-            const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment], core).then(() => {
+            const aem = new AutomatedExperimentManager(core);
+            return aem.initialize([FooExperiment]).then(() => {
                 assert.isFalse(postStub.called);
                 assert.isTrue(getStub.called);
                 assert.isFalse(setStub.called);
@@ -328,8 +323,8 @@ describe('AutomatedExperimentManager test', () => {
                     response: responseText
                 });
 
-            const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperimentNoCache], core).then(() => {
+            const aem = new AutomatedExperimentManager(core);
+            return aem.initialize([FooExperimentNoCache]).then(() => {
                 assert.isTrue(postStub.called);
                 assert.isFalse(getStub.called);
                 assert.isTrue(setStub.called);
@@ -376,8 +371,8 @@ describe('AutomatedExperimentManager test', () => {
                 response: rewardResponseText
             });
 
-            const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-            return aem.initialize([FooExperiment], core).then(() => {
+            const aem = new AutomatedExperimentManager(core);
+            return aem.initialize([FooExperiment]).then(() => {
                 aem.beginExperiment();
                 const variant = aem.getExperimentAction(FooExperiment);
 
@@ -398,8 +393,8 @@ describe('AutomatedExperimentManager test', () => {
     });
 
     it('EndExperiment should fail if called before beginExperiment', (done) => {
-        const aem = new AutomatedExperimentManager(core.RequestManager, core.Api.Storage);
-        aem.initialize([], core).then(() => {
+        const aem = new AutomatedExperimentManager(core);
+        aem.initialize([]).then(() => {
             aem.endExperiment().catch(() => { done(); });
         });
     });
