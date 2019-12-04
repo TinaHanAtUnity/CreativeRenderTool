@@ -190,7 +190,6 @@ export class VastParserStrict {
         parsedVast.setIsPublicaTag(isPublica ? true : false);
 
         const wrapperURL = parsedVast.getWrapperURL();
-
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         }
@@ -272,7 +271,7 @@ export class VastParserStrict {
         return rootNode.querySelector(name);
     }
 
-    public applyParentURLs(parsedVast: Vast, parent?: Vast) {
+    private applyParentURLs(parsedVast: Vast, parent?: Vast) {
         if (parent) {
             const ad = parent.getAd();
             const parsedAd = parsedVast.getAd();
