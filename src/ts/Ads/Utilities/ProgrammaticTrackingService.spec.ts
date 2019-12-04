@@ -1,45 +1,34 @@
+import { Platform } from 'Core/Constants/Platform';
+import { RequestManagerMock, RequestManager } from 'Core/Managers/__mocks__/RequestManager';
 import {
-    ProgrammaticTrackingError,
     ProgrammaticTrackingService,
+    ProgrammaticTrackingError,
     IProgrammaticTrackingData,
     AdmobMetric,
     TimingMetric
 } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { assert } from 'chai';
-import { Platform } from 'Core/Constants/Platform';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import 'mocha';
-import * as sinon from 'sinon';
+import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
+import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
 
-describe('ProgrammaticTrackingService', () => {
+[
+    Platform.IOS,
+    Platform.ANDROID
+].forEach(platform => describe('ProgrammaticTrackingService', () => {
 
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let osVersionStub: sinon.SinonStub;
-    let sdkVersionStub: sinon.SinonStub;
-    let postStub: sinon.SinonStub;
-    let platform: Platform;
+    let clientInfo: ClientInfoMock;
+    let deviceInfo: DeviceInfoMock;
+    let requestManager: RequestManagerMock;
     const osVersion = '11.2.1';
     const sdkVersion = '2300';
 
     beforeEach(() => {
-        const request = sinon.createStubInstance(RequestManager);
-        const clientInfo = sinon.createStubInstance(ClientInfo);
-        const deviceInfo = sinon.createStubInstance(DeviceInfo);
-        platform = Platform.ANDROID;
-        programmaticTrackingService = new ProgrammaticTrackingService(platform, request, clientInfo, deviceInfo, 'us');
-        osVersionStub = deviceInfo.getOsVersion;
-        sdkVersionStub = clientInfo.getSdkVersionName;
-        postStub = request.post;
-        osVersionStub.returns(osVersion);
-        sdkVersionStub.returns(sdkVersion);
-        postStub.resolves({
-            url: 'test',
-            response: 'test',
-            responseCode: 200,
-            headers: []
-        });
+        requestManager = new RequestManager();
+        clientInfo = new ClientInfo();
+        deviceInfo = new DeviceInfo();
+        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
+        deviceInfo.getOsVersion.mockReturnValue(osVersion);
+        clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
     });
 
     describe('createAdsSdkTag', () => {
@@ -60,7 +49,7 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected}" with suffix "${t.inputSuffix}" and value "${t.inputValue}"`, () => {
                 const tag = programmaticTrackingService.createAdsSdkTag(t.inputSuffix, t.inputValue);
-                assert.equal(tag, t.expected);
+                expect(tag).toEqual(t.expected);
             });
         });
     });
@@ -70,7 +59,7 @@ describe('ProgrammaticTrackingService', () => {
         const seatId = 1234;
 
         const tagBuilder = [
-            `ads_sdk2_plt:${Platform[Platform.ANDROID]}`,
+            `ads_sdk2_plt:${Platform[platform]}`,
             `ads_sdk2_osv:${osVersion}`,
             `ads_sdk2_sdv:${sdkVersion}`,
             `ads_sdk2_adt:${adType}`,
@@ -113,18 +102,18 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
-                sinon.assert.calledOnce(postStub);
-                assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
-                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
-                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
+                    JSON.stringify(t.expected),
+                    [['Content-Type', 'application/json']]
+                    );
                 return promise;
             });
         });
     });
 
     describe('reportMetricEvent', () => {
-
         const tests: {
             input: AdmobMetric;
             expected: IProgrammaticTrackingData;
@@ -138,7 +127,7 @@ describe('ProgrammaticTrackingService', () => {
                         tags: [
                             'ads_sdk2_mevt:admob_used_cached_video',
                             `ads_sdk2_sdv:${sdkVersion}`,
-                            'ads_sdk2_plt:ANDROID'
+                            `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
                 ]
@@ -153,7 +142,7 @@ describe('ProgrammaticTrackingService', () => {
                         tags: [
                             'ads_sdk2_mevt:admob_used_streamed_video',
                             `ads_sdk2_sdv:${sdkVersion}`,
-                            'ads_sdk2_plt:ANDROID'
+                            `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
                 ]
@@ -162,11 +151,13 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEvent(t.input);
-                sinon.assert.calledOnce(postStub);
-                assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
-                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
-                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
+                    JSON.stringify(t.expected),
+                    [['Content-Type', 'application/json']]
+                    );
+
                 return promise;
             });
         });
@@ -188,8 +179,8 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_cached_video',
-                            'ads_sdk2_sdv:2300',
-                            'ads_sdk2_plt:ANDROID',
+                            `ads_sdk2_sdv:${sdkVersion}`,
+                            `ads_sdk2_plt:${Platform[platform]}`,
                             'ads_sdk2_blt:3.0.0'
                         ]
                     }
@@ -205,8 +196,8 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:admob_used_streamed_video',
-                            'ads_sdk2_sdv:2300',
-                            'ads_sdk2_plt:ANDROID',
+                            `ads_sdk2_sdv:${sdkVersion}`,
+                            `ads_sdk2_plt:${Platform[platform]}`,
                             'ads_sdk2_test:testValue'
                         ]
                     }
@@ -216,11 +207,14 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
-                sinon.assert.calledOnce(postStub);
-                assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics');
-                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
-                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
+                    JSON.stringify(t.expected),
+                    [['Content-Type', 'application/json']]
+                    );
+
                 return promise;
             });
         });
@@ -243,9 +237,9 @@ describe('ProgrammaticTrackingService', () => {
                         name: 'webview_initialization_time',
                         value: 18331,
                         tags: [
-                            'ads_sdk2_sdv:2300',
+                            `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:ANDROID`
+                            `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
                 ]
@@ -261,8 +255,8 @@ describe('ProgrammaticTrackingService', () => {
                         value: 1,
                         tags: [
                             'ads_sdk2_mevt:webview_initialization_time', // Intentional to track which timing metrics are negative
-                            'ads_sdk2_sdv:2300',
-                            'ads_sdk2_plt:ANDROID'
+                            `ads_sdk2_sdv:${sdkVersion}`,
+                            `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
                 ]
@@ -271,11 +265,14 @@ describe('ProgrammaticTrackingService', () => {
         tests.forEach((t) => {
             it(`should send "${t.expected.metrics[0].name}" with "${t.metric}" and "${t.value}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value);
-                sinon.assert.calledOnce(postStub);
-                assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path);
-                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
-                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path,
+                    JSON.stringify(t.expected),
+                    [['Content-Type', 'application/json']]
+                    );
+
                 return promise;
             });
         });
@@ -285,14 +282,14 @@ describe('ProgrammaticTrackingService', () => {
 
         it('should not fire events when no events are batched', () => {
             return programmaticTrackingService.sendBatchedEvents().then(() => {
-                sinon.assert.notCalled(postStub);
+                expect(requestManager.post).toBeCalledTimes(0);
             });
         });
 
         it('should not fire events when negative valued events are batched', () => {
             programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, -200);
             return programmaticTrackingService.sendBatchedEvents().then(() => {
-                sinon.assert.notCalled(postStub);
+                expect(requestManager.post).toBeCalledTimes(0);
             });
         });
 
@@ -303,17 +300,17 @@ describe('ProgrammaticTrackingService', () => {
                         name: 'uads_core_initialize_time',
                         value: 999,
                         tags: [
-                            'ads_sdk2_sdv:2300',
+                            `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:ANDROID`
+                            `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }, {
                         name: 'webview_load_to_configuration_complete_time',
                         value: 100,
                         tags: [
-                            'ads_sdk2_sdv:2300',
+                            `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:ANDROID`
+                            `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
                 ]
@@ -321,22 +318,23 @@ describe('ProgrammaticTrackingService', () => {
             programmaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, 999);
             programmaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
             return programmaticTrackingService.sendBatchedEvents().then(() => {
-                sinon.assert.calledOnce(postStub);
-                assert.equal(postStub.firstCall.args.length, 3);
-                assert.equal(postStub.firstCall.args[0], 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing');
-                assert.deepEqual(postStub.firstCall.args[1], JSON.stringify(expected));
-                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
-                // tslint:disable-next-line:no-string-literal
-                assert.deepEqual(programmaticTrackingService['_batchedEvents'], []);
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
+                    JSON.stringify(expected),
+                    [['Content-Type', 'application/json']]
+                    );
+                expect(programmaticTrackingService['_batchedEvents']).toEqual([]);
             });
         });
 
         it('should fire events when 10 events are reached', () => {
             for (let i = 0; i < 10; i++) {
-                sinon.assert.notCalled(postStub);
+                expect(requestManager.post).toBeCalledTimes(0);
                 programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
             }
-            sinon.assert.calledOnce(postStub);
+            expect(requestManager.post).toBeCalledTimes(1);
         });
     });
-});
+
+}));
