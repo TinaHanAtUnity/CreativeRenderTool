@@ -4,25 +4,29 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
-export class HigherOrderVastParserStrict {
+export class PublicaCheckingVastParser {
 
-    private _isPublicaResponse: boolean;
     private _vastParserStrict: VastParserStrict;
 
     constructor(vastParserStrict: VastParserStrict) {
-        this._isPublicaResponse = false;
         this._vastParserStrict = vastParserStrict;
     }
 
     public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
+        const isPublica = this.checkIsPublica(vast, depth, urlProtocol);
+        return this._vastParserStrict.retrieveVast(vast, core, request, bundleId, parent, depth, urlProtocol, isPublica);
+    }
+
+    private checkIsPublica(vast: string, depth: number = 0, urlProtocol: string = 'https:') {
         let parsedVast: Vast;
+        let isPublicaResponse = false;
 
         try {
             parsedVast = this._vastParserStrict.parseVast(vast, urlProtocol);
         } catch (campaignError) {
             const errorData: {} = {
                 vast: vast,
-                wrapperDepth: depth,
+                wrapperDepth: 0,
                 rootWrapperVast: depth === 0 ? vast : ''
             };
             campaignError.errorData = errorData;
@@ -33,10 +37,10 @@ export class HigherOrderVastParserStrict {
         const wrapperURL = parsedVast.getWrapperURL();
         if (wrapperURL) {
             if (CustomFeatures.isIASVastTag(wrapperURL)) {
-                this._isPublicaResponse = true;
+                isPublicaResponse = true;
             }
         }
 
-        return this._vastParserStrict.retrieveVast(vast, core, request, bundleId, parent, depth, urlProtocol, this._isPublicaResponse);
+        return isPublicaResponse;
     }
 }
