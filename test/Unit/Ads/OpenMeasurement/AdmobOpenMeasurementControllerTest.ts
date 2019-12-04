@@ -18,7 +18,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${'platform'} AdmobOpenMeasurementContoller`, () => {
+    describe(`${platform} AdmobOpenMeasurementContoller`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
         let backend: Backend;
