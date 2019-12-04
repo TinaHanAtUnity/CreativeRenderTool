@@ -1,3 +1,9 @@
+# Pending
+
+* Use LegalFramework.NONE instead of LegalFramework.DEFAULT [#12194](https://github.com/Applifier/unity-ads-webview/pull/12194)
+* Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)
+* Fix forcedConsent-metadata [#12249](https://github.com/Applifier/unity-ads-webview/pull/12249)
+
 # Wed Dec  4 22:44:29 UTC 2019
 
 * Open Measurement - Fix/om dp iab android SDK 3.3 [#12279](https://github.com/Applifier/unity-ads-webview/pull/12279) [#12107](https://github.com/Applifier/unity-ads-webview/pull/12107)
