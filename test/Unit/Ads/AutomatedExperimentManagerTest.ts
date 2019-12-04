@@ -217,13 +217,6 @@ describe('AutomatedExperimentManagerTest', () => {
                 assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
                 assert.equal(aem.getExperimentAction(FooExperiment), 'FooAction2', 'Wrong variant...');
-
-                assert.equal(diagnosticTrigger.callCount, 2, 'missing an error...');
-                assert.equal(diagnosticTrigger.firstCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
-
-                assert.equal(diagnosticTrigger.secondCall.args[0], 'failed_to_parse_automated_experiments');
-                // The error message is browser dependant, thus different between safari(iOS) and chrome(Android)
-                assert.oneOf(diagnosticTrigger.secondCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
             });
         });
     });
@@ -260,12 +253,6 @@ describe('AutomatedExperimentManagerTest', () => {
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
             assert.equal(aem.getExperimentAction(FooExperiment), 'FooAction2', 'Wrong variant...');
-
-            assert.equal(diagnosticTrigger.callCount, 2, 'missing an error...');
-            assert.equal(diagnosticTrigger.firstCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
-
-            assert.equal(diagnosticTrigger.secondCall.args[0], 'failed_to_fetch_automated_experiments');
-            assert.equal(diagnosticTrigger.secondCall.args[1].message, 'Failed to fetch response from aui service');
         });
     });
 
