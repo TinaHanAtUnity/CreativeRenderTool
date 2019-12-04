@@ -1,8 +1,8 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ICore } from 'Core/ICore';
-import { StorageType, StorageApi } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
@@ -11,10 +11,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: string };
@@ -63,8 +59,7 @@ export class CachableAutomatedExperimentData {
 }
 
 export class AutomatedExperimentManager {
-    private readonly _requestManager: RequestManager;
-    private readonly _storageApi: StorageApi;
+    private readonly _core: ICore;
 
     private readonly _state: { [key: string]: StateItem };
     private _experimentBegan: boolean;
@@ -76,15 +71,14 @@ export class AutomatedExperimentManager {
     private static readonly _rewardEndPoint = 'reward';
     private static readonly _settingsPrefix = 'AUI_OPT_EXPERIMENT';
 
-    constructor(requestManager: RequestManager, storageApi: StorageApi) {
-        this._requestManager = requestManager;
-        this._storageApi = storageApi;
+    constructor(core: ICore) {
+        this._core = core;
         this._state = {};
         this._experimentBegan = false;
         this._userInfo = new UserInfo();
     }
 
-    public initialize(experiments: AutomatedExperiment[], core: ICore): Promise<void> {
+    public initialize(experiments: AutomatedExperiment[]): Promise<void> {
         const storedExperimentsPromise = experiments
             .filter(experiment => !experiment.isCacheDisabled())
             .map(experiment => this.getStoredExperimentData(experiment)
@@ -96,10 +90,10 @@ export class AutomatedExperimentManager {
             this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
         });
 
-        this._userInfo.ABGroup = core.Config.getAbGroup();
-        this._userInfo.GameSessionID = core.Ads.SessionManager.getGameSessionId();
+        this._userInfo.ABGroup = this._core.Config.getAbGroup();
+        this._userInfo.GameSessionID = this._core.Ads.SessionManager.getGameSessionId();
 
-        return this.collectStaticContextualFeatures(core.DeviceInfo, core.ClientInfo, core.Config, core.Ads.PrivacySDK, core.NativeBridge).then(features => {
+        return this.collectStaticContextualFeatures().then(features => {
               return Promise.all(storedExperimentsPromise).then(storedExperiments => {
                 storedExperiments
                     .filter(storedExperiment => storedExperiment.data !== null)
@@ -122,7 +116,7 @@ export class AutomatedExperimentManager {
                     const body = this.createRequestBody(experimentsToRequest, features);
                     const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
 
-                    return this._requestManager.post(url, body)
+                    return this._core.RequestManager.post(url, body)
                         .then((response) => this.parseExperimentsResponse(response))
                         .then((parsedExperiments) => Promise.all([this.storeExperiments(parsedExperiments), this.loadExperiments(parsedExperiments)]).then(() => Promise.resolve()))
                         .catch((err) => {
@@ -213,7 +207,7 @@ export class AutomatedExperimentManager {
 
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
         const body = JSON.stringify(action);
-        return this._requestManager.post(url, body);
+        return this._core.RequestManager.post(url, body);
     }
 
     private submitExperimentOutcome(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
@@ -236,7 +230,7 @@ export class AutomatedExperimentManager {
 
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
         const body = JSON.stringify(outcome);
-        return this._requestManager.post(url, body);
+        return this._core.RequestManager.post(url, body);
     }
 
     private loadExperiments(experiments: IParsedExperiment[]): Promise<void> {
@@ -277,7 +271,7 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private async collectStaticContextualFeatures(deviceInfo: DeviceInfo, clientInfo: ClientInfo, coreConfig: CoreConfiguration, privacySDK: PrivacySDK, nativeBridge: NativeBridge): Promise<{ [key: string]: ContextualFeature }>  {
+    private async collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id'},
@@ -328,6 +322,12 @@ export class AutomatedExperimentManager {
             // NOT REALLY STATIC, BUT CONCIDERED SO FOR NOW
             { l: 'local_day_time', c: undefined }
         ];
+
+        const deviceInfo = this._core.DeviceInfo;
+        const clientInfo = this._core.ClientInfo;
+        const coreConfig = this._core.ClientInfo;
+        const privacySDK = this._core.Ads.PrivacySDK;
+        const nativeBridge = this._core.NativeBridge;
 
         return Promise.all([
             deviceInfo.fetch(),
@@ -422,11 +422,11 @@ export class AutomatedExperimentManager {
     }
 
     private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableAutomatedExperimentData> {
-        return this._storageApi.get<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
+        return this._core.Api.Storage.get<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
     }
 
     private storeExperimentData(experimentName: string, data: CachableAutomatedExperimentData) {
-        this._storageApi.set<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
-        this._storageApi.write(StorageType.PRIVATE);
+        this._core.Api.Storage.set<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
+        this._core.Api.Storage.write(StorageType.PRIVATE);
     }
 }
