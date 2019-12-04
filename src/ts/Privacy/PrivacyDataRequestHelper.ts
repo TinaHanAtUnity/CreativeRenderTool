@@ -1,5 +1,7 @@
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { RequestError } from 'Core/Errors/RequestError';
+import { Platform } from 'Core/Constants/Platform';
+import { ITrackingIdentifier } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export enum DataRequestResponseStatus {
     SUCCESS,
@@ -17,27 +19,26 @@ export class PrivacyDataRequestHelper {
 
     private static BaseUrl: string = 'https://us-central1-ads-debot.cloudfunctions.net/debot/';
 
-    private static Request: RequestManager;
-    private static AdvertisingIdentifier: string | undefined | null;
+    private static _platform: Platform;
+    private static _request: RequestManager;
+    private static _trackingIdentifiers: ITrackingIdentifier;
 
-    public static setRequest(request: RequestManager) {
-        PrivacyDataRequestHelper.Request = request;
-    }
-
-    public static setAdvertisingIdentifier(idfa: string | undefined | null): void {
-        PrivacyDataRequestHelper.AdvertisingIdentifier = idfa;
+    public static init(platform: Platform, request: RequestManager, trackingIdentifiers: ITrackingIdentifier) {
+        this._platform = platform;
+        this._request = request;
+        this._trackingIdentifiers = trackingIdentifiers;
     }
 
     public static sendInitRequest(email: string): Promise<IDataRequestResponse> {
         const url = PrivacyDataRequestHelper.BaseUrl + 'init';
         return PrivacyDataRequestHelper.sendRequest(
-            url, JSON.stringify({ idfa: PrivacyDataRequestHelper.AdvertisingIdentifier, email: email}));
+            url, JSON.stringify({ idfa: PrivacyDataRequestHelper._trackingIdentifiers.advertisingTrackingId, email: email}));
     }
 
     public static sendVerifyRequest(email: string, selectedImage: string): Promise<IDataRequestResponse> {
         const url = PrivacyDataRequestHelper.BaseUrl + 'verify';
         return PrivacyDataRequestHelper.sendRequest(
-            url, JSON.stringify({ idfa: PrivacyDataRequestHelper.AdvertisingIdentifier, email: email, answer: selectedImage }));
+            url, JSON.stringify({ idfa: PrivacyDataRequestHelper._trackingIdentifiers.advertisingTrackingId, email: email, answer: selectedImage }));
     }
 
     public static sendDebugResetRequest(): Promise<IDataRequestResponse> {
@@ -47,7 +48,7 @@ export class PrivacyDataRequestHelper {
     }
 
     private static sendRequest(url: string, data: string): Promise<IDataRequestResponse> {
-        return PrivacyDataRequestHelper.Request.post(url, data).then((response: INativeResponse) => {
+        return PrivacyDataRequestHelper._request.post(url, data).then((response: INativeResponse) => {
             if (response.responseCode === 200) {
                 return { status: DataRequestResponseStatus.SUCCESS, imageUrls: JSON.parse(response.response).imageURLs };
             } else {

@@ -44,6 +44,7 @@
     height: 14.25 * $default-size;
   }
 
+  // fallback option if css grid is not supported
   .privacy-captcha-grid {
     display: flex;
     flex-wrap: wrap;
@@ -51,22 +52,18 @@
     padding: .5 * $default-size;
   }
 
-  .privacy-captcha-grid > img {
-    // todo: dynamic size (use vw or width: 20% padding-bottom: 20%)
-    width: 3 * $default-size;
-    height: 3 * $default-size;
-  }
-
-  .privacy-captcha-grid-item {
-    border: 1px solid $consent-border-gray;
-    border-radius: .25 * $default-size;
-    background: $white;
-  }
-
   .privacy-captcha-grid {
     display: grid;
     grid-gap: .25 * $default-size; // @stylint ignore;
     grid-template-columns: repeat(4, auto); // @stylint ignore;
+  }
+
+  .privacy-captcha-grid-item {
+    width: 3 * $default-size;
+    height: 3 * $default-size;
+    border: 1px solid $consent-border-gray;
+    border-radius: .25 * $default-size;
+    background: $white;
   }
 
   .privacy-captcha-retry-message {

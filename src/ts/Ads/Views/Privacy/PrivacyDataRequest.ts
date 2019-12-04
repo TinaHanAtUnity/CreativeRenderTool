@@ -18,7 +18,11 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
     private readonly _language: string;
 
     private _captchaView: Captcha;
-    private _email: string;
+    private _buttonSpinner: ButtonSpinner;
+    private _currentValidatedEmail: string;
+
+    private _emailInputElement: HTMLInputElement;
+    private _submitButtonElement: HTMLElement;
 
     constructor(platform: Platform, language: string) {
         super(platform, 'privacy-data-request');
@@ -35,22 +39,23 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
             }
         ];
 
+        this._buttonSpinner = new ButtonSpinner(platform);
         PrivacyDataRequestHelper.sendDebugResetRequest();
     }
 
     public render(): void {
         super.render();
 
-        const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
+        this._buttonSpinner.render();
 
-        if (emailInputElement) {
-            emailInputElement.placeholder = this._localization.translate('privacy-data-request-email-input-placeholder');
-        }
+        this._emailInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
+        this._emailInputElement.placeholder = this._localization.translate('privacy-data-request-email-input-placeholder');
+
+        this._submitButtonElement = <HTMLElement> this.container().querySelector('.privacy-data-request-submit-button');
     }
 
     public hide(): void {
         super.hide();
-
         this.hideAndCloseCaptcha();
     }
 
@@ -59,81 +64,64 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
     }
 
     public onItemSelected(url: string): void {
-        PrivacyDataRequestHelper.sendVerifyRequest(this._email, url).then((response) => {
-            if (response.status === DataRequestResponseStatus.SUCCESS) {
-                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-confirm-msg');
-                msgElement.classList.add('show-msg');
-
-                this.hideAndCloseCaptcha();
-            } else if (response.status === DataRequestResponseStatus.FAILED_VERIFICATION) {
-                this.sendDataRequestEvent();
-                if (this._captchaView) {
-                    this._captchaView.showTryAgainMessage();
-                }
-            } else if (response.status === DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS) {
-                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
-                msgElement.classList.add('show-msg');
-
-                const submitButton = <HTMLElement> this.container().querySelector('.privacy-data-request-submit-button');
-                submitButton.classList.add('disabled');
-
-                const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
-                emailInputElement.disabled = true;
-
-                this.hideAndCloseCaptcha();
-            } else {
-                // todo: add generic error message
-                const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
-                msgElement.classList.add('show-msg');
-
-                this.hideAndCloseCaptcha();
+        PrivacyDataRequestHelper.sendVerifyRequest(this._currentValidatedEmail, url).then((response) => {
+            switch (response.status) {
+                case DataRequestResponseStatus.SUCCESS:
+                    const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-confirm-msg');
+                    msgElement.classList.add('show-msg');
+                    this.disableInputs();
+                    this.hideAndCloseCaptcha();
+                    break;
+                case DataRequestResponseStatus.FAILED_VERIFICATION:
+                    this.initCaptcha();
+                    if (this._captchaView) {
+                        this._captchaView.showTryAgainMessage();
+                    }
+                    break;
+                case DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS:
+                    this.showMultipleFailedErrorMsg();
+                    this.hideAndCloseCaptcha();
+                    break;
+                default:
+                    this.showGenericErrorMsg();
+                    this.hideAndCloseCaptcha();
             }
         });
     }
 
     private onDataRequestSubmitEvent(event: Event): void {
         event.preventDefault();
-        this.sendDataRequestEvent();
-    }
 
-    private sendDataRequestEvent(): void {
-        const emailInputElement: HTMLInputElement = <HTMLInputElement> this.container().querySelector('#privacy-data-request-email-input');
-        this._email = emailInputElement.value;
-
+        const email = this._emailInputElement.value;
         // copied from https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email
-        if (this._email.length > 0 && this._email.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
-            const submitButton = <HTMLElement> this.container().querySelector('.privacy-data-request-submit-button');
-            const buttonSpinner = new ButtonSpinner(this._platform);
-            buttonSpinner.render();
-
-            submitButton.classList.add('click-animation');
-            submitButton.appendChild(buttonSpinner.container());
-
-            emailInputElement.disabled = true;
-            emailInputElement.blur();
-
-            PrivacyDataRequestHelper.sendInitRequest(this._email).then((response: IDataRequestResponse) => {
-                if (this.container() && this.container().parentElement) {
-                    submitButton.classList.remove('click-animation');
-                    buttonSpinner.container().classList.add('stop');
-                    emailInputElement.disabled = false;
-                    const imageUrls = response.imageUrls ? response.imageUrls : [];
-                    this.showCaptcha(imageUrls);
-                }
-
-            }).catch((error) => {
-                if (this.container() && this.container().parentElement) {
-                    submitButton.classList.remove('click-animation');
-                    buttonSpinner.container().classList.add('stop');
-                    emailInputElement.disabled = false;
-
-                    // show failure msg
-                }
-            });
+        if (email.length > 0 && email.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
+            this._currentValidatedEmail = email;
+            this.initCaptcha();
         } else {
             // todo: triggers browser's built-in ui pop-up, could be replaced with something else
-            emailInputElement.reportValidity();
+            this._emailInputElement.reportValidity();
         }
+    }
+
+    private initCaptcha(): void {
+        this.disableInputsAndStartAnimation();
+        PrivacyDataRequestHelper.sendInitRequest(this._currentValidatedEmail).then((response: IDataRequestResponse) => {
+            this.enableInputsAndStopAnimation();
+            if (response.status === DataRequestResponseStatus.SUCCESS) {
+                const imageUrls = response.imageUrls ? response.imageUrls : [];
+                this.showCaptcha(imageUrls);
+            } else if (response.status === DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS) {
+                this.showMultipleFailedErrorMsg();
+                this.hideAndCloseCaptcha();
+            } else {
+                // todo: show generic error message
+                this.hideAndCloseCaptcha();
+                this.showGenericErrorMsg();
+            }
+        }).catch((error) => {
+            this.hideAndCloseCaptcha();
+            this.showGenericErrorMsg();
+        });
     }
 
     private showCaptcha(urls: string[]): void {
@@ -159,5 +147,39 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
             }
             delete this._captchaView;
         }
+    }
+
+    private showMultipleFailedErrorMsg(): void {
+        const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
+        msgElement.classList.add('show-msg');
+
+        this.disableInputs();
+    }
+
+    private showGenericErrorMsg(): void {
+        // todo: add an element for showing generic errors
+    }
+
+    private disableInputs(): void {
+        this._submitButtonElement.classList.add('disabled');
+        this._emailInputElement.disabled = true;
+        this._emailInputElement.blur();
+    }
+
+    private disableInputsAndStartAnimation(): void {
+        this.disableInputs();
+        this._buttonSpinner.container().classList.remove('stop');
+
+        this._submitButtonElement.classList.add('click-animation');
+        this._submitButtonElement.appendChild(this._buttonSpinner.container());
+    }
+
+    private enableInputsAndStopAnimation(): void {
+        this._submitButtonElement.classList.remove('disabled');
+        this._submitButtonElement.classList.remove('click-animation');
+        this._emailInputElement.disabled = false;
+
+        this._buttonSpinner.container().classList.add('stop');
+
     }
 }

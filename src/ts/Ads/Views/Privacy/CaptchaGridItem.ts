@@ -29,6 +29,7 @@ export class CaptchaGridItem {
 
     public resetElement(url: string) {
         this._url = url;
+        this._element.src = '';
         this._element.src = url;
     }
 
