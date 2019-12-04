@@ -1,5 +1,5 @@
 import { IAds } from 'Ads/IAds';
-import { AutomatedExperimentManager, CachableAutomatedExperimentData } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentManager, CachableAutomatedExperimentData, ContextualFeature } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -55,7 +55,7 @@ describe('AutomatedExperimentManagerTest', () => {
 
     // exhaustive list so that if ever something appears, or changes type (to a point), we will catch it in the tests.
     // as that could signify a breaking change for the AutomatedExperimentManager back end (CDP schema).
-    const defaultContextualFeatures: { [key: string]: unknown } = {
+    const defaultContextualFeatures: { [key: string]: ContextualFeature } = {
         bundle_id: 'com.unity3d.ads.example',
         game_id: '12345',
         coppa_compliant: false,

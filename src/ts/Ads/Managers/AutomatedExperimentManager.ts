@@ -27,7 +27,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
+export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
 
 class StateItem {
     constructor(experiment: AutomatedExperiment, action: string) {
