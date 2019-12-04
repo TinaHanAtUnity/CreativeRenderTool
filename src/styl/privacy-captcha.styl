@@ -19,7 +19,6 @@
     .privacy-captcha-retry-message {
       display: block;
     }
-
   }
 
   .privacy-captcha-container {
@@ -31,7 +30,7 @@
   }
 
   .privacy-captcha-title {
-    padding: .75 * $default-size .5 * $default-size .5 * $default-size .5 * $default-size;
+    padding: .5 * $default-size .5 * $default-size .25 * $default-size .5 * $default-size;
     border-bottom: 1px solid $consent-border-gray;
     border-radius: .5 * $default-size .5 * $default-size 0 0;
     background: $privacy-light-gray;
@@ -134,9 +133,27 @@
 body {
   &.landscape #privacy-captcha {
 
+    .privacy-captcha-title {
+      font-size: .6 * $default-font-size;
+    }
+
+    .privacy-captcha-container {
+      width: 12.25 * $default-size;
+    }
+
+    .privacy-captcha-grid-container {
+      position: relative;
+      width: 12.25 * $default-size;
+      height: 12.25 * $default-size;
+    }
+
     .privacy-captcha-grid-item {
       width: 2.5 * $default-size;
       height: 2.5 * $default-size;
+    }
+
+    .privacy-captcha-retry-message {
+      font-size: .6 * $default-size;
     }
   }
 }
