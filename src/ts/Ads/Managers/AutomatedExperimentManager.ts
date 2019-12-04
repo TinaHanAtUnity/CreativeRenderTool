@@ -74,7 +74,7 @@ export class AutomatedExperimentManager {
     private readonly _state: { [key: string]: StateItem };
     private _experimentBegan: boolean;
     private _userInfo: UserInfo;
-    private _sessionId: number;
+    private _gameSessionId: number;
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
     private static readonly _createEndPoint = 'experiment';
@@ -89,7 +89,8 @@ export class AutomatedExperimentManager {
         this._privacySDK = core.Ads.PrivacySDK;
         this._nativeBridge = core.NativeBridge;
         this._requestManager = core.RequestManager;
-        this._sessionId = core.Ads.SessionManager.getGameSessionId();
+        this._storageApi = core.Api.Storage;
+        this._gameSessionId = core.Ads.SessionManager.getGameSessionId();
         this._state = {};
         this._experimentBegan = false;
         this._userInfo = new UserInfo();
@@ -108,7 +109,7 @@ export class AutomatedExperimentManager {
         });
 
         this._userInfo.ABGroup = this._coreConfig.getAbGroup();
-        this._userInfo.GameSessionID = this._sessionId;
+        this._userInfo.GameSessionID = this._gameSessionId;
 
         return this.collectStaticContextualFeatures().then(features => {
               return Promise.all(storedExperimentsPromise).then(storedExperiments => {

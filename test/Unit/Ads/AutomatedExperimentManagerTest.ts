@@ -27,7 +27,7 @@ const FooExperimentNoCache = new AutomatedExperiment({
     cacheDisabled: true
 });
 
-describe('AutomatedExperimentManager test', () => {
+describe('AutomatedExperimentManagerTest', () => {
     const baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
     const createEndPoint = 'experiment';
     const actionEndPoint = 'action';
