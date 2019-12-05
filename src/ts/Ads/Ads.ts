@@ -50,7 +50,6 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
@@ -65,9 +64,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
-import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
-import { ITestCreativePack } from 'Ads/Models/CreativePack';
+import { CampaignResponseUtils } from 'Ads/Utilities/CampaignResponseUtils';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -579,6 +576,9 @@ export class Ads implements IAds {
         }
 
         if (TestEnvironment.get('creativeUrl')) {
+            // reset auction protocol to allow changing between creativeUrl and creativePack modes
+            RequestManager.setTestAuctionProtocol(undefined);
+
             const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
@@ -599,23 +599,11 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
-            const json = JsonParser.parse<ITestCreativePack>(creativePack);
+            // reset auction protocol to allow changing between creativeUrl and creativePack modes
+            RequestManager.setTestAuctionProtocol(undefined);
+
             const platform = this._core.NativeBridge.getPlatform();
-            let response: string = '';
-
-            if (platform === Platform.ANDROID) {
-                response = CreativePackResponseAndroid;
-            } else if (platform === Platform.IOS) {
-                response = CreativePackResponseIos;
-            }
-
-            response = response.replace('{ICON_PLACEHOLDER}', json.gameIcon ? json.gameIcon : '');
-            response = response.replace('{ENDSCREEN_PLACEHOLDER}', json.endScreen ? json.endScreen : '');
-            response = response.replace('{ENDSCREEN_LANDSCAPE_PLACEHOLDER}', json.endScreenLandscape ? json.endScreenLandscape : '');
-            response = response.replace('{ENDSCREEN_PORTRAIT_PLACEHOLDER}', json.endScreenPortrait ? json.endScreenPortrait : '');
-            response = response.replace('{TRAILER_DOWNLOADABLE_PLACEHOLDER}', json.trailerDownloadable ? json.trailerDownloadable : '');
-            response = response.replace('{TRAILER_DOWNLOADABLE_SIZE}', json.trailerDownloadableSize ? json.trailerDownloadableSize.toString() : '0');
-            response = response.replace('{TRAILER_STREAMING_PLACEHOLDER}', json.trailerStreaming ? json.trailerStreaming : '');
+            const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
 
             CampaignManager.setCampaignResponse(response);
         }
