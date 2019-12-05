@@ -100,14 +100,24 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             }
         }];
         tests.forEach((t) => {
+
+            it(`should call post once`, () => {
+                const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
+
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+
+                return promise;
+            });
+
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
-                expect(requestManager.post).toHaveBeenCalledTimes(1);
+
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
                     JSON.stringify(t.expected),
                     [['Content-Type', 'application/json']]
                     );
+
                 return promise;
             });
         });
@@ -149,9 +159,18 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             }
         }];
         tests.forEach((t) => {
+
+            it(`should call post once`, () => {
+                const promise = programmaticTrackingService.reportMetricEvent(t.input);
+
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+
+                return promise;
+            });
+
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportMetricEvent(t.input);
-                expect(requestManager.post).toHaveBeenCalledTimes(1);
+
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
                     JSON.stringify(t.expected),
@@ -205,10 +224,18 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             }
         }];
         tests.forEach((t) => {
-            it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
+
+            it(`should call post once`, () => {
                 const promise = programmaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
+
+                return promise;
+            });
+
+            it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
+
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
                     JSON.stringify(t.expected),
@@ -263,10 +290,18 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             }
         }];
         tests.forEach((t) => {
-            it(`should send "${t.expected.metrics[0].name}" with "${t.metric}" and "${t.value}" is passed in`, () => {
+
+            it(`should call post once`, () => {
                 const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value);
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
+
+                return promise;
+            });
+
+            it(`should send "${t.expected.metrics[0].name}" with "${t.metric}" and "${t.value}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value);
+
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path,
                     JSON.stringify(t.expected),
@@ -293,47 +328,72 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             });
         });
 
-        it('should fire events when events are batched', () => {
-            const expected = {
-                metrics: [
-                    {
-                        name: 'uads_core_initialize_time',
-                        value: 999,
-                        tags: [
-                            `ads_sdk2_sdv:${sdkVersion}`,
-                            'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:${Platform[platform]}`
-                        ]
-                    }, {
-                        name: 'webview_load_to_configuration_complete_time',
-                        value: 100,
-                        tags: [
-                            `ads_sdk2_sdv:${sdkVersion}`,
-                            'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:${Platform[platform]}`
-                        ]
-                    }
-                ]
-            };
-            programmaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, 999);
-            programmaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
-            return programmaticTrackingService.sendBatchedEvents().then(() => {
+        describe('Batch two events', () => {
+
+            beforeEach(() => {
+                programmaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, 999);
+                programmaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
+            });
+
+            it('should call post once', () => {
+                const promise = programmaticTrackingService.sendBatchedEvents();
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
+                return promise;
+            });
+
+            it('should fire events when events are batched', () => {
+                const expected = {
+                    metrics: [
+                        {
+                            name: 'uads_core_initialize_time',
+                            value: 999,
+                            tags: [
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                'ads_sdk2_iso:us',
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }, {
+                            name: 'webview_load_to_configuration_complete_time',
+                            value: 100,
+                            tags: [
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                'ads_sdk2_iso:us',
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }
+                    ]
+                };
+                const promise = programmaticTrackingService.sendBatchedEvents();
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
                     JSON.stringify(expected),
                     [['Content-Type', 'application/json']]
                     );
-                expect(programmaticTrackingService['_batchedEvents']).toEqual([]);
+
+                return promise;
+            });
+
+            it('should clear batchedEvents', () => {
+                return programmaticTrackingService.sendBatchedEvents().then(() => {
+                    expect(programmaticTrackingService['_batchedEvents']).toEqual([]);
+                });
             });
         });
 
-        it('should fire events when 10 events are reached', () => {
-            for (let i = 0; i < 10; i++) {
-                expect(requestManager.post).toBeCalledTimes(0);
-                programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
-            }
-            expect(requestManager.post).toBeCalledTimes(1);
+        describe('batch 10 events', () => {
+            it('should not fire events when below 10', () => {
+                for (let i = 0; i < 10; i++) {
+                    expect(requestManager.post).toBeCalledTimes(0);
+                    programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                }
+            });
+
+            it('should fire events when 10 events are reached', () => {
+                for (let i = 0; i < 10; i++) {
+                    programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                }
+                expect(requestManager.post).toBeCalledTimes(1);
+            });
         });
     });
 
