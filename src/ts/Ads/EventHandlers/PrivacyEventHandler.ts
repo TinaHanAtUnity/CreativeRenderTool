@@ -3,7 +3,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions, isUnityConsentPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { IPrivacyPermissions, isPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
@@ -59,9 +59,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
         this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
     }
 
-    public onPersonalizedConsent(permissions: IPermissions): void {
+    public onPersonalizedConsent(permissions: IPrivacyPermissions): void {
         const gamePrivacy = this._privacy.getGamePrivacy();
-        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT && isUnityConsentPermissions(permissions)) {
+        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT && isPrivacyPermissions(permissions)) {
             this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.PERSONALIZED_PERMISSIONS, ConsentPage.MY_CHOICES);
         }
     }

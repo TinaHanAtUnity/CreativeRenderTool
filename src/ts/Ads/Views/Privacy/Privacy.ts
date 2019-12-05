@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions, UserPrivacy } from 'Privacy/Privacy';
+import { IPrivacyPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
@@ -159,7 +159,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
         }
     }
 
-    public testAutoConsent(consent: IPermissions): void {
+    public testAutoConsent(consent: IPrivacyPermissions): void {
         this._handlers.forEach(handler => handler.onConsent(consent, GDPREventAction.TEST_AUTO_CONSENT, GDPREventSource.USER));
         this._handlers.forEach(handler => handler.onClose());
     }
@@ -271,7 +271,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
 
         this._switchGroup.checkCheckboxes(true);
 
-        const permissions: IPermissions = {
+        const permissions: IPrivacyPermissions = {
             gameExp: true,
             ads: true,
             external: true
@@ -293,7 +293,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
     private onSaveMyChoicesEvent(event: Event) {
         event.preventDefault();
 
-        const permissions: IPermissions = {
+        const permissions: IPrivacyPermissions = {
             gameExp: this._switchGroup.isPersonalizedExperienceChecked(),
             ads: this._switchGroup.isPersonalizedAdsChecked(),
             external: this._switchGroup.isAds3rdPartyChecked()

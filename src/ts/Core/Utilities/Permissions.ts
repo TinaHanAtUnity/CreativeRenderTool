@@ -6,7 +6,8 @@ import { IosBundleKeys, IosPermission } from 'Core/Native/iOS/Permissions';
 export enum CurrentPermission {
     UNKNOWN,
     DENIED,
-    ACCEPTED
+    ACCEPTED,
+    NOT_IN_MANIFEST
 }
 
 export enum PermissionTypes {

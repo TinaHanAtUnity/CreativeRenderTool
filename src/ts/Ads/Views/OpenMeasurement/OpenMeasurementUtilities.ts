@@ -25,15 +25,14 @@ export class OpenMeasurementUtilities {
     }
 
     /**
-     * Will be calculated properly for sdk 3.3+ - output original px in 3.2
+     * Will be calculated properly for sdk 3.3+
      * Converts pixels from native to estimated DPs using native magic number
      * @param px size to convert
      * @param deviceInfo deviceinfo
      * @param platform Android/IOS
      */
-    public static pxToDp(px: number, deviceInfo: DeviceInfo, platform: Platform): number {
-        // TODO: Use GetMetricDensity from 3.3 for this calculation
-        return px;
+    public static pxToDp(px: number, deviceInfo: AndroidDeviceInfo): number {
+        return px / deviceInfo.getDisplayMetricDensity();
     }
 
     /**

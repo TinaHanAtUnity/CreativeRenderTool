@@ -20,7 +20,7 @@ export class Performance extends AbstractParserModule {
         let performanceFactory: PerformanceAdUnitFactory;
         if (MabDecisionButtonTest.isValid(core.Config.getAbGroup())) {
             performanceFactory = new PerformanceAdUnitWithAutomatedExperimentFactory(
-                new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, ads, china));
+                new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, china));
         } else {
             performanceFactory = new PerformanceAdUnitFactory(new PerformanceAdUnitParametersFactory(core, ads, china));
         }

@@ -1,4 +1,4 @@
-import { GamePrivacy, UserPrivacy } from 'Privacy/Privacy';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 export class PrivacySDK {

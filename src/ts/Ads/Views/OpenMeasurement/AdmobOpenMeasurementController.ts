@@ -12,7 +12,7 @@ import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasure
 import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-import { Url } from 'Core/Utilities/Url';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -31,8 +31,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _pts: ProgrammaticTrackingService;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder, thirdPartyEventManager: ThirdPartyEventManager) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder, thirdPartyEventManager: ThirdPartyEventManager, pts: ProgrammaticTrackingService) {
         super(placement, omAdViewBuilder);
 
         this._platform = platform;
@@ -42,6 +43,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._deviceInfo = deviceInfo;
         this._request = request;
         this._thirdPartyEventManager = thirdPartyEventManager;
+        this._pts = pts;
 
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
@@ -81,6 +83,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
         this._campaign.setOMVendors(omVendors);
         this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
+        this._pts.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
     public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
@@ -137,11 +140,17 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
+    public sessionStart() {
+        super.sessionStart();
+        this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
+    }
+
     /**
      * SessionFinish:
      */
     public sessionFinish() {
         super.sessionFinish();
+        this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
         this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }
