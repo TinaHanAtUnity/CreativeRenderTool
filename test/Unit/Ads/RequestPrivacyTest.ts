@@ -49,7 +49,7 @@ describe('RequestPrivacyFactoryTests', () => {
                         switch (method) {
                             case PrivacyMethod.DEFAULT: expectedPermissions = UserPrivacy.PERM_ALL_TRUE;
                                 break;
-                            case PrivacyMethod.UNITY_CONSENT: expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
+                            case PrivacyMethod.UNITY_CONSENT: expectedPermissions = UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ;
                                 break;
                             case PrivacyMethod.DEVELOPER_CONSENT: expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
                                 break;
@@ -164,11 +164,11 @@ describe('RequestPrivacyFactoryTests', () => {
             const requestPrivacy = RequestPrivacyFactory.create(privacySDK, false);
             assert.equal(requestPrivacy.method, PrivacyMethod.UNITY_CONSENT);
             assert.equal(requestPrivacy.firstRequest, true);
-            assert.deepEqual(requestPrivacy.permissions, UserPrivacy.PERM_ALL_FALSE);
+            assert.deepEqual(requestPrivacy.permissions, UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ);
             privacySDK.getUserPrivacy().update(newUserPrivacy);
             assert.equal(requestPrivacy.method, PrivacyMethod.UNITY_CONSENT);
             assert.equal(requestPrivacy.firstRequest, true);
-            assert.deepEqual(requestPrivacy.permissions, UserPrivacy.PERM_ALL_FALSE);
+            assert.deepEqual(requestPrivacy.permissions, UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ);
         });
 
         it('legacyRequestPrivacy should be unaltered by privacy changes', () => {

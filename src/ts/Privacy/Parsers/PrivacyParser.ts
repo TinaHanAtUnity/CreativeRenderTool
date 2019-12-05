@@ -27,7 +27,7 @@ export class PrivacyParser {
         const optOutEnabled = configJson.optOutEnabled;
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, gamePrivacy, optOutRecorded, optOutEnabled, limitAdTracking);
-        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
+        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.NONE;
         const ageGateLimit =  this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
 
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, ageGateLimit, legalFramework);
@@ -151,21 +151,6 @@ export class PrivacyParser {
 
         if (rawUserPrivacy && rawUserPrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-        }
-
-        if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST ||
-            gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
-            if (!rawUserPrivacy || gamePrivacy.getMethod() !== rawUserPrivacy.method) {
-                return new UserPrivacy({
-                    method: optOutRecorded ? gamePrivacy.getMethod() : PrivacyMethod.DEFAULT,
-                    version: 0,
-                    permissions: {
-                        gameExp: false,
-                        ads: optOutRecorded ? !optOutEnabled : false,
-                        external: optOutRecorded ? !optOutEnabled : false
-                    }
-                });
-            }
         }
 
         if (!rawUserPrivacy) {

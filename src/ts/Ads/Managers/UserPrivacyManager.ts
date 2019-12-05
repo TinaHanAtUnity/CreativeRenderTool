@@ -47,7 +47,7 @@ export enum GDPREventAction {
 }
 
 export enum LegalFramework {
-    DEFAULT = 'default',
+    NONE = 'none',
     GDPR = 'gdpr', // EU
     CCPA = 'ccpa', // California
     TC260 = 'tc260' // China
@@ -72,6 +72,8 @@ export class UserPrivacyManager {
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
 
+    public _forcedConsentUnit: boolean;
+
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
@@ -85,7 +87,7 @@ export class UserPrivacyManager {
     private readonly _request: RequestManager;
     private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -96,6 +98,7 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
+        this._forcedConsentUnit = forcedConsentUnit || false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
@@ -268,6 +271,10 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
+        if (this._forcedConsentUnit) {
+            return true;
+        }
+
         if (this.isAgeGateShowRequired()) {
             return true;
         }

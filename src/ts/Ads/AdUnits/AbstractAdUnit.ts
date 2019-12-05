@@ -136,4 +136,8 @@ export abstract class AbstractAdUnit implements IAdUnit {
     public markAsSkipped() {
         this._finishState = FinishState.SKIPPED;
     }
+
+    public getCampaign(): Campaign {
+        return this._baseCampaign;
+    }
 }

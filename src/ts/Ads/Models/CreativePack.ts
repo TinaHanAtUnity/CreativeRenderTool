@@ -6,4 +6,9 @@ export interface ITestCreativePack {
     trailerDownloadable: string;
     trailerDownloadableSize: number;
     trailerStreaming: string;
+    trailerPortraitDownloadable: string;
+    trailerPortraitDownloadableSize: number;
+    trailerPortraitStreaming: string;
+    appStoreId: string;
+    appStoreName: string;
 }
