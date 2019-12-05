@@ -221,8 +221,8 @@
             }
 
             this.setClientInfo = function(sessionClientVersion, partnerName, partnerVersion) {
-                omidNativeInfo.partnerName = partnerName;
-                omidNativeInfo.partnerVersion = partnerVersion;
+                omidNativeInfo.partnerName = 'Unity3d';
+                omidNativeInfo.partnerVersion = getUnitySDKVersion();
 
                 omidJSInfo.sessionClientVersion = sessionClientVersion;
                 omidJSInfo.partnerName = partnerName;
