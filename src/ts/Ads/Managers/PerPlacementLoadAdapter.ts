@@ -1,6 +1,7 @@
 import { IAdsApi } from 'Ads/IAds';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { PlacementState } from 'Ads/Models/Placement';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { Platform } from 'Core/Constants/Platform';
@@ -32,14 +33,15 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         return;
     }
 
-    public sendPlacementStateChangesLoadAdapter(placementId: string): void {
-        const placement = this._adsConfig.getPlacement(placementId);
-        if (placement.getPlacementStateChanged()) {
-            placement.setPlacementStateChanged(false);
-            this._ads.Placement.setPlacementState(placementId, placement.getState());
-            this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
-        }
-        if (placement.getState() === PlacementState.READY) {
+    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
+        placement.setCurrentCampaign(undefined);
+        this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
+        this.sendPlacementStateChangesLoadAdapter(placement.getId(), PlacementState.READY, PlacementState.NOT_AVAILABLE);
+    }
+
+    public sendPlacementStateChangesLoadAdapter(placementId: string, previousState: PlacementState, nextState: PlacementState): void {
+        this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[previousState], PlacementState[nextState]);
+        if (nextState === PlacementState.READY) {
             this._ads.Listener.sendReadyEvent(placementId);
         }
     }
@@ -47,21 +49,16 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     private sendLoadAPIEvent(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
         const currentState = placement.getState();
-        this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
-        this.setPlacementState(placementId, PlacementState.WAITING);
-        this.sendPlacementStateChangesLoadAdapter(placementId);
+        this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
         switch (currentState) {
             case PlacementState.READY:
-                this.setPlacementState(placementId, PlacementState.READY);
-                this.sendPlacementStateChangesLoadAdapter(placementId);
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.READY);
                 break;
             case PlacementState.NO_FILL:
-                this.setPlacementState(placementId, PlacementState.NO_FILL);
-                this.sendPlacementStateChangesLoadAdapter(placementId);
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 break;
             case PlacementState.NOT_AVAILABLE:
-                this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
-                this.sendPlacementStateChangesLoadAdapter(placementId);
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NOT_AVAILABLE);
                 break;
             default:
         }
