@@ -191,6 +191,7 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaignExpired(): Promise<INativeResponse | void> {
+        this._core.Sdk.logDebug('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL, this._adsConfig.getPlacementIds());
         this.invalidateCampaigns(false, this._adsConfig.getPlacementIds());
         return this._campaignManager.request();
