@@ -242,6 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // tslint:disable-next-line
          } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD]()) {
             loadModeElement.checked = true;
+            //Mopub whitelisted load API gameID
+            gameIdElement.value = '2788221';
             initialize();
             UnityAds.load('rewardedVideo');
         } else {

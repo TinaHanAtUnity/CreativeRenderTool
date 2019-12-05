@@ -47,6 +47,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     private sendLoadAPIEvent(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
         const currentState = placement.getState();
+        this.setPlacementState(placementId, PlacementState.NOT_AVAILABLE);
         this.setPlacementState(placementId, PlacementState.WAITING);
         this.sendPlacementStateChangesLoadAdapter(placementId);
         switch (currentState) {
