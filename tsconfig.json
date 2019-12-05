@@ -35,7 +35,8 @@
       "babel__traverse",
       "estree",
       "events",
-      "glob"
+      "glob",
+      "jest"
     ]
   },
   "include": [
@@ -43,7 +44,6 @@
     "test/**/*.ts"
   ],
   "exclude": [
-    "src/ts/**/__mocks__/*.ts",
-    "src/ts/**/*.spec.ts"
+    "src/ts/**/*.spec.ts",
   ]
 }
