@@ -28,6 +28,9 @@
                         });
                         const sessionObservers = [].concat.apply([], observerList);
                         sessionObservers.forEach(function(sessionObserver) {
+                            if (!eventData.data || Object.keys(eventData.data).length === 0) {
+                                delete eventData.data;
+                            }
                             sessionObserver(eventData);
                         });
                     }
@@ -122,7 +125,9 @@
                                     adSessionId: event.data.adSessionId,
                                     timestamp: event.data.timestamp,
                                     type: stripEventString(event.data.type),
-                                    data: payload
+                            }
+                            if (payload) {
+                                eventData.data = payload;
                             }
                             var handler = registeredFunctions[event.data.uuid];
                             handler(eventData);

@@ -54,6 +54,7 @@
   ],
   "useAuction": true,
   "country": "FI",
+  "subdivision": "",
   "abGroup": 99,
   "properties": "abcdefgh12345678",
   "projectId": "abcd-1234",

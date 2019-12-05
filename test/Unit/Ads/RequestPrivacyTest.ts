@@ -1,49 +1,111 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 import 'mocha';
-import {ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory} from 'Ads/Models/RequestPrivacy';
-import {GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy} from 'Privacy/Privacy';
-import {toAbGroup} from 'Core/Models/ABGroup';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { CurrentUnityConsentVersion, GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from 'Core/Constants/Platform';
+import * as sinon from 'sinon';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 describe('RequestPrivacyFactoryTests', () => {
     let userPrivacy: UserPrivacy;
     let gamePrivacy: GamePrivacy;
+    let privacySDK: PrivacySDK;
+    const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+    const deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
+    (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(false);
 
     const consentMethods = [PrivacyMethod.UNITY_CONSENT, PrivacyMethod.DEVELOPER_CONSENT];
+    const privacyMethods = Object.values(PrivacyMethod);
 
-    consentMethods.forEach((method) => {
-        context('for a game using ' + method, () => {
-            context('when no previous user privacy is recorded', () => {
-                let result: IRequestPrivacy | undefined;
+    context('when userPrivacy has not been recorded', () => {
+        let result: IRequestPrivacy;
+        privacyMethods.forEach((method) => {
+            context('gamePrivacy.method = ' + method, () => {
                 beforeEach(() => {
                     userPrivacy = UserPrivacy.createUnrecorded();
                     gamePrivacy = new GamePrivacy({ method: method });
-                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
                 });
-                it('should set firstRequest as true', () => assert.equal(result!.firstRequest, true));
-                it('should set privacy method as ' + method, () => assert.equal(result!.method, method));
-                it('should set permissions as empty', () => assert.deepEqual(result!.permissions, {}));
-            });
 
+                context('and limitAdTracking = true', () => {
+                    it ('sets appropriate method and all-false permissions', () => {
+                        result = RequestPrivacyFactory.create(privacySDK, true);
+                        assert.equal(result.method, method);
+                        assert.equal(result.firstRequest, true);
+                        assert.deepEqual(result.permissions, UserPrivacy.PERM_ALL_FALSE);
+                    });
+                });
+
+                context('and limitAdTracking = false', () => {
+                    it ('sets appropriate method and all-false permissions', () => {
+                        result = RequestPrivacyFactory.create(privacySDK, false);
+                        let expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
+                        switch (method) {
+                            case PrivacyMethod.DEFAULT: expectedPermissions = UserPrivacy.PERM_ALL_TRUE;
+                                break;
+                            case PrivacyMethod.UNITY_CONSENT: expectedPermissions = UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ;
+                                break;
+                            case PrivacyMethod.DEVELOPER_CONSENT: expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
+                                break;
+                            case PrivacyMethod.LEGITIMATE_INTEREST: expectedPermissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
+                                break;
+                            default: assert.isOk(false, 'PrivacyMethod ' + method + ' is not handled by unit tests, please update tests');
+                        }
+                        assert.equal(result.method, method);
+                        assert.equal(result.firstRequest, true);
+                        assert.deepEqual(result.permissions, expectedPermissions);
+                    });
+                });
+            });
+        });
+    });
+
+    consentMethods.forEach((method) => {
+        context('for a game using ' + method, () => {
             context('when a recorded user privacy exists', () => {
                 let result: IRequestPrivacy | undefined;
-                const expectedPermissions = { gameExp: false, ads: true, external: true };
+                const userPermissions = { gameExp: false, ads: true, external: true };
+
                 beforeEach(() => {
-                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: {all: false, ...expectedPermissions} });
+                    userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: userPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
                 });
-                it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
-                it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
-                it('should set recorded permissions', () => assert.deepEqual(result!.permissions, expectedPermissions));
+
+                context('and limitAdTracking is false', () => {
+                    beforeEach(() => {
+                        result = RequestPrivacyFactory.create(privacySDK, false);
+                    });
+                    it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
+                    it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
+                    it('should set recorded permissions', () => assert.deepEqual(result!.permissions, userPermissions));
+                });
+
+                context('and limitAdTracking is true', () => {
+                    beforeEach(() => {
+                        result = RequestPrivacyFactory.create(privacySDK, true);
+                    });
+                    it('should set firstRequest as false', () => assert.equal(result!.firstRequest, false));
+                    it('should set privacy method to ' + method, () => assert.equal(result!.method, method));
+                    it('should set recorded permissions', () => assert.deepEqual(result!.permissions, UserPrivacy.PERM_ALL_FALSE));
+                });
+
             });
 
             context('if game privacy method has changed since last privacy store', () => {
                 let result: IRequestPrivacy | undefined;
-                const anyPermissions = <IPermissions>{};
+                const anyPermissions = <IPrivacyPermissions>{};
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+                    result = RequestPrivacyFactory.create(privacySDK, false);
                 });
                 it('should not affect set privacy method', () => assert.notEqual(result!.method, method));
             });
@@ -52,96 +114,72 @@ describe('RequestPrivacyFactoryTests', () => {
 
     context('when all permission is set', () => {
         let result: IRequestPrivacy | undefined;
-        const expectedPermissions = { gameExp: true, ads: true, external: true };
+        const expectedPermissions = UserPrivacy.PERM_ALL_TRUE;
         beforeEach(() => {
-            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: { all: true} });
+            userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: expectedPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
-            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+            privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+            result = RequestPrivacyFactory.create(privacySDK, false);
         });
         it('should strip away all:true and replace with granular permissions',
             () => assert.deepEqual(result!.permissions, expectedPermissions));
     });
 
     context('if game privacy method is PrivacyMethod.LEGITIMATE_INTEREST', () => {
-        let result: IRequestPrivacy | undefined;
-        const anyPermissions = <IPermissions>{};
+        let result: IRequestPrivacy;
+        const anyPermissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
         beforeEach(() => {
             userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
-            result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
+            privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+            result = RequestPrivacyFactory.create(privacySDK, false);
         });
-        it('should return undefined', () => assert.isUndefined(result));
-    });
-});
-
-describe('LegacyRequestPrivacyTests', () => {
-    const anyMethod = PrivacyMethod.DEVELOPER_CONSENT;
-
-    context('optOutRecorded', () => {
-        it('should set optOutRecorded true if not the first request', () => {
-            const result = RequestPrivacyFactory.createLegacy({ method: anyMethod, firstRequest: false, permissions: {}});
-            assert.equal(result.optOutRecorded, true);
-        });
-
-        it('should set optOutRecorded false if the first request', () => {
-            const result = RequestPrivacyFactory.createLegacy({ method: anyMethod, firstRequest: true, permissions: {}});
-            assert.equal(result.optOutRecorded, false);
+        it('should return legitimate_interest privacy object', () => {
+            assert.equal(result.method, PrivacyMethod.LEGITIMATE_INTEREST);
+            assert.equal(result.firstRequest, false);
+            assert.deepEqual(result.permissions, anyPermissions);
         });
     });
 
-    context('when privacy method is DEFAULT (e.g. user has never played inside EU)', () => {
-        let result: ILegacyRequestPrivacy;
+    context('when userPrivacy is modified', () => {
+        const privacyParts = {
+            gdprEnabled: true,
+            optOutRecorded: false,
+            optOutEnabled: false,
+            gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT},
+            legalFramework: LegalFramework.GDPR
+        };
+        const newUserPrivacy = {
+            method: PrivacyMethod.UNITY_CONSENT,
+            permissions: {
+                ads: true,
+                external: true,
+                gameExp: true},
+            version: CurrentUnityConsentVersion};
         beforeEach(() => {
-            const requestPrivacy = { method: PrivacyMethod.DEFAULT, firstRequest: true, permissions: {}};
-            result = RequestPrivacyFactory.createLegacy(requestPrivacy);
-        });
-        it('should set gdprEnabled false', () => assert.equal(result.gdprEnabled, false));
-        it('should set optOutRecorded false', () => assert.equal(result.optOutEnabled, false));
-        it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, false));
-    });
-
-    context('when privacy method is UNITY_CONSENT', () => {
-        let result: ILegacyRequestPrivacy;
-        beforeEach(() => {
-            const requestPrivacy = { method: PrivacyMethod.UNITY_CONSENT, firstRequest: false, permissions: {}};
-            result = RequestPrivacyFactory.createLegacy(requestPrivacy);
-        });
-        it('should set gdprEnabled true', () => assert.equal(result.gdprEnabled, true));
-        it('should set optOutEnabled true', () => assert.equal(result.optOutEnabled, true));
-    });
-
-    it('should set optOutEnabled false for first request if LEGITIMATE_INTEREST', () => {
-        const result = RequestPrivacyFactory.createLegacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, firstRequest: true, permissions: {}});
-        assert.equal(result.optOutRecorded, false);
-        assert.equal(result.optOutEnabled, false);
-    });
-
-    it('should set optOutEnabled based on permissions for first request if DEVELOPER_CONSENT', () => {
-        const result = RequestPrivacyFactory.createLegacy({ method: PrivacyMethod.DEVELOPER_CONSENT, firstRequest: true, permissions: { profiling: false }});
-        assert.equal(result.optOutRecorded, false);
-        assert.equal(result.optOutEnabled, true);
-    });
-
-    context('when privacy method is LEGITIMATE_INTEREST or DEVELOPER_CONSENT', () => {
-        let result: ILegacyRequestPrivacy;
-        context('and user has given permission for profiling', () => {
-            beforeEach(() => {
-                const requestPrivacy = { method: anyMethod, firstRequest: false, permissions: { profiling: true } };
-                result = RequestPrivacyFactory.createLegacy(requestPrivacy);
-            });
-            it('should set gdprEnabled true', () => assert.equal(result.gdprEnabled, true));
-            it('should set optOutRecorded true', () => assert.equal(result.optOutRecorded, true));
-            it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, false));
+            privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyParts, clientInfo, deviceInfo);
         });
 
-        context('and user has denied permission for profiling', () => {
-            beforeEach(() => {
-                const requestPrivacy = { method: anyMethod, firstRequest: false, permissions: { profiling: false } };
-                result = RequestPrivacyFactory.createLegacy(requestPrivacy);
-            });
-            it('should set gdprEnabled true', () => assert.equal(result.gdprEnabled, true));
-            it('should set optOutRecorded true', () => assert.equal(result.optOutRecorded, true));
-            it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, true));
+        it('requestPrivacy should be unaltered by privacy changes', () => {
+            const requestPrivacy = RequestPrivacyFactory.create(privacySDK, false);
+            assert.equal(requestPrivacy.method, PrivacyMethod.UNITY_CONSENT);
+            assert.equal(requestPrivacy.firstRequest, true);
+            assert.deepEqual(requestPrivacy.permissions, UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ);
+            privacySDK.getUserPrivacy().update(newUserPrivacy);
+            assert.equal(requestPrivacy.method, PrivacyMethod.UNITY_CONSENT);
+            assert.equal(requestPrivacy.firstRequest, true);
+            assert.deepEqual(requestPrivacy.permissions, UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ);
+        });
+
+        it('legacyRequestPrivacy should be unaltered by privacy changes', () => {
+            const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(privacySDK);
+            assert.equal(legacyRequestPrivacy.optOutRecorded, false);
+            assert.equal(legacyRequestPrivacy.optOutEnabled, false);
+            assert.equal(legacyRequestPrivacy.gdprEnabled, true);
+            privacySDK.getUserPrivacy().update(newUserPrivacy);
+            assert.equal(legacyRequestPrivacy.optOutRecorded, false);
+            assert.equal(legacyRequestPrivacy.optOutEnabled, false);
+            assert.equal(legacyRequestPrivacy.gdprEnabled, true);
         });
     });
 });

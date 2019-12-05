@@ -50,7 +50,6 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
@@ -65,9 +64,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
-import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
-import { ITestCreativePack } from 'Ads/Models/CreativePack';
+import { CampaignResponseUtils } from 'Ads/Utilities/CampaignResponseUtils';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -75,7 +72,7 @@ import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
+import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
@@ -88,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, ZyngaLoadRefreshV4, ZyngaOldApiHoldoutExperiment } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, ZyngaLoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
@@ -117,7 +114,7 @@ export class Ads implements IAds {
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
-    private _showingConsent: boolean = false;
+    private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _core: ICore;
 
@@ -183,7 +180,7 @@ export class Ads implements IAds {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             PrivacyMetrics.setGameSessionId(gameSessionId);
@@ -291,8 +288,6 @@ export class Ads implements IAds {
             if (isZyngaDealGame) {
                 if (ZyngaLoadRefreshV4.isValid(abGroup)) {
                     this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-                } else if (ZyngaOldApiHoldoutExperiment.isValid(abGroup)) {
-                    this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager, this._core.MetaDataManager);
                 } else {
                     this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
                 }
@@ -312,8 +307,8 @@ export class Ads implements IAds {
         }
     }
 
-    private showConsentIfNeeded(options: unknown): Promise<void> {
-        if (!this.PrivacyManager.isConsentShowRequired()) {
+    private showPrivacyIfNeeded(options: unknown): Promise<void> {
+        if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
         }
 
@@ -329,9 +324,9 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        this._showingConsent = true;
+        this._showingPrivacy = true;
 
-        const consentView = new ConsentUnit({
+        const privacyView = new PrivacyUnit({
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
@@ -342,7 +337,7 @@ export class Ads implements IAds {
             pts: this._core.ProgrammaticTrackingService,
             privacySDK: this.PrivacySDK
         });
-        return consentView.show(options);
+        return privacyView.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
@@ -363,7 +358,7 @@ export class Ads implements IAds {
         const contentType = campaign.getContentType();
         const seatId = campaign.getSeatId();
 
-        if (this._showing || this._showingConsent) {
+        if (this._showing || this._showingPrivacy) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
@@ -421,8 +416,8 @@ export class Ads implements IAds {
             this._core.ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
         }
 
-        this.showConsentIfNeeded(options).then(() => {
-            this._showingConsent = false;
+        this.showPrivacyIfNeeded(options).then(() => {
+            this._showingPrivacy = false;
             this.showAd(placement, campaign, options);
         });
     }
@@ -578,10 +573,12 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forcedConsent')) {
             forcedConsentUnit = TestEnvironment.get('forcedConsent');
             Ads._forcedConsentUnit = forcedConsentUnit;
-            AbstractAdUnitParametersFactory.setForcedConsentUnit(forcedConsentUnit);
         }
 
         if (TestEnvironment.get('creativeUrl')) {
+            // reset auction protocol to allow changing between creativeUrl and creativePack modes
+            RequestManager.setTestAuctionProtocol(undefined);
+
             const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
@@ -602,23 +599,11 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
-            const json = JsonParser.parse<ITestCreativePack>(creativePack);
+            // reset auction protocol to allow changing between creativeUrl and creativePack modes
+            RequestManager.setTestAuctionProtocol(undefined);
+
             const platform = this._core.NativeBridge.getPlatform();
-            let response: string = '';
-
-            if (platform === Platform.ANDROID) {
-                response = CreativePackResponseAndroid;
-            } else if (platform === Platform.IOS) {
-                response = CreativePackResponseIos;
-            }
-
-            response = response.replace('{ICON_PLACEHOLDER}', json.gameIcon ? json.gameIcon : '');
-            response = response.replace('{ENDSCREEN_PLACEHOLDER}', json.endScreen ? json.endScreen : '');
-            response = response.replace('{ENDSCREEN_LANDSCAPE_PLACEHOLDER}', json.endScreenLandscape ? json.endScreenLandscape : '');
-            response = response.replace('{ENDSCREEN_PORTRAIT_PLACEHOLDER}', json.endScreenPortrait ? json.endScreenPortrait : '');
-            response = response.replace('{TRAILER_DOWNLOADABLE_PLACEHOLDER}', json.trailerDownloadable ? json.trailerDownloadable : '');
-            response = response.replace('{TRAILER_DOWNLOADABLE_SIZE}', json.trailerDownloadableSize ? json.trailerDownloadableSize.toString() : '0');
-            response = response.replace('{TRAILER_STREAMING_PLACEHOLDER}', json.trailerStreaming ? json.trailerStreaming : '');
+            const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
 
             CampaignManager.setCampaignResponse(response);
         }

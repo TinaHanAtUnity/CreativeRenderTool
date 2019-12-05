@@ -1,3 +1,88 @@
+# Pending
+
+* Remove animation AB tests [12331](https://github.com/Applifier/unity-ads-webview/pull/12331)
+
+# Thu Dec  5 18:39:42 UTC 2019
+
+* Use LegalFramework.NONE instead of LegalFramework.DEFAULT [#12194](https://github.com/Applifier/unity-ads-webview/pull/12194)
+* Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)
+* Fix forcedConsent-metadata [#12249](https://github.com/Applifier/unity-ads-webview/pull/12249)
+* Add 'NOT_IN_MANIFEST' to AR Permissions [#12222](https://github.com/Applifier/unity-ads-webview/pull/12222)
+* Improve Forced Creative Packs [#11951](https://github.com/Applifier/unity-ads-webview/pull/11951)
+
+# Wed Dec  4 22:44:29 UTC 2019
+
+* Open Measurement - Fix/om dp iab android SDK 3.3 [#12279](https://github.com/Applifier/unity-ads-webview/pull/12279) [#12107](https://github.com/Applifier/unity-ads-webview/pull/12107)
+* Add Support for AUI Contextual Features [#12100](https://github.com/Applifier/unity-ads-webview/pull/12100)
+* Always Merge Staging Branches from Remote [#12277](https://github.com/Applifier/unity-ads-webview/pull/12277)
+* Remove Diagnostic Test Checks [#12305](https://github.com/Applifier/unity-ads-webview/pull/12305)
+
+# Tue Dec  3 15:51:44 UTC 2019
+
+* Privacy protocol V2 changes to AuctionRequests and Operative events [#12247](https://github.com/Applifier/unity-ads-webview/pull/12247)
+* Privacy protocol V2 update auctionReq and operativeEvents, amendment for unity_consent first request [#12278](https://github.com/Applifier/unity-ads-webview/pull/12278)
+
+# Tue Nov 26 23:55:06 UTC 2019
+
+* Add banner fill metric event [#12196](https://github.com/Applifier/unity-ads-webview/pull/12196)
+* Open Measurement - Add basic OM metrics for Admob [#12192](https://github.com/Applifier/unity-ads-webview/pull/12192)
+
+# Tue Nov 26 18:53:05 UTC 2019
+
+* Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
+* Disable transparent privacy ad unit for iOS 13 [12197](https://github.com/Applifier/unity-ads-webview/pull/12197)
+
+# Fri Nov 22 07:50:17 UTC 2019
+
+* Rollback Webpack Release Build [#12193](https://github.com/Applifier/unity-ads-webview/pull/12193)
+
+# Thu Nov 21 21:05:32 UTC 2019
+
+* Update Dependencies [#12163](https://github.com/Applifier/unity-ads-webview/pull/12163)
+* Remove Yarn.lock Package Dependencies [#12162](https://github.com/Applifier/unity-ads-webview/pull/12162)
+* Deploy Support for Webpack Release Build on Versions other than 2.1.0 and 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+* Open Measurement - Check data is null/undefined before Object check [#12190](https://github.com/Applifier/unity-ads-webview/pull/12190)
+* Fix IAP Promo Tracking for Promos Waiting for Catalog [#12164](https://github.com/Applifier/unity-ads-webview/pull/12190)
+
+# Wed Nov 20 21:53:12 UTC 2019
+
+* Use npm over LinuxBrew Installation in Travis CI [#12097](https://github.com/Applifier/unity-ads-webview/pull/12097)
+* Open Measurement - Remove null or {} data fields [#12101](https://github.com/Applifier/unity-ads-webview/pull/12101)
+* End Omnivirt Endcard Experiment [#12103](https://github.com/Applifier/unity-ads-webview/pull/12103)
+* Update COPPA text [#12099](https://github.com/Applifier/unity-ads-webview/pull/12099)
+* Open Measurement - Add macros for Brand tracking [#11816](https://github.com/Applifier/unity-ads-webview/pull/11816)
+* Fix Thind Ads Analytics Path [#12161](https://github.com/Applifier/unity-ads-webview/pull/12161)
+
+# Tue Nov 19 10:40:27 UTC 2019
+
+* Hotfix for privacy protocol v2 [commit](https://github.com/Applifier/unity-ads-webview/commit/f1c00b6a6a27f7ac2f3b670bbe01a7494a6b7be9)
+
+# Tue Nov 19 10:40:27 UTC 2019
+
+* Protocol update of DSE privacy events to V2 [#12012](https://github.com/Applifier/unity-ads-webview/pull/12012)
+
+# Fri Nov 15 21:55:35 UTC 2019
+
+* Deploy Support for Webpack Release Build on 3.0.1 [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+
+# Thu Nov 14 22:01:01 UTC 2019
+
+* Add Support for Webpack Release Builds (Only being deployed on 2.1.0) [#12069](https://github.com/Applifier/unity-ads-webview/pull/12069)
+* Add Omnivirt widget Square Endcard Experiment [#12067](https://github.com/Applifier/unity-ads-webview/pull/12067)
+* Enable age gate for consent flow [#11979](https://github.com/Applifier/unity-ads-webview/pull/11979)
+* Add some diagnostics for Consent views [#12013](https://github.com/Applifier/unity-ads-webview/pull/12013)
+* Translate privacy pop-up for AdMob, Display and VPAID ad units [#12071](https://github.com/Applifier/unity-ads-webview/pull/12071)
+* Add Additional Mopub GameIDs for Load Testing [#12068](https://github.com/Applifier/unity-ads-webview/pull/12068)
+* Add Experiment with button animations and MA bandit [#11978](https://github.com/Applifier/unity-ads-webview/pull/11978)
+* Remove A/B test and enable semi-transparent background in all groups [#12070](https://github.com/Applifier/unity-ads-webview/pull/12070)
+
+# Fri Nov  8 23:41:18 UTC 2019
+
+* Add Custom Close MRAID Functionality [#11566](https://github.com/Applifier/unity-ads-webview/pull/11566)
+* Add Groups 13 and 14 to Zynga Load V4 Experiment [#12065](https://github.com/Applifier/unity-ads-webview/pull/12065)
+* AR MRAID - Fix Click Behavior [#12064](https://github.com/Applifier/unity-ads-webview/pull/12064)
+* Add Granular Metrics for Tracking Admob Behavior [#12039](https://github.com/Applifier/unity-ads-webview/pull/12039)
+
 # Thu Nov  7 20:54:44 UTC 2019
 
 * Revert "Direct Catalog Request to Production Endpoint" [#12014](https://github.com/Applifier/unity-ads-webview/pull/12014)
