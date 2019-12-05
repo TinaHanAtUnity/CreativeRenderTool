@@ -4,6 +4,7 @@
 * Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)
 * Fix forcedConsent-metadata [#12249](https://github.com/Applifier/unity-ads-webview/pull/12249)
 * Add 'NOT_IN_MANIFEST' to AR Permissions [#12222](https://github.com/Applifier/unity-ads-webview/pull/12222)
+* Improve Forced Creative Packs [#11951](https://github.com/Applifier/unity-ads-webview/pull/11951)
 
 # Wed Dec  4 22:44:29 UTC 2019
 
