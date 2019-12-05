@@ -6,7 +6,7 @@ describe('MacroUtilTest', () => {
     const macroReplace3 = 'here is to test replacement of {{ OMID_IMPLEMENTOR }} and {{ OMID_API_VERSION }}';
 
     it('should replace CREATIVE_URL correctly', () => {
-        expect(MacroUtil.replaceMacro(macroReplace1, {'{{ CREATIVE_URL }}': 'https://cdn.unityads.unity3d.com/playables/production/ios/9innings_23022018/index.html'})).toBe('here is to test replcement of https://cdn.unityads.unity3d.com/playables/production/ios/9innings_23022018/index.html');
+        expect(MacroUtil.replaceMacro(macroReplace1, {'{{ CREATIVE_URL }}': 'https://cdn.unityads.unity3d.com/playables/production/ios/9innings_23022018/index.html'})).toBe('here is to test replacement of https://cdn.unityads.unity3d.com/playables/production/ios/9innings_23022018/index.html');
     });
 
     it('should not replace anything', () => {
@@ -14,6 +14,6 @@ describe('MacroUtilTest', () => {
     });
 
     it('should replace both URLs', () => {
-        expect(MacroUtil.replaceMacro(macroReplace3, {'{{ OMID_IMPLEMENTOR }}': 'PARTNER_NAME', '{{ OMID_API_VERSION }}': 'OM_JS_VERSION'})).toBe('here is to test replcement of PARTNER_NAME and OM_JS_VERSION');
+        expect(MacroUtil.replaceMacro(macroReplace3, {'{{ OMID_IMPLEMENTOR }}': 'PARTNER_NAME', '{{ OMID_API_VERSION }}': 'OM_JS_VERSION'})).toBe('here is to test replacement of PARTNER_NAME and OM_JS_VERSION');
     });
 });
