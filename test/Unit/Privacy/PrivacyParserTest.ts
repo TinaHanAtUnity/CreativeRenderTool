@@ -94,20 +94,16 @@ describe('PrivacyParserTest', () => {
 
         context ('when gdprEnabled = true', () => {
             [[true, true], [true, false], [false, false]].forEach(([optOutRecorded, optOutEnabled]) => {
-                it (`sets privacy method legitimiate_interest with gdprEnabled true, optOutRecorded=${optOutRecorded} and optOutEnabled=${optOutEnabled}`, () => {
+                it (`sets privacy method to default (unrecorded) with gdprEnabled true, optOutRecorded=${optOutRecorded} and optOutEnabled=${optOutEnabled}`, () => {
                     privacyPartsConfig.gdprEnabled = true;
                     privacyPartsConfig.optOutRecorded = optOutRecorded;
                     privacyPartsConfig.optOutEnabled = optOutEnabled;
-                    const consent = optOutRecorded ? !optOutEnabled : false;
                     const privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyPartsConfig, clientInfo, deviceInfo);
                     const gamePrivacy = privacySDK.getGamePrivacy();
-                    const userPrivacy = privacySDK.getUserPrivacy();
                     assert.equal(gamePrivacy.getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
-                    assert.equal(userPrivacy.getMethod(), optOutRecorded ? PrivacyMethod.LEGITIMATE_INTEREST : PrivacyMethod.DEFAULT);
-                    assert.equal(userPrivacy.getVersion(), 0);
-                    assert.deepEqual(userPrivacy.getPermissions(), {ads: consent, external: consent, gameExp: false});
-                    assert.equal(privacySDK.isOptOutRecorded(), optOutRecorded);
-                    assert.equal(privacySDK.isOptOutEnabled(), optOutRecorded ? !consent : false);
+                    assertDefaultUserPrivacy(privacySDK);
+                    assert.equal(privacySDK.isOptOutRecorded(), false);
+                    assert.equal(privacySDK.isOptOutEnabled(), false);
                     assert.equal(privacySDK.isGDPREnabled(), true);
                 });
             });
