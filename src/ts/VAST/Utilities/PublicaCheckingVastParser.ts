@@ -19,14 +19,7 @@ export class PublicaCheckingVastParser {
         try {
             parsedVast = this._vastParserStrict.parseVast(vast, urlProtocol);
         } catch (campaignError) {
-            const errorData: {} = {
-                vast: vast,
-                wrapperDepth: 0,
-                rootWrapperVast: depth === 0 ? vast : ''
-            };
-            campaignError.errorData = errorData;
-
-            throw campaignError;
+            return false;
         }
 
         const wrapperURL = parsedVast.getWrapperURL();
