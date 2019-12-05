@@ -41,7 +41,6 @@ declare global {
 }
 
 Array.prototype.unique = function () {
-    // tslint:disable
+    // tslint:disable-next-line
     return this.filter((val, index) => this.indexOf(val) === index);
-    // tslint:enable
 };
