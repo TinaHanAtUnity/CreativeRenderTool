@@ -1,4 +1,5 @@
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 
 // List experiments to run here and add them to the list
 // Examples:
@@ -14,4 +15,11 @@ import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 //     cacheDisabled: true
 // });
 
-export const AutomatedExperimentsList: AutomatedExperiment[] = [];
+export const ButtonAnimationsExperiment = new AutomatedExperiment({
+    name: 'ButtonAnimationsExperiment',
+    actions: Object.values(EndScreenAnimation),
+    defaultAction: EndScreenAnimation.STATIC,
+    cacheDisabled: true
+});
+
+export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];

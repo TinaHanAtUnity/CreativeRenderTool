@@ -210,6 +210,7 @@ export class TestFixtures {
             video: null,
             useWebViewUserAgentForTracking: false,
             isOMEnabled: false,
+            omVendors: [],
             shouldMuteByDefault: false
         };
     }
@@ -342,7 +343,8 @@ export class TestFixtures {
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
             playableConfiguration: undefined,
-            targetGameId: mraidContentJson.gameId
+            targetGameId: mraidContentJson.gameId,
+            isCustomCloseEnabled: false
         };
     }
 
@@ -392,7 +394,8 @@ export class TestFixtures {
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             playableConfiguration: undefined,
-            targetGameId: mraidContentJson.gameId
+            targetGameId: mraidContentJson.gameId,
+            isCustomCloseEnabled: false
         };
     }
 
@@ -454,7 +457,9 @@ export class TestFixtures {
             buyerId: 'buyerId',
             trackingUrls: {},
             impressionUrls: vast.getImpressionUrls(),
-            isMoatEnabled: true
+            isMoatEnabled: true,
+            isOMEnabled: false,
+            omVendors: []
         };
     }
 
@@ -871,8 +876,7 @@ export class TestFixtures {
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            privacySDK: sinon.createStubInstance(PrivacySDK),
-            automatedExperimentManager: sinon.createStubInstance(AutomatedExperimentManager)
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
 
@@ -1039,7 +1043,8 @@ export class TestFixtures {
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),
-            ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager)
+            ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager),
+            PrivacySDK: privacySDK
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager, privacySDK);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);

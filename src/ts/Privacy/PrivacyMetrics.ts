@@ -1,15 +1,20 @@
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { IPrivacyPermissions } from 'Privacy/Privacy';
 
 export enum PrivacyEvent {
     AGE_GATE_SHOW = 'age_gate_show',
     AGE_GATE_PASS = 'age_gate_pass',
-    AGE_GATE_NOT_PASSED = 'age_gate_not_passed'
+    AGE_GATE_NOT_PASSED = 'age_gate_not_passed',
+    CONSENT_SHOW = 'consent_show',
+    CONSENT_ACCEPT_ALL = 'consent_accept_all',
+    CONSENT_NOT_ACCEPTED = 'consent_not_accepted',
+    CONSENT_PARTIALLY_ACCEPTED = 'consent_partially_accepted'
 }
 
 export class PrivacyMetrics {
-    public static trigger(event: PrivacyEvent) {
+    public static trigger(event: PrivacyEvent, permissions?: IPrivacyPermissions) {
         const kafkaObject: { [key: string]: unknown } = {};
 
         kafkaObject.type = event;
@@ -28,6 +33,9 @@ export class PrivacyMetrics {
             kafkaObject.abGroup = PrivacyMetrics._abGroup.valueOf();
         }
 
+        if (permissions) {
+            kafkaObject.permissions = permissions;
+        }
         HttpKafka.sendEvent('ads.sdk2.events.privacymetrics.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 

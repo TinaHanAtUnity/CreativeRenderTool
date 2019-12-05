@@ -14,6 +14,8 @@ import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobO
 import * as sinon from 'sinon';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('OpenMeasurementAdViewBuilder', () => {
@@ -216,7 +218,11 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
                 }
                 const request = sinon.createStubInstance(RequestManager);
                 const adViewBuilder = sinon.createStubInstance(AdmobOpenMeasurementController);
-                return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder);
+                const thirdParty = sinon.createStubInstance(ThirdPartyEventManager);
+                const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+
+                // TODO: Remove the open measurement controller as a dependency for the adview builder - future refactor
+                return new AdmobOpenMeasurementController(platform, core, clientInformation, admobcampaign, placement, deviceInfo, request, adViewBuilder, thirdParty, pts);
             };
 
             it('should output obstructed adview', () => {
@@ -229,7 +235,7 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 
                 const rect = OpenMeasurementUtilities.createRectangle(0, 0, 200, 200);
                 const testAdView: IAdView = {
-                    percentageInView: platform === Platform.ANDROID ? 49.8888888888889 : 55.55555555555556,
+                    percentageInView: platform === Platform.ANDROID ? 49 : 55,
                     geometry: {
                         x: 0,
                         y: 0,

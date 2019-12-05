@@ -11,6 +11,7 @@ import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialC
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
@@ -46,7 +47,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
-        this._template = new Template(DisplayInterstitialTemplate);
+        this._template = new Template(DisplayInterstitialTemplate, new Localization(deviceInfo.getLanguage(), 'privacy'));
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._hidePrivacy = hidePrivacy;
@@ -67,7 +68,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-gdpr'
+                selector: '.privacy-button'
             }
         ];
 

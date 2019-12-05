@@ -32,5 +32,6 @@
     "freeMemory": 1234567,
     "freeSpaceExternal": 12345678,
     "ringerMode": 2,
-    "imei": 1
+    "imei": 1,
+    "displayMetricDensity": 1
 }
