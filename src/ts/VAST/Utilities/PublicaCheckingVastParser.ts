@@ -12,12 +12,7 @@ export class PublicaCheckingVastParser {
         this._vastParserStrict = vastParserStrict;
     }
 
-    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
-        const isPublica = this.checkIsPublica(vast, depth, urlProtocol);
-        return this._vastParserStrict.retrieveVast(vast, core, request, bundleId, parent, depth, urlProtocol, isPublica);
-    }
-
-    private checkIsPublica(vast: string, depth: number = 0, urlProtocol: string = 'https:') {
+    public checkIsPublica(vast: string, depth: number = 0, urlProtocol: string = 'https:') {
         let parsedVast: Vast;
         let isPublicaResponse = false;
 

@@ -38,8 +38,6 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _vastParserStrict: VastParserStrict;
     protected _coreConfig: CoreConfiguration;
 
-    private _publicaCheckingVastParser: PublicaCheckingVastParser;
-
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._deviceInfo = core.DeviceInfo;
@@ -78,8 +76,10 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
-        this._publicaCheckingVastParser = new PublicaCheckingVastParser(this._vastParserStrict);
-        return this._publicaCheckingVastParser.retrieveVast(decodedVast, this._coreApi, this._requestManager, response.getAdvertiserBundleId());
+        const publicaCheckingVastParser = new PublicaCheckingVastParser(this._vastParserStrict);
+        const isPublica = publicaCheckingVastParser.checkIsPublica(decodedVast);
+
+        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager, response.getAdvertiserBundleId(), isPublica);
     }
 
     protected parseVastToCampaign(vast: Vast, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {

@@ -170,7 +170,7 @@ export class VastParserStrict {
     }
 
     // default to https: for relative urls
-    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:', isPublica?: boolean): Promise<Vast> {
+    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, isPublica?: boolean, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
         try {
@@ -220,7 +220,7 @@ export class VastParserStrict {
 
         wrapperURL = decodeURIComponent(wrapperURL);
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol, isPublica);
+            return this.retrieveVast(response.response, core, request, bundleId, isPublica, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
 
