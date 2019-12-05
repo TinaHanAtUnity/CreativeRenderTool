@@ -36,6 +36,11 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
                 event: 'click',
                 listener: (event: Event) => this.onDataRequestSubmitEvent(event),
                 selector: '.privacy-data-request-submit-button'
+            },
+            {
+                event: 'blur',
+                listener: () => this.onBlur(),
+                selector: '#privacy-data-request-email-input'
             }
         ];
 
@@ -61,6 +66,13 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     public onCloseEvent(): void {
         this.hideAndCloseCaptcha();
+    }
+
+    //hack for webview bug on ios12/ios13
+    private onBlur(): void {
+        setTimeout (() => {
+            window.scrollTo(0, 0);
+        }, 50);
     }
 
     public onItemSelected(url: string): void {
