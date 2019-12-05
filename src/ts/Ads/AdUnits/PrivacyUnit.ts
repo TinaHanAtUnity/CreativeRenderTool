@@ -8,7 +8,7 @@ import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } f
 import { Platform } from 'Core/Constants/Platform';
 import { Privacy, ConsentPage, IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
-import { IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -167,7 +167,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     }
 
     // IConsentViewHandler
-    public onConsent(permissions: IPermissions, userAction: GDPREventAction, source: GDPREventSource): void {
+    public onConsent(permissions: IPrivacyPermissions, userAction: GDPREventAction, source: GDPREventSource): void {
         if (UserPrivacy.permissionsEql(permissions, UserPrivacy.PERM_ALL_TRUE)) {
             PrivacyMetrics.trigger(PrivacyEvent.CONSENT_ACCEPT_ALL, permissions);
         } else if (UserPrivacy.permissionsEql(permissions, UserPrivacy.PERM_ALL_FALSE)) {
@@ -192,7 +192,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     public onAgeGateDisagree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
 
-        const permissions: IPermissions = {
+        const permissions: IPrivacyPermissions = {
             gameExp: false,
             ads: false,
             external: false
@@ -223,7 +223,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         }, 3000);
     }
 
-    private handleAutoConsent(consent: IPermissions) {
+    private handleAutoConsent(consent: IPrivacyPermissions) {
         setTimeout(() => {
             if (consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));

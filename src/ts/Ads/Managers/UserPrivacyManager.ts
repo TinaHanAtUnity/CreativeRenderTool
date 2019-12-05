@@ -1,5 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IGranularPermissions, IPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -49,7 +49,7 @@ export enum GDPREventAction {
 }
 
 export enum LegalFramework {
-    DEFAULT = 'default',
+    NONE = 'none',
     GDPR = 'gdpr', // EU
     CCPA = 'ccpa', // California
     TC260 = 'tc260' // China
@@ -74,6 +74,8 @@ export class UserPrivacyManager {
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
 
+    public _forcedConsentUnit: boolean;
+
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
@@ -87,7 +89,7 @@ export class UserPrivacyManager {
     private readonly _request: RequestManager;
     private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -98,6 +100,7 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
+        this._forcedConsentUnit = forcedConsentUnit || false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
     }
 
@@ -126,9 +129,9 @@ export class UserPrivacyManager {
                         webViewUrl: privacyUrl
                     },
                     {
-                        ads: (<IGranularPermissions>this._userPrivacy.getPermissions()).ads,
-                        external: (<IGranularPermissions>this._userPrivacy.getPermissions()).external,
-                        gameExp: (<IGranularPermissions>this._userPrivacy.getPermissions()).gameExp,
+                        ads: this._userPrivacy.getPermissions().ads,
+                        external: this._userPrivacy.getPermissions().external,
+                        gameExp: this._userPrivacy.getPermissions().gameExp,
                         agreedOverAgeLimit: agreedOverAgeLimit
                     },
                     {
@@ -174,7 +177,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
@@ -213,7 +216,7 @@ export class UserPrivacyManager {
         return this.sendPrivacyEvent(permissions, source, action, layout, firstRequest);
     }
 
-    private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
+    private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPrivacyPermissions }) {
         const currentPrivacy = this._userPrivacy;
         if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
             return true;
@@ -229,7 +232,7 @@ export class UserPrivacyManager {
         return !UserPrivacy.permissionsEql(currentPermissions, updatedPermissions);
     }
 
-    private sendPrivacyEvent(permissions: IPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
+    private sendPrivacyEvent(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
             'v': 2,
             advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
@@ -310,7 +313,7 @@ export class UserPrivacyManager {
         return this._privacy.isOptOutEnabled();
     }
 
-    public getUserPrivacyPermissions(): IGranularPermissions {
+    public getUserPrivacyPermissions(): IPrivacyPermissions {
         return this._privacy.getUserPrivacy().getPermissions();
     }
 
@@ -343,6 +346,10 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
+        if (this._forcedConsentUnit) {
+            return true;
+        }
+
         if (this.isAgeGateShowRequired()) {
             return true;
         }

@@ -460,8 +460,10 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                 if (granted) {
                     // send event only if permission is granted, otherwise would reload fallback scene
-                    this.sendMraidAnalyticsEvent('permission_dialog_ar_mode', undefined);
                     this.onCameraPermissionEvent(true);
+                    this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
+                } else {
+                    this.sendMraidAnalyticsEvent('camera_permission_user_denied', undefined);
                 }
             }
         });
@@ -521,19 +523,21 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             PermissionsUtil.checkPermissionInManifest(this._platform, this._core, PermissionTypes.CAMERA).then((available: boolean) => {
                 if (!available) {
-                    this.sendMraidAnalyticsEvent('camera_permission_not_in_manifest', undefined);
-                    return CurrentPermission.DENIED;
+                    return CurrentPermission.NOT_IN_MANIFEST;
                 }
                 return PermissionsUtil.checkPermissions(this._platform, this._core, PermissionTypes.CAMERA);
-            }).then((results: CurrentPermission) => {
-                if (results === CurrentPermission.DENIED) {
-                    this.sendMraidAnalyticsEvent('camera_permission_user_denied', undefined);
+            }).then((result: CurrentPermission) => {
+                if (result === CurrentPermission.NOT_IN_MANIFEST) {
                     this._arAvailableButton.classList.add('hidden');
+                    this.sendMraidAnalyticsEvent('camera_permission_not_in_manifest', undefined);
+                } else if (result === CurrentPermission.DENIED) {
+                    this._arAvailableButton.classList.add('hidden');
+                    this.sendMraidAnalyticsEvent('camera_permission_user_denied', undefined);
                 } else {
                     // the user can see ar content
                     this._arCameraAlreadyAccepted = false;
 
-                    if (results === CurrentPermission.ACCEPTED) {
+                    if (result === CurrentPermission.ACCEPTED) {
                         this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
                         this._arCameraAlreadyAccepted = true;
                     }

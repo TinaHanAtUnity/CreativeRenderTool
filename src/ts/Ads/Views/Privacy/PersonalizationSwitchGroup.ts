@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import SwitchGroupTemplate from 'html/consent/personalization-switch-group.html';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { IGranularPermissions } from 'Privacy/Privacy';
+import { IPrivacyPermissions } from 'Privacy/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Localization } from 'Core/Utilities/Localization';
 
@@ -53,7 +53,7 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     }
 
     public show(): void {
-        const permissions: IGranularPermissions = this._userPrivacyManager.getUserPrivacyPermissions();
+        const permissions: IPrivacyPermissions = this._userPrivacyManager.getUserPrivacyPermissions();
 
         this._personalizedExpSwitch.checked = permissions.gameExp;
         this._personalizedAdsSwitch.checked = permissions.ads;
