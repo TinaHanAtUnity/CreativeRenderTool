@@ -59,19 +59,18 @@ class ZyngaFilteredABTest extends FilteredABTest {
     }
 }
 
-// for unit tests
+// For Unit Testing
 export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 
-// Add actual A/B tests below
+// Active AB Tests
+export const MabDecisionButtonTest = new ZyngaFilteredABTest(15, 17);
+export const LoadExperiment = new ABTest(13);
+export const LoadRefreshV4 = new ABTest(14);
+
+// Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new DisabledABTest();
-export const HeartbeatingDownloadButtonTest = new ABTest(7);
-export const BouncingDownloadButtonTest = new ABTest(8);
-export const ShiningDownloadButtonTest = new ABTest(15);
-export const MabDecisionButtonTest = new ABTest(17);
-export const LoadExperiment = new ABTest(13);
-export const LoadRefreshV4 = new ABTest(14);

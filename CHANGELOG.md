@@ -1,5 +1,9 @@
 # Pending
 
+* Remove animation AB tests [12331](https://github.com/Applifier/unity-ads-webview/pull/12331)
+
+# Thu Dec  5 18:39:42 UTC 2019
+
 * Use LegalFramework.NONE instead of LegalFramework.DEFAULT [#12194](https://github.com/Applifier/unity-ads-webview/pull/12194)
 * Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)
 * Fix forcedConsent-metadata [#12249](https://github.com/Applifier/unity-ads-webview/pull/12249)
