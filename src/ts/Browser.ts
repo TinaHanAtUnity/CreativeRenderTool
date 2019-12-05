@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toBoolean = (element: HTMLInputElement): boolean => element.checked;
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
     const JS_FUNC_NAME_GET_HEADLESS_LOAD = 'getHeadlessLoad';
+    const JS_FUNC_NAME_GET_HEADLESS_LOAD_ADAPTER = 'getHeadlessLoadAdapter';
 
     const setClientInfo = () => {
         const fields: [string, string, ((element: HTMLInputElement) => unknown) | undefined][] = [
@@ -244,6 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
             loadModeElement.checked = true;
             //Mopub whitelisted load API gameID
             gameIdElement.value = '2788221';
+            initialize();
+            UnityAds.load('rewardedVideo');
+        // tslint:disable-next-line
+        } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD_ADAPTER]()) {
+            loadModeElement.checked = true;
             initialize();
             UnityAds.load('rewardedVideo');
         } else {
