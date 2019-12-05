@@ -124,10 +124,9 @@ describe('PerPlacementLoadAdapterTest', () => {
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
             sinon.assert.calledWith(sendReadyEventStub, placementID);
-            assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
-            assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be waiting');
         });
 
         it('should update state for NO_FILL', () => {
@@ -137,10 +136,9 @@ describe('PerPlacementLoadAdapterTest', () => {
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
             sinon.assert.notCalled(sendReadyEventStub);
-            assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
-            assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement previous state should be waiting');
         });
     });
 });
