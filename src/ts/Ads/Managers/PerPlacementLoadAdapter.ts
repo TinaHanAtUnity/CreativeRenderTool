@@ -33,12 +33,6 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         return;
     }
 
-    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
-        placement.setCurrentCampaign(undefined);
-        this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
-        this.sendPlacementStateChangesLoadAdapter(placement.getId(), PlacementState.READY, PlacementState.NOT_AVAILABLE);
-    }
-
     public sendPlacementStateChangesLoadAdapter(placementId: string, previousState: PlacementState, nextState: PlacementState): void {
         this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[previousState], PlacementState[nextState]);
         if (nextState === PlacementState.READY) {
