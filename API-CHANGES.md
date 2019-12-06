@@ -16,7 +16,8 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 ## 3.4.0
 
-
+* Added ClassDetection API
+* Removed DeviceInfo method: isMadeWithUnity
 
 ## 3.3.0
 
@@ -32,11 +33,27 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 ## 3.2.0
 
+* Added Load API
+* Added usePerPlacementLoad to parameters on ClientInfo in Initialization
+* Added MediationMetaData method: getAdapterVersion
+* Added Sdk API method: initError
+* Added Videoplayer method: getVideoViewRectangle
+
 ## 3.1.0
+
+* Added Native Error API
+* Added Support for Metadata Load API
+* Added iOS WebAuth API
 
 ## 3.0.3
 
+* Added Android Store API
+* Added iOS Products API
+* Appsheet API moved from Core Module to Store Module
+
 ## 3.0.1
+
+* Added AndroidAR API
 
 ## 3.0.0
 
@@ -46,6 +63,8 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Permissions API class.
 
 ## 2.3.0
+
+* Added AndroidRequest API
 
 ## 2.2.1
 
