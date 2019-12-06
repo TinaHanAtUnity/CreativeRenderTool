@@ -18,7 +18,6 @@ import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
-import { PublicaCheckingVastParser } from 'VAST/Utilities/PublicaCheckingVastParser';
 
 export class ProgrammaticVastParser extends CampaignParser {
 
@@ -76,10 +75,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
-        const publicaCheckingVastParser = new PublicaCheckingVastParser(this._vastParserStrict);
-        const isPublica = publicaCheckingVastParser.checkIsPublica(decodedVast);
-
-        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager, response.getAdvertiserBundleId(), isPublica);
+        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager, response.getAdvertiserBundleId(), false);
     }
 
     protected parseVastToCampaign(vast: Vast, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {

@@ -216,6 +216,7 @@ export class VastParserStrict {
             if (this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             }
+            isPublica = true;
         }
 
         wrapperURL = decodeURIComponent(wrapperURL);
