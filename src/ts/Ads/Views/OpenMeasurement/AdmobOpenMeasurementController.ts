@@ -1,4 +1,4 @@
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurement, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AdMobSessionInterfaceEventBridge } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
@@ -9,8 +9,9 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
-import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent, MediaType, VideoEventAdaptorType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
@@ -48,7 +49,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._omAdSessionId = JaegerUtilities.uuidv4();
 
         this._omSessionInterfaceBridge = new AdMobSessionInterfaceEventBridge(core, {
-            onImpression: (impressionValues: IImpressionValues) => this.impression(impressionValues),
+            onImpression: (impressionValues: IImpressionValues) => this.admobImpression(omAdViewBuilder),
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
             onSendFirstQuartile: () => this.sendFirstQuartile(),
@@ -67,7 +68,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             onVideoElement: (element: HTMLElement) => { this._admobVideoElement = element; },
             onElementBounds: (elementBounds: IRectangle) => { this._admobElementBounds = elementBounds; },
             onInjectVerificationResources: (verifcationResources: IVerificationScriptResource[]) => this.injectVerificationResources(verifcationResources),
-            onSessionStart: (sessionEvent: ISessionEvent) => this.sessionStart(),
+            onSessionStart: (sessionEvent: ISessionEvent) => this.sessionStart(sessionEvent),
             onSessionFinish: (sessionEvent: ISessionEvent) => this.sessionFinish(),
             onSessionError: (sessionEvent: ISessionEvent) => this.sessionError(sessionEvent)
         }, this);
@@ -140,8 +141,29 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
-    public sessionStart() {
-        super.sessionStart();
+    public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+            const impressionObject: IImpressionValues = {
+                mediaType: MediaType.VIDEO
+            };
+
+            impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            if (this._platform === Platform.ANDROID) {
+                impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
+            }
+            impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+            super.impression(impressionObject);
+        }).catch((e) => {
+            const impressionObject: IImpressionValues = {
+                mediaType: MediaType.VIDEO
+            };
+
+            super.impression(impressionObject);
+        });
+    }
+
+    public sessionStart(sessionEvent: ISessionEvent) {
+        super.sessionStart(sessionEvent);
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 

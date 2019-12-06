@@ -25,7 +25,7 @@ import OMIDSessionClient from 'html/omid/admob-session-interface.html';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { Localization } from 'Core/Utilities/Localization';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
@@ -159,6 +159,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         if (this._privacy) {
             this._privacy.hide();
         }
+
+        if (this._admobOMController) {
+            this.sendUnObstructedOMGeometryChange(this._admobOMController);
+        }
     }
 
     public onBackPressed() {
@@ -175,6 +179,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
     public sendMuteChange(isMuted: boolean) {
         this._afmaBridge.sendMuteChange(isMuted);
+    }
+
+    public getOpenMeasurementController() {
+        return this._admobOMController;
     }
 
     private choosePrivacyShown(): void {
@@ -328,7 +336,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy.show();
 
         if (this._admobOMController) {
-            this.sendOMGeometryChange(this._admobOMController);
+            this.sendObstructedOMGeometryChange(this._admobOMController);
         }
     }
 
@@ -337,17 +345,26 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy.show();
 
         if (this._admobOMController) {
-            this.sendOMGeometryChange(this._admobOMController);
+            this.sendObstructedOMGeometryChange(this._admobOMController);
         }
     }
 
-    private sendOMGeometryChange(om: AdmobOpenMeasurementController) {
+    private sendObstructedOMGeometryChange(om: AdmobOpenMeasurementController) {
         const popup = <HTMLElement>document.querySelector('.pop-up');
         const gdprRect = popup.getBoundingClientRect();
         const obstructionRect = OpenMeasurementUtilities.createRectangle(gdprRect.left, gdprRect.top, gdprRect.width, gdprRect.height);
 
         const adViewBuilder = om.getOMAdViewBuilder();
         return adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om, obstructionRect).then((adview) => {
+            const viewPort = adViewBuilder.getViewPort();
+            om.geometryChange(viewPort, adview);
+        });
+    }
+
+    private sendUnObstructedOMGeometryChange(om: AdmobOpenMeasurementController) {
+        const adViewBuilder = om.getOMAdViewBuilder();
+        const obstructionRect: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
+        return adViewBuilder.buildAdmobAdView([], om, obstructionRect).then((adview) => {
             const viewPort = adViewBuilder.getViewPort();
             om.geometryChange(viewPort, adview);
         });
