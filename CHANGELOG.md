@@ -1,6 +1,7 @@
 # Pending
 
 * Merge 3.4.0 into Master [#12361](https://github.com/Applifier/unity-ads-webview/pull/12361)
+* Add 3.4.0 to Release Process [#12358](https://github.com/Applifier/unity-ads-webview/pull/12358)
 * Array Prototype Unique [#12360](https://github.com/Applifier/unity-ads-webview/pull/12360)
 
 # Fri Dec  6 01:04:44 UTC 2019
