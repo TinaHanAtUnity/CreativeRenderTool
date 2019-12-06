@@ -90,6 +90,7 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Android system UI event handling to ad unit and activity
 * Added Cache.setFileContent method to Android and iOS
 * Android Cache.getFileContent no longer allows blank string as value for encoding, iOS already functioned this way
+* Added Support for Missed Impression Ordinal Data
 
 ## 2.1.1
 
