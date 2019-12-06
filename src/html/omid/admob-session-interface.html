@@ -67,7 +67,7 @@
                 return '{{ OMID_API_VERSION }}';
             }
 
-            var getOMIDImplementor = function() {
+            var getOmidImplementer = function() {
                 return '{{ OMID_IMPLEMENTOR }}';
             }
 
@@ -100,7 +100,7 @@
             };
 
             var omidJSInfo = {
-                omidImplementer: getOMIDImplementor(),
+                omidImplementer: getOmidImplementer(),
                 serviceVersion: getUnitySDKVersion(),
                 sessionClientVersion: undefined,
                 partnerName: undefined,
@@ -120,8 +120,8 @@
             }
 
             var App = {
-                omidImplementer: getOMIDImplementor(),
-                libraryVersion: '1.0.0',                  // First version of unity's implementation of OMID for Web
+                omidImplementer: getOmidImplementer(),
+                libraryVersion: '1.2.10',                 // First version of unity's implementation of OMID for Web
                 appId: 'com.unity.ads',                   // The host app's identifier - unity sdk name
                 adId: undefined,                          // The iOS or Android advertising identifier - set by unity?
             }
@@ -221,12 +221,13 @@
             }
 
             this.setClientInfo = function(sessionClientVersion, partnerName, partnerVersion) {
-                omidNativeInfo.partnerName = partnerName;
-                omidNativeInfo.partnerVersion = partnerVersion;
+                omidNativeInfo.partnerName = 'Unity3d';
+                omidNativeInfo.partnerVersion = getUnitySDKVersion();
 
                 omidJSInfo.sessionClientVersion = sessionClientVersion;
                 omidJSInfo.partnerName = partnerName;
                 omidJSInfo.partnerVersion = partnerVersion;
+                omidJSInfo.serviceVersion = '1.2.10';
             };
 
             this.registerSessionObserver = function(sessionEventsCallback) {
