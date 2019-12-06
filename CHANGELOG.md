@@ -1,4 +1,4 @@
-# Pending
+# Fri Dec  6 23:28:26 UTC 2019
 
 * Merge 3.4.0 into Master [#12361](https://github.com/Applifier/unity-ads-webview/pull/12361)
 * Add 3.4.0 to Release Process [#12358](https://github.com/Applifier/unity-ads-webview/pull/12358)
