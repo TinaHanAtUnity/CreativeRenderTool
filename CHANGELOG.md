@@ -1,4 +1,4 @@
-# Pending
+# Fri Dec  6 01:04:44 UTC 2019
 
 * Remove animation AB tests [#12331](https://github.com/Applifier/unity-ads-webview/pull/12331)
 * Open Measurement - Admob Viewability Adjustments [#12102](https://github.com/Applifier/unity-ads-webview/pull/12102)
