@@ -14,6 +14,10 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 3.4.0
+
+
+
 ## 3.3.0
 
 * Removed destroy from banner API class.
@@ -26,12 +30,26 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added setRefreshRate to banner API class.
 * Added getDisplayMetricDensity to Android DeviceInfo API class.
 
+## 3.2.0
+
+## 3.1.0
+
+## 3.0.3
+
+## 3.0.1
+
 ## 3.0.0
 
 * Added MonetizationListener API class.
 * Added CustomPurchasing API class.
 * Added Analytics API class.
 * Added Permissions API class.
+
+## 2.3.0
+
+## 2.2.1
+
+* Added Android DeviceInfo Method: getNetworkMetered
 
 ## 2.2.0
 
@@ -98,7 +116,6 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Android Cache API events: NETWORK_ERROR and ILLEGAL_STATE
 * Modified Cache API on both platforms to add existing file size to expected content size (not just totalBytes from request)
 * Added Android Request API exception type to RESULT_FAIL message
-
 
 ## 2.0.8
 
