@@ -3,7 +3,7 @@ import {
     CurrentUnityConsentVersion,
     GamePrivacy,
     IAllPermissions,
-    IGranularPermissions,
+    IPrivacyPermissions,
     IProfilingPermissions,
     IRawGamePrivacy,
     IRawUserPrivacy,
@@ -27,7 +27,7 @@ export class PrivacyParser {
         const optOutEnabled = configJson.optOutEnabled;
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, gamePrivacy, optOutRecorded, optOutEnabled, limitAdTracking);
-        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.DEFAULT;
+        const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.NONE;
         const ageGateLimit =  this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
 
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, ageGateLimit, legalFramework);
@@ -112,7 +112,7 @@ export class PrivacyParser {
         // Handle old style 'profiling'-privacy
         const profiling = (<IProfilingPermissions><unknown>rawUserPrivacy.permissions).profiling;
         if (profiling !== undefined) {
-            let permissions: IGranularPermissions | undefined;
+            let permissions: IPrivacyPermissions | undefined;
             if (profiling) {
                 if (rawUserPrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST) {
                     permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
@@ -151,21 +151,6 @@ export class PrivacyParser {
 
         if (rawUserPrivacy && rawUserPrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
-        }
-
-        if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST ||
-            gamePrivacy.getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
-            if (!rawUserPrivacy || gamePrivacy.getMethod() !== rawUserPrivacy.method) {
-                return new UserPrivacy({
-                    method: optOutRecorded ? gamePrivacy.getMethod() : PrivacyMethod.DEFAULT,
-                    version: 0,
-                    permissions: {
-                        gameExp: false,
-                        ads: optOutRecorded ? !optOutEnabled : false,
-                        external: optOutRecorded ? !optOutEnabled : false
-                    }
-                });
-            }
         }
 
         if (!rawUserPrivacy) {
