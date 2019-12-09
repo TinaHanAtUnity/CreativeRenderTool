@@ -14,6 +14,11 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 3.4.0
+
+* Added ClassDetection API
+* Removed DeviceInfo method: isMadeWithUnity
+
 ## 3.3.0
 
 * Removed destroy from banner API class.
@@ -26,12 +31,44 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added setRefreshRate to banner API class.
 * Added getDisplayMetricDensity to Android DeviceInfo API class.
 
+## 3.2.0
+
+* Added Load API
+* Added usePerPlacementLoad to parameters on ClientInfo in Initialization
+* Added MediationMetaData method: getAdapterVersion
+* Added Sdk API method: initError
+* Added Videoplayer method: getVideoViewRectangle
+
+## 3.1.0
+
+* Added Native Error API
+* Added Support for Metadata Load API
+* Added iOS WebAuth API
+
+## 3.0.3
+
+* Added Android Store API
+* Added iOS Products API
+* Appsheet API moved from Core Module to Store Module
+
+## 3.0.1
+
+* Added AndroidAR API
+
 ## 3.0.0
 
 * Added MonetizationListener API class.
 * Added CustomPurchasing API class.
 * Added Analytics API class.
 * Added Permissions API class.
+
+## 2.3.0
+
+* Added AndroidRequest API
+
+## 2.2.1
+
+* Added Android DeviceInfo Method: getNetworkMetered
 
 ## 2.2.0
 
@@ -53,6 +90,7 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Android system UI event handling to ad unit and activity
 * Added Cache.setFileContent method to Android and iOS
 * Android Cache.getFileContent no longer allows blank string as value for encoding, iOS already functioned this way
+* Added Support for Missed Impression Ordinal Data
 
 ## 2.1.1
 
@@ -98,7 +136,6 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added Android Cache API events: NETWORK_ERROR and ILLEGAL_STATE
 * Modified Cache API on both platforms to add existing file size to expected content size (not just totalBytes from request)
 * Added Android Request API exception type to RESULT_FAIL message
-
 
 ## 2.0.8
 
