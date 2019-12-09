@@ -1,3 +1,7 @@
+# Pending
+
+* Open Measurement - Add Publica To Tracking Path[#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
+
 # Mon Dec  9 21:11:59 UTC 2019
 
 * Update API-Changes.md up to 3.4.0 [#12387](https://github.com/Applifier/unity-ads-webview/pull/12387)
