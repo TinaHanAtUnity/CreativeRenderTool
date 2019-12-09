@@ -17,7 +17,7 @@ export interface IDataRequestResponse {
 
 export class PrivacyDataRequestHelper {
 
-    private static BaseUrl: string = 'https://us-central1-ads-debot.cloudfunctions.net/debot/';
+    private static BaseUrl: string = 'https://us-central1-unity-ads-debot-prd.cloudfunctions.net/debot/';
 
     private static _platform: Platform;
     private static _request: RequestManager;
