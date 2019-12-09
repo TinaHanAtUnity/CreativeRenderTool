@@ -77,13 +77,13 @@
                 </p>
             </div>
             <ul class="radio-group-container">
-                <% for (var k in data.reportReasons) { %>
+                <% data.reportReasons.forEach((k) => { %>
                 <div class="radio-item-container">
                     <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
                     <label for="<%= data.reportKeys[k] %>">
-                        <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
+                        <%= (k === null || k === "undefined") ? "N/A" : k %></label>
                 </div>
-                <% } %>
+                <% }); %>
             </ul>
             <div class="text-small">
                 <p>
