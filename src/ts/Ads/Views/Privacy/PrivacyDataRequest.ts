@@ -70,9 +70,11 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     //hack for webview bug on ios12/ios13
     private onBlur(): void {
-        setTimeout (() => {
-            window.scrollTo(0, 0);
-        }, 50);
+        if (this._platform === Platform.IOS) {
+            setTimeout (() => {
+                window.scrollTo(0, 0);
+            }, 50);
+        }
     }
 
     public onItemSelected(url: string): void {
