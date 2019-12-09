@@ -34,6 +34,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     }
 
     public sendPlacementStateChangesLoadAdapter(placementId: string, previousState: PlacementState, nextState: PlacementState): void {
+        this._ads.Placement.setPlacementState(placementId, nextState);
         this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[previousState], PlacementState[nextState]);
         if (nextState === PlacementState.READY) {
             this._ads.Listener.sendReadyEvent(placementId);
