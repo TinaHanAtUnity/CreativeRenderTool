@@ -98,12 +98,12 @@ describe('VastParserStrict', () => {
 
         it ('should decode encoded IAS urls', () => {
             const wrappedVAST = WrappedVASTUrlEncoded;
-            sinon.stub(request, 'get').resolves();
+            const getStub = sinon.stub(request, 'get').resolves();
 
             TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
-            const options = [['X-Device-Type', 'unity'], ['User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/73.0.3679.0 Safari/537.36']];
             const newUrl = 'https://vastpixel3.adsafeprotected.com/ddm/pfadx/N755990.157757SKYITALIAS.R.L._GM/B22442959.242394195;sz=0x0;ord=123;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;dcmt=text/xml;dc_sdk_apis=123;dc_omid_p=123';
-            sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, options, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+            const theUrl = getStub.getCall(0).args[0];
+            assert.equal(newUrl, theUrl);
         });
 
         it ('should no-op already decoded urls', () => {
