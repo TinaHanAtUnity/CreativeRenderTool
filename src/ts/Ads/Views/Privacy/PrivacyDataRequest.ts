@@ -93,12 +93,10 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
                     }
                     break;
                 case DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS:
-                    this.showMultipleFailedErrorMsg();
-                    this.hideAndCloseCaptcha();
+                    this.handleMultipleFailedError();
                     break;
                 default:
-                    this.showGenericErrorMsg();
-                    this.hideAndCloseCaptcha();
+                    this.handleGenericError();
             }
         });
     }
@@ -125,16 +123,12 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
                 const imageUrls = response.imageUrls ? response.imageUrls : [];
                 this.showCaptcha(imageUrls);
             } else if (response.status === DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS) {
-                this.showMultipleFailedErrorMsg();
-                this.hideAndCloseCaptcha();
+                this.handleMultipleFailedError();
             } else {
-                // todo: show generic error message
-                this.hideAndCloseCaptcha();
-                this.showGenericErrorMsg();
+                this.handleGenericError();
             }
         }).catch((error) => {
-            this.hideAndCloseCaptcha();
-            this.showGenericErrorMsg();
+            this.handleGenericError();
         });
     }
 
@@ -163,15 +157,24 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
         }
     }
 
-    private showMultipleFailedErrorMsg(): void {
-        const msgElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
-        msgElement.classList.add('show-msg');
-
-        this.disableInputs();
+    private handleMultipleFailedError(): void {
+        this.showError(this._localization.translate('privacy-data-request-fail-message'));
+        this.hideAndCloseCaptcha();
     }
 
-    private showGenericErrorMsg(): void {
-        // todo: add an element for showing generic errors
+    private handleGenericError(): void {
+        // todo: add an error message
+        this.showError('Error. Please try again later.');
+        this.hideAndCloseCaptcha();
+    }
+
+    private showError(errorMsg: string) {
+        const errorElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
+        const errorMsgElement = <HTMLElement> errorElement.querySelector('.error-msg');
+        errorMsgElement.innerHTML = errorMsg;
+        errorElement.classList.add('show-msg');
+
+        this.disableInputs();
     }
 
     private disableInputs(): void {
