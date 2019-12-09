@@ -38,7 +38,8 @@ export enum AdmobMetric {
     AdmobOMEnabled = 'admob_om_enabled',
     AdmobOMInjected = 'admob_om_injected',
     AdmobOMSessionStart = 'admob_om_session_start',
-    AdmobOMSessionFinish = 'admob_om_session_finish'
+    AdmobOMSessionFinish = 'admob_om_session_finish',
+    AdmobOMImpression = 'admob_om_impression'
 }
 
 export enum BannerMetric {

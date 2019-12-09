@@ -152,12 +152,15 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
             }
             impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+
+            this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             super.impression(impressionObject);
         }).catch((e) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO
             };
 
+            this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             super.impression(impressionObject);
         });
     }
