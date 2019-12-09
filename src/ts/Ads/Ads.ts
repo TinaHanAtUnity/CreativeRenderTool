@@ -89,7 +89,6 @@ import { LoadExperiment, LoadRefreshV4, ZyngaLoadRefreshV4 } from 'Core/Models/A
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
-import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export class Ads implements IAds {
 
@@ -189,11 +188,7 @@ export class Ads implements IAds {
             PrivacyMetrics.setPrivacy(this.PrivacySDK);
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
 
-            PrivacyDataRequestHelper.init(this._core.NativeBridge.getPlatform(),
-                    this._core.RequestManager,
-                    TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._core.NativeBridge.getPlatform(),
-                    this._core.ClientInfo.getSdkVersionName(),
-                    this._core.DeviceInfo));
+            PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {

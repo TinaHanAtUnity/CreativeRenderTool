@@ -1,7 +1,9 @@
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { RequestError } from 'Core/Errors/RequestError';
 import { Platform } from 'Core/Constants/Platform';
-import { ITrackingIdentifier } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ICore } from 'Core/ICore';
 
 export enum DataRequestResponseStatus {
     SUCCESS,
@@ -15,30 +17,55 @@ export interface IDataRequestResponse {
     imageUrls?: string[];
 }
 
+interface IDataRequestBody {
+    idfa: string | null | undefined;
+    gameID: string;
+    projectID: string;
+    platform: string;
+    language: string;
+}
+
 export class PrivacyDataRequestHelper {
 
     private static BaseUrl: string = 'https://us-central1-unity-ads-debot-prd.cloudfunctions.net/debot/';
 
     private static _platform: Platform;
     private static _request: RequestManager;
-    private static _trackingIdentifiers: ITrackingIdentifier;
+    private static _idfa: string | null | undefined;
+    private static _gameID: string;
+    private static _projectID: string;
+    private static _language: string;
 
-    public static init(platform: Platform, request: RequestManager, trackingIdentifiers: ITrackingIdentifier) {
-        this._platform = platform;
-        this._request = request;
-        this._trackingIdentifiers = trackingIdentifiers;
+    public static init(core: ICore) {
+        this._platform = core.NativeBridge.getPlatform();
+        this._request = core.RequestManager;
+        this._idfa = this.getIdfa(core.NativeBridge.getPlatform(), core.DeviceInfo);
+        this._gameID = core.ClientInfo.getGameId();
+        this._projectID = core.Config.getUnityProjectId();
+        this._language = core.DeviceInfo.getLanguage();
     }
 
     public static sendInitRequest(email: string): Promise<IDataRequestResponse> {
+        const body = {
+            ... this.getRequestBody(),
+            email: email
+        };
+
         const url = PrivacyDataRequestHelper.BaseUrl + 'init';
         return PrivacyDataRequestHelper.sendRequest(
-            url, JSON.stringify({ idfa: PrivacyDataRequestHelper._trackingIdentifiers.advertisingTrackingId, email: email}));
+            url, JSON.stringify(body));
     }
 
     public static sendVerifyRequest(email: string, selectedImage: string): Promise<IDataRequestResponse> {
+        const body = {
+            ... this.getRequestBody(),
+            email: email,
+            answer: selectedImage
+        };
+
         const url = PrivacyDataRequestHelper.BaseUrl + 'verify';
         return PrivacyDataRequestHelper.sendRequest(
-            url, JSON.stringify({ idfa: PrivacyDataRequestHelper._trackingIdentifiers.advertisingTrackingId, email: email, answer: selectedImage }));
+            url, JSON.stringify(body));
     }
 
     public static sendDebugResetRequest(): Promise<IDataRequestResponse> {
@@ -67,5 +94,28 @@ export class PrivacyDataRequestHelper {
             return { status: DataRequestResponseStatus.GENERIC_ERROR };
 
         });
+    }
+
+    private static getIdfa(platform: Platform, deviceInfo: DeviceInfo): string | null | undefined {
+        let idfa: string | null | undefined;
+
+        if (!deviceInfo.getAdvertisingIdentifier()) {
+            if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+                idfa = deviceInfo.getAndroidId();
+            }
+        } else {
+            idfa = deviceInfo.getAdvertisingIdentifier();
+        }
+        return idfa;
+    }
+
+    private static getRequestBody(): IDataRequestBody {
+        return {
+            idfa: PrivacyDataRequestHelper._idfa,
+            gameID: PrivacyDataRequestHelper._gameID,
+            projectID: PrivacyDataRequestHelper._projectID,
+            platform: Platform[PrivacyDataRequestHelper._platform].toLowerCase(),
+            language: PrivacyDataRequestHelper._language
+        };
     }
 }
