@@ -152,10 +152,10 @@
         <span class="report-title centered-title">Report Advertisement</span>
         <span class="report-dialog">Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!</span>
         <ul class="radio-group-container">
-            <% data.reportReasons.forEach((k) => { %>
+            <% data.reportReasons.forEach((k, index) => { %>
             <div class="radio-item-container">
-                <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
-                <label for="<%= data.reportKeys[k] %>">
+                <input id="<%= data.reportKeys[index] %>" class="report-choice-radio" name="report-reason" type="radio">
+                <label for="<%= data.reportKeys[index] %>">
                     <%= (k === null || k === "undefined") ? "N/A" : k %></label>
             </div>
             <% }); %>
