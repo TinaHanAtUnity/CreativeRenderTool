@@ -7,14 +7,14 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
-import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
 import { IPrivacySettings, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
 
-export class PrivacyView extends View<IPrivacyViewHandler> {
+export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     private readonly _coreApi: ICoreApi;
     private readonly _privacyManager: UserPrivacyManager;
 

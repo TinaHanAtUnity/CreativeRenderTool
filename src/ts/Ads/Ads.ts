@@ -88,6 +88,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadRefreshV4, ZyngaLoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 
 export class Ads implements IAds {
 
@@ -326,7 +327,7 @@ export class Ads implements IAds {
 
         this._showingPrivacy = true;
 
-        const privacyView = new PrivacyUnit({
+        const privacyView = new PrivacySDKUnit({
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
