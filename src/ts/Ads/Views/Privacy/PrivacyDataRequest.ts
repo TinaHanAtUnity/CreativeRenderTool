@@ -163,8 +163,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
     }
 
     private handleGenericError(): void {
-        // todo: add an error message
-        this.showError('Error. Please try again later.');
+        this.showError(this._localization.translate('privacy-data-request-error-message'));
         this.hideAndCloseCaptcha();
     }
 

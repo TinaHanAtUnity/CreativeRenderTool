@@ -53,6 +53,7 @@
   "privacy-data-request-email-input-placeholder": "Enter Email Id",
   "privacy-data-request-confirmation-message": "Thank you. You should receive an email with the link to request your data shortly.",
   "privacy-data-request-fail-message": "You have reached the maximum number of attempts. To request your data, please try again after 24 hours.",
+  "privacy-data-request-error-message": "Error: Please try again later.",
 
   "privacy-captcha-description": "We need to verify that the user is human. Please review the following 16 images and select the one that does not fit the theme.",
   "privacy-captcha-success-message": "Success",
