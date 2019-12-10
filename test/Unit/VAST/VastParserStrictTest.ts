@@ -97,21 +97,22 @@ describe('VastParserStrict', () => {
             });
         });
 
-        it ('should decode encoded urls', () => {
+        it ('should decode encoded IAS urls', () => {
+            const wrappedVAST = WrappedVASTUrlEncoded;
+            const getStub = sinon.stub(request, 'get').resolves();
+
+            TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
+            const newUrl = 'https://vastpixel3.adsafeprotected.com/ddm/pfadx/N755990.157757SKYITALIAS.R.L._GM/B22442959.242394195;sz=0x0;ord=123;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;dcmt=text/xml;dc_sdk_apis=123;dc_omid_p=123';
+            const theUrl = getStub.getCall(0).args[0];
+            assert.equal(newUrl, theUrl);
+        });
+
+        it ('should no-op already decoded urls', () => {
             const wrappedVAST = WrappedVast;
             sinon.stub(request, 'get').resolves();
 
             TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
             const newUrl = 'http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_2.xml';
-            sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
-        });
-
-        it ('should no-op already decoded urls', () => {
-            const wrappedVAST = WrappedVASTUrlEncoded;
-            sinon.stub(request, 'get').resolves();
-
-            TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
-            const newUrl = 'https://ad.doubleclick.net/ddm/pfadx/N755990.157757SKYITALIAS.R.L._GM/B22442959.242394195;sz=0x0;ord=123;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;dcmt=text/xml;dc_sdk_apis=123;dc_omid_p=123';
             sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
         });
 

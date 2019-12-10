@@ -216,10 +216,10 @@ export class VastParserStrict {
             if (this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             }
+            wrapperURL = decodeURIComponent(wrapperURL);
             isPublica = true;
         }
 
-        wrapperURL = decodeURIComponent(wrapperURL);
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, bundleId, isPublica, parsedVast, depth + 1, wrapperUrlProtocol);
         });
