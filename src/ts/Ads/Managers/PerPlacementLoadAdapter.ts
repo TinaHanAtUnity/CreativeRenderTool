@@ -16,6 +16,8 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
+    private _trackablePlacements: Set<string>;
+
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
         super(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
 
@@ -29,8 +31,25 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         });
     }
 
+    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
+        super.setCurrentAdUnit(adUnit, placement);
+
+        this.sendPlacementStateChangesLoadAdapter(placement.getId(), PlacementState.READY, PlacementState.NOT_AVAILABLE);
+    }
+
     public sendPlacementStateChanges(placementId: string): void {
-        return;
+        if (this._trackablePlacements.has(placementId)) {
+            const placement = this._adsConfig.getPlacement(placementId);
+            if (placement.getPlacementStateChanged())
+            {
+                this.sendPlacementStateChangesLoadAdapter(placementId, placement.getPreviousState(), placement.getState());
+                placement.setPlacementStateChanged(false);
+
+                if (placement.getState() !== PlacementState.WAITING) {
+                    this._trackablePlacements.delete(placementId);
+                }
+            }
+        }
     }
 
     public sendPlacementStateChangesLoadAdapter(placementId: string, previousState: PlacementState, nextState: PlacementState): void {
@@ -45,15 +64,10 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         const placement = this._adsConfig.getPlacement(placementId);
 
         if (placement.getState() === PlacementState.WAITING) {
-            const onPlacementStateChangeObserver = placement.onPlacementStateChanged.subscribe((previousState, currentState) => {
-                if (previousState === PlacementState.WAITING) {
-                    this.sendPlacementStateChange(placementId, currentState);
-                    placement.onPlacementStateChanged.unsubscribe(onPlacementStateChangeObserver);
-                }
-            });
-        } else {
-            this.sendPlacementStateChange(placementId, placement.getState());
+            this._trackablePlacements.add(placementId);
         }
+        
+        this.sendPlacementStateChange(placementId, placement.getState());
     }
 
     private sendPlacementStateChange(placementId: string, placementState: PlacementState) {
