@@ -277,32 +277,46 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             describe('when privacy.consent has not been set', () => {
-                [true, false, 'badValue', undefined].forEach((gdprConsentValue) => {
-                    it('and and gdpr.consent = ' + gdprConsentValue, () => {
-                        privacyConsent = undefined;
+                beforeEach(() => {
+                    privacyConsent = undefined;
+                });
+                [true, false].forEach((gdprConsentValue) => {
+                    it('gdpr.consent = ' + gdprConsentValue, () => {
                         gdprConsent = gdprConsentValue;
                         return privacyManager.getConsentAndUpdateConfiguration().then(() => {
-                            if (gdprConsentValue === 'badValue') {
-                                assert.fail('should throw');
-                            }
-                            if (gdprConsentValue === undefined) {
-                                assert.fail('should throw');
-                            }
                             sinon.assert.calledTwice(getStub);
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             const expectedPermissions = gdprConsentValue ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
                             sinon.assert.calledOnce(updateUserPrivacy);
                             sinon.assert.calledWith(updateUserPrivacy, expectedPermissions);
-                        }).catch((e) => {
-                            sinon.assert.notCalled(updateUserPrivacy);
-                            if (gdprConsentValue === 'badValue') {
-                                assert.equal(e.message, 'gdpr.consent.value is undefined');
-                                return;
-                            }
-                            assert.isUndefined(gdprConsentValue);
-                            assert.equal(e, StorageError.COULDNT_GET_VALUE);
                         });
+                    });
+                });
+
+                it('gdpr.consent is not set, should throw', () => {
+                    gdprConsent = undefined;
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        assert.fail('should throw');
+                    }).catch((e) => {
+                        sinon.assert.calledTwice(getStub);
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                        sinon.assert.notCalled(updateUserPrivacy);
+                        assert.equal(e, StorageError.COULDNT_GET_VALUE);
+                    });
+                });
+
+                it('gdpr.consent is set to a bad value, should throw', () => {
+                    gdprConsent = 'badValue';
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        assert.fail('should throw');
+                    }).catch((e) => {
+                        sinon.assert.calledTwice(getStub);
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                        sinon.assert.notCalled(updateUserPrivacy);
+                        assert.equal(e.message, 'gdpr.consent.value is undefined');
                     });
                 });
             });
