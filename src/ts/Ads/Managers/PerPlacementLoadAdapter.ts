@@ -43,9 +43,22 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
     private sendLoadAPIEvent(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
-        const currentState = placement.getState();
+
+        if (placement.getState() === PlacementState.WAITING) {
+            const onPlacementStateChangeObserver = placement.onPlacementStateChanged.subscribe((previousState, currentState) => {
+                if (previousState === PlacementState.WAITING) {
+                    this.sendPlacementStateChange(placementId, currentState);
+                    placement.onPlacementStateChanged.unsubscribe(onPlacementStateChangeObserver);
+                }
+            });
+        } else {
+            this.sendPlacementStateChange(placementId, placement.getState());
+        }
+    }
+
+    private sendPlacementStateChange(placementId: string, placementState: PlacementState) {
         this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
-        switch (currentState) {
+        switch (placementState) {
             case PlacementState.READY:
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.READY);
                 break;
