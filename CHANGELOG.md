@@ -1,4 +1,4 @@
-# Pending
+# Tue Dec 10 17:30:44 UTC 2019
 
 * Open Measurement - Add Publica To Tracking Path [#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
 * Fix Reporting Ad Reasons [#12418](https://github.com/Applifier/unity-ads-webview/pull/12418)
