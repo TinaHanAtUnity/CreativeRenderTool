@@ -45,7 +45,6 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
         ];
 
         this._buttonSpinner = new ButtonSpinner(platform);
-        PrivacyDataRequestHelper.sendDebugResetRequest();
     }
 
     public render(): void {
