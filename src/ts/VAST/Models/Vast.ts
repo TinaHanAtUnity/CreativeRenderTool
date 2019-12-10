@@ -17,6 +17,7 @@ interface IVast {
 export class Vast extends Model<IVast> {
 
     private _campaignErrors: CampaignError[];
+    private _isPublica = false;
 
     constructor(ads: VastAd[], parseErrorURLTemplates: string[], campaignErrors?: CampaignError[]) {
         super('Vast', {
@@ -30,6 +31,14 @@ export class Vast extends Model<IVast> {
         this.set('additionalTrackingEvents', {});
 
         this._campaignErrors = campaignErrors || [];
+    }
+
+    public setIsPublicaTag(isPublica: boolean) {
+        this._isPublica = isPublica;
+    }
+
+    public isPublicaTag(): boolean {
+        return this._isPublica;
     }
 
     public getAdVerifications(): VastAdVerification[] {

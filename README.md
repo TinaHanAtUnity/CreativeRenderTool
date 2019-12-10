@@ -88,6 +88,7 @@ To build continuously (on file changes), use:
 - `make test` for both unit and integration tests
 - `make test-unit`
 - `make test-integration`
+- `npm run test` for jest tests
 
 To watch tests, use:
 

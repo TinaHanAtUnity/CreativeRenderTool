@@ -23,6 +23,7 @@ import { MainBundleApi } from 'Core/Native/iOS/__mocks__/MainBundleApi';
 import { NotificationApi } from 'Core/Native/iOS/__mocks__/NotificationApi';
 import { UrlSchemeApi } from 'Core/Native/iOS/__mocks__/UrlSchemeApi';
 import { CacheApi } from 'Core/Native/__mocks__/CacheApi';
+import { ClassDetectionApi } from 'Core/Native/__mocks__/ClassDetectionApi';
 import { ConnectivityApi } from 'Core/Native/__mocks__/ConnectivityApi';
 import { DeviceInfoApi } from 'Core/Native/__mocks__/DeviceInfoApi';
 import { ListenerApi } from 'Core/Native/__mocks__/ListenerApi';
@@ -52,6 +53,7 @@ export const Core = jest.fn(() => {
             SensorInfo: new SensorInfoApi(),
             Storage: new StorageApi(),
             NativeError: new NativeErrorApi(),
+            ClassDetection: new ClassDetectionApi(),
             Android: {
                 Broadcast: new BroadcastApi(),
                 Intent: new IntentApi(),
@@ -82,6 +84,6 @@ export const Core = jest.fn(() => {
         Config: new CoreConfiguration(),
         Ads: new Ads(),
         Purchasing: new Purchasing(),
-        ProgrammaticTrackingService: new ProgrammaticTrackingService()
+        ProgrammaticTrackingService: new ProgrammaticTrackingService(),
     };
 });

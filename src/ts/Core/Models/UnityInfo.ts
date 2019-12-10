@@ -35,7 +35,6 @@ export class UnityInfo extends Model<IUnityInfo> {
         } else {
             // from Unity engine PlatformDependent/AndroidPlayer/Source/PlayerPrefs.cpp
             const settingsFile = applicationName + '.v2.playerprefs';
-
             nativeUserIdPromise = this._core.Android!.Preferences.getString(settingsFile, UnityInfo._userIdKey);
             nativeSessionIdPromise = this._core.Android!.Preferences.getString(settingsFile, UnityInfo._sessionIdKey);
         }
