@@ -170,7 +170,7 @@ export class VastParserStrict {
     }
 
     // default to https: for relative urls
-    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
+    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, bundleId?: string, isPublica = false, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
         try {
@@ -187,11 +187,17 @@ export class VastParserStrict {
         }
 
         this.applyParentURLs(parsedVast, parent);
+        parsedVast.setIsPublicaTag(!!isPublica);
 
-        let wrapperURL = parsedVast.getWrapperURL();
+        const wrapperURL = parsedVast.getWrapperURL();
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         }
+
+        return this.retrieveWrappedVast(wrapperURL, depth, parsedVast, core, request, isPublica, bundleId);
+    }
+
+    private retrieveWrappedVast(wrapperURL: string, depth: number, parsedVast: Vast, core: ICoreApi, request: RequestManager, isPublica?: boolean, bundleId?: string): Promise<Vast> {
 
         if (depth >= this._maxWrapperDepth) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED], CampaignContentTypes.ProgrammaticVast, CampaignErrorLevel.HIGH, VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED, parsedVast.getErrorURLTemplates(), wrapperURL, undefined, undefined);
@@ -211,10 +217,11 @@ export class VastParserStrict {
                 this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             }
             wrapperURL = decodeURIComponent(wrapperURL);
+            isPublica = true;
         }
 
         return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, bundleId, parsedVast, depth + 1, wrapperUrlProtocol);
+            return this.retrieveVast(response.response, core, request, bundleId, isPublica, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
 

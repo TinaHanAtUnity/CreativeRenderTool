@@ -1,6 +1,7 @@
 import { DeviceInfo as Base } from 'Core/Models/DeviceInfo';
 
 export type DeviceInfoMock = Base & {
+    getOsVersion: jest.Mock;
 };
 
 export const DeviceInfo = jest.fn(() => {

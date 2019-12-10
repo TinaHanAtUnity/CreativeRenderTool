@@ -32,6 +32,7 @@ import { Vast } from 'VAST/Models/Vast';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('VastParserStrict', () => {
 
@@ -136,6 +137,19 @@ describe('VastParserStrict', () => {
 
                 TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah');
                 sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+            });
+
+            it('should create a Vast tag that is Publica when Publica check is true', () => {
+                const wrappedVAST = WrappedVastIAS;
+                sinon.stub(request, 'get').returns(Promise.resolve({
+                    response: VastCompanionAdXml
+                }));
+
+                const isPublica = true;
+
+                return TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah', isPublica).then((vast) => {
+                    assert.equal(vast.isPublicaTag(), true);
+                });
             });
         });
     });
