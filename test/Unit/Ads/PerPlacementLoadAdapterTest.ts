@@ -140,5 +140,21 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
             sinon.assert.notCalled(sendReadyEventStub);
         });
+
+        it('call update state after WAITING', () => {
+            placement.setState(PlacementState.WAITING);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+
+            placement.setState(PlacementState.READY);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
+            sinon.assert.calledWith(sendReadyEventStub, placementID);
+
+        });
     });
 });
