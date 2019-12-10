@@ -368,6 +368,10 @@ export class UserPrivacyManager {
         return methodChangedSinceConsent || versionUpdatedSinceConsent;
     }
 
+    public usePrivacySDK(): boolean {
+        return true;
+    }
+
     public getLegalFramework(): LegalFramework {
         return this._privacy.getLegalFramework();
     }

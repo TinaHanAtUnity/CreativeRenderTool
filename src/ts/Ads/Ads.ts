@@ -8,7 +8,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -327,7 +327,7 @@ export class Ads implements IAds {
 
         this._showingPrivacy = true;
 
-        const privacyView = new PrivacySDKUnit({
+        const privacyAdUnitParams = {
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
@@ -337,8 +337,16 @@ export class Ads implements IAds {
             deviceInfo: this._core.DeviceInfo,
             pts: this._core.ProgrammaticTrackingService,
             privacySDK: this.PrivacySDK
-        });
-        return privacyView.show(options);
+        };
+
+        let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
+        if (this.PrivacyManager.usePrivacySDK()) {
+            privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
+        } else {
+            privacyAdUnit = new PrivacyUnit(privacyAdUnitParams);
+        }
+
+        return privacyAdUnit.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
