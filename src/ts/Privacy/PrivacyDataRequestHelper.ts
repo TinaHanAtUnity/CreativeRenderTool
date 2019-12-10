@@ -20,6 +20,7 @@ export interface IDataRequestResponse {
 interface IDataRequestBody {
     idfa: string | null | undefined;
     gameID: string;
+    bundleID: string;
     projectID: string;
     platform: string;
     language: string;
@@ -33,14 +34,16 @@ export class PrivacyDataRequestHelper {
     private static _request: RequestManager;
     private static _idfa: string | null | undefined;
     private static _gameID: string;
+    private static _bundleID: string;
     private static _projectID: string;
     private static _language: string;
 
     public static init(core: ICore) {
-        this._platform = core.NativeBridge.getPlatform();
         this._request = core.RequestManager;
+        this._platform = core.NativeBridge.getPlatform();
         this._idfa = this.getIdfa(core.NativeBridge.getPlatform(), core.DeviceInfo);
         this._gameID = core.ClientInfo.getGameId();
+        this._bundleID = core.ClientInfo.getApplicationName();
         this._projectID = core.Config.getUnityProjectId();
         this._language = core.DeviceInfo.getLanguage();
     }
@@ -113,6 +116,7 @@ export class PrivacyDataRequestHelper {
         return {
             idfa: PrivacyDataRequestHelper._idfa,
             gameID: PrivacyDataRequestHelper._gameID,
+            bundleID: PrivacyDataRequestHelper._bundleID,
             projectID: PrivacyDataRequestHelper._projectID,
             platform: Platform[PrivacyDataRequestHelper._platform].toLowerCase(),
             language: PrivacyDataRequestHelper._language

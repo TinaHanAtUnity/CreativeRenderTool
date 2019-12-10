@@ -159,6 +159,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     private handleMultipleFailedError(): void {
         this.showError(this._localization.translate('privacy-data-request-fail-message'));
+        this.disableInputs();
         this.hideAndCloseCaptcha();
     }
 
@@ -167,13 +168,16 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
         this.hideAndCloseCaptcha();
     }
 
-    private showError(errorMsg: string) {
+    private showError(errorMsg: string): void {
         const errorElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
         const errorMsgElement = <HTMLElement> errorElement.querySelector('.error-msg');
         errorMsgElement.innerHTML = errorMsg;
         errorElement.classList.add('show-msg');
+    }
 
-        this.disableInputs();
+    private hideErrorMessage(): void {
+        const errorElement = <HTMLElement> this.container().querySelector('.privacy-data-request-error-msg');
+        errorElement.classList.remove('show-msg');
     }
 
     private disableInputs(): void {
@@ -184,6 +188,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
     private disableInputsAndStartAnimation(): void {
         this.disableInputs();
+        this.hideErrorMessage();
         this._buttonSpinner.container().classList.remove('stop');
 
         this._submitButtonElement.classList.add('click-animation');
