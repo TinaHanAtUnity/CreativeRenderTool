@@ -26,10 +26,6 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getLimitAdTrackingFlag');
     }
 
-    public isMadeWithUnity(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isMadeWithUnity');
-    }
-
     public getOsVersion(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getOsVersion');
     }

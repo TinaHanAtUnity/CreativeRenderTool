@@ -64,12 +64,32 @@ export class OpenMeasurementAdViewBuilder {
         return this.calculateVastAdView(percentageInView, obstructionReasons, measuringElementAvailable, [], screenWidth, screenHeight);
     }
 
+    public buildAdmobImpressionView(om: AdmobOpenMeasurementController, screenWidth: number, screenHeight: number) {
+        const videoView =  om.getAdmobVideoElementBounds();
+        this.setVideoView(videoView);
+        let screenView;
+        let percentageInView = 100;
+
+        if (this._platform === Platform.ANDROID) {
+            screenWidth = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo);
+            screenHeight = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo);
+        }
+
+        screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
+        percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(this.getVideoView(), screenView);
+
+        const obstructionReasons: ObstructionReasons[] = [];
+
+        return this.calculateVastAdView(percentageInView, obstructionReasons, true, [], screenWidth, screenHeight);
+    }
+
     public buildAdmobAdView(obstructionReasons: ObstructionReasons[], om: AdmobOpenMeasurementController, obstructionRect: IRectangle): Promise<IAdView> {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
             const videoView =  om.getAdmobVideoElementBounds();
             this.setVideoView(videoView);
             let screenView;
+            let percentInView = 100;
 
             if (this._platform === Platform.ANDROID) {
                 screenWidth = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo);
@@ -77,10 +97,18 @@ export class OpenMeasurementAdViewBuilder {
             }
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            let obstructionRects = [obstructionRect];
 
-            const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
+            if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
+                percentInView = 0;
+                obstructionRects = [];
+            } else if (!obstructionReasons.includes(ObstructionReasons.OBSTRUCTED)) {
+                obstructionRects = [];
+            } else {
+                percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
+            }
 
-            return this.calculateVastAdView(percentInView, obstructionReasons, true, [obstructionRect], screenWidth, screenHeight);
+            return this.calculateVastAdView(percentInView, obstructionReasons, true, obstructionRects, screenWidth, screenHeight);
         });
     }
 

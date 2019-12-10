@@ -109,6 +109,9 @@ export class BannerAdContext {
     }
 
     public load(): Promise<void> {
+        this._programmaticTrackingService.reportMetricEventWithTags(BannerMetric.BannerAdLoad, [
+            this._programmaticTrackingService.createAdsSdkTag('bls', BannerLoadState[this._loadState]) // banner load state
+        ]);
         switch (this._loadState) {
             case BannerLoadState.Unloaded:
             case BannerLoadState.Loaded:
@@ -133,14 +136,16 @@ export class BannerAdContext {
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
+                    this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdUnitLoaded);
                     return this._bannerNativeApi.BannerListenerApi.sendLoadEvent(this._bannerAdViewId);
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
-                this._programmaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
                 if (e instanceof NoFillError) {
+                    this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdNoFill);
                     return this.onBannerNoFill();
                 } else {
+                    this._programmaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
                     return this.sendBannerError(new Error(`Banner failed to load : ${e.message}`));
                 }
             });
@@ -166,8 +171,8 @@ export class BannerAdContext {
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.WebViewError, e.message);
     }
 
-    private onBannerNoFill() {
-        this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
+    private onBannerNoFill(): Promise<void> {
+        return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
     }
 
     private onBannerShow() {

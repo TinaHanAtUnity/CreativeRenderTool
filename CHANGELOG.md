@@ -1,5 +1,30 @@
 # Pending
 
+* Open Measurement - Add Publica To Tracking Path [#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
+* Fix Reporting Ad Reasons [#12418](https://github.com/Applifier/unity-ads-webview/pull/12418)
+* Deployment Scripts: Add Setup and Remove Makefile [#12415](https://github.com/Applifier/unity-ads-webview/pull/12415)
+* Update Consent texts and 3rd party list [#12389](https://github.com/Applifier/unity-ads-webview/pull/12389/files)
+* Move Vast Tag URI Decoding to only Run for IAS [#12388](https://github.com/Applifier/unity-ads-webview/pull/12388)
+
+# Mon Dec  9 21:11:59 UTC 2019
+
+* Update API-Changes.md up to 3.4.0 [#12387](https://github.com/Applifier/unity-ads-webview/pull/12387)
+* Add more Banner Trackign [#12248](https://github.com/Applifier/unity-ads-webview/pull/12248)
+
+# Fri Dec  6 23:28:26 UTC 2019
+
+* Merge 3.4.0 into Master [#12361](https://github.com/Applifier/unity-ads-webview/pull/12361)
+* Add 3.4.0 to Release Process [#12358](https://github.com/Applifier/unity-ads-webview/pull/12358)
+* Update tsconfig.json to Fix Mock Import Paths [#12359](https://github.com/Applifier/unity-ads-webview/pull/12359)
+* Array Prototype Unique [#12360](https://github.com/Applifier/unity-ads-webview/pull/12360)
+
+# Fri Dec  6 01:04:44 UTC 2019
+
+* Remove animation AB tests [#12331](https://github.com/Applifier/unity-ads-webview/pull/12331)
+* Open Measurement - Admob Viewability Adjustments [#12102](https://github.com/Applifier/unity-ads-webview/pull/12102)
+
+# Thu Dec  5 18:39:42 UTC 2019
+
 * Use LegalFramework.NONE instead of LegalFramework.DEFAULT [#12194](https://github.com/Applifier/unity-ads-webview/pull/12194)
 * Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)
 * Fix forcedConsent-metadata [#12249](https://github.com/Applifier/unity-ads-webview/pull/12249)
