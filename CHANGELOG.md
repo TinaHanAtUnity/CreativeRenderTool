@@ -1,6 +1,9 @@
 # Pending
 
-* Open Measurement - Add Publica To Tracking Path[#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
+* Open Measurement - Add Publica To Tracking Path [#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
+* Fix Reporting Ad Reasons [#12418](https://github.com/Applifier/unity-ads-webview/pull/12418)
+* Deployment Scripts: Add Setup and Remove Makefile [#12415](https://github.com/Applifier/unity-ads-webview/pull/12415)
+* Update Consent texts and 3rd party list [#12389](https://github.com/Applifier/unity-ads-webview/pull/12389/files)
 
 # Mon Dec  9 21:11:59 UTC 2019
 
