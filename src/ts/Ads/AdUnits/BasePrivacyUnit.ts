@@ -4,7 +4,6 @@ import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler
 import { Orientation, IAdUnit, AdUnitContainer, AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ICoreApi } from 'Core/ICore';
 import { UserPrivacyManager, AgeGateChoice, GDPREventAction, GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyMethod, IPrivacyPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -77,20 +76,8 @@ export abstract class BasePrivacyUnit<T extends View<IPrivacyViewHandler | IPriv
                 PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
             }
 
-            if (typeof TestEnvironment.get('autoAcceptAgeGate') === 'boolean') {
-                const ageGateValue = JSON.parse(TestEnvironment.get('autoAcceptAgeGate'));
-                this.handleAutoAgeGate(ageGateValue);
-            }
-
-            if (TestEnvironment.get('autoAcceptConsent')) {
-                const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
-                this.handleAutoConsent(consentValues);
-            }
             return donePromise;
-        }).catch((e: Error) => {
-            this._core.Sdk.logWarning('Error opening Privacy view ' + e);
         });
-
     }
 
     // IAdUnitContainerListener
@@ -179,22 +166,6 @@ export abstract class BasePrivacyUnit<T extends View<IPrivacyViewHandler | IPriv
                 'uri': url
             });
         }
-    }
-
-    private handleAutoAgeGate(ageGate: boolean) {
-        setTimeout(() => {
-            this._core.Sdk.logInfo('setting autoAcceptAgeGate based on ' + ageGate);
-            // this._unityPrivacyView.testAutoAgeGate(ageGate);
-        }, 3000);
-    }
-
-    private handleAutoConsent(consent: IPrivacyPermissions) {
-        setTimeout(() => {
-            if (consent.hasOwnProperty('ads')) {
-                this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
-                // this._unityPrivacyView.testAutoConsent(consent);
-            }
-        }, 3000);
     }
 
     protected getViewParams(parameters: IPrivacyUnitParameters): IPrivacyViewParameters {
