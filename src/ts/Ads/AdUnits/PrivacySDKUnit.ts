@@ -1,7 +1,7 @@
 import { GDPREventAction, GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
 import { IPrivacySettings } from 'Privacy/IPrivacySettings';
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
-import { PrivacySDKView } from 'Ads/Views/Privacy/PrivacyView';
+import { PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { BasePrivacyUnit, IPrivacyUnitParameters } from 'Ads/AdUnits/BasePrivacyUnit';
 
