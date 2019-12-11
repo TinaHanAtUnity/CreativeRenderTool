@@ -2,6 +2,7 @@
 
 * Change permissions for first request [#12452](https://github.com/Applifier/unity-ads-webview/pull/12452)
 * Feature/privacy consent metadata [#12451](https://github.com/Applifier/unity-ads-webview/pull/12451)
+* Open Measurement - Add Impression Metric for Admob [#12416](https://github.com/Applifier/unity-ads-webview/pull/12416)
 
 # Wed Dec 11 18:15:01 UTC 2019
 
