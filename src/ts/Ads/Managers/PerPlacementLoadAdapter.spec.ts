@@ -2,11 +2,12 @@ import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/Requ
 import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Core } from 'Core/__mocks__/Core';
-import { CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
-import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
-import { WakeUpManager } from 'Core/Managers/__mocks__/WakeUpManager';
-import { SessionManager } from 'Ads/Managers/__mocks__/SessionManager';
-import { FocusManager} from 'Core/Managers/__mocks__/FocusManager';
+import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/CoreConfiguration';
+import { AdsConfiguration, AdsConfigurationMock } from 'Ads/Models/__mocks__/AdsConfiguration';
+import { WakeUpManager, WakeUpManagerMock } from 'Core/Managers/__mocks__/WakeUpManager';
+import { SessionManager, SessionManagerMock } from 'Ads/Managers/__mocks__/SessionManager';
+import { FocusManager, FocusManagerMock } from 'Core/Managers/__mocks__/FocusManager';
+//import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
@@ -15,8 +16,10 @@ import { CampaignManagerMock, CampaignManager } from 'Ads/Managers/__mocks__/Cam
 import { UserPrivacyManagerMock, UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 
 import { ICore, ICoreApi } from 'Core/ICore';
-import { Ads, AdsMock } from 'Ads/__mocks__/Ads';
-import { CacheManagerMock, CacheManager } from 'Ads/Managers/__mocks__/CacheManager';
+import { Ads } from 'Ads/__mocks__/Ads';
+//import { IAds } from 'Ads/IAds';
+import {PlacementState, Placement} from 'Ads/Models/Placement';
+import { CacheManagerMock, CacheManager } from 'Core/Managers/__mocks__/CacheManager';
 
 import { Backend } from 'Backend/Backend';
 
@@ -28,7 +31,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 
-import { Placement, PlacementState } from 'Ads/Models/Placement';
+
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
@@ -97,59 +100,34 @@ export class TestAdUnit extends AbstractAdUnit {
 }
 
 describe('PerPlacementLoadAdapterTest', () => {
-    //let PerPlacementLoadAdapter: PerPlacementLoadAdapter;
-    //let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: RequestManagerMock;
-
-    beforeEach(() => {
-        const core: ICoreApi = new Core().Api;
-        request = new RequestManager();
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-    });
-
-    describe('when replacing Open Measurement Macros', () => {
-        const urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
-
-        it('should replace om_enabled macro correctly', () => {
-            thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
-            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
-            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=true&om_vendors=%25OM_VENDORS%25', expect.anything(), expect.anything());
-        });
-
-        it('should replace om_vendors macro correctly', () => {
-            thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, 'value1|value2|value3');
-            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
-            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=value1%7Cvalue2%7Cvalue3', expect.anything(), expect.anything());
-        });
-    });
-});
-
-describe('PerPlacementLoadAdapterTest', () => {
-    let deviceInfo: DeviceInfoMock;
+    //let deviceInfo: DeviceInfoMock;
     let clientInfo: ClientInfoMock;
     let campaignManager: CampaignManagerMock;
     let privacyManager: UserPrivacyManagerMock;
     let cacheManager: CacheManagerMock;
-    let ads: AdsMock; // or Ads
+    const ads = new Ads().Api; 
     let core: ICoreApi;
-    let wakeUpManager: WakeUpManager;
-    let sessionManager: SessionManager;
-    let focusManager: FocusManager;
+    let wakeUpManager: WakeUpManagerMock;
+    let sessionManager: SessionManagerMock;
+    let focusManager: FocusManagerMock;
     let request: RequestManagerMock; 
 
-    let coreConfig: CoreConfiguration;
-    let adsConfig: AdsConfiguration;
+    let coreConfig: CoreConfigurationMock;
+    let adsConfig: AdsConfigurationMock;
    
     let platform: Platform;
 
     let perPlacementLoadAdapter: PerPlacementLoadAdapter;
 
     beforeEach(() => {
+        //ads = new Ads();
         platform = Platform.ANDROID;
         core = new Core().Api;
         request = new RequestManager();
+        clientInfo = new ClientInfo();
         wakeUpManager = new WakeUpManager();
         sessionManager = new SessionManager();
+        focusManager = new FocusManager();
         adsConfig = new AdsConfiguration();
         coreConfig = new CoreConfiguration();
         cacheManager = new CacheManager();
@@ -164,13 +142,10 @@ describe('PerPlacementLoadAdapterTest', () => {
 
         beforeEach(() => {
             placementID = 'premium';
-            placement = adsConfig.getPlacement(placementID);
+            placement = new Placement();
             placement.setState(PlacementState.NOT_AVAILABLE);
-            //sandbox = sinon.createSandbox();
-           // sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
-            //sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
 
-            perPlacementLoadAdapter = new PerPlacementLoadAdapter(platform, core, coreConfig, ads.Api, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cacheManager);
+            perPlacementLoadAdapter = new PerPlacementLoadAdapter(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cacheManager);
         });
 
         afterEach(() => {
@@ -178,7 +153,7 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         describe('Ready state', () => {
-            before(() => {
+            beforeAll(() => {
                 placement.setState(PlacementState.READY);
                 const loadDict: {[key: string]: number} = {};
                 loadDict[placementID] = 1;
@@ -199,7 +174,7 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         describe('No fill state', () => {
-            before(() => {
+            beforeAll(() => {
                 placement.setState(PlacementState.NO_FILL);
                 const loadDict: {[key: string]: number} = {};
                 loadDict[placementID] = 1;
@@ -220,7 +195,7 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         describe('Waiting state', () => {
-            before(() => {
+            beforeAll(() => {
                 placement.setState(PlacementState.WAITING);
                 const loadDict: {[key: string]: number} = {};
                 loadDict[placementID] = 1;
@@ -232,7 +207,7 @@ describe('PerPlacementLoadAdapterTest', () => {
             });
 
             describe('Waiting change to Ready', () => {
-                before(() => {
+                beforeAll(() => {
                     perPlacementLoadAdapter.setPlacementStates(PlacementState.READY, [placementID]);
                 });
 
