@@ -153,7 +153,7 @@
         <span class="report-dialog">Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!</span>
         <ul class="radio-group-container">
             <% for (let k = 0; k < data.reportReasons.length; k++) { %>
-                <div class="radio-item-container">
+            <div class="radio-item-container">
                 <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
                 <label for="<%= data.reportKeys[k] %>">
                     <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
