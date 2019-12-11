@@ -24,6 +24,9 @@ interface IDataRequestBody {
     projectID: string;
     platform: string;
     language: string;
+    country: string;
+    subdivision: string;
+    token: string;
 }
 
 export class PrivacyDataRequestHelper {
@@ -37,6 +40,9 @@ export class PrivacyDataRequestHelper {
     private static _bundleID: string;
     private static _projectID: string;
     private static _language: string;
+    private static _country: string;
+    private static _subdivision: string;
+    private static _token: string;
 
     public static init(core: ICore) {
         this._request = core.RequestManager;
@@ -46,6 +52,9 @@ export class PrivacyDataRequestHelper {
         this._bundleID = core.ClientInfo.getApplicationName();
         this._projectID = core.Config.getUnityProjectId();
         this._language = core.DeviceInfo.getLanguage();
+        this._country = core.Config.getCountry();
+        this._subdivision = core.Config.getSubdivision();
+        this._token = core.Config.getToken();
     }
 
     public static sendInitRequest(email: string): Promise<IDataRequestResponse> {
@@ -119,7 +128,10 @@ export class PrivacyDataRequestHelper {
             bundleID: PrivacyDataRequestHelper._bundleID,
             projectID: PrivacyDataRequestHelper._projectID,
             platform: Platform[PrivacyDataRequestHelper._platform].toLowerCase(),
-            language: PrivacyDataRequestHelper._language
+            language: PrivacyDataRequestHelper._language,
+            country: PrivacyDataRequestHelper._country,
+            subdivision: PrivacyDataRequestHelper._subdivision,
+            token: PrivacyDataRequestHelper._token
         };
     }
 }
