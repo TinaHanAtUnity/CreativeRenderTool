@@ -77,7 +77,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
         const omVendors: string[] = [];
         verificationResources.forEach((resource) => {
-            const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
+            const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey, this._pts);
             this._omInstances.push(om);
             this.setupOMInstance(om, resource);
             omVendors.push(resource.vendorKey);
@@ -152,12 +152,15 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
             }
             impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+
+            this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             super.impression(impressionObject);
         }).catch((e) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO
             };
 
+            this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             super.impression(impressionObject);
         });
     }
