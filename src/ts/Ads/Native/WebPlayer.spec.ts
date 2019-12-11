@@ -26,9 +26,9 @@ import { Observable } from 'Core/Utilities/Observable';
         const tests: {
             label: string;
             event: WebplayerEvent;
-            listener(): Observable<any>;
-            handleEvent: any[];
-            calledWith: any[];
+            listener(): Observable<unknown>;
+            handleEvent: unknown[];
+            calledWith: unknown[];
         }[] = [
             {
                 label: 'onPageStarted',
@@ -84,16 +84,16 @@ import { Observable } from 'Core/Utilities/Observable';
                 listener: () => {
                     return webPlayerApi.onFrameUpdate;
                 },
-                handleEvent: ['WEBPLAYER', 'FRAME_UPDATE', 'testViewId', 0, 10, 50, 50, 0.50],
-                calledWith: ['testViewId', 0, 10, 50, 50, 0.50]
+                handleEvent: ['WEBPLAYER', 'FRAME_UPDATE', 'testViewId', 0, 10, 50, 50, 0.5],
+                calledWith: ['testViewId', 0, 10, 50, 50, 0.5]
             }, {
                 label: 'onGetFrameResponse',
                 event: WebplayerEvent.GET_FRAME_RESPONSE,
                 listener: () => {
                     return webPlayerApi.onGetFrameResponse;
                 },
-                handleEvent: ['WEBPLAYER', 'GET_FRAME_RESPONSE', 'testCallId', 'testViewId', 0, 0, 50, 50, 0.50],
-                calledWith: ['testCallId', 'testViewId', 0, 0, 50, 50, 0.50]
+                handleEvent: ['WEBPLAYER', 'GET_FRAME_RESPONSE', 'testCallId', 'testViewId', 0, 0, 50, 50, 0.5],
+                calledWith: ['testCallId', 'testViewId', 0, 0, 50, 50, 0.5]
             }
         ];
 
