@@ -29,8 +29,8 @@
   "privacy-seen-ads": "Seen {0} ads in this app",
   "privacy-installed-based-on": "Installed {0} apps based on those ads",
 
-  "privacy-data-transfer-title": "Data transfer outside of the EU",
-  "privacy-data-transfer-desc": "Please note Unity may transfer and process your data on servers located in the United States.  We have committed through internal agreements and agreements with our third-party processors to treat your data with the same protections as those afforded to you in the European Economic Area if your data is collected in that region of the world. For more information on transfers, visit Unity’s <a href=\"https://unity3d.com/legal/privacy-policy\">Privacy Policy</a>.",
+  "privacy-data-transfer-title": "Data transfer",
+  "privacy-data-transfer-desc": "Please note Unity may transfer and process your data on servers located in the United States. We have committed through internal agreements and agreements with our third-party processors to treat your data with the same protections as those afforded to you by applicable law, including, in the European Economic Area if your data is collected in that region of the world. For more information on transfers, visit Unity’s <a href=\"https://unity3d.com/legal/privacy-policy\">Privacy Policy</a>.",
 
   "privacy-third-party-title": "View our third-party ad partners",
 

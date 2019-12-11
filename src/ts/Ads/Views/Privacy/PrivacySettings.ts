@@ -7,7 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Privacy/PrivacyRowItemContainer';
 import { PersonalizationSwitchGroup } from 'Ads/Views/Privacy/PersonalizationSwitchGroup';
-import { IPermissions } from 'Privacy/Privacy';
+import { IPrivacyPermissions } from 'Privacy/Privacy';
 import { Localization } from 'Core/Utilities/Localization';
 
 enum ViewState {
@@ -218,7 +218,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     }
 
     private triggerPersonalizedConsent(): void {
-        const consent: IPermissions = {
+        const consent: IPrivacyPermissions = {
             gameExp: this._personalizationSwitchGroup.isPersonalizedExperienceChecked(),
             ads: this._personalizationSwitchGroup.isPersonalizedAdsChecked(),
             external: this._personalizationSwitchGroup.isAds3rdPartyChecked()

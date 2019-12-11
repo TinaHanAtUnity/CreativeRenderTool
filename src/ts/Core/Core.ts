@@ -49,6 +49,8 @@ import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 export class Core implements ICore {
 
@@ -70,6 +72,7 @@ export class Core implements ICore {
     public DeviceIdManager: DeviceIdManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
+    public SdkDetectionInfo: SdkDetectionInfo;
     public UnityInfo: UnityInfo;
     public Config: CoreConfiguration;
 
@@ -85,6 +88,7 @@ export class Core implements ICore {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
+            ClassDetection: new ClassDetectionApi(nativeBridge),
             Listener: new ListenerApi(nativeBridge),
             Permissions: new PermissionsApi(nativeBridge),
             Request: new RequestApi(nativeBridge),
@@ -139,6 +143,7 @@ export class Core implements ICore {
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
+            this.SdkDetectionInfo = new SdkDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
 
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
@@ -150,11 +155,11 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
+            return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
-
             this.WakeUpManager.setListenConnectivity(true);
+            this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.FocusManager.setListenAppForeground(true);
                 this.FocusManager.setListenAppBackground(true);

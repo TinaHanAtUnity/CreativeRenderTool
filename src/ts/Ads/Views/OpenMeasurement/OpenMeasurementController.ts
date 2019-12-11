@@ -215,9 +215,9 @@ export class OpenMeasurementController implements IOMController {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart() {
+    public sessionStart(sessionEvent?: ISessionEvent) {
         this._omInstances.forEach((om) => {
-            om.sessionStart();
+            om.sessionStart(sessionEvent);
         });
     }
 

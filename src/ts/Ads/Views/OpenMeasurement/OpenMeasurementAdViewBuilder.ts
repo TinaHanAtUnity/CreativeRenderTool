@@ -7,6 +7,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class OpenMeasurementAdViewBuilder {
 
@@ -30,10 +31,10 @@ export class OpenMeasurementAdViewBuilder {
      */
     public setVideoView(videoView: IRectangle) {
         if (this._platform === Platform.ANDROID && this._campaign instanceof VastCampaign) {
-            videoView.x = OpenMeasurementUtilities.pxToDp(videoView.x, this._deviceInfo, this._platform);
-            videoView.y = OpenMeasurementUtilities.pxToDp(videoView.y, this._deviceInfo, this._platform);
-            videoView.width = OpenMeasurementUtilities.pxToDp(videoView.width, this._deviceInfo, this._platform);
-            videoView.height = OpenMeasurementUtilities.pxToDp(videoView.height, this._deviceInfo, this._platform);
+            videoView.x = OpenMeasurementUtilities.pxToDp(videoView.x, <AndroidDeviceInfo> this._deviceInfo);
+            videoView.y = OpenMeasurementUtilities.pxToDp(videoView.y, <AndroidDeviceInfo> this._deviceInfo);
+            videoView.width = OpenMeasurementUtilities.pxToDp(videoView.width, <AndroidDeviceInfo> this._deviceInfo);
+            videoView.height = OpenMeasurementUtilities.pxToDp(videoView.height, <AndroidDeviceInfo> this._deviceInfo);
         }
         this._videoViewRectangle = videoView;
     }
@@ -63,12 +64,32 @@ export class OpenMeasurementAdViewBuilder {
         return this.calculateVastAdView(percentageInView, obstructionReasons, measuringElementAvailable, [], screenWidth, screenHeight);
     }
 
+    public buildAdmobImpressionView(om: AdmobOpenMeasurementController, screenWidth: number, screenHeight: number) {
+        const videoView =  om.getAdmobVideoElementBounds();
+        this.setVideoView(videoView);
+        let screenView;
+        let percentageInView = 100;
+
+        if (this._platform === Platform.ANDROID) {
+            screenWidth = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo);
+            screenHeight = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo);
+        }
+
+        screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
+        percentageInView = OpenMeasurementUtilities.calculateObstructionOverlapPercentage(this.getVideoView(), screenView);
+
+        const obstructionReasons: ObstructionReasons[] = [];
+
+        return this.calculateVastAdView(percentageInView, obstructionReasons, true, [], screenWidth, screenHeight);
+    }
+
     public buildAdmobAdView(obstructionReasons: ObstructionReasons[], om: AdmobOpenMeasurementController, obstructionRect: IRectangle): Promise<IAdView> {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
             const videoView =  om.getAdmobVideoElementBounds();
             this.setVideoView(videoView);
             let screenView;
+            let percentInView = 100;
 
             if (this._platform === Platform.ANDROID) {
                 screenWidth = OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo);
@@ -76,10 +97,18 @@ export class OpenMeasurementAdViewBuilder {
             }
             screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
             this._viewPort = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            let obstructionRects = [obstructionRect];
 
-            const percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
+            if (obstructionReasons.includes(ObstructionReasons.BACKGROUNDED)) {
+                percentInView = 0;
+                obstructionRects = [];
+            } else if (!obstructionReasons.includes(ObstructionReasons.OBSTRUCTED)) {
+                obstructionRects = [];
+            } else {
+                percentInView = OpenMeasurementUtilities.calculatePercentageInView(videoView, obstructionRect, screenView);
+            }
 
-            return this.calculateVastAdView(percentInView, obstructionReasons, true, [obstructionRect], screenWidth, screenHeight);
+            return this.calculateVastAdView(percentInView, obstructionReasons, true, obstructionRects, screenWidth, screenHeight);
         });
     }
 
@@ -99,8 +128,8 @@ export class OpenMeasurementAdViewBuilder {
             let screenView;
 
             if (this._platform === Platform.ANDROID) {
-                screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, this._deviceInfo, this._platform);
-                screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, this._deviceInfo, this._platform);
+                screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo> this._deviceInfo);
+                screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo> this._deviceInfo);
             }
 
             if (!obstructionRect) {
@@ -121,8 +150,8 @@ export class OpenMeasurementAdViewBuilder {
                 const videoView = this._videoViewRectangle;
 
                 if (this._platform === Platform.ANDROID) {
-                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, this._deviceInfo, this._platform);
-                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, this._deviceInfo, this._platform);
+                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo> this._deviceInfo);
+                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo> this._deviceInfo);
                 }
 
                 const screenView = OpenMeasurementUtilities.createRectangle(0, 0, screenWidth, screenHeight);
@@ -143,12 +172,12 @@ export class OpenMeasurementAdViewBuilder {
                 let videoView;
 
                 if (this._platform === Platform.ANDROID) {
-                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, this._deviceInfo, this._platform);
-                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, this._deviceInfo, this._platform);
-                    const rect0 = OpenMeasurementUtilities.pxToDp(rectangle[0], this._deviceInfo, this._platform);
-                    const rect1 = OpenMeasurementUtilities.pxToDp(rectangle[1], this._deviceInfo, this._platform);
-                    const rect2 = OpenMeasurementUtilities.pxToDp(rectangle[2], this._deviceInfo, this._platform);
-                    const rect3 = OpenMeasurementUtilities.pxToDp(rectangle[3], this._deviceInfo, this._platform);
+                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo> this._deviceInfo);
+                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo> this._deviceInfo);
+                    const rect0 = OpenMeasurementUtilities.pxToDp(rectangle[0], <AndroidDeviceInfo> this._deviceInfo);
+                    const rect1 = OpenMeasurementUtilities.pxToDp(rectangle[1], <AndroidDeviceInfo> this._deviceInfo);
+                    const rect2 = OpenMeasurementUtilities.pxToDp(rectangle[2], <AndroidDeviceInfo> this._deviceInfo);
+                    const rect3 = OpenMeasurementUtilities.pxToDp(rectangle[3], <AndroidDeviceInfo> this._deviceInfo);
 
                     videoView = OpenMeasurementUtilities.createRectangle(rect0, rect1, rect2, rect3);
                 } else {
@@ -203,7 +232,7 @@ export class OpenMeasurementAdViewBuilder {
         }
 
         const adView: IAdView = {
-            percentageInView: percentInView,
+            percentageInView: Math.trunc(percentInView),
             geometry: {
                 x: topLeftX,
                 y: topLeftY,

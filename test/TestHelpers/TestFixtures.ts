@@ -178,6 +178,8 @@ import { Store } from 'Store/Store';
 import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -208,6 +210,7 @@ export class TestFixtures {
             video: null,
             useWebViewUserAgentForTracking: false,
             isOMEnabled: false,
+            omVendors: [],
             shouldMuteByDefault: false
         };
     }
@@ -454,7 +457,9 @@ export class TestFixtures {
             buyerId: 'buyerId',
             trackingUrls: {},
             impressionUrls: vast.getImpressionUrls(),
-            isMoatEnabled: true
+            isMoatEnabled: true,
+            isOMEnabled: false,
+            omVendors: []
         };
     }
 
@@ -1038,7 +1043,8 @@ export class TestFixtures {
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),
-            ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager)
+            ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager),
+            PrivacySDK: privacySDK
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager, privacySDK);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
@@ -1086,6 +1092,7 @@ export class TestFixtures {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
+            ClassDetection: new ClassDetectionApi(nativeBridge),
             Listener: new CoreListenerApi(nativeBridge),
             Permissions: new PermissionsApi(nativeBridge),
             Request: new RequestApi(nativeBridge),

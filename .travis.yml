@@ -12,16 +12,16 @@ install:
 - ". $HOME/.nvm/nvm.sh"
 - nvm install 10
 - nvm use 10
-- brew install akamai dep yarn
+- npm install -g akamai-cli
+- npm i dep
 - pip install awscli
-- yarn install
 - echo "N" | akamai install purge --force
 cache:
   pip: true
   directories:
   - node_modules
   - "$HOME/google-cloud-sdk/"
-script: make lint && yarn test && make test-coverage && make test-integration && make build-test && make test-browser && make webpack-build-release && make build-release && make deploy
+script: make lint && npm run test && make test-coverage && make test-integration && make build-test && make test-browser && make webpack-build-release && make build-release && make deploy
 notifications:
   slack:
     rooms:
@@ -39,7 +39,3 @@ before_install:
 - echo 'source $HOME/google-cloud-sdk/path.bash.inc' > ~/.bashrc
 - source ~/google-cloud-sdk/path.bash.inc
 - gcloud auth activate-service-account --key-file gcs_credentials.json
-- git clone https://github.com/Linuxbrew/brew.git ~/.linuxbrew
-- test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-- test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-- echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile

@@ -9,7 +9,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-
+import ProgrammaticVastCampaignIAS from 'json/campaigns/vast/ProgrammaticVastCampaignIAS.json';
 import ProgrammaticVastCampaignFlat from 'json/campaigns/vast/ProgrammaticVastCampaignFlat.json';
 import ProgrammaticVastCampaignWithEncodedUrl from 'json/campaigns/vast/ProgrammaticVastCampaignWithEncodedUrl.json';
 import ProgrammaticVastCampaignWithVpaidAd from 'json/campaigns/vast/ProgrammaticVastCampaignWithVpaidAd.json';
@@ -21,6 +21,8 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
+import VastWrappedIAS from 'xml/WrappedVastIAS.xml';
+import ProgrammaticVastCampaignIASMid from 'json/campaigns/vast/ProgrammaticVastCampaignIASMid.json';
 
 describe('ProgrammaticVastParser', () => {
     const placementId = 'TestPlacement';
@@ -112,6 +114,51 @@ describe('ProgrammaticVastParser', () => {
                     const vastCampaign: VastCampaign = <VastCampaign>parsedCampaign;
                     assert.isNotNull(vastCampaign);
                     // no errors is passing
+                });
+            });
+        });
+
+        describe('with a nested IAS tag at the top-level VAST', () => {
+            it('should be a publica VAST', () => {
+                const getStub: sinon.SinonStub = <sinon.SinonStub>request.get;
+                getStub.returns(Promise.resolve({
+                    response: VastCompanionAdXml
+                }));
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], ProgrammaticVastCampaignIAS, mediaId, correlationId);
+                return parser.parse(response, session).then((parsedCampaign) => {
+                    const vastCampaign: VastCampaign = <VastCampaign>parsedCampaign;
+                    assert.isNotNull(vastCampaign);
+                    assert.equal(vastCampaign.getVast().isPublicaTag(), true);
+                });
+            });
+        });
+
+        describe('with a nested IAS tag at the second-level VAST', () => {
+            it('should be a publica VAST', () => {
+                const getStub: sinon.SinonStub = <sinon.SinonStub>request.get;
+
+                // IAS Vast returned after first wrapper call
+                getStub.onCall(0).returns(Promise.resolve({
+                    response: VastWrappedIAS
+                }));
+
+                // non-IAS Vast returned after second wrapper call
+                getStub.onCall(1).returns(Promise.resolve({
+                    response: VastCompanionAdXml
+                }));
+
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+
+                // ProgrammaticVastCampaignIASMid - contains a non-ias wrapper tag
+                const response = new AuctionResponse([auctionPlacement], ProgrammaticVastCampaignIASMid, mediaId, correlationId);
+
+                return parser.parse(response, session).then((parsedCampaign) => {
+                    const vastCampaign: VastCampaign = <VastCampaign>parsedCampaign;
+                    assert.isNotNull(vastCampaign);
+
+                    // maintains publica status
+                    assert.equal(vastCampaign.getVast().isPublicaTag(), true);
                 });
             });
         });

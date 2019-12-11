@@ -34,12 +34,20 @@ export enum AdmobMetric {
     AdmobNonDBMNonRewardedCanPlay = 'admob_nondbm_nonrewarded_canplay',
     AdmobNonDBMNonRewardedStarted = 'admob_nondbm_nonrewarded_started',
     AdmobVideoCanPlay = 'admob_video_canplay',
-    AdmobVideoStarted = 'admob_video_started'
+    AdmobVideoStarted = 'admob_video_started',
+    AdmobOMEnabled = 'admob_om_enabled',
+    AdmobOMInjected = 'admob_om_injected',
+    AdmobOMSessionStart = 'admob_om_session_start',
+    AdmobOMSessionFinish = 'admob_om_session_finish'
 }
 
 export enum BannerMetric {
+    BannerAdLoad = 'banner_ad_load',
+    BannerAdUnitLoaded = 'banner_ad_unit_loaded',
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
+    BannerAdFill = 'banner_ad_fill',
+    BannerAdNoFill = 'banner_ad_no_fill',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking'
 }
 
@@ -150,9 +158,11 @@ export class ProgrammaticTrackingService {
         this._batchedEvents = [];
     }
 
-    private createMetricTags(event: PTSEvent): string[] {
+    private createMetricTags(event: PTSEvent, tags: string[]): string[] {
+        const sdkVersion: string = this._clientInfo.getSdkVersionName();
         return [this.createAdsSdkTag('mevt', event),
-                this.createAdsSdkTag('plt', Platform[this._platform])];
+                this.createAdsSdkTag('sdv', sdkVersion),
+                this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
     }
 
     private createTimingTags(): string[] {
@@ -179,10 +189,6 @@ export class ProgrammaticTrackingService {
         ];
     }
 
-    private createAdsSdkTag(suffix: string, tagValue: string): string {
-        return `ads_sdk2_${suffix}:${tagValue}`;
-    }
-
     private createData(event: PTSEvent, value: number, tags: string[]): IProgrammaticTrackingData {
         return {
             metrics: [
@@ -203,10 +209,17 @@ export class ProgrammaticTrackingService {
         return this._request.post(url, data, headers);
     }
 
-    public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
-        const metricData = this.createData(event, 1, this.createMetricTags(event));
-        return this.postToDatadog(metricData, this.metricPath);
+    public createAdsSdkTag(suffix: string, tagValue: string): string {
+        return `ads_sdk2_${suffix}:${tagValue}`;
+    }
 
+    public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
+        return this.reportMetricEventWithTags(event, []);
+    }
+
+    public reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
+        const metricData = this.createData(event, 1, this.createMetricTags(event, tags));
+        return this.postToDatadog(metricData, this.metricPath);
     }
 
     public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
@@ -220,7 +233,7 @@ export class ProgrammaticTrackingService {
             const timingData = this.createData(event, value, this.createTimingTags());
             return this.postToDatadog(timingData, this.timingPath);
         } else {
-            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event));
+            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
             return this.postToDatadog(metricData, this.metricPath);
         }
     }

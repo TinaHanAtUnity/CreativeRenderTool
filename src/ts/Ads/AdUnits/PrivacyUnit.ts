@@ -8,7 +8,7 @@ import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } f
 import { Platform } from 'Core/Constants/Platform';
 import { Privacy, ConsentPage, IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
-import {IPermissions, PrivacyMethod, UserPrivacy} from 'Privacy/Privacy';
+import { IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -18,6 +18,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { ABGroup, ConsentUXTest } from 'Core/Models/ABGroup';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -42,6 +43,8 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
     private _privacySDK: PrivacySDK;
+
+    private _useTransparency: boolean;
 
     constructor(parameters: IConsentUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -76,11 +79,17 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         }
         this._unityPrivacyView = new Privacy(viewParams);
         this._unityPrivacyView.addEventHandler(this);
+
+        this._useTransparency = true;
+        if (this._platform === Platform.IOS && IosUtils.isAdUnitTransparencyBroken(parameters.deviceInfo.getOsVersion())) {
+            this._useTransparency = false;
+        }
     }
 
     public show(options: unknown): Promise<void> {
         this._showing = true;
-        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
+
+        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, this._useTransparency, true, false, options).then(() => {
             const donePromise = new Promise<void>((resolve) => {
                 this._donePromiseResolve = resolve;
             });
@@ -148,7 +157,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     }
 
     // IConsentViewHandler
-    public onConsent(permissions: IPermissions, userAction: GDPREventAction, source: GDPREventSource): void {
+    public onConsent(permissions: IPrivacyPermissions, userAction: GDPREventAction, source: GDPREventSource): void {
         if (UserPrivacy.permissionsEql(permissions, UserPrivacy.PERM_ALL_TRUE)) {
             PrivacyMetrics.trigger(PrivacyEvent.CONSENT_ACCEPT_ALL, permissions);
         } else if (UserPrivacy.permissionsEql(permissions, UserPrivacy.PERM_ALL_FALSE)) {
@@ -173,7 +182,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     public onAgeGateDisagree(): void {
         this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
 
-        const permissions: IPermissions = {
+        const permissions: IPrivacyPermissions = {
             gameExp: false,
             ads: false,
             external: false
@@ -210,7 +219,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         }, 3000);
     }
 
-    private handleAutoConsent(consent: IPermissions) {
+    private handleAutoConsent(consent: IPrivacyPermissions) {
         setTimeout(() => {
             if (consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));

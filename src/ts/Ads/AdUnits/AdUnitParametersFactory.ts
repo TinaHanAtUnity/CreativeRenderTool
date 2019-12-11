@@ -38,7 +38,6 @@ export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extend
 
 export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> implements IAbstractAdUnitParametersFactory<T1, T2> {
     private static _forceGDPRBanner: boolean;
-    private static _forcedConsentUnit: boolean;
 
     protected _campaign: T1;
     protected _placement: Placement;
@@ -69,10 +68,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     public static setForcedGDPRBanner(value: boolean) {
         AbstractAdUnitParametersFactory._forceGDPRBanner = value;
-    }
-
-    public static setForcedConsentUnit(value: boolean) {
-        AbstractAdUnitParametersFactory._forcedConsentUnit = value;
     }
 
     constructor(core: ICore, ads: IAds) {
@@ -123,7 +118,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             thirdPartyEventManager: this._thirdPartyEventManagerFactory.create({
                 [ThirdPartyEventMacro.ZONE]: this._placement.getId(),
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
-                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || ''
+                [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
+                [ThirdPartyEventMacro.OM_ENABLED]: 'false',
+                [ThirdPartyEventMacro.OM_VENDORS]: ''
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,
@@ -165,7 +162,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
         if (this._coreConfig.isCoppaCompliant() ||  this._privacyManager.isUserUnderAgeLimit()) {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
-        } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT || AbstractAdUnitParametersFactory._forcedConsentUnit) {
+        } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT || this._privacyManager._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
