@@ -47,7 +47,7 @@ export class PrivacyDataRequestHelper {
     public static init(core: ICore) {
         this._request = core.RequestManager;
         this._platform = core.NativeBridge.getPlatform();
-        this._idfa = this.getIdfa(core.NativeBridge.getPlatform(), core.DeviceInfo);
+        this._idfa = core.DeviceInfo.getAdvertisingIdentifier();
         this._gameID = core.ClientInfo.getGameId();
         this._bundleID = core.ClientInfo.getApplicationName();
         this._projectID = core.Config.getUnityProjectId();
@@ -106,19 +106,6 @@ export class PrivacyDataRequestHelper {
             return { status: DataRequestResponseStatus.GENERIC_ERROR };
 
         });
-    }
-
-    private static getIdfa(platform: Platform, deviceInfo: DeviceInfo): string | null | undefined {
-        let idfa: string | null | undefined;
-
-        if (!deviceInfo.getAdvertisingIdentifier()) {
-            if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-                idfa = deviceInfo.getAndroidId();
-            }
-        } else {
-            idfa = deviceInfo.getAdvertisingIdentifier();
-        }
-        return idfa;
     }
 
     private static getRequestBody(): IDataRequestBody {
