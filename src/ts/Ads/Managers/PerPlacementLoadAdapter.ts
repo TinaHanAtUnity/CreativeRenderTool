@@ -79,7 +79,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.READY);
                 break;
             case PlacementState.NO_FILL:
-                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NO_FILL, PlacementState.WAITING);
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 break;
             case PlacementState.NOT_AVAILABLE:

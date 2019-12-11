@@ -186,14 +186,14 @@ describe('PerPlacementLoadAdapterTest', () => {
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            //first time it should be NOT_AVAILABLE -> WAITING -> NO_FILL
-            //second time load call for no_fill placement should be NO_FILL -> WAITING -> NO_FILL
-            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NO_AVAILABLE', 'WAITING');
+            //first time or after ready and show, it should be NOT_AVAILABLE -> WAITING -> NO_FILL
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
 
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NO_FILL', 'WAITING');
+            //load call for no_fill placement, and call load again should be NO_FILL -> WAITING -> NO_FILL
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
 
             sinon.assert.notCalled(sendReadyEventStub);
