@@ -3,7 +3,7 @@
     <Ad id="602833">
         <Wrapper>
             <AdSystem>Acudeo Compatible</AdSystem>
-            <VASTAdTagURI>https%3A%2F%2Fad.doubleclick.net%2Fddm%2Fpfadx%2FN755990.157757SKYITALIAS.R.L._GM%2FB22442959.242394195%3Bsz=0x0%3Bord=123%3Bdc_lat=%3Bdc_rdid=%3Btag_for_child_directed_treatment=%3Btfua=%3Bdcmt=text%2Fxml%3Bdc_sdk_apis=123%3Bdc_omid_p=123</VASTAdTagURI>
+            <VASTAdTagURI>https%3A%2F%2Fvastpixel3.adsafeprotected.com%2Fddm%2Fpfadx%2FN755990.157757SKYITALIAS.R.L._GM%2FB22442959.242394195%3Bsz=0x0%3Bord=123%3Bdc_lat=%3Bdc_rdid=%3Btag_for_child_directed_treatment=%3Btfua=%3Bdcmt=text%2Fxml%3Bdc_sdk_apis=123%3Bdc_omid_p=123</VASTAdTagURI>
             <Error>http://myErrorURL/wrapper/error</Error>
             <Impression>http://myTrackingURL/wrapper/impression</Impression>
             <Creatives>

@@ -11,7 +11,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
+import { StorageError, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable2 } from 'Core/Utilities/Observable';
@@ -47,14 +47,14 @@ describe('UserPrivacyManagerTest', () => {
     let updateUserPrivacy: sinon.SinonSpy;
     let httpKafkaSpy: sinon.SinonStub;
 
-    let consentlastsent: boolean | string = false;
-    let consent: any = false;
+    let privacyConsent: any = false;
+    let gdprConsent: any = false;
     let isGDPREnabled: boolean = false;
     let storageTrigger: (eventType: string, data: any) => void;
 
     beforeEach(() => {
-        consentlastsent = false;
-        consent = false;
+        privacyConsent = false;
+        gdprConsent = false;
 
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
@@ -92,11 +92,11 @@ describe('UserPrivacyManagerTest', () => {
 
         httpKafkaSpy = sinon.stub(HttpKafka, 'sendEvent').resolves();
 
-        getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').callsFake(() => {
-            return Promise.resolve(consentlastsent);
-        });
         getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
-            return Promise.resolve(consent);
+            return Promise.resolve(gdprConsent);
+        });
+        getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+            return Promise.resolve(privacyConsent);
         });
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
@@ -171,7 +171,6 @@ describe('UserPrivacyManagerTest', () => {
         describe('and configuration isGDPREnabled is false', () => {
             it('should not do anything', () => {
                 isGDPREnabled = false;
-                consentlastsent = false;
                 storageTrigger('', { gdpr: { consent: { value: true } } });
 
                 sinon.assert.calledOnce(onSetStub);
@@ -216,12 +215,118 @@ describe('UserPrivacyManagerTest', () => {
                 });
             });
         });
+
+        describe('prioritises privacy.consent over gdpr.consent', () => {
+            beforeEach(() => {
+                isGDPREnabled = true;
+                userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+                userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
+                userPrivacy.getVersion.returns(0);
+                getStub.reset();
+                getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+                    if (gdprConsent === undefined) {
+                        return Promise.reject(StorageError.COULDNT_GET_VALUE);
+                    }
+                    return Promise.resolve(gdprConsent);
+                });
+                getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+                    if (privacyConsent === undefined) {
+                        return Promise.reject(StorageError.COULDNT_GET_VALUE);
+                    }
+                    return Promise.resolve(privacyConsent);
+                });
+            });
+
+            after(() => {
+                getStub.reset();
+                getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+                    return Promise.resolve(gdprConsent);
+                });
+                getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+                    return Promise.resolve(privacyConsent);
+                });
+            });
+
+            describe('sets value according to privacy.consent', () => {
+                [true, false].forEach((privacyConsentValue) => {
+                    it('when privacy.consent = ' + privacyConsentValue, () => {
+                        privacyConsent = privacyConsentValue;
+                        return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                            const expectedPermissions = privacyConsentValue ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                            sinon.assert.calledOnce(getStub);
+                            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                            sinon.assert.calledOnce(updateUserPrivacy);
+                            sinon.assert.calledWith(updateUserPrivacy, expectedPermissions);
+                        });
+                    });
+                });
+            });
+
+            describe('when privacy.consent has a bad value', () => {
+                it('throws an error', () => {
+                    privacyConsent = 'badValue';
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        assert.fail('Should throw');
+                    }).catch((e) => {
+                        sinon.assert.calledOnce(getStub);
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                        sinon.assert.notCalled(updateUserPrivacy);
+                        assert.equal(e.message, 'privacy.consent.value is undefined');
+                    });
+                });
+            });
+
+            describe('when privacy.consent has not been set', () => {
+                beforeEach(() => {
+                    privacyConsent = undefined;
+                });
+                [true, false].forEach((gdprConsentValue) => {
+                    it('gdpr.consent = ' + gdprConsentValue, () => {
+                        gdprConsent = gdprConsentValue;
+                        return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                            sinon.assert.calledTwice(getStub);
+                            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                            const expectedPermissions = gdprConsentValue ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                            sinon.assert.calledOnce(updateUserPrivacy);
+                            sinon.assert.calledWith(updateUserPrivacy, expectedPermissions);
+                        });
+                    });
+                });
+
+                it('gdpr.consent is not set, should throw', () => {
+                    gdprConsent = undefined;
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        assert.fail('should throw');
+                    }).catch((e) => {
+                        sinon.assert.calledTwice(getStub);
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                        sinon.assert.notCalled(updateUserPrivacy);
+                        assert.equal(e, StorageError.COULDNT_GET_VALUE);
+                    });
+                });
+
+                it('gdpr.consent is set to a bad value, should throw', () => {
+                    gdprConsent = 'badValue';
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        assert.fail('should throw');
+                    }).catch((e) => {
+                        sinon.assert.calledTwice(getStub);
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                        sinon.assert.notCalled(updateUserPrivacy);
+                        assert.equal(e.message, 'gdpr.consent.value is undefined');
+                    });
+                });
+            });
+        });
     });
 
     describe('getConsentAndUpdateConfiguration', () => {
         describe('and consent is undefined', () => {
             it('should not update the configuration', () => {
-                consent = undefined;
+                privacyConsent = undefined;
                 return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                     assert.fail('should throw');
                 }).catch(() => {
@@ -285,12 +390,11 @@ describe('UserPrivacyManagerTest', () => {
                     userPrivacy.getPermissions.returns(currentPermissions);
                     userPrivacy.getMethod.returns(t.method);
                     userPrivacy.getVersion.returns(0);
-                    consentlastsent = t.lastConsent;
-                    consent = t.storedConsent;
+                    privacyConsent = t.storedConsent;
 
                     return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                         return (<Promise<void>>updateUserPrivacy.firstCall.returnValue).then(() => {
-                            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
                             sinon.assert.calledWithExactly(updateUserPrivacy, expectedPermissions, GDPREventSource.DEVELOPER, t.event);
                         });
                     });
@@ -300,8 +404,7 @@ describe('UserPrivacyManagerTest', () => {
             describe('and configuration isGDPREnabled is set to false during getConsentAndUpdateConfiguration', () => {
                 it('should not do anything', () => {
                     isGDPREnabled = true;
-                    consentlastsent = false;
-                    consent = true;
+                    privacyConsent = true;
                     getStub.reset();
                     getStub.callsFake(() => {
                         isGDPREnabled = false;
@@ -309,7 +412,7 @@ describe('UserPrivacyManagerTest', () => {
                     });
                     return privacyManager.getConsentAndUpdateConfiguration().then((storedConsent: boolean) => {
                         assert.equal(storedConsent, true);
-                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'privacy.consent.value');
                         sinon.assert.notCalled(updateUserPrivacy);
                         sinon.assert.notCalled(setStub);
                         sinon.assert.notCalled(writeStub);
@@ -320,7 +423,6 @@ describe('UserPrivacyManagerTest', () => {
             describe('and configuration isGDPREnabled is false', () => {
                 it('should not do anything', () => {
                     isGDPREnabled = false;
-                    consentlastsent = false;
                     const writePromise = new Promise<void>((resolve) => {
                         writeStub.reset();
                         writeStub.callsFake(() => {
@@ -348,7 +450,7 @@ describe('UserPrivacyManagerTest', () => {
                         userPrivacy.getPermissions.returns(UserPrivacy.PERM_ALL_FALSE);
                         userPrivacy.getMethod.returns(PrivacyMethod.DEFAULT);
                         userPrivacy.getVersion.returns(0);
-                        consent = userConsents;
+                        privacyConsent = userConsents;
 
                         let expectedPermissions = UserPrivacy.PERM_ALL_FALSE;
                         if (userConsents) {
@@ -376,7 +478,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should override the configuration with no consent', () => {
-                consent = true;
+                privacyConsent = true;
                 return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                     sinon.assert.calledWith(gamePrivacy.setMethod, PrivacyMethod.DEVELOPER_CONSENT);
                     sinon.assert.calledWith(userPrivacy.update, {
@@ -399,7 +501,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should not override the configuration', () => {
-                consent = undefined;
+                privacyConsent = undefined;
                 return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                     assert.fail('should throw');
                 }).catch(() => {
@@ -408,7 +510,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should override the configuration if consent is given', () => {
-                consent = false;
+                privacyConsent = false;
                 return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                     sinon.assert.calledWith(gamePrivacy.setMethod, PrivacyMethod.DEVELOPER_CONSENT);
                 }).catch(() => {
@@ -521,7 +623,7 @@ describe('UserPrivacyManagerTest', () => {
             sandbox.restore();
         });
 
-        it ('with proper fields', () => {
+        it('with proper fields', () => {
             const expectedKafkaObject = {
                 v: 2,
                 advertisingId: testAdvertisingId,
@@ -654,6 +756,143 @@ describe('UserPrivacyManagerTest', () => {
                 userPrivacy.getPermissions.returns({ ads: true, gameExp: true, external: true });
                 return privacyManager.updateUserPrivacy({ ads: true, gameExp: true, external: true }, GDPREventSource.USER_INDIRECT, GDPREventAction.PERSONALIZED_PERMISSIONS).then(() => {
                     sinon.assert.notCalled(httpKafkaSpy);
+                });
+            });
+        });
+    });
+
+    describe('Setting developer_consent after Ads has been initialized', () => {
+        beforeEach(() => {
+            isGDPREnabled = true;
+            privacyConsent = undefined;
+            gdprConsent = undefined;
+            userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+            userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
+            userPrivacy.getVersion.returns(0);
+            getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+                if (gdprConsent === undefined) {
+                    return Promise.reject(StorageError.COULDNT_GET_VALUE);
+                }
+                return Promise.resolve(gdprConsent);
+            });
+            getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+                if (privacyConsent === undefined) {
+                    return Promise.reject(StorageError.COULDNT_GET_VALUE);
+                }
+                return Promise.resolve(privacyConsent);
+            });
+        });
+
+        after(() => {
+            getStub.reset();
+            getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+                return Promise.resolve(gdprConsent);
+            });
+            getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+                return Promise.resolve(privacyConsent);
+            });
+        });
+
+        [true, false, undefined].forEach((gdprInitDevConsent) => {
+            describe('when developer consent was set on init with gdpr.consent=' + gdprInitDevConsent, () => {
+                const allowedTransitions = [
+                    {from: 'privacy', to: 'privacy'},
+                    {from: 'gdpr', to: 'privacy'},
+                    {from: 'gdpr', to: 'gdpr'}];
+                beforeEach(() => {
+                    gdprConsent = gdprInitDevConsent;
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        sinon.assert.calledOnce(updateUserPrivacy);
+                        httpKafkaSpy.resetHistory();
+                        updateUserPrivacy.resetHistory();
+                    }).catch ((e) => {
+                        if (gdprInitDevConsent !== undefined) {
+                            assert.fail('Setting of metadata should not fail here ' + JSON.stringify(e));
+                        }
+                        sinon.assert.notCalled(updateUserPrivacy);
+                    });
+                });
+                allowedTransitions.forEach((transition: {from: string; to: string}) => {
+                    describe('it updates ' + transition.from + '-metadatas based on ' + transition.to + '-metadatas', () => {
+                        [true, false].forEach((firstConsent) => {
+                            [true, false].forEach((secondConsent) => {
+                                it('from ' + firstConsent + ' to ' + secondConsent, () => {
+                                    const firstTrigger: {[index: string]: any} = {};
+                                    firstTrigger[transition.from] = { consent: { value: firstConsent } };
+                                    const expectedFirstPermissions = firstConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                                    storageTrigger('', firstTrigger);
+                                    return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
+                                        sinon.assert.calledOnce(updateUserPrivacy);
+                                        sinon.assert.calledWith(updateUserPrivacy, expectedFirstPermissions);
+
+                                        const secondTrigger: {[index: string]: any} = {};
+                                        secondTrigger[transition.to] = { consent: { value: secondConsent } };
+                                        const expectedSecondPermissions = secondConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                                        storageTrigger('', secondTrigger);
+                                        return (<Promise<void>>httpKafkaSpy.secondCall.returnValue).then(() => {
+                                            sinon.assert.calledTwice(updateUserPrivacy);
+                                            sinon.assert.calledWith(updateUserPrivacy, expectedSecondPermissions);
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+
+                describe('it does not update privacy-metadatas with gdpr-metadatas', () => {
+                    [true, false].forEach((firstConsent) => {
+                        [true, false].forEach((secondConsent) => {
+                            it('from ' + firstConsent + ' to ' + secondConsent, () => {
+                                const firstTrigger = { privacy: { consent: { value: firstConsent } } };
+                                const expectedFirstPermissions = firstConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                                storageTrigger('', firstTrigger);
+                                return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
+                                    sinon.assert.calledOnce(updateUserPrivacy);
+                                    sinon.assert.calledWith(updateUserPrivacy, expectedFirstPermissions);
+
+                                    httpKafkaSpy.resetHistory();
+                                    updateUserPrivacy.resetHistory();
+                                    const secondTrigger = { gdpr: { consent: { value: firstConsent } } };
+                                    storageTrigger('', secondTrigger);
+                                    sinon.assert.notCalled(httpKafkaSpy);
+                                    sinon.assert.notCalled(updateUserPrivacy);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        [true, false].forEach((privacyInitDevConsent) => {
+            describe('when developer consent was set on init with privacy.consent=' + privacyInitDevConsent, () => {
+                beforeEach(() => {
+                    privacyConsent = privacyInitDevConsent;
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        sinon.assert.calledOnce(updateUserPrivacy);
+                        httpKafkaSpy.resetHistory();
+                        updateUserPrivacy.resetHistory();
+                    });
+                });
+
+                [true, false].forEach((consent) => {
+                    it('it does not update with gdpr.consent=' + consent, () => {
+                        const trigger = { gdpr: { consent: { value: consent } } };
+                        storageTrigger('', trigger);
+                        sinon.assert.notCalled(httpKafkaSpy);
+                        sinon.assert.notCalled(updateUserPrivacy);
+                    });
+
+                    it('updates with privacy.consent=' + consent, () => {
+                        const trigger = { privacy: { consent: { value: consent } } };
+                        const expectedPermissions = consent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                        storageTrigger('', trigger);
+                        return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
+                            sinon.assert.calledOnce(updateUserPrivacy);
+                            sinon.assert.calledWith(updateUserPrivacy, expectedPermissions);
+                        });
+                    });
                 });
             });
         });
