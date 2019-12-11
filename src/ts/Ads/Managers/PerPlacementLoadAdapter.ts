@@ -23,6 +23,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
         this._ads = ads;
         this._adsConfig = adsConfig;
+        this._trackablePlacements = new Set();
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
@@ -40,8 +41,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     public sendPlacementStateChanges(placementId: string): void {
         if (this._trackablePlacements.has(placementId)) {
             const placement = this._adsConfig.getPlacement(placementId);
-            if (placement.getPlacementStateChanged())
-            {
+            if (placement.getPlacementStateChanged()) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, placement.getPreviousState(), placement.getState());
                 placement.setPlacementStateChanged(false);
 
@@ -66,17 +66,20 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         if (placement.getState() === PlacementState.WAITING) {
             this._trackablePlacements.add(placementId);
         }
-        
         this.sendPlacementStateChange(placementId, placement.getState());
     }
 
     private sendPlacementStateChange(placementId: string, placementState: PlacementState) {
-        this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
         switch (placementState) {
+            case PlacementState.WAITING:
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
+                break;
             case PlacementState.READY:
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.READY);
                 break;
             case PlacementState.NO_FILL:
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NO_FILL, PlacementState.WAITING);
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 break;
             case PlacementState.NOT_AVAILABLE:

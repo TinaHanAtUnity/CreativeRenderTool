@@ -32,6 +32,56 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { Campaign } from 'Ads/Models/Campaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { IStoreApi } from 'Store/IStore';
+import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+
+export class TestContainer extends AdUnitContainer {
+    public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
+        return Promise.resolve();
+    }
+    public close(): Promise<void> {
+        return Promise.resolve();
+    }
+    public reconfigure(configuration: ViewConfiguration): Promise<unknown[]> {
+        return Promise.all([]);
+    }
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void> {
+        return Promise.resolve(void 0);
+    }
+    public isPaused(): boolean {
+        return false;
+    }
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return Promise.resolve();
+    }
+    public getViews(): Promise<string[]> {
+        return Promise.all([]);
+    }
+}
+export class TestAdUnit extends AbstractAdUnit {
+
+    public show(): Promise<void> {
+        return Promise.resolve();
+    }
+    public hide(): Promise<void> {
+        return Promise.resolve();
+    }
+    public description(): string {
+        return 'TestAdUnit';
+    }
+    public isShowing() {
+        return true;
+    }
+    public isCached() {
+        return false;
+    }
+}
 
 describe('PerPlacementLoadAdapterTest', () => {
     let deviceInfo: DeviceInfo;
@@ -136,8 +186,16 @@ describe('PerPlacementLoadAdapterTest', () => {
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            //first time it should be NOT_AVAILABLE -> WAITING -> NO_FILL
+            //second time load call for no_fill placement should be NO_FILL -> WAITING -> NO_FILL
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NO_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NO_FILL', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+
             sinon.assert.notCalled(sendReadyEventStub);
         });
 
@@ -148,13 +206,86 @@ describe('PerPlacementLoadAdapterTest', () => {
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
 
-            placement.setState(PlacementState.READY);
+            perPlacementLoadAdapter.setPlacementStates(PlacementState.READY, [placementID]);
 
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
             sinon.assert.calledWith(sendReadyEventStub, placementID);
+        });
 
+        describe('setCurrentAdUnit', () => {
+            let adUnitParams: IAdUnitParameters<Campaign>;
+            let store: IStoreApi;
+            let container: AdUnitContainer;
+            let thirdPartyEventManager: ThirdPartyEventManager;
+            let operativeEventManager: OperativeEventManager;
+            let privacy: AbstractPrivacy;
+
+            beforeEach(() => {
+                privacy = sinon.createStubInstance(AbstractPrivacy);
+                container = new TestContainer();
+                thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+                const campaign = TestFixtures.getCampaign();
+                store = TestFixtures.getStoreApi(nativeBridge);
+
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                    platform,
+                    core,
+                    ads,
+                    request: request,
+                    metaDataManager: metaDataManager,
+                    sessionManager: sessionManager,
+                    clientInfo: clientInfo,
+                    deviceInfo: deviceInfo,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
+                    storageBridge: storageBridge,
+                    campaign: campaign,
+                    playerMetadataServerId: 'test-gamerSid',
+                    privacySDK: privacySDK,
+                    userPrivacyManager: privacyManager
+                });
+
+                adUnitParams = {
+                    platform,
+                    core,
+                    ads,
+                    store,
+                    forceOrientation: Orientation.NONE,
+                    focusManager: focusManager,
+                    container: container,
+                    deviceInfo: deviceInfo,
+                    clientInfo: clientInfo,
+                    thirdPartyEventManager: thirdPartyEventManager,
+                    operativeEventManager: operativeEventManager,
+                    placement: TestFixtures.getPlacement(),
+                    campaign: campaign,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
+                    request: request,
+                    options: {},
+                    privacyManager: privacyManager,
+                    programmaticTrackingService: programmaticTrackingService,
+                    privacy: privacy,
+                    privacySDK: privacySDK
+                };
+            });
+
+            it('should handle setting the current ad unit correctly', () => {
+                const campaign: Campaign = TestFixtures.getCampaign();
+                adUnitParams.placement = placement;
+                adUnitParams.campaign = campaign;
+
+                placement.setState(PlacementState.READY);
+                const currentAdUnit = new TestAdUnit(adUnitParams);
+
+                perPlacementLoadAdapter.setCurrentAdUnit(currentAdUnit, placement);
+                currentAdUnit.onStart.trigger();
+
+                assert.isUndefined(placement.getCurrentCampaign());
+                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'READY', 'NOT_AVAILABLE');
+            });
         });
     });
 });

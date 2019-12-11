@@ -1,6 +1,5 @@
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Model } from 'Core/Models/Model';
-import {Observable2} from 'Core/Utilities/Observable';
 
 export enum PlacementState {
     READY,
@@ -62,7 +61,6 @@ export interface IPlacement {
 }
 
 export class Placement extends Model<IPlacement> {
-    public readonly onPlacementStateChanged = new Observable2<PlacementState, PlacementState>();
 
     constructor(data: IRawPlacement) {
         super('Placement', {
@@ -177,7 +175,6 @@ export class Placement extends Model<IPlacement> {
         if (this.getState() !== state) {
             this.set('previousState', this.getState());
             this.setPlacementStateChanged(true);
-            this.onPlacementStateChanged.trigger(this.getState(), state);
         }
         this.set('state', state);
     }
