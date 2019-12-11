@@ -340,10 +340,10 @@ export class Ads implements IAds {
         };
 
         let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
-        if (this.PrivacyManager.usePrivacySDK()) {
-            privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
-        } else {
+        if (this.PrivacyManager.useLegacyPrivacy()) {
             privacyAdUnit = new PrivacyUnit(privacyAdUnitParams);
+        } else {
+            privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
         }
 
         return privacyAdUnit.show(options);
