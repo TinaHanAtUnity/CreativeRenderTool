@@ -623,7 +623,7 @@ describe('UserPrivacyManagerTest', () => {
             sandbox.restore();
         });
 
-        it ('with proper fields', () => {
+        it('with proper fields', () => {
             const expectedKafkaObject = {
                 v: 2,
                 advertisingId: testAdvertisingId,
@@ -806,7 +806,7 @@ describe('UserPrivacyManagerTest', () => {
                         httpKafkaSpy.resetHistory();
                         updateUserPrivacy.resetHistory();
                     }).catch ((e) => {
-                        if(gdprInitDevConsent !== undefined) {
+                        if (gdprInitDevConsent !== undefined) {
                             assert.fail('Setting of metadata should not fail here ' + JSON.stringify(e));
                         }
                         sinon.assert.notCalled(updateUserPrivacy);
@@ -816,7 +816,7 @@ describe('UserPrivacyManagerTest', () => {
                     describe('it updates ' + transition.from + '-metadatas based on ' + transition.to + '-metadatas', () => {
                         [true, false].forEach((firstConsent) => {
                             [true, false].forEach((secondConsent) => {
-                                it ('from ' + firstConsent + ' to ' + secondConsent, () => {
+                                it('from ' + firstConsent + ' to ' + secondConsent, () => {
                                     const firstTrigger: {[index: string]: any} = {};
                                     firstTrigger[transition.from] = { consent: { value: firstConsent } };
                                     const expectedFirstPermissions = firstConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
@@ -843,7 +843,7 @@ describe('UserPrivacyManagerTest', () => {
                 describe('it does not update privacy-metadatas with gdpr-metadatas', () => {
                     [true, false].forEach((firstConsent) => {
                         [true, false].forEach((secondConsent) => {
-                            it ('from ' + firstConsent + ' to ' + secondConsent, () => {
+                            it('from ' + firstConsent + ' to ' + secondConsent, () => {
                                 const firstTrigger = { privacy: { consent: { value: firstConsent } } };
                                 const expectedFirstPermissions = firstConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
                                 storageTrigger('', firstTrigger);
@@ -877,14 +877,14 @@ describe('UserPrivacyManagerTest', () => {
                 });
 
                 [true, false].forEach((consent) => {
-                    it ('it does not update with gdpr.consent=' + consent, () => {
+                    it('it does not update with gdpr.consent=' + consent, () => {
                         const trigger = { gdpr: { consent: { value: consent } } };
                         storageTrigger('', trigger);
                         sinon.assert.notCalled(httpKafkaSpy);
                         sinon.assert.notCalled(updateUserPrivacy);
                     });
 
-                    it ('updates with privacy.consent=' + consent, () => {
+                    it('updates with privacy.consent=' + consent, () => {
                         const trigger = { privacy: { consent: { value: consent } } };
                         const expectedPermissions = consent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
                         storageTrigger('', trigger);
