@@ -760,4 +760,141 @@ describe('UserPrivacyManagerTest', () => {
             });
         });
     });
+
+    describe('Setting developer_consent after Ads has been initialized', () => {
+        beforeEach(() => {
+            isGDPREnabled = true;
+            privacyConsent = undefined;
+            gdprConsent = undefined;
+            userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+            userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
+            userPrivacy.getVersion.returns(0);
+            getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+                if (gdprConsent === undefined) {
+                    return Promise.reject(StorageError.COULDNT_GET_VALUE);
+                }
+                return Promise.resolve(gdprConsent);
+            });
+            getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+                if (privacyConsent === undefined) {
+                    return Promise.reject(StorageError.COULDNT_GET_VALUE);
+                }
+                return Promise.resolve(privacyConsent);
+            });
+        });
+
+        after(() => {
+            getStub.reset();
+            getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+                return Promise.resolve(gdprConsent);
+            });
+            getStub.withArgs(StorageType.PUBLIC, 'privacy.consent.value').callsFake(() => {
+                return Promise.resolve(privacyConsent);
+            });
+        });
+
+        [true, false, undefined].forEach((gdprInitDevConsent) => {
+            describe('when developer consent was set on init with gdpr.consent=' + gdprInitDevConsent, () => {
+                const allowedTransitions = [
+                    {from: 'privacy', to: 'privacy'},
+                    {from: 'gdpr', to: 'privacy'},
+                    {from: 'gdpr', to: 'gdpr'}];
+                beforeEach(() => {
+                    gdprConsent = gdprInitDevConsent;
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        sinon.assert.calledOnce(updateUserPrivacy);
+                        httpKafkaSpy.resetHistory();
+                        updateUserPrivacy.resetHistory();
+                    }).catch ((e) => {
+                        if(gdprInitDevConsent !== undefined) {
+                            assert.fail('Setting of metadata should not fail here ' + JSON.stringify(e));
+                        }
+                        sinon.assert.notCalled(updateUserPrivacy);
+                    });
+                });
+                allowedTransitions.forEach((transition: {from: string; to: string}) => {
+                    describe('it updates ' + transition.from + '-metadatas based on ' + transition.to + '-metadatas', () => {
+                        [true, false].forEach((firstConsent) => {
+                            [true, false].forEach((secondConsent) => {
+                                it ('from ' + firstConsent + ' to ' + secondConsent, () => {
+                                    const firstTrigger: {[index: string]: any} = {};
+                                    firstTrigger[transition.from] = { consent: { value: firstConsent } };
+                                    const expectedFirstPermissions = firstConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                                    storageTrigger('', firstTrigger);
+                                    return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
+                                        sinon.assert.calledOnce(updateUserPrivacy);
+                                        sinon.assert.calledWith(updateUserPrivacy, expectedFirstPermissions);
+
+                                        const secondTrigger: {[index: string]: any} = {};
+                                        secondTrigger[transition.to] = { consent: { value: secondConsent } };
+                                        const expectedSecondPermissions = secondConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                                        storageTrigger('', secondTrigger);
+                                        return (<Promise<void>>httpKafkaSpy.secondCall.returnValue).then(() => {
+                                            sinon.assert.calledTwice(updateUserPrivacy);
+                                            sinon.assert.calledWith(updateUserPrivacy, expectedSecondPermissions);
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+
+                describe('it does not update privacy-metadatas with gdpr-metadatas', () => {
+                    [true, false].forEach((firstConsent) => {
+                        [true, false].forEach((secondConsent) => {
+                            it ('from ' + firstConsent + ' to ' + secondConsent, () => {
+                                const firstTrigger = { privacy: { consent: { value: firstConsent } } };
+                                const expectedFirstPermissions = firstConsent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                                storageTrigger('', firstTrigger);
+                                return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
+                                    sinon.assert.calledOnce(updateUserPrivacy);
+                                    sinon.assert.calledWith(updateUserPrivacy, expectedFirstPermissions);
+
+                                    httpKafkaSpy.resetHistory();
+                                    updateUserPrivacy.resetHistory();
+                                    const secondTrigger = { gdpr: { consent: { value: firstConsent } } };
+                                    storageTrigger('', secondTrigger);
+                                    sinon.assert.notCalled(httpKafkaSpy);
+                                    sinon.assert.notCalled(updateUserPrivacy);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        [true, false].forEach((privacyInitDevConsent) => {
+            describe('when developer consent was set on init with privacy.consent=' + privacyInitDevConsent, () => {
+                beforeEach(() => {
+                    privacyConsent = privacyInitDevConsent;
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                        sinon.assert.calledOnce(updateUserPrivacy);
+                        httpKafkaSpy.resetHistory();
+                        updateUserPrivacy.resetHistory();
+                    });
+                });
+
+                [true, false].forEach((consent) => {
+                    it ('it does not update with gdpr.consent=' + consent, () => {
+                        const trigger = { gdpr: { consent: { value: consent } } };
+                        storageTrigger('', trigger);
+                        sinon.assert.notCalled(httpKafkaSpy);
+                        sinon.assert.notCalled(updateUserPrivacy);
+                    });
+
+                    it ('updates with privacy.consent=' + consent, () => {
+                        const trigger = { privacy: { consent: { value: consent } } };
+                        const expectedPermissions = consent ? UserPrivacy.PERM_DEVELOPER_CONSENTED : UserPrivacy.PERM_ALL_FALSE;
+                        storageTrigger('', trigger);
+                        return (<Promise<void>>httpKafkaSpy.firstCall.returnValue).then(() => {
+                            sinon.assert.calledOnce(updateUserPrivacy);
+                            sinon.assert.calledWith(updateUserPrivacy, expectedPermissions);
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
