@@ -1,5 +1,6 @@
 # Pending
 
+* In-app Human Verification UI [#12446](https://github.com/Applifier/unity-ads-webview/pull/12446)
 * Change permissions for first request [#12452](https://github.com/Applifier/unity-ads-webview/pull/12452)
 * Feature/privacy consent metadata [#12451](https://github.com/Applifier/unity-ads-webview/pull/12451)
 * Open Measurement - Add Impression Metric for Admob [#12416](https://github.com/Applifier/unity-ads-webview/pull/12416)
