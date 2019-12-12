@@ -87,18 +87,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });
-        }).catch(() => {
-            if (this._platform === Platform.ANDROID) {
-                // Fix for Android WEBPLAYER_NULL errors:
-                // setSettings is called before _container.open, which initializes the webplayer.  On the
-                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
-                // from being called and breaks ads.
-                this._urlLoadingObserver = this._webPlayerContainer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-                this.setupPrivacyObservers();
-                return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
-                    this.onStart.trigger();
-                });
-            }
         });
     }
 

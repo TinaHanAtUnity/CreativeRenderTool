@@ -105,14 +105,6 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
     private setupWebPlayerView(): Promise<void> {
         return this.setupWebPlayer().then(() => {
             return this.openAdUnitContainer(['webplayer', 'webview']);
-        }).catch(() => {
-            if (this._platform === Platform.ANDROID) {
-                // Fix for Android WEBPLAYER_NULL errors:
-                // setSettings is called before _container.open, which initializes the webplayer.  On the
-                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
-                // from being called and breaks ads.
-                return this.openAdUnitContainer(['webplayer', 'webview']);
-            }
         });
     }
 

@@ -280,16 +280,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
                 this.hide();
             });
-        }).catch(() => {
-            if (platform === Platform.ANDROID) {
-                // Fix for Android WEBPLAYER_NULL errors:
-                // setSettings is called before _container.open, which initializes the webplayer.  On the
-                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
-                // from being called and breaks ads.
-                return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
-                    this.hide();
-                });
-            }
         });
     }
 

@@ -201,7 +201,17 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]).catch((e) => {
+            if (e === 'WEBPLAYER_NULL') {
+                // Fix for Android WEBPLAYER_NULL errors:
+                // setSettings is called before _container.open, which initializes the webplayer.  On the
+                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
+                // from being called and breaks ads.
+                return Promise.resolve();
+            } else {
+                return Promise.reject(e);
+            }
+        });
     }
 
     public clearSettings(viewId: string): Promise<void> {
@@ -209,7 +219,17 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public setEventSettings(eventSettings: IWebPlayerEventSettings, viewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]).catch((e) => {
+            if (e === 'WEBPLAYER_NULL') {
+                // Fix for Android WEBPLAYER_NULL errors:
+                // setSettings is called before _container.open, which initializes the webplayer.  On the
+                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
+                // from being called and breaks ads.
+                return Promise.resolve();
+            } else {
+                return Promise.reject(e);
+            }
+        });
     }
 
     public sendEvent(args: unknown[], viewId: string): Promise<void> {
