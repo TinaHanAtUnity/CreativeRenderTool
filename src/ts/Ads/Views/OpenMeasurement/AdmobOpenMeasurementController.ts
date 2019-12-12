@@ -153,14 +153,18 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             }
             impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
 
-            this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+            this._omInstances.forEach((om) => {
+                this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+            });
             super.impression(impressionObject);
         }).catch((e) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO
             };
 
-            this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+            this._omInstances.forEach((om) => {
+                this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+            });
             super.impression(impressionObject);
         });
     }
