@@ -18,7 +18,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
     private _trackablePlacements: string[];
     private _activePlacements: string[];
-    private _forceLoadPlacements: string[];
+    private _forceLoadPlacements: {[key: string]: string } = {};
     private _initialized: boolean;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
@@ -28,7 +28,6 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         this._adsConfig = adsConfig;
         this._trackablePlacements = [];
         this._activePlacements = [];
-        this._forceLoadPlacements = [];
         this._initialized = false;
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
@@ -36,7 +35,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
                 if (this._initialized) {
                     this.sendLoadAPIEvent(placementId);
                 } else {
-                   this._forceLoadPlacements.push(placementId);
+                   this._forceLoadPlacements[placementId] = placementId;
                 }
             });
         });
@@ -45,7 +44,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     public initialize(): Promise<INativeResponse | void> {
         this._initialized = true;
         return super.initialize().then((returnValue) => {
-            this._forceLoadPlacements.unique().forEach((placementId) => {
+            Object.keys(this._forceLoadPlacements).forEach((placementId) => {
                 this.sendLoadAPIEvent(placementId);
             });
             return returnValue;
