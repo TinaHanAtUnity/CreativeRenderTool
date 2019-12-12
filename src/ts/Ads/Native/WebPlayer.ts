@@ -243,18 +243,15 @@ export class WebPlayerApi extends NativeApi {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
                 this.onPageStarted.trigger(<string>parameters[1], <string>parameters[0]);
                 break;
-
             case WebplayerEvent[WebplayerEvent.PAGE_FINISHED]:
                 this.onPageFinished.trigger(<string>parameters[1], <string>parameters[0]);
                 break;
-
             case WebplayerEvent[WebplayerEvent.ERROR]:
                 this.onPageFinished.trigger(<string>parameters[1], <string>parameters[0]);
                 break;
             case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
                 this.onWebPlayerEvent.trigger(<string>parameters[1], <string>parameters[0]);
                 break;
-
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
                 this.shouldOverrideUrlLoading.trigger(<string>parameters[2], <string>parameters[0], <string>parameters[1]);
                 break;
