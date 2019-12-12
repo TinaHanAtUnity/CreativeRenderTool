@@ -88,6 +88,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 
 export class Ads implements IAds {
 
@@ -186,6 +187,8 @@ export class Ads implements IAds {
             PrivacyMetrics.setGameSessionId(gameSessionId);
             PrivacyMetrics.setPrivacy(this.PrivacySDK);
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
+
+            PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
