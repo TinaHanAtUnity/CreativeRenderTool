@@ -17,6 +17,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
     private _trackablePlacements: Set<string>;
+    private _activePlacements: Set<string>;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
         super(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
@@ -24,6 +25,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         this._ads = ads;
         this._adsConfig = adsConfig;
         this._trackablePlacements = new Set();
+        this._activePlacements = new Set();
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
@@ -49,6 +51,14 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
                     this._trackablePlacements.delete(placementId);
                 }
             }
+        } else if (this._activePlacements.has(placementId)) {
+            const placement = this._adsConfig.getPlacement(placementId);
+            if (placement.getPlacementStateChanged() && placement.getState() === PlacementState.NOT_AVAILABLE) {
+                this._activePlacements.delete(placementId);
+            } else if (placement.getPlacementStateChanged() && placement.getPreviousState() ===  PlacementState.WAITING && placement.getState() === PlacementState.NO_FILL) {
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
+                this._activePlacements.delete(placementId);
+            }
         }
     }
 
@@ -56,6 +66,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         this._ads.Placement.setPlacementState(placementId, nextState);
         this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[previousState], PlacementState[nextState]);
         if (nextState === PlacementState.READY) {
+            this._activePlacements.add(placementId);
             this._ads.Listener.sendReadyEvent(placementId);
         }
     }

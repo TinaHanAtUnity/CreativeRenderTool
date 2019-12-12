@@ -150,6 +150,7 @@ describe('PerPlacementLoadAdapterTest', () => {
         let sandbox: sinon.SinonSandbox;
         let sendReadyEventStub: sinon.SinonStub;
         let sendPlacementStateChangedEventStub: sinon.SinonStub;
+        let clock: sinon.SinonFakeTimers;
 
         beforeEach(() => {
             placementID = 'premium';
@@ -158,6 +159,7 @@ describe('PerPlacementLoadAdapterTest', () => {
             sandbox = sinon.createSandbox();
             sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
             sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
+            clock = sinon.useFakeTimers();
 
             perPlacementLoadAdapter = new PerPlacementLoadAdapter(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
@@ -166,9 +168,20 @@ describe('PerPlacementLoadAdapterTest', () => {
             sandbox.restore();
         });
 
-        it('should update state for READY state', () => {
-            placement.setState(PlacementState.READY);
+        it('should update state after load', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+            
+            await perPlacementLoadAdapter.refresh();
+
             assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
 
             const loadDict: {[key: string]: number} = {};
             loadDict[placementID] = 1;
@@ -179,39 +192,150 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendReadyEventStub, placementID);
         });
 
-        it('should update state for NO_FILL', () => {
-            placement.setState(PlacementState.NO_FILL);
+        it('should update state after load while load called during ad request', async () => {
+            let requestPromiseResolve = () => {};
+            const requestPromise = new Promise((resolve) => { requestPromiseResolve = resolve; });
+
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                return requestPromise.then(() => {
+                    campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
+                });
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+            
+            const refreshPromise = perPlacementLoadAdapter.refresh();
+
+            assert.equal(placement.getState(), PlacementState.WAITING, 'placement state is set to WAITING');
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
 
             const loadDict: {[key: string]: number} = {};
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            //first time or after ready and show, it should be NOT_AVAILABLE -> WAITING -> NO_FILL
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
-            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
 
+            requestPromiseResolve();
+
+            await refreshPromise;
+
+            assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
+            sinon.assert.calledWith(sendReadyEventStub, placementID);
+        });
+
+        it('should update properly handle no fill', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                campaignManager.onNoFill.trigger('premium');
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+            
+            await perPlacementLoadAdapter.refresh();
+
+            assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement state is set to NO_FILL');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
-            //load call for no_fill placement, and call load again should be NO_FILL -> WAITING -> NO_FILL
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
-
             sinon.assert.notCalled(sendReadyEventStub);
         });
 
-        it('call update state after WAITING', () => {
-            placement.setState(PlacementState.WAITING);
+        it('should update properly handle ready to no fill', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
+                campaignManager.onAdPlanReceived.trigger(1, 3, 0);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+            
+            await perPlacementLoadAdapter.refresh();
+
+            assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
 
             const loadDict: {[key: string]: number} = {};
             loadDict[placementID] = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
-
-            perPlacementLoadAdapter.setPlacementStates(PlacementState.READY, [placementID]);
-
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
             sinon.assert.calledWith(sendReadyEventStub, placementID);
+
+            sendPlacementStateChangedEventStub.resetHistory();
+            sendReadyEventStub.resetHistory();
+            sandbox.restore();
+        
+            sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
+
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                campaignManager.onNoFill.trigger('premium');
+                return Promise.resolve();
+            });
+        
+            clock.tick(1001);
+
+            PerPlacementLoadAdapter.ErrorRefillDelayInSeconds = 0;
+            await perPlacementLoadAdapter.refresh();
+            clock.reset();
+            
+            assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement state is set to NO_FILL');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+        });
+
+        it('should update properly handle ready to ready', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
+                campaignManager.onAdPlanReceived.trigger(1, 3, 0);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            await perPlacementLoadAdapter.refresh();
+
+            assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
+            sinon.assert.calledWith(sendReadyEventStub, placementID);
+
+            sendPlacementStateChangedEventStub.resetHistory();
+            sendReadyEventStub.resetHistory();
+            sandbox.restore();
+            
+            sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
+            
+            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
+                return Promise.resolve();
+            });
+
+            clock.tick(1001);
+
+            await perPlacementLoadAdapter.refresh();
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
         });
 
         describe('setCurrentAdUnit', () => {
