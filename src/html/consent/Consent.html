@@ -4,7 +4,11 @@
             <span class="title"><%= data.t("age-gate-title") %></span>
             <div class="main-text">
                 <p>
+                    <% if(data.isCCPA) { %>
+                    <%= data.t("age-gate-text-ccpa") %>
+                    <% } else { %>
                     <%= data.t("age-gate-text") %>
+                    <% } %>
                 </p>
             </div>
             <div class="empty-block">

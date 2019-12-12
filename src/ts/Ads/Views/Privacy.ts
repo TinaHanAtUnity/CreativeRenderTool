@@ -109,6 +109,11 @@ export class Privacy extends AbstractPrivacy {
             const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
             if (agreeRadioButton) {
                 agreeRadioButton.onclick = () => {
+                    const noteContainer = this._container.querySelector('.data-deletion-note');
+                    if (noteContainer) {
+                        noteContainer.classList.remove('active');
+                    }
+
                     const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
                     confirmationContainer.classList.remove('active');
 
@@ -157,6 +162,11 @@ export class Privacy extends AbstractPrivacy {
             return;
         }
 
+        const noteContainer = this._container.querySelector('.data-deletion-note');
+        if (noteContainer) {
+            noteContainer.classList.toggle('active');
+        }
+
         const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
         confirmationContainer.classList.toggle('active');
     }
@@ -167,6 +177,11 @@ export class Privacy extends AbstractPrivacy {
 
         const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
         confirmationContainer.classList.toggle('active');
+
+        const noteContainer = this._container.querySelector('.data-deletion-note');
+        if (noteContainer) {
+            noteContainer.classList.toggle('active');
+        }
 
         const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
         requestContainer.classList.add('active');
