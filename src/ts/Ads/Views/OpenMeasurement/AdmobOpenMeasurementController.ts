@@ -163,11 +163,18 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public sessionStart(sessionEvent: ISessionEvent) {
-        super.sessionStart(sessionEvent);
+
+        this._omInstances.forEach((om) => {
+            om.sessionStart(sessionEvent);
+            const verification = om.getVastVerification();
+            sessionEvent.data.vendorkey = verification.getVerificationVendor();
+
+            om.sessionStart(sessionEvent);
+        });
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
-    /**
+    /**v
      * SessionFinish:
      */
     public sessionFinish() {

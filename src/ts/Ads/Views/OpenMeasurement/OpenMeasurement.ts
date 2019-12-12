@@ -26,11 +26,6 @@ interface IVerificationVendorMap {
     [vendorKey: string]: string;
 }
 
-enum AdSessionType {
-    NATIVE = 'native',
-    HTML = 'html'
-}
-
 interface IOmidJsInfo {
     omidImplementer: string;
     serviceVersion: string;
@@ -50,28 +45,6 @@ interface IDeviceInfo {
     osVersion: string;
 }
 
-interface IContext {
-    apiVersion: string;
-    environment: string;
-    accessMode: AccessMode;
-    videoElement?: HTMLVideoElement | null; // Only required for AccessMode.FULL video
-    slotElement?: HTMLElement;              // Only required for AccessMode.FULL display
-    adSessionType: AdSessionType;
-    adServingId?: string;                   // VAST optional field - <AdServingId>
-    transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
-    podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
-    adCount?: number;                       // VAST optional field - number of <InLine> elements
-    omidNativeInfo?: {
-        partnerName: string;
-        partnerVersion: string;
-    };
-    omidJsInfo: IOmidJsInfo;
-    app?: IApp;
-    deviceInfo: IDeviceInfo;
-    supports: string[];
-    customReferenceData?: string;
-}
-
 export const PARTNER_NAME = 'Unity3d';
 export const DEFAULT_VENDOR_KEY = 'default_key';
 export const OM_JS_VERSION = '1.2.10';
@@ -87,12 +60,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _request: RequestManager;
     private _omAdSessionId: string;
 
-    private _verificationVendorMap: IVerificationVendorMap;
-    private _vendorKey: string;
+    // private _verificationVendorMap: IVerificationVendorMap;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
 
-    private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
     private _sessionStartEventData: ISessionEvent;
     private _sessionStartProcessedByOmidScript = false;
@@ -112,7 +83,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omAdSessionId = JaegerUtilities.uuidv4();
         this._bindings = [];
         this._core = core;
-        this._verificationVendorMap = {};
         this._clientInfo = clientInfo;
         this._campaign = campaign;
 
@@ -133,6 +103,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
         }, this._omIframe, this);
+    }
+
+    public getVastVerification(): VastAdVerification{
+        return this._adVerification;
     }
 
     // only needed to build impression adview for VAST campaigns
@@ -246,66 +220,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart(sessionEvent?: ISessionEvent) {
-        if (!sessionEvent) {
-            // Non-Admob code path
-            const event: ISessionEvent = {
-                adSessionId: this.getOMAdSessionId(),
-                timestamp: Date.now(),
-                type: 'sessionStart',
-                data: {}
-            };
-            this._sessionStartCalled = true;
-
-            if (this._verificationVendorMap[this._vendorKey]) {
-                event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
-            }
-            const contextData: IContext = this.buildSessionContext();
-            event.data.context = contextData;
-            event.data.vendorkey = this._vendorKey;
-            this._omBridge.triggerSessionEvent(event);
-        } else {
-            // TODO: Refactor. Admob Code Path
-            this._sessionStartEventData = sessionEvent;
-            this._sessionStartEventData.data.vendorkey = this._vendorKey;
-            this._omBridge.triggerSessionEvent(this._sessionStartEventData);
-        }
-    }
-
-    private buildSessionContext(): IContext {
-        const contextData: IContext = {
-            apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
-            environment: 'app',                                   // OMID JS Verification Client API
-            accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
-            omidNativeInfo: {
-                partnerName: PARTNER_NAME,
-                partnerVersion: this._clientInfo.getSdkVersionName()
-            },
-            omidJsInfo: {
-                omidImplementer: PARTNER_NAME,
-                serviceVersion: this._clientInfo.getSdkVersionName(),
-                sessionClientVersion: OMID_P,
-                partnerName: PARTNER_NAME,
-                partnerVersion: this._clientInfo.getSdkVersionName()
-            },
-            app: {
-                libraryVersion: OM_JS_VERSION,
-                appId: this._clientInfo.getApplicationName()
-            },
-            deviceInfo: {
-                deviceType: this._deviceInfo.getModel(),
-                os: Platform[this._platform].toLowerCase(),
-                osVersion: this._deviceInfo.getOsVersion()
-            },
-            supports: ['vlid', 'clid']
-        };
-
-        if (contextData.accessMode === AccessMode.FULL) {
-            contextData.videoElement = document.querySelector('video');
-        }
-
-        return contextData;
+    public sessionStart(sessionEvent: ISessionEvent) {
+        this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
    /**
@@ -472,7 +388,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this.checkVendorResourceURL(resourceUrl).then(() => {
             this.injectAsString(resourceUrl, vendorKey);
             this.populateVendorKey(vendorKey);
-            this._verificationVendorMap[vendorKey] = verificationParameters;
 
             if (vendorKey === 'IAS' && this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASVerificatonInjected);

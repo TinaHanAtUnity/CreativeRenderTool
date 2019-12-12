@@ -56,7 +56,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 }
             });
 
-            const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
+            const omManager = new VastOpenMeasurementController(baseParams.platform, baseParams.placement, omInstances, omAdViewBuilder, baseParams.clientInfo, baseParams.deviceInfo);
             omManager.addToViewHierarchy();
             omManager.injectVerifications();
 
