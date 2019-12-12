@@ -1,8 +1,8 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { Template } from 'Core/Utilities/Template';
+import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
 import EndScreenAnimatedDownloadButton from 'html/EndScreenAnimatedDownloadButton.html';
+import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/SquareEndScreenAnimatedDownloadButton.html';
 
 export enum EndScreenAnimation {
   STATIC = 'static',
@@ -18,7 +18,6 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     super(parameters, campaign, country);
 
     this._animation = animation;
-    this._template = new Template(EndScreenAnimatedDownloadButton, this._localization);
     this._templateData = {
       ...this._templateData,
       'hasShadow': animation === EndScreenAnimation.BOUNCING
@@ -27,6 +26,17 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
   public render(): void {
     super.render();
-    this._container.classList.add(`${this._animation}-download-button-end-screen`);
+    let animationClass = `${this._animation}-download-button-end-screen`;
+    if (this._animation === EndScreenAnimation.BOUNCING && this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+      animationClass += '-squared';
+    }
+    this._container.classList.add(animationClass);
   }
+
+  protected getTemplate() {
+    if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+        return SquareEndScreenAnimatedDownloadButtonTemplate;
+    }
+    return EndScreenAnimatedDownloadButton;
+}
 }
