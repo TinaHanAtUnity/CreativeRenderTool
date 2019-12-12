@@ -59,7 +59,7 @@ import { assert } from 'chai';
             };
 
             sandbox.stub(Date, 'now').returns(111);
-            omidEventBridge = new OMIDEventBridge(core, handler, iframe, omInstance);
+            omidEventBridge = new OMIDEventBridge(core, handler, iframe, omInstance, campaign);
             omidEventBridge.connect();
         });
 

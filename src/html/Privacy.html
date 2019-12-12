@@ -179,13 +179,13 @@
         <span class="report-title centered-title">Report Advertisement</span>
         <span class="report-dialog">Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!</span>
         <ul class="radio-group-container">
-            <% data.reportReasons.forEach((k, index) => { %>
+            <% for (let k = 0; k < data.reportReasons.length; k++) { %>
             <div class="radio-item-container">
-                <input id="<%= data.reportKeys[index] %>" class="report-choice-radio" name="report-reason" type="radio">
-                <label for="<%= data.reportKeys[index] %>">
-                    <%= (k === null || k === "undefined") ? "N/A" : k %></label>
+                <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
+                <label for="<%= data.reportKeys[k] %>">
+                    <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
             </div>
-            <% }); %>
+            <% } %>
         </ul>
         <span class="report-disclaimer">Disclaimer: Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.</span>
         <div class="report-container">

@@ -104,7 +104,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification, pts?: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, pts?: ProgrammaticTrackingService, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -132,7 +132,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
-        }, this._omIframe, this);
+        }, this._omIframe, this, this._campaign, this._pts);
     }
 
     // only needed to build impression adview for VAST campaigns
