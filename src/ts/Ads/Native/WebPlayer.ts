@@ -173,6 +173,8 @@ export enum WebPlayerViewId {
     WebPlayer = 'webplayer'
 }
 
+const AndroidApiClassName = 'com.unity3d.services.ads.api.WebPlayer';
+
 export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable2<string, string>();
@@ -202,11 +204,11 @@ export class WebPlayerApi extends NativeApi {
 
     public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void>  {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]).catch((e) => {
-            if (e === 'WEBPLAYER_NULL') {
+            if (this._fullApiClassName === AndroidApiClassName && e === 'WEBPLAYER_NULL') {
                 // Fix for Android WEBPLAYER_NULL errors:
-                // setSettings is called before _container.open, which initializes the webplayer.  On the
-                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
-                // from being called and breaks ads.
+                // In some cases setSettings is called before the container is opened.  In this case, the settings
+                // are saved, but the error WEBPLAYER_NULL is returned.  This check prevents ad units from breaking
+                // due to this error.
                 return Promise.resolve();
             } else {
                 return Promise.reject(e);
@@ -220,11 +222,11 @@ export class WebPlayerApi extends NativeApi {
 
     public setEventSettings(eventSettings: IWebPlayerEventSettings, viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]).catch((e) => {
-            if (e === 'WEBPLAYER_NULL') {
+            if (this._fullApiClassName === AndroidApiClassName && e === 'WEBPLAYER_NULL') {
                 // Fix for Android WEBPLAYER_NULL errors:
-                // setSettings is called before _container.open, which initializes the webplayer.  On the
-                // Android platform this will cause a WEBPLAYER_NULL error which will prevent _container.open
-                // from being called and breaks ads.
+                // In some cases setEventSettings is called before the container is opened.  In this case, the settings
+                // are saved, but the error WEBPLAYER_NULL is returned.  This check prevents ad units from breaking
+                // due to this error.
                 return Promise.resolve();
             } else {
                 return Promise.reject(e);
