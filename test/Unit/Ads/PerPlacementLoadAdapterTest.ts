@@ -176,7 +176,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
 
-            await perPlacementLoadAdapter.refresh();
+            await perPlacementLoadAdapter.initialize();
 
             assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
 
@@ -205,7 +205,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
 
-            const refreshPromise = perPlacementLoadAdapter.refresh();
+            const refreshPromise = perPlacementLoadAdapter.initialize();
 
             assert.equal(placement.getState(), PlacementState.WAITING, 'placement state is set to WAITING');
             sinon.assert.notCalled(sendPlacementStateChangedEventStub);
@@ -228,6 +228,36 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendReadyEventStub, placementID);
         });
 
+        it('should update state after load while load called before RefreshManager initialized', async () => {
+            // tslint:disable-next-line
+            let requestPromiseResolve = () => {};
+            const requestPromise = new Promise((resolve) => { requestPromiseResolve = resolve; });
+
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                return requestPromise.then(() => {
+                    campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
+                });
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            const refreshPromise = perPlacementLoadAdapter.initialize();
+
+            assert.equal(placement.getState(), PlacementState.WAITING, 'placement state is set to WAITING');
+
+            requestPromiseResolve();
+
+            await refreshPromise;
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
+            sinon.assert.calledWith(sendReadyEventStub, placementID);
+        });
+
         it('should update properly handle no fill', async () => {
             sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onNoFill.trigger('premium');
@@ -236,7 +266,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
 
-            await perPlacementLoadAdapter.refresh();
+            await perPlacementLoadAdapter.initialize();
 
             assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement state is set to NO_FILL');
 
@@ -261,7 +291,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
 
-            await perPlacementLoadAdapter.refresh();
+            await perPlacementLoadAdapter.initialize();
 
             assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
 
@@ -306,7 +336,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
 
-            await perPlacementLoadAdapter.refresh();
+            await perPlacementLoadAdapter.initialize();
 
             assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
             sinon.assert.notCalled(sendPlacementStateChangedEventStub);

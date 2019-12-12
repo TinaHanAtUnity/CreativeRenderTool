@@ -2,7 +2,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, INativeResponse } from 'Core/Managers/RequestManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -16,21 +16,39 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
-    private _trackablePlacements: Set<string>;
-    private _activePlacements: Set<string>;
+    private _trackablePlacements: string[];
+    private _activePlacements: string[];
+    private _forceLoadPlacements: string[];
+    private _initialized: boolean;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
         super(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
 
         this._ads = ads;
         this._adsConfig = adsConfig;
-        this._trackablePlacements = new Set();
-        this._activePlacements = new Set();
+        this._trackablePlacements = [];
+        this._activePlacements = [];
+        this._forceLoadPlacements = [];
+        this._initialized = false;
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
+                if (this._initialized) {
+                    this.sendLoadAPIEvent(placementId);
+                } else {
+                   this._forceLoadPlacements.push(placementId);
+                }
+            });
+        });
+    }
+
+    public initialize(): Promise<INativeResponse | void> {
+        this._initialized = true;
+        return super.initialize().then((returnValue) => {
+            this._forceLoadPlacements.unique().forEach((placementId) => {
                 this.sendLoadAPIEvent(placementId);
             });
+            return returnValue;
         });
     }
 
@@ -41,23 +59,23 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     }
 
     public sendPlacementStateChanges(placementId: string): void {
-        if (this._trackablePlacements.has(placementId)) {
+        if (this._trackablePlacements.indexOf(placementId) !== -1) {
             const placement = this._adsConfig.getPlacement(placementId);
             if (placement.getPlacementStateChanged()) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, placement.getPreviousState(), placement.getState());
                 placement.setPlacementStateChanged(false);
 
                 if (placement.getState() !== PlacementState.WAITING) {
-                    this._trackablePlacements.delete(placementId);
+                    this._trackablePlacements.filter(e => e !== placementId);
                 }
             }
-        } else if (this._activePlacements.has(placementId)) {
+        } else if (this._activePlacements.indexOf(placementId) !== -1) {
             const placement = this._adsConfig.getPlacement(placementId);
             if (placement.getPlacementStateChanged() && placement.getState() === PlacementState.NOT_AVAILABLE) {
-                this._activePlacements.delete(placementId);
+                this._activePlacements.filter(e => e !== placementId);
             } else if (placement.getPlacementStateChanged() && placement.getPreviousState() ===  PlacementState.WAITING && placement.getState() === PlacementState.NO_FILL) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
-                this._activePlacements.delete(placementId);
+                this._activePlacements.filter(e => e !== placementId);
             }
         }
     }
@@ -66,7 +84,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         this._ads.Placement.setPlacementState(placementId, nextState);
         this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[previousState], PlacementState[nextState]);
         if (nextState === PlacementState.READY) {
-            this._activePlacements.add(placementId);
+            this._activePlacements.push(placementId);
             this._ads.Listener.sendReadyEvent(placementId);
         }
     }
@@ -75,7 +93,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         const placement = this._adsConfig.getPlacement(placementId);
 
         if (placement.getState() === PlacementState.WAITING) {
-            this._trackablePlacements.add(placementId);
+            this._trackablePlacements.push(placementId);
         }
         this.sendPlacementStateChange(placementId, placement.getState());
     }
