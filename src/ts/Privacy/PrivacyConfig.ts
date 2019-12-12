@@ -1,19 +1,14 @@
 import { IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 
-export interface IPrivacyConfigJson {
-    flow: { [key: string]: unknown };
-    webViewUrl: string;
-}
-
 export class PrivacyConfig {
     private _env: { [key: string]: unknown };
     private _userSettings: IUserPrivacySettings;
-    private _configJson: IPrivacyConfigJson;
+    private _flow: { [key: string]: unknown };
     private _html: string;
 
-    constructor(configJson: IPrivacyConfigJson, userSettings: IUserPrivacySettings, env: { [key: string]: unknown }, privacyHtml: string) {
+    constructor(flow: { [key: string]: unknown }, userSettings: IUserPrivacySettings, env: { [key: string]: unknown }, privacyHtml: string) {
         this._env = env;
-        this._configJson = configJson;
+        this._flow = flow;
         this._userSettings = userSettings;
         this._html = privacyHtml;
     }
@@ -23,11 +18,7 @@ export class PrivacyConfig {
     }
 
     public getFlow(): { [key: string]: unknown } {
-        return this._configJson.flow;
-    }
-
-    public getWebViewUrl(): string {
-        return this._configJson.webViewUrl;
+        return this._flow;
     }
 
     public getUserSettings(): IUserPrivacySettings {

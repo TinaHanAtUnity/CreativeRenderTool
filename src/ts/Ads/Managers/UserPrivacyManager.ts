@@ -17,6 +17,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -122,33 +123,28 @@ export class UserPrivacyManager {
             return Promise.reject(new Error('No privacy url'));
         }
 
-        return this._request.get(privacyUrl + 'api/v1/flows/create').then((response) => {
-            return this._request.get(privacyUrl).then((privacyHtml) => {
-                return Promise.resolve(new PrivacyConfig({
-                        flow: JSON.parse(response.response),
-                        webViewUrl: privacyUrl
-                    },
-                    {
-                        ads: this._userPrivacy.getPermissions().ads,
-                        external: this._userPrivacy.getPermissions().external,
-                        gameExp: this._userPrivacy.getPermissions().gameExp,
-                        agreedOverAgeLimit: agreedOverAgeLimit
-                    },
-                    {
-                        buildOsVersion: this._deviceInfo.getOsVersion(),
-                        platform: this._platform,
-                        userLocale: this._deviceInfo.getLanguage(),
-                        country: this._coreConfig.getCountry(),
-                        // todo: add api level
-                        // todo: add subcountry
+        return this._request.get(privacyUrl).then((privacyHtml) => {
+            return Promise.resolve(new PrivacyConfig(PrivacySDKFlow,
+                {
+                    ads: this._userPrivacy.getPermissions().ads,
+                    external: this._userPrivacy.getPermissions().external,
+                    gameExp: this._userPrivacy.getPermissions().gameExp,
+                    agreedOverAgeLimit: agreedOverAgeLimit
+                },
+                {
+                    buildOsVersion: this._deviceInfo.getOsVersion(),
+                    platform: this._platform,
+                    userLocale: this._deviceInfo.getLanguage(),
+                    country: this._coreConfig.getCountry(),
+                    // todo: add api level
+                    // todo: add subcountry
 
-                        privacyMethod: this._gamePrivacy.getMethod(),
-                        ageGateLimit: this._privacy.getAgeGateLimit(),
-                        legalFramework: this._privacy.getLegalFramework(),
-                        isCoppa: this._coreConfig.isCoppaCompliant()
-                    },
-                    privacyHtml.response));
-            });
+                    privacyMethod: this._gamePrivacy.getMethod(),
+                    ageGateLimit: this._privacy.getAgeGateLimit(),
+                    legalFramework: this._privacy.getLegalFramework(),
+                    isCoppa: this._coreConfig.isCoppaCompliant()
+                },
+                privacyHtml.response));
         });
     }
 
