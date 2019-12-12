@@ -1,3 +1,15 @@
+# Pending
+
+* Change permissions for first request [#12452](https://github.com/Applifier/unity-ads-webview/pull/12452)
+* Feature/privacy consent metadata [#12451](https://github.com/Applifier/unity-ads-webview/pull/12451)
+* Open Measurement - Add Impression Metric for Admob [#12416](https://github.com/Applifier/unity-ads-webview/pull/12416)
+* Fix Reporting Options V2 [#12455](https://github.com/Applifier/unity-ads-webview/pull/12455)
+* Limit Load API Experiments [#12356](https://github.com/Applifier/unity-ads-webview/pull/12356)
+
+# Wed Dec 11 18:15:01 UTC 2019
+
+* Revert "Fix Reporting Ad Reasons" [#12453](https://github.com/Applifier/unity-ads-webview/pull/12453)
+
 # Tue Dec 10 17:30:44 UTC 2019
 
 * Open Measurement - Add Publica To Tracking Path [#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
