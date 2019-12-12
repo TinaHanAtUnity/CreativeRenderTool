@@ -110,7 +110,11 @@
             </p>
 
 
+            <% if(data.isCCPA) { %>
+            <p><span class="header"><%= data.t("privacy-dialog-text-li-p5-header-ccpa") %></span></p>
+            <% } else { %>
             <p><span class="header"><%= data.t("privacy-dialog-text-li-p5-header") %></span></p>
+            <% } %>
             <p>
                 <%= data.t("privacy-dialog-text-li-p5") %>
             </p>
@@ -119,13 +123,21 @@
                 <div class="radio-item-container">
                     <input id="gdpr-agree-radio" name="gdpr-radio-group" type="radio">
                     <label for="gdpr-agree-radio">
+                        <% if(data.isCCPA) { %>
+                        <%= data.t("privacy-dialog-text-li-agree-radio-button-ccpa") %>
+                        <% } else { %>
                         <%= data.t("privacy-dialog-text-li-agree-radio-button") %>
+                        <% } %>
                     </label>
                 </div>
                 <div class="radio-item-container">
                     <input id="gdpr-refuse-radio" name="gdpr-radio-group" type="radio">
                     <label for="gdpr-refuse-radio">
+                        <% if(data.isCCPA) { %>
+                        <%= data.t("privacy-dialog-text-li-disagree-radio-button-ccpa") %>
+                        <% } else { %>
                         <%= data.t("privacy-dialog-text-li-disagree-radio-button") %>
+                        <% } %>
                     </label>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPrivacyPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
@@ -70,7 +70,9 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
         this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, this._localization);
-        this._templateData = {};
+        this._templateData = {
+            'isCCPA': parameters.privacyManager.getLegalFramework() === LegalFramework.CCPA
+        };
 
         this._bindings = [
             {
