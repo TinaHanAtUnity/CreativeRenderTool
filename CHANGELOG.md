@@ -1,4 +1,4 @@
-# Pending
+# Thu Dec 12 11:26:14 UTC 2019
 
 * In-app Human Verification UI [#12446](https://github.com/Applifier/unity-ads-webview/pull/12446)
 * Change permissions for first request [#12452](https://github.com/Applifier/unity-ads-webview/pull/12452)
