@@ -1,3 +1,7 @@
+# Staged
+
+* Revert "Fix Reporting Options V2" [#12483](https://github.com/Applifier/unity-ads-webview/pull/12483)
+
 # Thu Dec 12 11:26:14 UTC 2019
 
 * In-app Human Verification UI [#12446](https://github.com/Applifier/unity-ads-webview/pull/12446)
