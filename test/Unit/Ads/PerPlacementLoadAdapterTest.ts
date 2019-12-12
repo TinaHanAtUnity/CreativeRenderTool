@@ -169,13 +169,13 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         it('should update state after load', async () => {
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 return Promise.resolve();
             });
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
-            
+
             await perPlacementLoadAdapter.refresh();
 
             assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
@@ -193,17 +193,18 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         it('should update state after load while load called during ad request', async () => {
+            // tslint:disable-next-line
             let requestPromiseResolve = () => {};
             const requestPromise = new Promise((resolve) => { requestPromiseResolve = resolve; });
 
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 return requestPromise.then(() => {
                     campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 });
             });
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
-            
+
             const refreshPromise = perPlacementLoadAdapter.refresh();
 
             assert.equal(placement.getState(), PlacementState.WAITING, 'placement state is set to WAITING');
@@ -228,13 +229,13 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         it('should update properly handle no fill', async () => {
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onNoFill.trigger('premium');
                 return Promise.resolve();
             });
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
-            
+
             await perPlacementLoadAdapter.refresh();
 
             assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement state is set to NO_FILL');
@@ -252,14 +253,14 @@ describe('PerPlacementLoadAdapterTest', () => {
         });
 
         it('should update properly handle ready to no fill', async () => {
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 campaignManager.onAdPlanReceived.trigger(1, 3, 0);
                 return Promise.resolve();
             });
 
             assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
-            
+
             await perPlacementLoadAdapter.refresh();
 
             assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
@@ -278,26 +279,26 @@ describe('PerPlacementLoadAdapterTest', () => {
             sendPlacementStateChangedEventStub.resetHistory();
             sendReadyEventStub.resetHistory();
             sandbox.restore();
-        
+
             sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
 
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onNoFill.trigger('premium');
                 return Promise.resolve();
             });
-        
+
             clock.tick(1001);
 
             PerPlacementLoadAdapter.ErrorRefillDelayInSeconds = 0;
             await perPlacementLoadAdapter.refresh();
             clock.reset();
-            
+
             assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement state is set to NO_FILL');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
         });
 
         it('should update properly handle ready to ready', async () => {
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 campaignManager.onAdPlanReceived.trigger(1, 3, 0);
                 return Promise.resolve();
@@ -322,10 +323,10 @@ describe('PerPlacementLoadAdapterTest', () => {
             sendPlacementStateChangedEventStub.resetHistory();
             sendReadyEventStub.resetHistory();
             sandbox.restore();
-            
+
             sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
-            
-            sandbox.stub(campaignManager, 'request').callsFake(()=> {
+
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 return Promise.resolve();
             });

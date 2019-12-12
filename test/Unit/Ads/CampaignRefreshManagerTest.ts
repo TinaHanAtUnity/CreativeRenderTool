@@ -128,7 +128,6 @@ describe('CampaignRefreshManager', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
     let campaignRefreshManager: RefreshManager;
-    let loadManager: CampaignRefreshManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<Campaign>;
@@ -754,70 +753,6 @@ describe('CampaignRefreshManager', () => {
 
         afterEach(() => {
             sandbox.restore();
-        });
-
-        describe('for targeted mediation and adapter version', () => {
-            beforeEach(() => {
-                backend.Api.Storage.setStorageContents(<any>{
-                    mediation: {
-                        name: {value: 'MoPub'},
-                        version: {value: 'test_version'},
-                        adapter_version: {value: '3.3.0.1'}
-                    }
-                });
-                return metaDataManager.fetch(MediationMetaData, true, ['name', 'version', 'adapter_version']).then(metaData => {
-                    if (metaData) {
-                        assert.equal(metaData.getName(), 'MoPub', 'MediationMetaData.getName() did not pass through correctly');
-                        assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
-                        assert.equal(metaData.getAdapterVersion(), '3.3.0.1', 'MediationMetaData.getAdapterVersion() did not pass through correctly');
-                    }
-                }).then(() => {
-                    loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
-                });
-            });
-
-            xit('should update state for READY state', () => {
-                placement.setState(PlacementState.READY);
-                assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
-
-                const loadDict: {[key: string]: number} = {};
-                loadDict[placementID] = 1;
-                ads.LoadApi.onLoad.trigger(loadDict);
-
-                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
-                sinon.assert.calledWith(sendReadyEventStub, placementID);
-                assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
-                assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be waiting');
-            });
-
-            xit('should update state for NO_FILL', () => {
-                placement.setState(PlacementState.NO_FILL);
-
-                const loadDict: {[key: string]: number} = {};
-                loadDict[placementID] = 1;
-                ads.LoadApi.onLoad.trigger(loadDict);
-
-                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
-                sinon.assert.notCalled(sendReadyEventStub);
-                assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
-                assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement previous state should be waiting');
-            });
-        });
-
-        describe('not targeted mediation and adapter version', () => {
-            xit('should not update the placement state', () => {
-                loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
-                placement.setState(PlacementState.READY);
-
-                const loadDict: {[key: string]: number} = {};
-                loadDict[placementID] = 1;
-                ads.LoadApi.onLoad.trigger(loadDict);
-
-                sinon.assert.notCalled(sendPlacementStateChangedEventStub);
-                sinon.assert.notCalled(sendReadyEventStub);
-                assert.equal(placement.getPreviousState(), PlacementState.NOT_AVAILABLE, 'placement previous state should be not availalbe');
-                assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be ready as no change');
-            });
         });
     });
 });

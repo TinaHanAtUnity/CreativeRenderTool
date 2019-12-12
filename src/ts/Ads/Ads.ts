@@ -291,7 +291,7 @@ export class Ads implements IAds {
             } else {
                 if (LoadRefreshV4.isValid(abGroup)) {
                     this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-                } else if (LoadExperiment.isValid(abGroup)) {
+                } else {
                     this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
                 }
             }
