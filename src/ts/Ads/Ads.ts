@@ -285,13 +285,14 @@ export class Ads implements IAds {
             const abGroup = this._core.Config.getAbGroup();
             const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
             const isMopubTestGame = CustomFeatures.isMopubTestGameForLoad(this._core.ClientInfo.getGameId());
+            const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
 
             if (isZyngaDealGame) {
                 this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
             } else {
                 if (LoadRefreshV4.isValid(abGroup)) {
                     this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
-                } else if (LoadExperiment.isValid(abGroup) || isMopubTestGame) {
+                } else if (LoadExperiment.isValid(abGroup) || isMopubTestGame || isCheetahTestGame) {
                     this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this._core.ProgrammaticTrackingService);
                 } else {
                     this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager, this._core.MetaDataManager);
@@ -646,8 +647,9 @@ export class Ads implements IAds {
     private setupLoadApiEnabled(): void {
         const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
         const isMopubTestGame = CustomFeatures.isMopubTestGameForLoad(this._core.ClientInfo.getGameId());
+        const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
         const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
-        if (isContainedLoadExperiment || isZyngaDealGame || isMopubTestGame) {
+        if (isContainedLoadExperiment || isZyngaDealGame || isMopubTestGame || isCheetahTestGame) {
             this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
         }
     }

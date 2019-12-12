@@ -123,6 +123,10 @@ export class CustomFeatures {
         }
     }
 
+    public static isCheetahTestGameForLoad(gameId: string): boolean {
+        return (gameId === '3058518' || gameId === '3058519');
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;
