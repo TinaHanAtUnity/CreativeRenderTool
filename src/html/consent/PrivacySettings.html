@@ -77,7 +77,7 @@
                 </p>
             </div>
             <ul class="radio-group-container">
-                <% for (var k in data.reportReasons) { %>
+                <% for (let k = 0; k < data.reportReasons.length; k++) { %>
                 <div class="radio-item-container">
                     <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
                     <label for="<%= data.reportKeys[k] %>">
