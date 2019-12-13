@@ -174,8 +174,6 @@ export enum WebPlayerViewId {
     WebPlayer = 'webplayer'
 }
 
-const AndroidApiClassName = 'com.unity3d.services.ads.api.WebPlayer';
-
 export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable2<string, string>();
