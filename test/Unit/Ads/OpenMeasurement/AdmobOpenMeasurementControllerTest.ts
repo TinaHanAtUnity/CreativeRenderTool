@@ -192,13 +192,59 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 });
             });
 
-            it('should send admob om impression pts metric', () => {
+            it('should not send admob om impression pts metric if no verification exists', () => {
 
                 const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
-                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_impression');
+                    sinon.assert.notCalled(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                });
+            });
+
+            it('should send admob om impression pts metric if one verification exists', () => {
+
+                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+                sandbox.stub(omManager, 'setupOMInstance');
+                const reportSpy = <sinon.SinonStub>programmaticTrackingService.reportMetricEvent;
+
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+
+                omManager.injectVerificationResources([verificationResource]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.calledTwice(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                });
+            });
+
+            it('should send admob om impression pts metric for multiple om instances', () => {
+
+                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+                sandbox.stub(omManager, 'setupOMInstance');
+                const reportSpy = <sinon.SinonStub>programmaticTrackingService.reportMetricEvent;
+
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+                const verificationResource1 = {
+                    resourceUrl: 'http://scoot1.com',
+                    vendorKey: 'scoot1',
+                    verificationParameters: 'scootage1'
+                };
+                omManager.injectVerificationResources([verificationResource, verificationResource1]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.calledThrice(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                    assert.equal(reportSpy.getCall(2).args[0], 'admob_om_impression');
                 });
             });
         });
