@@ -300,7 +300,9 @@ export class Ads implements IAds {
                 }
             }
         } else if (this._loadApiEnabled) {
-            if (LoadAdapterV1.isValid(this._core.Config.getAbGroup())) {
+            const isForcedLoadAdapterGame = CustomFeatures.isForcedLoadAdapterGame(this._core.ClientInfo.getGameId());
+
+            if (LoadAdapterV1.isValid(this._core.Config.getAbGroup()) || isForcedLoadAdapterGame) {
                 this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
             } else {
                 this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
