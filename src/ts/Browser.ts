@@ -250,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // tslint:disable-next-line
         } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD_ADAPTER]()) {
             loadModeElement.checked = true;
+            abGroupElement.value = '5'; // Temporary while under abtest
             initialize();
             UnityAds.load('rewardedVideo');
         } else {
