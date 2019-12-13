@@ -93,7 +93,6 @@ export class PrivacyDataRequestHelper {
                 } else if (url.includes('verify')) {
                     PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_PASS);
                 }
-
                 return { status: DataRequestResponseStatus.SUCCESS, imageUrls: JSON.parse(response.response).imageURLs };
             } else {
                 return { status: DataRequestResponseStatus.GENERIC_ERROR };
