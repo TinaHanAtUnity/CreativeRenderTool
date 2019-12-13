@@ -26,11 +26,10 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
   public render(): void {
     super.render();
-    let animationClass = `${this._animation}-download-button-end-screen`;
-    if (this._animation === EndScreenAnimation.BOUNCING && this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-      animationClass += '-squared';
+    this._container.classList.add(`${this._animation}-download-button-end-screen`);
+    if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+        this._container.classList.add(`${this._animation}-download-button-end-screen-square`);
     }
-    this._container.classList.add(animationClass);
   }
 
   protected getTemplate() {
@@ -38,5 +37,5 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         return SquareEndScreenAnimatedDownloadButtonTemplate;
     }
     return EndScreenAnimatedDownloadButton;
-}
+  }
 }

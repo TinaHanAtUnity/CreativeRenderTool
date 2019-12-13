@@ -123,30 +123,13 @@
       opacity: .6;
       animation: animated-download-button-bounce-shadow 2s linear 1s infinite both;
     }
-  }
 
-  &.bouncing-download-button-end-screen-squared {
-    .column-container {
-      position: relative;
-    }
-
-    .download-container {
-      z-index: 1;
-      animation: animated-download-button-bounce 2s ease 1s infinite both;
-    }
-
-    .download-container-shadow {
-      position: absolute;
-      bottom: .25em;
-      z-index: 0;
-      width: 11.2em;
-      height: .4em;
-      background: radial-gradient(closest-side, $gray, transparent);
-      opacity: .6;
-      animation: animated-download-button-bounce-shadow 2s linear 1s infinite both;
+    &.bouncing-download-button-end-screen-square {
+      .download-container-shadow {
+        bottom: .25em;
+      }
     }
   }
-
 
   &.shining-download-button-end-screen {
     .download-container {
