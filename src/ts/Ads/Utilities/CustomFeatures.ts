@@ -123,6 +123,12 @@ export class CustomFeatures {
         }
     }
 
+    public static isForcedLoadAdapterGame(gameId: string): boolean {
+        const fanateeGames = ['1344431', '1346246', '500002653', '56659', '1225669', '500012952'];
+        const etermaxGames = ['20721', '20723', '89611', '89610', '1781085', '1781084', '1448936', '1448937'];
+        return this.existsInList(fanateeGames, gameId) || this.existsInList(etermaxGames, gameId);
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;
