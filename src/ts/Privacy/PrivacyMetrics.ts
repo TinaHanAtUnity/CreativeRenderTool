@@ -2,7 +2,6 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { IPrivacyPermissions } from 'Privacy/Privacy';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export enum PrivacyEvent {
     AGE_GATE_SHOW = 'age_gate_show',
