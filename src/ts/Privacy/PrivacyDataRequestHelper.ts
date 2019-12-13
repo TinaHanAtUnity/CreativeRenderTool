@@ -1,9 +1,8 @@
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { RequestError } from 'Core/Errors/RequestError';
 import { Platform } from 'Core/Constants/Platform';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ICore } from 'Core/ICore';
+import { CaptchaEvent, PrivacyMetrics} from 'Privacy/PrivacyMetrics';
 
 export enum DataRequestResponseStatus {
     SUCCESS,
@@ -89,6 +88,11 @@ export class PrivacyDataRequestHelper {
     private static sendRequest(url: string, data: string): Promise<IDataRequestResponse> {
         return PrivacyDataRequestHelper._request.post(url, data).then((response: INativeResponse) => {
             if (response.responseCode === 200) {
+                if (url.includes('init')) {
+                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_SCREEN_SHOW);
+                } else if (url.includes('verify')) {
+                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_PASS);
+                }
                 return { status: DataRequestResponseStatus.SUCCESS, imageUrls: JSON.parse(response.response).imageURLs };
             } else {
                 return { status: DataRequestResponseStatus.GENERIC_ERROR };
@@ -96,12 +100,28 @@ export class PrivacyDataRequestHelper {
         }).catch((error) => {
             if (error instanceof RequestError && error.nativeResponse) {
                 if (error.nativeResponse.responseCode === 403) {
+                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_FAIL);
                     return { status: DataRequestResponseStatus.FAILED_VERIFICATION };
                 } else if (error.nativeResponse.responseCode === 429) {
+                    if (url.includes('init')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_BLOCKED);
+                    } else if (url.includes('verify')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_FAIL_LIMIT);
+                    }
                     return { status: DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS };
                 } else {
+                    if (url.includes('init')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_INIT_MISSING_DATA);
+                    } else if (url.includes('verify')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_VERIFY_MISSING_DATA);
+                    }
                     return { status: DataRequestResponseStatus.GENERIC_ERROR };
                 }
+            }
+            if (url.includes('init')) {
+                PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_INIT);
+            } else if (url.includes('verify')) {
+                PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_VERIFY);
             }
             return { status: DataRequestResponseStatus.GENERIC_ERROR };
 

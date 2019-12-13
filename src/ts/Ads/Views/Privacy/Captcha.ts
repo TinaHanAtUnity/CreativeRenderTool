@@ -5,6 +5,7 @@ import { Template } from 'Core/Utilities/Template';
 
 import CaptchaTemplate from 'html/consent/captcha.html';
 import { Localization } from 'Core/Utilities/Localization';
+import { CaptchaEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 
 export interface ICaptchaHandler {
     onItemSelected(url: string): void;
@@ -98,6 +99,7 @@ export class Captcha extends View<ICaptchaHandler> implements IGridItemClickedLi
     private onCloseEvent(event: Event): void {
         event.preventDefault();
 
+        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_SCREEN_CLOSE);
         this.hide();
         this._handlers.forEach(handler => handler.onCloseEvent());
 
