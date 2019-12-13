@@ -1,3 +1,11 @@
+# Pending
+
+* Fix bug with squared endscreen with animated button [12529](https://github.com/Applifier/unity-ads-webview/pull/12529)
+
+# Fri Dec 13 02:29:11 UTC 2019
+
+* Add PerPlacementLoadAdapter V1 on Groups 5 and 6 [#12159](https://github.com/Applifier/unity-ads-webview/pull/12159)
+
 # Thu Dec 12 16:24:57 UTC 2019
 
 * Update privacy texts and layout for CCPA [#12447](https://github.com/Applifier/unity-ads-webview/pull/12447)
