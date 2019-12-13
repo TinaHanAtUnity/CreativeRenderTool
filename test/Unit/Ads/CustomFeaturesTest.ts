@@ -157,6 +157,12 @@ describe('CustomFeatures', () => {
             gameId: '1781085',
             expected: true
         }, {
+            gameId: '1687868',
+            expected: true
+        }, {
+            gameId: '1781853',
+            expected: true
+        }, {
             gameId: 'scott',
             expected: false
         }];
