@@ -43,7 +43,7 @@ export class PrivacyMetrics {
         }
 
         if (PrivacyMetrics._subdivision) {
-            kafkaObject.subdivision = PrivacyMetrics.subdivision;
+            kafkaObject.subdivision = PrivacyMetrics._subdivision;
         }
 
         if (permissions) {
