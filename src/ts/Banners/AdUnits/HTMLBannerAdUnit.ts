@@ -37,7 +37,6 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     private _bannerAdViewId: string;
 
     private _clickEventsSent = false;
-    private _impressionEventsSent = false;
     private _leaveApplicationEventTriggered = false;
 
     constructor(parameters: IBannerAdUnitParameters) {
@@ -77,11 +76,9 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     public onShow(): Promise<void> {
         GameSessionCounters.addStart(this._campaign);
         GameSessionCounters.addView(this._campaign);
-        if (!this._impressionEventsSent) {
-            this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdImpression);
-            this.sendTrackingEvent(TrackingEvent.IMPRESSION);
-            this._impressionEventsSent = true;
-        }
+        this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdImpression);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
+
         return Promise.resolve();
     }
 

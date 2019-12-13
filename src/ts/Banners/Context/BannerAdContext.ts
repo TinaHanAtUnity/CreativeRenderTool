@@ -44,6 +44,7 @@ export class BannerAdContext {
     private _programmaticTrackingService: ProgrammaticTrackingService;
     public _webPlayerContainer: WebPlayerContainer;
     private _clientInfo: ClientInfo;
+    private _bannerShowing: boolean;
 
     private _loadState: BannerLoadState = BannerLoadState.Unloaded;
 
@@ -70,6 +71,7 @@ export class BannerAdContext {
         this._webPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api, bannerAdViewId);
         this._clientInfo = core.ClientInfo;
         this._programmaticTrackingService = core.ProgrammaticTrackingService;
+        this._bannerShowing = false;
         this.subscribeListeners();
     }
 
@@ -81,7 +83,7 @@ export class BannerAdContext {
 
         this._onBannerOpened = this._bannerNativeApi.BannerApi.onBannerAttached.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this.onBannerShow();
+                this.onBannerAttached();
             }
         });
         this._onBannerClosed = this._bannerNativeApi.BannerApi.onBannerDetached.subscribe((bannerAdViewId: string) => {
@@ -130,9 +132,13 @@ export class BannerAdContext {
                 this._campaign = <BannerCampaign>campaign;
                 this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdFill);
                 return this.createAdUnit().then((adUnit) => {
-                    this._adUnit = adUnit;
                     return this.loadBanner().then(() => {
-                        this._adUnit.onLoad();
+                        return adUnit.onLoad().then(() => {
+                            this._adUnit = adUnit;
+                            if (this._bannerShowing) {
+                                this.onBannerShow();
+                            }
+                        });
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
@@ -152,6 +158,7 @@ export class BannerAdContext {
     }
 
     public hide() {
+        this._bannerShowing = false;
         if (this._adUnit) {
             this._adUnit.onHide();
         }
@@ -173,6 +180,11 @@ export class BannerAdContext {
 
     private onBannerNoFill(): Promise<void> {
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
+    }
+
+    private onBannerAttached() {
+        this._bannerShowing = true;
+        this.onBannerShow();
     }
 
     private onBannerShow() {
