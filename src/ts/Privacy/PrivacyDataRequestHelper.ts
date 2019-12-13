@@ -89,7 +89,7 @@ export class PrivacyDataRequestHelper {
         return PrivacyDataRequestHelper._request.post(url, data).then((response: INativeResponse) => {
             if (response.responseCode === 200) {
                 if (url.includes('init')) {
-                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_SCREEN_OPEN);
+                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_SCREEN_SHOW);
                 } else if (url.includes('verify')) {
                     PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_PASS);
                 }
@@ -104,14 +104,26 @@ export class PrivacyDataRequestHelper {
                     PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_FAIL);
                     return { status: DataRequestResponseStatus.FAILED_VERIFICATION };
                 } else if (error.nativeResponse.responseCode === 429) {
-                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_FAILED_MULTIPLE);
+                    if (url.includes('init')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_BLOCKED);
+                    } else if (url.includes('verify')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_FAIL_LIMIT);
+                    }
                     return { status: DataRequestResponseStatus.MULTIPLE_FAILED_VERIFICATIONS };
                 } else {
-                    PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_MISSING_DATA);
+                    if (url.includes('init')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_INIT_MISSING_DATA);
+                    } else if (url.includes('verify')) {
+                        PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_VERIFY_MISSING_DATA);
+                    }
                     return { status: DataRequestResponseStatus.GENERIC_ERROR };
                 }
             }
-            PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR);
+            if (url.includes('init')) {
+                PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_INIT);
+            } else if (url.includes('verify')) {
+                PrivacyMetrics.trigger(CaptchaEvent.REQUEST_CAPTCHA_ERROR_VERIFY);
+            }
             return { status: DataRequestResponseStatus.GENERIC_ERROR };
 
         });

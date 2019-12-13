@@ -14,13 +14,16 @@ export enum PrivacyEvent {
 }
 
 export enum CaptchaEvent {
-    REQUEST_SCREEN_OPEN = 'captcha_screen_open',
+    REQUEST_SCREEN_SHOW = 'captcha_screen_show',
     REQUEST_SCREEN_CLOSE = 'captcha_screen_close',
     REQUEST_CAPTCHA_PASS = 'captcha_pass',
     REQUEST_CAPTCHA_FAIL = 'captcha_fail',
-    REQUEST_CAPTCHA_FAILED_MULTIPLE = 'captcha_fail_multiple_blocked',
-    REQUEST_CAPTCHA_ERROR = 'captcha_error',
-    REQUEST_CAPTCHA_MISSING_DATA = 'captcha_missing_data_error'
+    REQUEST_CAPTCHA_BLOCKED = 'captcha_blocked',
+    REQUEST_CAPTCHA_ERROR_INIT = 'captcha_error_init',
+    REQUEST_CAPTCHA_ERROR_INIT_MISSING_DATA = 'captcha_error_init_missing_data',
+    REQUEST_CAPTCHA_FAIL_LIMIT = 'captcha_fail_limit',
+    REQUEST_CAPTCHA_ERROR_VERIFY = 'captcha_error_verify',
+    REQUEST_CAPTCHA_ERROR_VERIFY_MISSING_DATA = 'captcha_error_verify_missing_data'
 }
 
 export class PrivacyMetrics {
