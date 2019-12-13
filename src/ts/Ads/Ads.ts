@@ -187,7 +187,7 @@ export class Ads implements IAds {
             PrivacyMetrics.setGameSessionId(gameSessionId);
             PrivacyMetrics.setPrivacy(this.PrivacySDK);
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
-            PrivacyMetrics.setSubCountry(this._core.Config.getSubdivision());
+            PrivacyMetrics.setSubdivision(this._core.Config.getSubdivision());
 
             PrivacyDataRequestHelper.init(this._core);
         }).then(() => {

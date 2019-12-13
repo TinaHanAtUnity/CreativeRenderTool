@@ -42,8 +42,8 @@ export class PrivacyMetrics {
             kafkaObject.abGroup = PrivacyMetrics._abGroup.valueOf();
         }
 
-        if (PrivacyMetrics._subCountry) {
-            kafkaObject.subCountry = PrivacyMetrics._subCountry;
+        if (PrivacyMetrics._subdivision) {
+            kafkaObject.subdivision = PrivacyMetrics.subdivision;
         }
 
         if (permissions) {
@@ -64,12 +64,12 @@ export class PrivacyMetrics {
         PrivacyMetrics._abGroup = group;
     }
 
-    public static setSubCountry(subCountry: string) {
-        PrivacyMetrics._subCountry = subCountry;
+    public static setSubdivision(subdivision: string) {
+        PrivacyMetrics._subdivision = subdivision;
     }
 
     private static _gameSessionId: number | undefined;
     private static _privacy: PrivacySDK | undefined;
     private static _abGroup: ABGroup | undefined;
-    private static _subCountry: string | undefined;
+    private static _subdivision: string | undefined;
 }
