@@ -3,7 +3,7 @@ import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParam
 import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerApi } from 'Banners/Native/BannerApi';
-import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
+import { BannerListenerApi } from 'Banners/Native/BannerListenerApi';
 import { ICore } from 'Core/ICore';
 import { IBannerModule, IBannerNativeApi } from 'Banners/IBannerModule';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
