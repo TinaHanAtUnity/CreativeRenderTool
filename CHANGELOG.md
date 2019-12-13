@@ -3,6 +3,7 @@
 * Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
 * Open Measurement - Add Admob Impression metric for each OM Instance [#12528](https://github.com/Applifier/unity-ads-webview/pull/12528)
 * Diagnostics for Captcha [#12555](https://github.com/Applifier/unity-ads-webview/pull/12555)
+* Add Forced Load Adapter Games [#12586](https://github.com/Applifier/unity-ads-webview/pull/12586)
 
 
 # Fri Dec 13 18:12:19 UTC 2019
