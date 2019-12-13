@@ -1,3 +1,10 @@
+# Pending
+
+* Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
+* Open Measurement - Add Admob Impression metric for each OM Instance [#12528](https://github.com/Applifier/unity-ads-webview/pull/12528)
+* Diagnostics for Captcha [#12555](https://github.com/Applifier/unity-ads-webview/pull/12555)
+
+
 # Fri Dec 13 18:12:19 UTC 2019
 
 * Fix bug with squared endscreen with animated button [12529](https://github.com/Applifier/unity-ads-webview/pull/12529)
