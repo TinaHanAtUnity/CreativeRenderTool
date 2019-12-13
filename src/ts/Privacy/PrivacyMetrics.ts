@@ -15,6 +15,7 @@ export enum PrivacyEvent {
 
 export enum CaptchaEvent {
     REQUEST_SCREEN_OPEN = 'captcha_screen_open',
+    REQUEST_SCREEN_CLOSE = 'captcha_screen_close',
     REQUEST_CAPTCHA_PASS = 'captcha_pass',
     REQUEST_CAPTCHA_FAIL = 'captcha_fail',
     REQUEST_CAPTCHA_FAILED_MULTIPLE = 'captcha_fail_multiple_blocked',
