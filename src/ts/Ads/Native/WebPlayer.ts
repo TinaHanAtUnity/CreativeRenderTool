@@ -241,22 +241,25 @@ export class WebPlayerApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
-                this.onPageStarted.trigger(<string>parameters[1], <string>parameters[0]);
+                this.onPageStarted.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
+
             case WebplayerEvent[WebplayerEvent.PAGE_FINISHED]:
-                this.onPageFinished.trigger(<string>parameters[1], <string>parameters[0]);
+                this.onPageFinished.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
+
             case WebplayerEvent[WebplayerEvent.ERROR]:
-                this.onPageFinished.trigger(<string>parameters[1], <string>parameters[0]);
+                this.onPageFinished.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
             case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
-                this.onWebPlayerEvent.trigger(<string>parameters[1], <string>parameters[0]);
+                this.onWebPlayerEvent.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
+
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
-                this.shouldOverrideUrlLoading.trigger(<string>parameters[2], <string>parameters[0], <string>parameters[1]);
+                this.shouldOverrideUrlLoading.trigger(<string>parameters.pop(), <string>parameters[0], <string>parameters[1]);
                 break;
             case WebplayerEvent[WebplayerEvent.CREATE_WEBVIEW]:
-                this.onCreateWebView.trigger(<string>parameters[1], <string>parameters[0]);
+                this.onCreateWebView.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
             case WebplayerEvent[WebplayerEvent.FRAME_UPDATE]:
                 this.onFrameUpdate.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <number>parameters[4], <number>parameters[5]);
