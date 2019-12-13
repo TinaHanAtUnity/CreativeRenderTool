@@ -52,9 +52,11 @@ export class UnityAds {
         if (UnityAds._initialized) {
             const placements: {[key: string]: number} = {};
             placements[placement] = 1;
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], placements);
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], [placements]);
         } else {
-            UnityAds._loadRequests.push(placement);
+            const placements: {[key: string]: number} = {};
+            placements[placement] = 1;
+            UnityAds._loadRequests.push(placements);
         }
     }
 
@@ -80,6 +82,6 @@ export class UnityAds {
     private static _listener: IUnityAdsListener | undefined;
     private static _webView: WebView;
     private static _initialized: boolean = false;
-    private static _loadRequests: string[] = [];
+    private static _loadRequests: {[key: string]: number} [] = [];
 
 }
