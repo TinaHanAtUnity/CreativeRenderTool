@@ -1,4 +1,4 @@
-# Pending
+# Fri Dec 13 18:12:19 UTC 2019
 
 * Fix bug with squared endscreen with animated button [12529](https://github.com/Applifier/unity-ads-webview/pull/12529)
 
