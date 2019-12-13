@@ -16,8 +16,8 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
-    private _trackablePlacements: string[];
-    private _activePlacements: string[];
+    private _trackablePlacements: {[key: string]: string } = {};
+    private _activePlacements: {[key: string]: string } = {};
     private _forceLoadPlacements: {[key: string]: string } = {};
     private _initialized: boolean;
 
@@ -26,8 +26,6 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
         this._ads = ads;
         this._adsConfig = adsConfig;
-        this._trackablePlacements = [];
-        this._activePlacements = [];
         this._initialized = false;
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
@@ -58,32 +56,31 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     }
 
     public sendPlacementStateChanges(placementId: string): void {
-        if (this._trackablePlacements.indexOf(placementId) !== -1) {
-            const placement = this._adsConfig.getPlacement(placementId);
+        const placement = this._adsConfig.getPlacement(placementId);
+        if (this._trackablePlacements[placementId]) {
             if (placement.getPlacementStateChanged()) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, placement.getPreviousState(), placement.getState());
-                placement.setPlacementStateChanged(false);
 
                 if (placement.getState() !== PlacementState.WAITING) {
-                    this._trackablePlacements.filter(e => e !== placementId);
+                    delete this._trackablePlacements[placementId];
                 }
             }
-        } else if (this._activePlacements.indexOf(placementId) !== -1) {
-            const placement = this._adsConfig.getPlacement(placementId);
+        } else if (this._activePlacements[placementId]) {
             if (placement.getPlacementStateChanged() && placement.getState() === PlacementState.NOT_AVAILABLE) {
-                this._activePlacements.filter(e => e !== placementId);
+                delete this._activePlacements[placementId];
             } else if (placement.getPlacementStateChanged() && placement.getPreviousState() ===  PlacementState.WAITING && placement.getState() === PlacementState.NO_FILL) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
-                this._activePlacements.filter(e => e !== placementId);
+                delete this._activePlacements[placementId];
             }
         }
+        placement.setPlacementStateChanged(false);
     }
 
     public sendPlacementStateChangesLoadAdapter(placementId: string, previousState: PlacementState, nextState: PlacementState): void {
         this._ads.Placement.setPlacementState(placementId, nextState);
         this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[previousState], PlacementState[nextState]);
         if (nextState === PlacementState.READY) {
-            this._activePlacements.push(placementId);
+            this._activePlacements[placementId] = placementId;
             this._ads.Listener.sendReadyEvent(placementId);
         }
     }
@@ -92,8 +89,8 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         const placement = this._adsConfig.getPlacement(placementId);
 
         if (placement.getState() === PlacementState.WAITING) {
-            this._trackablePlacements.push(placementId);
-        }
+            this._trackablePlacements[placementId] = placementId;
+         }
         this.sendPlacementStateChange(placementId, placement.getState());
     }
 
