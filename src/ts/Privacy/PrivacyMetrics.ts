@@ -2,6 +2,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { IPrivacyPermissions } from 'Privacy/Privacy';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export enum PrivacyEvent {
     AGE_GATE_SHOW = 'age_gate_show',
@@ -13,8 +14,17 @@ export enum PrivacyEvent {
     CONSENT_PARTIALLY_ACCEPTED = 'consent_partially_accepted'
 }
 
+export enum CaptchaEvent {
+    REQUEST_SCREEN_OPEN = 'captcha_screen_open',
+    REQUEST_CAPTCHA_PASS = 'captcha_pass',
+    REQUEST_CAPTCHA_FAIL = 'captcha_fail',
+    REQUEST_CAPTCHA_FAILED_MULTIPLE = 'captcha_fail_multiple_blocked',
+    REQUEST_CAPTCHA_ERROR = 'captcha_error',
+    REQUEST_CAPTCHA_MISSING_DATA = 'captcha_missing_data_error'
+}
+
 export class PrivacyMetrics {
-    public static trigger(event: PrivacyEvent, permissions?: IPrivacyPermissions) {
+    public static trigger(event: PrivacyEvent | CaptchaEvent, permissions?: IPrivacyPermissions) {
         const kafkaObject: { [key: string]: unknown } = {};
 
         kafkaObject.type = event;
@@ -31,6 +41,10 @@ export class PrivacyMetrics {
 
         if (PrivacyMetrics._abGroup) {
             kafkaObject.abGroup = PrivacyMetrics._abGroup.valueOf();
+        }
+
+        if (PrivacyMetrics._subCountry) {
+            kafkaObject.subCountry = PrivacyMetrics._subCountry;
         }
 
         if (permissions) {
@@ -51,7 +65,12 @@ export class PrivacyMetrics {
         PrivacyMetrics._abGroup = group;
     }
 
+    public static setSubCountry(subCountry: string) {
+        PrivacyMetrics._subCountry = subCountry;
+    }
+
     private static _gameSessionId: number | undefined;
     private static _privacy: PrivacySDK | undefined;
     private static _abGroup: ABGroup | undefined;
+    private static _subCountry: string | undefined;
 }
