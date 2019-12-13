@@ -238,6 +238,7 @@ export class WebPlayerApi extends NativeApi {
         });
     }
 
+    // parameters.pop is used here because the params length is variable and we want the last param
     public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
