@@ -16,6 +16,9 @@ import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasure
 import { assert } from 'chai';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -101,9 +104,20 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
 
         describe('session event additional handling', () => {
             let omManager: AdmobOpenMeasurementController;
+            let openMeasuremnet: OpenMeasurement;
+            const vastVerificationResource = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
+            const vastAdVerificton: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource]);
+            const sessionEvent: ISessionEvent = {
+                adSessionId: '',
+                timestamp: 1,
+                type: '',
+                data: {}
+            };
 
             beforeEach(() => {
+                sinon.stub(openMeasuremnet, 'getVastVerification').returns(vastAdVerificton);
                 omManager = initAdMobOMManager();
+                sinon.stub(omManager);
                 sandbox.stub(omManager.getAdmobBridge(), 'sendSessionFinish');
                 sandbox.stub(omManager, 'setupOMInstance');
             });
@@ -127,16 +141,24 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
             it('sessionStart should report to pts', () => {
                 (<sinon.SinonStub>programmaticTrackingService.reportMetricEvent).reset();
 
-                const sessionEvent: ISessionEvent = {
-                    adSessionId: '',
-                    timestamp: 1,
-                    type: '',
-                    data: {}
-                };
+                // const sessionEvent: ISessionEvent = {
+                //     adSessionId: '',
+                //     timestamp: 1,
+                //     type: '',
+                //     data: {}
+                // };
 
                 omManager.sessionStart(sessionEvent);
                 sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
                 sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_start');
+            });
+
+            it('sessionStart should be called with correct data', () => {
+                sessionEvent.data.vendorKey = 'iabtechlab.com-omid';
+
+                omManager.sessionStart(sessionEvent);
+
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasuremnet.sessionStart, sessionEvent);
             });
         });
 

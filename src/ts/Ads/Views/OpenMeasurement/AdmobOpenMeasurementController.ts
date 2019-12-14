@@ -174,7 +174,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
-    /**v
+    /**
      * SessionFinish:
      */
     public sessionFinish() {

@@ -21,21 +21,18 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
     }
 
     public addToViewHierarchy(): void {
-        console.log('addToViewHierarchy');
         this._omInstances.forEach((om) => {
             om.addToViewHierarchy();
         });
     }
 
     public removeFromViewHieararchy(): void {
-        console.log('removeFromViewHieararchy');
         this._omInstances.forEach((om) => {
             om.removeFromViewHieararchy();
         });
     }
 
     public injectVerifications(): void {
-        console.log('injectVerifications');
         this._omInstances.forEach((om) => {
             om.injectAdVerifications();
         });
@@ -58,12 +55,13 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             event.data.vendorkey = verification.getVerificationVendor();
             event.data.context = contextData;
 
+            console.log(JSON.stringify(event));
             om.sessionStart(event);
         });
 
     }
 
-    public buildSessionContext(): IContext {
+    private buildSessionContext(): IContext {
         const contextData: IContext = {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API

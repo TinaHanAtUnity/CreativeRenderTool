@@ -26,6 +26,11 @@ interface IVerificationVendorMap {
     [vendorKey: string]: string;
 }
 
+enum AdSessionType {
+    NATIVE = 'native',
+    HTML = 'html'
+}
+
 interface IOmidJsInfo {
     omidImplementer: string;
     serviceVersion: string;
@@ -45,6 +50,28 @@ interface IDeviceInfo {
     osVersion: string;
 }
 
+interface IContext {
+    apiVersion: string;
+    environment: string;
+    accessMode: AccessMode;
+    videoElement?: HTMLVideoElement | null; // Only required for AccessMode.FULL video
+    slotElement?: HTMLElement;              // Only required for AccessMode.FULL display
+    adSessionType: AdSessionType;
+    adServingId?: string;                   // VAST optional field - <AdServingId>
+    transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
+    podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
+    adCount?: number;                       // VAST optional field - number of <InLine> elements
+    omidNativeInfo?: {
+        partnerName: string;
+        partnerVersion: string;
+    };
+    omidJsInfo: IOmidJsInfo;
+    app?: IApp;
+    deviceInfo: IDeviceInfo;
+    supports: string[];
+    customReferenceData?: string;
+}
+
 export const PARTNER_NAME = 'Unity3d';
 export const DEFAULT_VENDOR_KEY = 'default_key';
 export const OM_JS_VERSION = '1.2.10';
@@ -60,7 +87,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _request: RequestManager;
     private _omAdSessionId: string;
 
-    // private _verificationVendorMap: IVerificationVendorMap;
+    private _vendorKey: string;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
 

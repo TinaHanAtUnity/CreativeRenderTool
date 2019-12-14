@@ -200,6 +200,10 @@ export class TestFixtures {
         });
     }
 
+    public static getPlatform(): Platform {
+        return Platform.TEST;
+    }
+
     public static getAdmobCampaignBaseParams(): IAdMobCampaign {
         const session = sinon.createStubInstance(Session);
         return {

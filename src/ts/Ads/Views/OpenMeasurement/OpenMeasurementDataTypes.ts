@@ -154,6 +154,25 @@ export interface IContext {
     customReferenceData?: string;
 }
 
+export interface IOmidJsInfo {
+    omidImplementer: string;
+    serviceVersion: string;
+    sessionClientVersion: string;
+    partnerName: string;
+    partnerVersion: string;
+}
+
+export interface IApp {
+    libraryVersion: string;
+    appId: string;
+}
+
+export interface IDeviceInfo {
+    deviceType: string;
+    os: string;
+    osVersion: string;
+}
+
 export enum AdSessionType {
     NATIVE = 'native',
     HTML = 'html'
