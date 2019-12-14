@@ -1,4 +1,4 @@
-# Pending
+# Sat Dec 14 01:01:49 UTC 2019
 
 * Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
 * Open Measurement - Add Admob Impression metric for each OM Instance [#12528](https://github.com/Applifier/unity-ads-webview/pull/12528)
