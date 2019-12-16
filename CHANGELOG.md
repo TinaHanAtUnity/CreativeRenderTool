@@ -1,3 +1,7 @@
+# PENDING
+
+* Fix WEBPLAYER_NULL error on Android [#12465](https://github.com/Applifier/unity-ads-webview/pull/12465)
+
 # Sat Dec 14 01:01:49 UTC 2019
 
 * Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
