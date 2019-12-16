@@ -30,7 +30,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onPageStarted;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 0, 0, 0, 0, 0, 'testViewId'],
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onPageFinished',
@@ -38,7 +38,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onPageFinished;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 0, 0, 0, 0, 0, 0, 0, 0, 'testViewId'],
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onPageFinished',
@@ -46,7 +46,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onPageFinished;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 0, 0, 0, 'testViewId'],
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onWebPlayerEvent',
@@ -54,7 +54,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onWebPlayerEvent;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 0, 'testViewId'],
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'shouldOverrideUrlLoading',
@@ -62,7 +62,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.shouldOverrideUrlLoading;
                 },
-                handleEventParams: ['testUrl', 'testMethod', 'testViewId'],
+                handleEventParams: ['testUrl', 'testMethod', 0, 0, 0, 0, 0, 0, 'testViewId'],
                 calledWithOrder: ['testViewId', 'testUrl', 'testMethod']
             }, {
                 label: 'onCreateWebView',
@@ -70,7 +70,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onCreateWebView;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 0, 'testViewId'],
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onFrameUpdate',
