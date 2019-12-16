@@ -29,6 +29,17 @@
     display: none;
   }
 
+  .data-deletion-note {
+    display: none;
+    padding: $default-size * $default-scale-size * .75 0 0 0;
+    text-align: center;
+    font-style: italic;
+
+    &.active {
+      display: block;
+    }
+  }
+
   #data-deletion-container {
     padding: $default-size * $default-scale-size * .75 0;
     .page-link {
@@ -43,14 +54,12 @@
 
   #data-deletion-container,
   #data-deletion-request-container {
-    display: block;
-    padding-bottom: $default-size;
+    display: none;
+    padding: $default-size 0;
     text-align: center;
-    opacity: 0;
-    transition: opacity 250ms ease-in;
 
     &.active {
-      opacity: 1;
+      display: block;
     }
   }
 

@@ -310,6 +310,10 @@ export class UserPrivacyManager {
         return this._privacy.getLegalFramework();
     }
 
+    public isDataRequestEnabled(): boolean {
+        return this._privacy.getLegalFramework() === LegalFramework.CCPA;
+    }
+
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
         let permissions = UserPrivacy.PERM_ALL_FALSE;
         let action = GDPREventAction.DEVELOPER_OPTOUT;

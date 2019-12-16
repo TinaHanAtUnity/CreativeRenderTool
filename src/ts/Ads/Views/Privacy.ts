@@ -1,4 +1,4 @@
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy, ReportReason } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -6,6 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 import { Localization } from 'Core/Utilities/Localization';
+import { PrivacyDataRequest } from 'Ads/Views/Privacy/PrivacyDataRequest';
 
 enum PrivacyCardState {
     PRIVACY,
@@ -22,6 +23,7 @@ export class Privacy extends AbstractPrivacy {
     private _gdprEnabled: boolean = false;
     private _userSummaryObtained: boolean = false;
     private _localization: Localization;
+    private _language: string;
 
     constructor(platform: Platform, campaign: Campaign,
                 privacyManager: UserPrivacyManager, gdprEnabled: boolean,
@@ -32,6 +34,7 @@ export class Privacy extends AbstractPrivacy {
         // tslint:disable-next-line
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
+        this._language = language;
         this._localization = new Localization(language, 'privacy');
         this._template = new Template(PrivacyTemplate, this._localization);
         this._campaign = campaign;
@@ -76,6 +79,20 @@ export class Privacy extends AbstractPrivacy {
         ];
     }
 
+    public render(): void {
+        super.render();
+
+        if (this._userPrivacyManager.isDataRequestEnabled()) {
+            const dataRequestContainer = this._container.querySelector('.data-request-container');
+            if (dataRequestContainer) {
+                const dataRequestView = new PrivacyDataRequest(this._platform, this._language);
+                dataRequestView.render();
+                dataRequestContainer.appendChild(dataRequestView.container());
+            }
+
+        }
+    }
+
     public show(): void {
         super.show();
 
@@ -92,6 +109,11 @@ export class Privacy extends AbstractPrivacy {
             const agreeRadioButton = <HTMLInputElement> this._container.querySelector('#gdpr-agree-radio');
             if (agreeRadioButton) {
                 agreeRadioButton.onclick = () => {
+                    const noteContainer = this._container.querySelector('.data-deletion-note');
+                    if (noteContainer) {
+                        noteContainer.classList.remove('active');
+                    }
+
                     const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
                     confirmationContainer.classList.remove('active');
 
@@ -140,6 +162,11 @@ export class Privacy extends AbstractPrivacy {
             return;
         }
 
+        const noteContainer = this._container.querySelector('.data-deletion-note');
+        if (noteContainer) {
+            noteContainer.classList.toggle('active');
+        }
+
         const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
         confirmationContainer.classList.toggle('active');
     }
@@ -150,6 +177,11 @@ export class Privacy extends AbstractPrivacy {
 
         const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
         confirmationContainer.classList.toggle('active');
+
+        const noteContainer = this._container.querySelector('.data-deletion-note');
+        if (noteContainer) {
+            noteContainer.classList.toggle('active');
+        }
 
         const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
         requestContainer.classList.add('active');

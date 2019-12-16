@@ -1,5 +1,30 @@
-# Pending
+# Sat Dec 14 01:01:49 UTC 2019
 
+* Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
+* Open Measurement - Add Admob Impression metric for each OM Instance [#12528](https://github.com/Applifier/unity-ads-webview/pull/12528)
+* Diagnostics for Captcha [#12555](https://github.com/Applifier/unity-ads-webview/pull/12555)
+* Add Forced Load Adapter Games [#12586](https://github.com/Applifier/unity-ads-webview/pull/12586)
+
+
+# Fri Dec 13 18:12:19 UTC 2019
+
+* Fix bug with squared endscreen with animated button [12529](https://github.com/Applifier/unity-ads-webview/pull/12529)
+
+# Fri Dec 13 02:29:11 UTC 2019
+
+* Add PerPlacementLoadAdapter V1 on Groups 5 and 6 [#12159](https://github.com/Applifier/unity-ads-webview/pull/12159)
+
+# Thu Dec 12 16:24:57 UTC 2019
+
+* Update privacy texts and layout for CCPA [#12447](https://github.com/Applifier/unity-ads-webview/pull/12447)
+
+# Thu Dec 12 14:58:19 UTC 2019
+
+* Revert "Fix Reporting Options V2" [#12483](https://github.com/Applifier/unity-ads-webview/pull/12483)
+
+# Thu Dec 12 11:26:14 UTC 2019
+
+* In-app Human Verification UI [#12446](https://github.com/Applifier/unity-ads-webview/pull/12446)
 * Change permissions for first request [#12452](https://github.com/Applifier/unity-ads-webview/pull/12452)
 * Feature/privacy consent metadata [#12451](https://github.com/Applifier/unity-ads-webview/pull/12451)
 * Open Measurement - Add Impression Metric for Admob [#12416](https://github.com/Applifier/unity-ads-webview/pull/12416)
