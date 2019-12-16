@@ -21,8 +21,7 @@ export class MopubCampaignRefreshManager extends CampaignRefreshManager {
         metaDataManager.fetch(MediationMetaData).then((mediation) => {
             if (mediation) {
                 const mediationName = mediation.getName();
-                const mediationAdapterVersion = mediation.getAdapterVersion();
-                if (mediationName === 'MoPub' && mediationAdapterVersion === '3.3.0.1') {
+                if (mediationName === 'MoPub') {
                     ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
                         Object.keys(placements).forEach((placementId) => {
                             const count = placements[placementId];
