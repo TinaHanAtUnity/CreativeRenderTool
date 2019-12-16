@@ -3,6 +3,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2, Observable3, Observable5, Observable6, Observable7 } from 'Core/Utilities/Observable';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { Platform } from 'Core/Constants/Platform';
 import { Promises } from 'Core/Utilities/Promises';
 import { IObserver7 } from 'Core/Utilities/IObserver';
 
@@ -201,7 +202,17 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]).catch((e) => {
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID && e === 'WEBPLAYER_NULL') {
+                // Fix for Android WEBPLAYER_NULL errors:
+                // In Ads SDK 3.3 & 3.4 setSettings is called before the container is opened.  In this case, the settings
+                // are saved, but the error WEBPLAYER_NULL is returned.  This check prevents ad units from breaking
+                // due to this error.
+                return Promise.resolve();
+            } else {
+                return Promise.reject(e);
+            }
+        });
     }
 
     public clearSettings(viewId: string): Promise<void> {
@@ -209,7 +220,17 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public setEventSettings(eventSettings: IWebPlayerEventSettings, viewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]).catch((e) => {
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID && e === 'WEBPLAYER_NULL') {
+                // Fix for Android WEBPLAYER_NULL errors:
+                // In Ads SDK 3.3 & 3.4 setEventSettings is called before the container is opened.  In this case, the settings
+                // are saved, but the error WEBPLAYER_NULL is returned.  This check prevents ad units from breaking
+                // due to this error.
+                return Promise.resolve();
+            } else {
+                return Promise.reject(e);
+            }
+        });
     }
 
     public sendEvent(args: unknown[], viewId: string): Promise<void> {
