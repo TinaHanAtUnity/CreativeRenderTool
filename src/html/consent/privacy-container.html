@@ -32,9 +32,9 @@
                                 window.privacyAdapter.completeCallback(event.data.data);
                             }
                             break;
-                        case 'eventCallback':
-                            if (window.privacyAdapter.eventCallback) {
-                                window.privacyAdapter.eventCallback(event.data.data);
+                        case 'metricCallback':
+                            if (window.privacyAdapter.metricCallback) {
+                                window.privacyAdapter.metricCallback();
                             }
                             break;
                         case 'openUrlCallback':
@@ -77,11 +77,10 @@
                     }, '*');
                 };
 
-                this.onPrivacyEvent = function(eventName, eventData) {
+                this.onPrivacyMetric = function(data) {
                     window.parent.postMessage({
-                        type: 'onPrivacyEvent',
-                        name: eventName,
-                        data: JSON.parse(eventData)
+                        type: 'onPrivacyMetric',
+                        data: JSON.parse(data)
                     }, '*');
                 };
             };

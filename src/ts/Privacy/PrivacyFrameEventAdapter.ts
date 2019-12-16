@@ -5,7 +5,7 @@ export enum IFrameEvents {
     PRIVACY_READY = 'onPrivacyReady',
     PRIVACY_COMPLETED = 'onPrivacyCompleted',
     PRIVACY_OPENURL = 'onPrivacyOpenUrl',
-    PRIVACY_EVENT = 'onPrivacyEvent'
+    PRIVACY_METRIC = 'onPrivacyMetric'
 }
 
 export interface IPrivacyFrameEventAdapter {
@@ -17,7 +17,7 @@ export interface IPrivacyFrameHandler {
     onPrivacyCompleted(userSettings: IPrivacySettings): void;
     onPrivacyReady(): void;
     onPrivacyOpenUrl(url: string): void;
-    onPrivacyEvent(name: string, data: { [key: string]: unknown }): void;
+    onPrivacyMetric(data: { [key: string]: unknown }): void;
 }
 
 export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
@@ -38,7 +38,7 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IPrivacySettings>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = (msg) => this.onPrivacyReady();
         this._iFrameHandlers[IFrameEvents.PRIVACY_OPENURL] = (msg) => this.onPrivacyOpenUrl(<string>msg.data);
-        this._iFrameHandlers[IFrameEvents.PRIVACY_EVENT] = (msg) => this.onPrivacyEvent(<string>msg.name, <{ [key: string]: unknown }>msg.data);
+        this._iFrameHandlers[IFrameEvents.PRIVACY_METRIC] = (msg) => this.onPrivacyMetric(<{ [key: string]: unknown }>msg.data);
     }
 
     public connect() {
@@ -78,7 +78,7 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._handler.onPrivacyOpenUrl(url);
     }
 
-    private onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
-        this._handler.onPrivacyEvent(name, data);
+    private onPrivacyMetric(data: { [key: string]: unknown }): void {
+        this._handler.onPrivacyMetric(data);
     }
 }

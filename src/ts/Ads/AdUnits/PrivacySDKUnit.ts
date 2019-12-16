@@ -59,8 +59,8 @@ export class PrivacySDKUnit extends BasePrivacyUnit<PrivacySDKView> implements I
         this._unityPrivacyView.openUrlCallback(url);
     }
 
-    public onPrivacyEvent(name: string, data: { [key: string]: unknown }): void {
-        this._unityPrivacyView.eventCallback(name);
-        this._core.Sdk.logDebug('PRIVACY: Got event: ' + name + ' with data: ' + JSON.stringify(data));
+    public onPrivacyMetric(data: { [key: string]: unknown }): void {
+        this._unityPrivacyView.metricCallback();
+        this._core.Sdk.logDebug('PRIVACY: Got metric: ' + JSON.stringify(data));
     }
 }

@@ -4,5 +4,5 @@ export interface IPrivacySDKViewHandler {
     onPrivacyReady(): void;
     onPrivacyCompleted(userSettings: IPrivacySettings): void;
     onPrivacyOpenUrl(url: string): void;
-    onPrivacyEvent(name: string, data: { [key: string]: unknown }): void;
+    onPrivacyMetric(data: { [key: string]: unknown }): void;
 }
