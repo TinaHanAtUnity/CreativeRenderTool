@@ -205,7 +205,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]).catch((e) => {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID && e === 'WEBPLAYER_NULL') {
                 // Fix for Android WEBPLAYER_NULL errors:
-                // In some cases setSettings is called before the container is opened.  In this case, the settings
+                // In Ads SDK 3.3 & 3.4 setSettings is called before the container is opened.  In this case, the settings
                 // are saved, but the error WEBPLAYER_NULL is returned.  This check prevents ad units from breaking
                 // due to this error.
                 return Promise.resolve();
@@ -223,7 +223,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]).catch((e) => {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID && e === 'WEBPLAYER_NULL') {
                 // Fix for Android WEBPLAYER_NULL errors:
-                // In some cases setEventSettings is called before the container is opened.  In this case, the settings
+                // In Ads SDK 3.3 & 3.4 setEventSettings is called before the container is opened.  In this case, the settings
                 // are saved, but the error WEBPLAYER_NULL is returned.  This check prevents ad units from breaking
                 // due to this error.
                 return Promise.resolve();
