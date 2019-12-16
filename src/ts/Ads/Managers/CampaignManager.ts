@@ -1,24 +1,35 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode } from 'Ads/Models/AuctionResponse';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
+import { AuctionResponse, AuctionStatusCode, IRawAuctionResponse, IRawAuctionV5Response } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { LoadMetric, ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
+import { OM_JS_VERSION, PARTNER_NAME } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { ICoreApi, ICore } from 'Core/ICore';
+import { ICore, ICoreApi } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { AuctionProtocol, INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -29,34 +40,31 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { CacheError } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
+import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Observable1, Observable2, Observable3, Observable4 } from 'Core/Utilities/Observable';
+import { Observable1, Observable3, Observable4 } from 'Core/Utilities/Observable';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
-import { CampaignError } from 'Ads/Errors/CampaignError';
-import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
-import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
-import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
-import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
-import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
     trackingUrls: ICampaignTrackingUrls;
+}
+
+export interface IOnCampaignListener {
+    listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void;
+}
+
+export function implementsIOnCampaignListener(/* tslint:disable:no-any */ arg: any /* tslint:enable:no-any */): arg is IOnCampaignListener {
+    return arg && arg.listenOnCampaigns;
 }
 
 export class CampaignManager {

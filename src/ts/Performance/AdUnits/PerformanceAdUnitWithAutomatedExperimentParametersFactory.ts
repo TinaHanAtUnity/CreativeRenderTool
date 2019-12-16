@@ -3,16 +3,17 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
-import { IAds } from 'Ads/IAds';
 import { IChina } from 'China/IChina';
 import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
+import { IOnCampaignListener, implementsIOnCampaignListener } from 'Ads/Managers/CampaignManager';
+import { Observable3 } from 'Core/Utilities/Observable';
+import { Campaign, ICampaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
-export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
+export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory implements IOnCampaignListener {
 
     private _automatedExperimentManager: AutomatedExperimentManager;
 
@@ -22,7 +23,6 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         this._automatedExperimentManager.initialize(AutomatedExperimentsList).catch(() => {
             this._programmaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
         });
-        this._automatedExperimentManager.beginExperiment();
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -40,7 +40,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
         let endscreenAnimation = EndScreenAnimation.STATIC;
-        const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
+        const mabDecision = this._automatedExperimentManager.activateExperiment(baseParams.campaign, ButtonAnimationsExperiment);
 
         if (mabDecision) {
             if ((<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
@@ -62,5 +62,9 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
             deviceIdManager: this._deviceIdManager,
             automatedExperimentManager: this._automatedExperimentManager
         };
+    }
+
+    public listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
+        this._automatedExperimentManager.listenOnCampaigns(onCampaign);
     }
 }

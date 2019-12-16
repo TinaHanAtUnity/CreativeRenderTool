@@ -1,18 +1,21 @@
-import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
-import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
-import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
-import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
-import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
-import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
-import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { IOnCampaignListener, implementsIOnCampaignListener } from 'Ads/Managers/CampaignManager';
+import { Campaign, ICampaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { IARApi } from 'AR/AR';
 import { IChina } from 'China/IChina';
-import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
+import { ICore } from 'Core/ICore';
 import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
+import { Observable3 } from 'Core/Utilities/Observable';
+import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
+import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { PerformanceAdUnitWithAutomatedExperimentFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentFactory';
+import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
-export class Performance extends AbstractParserModule {
+export class Performance extends AbstractParserModule implements IOnCampaignListener {
     constructor(ar: IARApi, core: ICore, ads: IAds, china?: IChina) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const parser = new CometCampaignParser(core);
@@ -35,4 +38,15 @@ export class Performance extends AbstractParserModule {
         };
         super(contentTypeHandlerMap);
     }
+
+    public listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
+        for (const key in this._contentTypeHandlerMap) {
+            if (this._contentTypeHandlerMap.hasOwnProperty(key)) {
+                if (implementsIOnCampaignListener(this._contentTypeHandlerMap[key].factory)) {
+                    (<IOnCampaignListener><unknown> this._contentTypeHandlerMap[key].factory).listenOnCampaigns(onCampaign);
+                }
+            }
+        }
+    }
+
 }

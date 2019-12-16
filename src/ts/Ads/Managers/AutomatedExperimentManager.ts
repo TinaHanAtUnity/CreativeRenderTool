@@ -1,20 +1,25 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { IOnCampaignListener } from 'Ads/Managers/CampaignManager';
+import { Observable3 } from 'Core/Utilities/Observable';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: string };
@@ -27,18 +32,20 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
+type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number };
 
-class StateItem {
-    constructor(experiment: AutomatedExperiment, action: string) {
+class OptimizedAutomatedExperiment {
+    constructor(experiment: AutomatedExperiment) {
         this._experiment = experiment;
-        this.Action = action;
+        this.Action = experiment.getDefaultAction();
+        this.Active = false;
+        this.Outcome = 0;
     }
 
     private _experiment: AutomatedExperiment;
     public Action: string;
-    public SendReward = false;
-    public SendAction = false;
+    public Active: boolean;
+    public Outcome: number;
     public MetaData: string;
 
     public getExperiment(): AutomatedExperiment {
@@ -46,10 +53,21 @@ class StateItem {
     }
 }
 
-class UserInfo {
-    public ABGroup: number;
-    public AuctionID: string | undefined;
-    public GameSessionID: number;
+enum AutomatedExperimentStage {
+    AwaitingOptimization,
+    Running,
+    OutcomePublished,
+    Ended
+}
+
+class OptimizedCampaign {
+    constructor() {
+        this.Stage = AutomatedExperimentStage.AwaitingOptimization;
+        this.experiments = {};
+    }
+
+    public Stage: AutomatedExperimentStage;
+    public experiments: { [experimentId: string]: OptimizedAutomatedExperiment };
 }
 
 export class CachableAutomatedExperimentData {
@@ -62,210 +80,152 @@ export class CachableAutomatedExperimentData {
     public Metadata: string;
 }
 
-enum AutomatedExperimentStage {
-    WaitingToStart,
-    Running,
-    ResultReported,
-    Done
-}
-
-export class AutomatedExperimentManager {
+export class AutomatedExperimentManager implements IOnCampaignListener {
+    private readonly _requestManager: RequestManager;
     private readonly _deviceInfo: DeviceInfo;
+    private readonly _sdkApi: SdkApi;
+    private readonly _privacySdk: PrivacySDK;
     private readonly _clientInfo: ClientInfo;
     private readonly _coreConfig: CoreConfiguration;
-    private readonly _privacySDK: PrivacySDK;
     private readonly _nativeBridge: NativeBridge;
-    private readonly _requestManager: RequestManager;
-    private readonly _storageApi: StorageApi;
-
-    private readonly _state: { [key: string]: StateItem };
-    private _experimentStage: AutomatedExperimentStage;
-    private _userInfo: UserInfo;
-    private _gameSessionId: number;
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
+
     private static readonly _createEndPoint = 'experiment';
-    private static readonly _actionEndPoint = 'action';
     private static readonly _rewardEndPoint = 'reward';
-    private static readonly _settingsPrefix = 'AUI_OPT_EXPERIMENT';
+
+    private _abGroup: number;
+    private _gameSessionID: number;
+    private _declaredExperiments: AutomatedExperiment[];
+    private _campaigns: { [CampaignId: string]: OptimizedCampaign };
+    private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
 
     constructor(core: ICore) {
+        this._campaigns = {};
+
+        this._requestManager = core.RequestManager;
         this._deviceInfo = core.DeviceInfo;
+        this._abGroup = core.Config.getAbGroup();
+        this._gameSessionID = core.Ads.SessionManager.getGameSessionId();
+        this._sdkApi = core.Api.Sdk;
+        this._privacySdk = core.Ads.PrivacySDK;
         this._clientInfo = core.ClientInfo;
         this._coreConfig = core.Config;
-        this._privacySDK = core.Ads.PrivacySDK;
         this._nativeBridge = core.NativeBridge;
-        this._requestManager = core.RequestManager;
-        this._storageApi = core.Api.Storage;
-        this._gameSessionId = core.Ads.SessionManager.getGameSessionId();
-        this._state = {};
-        this._experimentStage = AutomatedExperimentStage.WaitingToStart;
-        this._userInfo = new UserInfo();
+    }
+
+    public listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
+        onCampaign.subscribe((placementId, campaign, trackingUrls) => AutomatedExperimentManager.onNewCampaign(this, campaign));
     }
 
     public initialize(experiments: AutomatedExperiment[]): Promise<void> {
-        const storedExperimentsPromise = experiments
-            .filter(experiment => !experiment.isCacheDisabled())
-            .map(experiment => this.getStoredExperimentData(experiment)
-                .then((storedExperimentData) => ({ experiment, data : storedExperimentData }))
-                .catch(() => ({experiment, data: null}))
-            );
+        this._declaredExperiments = experiments;
+        this._staticFeaturesPromise = this.collectStaticContextualFeatures();
 
-        experiments.forEach(experiment => {
-            this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
-        });
-
-        this._userInfo.ABGroup = this._coreConfig.getAbGroup();
-        this._userInfo.GameSessionID = this._gameSessionId;
-
-        return this.collectStaticContextualFeatures().then(features => {
-              return Promise.all(storedExperimentsPromise).then(storedExperiments => {
-                storedExperiments
-                    .filter(storedExperiment => storedExperiment.data !== null)
-                    .forEach((storedExperiment) => {
-                        const stateItem = this._state[storedExperiment.experiment.getName()];
-                        if (stateItem) {
-                            stateItem.Action = storedExperiment.data!.Action;
-                            stateItem.MetaData = storedExperiment.data!.Metadata;
-                        }
-                    });
-
-                const experimentsToRequest = [
-                    ...storedExperiments
-                        .filter(storedExperiment => storedExperiment.data === null)
-                        .map(storedExperiment => storedExperiment.experiment),
-                    ...experiments.filter(experiment => experiment.isCacheDisabled())
-                ];
-
-                if (experimentsToRequest.length > 0) {
-                    const body = this.createRequestBody(experimentsToRequest, features);
-                    const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
-
-                    return this._requestManager.post(url, body)
-                        .then((response) => this.parseExperimentsResponse(response))
-                        .then((parsedExperiments) => Promise.all([this.storeExperiments(parsedExperiments), this.loadExperiments(parsedExperiments)]).then(() => Promise.resolve()))
-                        .catch((err) => {
-                            Diagnostics.trigger('failed_to_fetch_automated_experiments', err);
-                        });
-                }
-            });
-        });
+        return Promise.resolve();
     }
 
-    public beginExperiment() {
-        for (const stateKey in this._state) {
-            if (this._state.hasOwnProperty(stateKey)) {
-                this._state[stateKey].SendAction = false;
-                this._state[stateKey].SendReward = false;
-            }
-        }
+    public startCampaign(campaign: Campaign) {
+        if (this._campaigns.hasOwnProperty(campaign.getId())) {
+            const optmzdCampaign = this._campaigns[campaign.getId()];
 
-        this._experimentStage = AutomatedExperimentStage.Running;
-    }
-
-    public endExperiment(): Promise<void> {
-        if (this._experimentStage === AutomatedExperimentStage.Done) {
-            return Promise.resolve();
-        } else if (this._experimentStage === AutomatedExperimentStage.WaitingToStart) {
-            return Promise.reject('Experiment session not started.');
-        }
-
-        return this.reportExperiments(AutomatedExperimentStage.Done);
-    }
-
-    private reportExperiments(nextStage: AutomatedExperimentStage): Promise<void> {
-        const stage = this._experimentStage;
-        this._experimentStage = nextStage;
-
-        if (stage === AutomatedExperimentStage.Running) {
-            const promises: Promise<INativeResponse>[] = [];
-            for (const stateKey in this._state) {
-                if (this._state.hasOwnProperty(stateKey)) {
-                    if (this._state[stateKey].SendAction) {
-                        promises.push(this.submit(this._state[stateKey], AutomatedExperimentManager._actionEndPoint));
-                    }
-
-                    promises.push(this.submitExperimentOutcome(this._state[stateKey], AutomatedExperimentManager._rewardEndPoint));
+            for (const experimentName in optmzdCampaign.experiments.keys) {
+                if (optmzdCampaign.experiments.hasOwnProperty(experimentName)) {
+                    optmzdCampaign.experiments[experimentName].Active = false;
+                    optmzdCampaign.experiments[experimentName].Outcome = 0;
                 }
             }
 
-            this._experimentStage = nextStage;
-            return Promise.all(promises).then((ignored) => Promise.resolve());
+            optmzdCampaign.Stage = AutomatedExperimentStage.Running;
         } else {
-            this._experimentStage = nextStage;
-            return Promise.resolve();
+            this._sdkApi.logError('init_experiments_with_unkown_campaign:' + campaign.getId());
         }
     }
 
-    public sendAction(experiment: AutomatedExperiment, sessionId: string | undefined) {
-        if (this._experimentStage !== AutomatedExperimentStage.Running) {
-            return;
-        }
+    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): string|undefined {
 
-        const stateItem = this._state[experiment.getName()];
-        if (stateItem) {
-            stateItem.SendAction = true;
-            this._userInfo.AuctionID = sessionId; // happens to also be the auction ID. Horrible but that all I could find so far.
+        if (this._campaigns.hasOwnProperty(campaign.getId())) {
+            const optmzdCampaign = this._campaigns[campaign.getId()];
+
+            for (const experimentName in optmzdCampaign.experiments) {
+                if (optmzdCampaign.experiments.hasOwnProperty(experimentName)) {
+                    optmzdCampaign.experiments[experiment.getName()].Active = true;
+                    return optmzdCampaign.experiments[experiment.getName()].Action;
+                }
+            }
+        } else {
+            this._sdkApi.logError('start_experiments_with_unkown_campaign:' + campaign.getId());
         }
+        return undefined;
     }
 
-    public sendReward() {
-        if (this._experimentStage !== AutomatedExperimentStage.Running) {
-            return;
+    public endCampaign(campaign: Campaign): Promise<void> {
+        if (this._campaigns.hasOwnProperty(campaign.getId())) {
+
+            const optmzdCampaign = this._campaigns[campaign.getId()];
+            if (optmzdCampaign.Stage === AutomatedExperimentStage.OutcomePublished) {
+                optmzdCampaign.Stage = AutomatedExperimentStage.Ended;
+                return Promise.resolve();
+            } else if (optmzdCampaign.Stage !== AutomatedExperimentStage.Running) {
+                return Promise.reject('Experiment session not started.');
+            }
+
+            return this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.Ended);
         }
 
-        for (const state in this._state) {
-            if (this._state.hasOwnProperty(state)) {
-                if (this._state[state].SendAction) {
-                    this._state[state].SendReward = true;
+        return Promise.reject('Attempted to end experiments of unkown campaign');
+    }
+
+    private publishCampaignOutcomes(campaign: Campaign, optmzCampaign: OptimizedCampaign, nextStage: AutomatedExperimentStage): Promise<void> {
+
+        optmzCampaign.Stage = nextStage;
+        const promises: Promise<INativeResponse>[] = [];
+        for (const experimentName in optmzCampaign.experiments) {
+            if (optmzCampaign.experiments.hasOwnProperty(experimentName)) {
+                const optmzdExperiment = optmzCampaign.experiments[experimentName];
+                if (optmzdExperiment.Active) {
+                    optmzdExperiment.Active = false;
+                    promises.push(this.postExperimentOutcome(campaign, optmzdExperiment, AutomatedExperimentManager._rewardEndPoint));
                 }
             }
         }
 
-        this.reportExperiments(AutomatedExperimentStage.ResultReported);
+        return Promise.all(promises).then((ignored) => Promise.resolve());
     }
 
-    public getExperimentAction(experiment: AutomatedExperiment): string|undefined {
-        const stateItem = this._state[experiment.getName()];
-        if (!stateItem) {
-            return undefined;
+    public rewardExperiments(campaign: Campaign) {
+        if (this._campaigns.hasOwnProperty(campaign.getId())) {
+            const optmzdCampaign = this._campaigns[campaign.getId()];
+            if (optmzdCampaign.Stage !== AutomatedExperimentStage.Running) {
+                return;
+            }
+
+            for (const experimentName in optmzdCampaign.experiments) {
+                if (optmzdCampaign.experiments.hasOwnProperty(experimentName)) {
+                    if (optmzdCampaign.experiments[experimentName].Active) {
+                        optmzdCampaign.experiments[experimentName].Outcome = 1;
+                    }
+                }
+            }
+
+            this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.OutcomePublished);
+
+        } else {
+            this._sdkApi.logError('reward_experiments_with_unkown_campaign:' + campaign.getId());
         }
-
-        return stateItem.Action;
     }
 
-    private submit(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
-        const action = {
-            user_info: {
-                ab_group: this._userInfo.ABGroup,
-                auction_id: this._userInfo.AuctionID,
-                game_session_id: this._userInfo.GameSessionID
-            },
-            experiment: item.getExperiment().getName(),
-            action: item.Action
-        };
-
-        const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
-        const body = JSON.stringify(action);
-        return this._requestManager.post(url, body);
-    }
-
-    private submitExperimentOutcome(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
-        let rewardVal = 0;
-        if (item.SendReward) {
-            rewardVal = 1;
-        }
-
+    private postExperimentOutcome(campaign: Campaign, optmzExperiment: OptimizedAutomatedExperiment, apiEndPoint: string): Promise<INativeResponse> {
         const outcome = {
             user_info: {
-                ab_group: this._userInfo.ABGroup,
-                auction_id: this._userInfo.AuctionID,
-                game_session_id: this._userInfo.GameSessionID
+                ab_group: this._abGroup,
+                auction_id: campaign.getSession().getId(),
+                game_session_id: this._gameSessionID
             },
-            experiment: item.getExperiment().getName(),
-            action: item.Action,
-            reward: rewardVal,
-            metadata: item.MetaData
+            experiment: optmzExperiment.getExperiment().getName(),
+            action: optmzExperiment.Action,
+            reward: optmzExperiment.Outcome,
+            metadata: optmzExperiment.MetaData
         };
 
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
@@ -273,22 +233,24 @@ export class AutomatedExperimentManager {
         return this._requestManager.post(url, body);
     }
 
-    private loadExperiments(experiments: IParsedExperiment[]): Promise<void> {
-        experiments.forEach(experiment => {
-            const stateItem = this._state[experiment.name];
-            if (stateItem) {
-                stateItem.Action = experiment.action;
-                stateItem.MetaData = experiment.metadata;
-            }
-        });
-        return Promise.resolve();
-    }
+    private loadCampaignExperiments(campaign: Campaign, experiments: IParsedExperiment[]): Promise<void> {
+        if (this._campaigns.hasOwnProperty(campaign.getId())) {
+            const optmzdCampaign = this._campaigns[campaign.getId()];
 
-    private storeExperiments(experiments: IParsedExperiment[]): Promise<void> {
-        experiments.forEach(experiment => {
-            this.storeExperimentData(experiment.name, new CachableAutomatedExperimentData(experiment.action, experiment.metadata));
-        });
-        return Promise.resolve();
+            if (optmzdCampaign.Stage !== AutomatedExperimentStage.AwaitingOptimization) {
+                return Promise.reject('campaign_optimization_response_ignored');
+            }
+            experiments.forEach(experiment => {
+                const optmzdExperiment = optmzdCampaign.experiments[experiment.name];
+                if (optmzdExperiment) {
+                    optmzdExperiment.Action = experiment.action;
+                    optmzdExperiment.MetaData = experiment.metadata;
+                }
+            });
+            return Promise.resolve();
+        } else {
+            return Promise.reject('unknown_campaign_cant_load_experiments');
+        }
     }
 
     private parseExperimentsResponse(response: INativeResponse): IParsedExperiment[] {
@@ -334,70 +296,94 @@ export class AutomatedExperimentManager {
             { l: 'osVersion', c: 'os_version' },
             { l: 'deviceModel', c: 'device_model' },
             { l: 'deviceMake', c: 'device_make' },
-            { l: 'screenWidth', c: 'screen_width' },
-            { l: 'screenHeight', c: 'screen_height' },
             { l: 'screenDensity', c: 'screen_density' },
             { l: 'simulator',  c: undefined },
             { l: 'stores', c: undefined },
 
             //DEVICE -- BEHAVIOUR
             { l: 'rooted',  c: undefined },
-            { l: 'connectionType', c: 'connection_type' },
-            { l: 'device_free_space', c: undefined },
-            { l: 'headset', c: undefined },
-            { l: 'deviceVolume', c: 'device_volume' },
             { l: 'max_volume', c: undefined },
-            { l: 'freeMemory', c: 'free_memory' },
             { l: 'totalMemory', c: 'total_memory' },
             { l: 'total_internal_space', c: undefined },
-            { l: 'free_external_space', c: undefined },
-            { l: 'total_external_space', c: undefined },
-            { l: 'batteryLevel', c: 'battery_level' },
-            { l: 'batteryStatus', c: 'battery_status' },
-            { l: 'usb_connected', c: undefined },
-            { l: 'ringer_mode', c: undefined },
-            { l: 'network_metered', c: undefined },
-            { l: 'screenBrightness', c: 'screen_brightness' },
-
-            // NOT REALLY STATIC, BUT CONCIDERED SO FOR NOW
-            { l: 'local_day_time', c: undefined }
+            { l: 'totalSpaceExternal', c: 'total_external_space' }
         ];
 
-        return Promise.all([
-            this._deviceInfo.fetch(),
+        return this._deviceInfo.fetch().then(() => Promise.all([
             this._deviceInfo.getDTO(),
-            this._deviceInfo.getFreeSpace(),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getFreeSpaceExternal() : Promise.resolve<number | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getTotalSpaceExternal() : Promise.resolve<number | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getNetworkMetered() : Promise.resolve<boolean | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getRingerMode() : Promise.resolve<number | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.isUSBConnected() : Promise.resolve<boolean | undefined>(undefined),
-            new Date(Date.now())
-        ]).then((res) => {
+            this._clientInfo.getDTO(),
+            this._coreConfig.getDTO()
+        ]))
+        .then((res) => {
             const rawData: { [key: string]: ContextualFeature } = {
+               ...res[0],
                ...res[1],
-               ...this._clientInfo.getDTO(),
-               ...this._coreConfig.getDTO(),
-               'gdpr_enabled': this._privacySDK.isGDPREnabled(),
-               'opt_out_Recorded': this._privacySDK.isOptOutRecorded(),
-               'opt_out_enabled': this._privacySDK.isOptOutEnabled(),
+               ...res[2],
+               'gdpr_enabled': this._privacySdk.isGDPREnabled(),
+               'opt_out_Recorded': this._privacySdk.isOptOutRecorded(),
+               'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
                'platform': Platform[this._nativeBridge.getPlatform()],
                'stores':  this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
                'simulator': this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
                'total_internal_space': this._deviceInfo.getTotalSpace(),
-               'device_free_space': res[2],
-               'free_external_space': res[3],
-               'total_external_space': res[4],
-               'network_metered' : res[5],
-               'ringer_mode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
-               'usb_connected' : res[7],
-               'max_volume': this._deviceInfo.get('maxVolume'),
-               'local_day_time': res[8].getHours() + res[8].getMinutes() / 60
+               'max_volume': this._deviceInfo.get('maxVolume')
+            };
+
+            const features: { [key: string]: ContextualFeature } = {};
+            filter.forEach(item => {
+               if (rawData[item.l] !== undefined) {
+                   const name = (item.c !== undefined) ? item.c : item.l;
+                   features[ name ] = rawData[item.l] ;
+               }
+            });
+
+            return features;
+        }).catch(err => {
+            Diagnostics.trigger('failed_to_collect_static_features', err);
+            return {};
+        });
+    }
+
+    private async collectDeviceContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
+        const filter = [
+            { l: 'connectionType', c: 'connection_type' },
+            { l: 'headset', c: undefined },
+            { l: 'deviceVolume', c: 'device_volume' },
+            { l: 'freeMemory', c: 'free_memory' },
+            { l: 'device_free_space', c: undefined },
+            { l: 'freeSpaceExternal', c: 'free_external_space' },
+            { l: 'batteryLevel', c: 'battery_level' },
+            { l: 'batteryStatus', c: 'battery_status' },
+            { l: 'usbConnected', c: 'usb_connected' },
+            { l: 'ringerMode', c: 'ringer_mode' },
+            { l: 'networkMetered', c: 'network_metered' },
+            { l: 'screenBrightness', c: 'screen_brightness' },
+            { l: 'video_orientation', c: undefined },
+            { l: 'local_day_time', c: undefined },
+            { l: 'screenWidth', c: 'screen_width' },
+            { l: 'screenHeight', c: 'screen_height' }
+        ];
+
+        return this._deviceInfo.fetch().then(() => Promise.all([
+            this._deviceInfo.getDTO(),
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            new Date(Date.now()),
+            this._deviceInfo.getFreeSpace()
+        ]))
+        .then((res) => {
+            const rawData: { [key: string]: ContextualFeature } = {
+               ...res[0],
+               'video_orientation': Orientation[  res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
+               'local_day_time': res[3].getHours() + res[3].getMinutes() / 60,
+               'device_free_space': res[4]
             };
 
             // do some enum conversions
             if (rawData.hasOwnProperty('batteryStatus')) {
                 rawData.batteryStatus = BatteryStatus[<BatteryStatus>rawData.batteryStatus];
+            }
+            if (rawData.hasOwnProperty('ringerMode')) {
+                rawData.ringerMode = RingerMode[<RingerMode>rawData.ringerMode];
             }
 
             const features: { [key: string]: ContextualFeature } = {};
@@ -409,58 +395,88 @@ export class AutomatedExperimentManager {
             });
 
             return features;
+        }).catch(err => {
+            Diagnostics.trigger('failed_to_collect_device_features', err);
+            return {};
         });
     }
 
-    // not used at the moment. but will be soon: when we do an inference / ad display.
-    // incomplete implementation
-    private async collectAdRelatedFeatures(deviceInfo: DeviceInfo): Promise<{ [key: string]: ContextualFeature }>  {
-        const filter = [
-            // CAMPAIGN, THE AD
-            'campaignId', 'targetGameId', 'rating', 'ratingCount', 'gameSessionCounters', 'cached',
+    private async collectAdUnitFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }>  {
+        const features: { [key: string]: ContextualFeature } = {};
+        const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
-            // MISC
-            'videoOrientation'
-        ];
+        features.campaign_id = campaign.getId();
+        features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
+        features.rating =  campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
+        features.ratingCount =  campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
+        features.gsc_ad_requests = gameSessionCounters.adRequests;
+        features.gsc_views = gameSessionCounters.views;
+        features.gsc_starts = gameSessionCounters.starts;
+        features.is_video_cached = CampaignAssetInfo.isCached(campaign);
 
-        const undefinedValue = new Promise(() => undefined);
-        return Promise.all([
-            deviceInfo.getScreenWidth(),
-            deviceInfo.getScreenHeight()
-        ]).then((res) => {
-                const rawData: { [key: string]: ContextualFeature } = {
-                    'videoOrientation': Orientation[  res[0] >= res[1] ? Orientation.LANDSCAPE : Orientation.PORTRAIT]
-            };
+        // features['gsc_latest_campaign_starts'] =  gameSessionCounters.latestCampaignsStarts;  <- AUI can't read it at the moment...
+        // features['gsc_starts_per_campaign'] = gameSessionCounters.startsPerCampaign;          <- AUI can't read it at the moment...
+        // features['gsc_starts_per_target'] = gameSessionCounters.startsPerTarget;              <- AUI can't read it at the moment...
+        // features['gsc_views_per_campaign'] = gameSessionCounters.viewsPerCampaign;            <- AUI can't read it at the moment...
+        // features['gsc_views_per_target'] = gameSessionCounters.viewsPerTarget;                <- AUI can't read it at the moment...
 
-            const features: { [key: string]: ContextualFeature } = {};
-            filter.forEach(name => {
-               if (rawData[name] !== undefined) {
-                   features[name] = rawData[name];
-               }
-            });
-
-            return features;
-        });
+        return features;
     }
 
-    private createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}): string {
+    private createRequestBody(campaign: Campaign, experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}): string {
         return JSON.stringify({
             user_info: {
-                ab_group: this._userInfo.ABGroup,
-                game_session_id: this._userInfo.GameSessionID
-                // auction_id: Left out on purpose, as experiments are used accross multiple actions at the moment
+                ab_group: this._abGroup,
+                game_session_id: this._gameSessionID,
+                auction_id: campaign.getSession().getId()
             },
             experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
             contextual_features: contextualFeatures
         });
     }
 
-    private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableAutomatedExperimentData> {
-        return this._storageApi.get<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
-    }
+    // Only public so that testing can access it. :/
+    public static onNewCampaign(_this: AutomatedExperimentManager, campaign: Campaign): Promise<void> {
+        if (_this._declaredExperiments.length === 0) {
+            return Promise.resolve();
+        }
 
-    private storeExperimentData(experimentName: string, data: CachableAutomatedExperimentData) {
-        this._storageApi.set<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
-        this._storageApi.write(StorageType.PRIVATE);
+        if (_this._campaigns.hasOwnProperty(campaign.getId())) {
+            return Promise.resolve();
+        }
+
+        const optmzdCampaign = new OptimizedCampaign();
+        _this._campaigns[campaign.getId()] = optmzdCampaign;
+
+        _this._declaredExperiments.forEach(experiment => {
+            optmzdCampaign.experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
+        });
+
+        // Fire and forget... No one resolves it/blocks on it explicitely
+        return Promise.all([_this._staticFeaturesPromise, _this.collectDeviceContextualFeatures(), _this.collectAdUnitFeatures(campaign)])
+            .then((featureMaps) => {
+                const features: { [key: string]: ContextualFeature } = {};
+                for (const i in featureMaps) {
+                    if (featureMaps.hasOwnProperty(i)) {
+                        for (const name in featureMaps[i]) {
+                            if (!features.hasOwnProperty(name)) {
+                                features[name] = featureMaps[i][name];
+                            }
+                        }
+                    }
+                }
+                return features;
+        }).then((features) => {
+            const body = _this.createRequestBody(campaign, _this._declaredExperiments, features);
+            const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
+
+            return _this._requestManager.post(url, body)
+                .then((response) => _this.parseExperimentsResponse(response))
+                .then((parsedExperiments) => _this.loadCampaignExperiments(campaign, parsedExperiments))
+                .then(() => Promise.resolve())
+                .catch((err) => {
+                    Diagnostics.trigger('failed_to_fetch_automated_experiments', err);
+                });
+        });
     }
 }

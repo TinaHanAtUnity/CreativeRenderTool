@@ -1,4 +1,5 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
@@ -9,12 +10,8 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Platform } from 'Core/Constants/Platform';
-import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Placement } from 'Ads/Models/Placement';
-import { PrivacyMethod } from 'Privacy/Privacy';
+import { Platform } from 'Core/Constants/Platform';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private _adUnitParametersFactory: IAbstractAdUnitParametersFactory<T, Params>;
@@ -31,6 +28,10 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
     }
 
     protected abstract createAdUnit(parameters: Params): AbstractAdUnit;
+
+    protected getParametersFactory(): IAbstractAdUnitParametersFactory<T, Params> {
+        return this._adUnitParametersFactory;
+    }
 
     protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: new(p: ParamsType) => T1, params: ParamsType): T1 {
         const adUnit = params.adUnit;

@@ -1305,7 +1305,8 @@ export class TestFixtures {
             getSensorList: sinon.stub().returns(Promise.resolve([])),
             isUSBConnected: sinon.stub().returns(Promise.resolve(false)),
             getUptime: sinon.stub().returns(Promise.resolve(10000)),
-            getElapsedRealtime: sinon.stub().returns(Promise.resolve(10000))
+            getElapsedRealtime: sinon.stub().returns(Promise.resolve(10000)),
+            getNetworkMetered: sinon.stub().returns(Promise.resolve(false))
         };
     }
 
