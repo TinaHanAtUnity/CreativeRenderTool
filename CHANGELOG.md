@@ -1,4 +1,4 @@
-# PENDING
+# Mon Dec 16 23:38:26 UTC 2019
 
 * Fix WEBPLAYER_NULL error on Android [#12465](https://github.com/Applifier/unity-ads-webview/pull/12465)
 * Adjust Load Adapter V1 Test to Reverse AB Test and Remove Load Adapter Whitelist [#12638](https://github.com/Applifier/unity-ads-webview/pull/12638)
