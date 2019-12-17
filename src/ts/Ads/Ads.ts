@@ -85,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, LoadAdapterV1 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
