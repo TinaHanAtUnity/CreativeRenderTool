@@ -216,7 +216,7 @@ export class OpenMeasurementController implements IOMController {
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
     public sessionStart(sessionEvent?: ISessionEvent) {
-        
+        // handled by concrete definitions
     }
 
     /**

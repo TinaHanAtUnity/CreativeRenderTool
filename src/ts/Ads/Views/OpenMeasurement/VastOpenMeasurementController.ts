@@ -40,22 +40,20 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
 
     public sessionStart() {
         const contextData: IContext = this.buildSessionContext();
-
-        const event: ISessionEvent = {
-            adSessionId: '',
-            timestamp: Date.now(),
-            type: 'sessionStart',
-            data: {}
-        };
+        const date = Date.now();
 
         this._omInstances.forEach((om) => {
+            const event: ISessionEvent = {
+                adSessionId: '',
+                timestamp: date,
+                type: 'sessionStart',
+                data: {}
+            };
             event.adSessionId = om.getOMAdSessionId();
             const verification = om.getVastVerification();
             event.data.verificationParameters = verification.getVerificationParameters();
             event.data.vendorkey = verification.getVerificationVendor();
             event.data.context = contextData;
-
-            console.log(JSON.stringify(event));
             om.sessionStart(event);
         });
 

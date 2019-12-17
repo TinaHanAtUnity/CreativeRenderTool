@@ -162,14 +162,19 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
     }
 
+    public getOMInstances(): OpenMeasurement[] {
+        return this._omInstances;
+    }
+
     public sessionStart(sessionEvent: ISessionEvent) {
 
         this._omInstances.forEach((om) => {
-            om.sessionStart(sessionEvent);
+            //Need a deep assignment to avoid duplication for events
+            const event = JSON.parse(JSON.stringify(sessionEvent));
             const verification = om.getVastVerification();
-            sessionEvent.data.vendorkey = verification.getVerificationVendor();
+            event.data.vendorkey = verification.getVerificationVendor();
 
-            om.sessionStart(sessionEvent);
+            om.sessionStart(event);
         });
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }

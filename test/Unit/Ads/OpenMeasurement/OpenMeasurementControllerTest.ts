@@ -31,10 +31,6 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
                 sandbox.restore();
             });
 
-            it('sessionStart should be called twice', () => {
-                omManager.sessionStart();
-                sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionStart);
-            });
             it('sessionFinish should be called twice', () => {
                 omManager.sessionFinish();
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionFinish);
