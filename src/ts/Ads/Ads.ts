@@ -320,7 +320,7 @@ export class Ads implements IAds {
             if (mediation) {
                 const mediationName = mediation.getName();
                 if (mediationName === 'AdMob') {
-                    this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
+                    this.AdmobAdapterManager = new AdmobAdapterManager(this.Api, this._core.NativeBridge.getPlatform());
                 }
             }
         }).catch(() => {
