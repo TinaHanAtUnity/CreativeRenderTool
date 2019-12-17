@@ -13,6 +13,7 @@ import SpanishEndscreen from 'json/locale/es/endscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
 import SpanishConsent from 'json/locale/es/consent.json';
 import SpanishMraid from 'json/locale/es/mraid.json';
+import SpanishPrivacy from 'json/locale/es/privacy.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
 import FinnishMraid from 'json/locale/fi/mraid.json';
@@ -54,6 +55,7 @@ import ChineseSimplifiedPrivacy from 'json/locale/zh_Hans/privacy.json';
 import ChineseTraditionalEndscreen from 'json/locale/zh_Hant/endscreen.json';
 import ChineseTraditionalOverlay from 'json/locale/zh_Hant/overlay.json';
 import ChineseTraditionalMraid from 'json/locale/zh_Hant/mraid.json';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 interface ILanguageMap {
     [key: string]: { // device language regexp
@@ -170,8 +172,8 @@ export class Localization {
             'endscreen': SpanishEndscreen,
             'overlay': SpanishOverlay,
             'consent': SpanishConsent,
-            'mraid': SpanishMraid
-
+            'mraid': SpanishMraid,
+            'privacy': SpanishPrivacy
         },
         'fr.*': {
             'endscreen': FrenchEndscreen,
@@ -225,12 +227,8 @@ export class Localization {
     private _language: string;
     private _namespace: string;
 
-    constructor(language: string, namespace: string) {
-        if (namespace === 'consent' && !this.isConsentTranslationAvailable(language)) {
-            language = 'en.*';
-        }
-
-        this._language = language;
+    constructor(language: string, namespace: string, legalFramework?: LegalFramework) {
+        this._language = this.solveLanguage(language, namespace, legalFramework);
         this._namespace = namespace;
     }
 
@@ -260,7 +258,22 @@ export class Localization {
         return number.toString();
     }
 
-    private isConsentTranslationAvailable(language: string) {
+    private solveLanguage(language: string, namespace: string, legalFramework?: LegalFramework): string {
+        if (namespace !== 'privacy' && namespace !== 'consent') {
+            return language;
+        }
+
+        if (namespace === 'consent' && !this.isPrivacyUnitTranslationAvailable(language, legalFramework)) {
+            return 'en.*';
+        }
+        if (namespace === 'privacy' && !this.isPrivacySettingsTranslationAvailable(language, legalFramework)) {
+            return 'en.*';
+        }
+
+        return language;
+    }
+
+    private isPrivacyUnitTranslationAvailable(language: string, legalFramework?: LegalFramework) {
         if (language.match('fr.*')
             || language.match('de.*')
             || language.match('es.*')
@@ -270,8 +283,19 @@ export class Localization {
             || language.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
             return true;
         }
-
         return false;
     }
 
+    private isPrivacySettingsTranslationAvailable(language: string, legalFramework?: LegalFramework): boolean {
+        // only Spanish is available for CCPA
+        if (legalFramework === LegalFramework.CCPA) {
+            return language.match('es.*') ? true : false;
+        }
+
+        if (language.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
+            return true;
+        }
+
+        return false;
+    }
 }

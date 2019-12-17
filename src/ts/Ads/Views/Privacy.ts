@@ -35,7 +35,7 @@ export class Privacy extends AbstractPrivacy {
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._language = language;
-        this._localization = new Localization(language, 'privacy');
+        this._localization = new Localization(language, 'privacy', privacyManager.getLegalFramework());
         this._template = new Template(PrivacyTemplate, this._localization);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
@@ -85,7 +85,7 @@ export class Privacy extends AbstractPrivacy {
         if (this._userPrivacyManager.isDataRequestEnabled()) {
             const dataRequestContainer = this._container.querySelector('.data-request-container');
             if (dataRequestContainer) {
-                const dataRequestView = new PrivacyDataRequest(this._platform, this._language);
+                const dataRequestView = new PrivacyDataRequest(this._platform, this._userPrivacyManager, this._language);
                 dataRequestView.render();
                 dataRequestContainer.appendChild(dataRequestView.container());
             }
