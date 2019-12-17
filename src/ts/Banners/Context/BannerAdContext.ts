@@ -34,6 +34,7 @@ export class BannerAdContext {
     private readonly _size: IBannerDimensions;
     private _bannerNativeApi: IBannerNativeApi;
     private _adUnit: IBannerAdUnit;
+    private _adUnitOnShowHasBeenCalled: boolean;
     private _campaign: BannerCampaign;
     private _deviceInfo: DeviceInfo;
     private _campaignManager: BannerCampaignManager;
@@ -44,7 +45,7 @@ export class BannerAdContext {
     private _programmaticTrackingService: ProgrammaticTrackingService;
     public _webPlayerContainer: WebPlayerContainer;
     private _clientInfo: ClientInfo;
-    private _bannerShowing: boolean;
+    private _bannerAttached: boolean;
 
     private _loadState: BannerLoadState = BannerLoadState.Unloaded;
 
@@ -71,7 +72,8 @@ export class BannerAdContext {
         this._webPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api, bannerAdViewId);
         this._clientInfo = core.ClientInfo;
         this._programmaticTrackingService = core.ProgrammaticTrackingService;
-        this._bannerShowing = false;
+        this._bannerAttached = false;
+        this._adUnitOnShowHasBeenCalled = false;
         this.subscribeListeners();
     }
 
@@ -134,10 +136,8 @@ export class BannerAdContext {
                 return this.createAdUnit().then((adUnit) => {
                     return this.loadBanner().then(() => {
                         return adUnit.onLoad().then(() => {
-                            this._adUnit = adUnit;
-                            if (this._bannerShowing) {
-                                this.onBannerShow();
-                            }
+                            this.setNewAdUnit(adUnit);
+                            this.onBannerShow();
                         });
                     });
                 }).then(() => {
@@ -158,7 +158,7 @@ export class BannerAdContext {
     }
 
     public hide() {
-        this._bannerShowing = false;
+        this._bannerAttached = false;
         if (this._adUnit) {
             this._adUnit.onHide();
         }
@@ -174,6 +174,11 @@ export class BannerAdContext {
         }
     }
 
+    private setNewAdUnit(adUnit: IBannerAdUnit) {
+        this._adUnit = adUnit;
+        this._adUnitOnShowHasBeenCalled = false;
+    }
+
     private sendBannerError(e: Error): Promise<void> {
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.WebViewError, e.message);
     }
@@ -183,13 +188,16 @@ export class BannerAdContext {
     }
 
     private onBannerAttached() {
-        this._bannerShowing = true;
+        this._bannerAttached = true;
         this.onBannerShow();
     }
 
     private onBannerShow() {
-        if (this._adUnit) {
-            this._adUnit.onShow();
+        if (this._adUnit && this._bannerAttached) {
+            if (!this._adUnitOnShowHasBeenCalled) {
+                this._adUnit.onShow();
+                this._adUnitOnShowHasBeenCalled = true;
+            }
         }
     }
 

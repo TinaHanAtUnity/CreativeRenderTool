@@ -32,6 +32,55 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
         }, bannerModule, ads, core);
     });
 
+    describe('AdUnit onShow called once for each adUnit', () => {
+        let htmlBannerAdUnit: HTMLBannerAdUnitMock;
+        let bannerAttachedObserver: (viewId: string) => void;
+        let bannerDetachObserver: (viewId: string) => void;
+
+        const loadBannerAdContext = (count: number): Promise<void> => {
+            if (count > 0) {
+                return bannerAdContext.load().then(() => {
+                    return loadBannerAdContext(count - 1);
+                });
+            } else {
+                return Promise.resolve();
+            }
+        };
+
+        beforeEach(() => {
+            bannerModule.CampaignManager.request.mockImplementation(() => {
+                return Promise.resolve(BannerCampaign());
+            });
+            bannerModule.AdUnitParametersFactory.create.mockReturnValue(Promise.resolve());
+            bannerModule.AdUnitFactory.createAdUnit.mockImplementation(() => {
+                const adUnit = HTMLBannerAdUnit();
+                adUnit.onLoad.mockReturnValue(Promise.resolve());
+                htmlBannerAdUnit = adUnit;
+                return Promise.resolve(adUnit);
+            });
+            // this mock subscribe is called when the context is constructed
+            bannerAttachedObserver = bannerModule.Api.BannerApi.onBannerAttached.subscribe.mock.calls[0][0];
+            bannerDetachObserver = bannerModule.Api.BannerApi.onBannerDetached.subscribe.mock.calls[0][0];
+
+            let onBannerLoadedObserver: () => void;
+            bannerModule.Api.BannerApi.onBannerLoaded.subscribe.mockImplementation((fn: () => void) => {
+                onBannerLoadedObserver = fn;
+            });
+            bannerModule.Api.BannerApi.load.mockImplementation(() => {
+                onBannerLoadedObserver();
+            });
+            bannerModule.Api.BannerListenerApi.sendLoadEvent.mockReturnValue(Promise.resolve());
+            return loadBannerAdContext(1);
+        });
+
+        it(`after loading a banner triggering attach twice`, () => {
+            bannerAttachedObserver(placementId);
+            bannerDetachObserver(placementId);
+            bannerAttachedObserver(placementId);
+            expect(htmlBannerAdUnit.onShow).toBeCalledTimes(1);
+        });
+    });
+
     describe('AdUnit onShow called', () => {
         const tests: {
             loads: number;
@@ -45,7 +94,7 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
 
         tests.forEach((t) => {
             describe(`loading ${t.loads}`, () => {
-                let htmlBannerAdUnit: HTMLBannerAdUnitMock;
+                let htmlBannerAdUnits: HTMLBannerAdUnitMock[] = [];
 
                 const loadBannerAdContext = (count: number): Promise<void> => {
                     if (count > 0) {
@@ -58,10 +107,17 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
                 };
 
                 beforeEach(() => {
-                    htmlBannerAdUnit = HTMLBannerAdUnit();
-                    bannerModule.CampaignManager.request.mockReturnValue(Promise.resolve(BannerCampaign()));
+                    htmlBannerAdUnits = [];
+                    bannerModule.CampaignManager.request.mockImplementation(() => {
+                        return Promise.resolve(BannerCampaign());
+                    });
                     bannerModule.AdUnitParametersFactory.create.mockReturnValue(Promise.resolve());
-                    bannerModule.AdUnitFactory.createAdUnit.mockReturnValue(Promise.resolve(htmlBannerAdUnit));
+                    bannerModule.AdUnitFactory.createAdUnit.mockImplementation(() => {
+                        const adUnit = HTMLBannerAdUnit();
+                        adUnit.onLoad.mockReturnValue(Promise.resolve());
+                        htmlBannerAdUnits.push(adUnit);
+                        return Promise.resolve(adUnit);
+                    });
                     // this mock subscribe is called when the context is constructed
                     const bannerAttachedObserver: (viewId: string) => void = bannerModule.Api.BannerApi.onBannerAttached.subscribe.mock.calls[0][0];
                     let onBannerLoadedObserver: () => void;
@@ -71,7 +127,6 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
                     bannerModule.Api.BannerApi.load.mockImplementation(() => {
                         onBannerLoadedObserver();
                     });
-                    htmlBannerAdUnit.onLoad.mockReturnValue(Promise.resolve());
                     bannerModule.Api.BannerListenerApi.sendLoadEvent.mockReturnValue(Promise.resolve());
                     bannerAttachedObserver(placementId);
                     return loadBannerAdContext(t.loads);
@@ -94,11 +149,15 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
                 });
 
                 it(`should call onLoad ${t.loads} times`, () => {
-                    expect(htmlBannerAdUnit.onLoad).toBeCalledTimes(t.loads);
+                    htmlBannerAdUnits.forEach((bannerAdUnit: HTMLBannerAdUnitMock) => {
+                        expect(bannerAdUnit.onLoad).toBeCalledTimes(1);
+                    });
                 });
 
                 it(`loading ${t.loads} should trigger ${t.loads} onShow`, () => {
-                    expect(htmlBannerAdUnit.onShow).toBeCalledTimes(t.loads);
+                    htmlBannerAdUnits.forEach((bannerAdUnit: HTMLBannerAdUnitMock) => {
+                        expect(bannerAdUnit.onShow).toBeCalledTimes(1);
+                    });
                 });
             });
         });
