@@ -110,7 +110,16 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
             this.initCaptcha();
         } else {
             // todo: triggers browser's built-in ui pop-up, could be replaced with something else
-            this._emailInputElement.reportValidity();
+            if (this._platform === Platform.ANDROID) {
+                // @ts-ignore
+                const majorAndroidVersion = /Android (([0-9]+)(\.[0-9]+)+);/g.exec(navigator.userAgent)[2];
+                //hack for two Android 4 bugs
+                if (majorAndroidVersion !== '4') {
+                    this._emailInputElement.reportValidity();
+                }
+            } else {
+                this._emailInputElement.reportValidity();
+            }
         }
     }
 
