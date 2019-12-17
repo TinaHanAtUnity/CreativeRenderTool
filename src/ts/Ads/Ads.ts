@@ -91,6 +91,9 @@ import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MopubCampaignRefreshManager } from 'Ads/Managers/MopubCampaignRefreshManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { AdmobManager } from './Managers/AdmobManager';
+import { AdmobAdapterManager } from './Managers/AdmobAdapterManager';
 
 export class Ads implements IAds {
 
@@ -311,6 +314,15 @@ export class Ads implements IAds {
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
+
+        this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if (mediation) {
+                const mediationName = mediation.getName();
+                if (mediationName === 'AdMob') {
+                    new AdmobAdapterManager(this.Api);
+                }
+            }
+        });
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {

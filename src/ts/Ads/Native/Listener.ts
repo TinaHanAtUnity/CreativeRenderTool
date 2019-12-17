@@ -1,9 +1,10 @@
 import { FinishState } from 'Core/Constants/FinishState';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1 } from 'Core/Utilities/Observable';
 
 export class ListenerApi extends NativeApi {
-
+    public readonly onPlacementStateChangeToNofill = new Observable1<string>();
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Listener', ApiPackage.ADS);
     }
@@ -25,6 +26,9 @@ export class ListenerApi extends NativeApi {
     }
 
     public sendPlacementStateChangedEvent(placementId: string, oldState: string, newState: string): Promise<void> {
+        if (newState === 'NO_FILL'){
+            this.onPlacementStateChangeToNofill.trigger(placementId);
+        }
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendPlacementStateChangedEvent', [placementId, oldState, newState]);
     }
 
