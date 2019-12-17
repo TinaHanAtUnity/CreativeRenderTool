@@ -7,12 +7,12 @@ export class PrivacyLocalization extends Localization {
         super(PrivacyLocalization.resolveLanguage(language, namespace, legalFramework), namespace);
     }
 
-    private static resolveLanguage(language: string, namespace: string, legalFramework?: LegalFramework): string {
+    private static resolveLanguage(language: string, namespace: string, legalFramework: LegalFramework): string {
         if (namespace !== 'privacy' && namespace !== 'consent') {
             return language;
         }
 
-        if (namespace === 'consent' && !this.isPrivacyUnitTranslationAvailable(language, legalFramework)) {
+        if (namespace === 'consent' && !this.isPrivacyUnitTranslationAvailable(language)) {
             return 'en.*';
         }
         if (namespace === 'privacy' && !this.isPrivacySettingsTranslationAvailable(language, legalFramework)) {
@@ -22,7 +22,7 @@ export class PrivacyLocalization extends Localization {
         return language;
     }
 
-    private static isPrivacyUnitTranslationAvailable(language: string, legalFramework?: LegalFramework) {
+    private static isPrivacyUnitTranslationAvailable(language: string) {
         if (language.match('fr.*')
             || language.match('de.*')
             || language.match('es.*')
@@ -35,7 +35,7 @@ export class PrivacyLocalization extends Localization {
         return false;
     }
 
-    private static isPrivacySettingsTranslationAvailable(language: string, legalFramework?: LegalFramework): boolean {
+    private static isPrivacySettingsTranslationAvailable(language: string, legalFramework: LegalFramework): boolean {
         // only Spanish is available for CCPA
         if (legalFramework === LegalFramework.CCPA) {
             return language.match('es.*') ? true : false;
