@@ -12,6 +12,7 @@ import {
     PrivacyDataRequestHelper
 } from 'Privacy/PrivacyDataRequestHelper';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
@@ -29,7 +30,7 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
         super(platform, 'privacy-data-request');
 
         this._language = language;
-        this._localization = new Localization(language, 'privacy', privacyManager.getLegalFramework());
+        this._localization = new PrivacyLocalization(language, 'privacy', privacyManager.getLegalFramework());
         this._template = new Template(DataRequestTemplate, this._localization);
 
         this._bindings = [

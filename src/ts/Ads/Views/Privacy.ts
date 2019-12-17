@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 import { Localization } from 'Core/Utilities/Localization';
 import { PrivacyDataRequest } from 'Ads/Views/Privacy/PrivacyDataRequest';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 enum PrivacyCardState {
     PRIVACY,
@@ -35,7 +36,7 @@ export class Privacy extends AbstractPrivacy {
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._language = language;
-        this._localization = new Localization(language, 'privacy', privacyManager.getLegalFramework());
+        this._localization = new PrivacyLocalization(language, 'privacy', privacyManager.getLegalFramework());
         this._template = new Template(PrivacyTemplate, this._localization);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
