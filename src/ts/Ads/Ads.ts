@@ -85,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, LoadAdapterV1, AdmobAdapterV1 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, AdmobAdapterV1 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
@@ -200,10 +200,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
-            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch((error) => {
-                if (error instanceof Error) {
-                    this._core.Api.Sdk.logError('Failed to set developer consent based on metadata: ' + error.message);
-                }
+            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+                // do nothing since it's normal to have undefined developer consent
             });
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
@@ -305,11 +303,7 @@ export class Ads implements IAds {
                 }
             }
         } else if (this._loadApiEnabled) {
-            if (!LoadAdapterV1.isValid(this._core.Config.getAbGroup())) {
-                this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-            } else {
-                this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-            }
+            this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }

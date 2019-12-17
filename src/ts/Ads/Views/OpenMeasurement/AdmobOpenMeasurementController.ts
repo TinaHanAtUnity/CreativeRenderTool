@@ -9,7 +9,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
-import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent, MediaType, VideoEventAdaptorType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent, MediaType, VideoEventAdaptorType, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
@@ -147,16 +147,27 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 mediaType: MediaType.VIDEO
             };
 
-            impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            let viewport: IViewPort;
+            let adView: IAdView;
+
             if (this._platform === Platform.ANDROID) {
-                impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
+                viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
+            } else {
+                viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             }
-            impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+
+            adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+
+            impressionObject.viewport = viewport;
+            impressionObject.adView = adView;
 
             this._omInstances.forEach((om) => {
                 this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             });
             super.impression(impressionObject);
+
+            // TODO: Remove once Admob fixes their issue in Jan 2020
+            this.geometryChange(viewport, adView);
         }).catch((e) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO

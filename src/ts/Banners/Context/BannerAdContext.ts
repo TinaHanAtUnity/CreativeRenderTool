@@ -34,6 +34,7 @@ export class BannerAdContext {
     private readonly _size: IBannerDimensions;
     private _bannerNativeApi: IBannerNativeApi;
     private _adUnit: IBannerAdUnit;
+    private _adUnitOnShowHasBeenCalled: boolean;
     private _campaign: BannerCampaign;
     private _deviceInfo: DeviceInfo;
     private _campaignManager: BannerCampaignManager;
@@ -44,6 +45,7 @@ export class BannerAdContext {
     private _programmaticTrackingService: ProgrammaticTrackingService;
     public _webPlayerContainer: WebPlayerContainer;
     private _clientInfo: ClientInfo;
+    private _bannerAttached: boolean;
 
     private _loadState: BannerLoadState = BannerLoadState.Unloaded;
 
@@ -70,6 +72,8 @@ export class BannerAdContext {
         this._webPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api, bannerAdViewId);
         this._clientInfo = core.ClientInfo;
         this._programmaticTrackingService = core.ProgrammaticTrackingService;
+        this._bannerAttached = false;
+        this._adUnitOnShowHasBeenCalled = false;
         this.subscribeListeners();
     }
 
@@ -81,12 +85,12 @@ export class BannerAdContext {
 
         this._onBannerOpened = this._bannerNativeApi.BannerApi.onBannerAttached.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this.onBannerShow();
+                this.onBannerAttached();
             }
         });
         this._onBannerClosed = this._bannerNativeApi.BannerApi.onBannerDetached.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this.hide();
+                this.onBannerDetached();
             }
         });
         this._onBannerDestroyed = this._bannerNativeApi.BannerApi.onBannerDestroyed.subscribe((bannerAdViewId: string) => {
@@ -130,9 +134,11 @@ export class BannerAdContext {
                 this._campaign = <BannerCampaign>campaign;
                 this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdFill);
                 return this.createAdUnit().then((adUnit) => {
-                    this._adUnit = adUnit;
                     return this.loadBanner().then(() => {
-                        this._adUnit.onLoad();
+                        return adUnit.onLoad().then(() => {
+                            this.setAdUnit(adUnit);
+                            this.tryToShowAdUnit();
+                        });
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
@@ -151,12 +157,6 @@ export class BannerAdContext {
             });
     }
 
-    public hide() {
-        if (this._adUnit) {
-            this._adUnit.onHide();
-        }
-    }
-
     public destroy(): Promise<void> {
         if (this._adUnit) {
             return this._adUnit.onDestroy().then(() => {
@@ -167,6 +167,23 @@ export class BannerAdContext {
         }
     }
 
+    private onBannerAttached() {
+        this._bannerAttached = true;
+        this.tryToShowAdUnit();
+    }
+
+    private onBannerDetached() {
+        this._bannerAttached = false;
+        if (this._adUnit) {
+            this._adUnit.onHide();
+        }
+    }
+
+    private setAdUnit(adUnit: IBannerAdUnit) {
+        this._adUnit = adUnit;
+        this._adUnitOnShowHasBeenCalled = false;
+    }
+
     private sendBannerError(e: Error): Promise<void> {
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.WebViewError, e.message);
     }
@@ -175,9 +192,12 @@ export class BannerAdContext {
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
     }
 
-    private onBannerShow() {
-        if (this._adUnit) {
-            this._adUnit.onShow();
+    private tryToShowAdUnit() {
+        if (this._adUnit && this._bannerAttached) {
+            if (!this._adUnitOnShowHasBeenCalled) {
+                this._adUnit.onShow();
+                this._adUnitOnShowHasBeenCalled = true;
+            }
         }
     }
 

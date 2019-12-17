@@ -58,6 +58,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
         const loadBannerAdUnit = () => {
             adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
+            (<sinon.SinonStub>adUnit.onLoad).returns(Promise.resolve());
             sandbox.stub(bannerModule.CampaignManager, 'request').resolves(campaign);
             sandbox.stub(bannerModule.AdUnitParametersFactory, 'create').resolves();
             sandbox.stub(bannerModule.AdUnitFactory, 'createAdUnit').returns(adUnit);
