@@ -24,7 +24,7 @@ import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { Backend } from 'Backend/Backend';
 import { IBannerNativeApi, IBannerModule } from 'Banners/IBannerModule';
 import { BannerApi } from 'Banners/Native/BannerApi';
-import { BannerListenerApi } from 'Banners/Native/BannerListenerApi';
+import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
