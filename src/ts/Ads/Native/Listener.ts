@@ -1,15 +1,21 @@
 import { FinishState } from 'Core/Constants/FinishState';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable1 } from 'Core/Utilities/Observable';
+import { Observable1, Observable0} from 'Core/Utilities/Observable';
 
 export class ListenerApi extends NativeApi {
-    public readonly onPlacementStateChangeToNofill = new Observable1<string>();
+
+    public readonly onReadySent = new Observable1<string>();
+    public readonly onPlacementStateChangedEventSent = new Observable1<string>();
+    public readonly onErrorEvent = new Observable0();
+    public readonly onPlacementStateChangeToNoFill = new Observable1<string>();
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Listener', ApiPackage.ADS);
     }
 
     public sendReadyEvent(placementId: string): Promise<void> {
+        this.onReadySent.trigger(placementId);
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendReadyEvent', [placementId]);
     }
 
@@ -27,13 +33,15 @@ export class ListenerApi extends NativeApi {
 
     public sendPlacementStateChangedEvent(placementId: string, oldState: string, newState: string): Promise<void> {
         if (newState === 'NO_FILL') {
-            this.onPlacementStateChangeToNofill.trigger(placementId);
+            this.onPlacementStateChangeToNoFill.trigger(placementId);
         }
+        this.onPlacementStateChangedEventSent.trigger(placementId);
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendPlacementStateChangedEvent', [placementId, oldState, newState]);
     }
 
     public sendErrorEvent(error: string, message: string): Promise<void> {
         // Uses same codepath as Core/Native/Listener.sendErrorEvent
+        this.onErrorEvent.trigger();
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [error, message]);
     }
 
