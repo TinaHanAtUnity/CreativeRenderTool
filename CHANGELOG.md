@@ -4,6 +4,7 @@
 * Send out AUI reward on click instead of on hide [#12526](https://github.com/Applifier/unity-ads-webview/pull/12526)
 * Create Jest Mocks for Banners [#12583](https://github.com/Applifier/unity-ads-webview/pull/12583)
 * Send banner impression on reload of banner ad context [#12584](https://github.com/Applifier/unity-ads-webview/pull/12584)
+* Open Measurement - Add Geometry Change call to Admob Impression [#12669](https://github.com/Applifier/unity-ads-webview/pull/12669)
 
 # Tue Dec 17 15:22:32 UTC 2019
 
