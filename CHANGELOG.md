@@ -3,6 +3,7 @@
 * Add AB groups to Animated Button experiment [#12454](https://github.com/Applifier/unity-ads-webview/pull/12454)
 * Send out AUI reward on click instead of on hide [#12526](https://github.com/Applifier/unity-ads-webview/pull/12526)
 * Create Jest Mocks for Banners [#12583](https://github.com/Applifier/unity-ads-webview/pull/12583)
+* Send banner impression on reload of banner ad context [#12584](https://github.com/Applifier/unity-ads-webview/pull/12584)
 
 # Tue Dec 17 15:22:32 UTC 2019
 
