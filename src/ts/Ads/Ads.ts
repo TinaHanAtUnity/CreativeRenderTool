@@ -92,8 +92,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MopubCampaignRefreshManager } from 'Ads/Managers/MopubCampaignRefreshManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { AdmobManager } from './Managers/AdmobManager';
-import { AdmobAdapterManager } from './Managers/AdmobAdapterManager';
+import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 
 export class Ads implements IAds {
 
@@ -115,6 +114,7 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
+    public AdmobAdapterManager: AdmobAdapterManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -317,7 +317,7 @@ export class Ads implements IAds {
             if (mediation) {
                 const mediationName = mediation.getName();
                 if (mediationName === 'AdMob') {
-                    new AdmobAdapterManager(this.Api);
+                    this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
                 }
             }
         });

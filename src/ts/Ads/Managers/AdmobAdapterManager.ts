@@ -14,12 +14,12 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { PerPlacementLoadAdapter } from './PerPlacementLoadAdapter';
+import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 
 export class AdmobAdapterManager  {
     private _ads: IAdsApi;
-    
+
     constructor(ads: IAdsApi) {
         this._ads = ads;
         this._ads.Listener.onPlacementStateChangeToNofill.subscribe((placementId) => {
@@ -31,4 +31,3 @@ export class AdmobAdapterManager  {
         this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INTERNAL_ERROR], placementId);
     }
 }
-

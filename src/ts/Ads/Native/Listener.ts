@@ -26,7 +26,7 @@ export class ListenerApi extends NativeApi {
     }
 
     public sendPlacementStateChangedEvent(placementId: string, oldState: string, newState: string): Promise<void> {
-        if (newState === 'NO_FILL'){
+        if (newState === 'NO_FILL') {
             this.onPlacementStateChangeToNofill.trigger(placementId);
         }
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendPlacementStateChangedEvent', [placementId, oldState, newState]);
