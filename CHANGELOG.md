@@ -1,3 +1,8 @@
+# Pending
+
+* Add AB groups to Animated Button experiment [#12454](https://github.com/Applifier/unity-ads-webview/pull/12454)
+* Send out AUI reward on click instead of on hide [#12526](https://github.com/Applifier/unity-ads-webview/pull/12526)
+
 # Tue Dec 17 15:22:32 UTC 2019
 
 * Fix of reportValidity for android 4.x devices [#12641](https://github.com/Applifier/unity-ads-webview/pull/12641)
