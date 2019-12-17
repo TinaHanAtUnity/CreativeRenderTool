@@ -9,12 +9,11 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
-import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent, MediaType, VideoEventAdaptorType } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, IVerificationScriptResource, ISessionEvent, MediaType, VideoEventAdaptorType, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { IViewPort, IAdView } from './OpenMeasurementDataTypes';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
