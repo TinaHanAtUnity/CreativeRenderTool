@@ -91,6 +91,7 @@ import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class Ads implements IAds {
 
@@ -183,6 +184,7 @@ export class Ads implements IAds {
             return this.setupTestEnvironment();
         }).then(() => {
             this.configureMediationManager();
+            return Promise.resolve();
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -315,7 +317,14 @@ export class Ads implements IAds {
     }
 
     private configureMediationManager(): void {
-        this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
+        this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if (mediation) {
+                const mediationName = mediation.getName();
+                if (mediationName === 'AdMob') {
+                    this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
+                }
+            }
+        }); 
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
