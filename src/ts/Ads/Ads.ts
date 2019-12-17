@@ -195,10 +195,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
-            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch((error) => {
-                if (error instanceof Error) {
-                    this._core.Api.Sdk.logError('Failed to set developer consent based on metadata: ' + error.message);
-                }
+            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+                // do nothing since it's normal to have undefined developer consent
             });
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
