@@ -32,7 +32,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number };
+export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number };
 
 class OptimizedAutomatedExperiment {
     constructor(experiment: AutomatedExperiment) {

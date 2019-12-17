@@ -1,16 +1,13 @@
 import { IAds } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { ICore } from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
-import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentManager, ContextualFeature } from 'Ads/Managers/AutomatedExperimentManager';
 import { AuctionProtocol, INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -35,6 +32,7 @@ import CometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import { Performance } from 'Performance/Performance';
 import { China } from 'China/China';
 import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
+import * as sinon from 'sinon';
 
 const FooExperiment = new AutomatedExperiment({
     name: 'FooExperiment',
@@ -210,13 +208,11 @@ describe('AutomatedExperimentManagerTests', () => {
 
                 assert.equal(aem.activateExperiment(campaign, FooExperiment), 'FooAction2', 'Wrong variant...');
 
-                assert.equal(diagnosticTrigger.callCount, 3, 'missing an error...');
-                assert.equal(diagnosticTrigger.firstCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
-                assert.equal(diagnosticTrigger.secondCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
+                assert.equal(diagnosticTrigger.callCount, 1, 'missing an error...');
 
-                assert.equal(diagnosticTrigger.thirdCall.args[0], 'failed_to_parse_automated_experiments');
+                assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_parse_automated_experiments');
                 // The error message is browser dependant, thus different between safari(iOS) and chrome(Android)
-                assert.oneOf(diagnosticTrigger.thirdCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
+                assert.oneOf(diagnosticTrigger.firstCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
             });
         });
     });
@@ -243,12 +239,10 @@ describe('AutomatedExperimentManagerTests', () => {
 
             assert.equal(aem.activateExperiment(campaign, FooExperiment), 'FooAction2', 'Wrong variant...');
 
-            assert.equal(diagnosticTrigger.callCount, 3, 'missing an error...');
-            assert.equal(diagnosticTrigger.firstCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
-            assert.equal(diagnosticTrigger.secondCall.args[0], 'set_model_value_failed'); // related to DeviceInfo.fetch not finding isMadeWithUnity. dont know how to get rid of it
+            assert.equal(diagnosticTrigger.callCount, 1, 'missing an error...');
 
-            assert.equal(diagnosticTrigger.thirdCall.args[0], 'failed_to_fetch_automated_experiments');
-            assert.equal(diagnosticTrigger.thirdCall.args[1].message, 'Failed to fetch response from aui service');
+            assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_fetch_automated_experiments');
+            assert.equal(diagnosticTrigger.firstCall.args[1].message, 'Failed to fetch response from aui service');
         });
     });
 
