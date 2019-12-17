@@ -146,6 +146,35 @@ describe('CustomFeatures', () => {
         });
     });
 
+    describe('isForcedAdmobAdapterGame', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '1346246',
+            expected: true
+        }, {
+            gameId: '1781085',
+            expected: true
+        }, {
+            gameId: '20723',
+            expected: true
+        }, {
+            gameId: '1225669',
+            expected: true
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isForcedAdmobAdapterGame(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
+
     describe('isWhitelistedForLoadApi', () => {
         const tests: {
             gameId: string;

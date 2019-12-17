@@ -85,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, LoadAdapterV1 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, LoadAdapterV1, AdmobAdapterV1 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
@@ -316,16 +316,20 @@ export class Ads implements IAds {
     }
 
     private configureMediationManager(): void {
-        this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-            if (mediation) {
-                const mediationName = mediation.getName();
-                if (mediationName === 'AdMob') {
-                    this.AdmobAdapterManager = new AdmobAdapterManager(this.Api, this._core.NativeBridge.getPlatform());
+        const isAdmobAdapterGame = CustomFeatures.isForcedAdmobAdapterGame(this._core.ClientInfo.getGameId()) && !AdmobAdapterV1.isValid(this._core.Config.getAbGroup());
+
+        if(AdmobAdapterV1.isValid(this._core.Config.getAbGroup()) || isAdmobAdapterGame) {
+            this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation) {
+                    const mediationName = mediation.getName();
+                    if (mediationName === 'AdMob') {
+                        this.AdmobAdapterManager = new AdmobAdapterManager(this.Api, this._core.NativeBridge.getPlatform());
+                    }
                 }
-            }
-        }).catch(() => {
-            // ingore error
-        });
+            }).catch(() => {
+                // ingore error
+            });
+        }
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
