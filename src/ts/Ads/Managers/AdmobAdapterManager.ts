@@ -17,7 +17,7 @@ export class AdmobAdapterManager  {
 
     private sendNoFill(placementId: string, platform: Platform) {
         if (platform === Platform.IOS) {
-            this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], placementId);   
+            this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], placementId);
         } else {
             this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INTERNAL_ERROR], placementId);
         }
