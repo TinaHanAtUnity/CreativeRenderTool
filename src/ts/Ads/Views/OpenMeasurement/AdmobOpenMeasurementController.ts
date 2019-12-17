@@ -14,6 +14,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IViewPort, IAdView } from './OpenMeasurementDataTypes';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -147,16 +148,23 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 mediaType: MediaType.VIDEO
             };
 
-            impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+            let viewport: IViewPort;
+            let adView: IAdView;
+
+            viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             if (this._platform === Platform.ANDROID) {
-                impressionObject.viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
+                viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
             }
-            impressionObject.adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+            adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
+
+            impressionObject.viewport = viewport;
+            impressionObject.adView = adView;
 
             this._omInstances.forEach((om) => {
                 this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             });
             super.impression(impressionObject);
+            this.geometryChange(viewport, adView);
         }).catch((e) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO
