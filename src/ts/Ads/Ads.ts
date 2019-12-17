@@ -183,8 +183,7 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
-            this.configureMediationManager();
-            return Promise.resolve();
+            return this.configureMediationManager();
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -324,7 +323,9 @@ export class Ads implements IAds {
                     this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
                 }
             }
-        }); 
+        }).catch(() => {
+            // ingore error
+        });
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {

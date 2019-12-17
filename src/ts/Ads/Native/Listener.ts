@@ -4,10 +4,12 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable3 } from 'Core/Utilities/Observable';
 
 export class ListenerApi extends NativeApi {
-    public readonly onPlacementStateChangedEventSent = new Observable3<string, string, string>();
+    public readonly onPlacementStateChangedEventSent: Observable3<string, string, string>;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Listener', ApiPackage.ADS);
+
+        this.onPlacementStateChangedEventSent = new Observable3<string, string, string>();
     }
 
     public sendReadyEvent(placementId: string): Promise<void> {
