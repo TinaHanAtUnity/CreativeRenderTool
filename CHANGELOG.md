@@ -1,4 +1,4 @@
-# Pending
+# Tue Dec 17 15:22:32 UTC 2019
 
 * Fix of reportValidity for android 4.x devices [#12641](https://github.com/Applifier/unity-ads-webview/pull/12641)
 * Fix some "Uncaught TypeError: Cannot read property 'removeChild' of null" js errors [#12612](https://github.com/Applifier/unity-ads-webview/pull/12612)
