@@ -45,38 +45,38 @@ import { assert } from 'chai';
             return new VastOpenMeasurementController(platform, placement, om, adViewBuilder, clientInfo, deviceInfo);
         };
 
-        // describe('DOM Hierarchy', () => {
-        //     let omManager: VastOpenMeasurementController;
-        //     let openMeasurement: OpenMeasurement;
+        describe('DOM Hierarchy', () => {
+            let omManager: VastOpenMeasurementController;
+            let openMeasurement: OpenMeasurement;
 
-        //     beforeEach(() => {
-        //         openMeasurement = sandbox.createStubInstance(OpenMeasurement);
-        //         omManager = initOMManager([openMeasurement, openMeasurement]);
-        //     });
+            beforeEach(() => {
+                openMeasurement = sandbox.createStubInstance(OpenMeasurement);
+                omManager = initOMManager([openMeasurement, openMeasurement]);
+            });
 
-        //     afterEach(() => {
-        //         sandbox.restore();
-        //     });
+            afterEach(() => {
+                sandbox.restore();
+            });
 
-        //     describe('addToViewHierarchy', () => {
-        //         it('should add every om to the hierarchy', () => {
-        //             omManager.addToViewHierarchy();
-        //             sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.addToViewHierarchy);
-        //         });
-        //     });
-        //     describe('removeFromViewHieararchy', () => {
-        //         it('should add every om to the hierarchy', () => {
-        //             omManager.removeFromViewHieararchy();
-        //             sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.removeFromViewHieararchy);
-        //         });
-        //     });
-        //     describe('injectVerifications', () => {
-        //         it('should add every om to the hierarchy', () => {
-        //             omManager.injectVerifications();
-        //             sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.injectAdVerifications);
-        //         });
-        //     });
-        // });
+            describe('addToViewHierarchy', () => {
+                it('should add every om to the hierarchy', () => {
+                    omManager.addToViewHierarchy();
+                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.addToViewHierarchy);
+                });
+            });
+            describe('removeFromViewHieararchy', () => {
+                it('should add every om to the hierarchy', () => {
+                    omManager.removeFromViewHieararchy();
+                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.removeFromViewHieararchy);
+                });
+            });
+            describe('injectVerifications', () => {
+                it('should add every om to the hierarchy', () => {
+                    omManager.injectVerifications();
+                    sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.injectAdVerifications);
+                });
+            });
+        });
 
         describe('session start', () => {
             let omManager: VastOpenMeasurementController;
@@ -89,29 +89,6 @@ import { assert } from 'chai';
             const vastAdVerificton2: VastAdVerification = new VastAdVerification('test.test', [vastVerificationResource2]);
 
             beforeEach(() => {
-                // const vastVerificationResource1 = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
-                // const vastVerificationResource2 = new VastVerificationResource ('https://something.test.js', 'unity', false, 'Verifications');
-                // const vastAdVerificton1: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource1]);
-                // const vastAdVerificton2: VastAdVerification = new VastAdVerification('test.test', [vastVerificationResource2]);
-                // const vastXml = SimpleVast;
-                // const vastParser = TestFixtures.getVastParserStrict();
-                // const parsedVast = vastParser.parseVast(vastXml);
-                // const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
-                // const campaign = new VastCampaign(params);
-                // const request = sinon.createStubInstance(RequestManager);
-                // openMeasurement1 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton1.getVerificationVendor(), vastAdVerificton1);
-                // openMeasurement2 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton2.getVerificationVendor(), vastAdVerificton2);
-                // sinon.stub(Date, 'now').returns(123);
-                // sinon.stub(openMeasurement1, 'getOMAdSessionId').returns('456');
-                // sinon.stub(openMeasurement2, 'getOMAdSessionId').returns('456');
-                // omManager = initOMManager([openMeasurement1, openMeasurement2]);
-            });
-
-            // afterEach(() => {
-            //     sandbox.restore();
-            // });
-
-            it('should be called with correct data', () => {
                 const vastXml = SimpleVast;
                 const vastParser = TestFixtures.getVastParserStrict();
                 const parsedVast = vastParser.parseVast(vastXml);
@@ -124,6 +101,13 @@ import { assert } from 'chai';
                 sinon.stub(openMeasurement1, 'getOMAdSessionId').returns('456');
                 sinon.stub(openMeasurement2, 'getOMAdSessionId').returns('456');
                 omManager = initOMManager([openMeasurement1, openMeasurement2]);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should be called with correct data', () => {
 
                 const contextData: IContext = {
                     apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
@@ -177,21 +161,8 @@ import { assert } from 'chai';
                 sinon.stub(openMeasurement2, 'sessionStart');
                 omManager.sessionStart();
 
-                // assert.equal((<sinon.SinonStub>openMeasurement1.sessionStart).getCall(0).args[0].data.vendorkey, 'iabtechlab.com-omid');
-                // assert.equal((<sinon.SinonStub>openMeasurement2.sessionStart).getCall(0).args[0].data.vendorkey, 'test.test');
-                // sinon.stub(openMeasurement1, 'getVastVerification').returns(vastAdVerificton1);
-                // sinon.stub(openMeasurement2, 'getVastVerification').returns(vastAdVerificton2);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement2.sessionStart, event2);
                 sinon.assert.calledWith(<sinon.SinonStub>openMeasurement1.sessionStart, event1);
-
-                // return setTimeout(() => {
-                    // console.log('booayashdlfasjdlfka yay ^_^');
-                // }, 1);
-                // sinon.assert.calledWith(<sinon.SinonStub>openMeasurement1.sessionStart, event1);
-
-                // sinon.assert.calledWith(<sinon.SinonStub>openMeasurement2.sessionStart, event2);
-                // sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement1.sessionStart);
-                // sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement2.sessionStart);
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement2.sessionStart, event2);
             });
         });
     });
