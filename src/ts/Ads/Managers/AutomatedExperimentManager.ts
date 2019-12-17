@@ -408,7 +408,7 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
         features.rating =  campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
-        features.ratingCount =  campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
+        features.rating_count =  campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
         features.gsc_ad_requests = gameSessionCounters.adRequests;
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;

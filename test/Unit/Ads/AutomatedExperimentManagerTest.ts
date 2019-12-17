@@ -111,7 +111,7 @@ describe('AutomatedExperimentManagerTests', () => {
         campaign_id: '582bb5e352e4c4abd7fab850',
         target_game_id: 1000,
         rating: 4.5,
-        ratingCount: 0,
+        rating_count: 0,
         gsc_ad_requests: 0,
         gsc_views: 0,
         gsc_starts: 0,
