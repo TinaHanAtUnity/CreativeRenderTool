@@ -62,6 +62,13 @@ export class CachableAutomatedExperimentData {
     public Metadata: string;
 }
 
+enum AutomatedExperimentStage {
+    WaitingToStart,
+    Running,
+    ResultReported,
+    Done
+}
+
 export class AutomatedExperimentManager {
     private readonly _deviceInfo: DeviceInfo;
     private readonly _clientInfo: ClientInfo;
@@ -72,7 +79,7 @@ export class AutomatedExperimentManager {
     private readonly _storageApi: StorageApi;
 
     private readonly _state: { [key: string]: StateItem };
-    private _experimentBegan: boolean;
+    private _experimentStage: AutomatedExperimentStage;
     private _userInfo: UserInfo;
     private _gameSessionId: number;
 
@@ -92,7 +99,7 @@ export class AutomatedExperimentManager {
         this._storageApi = core.Api.Storage;
         this._gameSessionId = core.Ads.SessionManager.getGameSessionId();
         this._state = {};
-        this._experimentBegan = false;
+        this._experimentStage = AutomatedExperimentStage.WaitingToStart;
         this._userInfo = new UserInfo();
     }
 
@@ -153,32 +160,45 @@ export class AutomatedExperimentManager {
             }
         }
 
-        this._experimentBegan = true;
+        this._experimentStage = AutomatedExperimentStage.Running;
     }
 
     public endExperiment(): Promise<void> {
-        if (!this._experimentBegan) {
+        if (this._experimentStage === AutomatedExperimentStage.Done) {
+            return Promise.resolve();
+        } else if (this._experimentStage === AutomatedExperimentStage.WaitingToStart) {
             return Promise.reject('Experiment session not started.');
         }
 
-        this._experimentBegan = false;
+        return this.reportExperiments(AutomatedExperimentStage.Done);
+    }
 
-        const promises: Promise<INativeResponse>[] = [];
-        for (const stateKey in this._state) {
-            if (this._state.hasOwnProperty(stateKey)) {
-                if (this._state[stateKey].SendAction) {
-                    promises.push(this.submit(this._state[stateKey], AutomatedExperimentManager._actionEndPoint));
+    private reportExperiments(nextStage: AutomatedExperimentStage): Promise<void> {
+        const stage = this._experimentStage;
+        this._experimentStage = nextStage;
+
+        if (stage === AutomatedExperimentStage.Running) {
+            const promises: Promise<INativeResponse>[] = [];
+            for (const stateKey in this._state) {
+                if (this._state.hasOwnProperty(stateKey)) {
+                    if (this._state[stateKey].SendAction) {
+                        promises.push(this.submit(this._state[stateKey], AutomatedExperimentManager._actionEndPoint));
+                    }
+
+                    promises.push(this.submitExperimentOutcome(this._state[stateKey], AutomatedExperimentManager._rewardEndPoint));
                 }
-
-                promises.push(this.submitExperimentOutcome(this._state[stateKey], AutomatedExperimentManager._rewardEndPoint));
             }
-        }
 
-        return Promise.all(promises).then((ignored) => Promise.resolve());
+            this._experimentStage = nextStage;
+            return Promise.all(promises).then((ignored) => Promise.resolve());
+        } else {
+            this._experimentStage = nextStage;
+            return Promise.resolve();
+        }
     }
 
     public sendAction(experiment: AutomatedExperiment, sessionId: string | undefined) {
-        if (!this._experimentBegan) {
+        if (this._experimentStage !== AutomatedExperimentStage.Running) {
             return;
         }
 
@@ -190,7 +210,7 @@ export class AutomatedExperimentManager {
     }
 
     public sendReward() {
-        if (!this._experimentBegan) {
+        if (this._experimentStage !== AutomatedExperimentStage.Running) {
             return;
         }
 
@@ -201,6 +221,8 @@ export class AutomatedExperimentManager {
                 }
             }
         }
+
+        this.reportExperiments(AutomatedExperimentStage.ResultReported);
     }
 
     public getExperimentAction(experiment: AutomatedExperiment): string|undefined {
