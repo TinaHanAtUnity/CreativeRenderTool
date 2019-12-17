@@ -82,7 +82,6 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
             this.sendTrackingEvent(TrackingEvent.IMPRESSION);
             this._impressionEventsSent = true;
         }
-
         return Promise.resolve();
     }
 
