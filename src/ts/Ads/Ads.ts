@@ -315,12 +315,12 @@ export class Ads implements IAds {
         }
     }
 
-    private configureMediationManager(): void {
+    private configureMediationManager(): Promise<void> {
         const allowedByAbTest = AdmobAdapterV1.isValid(this._core.Config.getAbGroup());
         const allowedByGameId = CustomFeatures.isAdmobTimeoutWhitelisted(this._core.ClientInfo.getGameId());
 
         if (allowedByAbTest || allowedByGameId) {
-            this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation) {
                     const mediationName = mediation.getName();
                     if (mediationName === 'AdMob') {
@@ -331,6 +331,8 @@ export class Ads implements IAds {
                 // ingore error
             });
         }
+
+        return Promise.resolve();
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
