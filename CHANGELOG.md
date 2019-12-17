@@ -1,3 +1,9 @@
+# Pending
+
+* Fix of reportValidity for android 4.x devices [#12641](https://github.com/Applifier/unity-ads-webview/pull/12641)
+* Fix some "Uncaught TypeError: Cannot read property 'removeChild' of null" js errors [#12612](https://github.com/Applifier/unity-ads-webview/pull/12612)
+* Stop error level logging when using developer consent outside GDPR regions [#12640](https://github.com/Applifier/unity-ads-webview/pull/12640)
+
 # Mon Dec 16 23:38:26 UTC 2019
 
 * Fix WEBPLAYER_NULL error on Android [#12465](https://github.com/Applifier/unity-ads-webview/pull/12465)
