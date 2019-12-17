@@ -15,11 +15,13 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
     platform: Platform;
     privacyManager: UserPrivacyManager;
+    requestManager: RequestManager;
     adUnitContainer: AdUnitContainer;
     adsConfig: AdsConfiguration;
     core: ICoreApi;

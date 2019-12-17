@@ -328,6 +328,7 @@ export class Ads implements IAds {
         this._showingPrivacy = true;
 
         const privacyAdUnitParams = {
+            requestManager: this._core.RequestManager,
             abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
