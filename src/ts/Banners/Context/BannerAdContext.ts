@@ -90,7 +90,7 @@ export class BannerAdContext {
         });
         this._onBannerClosed = this._bannerNativeApi.BannerApi.onBannerDetached.subscribe((bannerAdViewId: string) => {
             if (bannerAdViewId === this._bannerAdViewId) {
-                this.hide();
+                this.onBannerDetached();
             }
         });
         this._onBannerDestroyed = this._bannerNativeApi.BannerApi.onBannerDestroyed.subscribe((bannerAdViewId: string) => {
@@ -136,8 +136,8 @@ export class BannerAdContext {
                 return this.createAdUnit().then((adUnit) => {
                     return this.loadBanner().then(() => {
                         return adUnit.onLoad().then(() => {
-                            this.setNewAdUnit(adUnit);
-                            this.onBannerShow();
+                            this.setAdUnit(adUnit);
+                            this.tryToShowAdUnit();
                         });
                     });
                 }).then(() => {
@@ -157,7 +157,7 @@ export class BannerAdContext {
             });
     }
 
-    public hide() {
+    public onBannerDetached() {
         this._bannerAttached = false;
         if (this._adUnit) {
             this._adUnit.onHide();
@@ -174,7 +174,7 @@ export class BannerAdContext {
         }
     }
 
-    private setNewAdUnit(adUnit: IBannerAdUnit) {
+    private setAdUnit(adUnit: IBannerAdUnit) {
         this._adUnit = adUnit;
         this._adUnitOnShowHasBeenCalled = false;
     }
@@ -189,10 +189,10 @@ export class BannerAdContext {
 
     private onBannerAttached() {
         this._bannerAttached = true;
-        this.onBannerShow();
+        this.tryToShowAdUnit();
     }
 
-    private onBannerShow() {
+    private tryToShowAdUnit() {
         if (this._adUnit && this._bannerAttached) {
             if (!this._adUnitOnShowHasBeenCalled) {
                 this._adUnit.onShow();

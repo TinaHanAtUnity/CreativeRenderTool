@@ -132,6 +132,14 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
                     return loadBannerAdContext(t.loads);
                 });
 
+                it('should call BannerApi.onBannerAttached.subscribe once', () => {
+                    expect(bannerModule.Api.BannerApi.onBannerAttached.subscribe).toBeCalledTimes(1);
+                });
+
+                it('should call BannerApi.onBannerDetached.subscribe once', () => {
+                    expect(bannerModule.Api.BannerApi.onBannerDetached.subscribe).toBeCalledTimes(1);
+                });
+
                 it(`should call BannerAdUnitParametersFactory.create`, () => {
                     expect(bannerModule.AdUnitParametersFactory.create).toBeCalledTimes(t.loads);
                 });
@@ -148,13 +156,13 @@ import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks_
                     expect(bannerModule.Api.BannerApi.load).toBeCalledTimes(t.loads);
                 });
 
-                it(`should call onLoad ${t.loads} times`, () => {
+                it(`should call onLoad for each ad unit`, () => {
                     htmlBannerAdUnits.forEach((bannerAdUnit: HTMLBannerAdUnitMock) => {
                         expect(bannerAdUnit.onLoad).toBeCalledTimes(1);
                     });
                 });
 
-                it(`loading ${t.loads} should trigger ${t.loads} onShow`, () => {
+                it(`loading ${t.loads} should trigger onShow for each ad unit`, () => {
                     htmlBannerAdUnits.forEach((bannerAdUnit: HTMLBannerAdUnitMock) => {
                         expect(bannerAdUnit.onShow).toBeCalledTimes(1);
                     });
