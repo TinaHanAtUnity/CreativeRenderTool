@@ -1,10 +1,14 @@
+# Mon Dec 16 23:38:26 UTC 2019
+
+* Fix WEBPLAYER_NULL error on Android [#12465](https://github.com/Applifier/unity-ads-webview/pull/12465)
+* Adjust Load Adapter V1 Test to Reverse AB Test and Remove Load Adapter Whitelist [#12638](https://github.com/Applifier/unity-ads-webview/pull/12638)
+
 # Sat Dec 14 01:01:49 UTC 2019
 
 * Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
 * Open Measurement - Add Admob Impression metric for each OM Instance [#12528](https://github.com/Applifier/unity-ads-webview/pull/12528)
 * Diagnostics for Captcha [#12555](https://github.com/Applifier/unity-ads-webview/pull/12555)
 * Add Forced Load Adapter Games [#12586](https://github.com/Applifier/unity-ads-webview/pull/12586)
-
 
 # Fri Dec 13 18:12:19 UTC 2019
 

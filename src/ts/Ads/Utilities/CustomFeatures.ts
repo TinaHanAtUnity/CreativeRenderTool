@@ -127,18 +127,6 @@ export class CustomFeatures {
         return (gameId === '3058518' || gameId === '3058519');
     }
 
-    public static isForcedLoadAdapterGame(gameId: string): boolean {
-        const fanateeGames = ['1344431', '1346246', '500002653', '56659', '1225669', '500012952'];
-        const etermaxGames = ['20721', '20723', '89611', '89610', '1781085', '1781084', '1448936', '1448937'];
-        const xflowGames = ['1712122', '1687868'];
-        const fugoGames = ['1781853', '1781854'];
-
-        return this.existsInList(fanateeGames, gameId) ||
-               this.existsInList(etermaxGames, gameId) ||
-               this.existsInList(xflowGames, gameId) ||
-               this.existsInList(fugoGames, gameId);
-    }
-
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;

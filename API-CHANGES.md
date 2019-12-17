@@ -18,6 +18,8 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 * Added ClassDetection API
 * Removed DeviceInfo method: isMadeWithUnity
+* Android native side contains a bug where setSettings and setEventSettings returns
+  an incorrect WEBPLAYER_NULL error.
 
 ## 3.3.0
 
@@ -30,6 +32,8 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added BannerEvents.BannerDestroyBanner handling to banner API class.
 * Added setRefreshRate to banner API class.
 * Added getDisplayMetricDensity to Android DeviceInfo API class.
+* Android native side contains a bug where setSettings and setEventSettings returns
+an incorrect WEBPLAYER_NULL error.
 
 ## 3.2.0
 
