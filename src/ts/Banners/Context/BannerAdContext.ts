@@ -157,13 +157,6 @@ export class BannerAdContext {
             });
     }
 
-    public onBannerDetached() {
-        this._bannerAttached = false;
-        if (this._adUnit) {
-            this._adUnit.onHide();
-        }
-    }
-
     public destroy(): Promise<void> {
         if (this._adUnit) {
             return this._adUnit.onDestroy().then(() => {
@@ -171,6 +164,18 @@ export class BannerAdContext {
             });
         } else {
             return Promise.resolve();
+        }
+    }
+
+    private onBannerAttached() {
+        this._bannerAttached = true;
+        this.tryToShowAdUnit();
+    }
+
+    private onBannerDetached() {
+        this._bannerAttached = false;
+        if (this._adUnit) {
+            this._adUnit.onHide();
         }
     }
 
@@ -185,11 +190,6 @@ export class BannerAdContext {
 
     private onBannerNoFill(): Promise<void> {
         return this._bannerNativeApi.BannerListenerApi.sendErrorEvent(this._bannerAdViewId, BannerErrorCode.NoFillError, `Placement ${this._placement.getId()} failed to fill!`);
-    }
-
-    private onBannerAttached() {
-        this._bannerAttached = true;
-        this.tryToShowAdUnit();
     }
 
     private tryToShowAdUnit() {
