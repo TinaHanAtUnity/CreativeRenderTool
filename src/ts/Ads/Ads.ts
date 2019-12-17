@@ -316,9 +316,10 @@ export class Ads implements IAds {
     }
 
     private configureMediationManager(): void {
-        const isAdmobAdapterGame = CustomFeatures.isForcedAdmobAdapterGame(this._core.ClientInfo.getGameId()) && !AdmobAdapterV1.isValid(this._core.Config.getAbGroup());
+        const allowedByAbTest = AdmobAdapterV1.isValid(this._core.Config.getAbGroup());
+        const allowedByGameId = CustomFeatures.isAdmobTimeoutWhitelisted(this._core.ClientInfo.getGameId());
 
-        if (AdmobAdapterV1.isValid(this._core.Config.getAbGroup()) || isAdmobAdapterGame) {
+        if (allowedByAbTest || allowedByGameId) {
             this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation) {
                     const mediationName = mediation.getName();
