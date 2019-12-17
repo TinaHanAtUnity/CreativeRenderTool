@@ -1,7 +1,7 @@
 import { FinishState } from 'Core/Constants/FinishState';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable1, Observable0, Observable3 } from 'Core/Utilities/Observable';
+import { Observable3 } from 'Core/Utilities/Observable';
 
 export class ListenerApi extends NativeApi {
     public readonly onPlacementStateChangedEventSent = new Observable3<string, string, string>();
