@@ -139,6 +139,7 @@ export class OMIDEventBridge {
             ...event,
             uuid: uuid
         };
+        console.log(event.type, event.payload);
         if (event.type === 'omidImpression' && this._campaign instanceof AdMobCampaign && this._pts) {
             this._pts.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
         }

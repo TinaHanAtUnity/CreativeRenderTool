@@ -150,10 +150,12 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             let viewport: IViewPort;
             let adView: IAdView;
 
-            viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             if (this._platform === Platform.ANDROID) {
                 viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
+            } else {
+                viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
             }
+
             adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
 
             impressionObject.viewport = viewport;
@@ -163,6 +165,8 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 this._pts.reportMetricEvent(AdmobMetric.AdmobOMImpression);
             });
             super.impression(impressionObject);
+
+            // TODO: Remove once Admob fixes their issue in Jan 2020
             this.geometryChange(viewport, adView);
         }).catch((e) => {
             const impressionObject: IImpressionValues = {
