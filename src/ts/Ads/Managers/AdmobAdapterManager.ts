@@ -22,8 +22,10 @@ export class AdmobAdapterManager  {
 
     constructor(ads: IAdsApi) {
         this._ads = ads;
-        this._ads.Listener.onPlacementStateChangeToNofill.subscribe((placementId) => {
-            this.sendNoFill(placementId);
+        this._ads.Listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, newState) => {
+            if (newState === 'NO_FILL') {
+                this.sendNoFill(placementId);
+            }
         });
     }
 

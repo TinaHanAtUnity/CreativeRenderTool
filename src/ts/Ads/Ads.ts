@@ -90,9 +90,9 @@ import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
-import { MopubCampaignRefreshManager } from 'Ads/Managers/MopubCampaignRefreshManager';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
+import { MediationManager } from 'Ads/Managers/MediationManager';
+import { MediationTimeoutManager } from 'Ads/Managers/MediationTimeoutManager';
 
 export class Ads implements IAds {
 
@@ -114,6 +114,7 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
+    public MediationTimeoutManager: MediationTimeoutManager;
     public AdmobAdapterManager: AdmobAdapterManager;
 
     private static _forcedConsentUnit: boolean = false;
@@ -183,6 +184,8 @@ export class Ads implements IAds {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             return this.setupTestEnvironment();
+        }).then(() => {
+            this.configureMediationManager();
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -312,15 +315,11 @@ export class Ads implements IAds {
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
+    }
 
-        this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-            if (mediation) {
-                const mediationName = mediation.getName();
-                if (mediationName === 'AdMob') {
-                    this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
-                }
-            }
-        });
+    private configureMediationManager(): void {
+        this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
+        this.MediationTimeoutManager = new MediationTimeoutManager(this._core.NativeBridge.getPlatform(), this.Api, this._core.FocusManager, this._core.ProgrammaticTrackingService);
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {

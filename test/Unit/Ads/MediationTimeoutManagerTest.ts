@@ -197,6 +197,7 @@ describe('MediationTimeoutManagerTest', () => {
         });
 
         it('ready after timeout', async () => {
+            // tslint:disable-next-line
             let requestPromiseResolve = () => {};
             const requestPromise = new Promise((resolve) => { requestPromiseResolve = resolve; });
 
@@ -224,7 +225,7 @@ describe('MediationTimeoutManagerTest', () => {
             //sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
 
            // ads.Listener.sendReadyEvent(placementID);
-            sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, LoadMetric.LoadRequestTimeout);    
+            sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, LoadMetric.LoadRequestTimeout);
         });
     });
 });

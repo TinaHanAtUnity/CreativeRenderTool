@@ -1,14 +1,13 @@
 import { FinishState } from 'Core/Constants/FinishState';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable1, Observable0} from 'Core/Utilities/Observable';
+import { Observable1, Observable0, Observable3 } from 'Core/Utilities/Observable';
 
 export class ListenerApi extends NativeApi {
 
     public readonly onReadySent = new Observable1<string>();
-    public readonly onPlacementStateChangedEventSent = new Observable1<string>();
+    public readonly onPlacementStateChangedEventSent = new Observable3<string, string, string>();
     public readonly onErrorEvent = new Observable0();
-    public readonly onPlacementStateChangeToNoFill = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Listener', ApiPackage.ADS);
@@ -32,10 +31,7 @@ export class ListenerApi extends NativeApi {
     }
 
     public sendPlacementStateChangedEvent(placementId: string, oldState: string, newState: string): Promise<void> {
-        if (newState === 'NO_FILL') {
-            this.onPlacementStateChangeToNoFill.trigger(placementId);
-        }
-        this.onPlacementStateChangedEventSent.trigger(placementId);
+        this.onPlacementStateChangedEventSent.trigger(placementId, oldState, newState);
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendPlacementStateChangedEvent', [placementId, oldState, newState]);
     }
 

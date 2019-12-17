@@ -11,7 +11,7 @@ export class MediationTimeoutManager {
 
     constructor(platform: Platform, ads: IAdsApi, focusManager: FocusManager,  programmaticTrackingService: ProgrammaticTrackingService) {
         this._pts = programmaticTrackingService;
-        
+
         ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
                 this.tryToFireTimeoutMetric();
@@ -31,7 +31,7 @@ export class MediationTimeoutManager {
 
         ads.Listener.onReadySent.subscribe((placementId) => {
             this.tryToFireTimeoutMetric();
-            if(this._timeoutHandles[placementId]) {
+            if (this._timeoutHandles[placementId]) {
                 delete this._timeoutHandles[placementId];
             }
         });
@@ -42,7 +42,7 @@ export class MediationTimeoutManager {
 
         ads.Listener.onPlacementStateChangedEventSent.subscribe((placementId) => { 
             this.tryToFireTimeoutMetric();
-            if(this._timeoutHandles[placementId]) {
+            if (this._timeoutHandles[placementId]) {
                 delete this._timeoutHandles[placementId];
             }
         });
@@ -50,9 +50,9 @@ export class MediationTimeoutManager {
 
     private tryToFireTimeoutMetric() {
         Object.keys(this._timeoutHandles).forEach((placementId) => {
-            if(this._timeoutHandles[placementId] < Date.now() - MediationTimeoutManager.mediationTimeout) {
+            if (this._timeoutHandles[placementId] < Date.now() - MediationTimeoutManager.mediationTimeout) {
                 this._pts.reportMetricEvent(LoadMetric.LoadRequestTimeout);
-                delete this._timeoutHandles[placementId]; 
+                delete this._timeoutHandles[placementId];
             }
         });
     }
