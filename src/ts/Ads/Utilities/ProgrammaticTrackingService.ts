@@ -88,8 +88,7 @@ export enum LoadMetric {
     LoadCometRefreshNoFill = 'load_comet_refresh_no_fill',
     LoadProgrammaticRefreshRequest = 'load_programmatic_refresh_request',
     LoadProgrammaticFill = 'load_programmatic_fill',
-    LoadProgrammaticUsedPreviousFill = 'load_programmatic_used_previous_fill',
-    LoadRequestTimeout = 'load_request_timeout'
+    LoadProgrammaticUsedPreviousFill = 'load_programmatic_used_previous_fill'
 }
 
 export enum OMMetric {

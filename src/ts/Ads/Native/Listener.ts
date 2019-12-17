@@ -4,17 +4,13 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable0, Observable3 } from 'Core/Utilities/Observable';
 
 export class ListenerApi extends NativeApi {
-
-    public readonly onReadySent = new Observable1<string>();
     public readonly onPlacementStateChangedEventSent = new Observable3<string, string, string>();
-    public readonly onErrorEvent = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Listener', ApiPackage.ADS);
     }
 
     public sendReadyEvent(placementId: string): Promise<void> {
-        this.onReadySent.trigger(placementId);
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendReadyEvent', [placementId]);
     }
 
@@ -37,7 +33,6 @@ export class ListenerApi extends NativeApi {
 
     public sendErrorEvent(error: string, message: string): Promise<void> {
         // Uses same codepath as Core/Native/Listener.sendErrorEvent
-        this.onErrorEvent.trigger();
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendErrorEvent', [error, message]);
     }
 

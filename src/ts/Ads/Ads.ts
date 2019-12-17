@@ -91,8 +91,6 @@ import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
-import { MediationManager } from 'Ads/Managers/MediationManager';
-import { MediationTimeoutManager } from 'Ads/Managers/MediationTimeoutManager';
 
 export class Ads implements IAds {
 
@@ -114,7 +112,6 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
-    public MediationTimeoutManager: MediationTimeoutManager;
     public AdmobAdapterManager: AdmobAdapterManager;
 
     private static _forcedConsentUnit: boolean = false;
@@ -319,7 +316,6 @@ export class Ads implements IAds {
 
     private configureMediationManager(): void {
         this.AdmobAdapterManager = new AdmobAdapterManager(this.Api);
-        this.MediationTimeoutManager = new MediationTimeoutManager(this._core.NativeBridge.getPlatform(), this.Api, this._core.FocusManager, this._core.ProgrammaticTrackingService);
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
