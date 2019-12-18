@@ -197,4 +197,31 @@ describe('CustomFeatures', () => {
             });
         });
     });
+
+
+    describe('isWhitelistedForLoadApi', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '56659',
+            expected: true
+        }, {
+            gameId: '1225669',
+            expected: true
+        }, {
+            gameId: '12256',
+            expected: false
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
 });
