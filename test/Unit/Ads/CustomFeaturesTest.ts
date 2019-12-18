@@ -198,7 +198,6 @@ describe('CustomFeatures', () => {
         });
     });
 
-
     describe('isWhitelistedForLoadApi', () => {
         const tests: {
             gameId: string;
