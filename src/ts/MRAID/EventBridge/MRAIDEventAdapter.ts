@@ -22,6 +22,7 @@ export interface IMRAIDHandler {
     onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
     onBridgeAREvent(event: MessageEvent): void;
     onBridgeArReadyToShow(event: MessageEvent): void;
+    onBridgeArButtonHide(event: MessageEvent): void;
     onBridgeDeviceOrientationSubscribe(): void;
     onUseCustomClose(hideClose: boolean): void;
 }
@@ -43,6 +44,7 @@ export enum MRAIDEvents {
     SEND_STATS          = 'sendStats',
     AR                  = 'ar',
     AR_READY_SHOW       = 'arReadyShow',
+    AR_BUTTON_HIDE      = 'hideArButton',
     CONSOLE_LOG         = 'consoleLog',
     DEVORIENTATION_SUB  = 'deviceorientationSubscribe'
 }
