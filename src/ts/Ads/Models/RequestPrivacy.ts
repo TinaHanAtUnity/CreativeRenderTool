@@ -29,9 +29,9 @@ export class RequestPrivacyFactory {
         } else {
             const gamePrivacyMethod = privacySDK.getGamePrivacy().getMethod();
             switch (gamePrivacyMethod) {
-                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_UNITY_CONSENT_FIRST_REQ;
+                case PrivacyMethod.UNITY_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
                     break;
-                case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
+                case PrivacyMethod.LEGITIMATE_INTEREST: permissions = UserPrivacy.PERM_ALL_FALSE;
                     break;
                 case PrivacyMethod.DEVELOPER_CONSENT: permissions = UserPrivacy.PERM_ALL_FALSE;
                     break;

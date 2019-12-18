@@ -49,10 +49,21 @@
                     a full description of our data practices. You can opt-out of Unity Ads’ personalized
                     experiences and ads through your device settings.
                 </p>
+                <div class="padding-block"></div>
             </div>
         </div>
         <% } else if(data.isUserUnderAgeLimit) { %>
         <div class="under-age-limit">
+            <% if(data.isCCPA) { %>
+            <p>
+                <%= data.t("privacy-dialog-text-failed-age-gate-p1-ccpa") %>
+            </p>
+            <p>
+                <%= data.t("privacy-dialog-text-failed-age-gate-p2-1-ccpa") %>
+                <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-failed-age-gate-p2-2-ccpa") %></a>
+                <%= data.t("privacy-dialog-text-failed-age-gate-p2-3-ccpa") %>
+            </p>
+            <% } else { %>
             <p>
                 <%= data.t("privacy-dialog-text-failed-age-gate-p1") %>
             </p>
@@ -61,6 +72,7 @@
                 <a href="https://unity3d.com/legal/privacy-policy"><%= data.t("privacy-dialog-text-failed-age-gate-p2-2") %></a>
                 <%= data.t("privacy-dialog-text-failed-age-gate-p2-3") %>
             </p>
+            <% } %>
         </div>
         <% } else { %>
         <div class="gdpr">
@@ -99,7 +111,11 @@
             </p>
 
 
+            <% if(data.isCCPA) { %>
+            <p><span class="header"><%= data.t("privacy-dialog-text-li-p5-header-ccpa") %></span></p>
+            <% } else { %>
             <p><span class="header"><%= data.t("privacy-dialog-text-li-p5-header") %></span></p>
+            <% } %>
             <p>
                 <%= data.t("privacy-dialog-text-li-p5") %>
             </p>
@@ -108,13 +124,21 @@
                 <div class="radio-item-container">
                     <input id="gdpr-agree-radio" name="gdpr-radio-group" type="radio">
                     <label for="gdpr-agree-radio">
+                        <% if(data.isCCPA) { %>
+                        <%= data.t("privacy-dialog-text-li-agree-radio-button-ccpa") %>
+                        <% } else { %>
                         <%= data.t("privacy-dialog-text-li-agree-radio-button") %>
+                        <% } %>
                     </label>
                 </div>
                 <div class="radio-item-container">
                     <input id="gdpr-refuse-radio" name="gdpr-radio-group" type="radio">
                     <label for="gdpr-refuse-radio">
+                        <% if(data.isCCPA) { %>
+                        <%= data.t("privacy-dialog-text-li-disagree-radio-button-ccpa") %>
+                        <% } else { %>
                         <%= data.t("privacy-dialog-text-li-disagree-radio-button") %>
+                        <% } %>
                     </label>
                 </div>
             </div>
@@ -125,6 +149,19 @@
             </p>
 
             <p>
+                <% if(data.isCCPA) { %>
+                <span class="header"><%= data.t("privacy-dialog-text-li-p7-header-ccpa") %></span>
+
+                <%= data.t("privacy-dialog-text-li-p7-1-ccpa") %>
+                <span class="data-deletion-link page-link"><%= data.t("privacy-dialog-text-li-p7-2-ccpa") %></span>
+                <%= data.t("privacy-dialog-text-li-p7-3-ccpa") %>
+                <span class="data-deletion-note"><%= data.t("privacy-dialog-text-li-p7-data-request-info") %></span>
+                <span id="data-deletion-container"><%= data.t("privacy-dialog-text-li-p7-are-you-sure") %><span id="data-deletion-confirm" class="page-link"><%= data.t("privacy-dialog-text-li-p7-yes") %></span>
+                    / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
+                <span id="data-deletion-request-container">
+                    <%= data.t("privacy-dialog-text-li-p7-data-deletion-text-ccpa") %>
+                </span>
+                <% } else { %>
                 <span class="header"><%= data.t("privacy-dialog-text-li-p7-header") %></span>
 
                 <%= data.t("privacy-dialog-text-li-p7-1") %>
@@ -135,7 +172,10 @@
                 <span id="data-deletion-request-container">
                     <%= data.t("privacy-dialog-text-li-p7-data-deletion-text") %>
                 </span>
+                <% } %>
             </p>
+            <div class="data-request-container"></div>
+            <div class="padding-block"></div>
         </div>
         <% } %>
     </div>
@@ -152,7 +192,7 @@
         <span class="report-title centered-title">Report Advertisement</span>
         <span class="report-dialog">Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!</span>
         <ul class="radio-group-container">
-            <% for (var k in data.reportReasons) { %>
+            <% for (var k = 0; k < data.reportReasons.length; k++) { %>
             <div class="radio-item-container">
                 <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
                 <label for="<%= data.reportKeys[k] %>">

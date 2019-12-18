@@ -29,7 +29,6 @@ export interface IDeviceInfo {
     cpuCount: number;
     maxVolume: number;
     headset: boolean;
-    madeWithUnity: boolean;
 }
 
 export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Model<T> {
@@ -58,8 +57,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         totalMemory: ['number'],
         cpuCount: ['integer'],
         maxVolume: ['number'],
-        headset: ['boolean'],
-        madeWithUnity: ['boolean']
+        headset: ['boolean']
     };
 
     protected _platform: Platform;
@@ -86,7 +84,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         promises.push(this._core.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getCPUCount().then(cpuCount => this.set('cpuCount', cpuCount)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.DeviceInfo.isMadeWithUnity().then(isUnity => this.set('madeWithUnity', isUnity)).catch(err => this.handleDeviceInfoError(err)));
         return Promise.all(promises);
     }
 
@@ -155,10 +152,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
 
     public isRooted(): boolean {
         return this.get('rooted');
-    }
-
-    public isMadeWithUnity(): boolean {
-        return this.get('madeWithUnity');
     }
 
     public getConnectionType(): Promise<string> {

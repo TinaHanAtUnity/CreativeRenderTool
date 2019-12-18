@@ -171,6 +171,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
         this._adUnit.sendMuteChange(isMuted);
     }
 
+    public onVolumeChange(volume: number, maxVolume: number) {
+        this._adUnit.sendVolumeChange(volume, maxVolume);
+    }
+
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
         return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
             return signal;

@@ -47,7 +47,7 @@ export enum GDPREventAction {
 }
 
 export enum LegalFramework {
-    DEFAULT = 'default',
+    NONE = 'none',
     GDPR = 'gdpr', // EU
     CCPA = 'ccpa', // California
     TC260 = 'tc260' // China
@@ -59,7 +59,7 @@ export enum AgeGateChoice {
     NO = 'no'
 }
 
-export interface IUserPrivacyStorageData {
+export interface IUserPrivacyStorageDataGdpr {
     gdpr: {
         consent: {
             value: unknown;
@@ -67,10 +67,23 @@ export interface IUserPrivacyStorageData {
     };
 }
 
+export interface IUserPrivacyStorageDataPrivacy {
+    privacy: {
+        consent: {
+            value: unknown;
+        };
+    };
+}
+
+export type IUserPrivacyStorageData = IUserPrivacyStorageDataGdpr | IUserPrivacyStorageDataPrivacy;
+
 export class UserPrivacyManager {
 
     private static GdprConsentStorageKey = 'gdpr.consent.value';
+    private static PrivacyConsentStorageKey = 'privacy.consent.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
+
+    public _forcedConsentUnit: boolean;
 
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
@@ -84,8 +97,9 @@ export class UserPrivacyManager {
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
     private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
+    private _privacyFormatMetadataSeenInSession: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -96,7 +110,9 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData>data));
+        this._forcedConsentUnit = forcedConsentUnit || false;
+        this._privacyFormatMetadataSeenInSession = false;
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
@@ -268,6 +284,10 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
+        if (this._forcedConsentUnit) {
+            return true;
+        }
+
         if (this.isAgeGateShowRequired()) {
             return true;
         }
@@ -290,6 +310,10 @@ export class UserPrivacyManager {
         return this._privacy.getLegalFramework();
     }
 
+    public isDataRequestEnabled(): boolean {
+        return this._privacy.getLegalFramework() === LegalFramework.CCPA;
+    }
+
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
         let permissions = UserPrivacy.PERM_ALL_FALSE;
         let action = GDPREventAction.DEVELOPER_OPTOUT;
@@ -303,13 +327,26 @@ export class UserPrivacyManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: unknown) => {
+        return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.PrivacyConsentStorageKey).then((data: unknown) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if (typeof(value) !== 'undefined') {
+                this._privacyFormatMetadataSeenInSession = true;
                 return Promise.resolve(value);
             } else {
-                throw new Error('gdpr.consent.value is undefined');
+                throw new Error('privacy.consent.value is undefined');
             }
+        }).catch((error) => {
+            if (error instanceof Error) {
+                throw error;
+            }
+            return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: unknown) => {
+                const value: boolean | undefined = this.getConsentTypeHack(data);
+                if (typeof(value) !== 'undefined') {
+                    return Promise.resolve(value);
+                } else {
+                    throw new Error('gdpr.consent.value is undefined');
+                }
+            });
         });
     }
 
@@ -329,14 +366,34 @@ export class UserPrivacyManager {
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
-        if (this._privacy.isGDPREnabled()) {
-            if (data && data.gdpr && data.gdpr.consent) {
-                const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
+        if (!this._privacy.isGDPREnabled()) {
+            return;
+        }
 
-                if (typeof(value) !== 'undefined') {
-                    this.pushConsent(value);
-                }
-            }
+        let value: boolean | undefined;
+
+        const usdAsPrivacy = <IUserPrivacyStorageDataPrivacy> data;
+        if (usdAsPrivacy && usdAsPrivacy.privacy && usdAsPrivacy.privacy.consent) {
+            value = this.getConsentTypeHack(usdAsPrivacy.privacy.consent.value);
+        }
+
+        if (typeof(value) !== 'undefined') {
+            this.pushConsent(value);
+            this._privacyFormatMetadataSeenInSession = true;
+            return;
+        }
+
+        if (this._privacyFormatMetadataSeenInSession) {
+            return;
+        }
+
+        const usdAsGdpr = <IUserPrivacyStorageDataGdpr> data;
+        if (usdAsGdpr && usdAsGdpr.gdpr && usdAsGdpr.gdpr.consent) {
+            value = this.getConsentTypeHack(usdAsGdpr.gdpr.consent.value);
+        }
+
+        if (typeof(value) !== 'undefined') {
+            this.pushConsent(value);
         }
     }
 

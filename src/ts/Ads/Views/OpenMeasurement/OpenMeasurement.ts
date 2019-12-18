@@ -32,7 +32,7 @@ enum AdSessionType {
 }
 
 interface IOmidJsInfo {
-    omidImplementor: string;
+    omidImplementer: string;
     serviceVersion: string;
     sessionClientVersion: string;
     partnerName: string;
@@ -94,6 +94,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
+    private _sessionStartEventData: ISessionEvent;
     private _sessionStartProcessedByOmidScript = false;
     private _sessionFinishProcessedByOmidScript = false;
     private _adVerification: VastAdVerification;
@@ -103,7 +104,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification, pts?: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, pts?: ProgrammaticTrackingService, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -131,7 +132,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
-        }, this._omIframe, this);
+        }, this._omIframe, this, this._campaign, this._pts);
     }
 
     // only needed to build impression adview for VAST campaigns
@@ -234,7 +235,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
      * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
-     * TODO: Calculate Geometry change for Privacy coverage
      */
     public geometryChange(viewport: IViewPort, adView: IAdView) {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
@@ -246,22 +246,30 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart() {
-        const event: ISessionEvent = {
-            adSessionId: this.getOMAdSessionId(),
-            timestamp: Date.now(),
-            type: 'sessionStart',
-            data: {}
-        };
-        this._sessionStartCalled = true;
+    public sessionStart(sessionEvent?: ISessionEvent) {
+        if (!sessionEvent) {
+            // Non-Admob code path
+            const event: ISessionEvent = {
+                adSessionId: this.getOMAdSessionId(),
+                timestamp: Date.now(),
+                type: 'sessionStart',
+                data: {}
+            };
+            this._sessionStartCalled = true;
 
-        if (this._verificationVendorMap[this._vendorKey]) {
-            event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+            if (this._verificationVendorMap[this._vendorKey]) {
+                event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+            }
+            const contextData: IContext = this.buildSessionContext();
+            event.data.context = contextData;
+            event.data.vendorkey = this._vendorKey;
+            this._omBridge.triggerSessionEvent(event);
+        } else {
+            // TODO: Refactor. Admob Code Path
+            this._sessionStartEventData = sessionEvent;
+            this._sessionStartEventData.data.vendorkey = this._vendorKey;
+            this._omBridge.triggerSessionEvent(this._sessionStartEventData);
         }
-        const contextData: IContext = this.buildSessionContext();
-        event.data.context = contextData;
-        event.data.vendorkey = this._vendorKey;
-        this._omBridge.triggerSessionEvent(event);
     }
 
     private buildSessionContext(): IContext {
@@ -269,20 +277,20 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,
+            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             omidJsInfo: {
-                omidImplementor: PARTNER_NAME,
+                omidImplementer: PARTNER_NAME,
                 serviceVersion: this._clientInfo.getSdkVersionName(),
                 sessionClientVersion: OMID_P,
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             app: {
-                libraryVersion: '1.0.0',
+                libraryVersion: OM_JS_VERSION,
                 appId: this._clientInfo.getApplicationName()
             },
             deviceInfo: {
@@ -375,7 +383,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
              * vast video event handler - calls session start for vast
              */
             if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
-                this.sessionStart();
+                this.sessionStart(this._sessionStartEventData);
             }
         }
 

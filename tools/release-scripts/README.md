@@ -18,9 +18,17 @@ If everything looks to be in order, the ads-deploys and ads-sdk channels are not
 
 ## Utilizing the Scripts
 
-The scripts can either be run individually, or through the use of make steps. The make steps run one or more scripts, and explanations of what each make step and individual script do can be found below.
+### Setup
 
-### `make staging`
+To get started, set your global git username to your first and last name. This is used by a Slack Bot to post relevant information about the individual who is staging and deploying to the ads-deploys and ads-sdk-devs channel. Your first and last name added to this should reflect these names in slack. Set this in your terminal with the following command:
+
+`git config --global user.name "FIRST_NAME LAST_NAME"`
+
+And check that it's correctly set with:
+
+`git config --get user.name`
+
+### Staging
 
 #### Staging/create_staging_branches.sh
 
@@ -50,8 +58,6 @@ Once the changes have been made, update the CHANGELOG.md in the master webview b
 
 After finishing execution of the first script, run this script to push up all of the branches. This is separated out into its own script in case there are any issues during merging master changes into the branches, and the merger wishes to stop merging.
 
-### `make prs`
-
 #### Staging/create_deployment_prs.sh
 
 This script should be run once a suitable amount of PRs have been merged.
@@ -70,7 +76,7 @@ This will create the deployment PRs in the Webview branch, notify the ads-sdk ch
 
 Note, if PRs need to merged after this point, it is still possible. It will only delay the deployment time.
 
-### `make deploy`
+### Deploying
 
 #### Deployment/update_lkgs.sh
 
@@ -100,14 +106,10 @@ When you are monitoring, be sure to look at the rightmost pie chart in kibana. T
 
 If things aren't looking correct, then run the revert script.
 
-### `make notify`
-
 #### Deployment/notify_deployment_finished.sh
 
 Once all of the builds have finished in Travis, Webview adoption is occurring, and nothing is seemingly broken, run this script. All it will do is notify ads-sdk and ads-deploys that the Webview deployment is finished and being monitored. If anything is broken, it should almost immediately show in the diagnostics, so once adoption occurs in all branches, then the deployment should end successfully.
 
-### `make revert`
-
 #### revert_to_lkgs.sh
 
-Ideally, this script won't be ran, but sometimes incorrect changes slip through the cracks. It's not uncommon and don't feel bad about it. Make sure that the bad diagnostics are definiely coming from the new Webview, run this script, and then devise a plan to fix those changes. The ads-sdk channel will be notified that the deployment was reverted.
+Ideally, this script won't be ran, but sometimes incorrect changes slip through the cracks. It's not uncommon and don't feel bad about it. Make sure that the bad diagnostics are definitely coming from the new Webview, run this script, and then devise a plan to fix those changes. The ads-sdk channel will be notified that the deployment was reverted.

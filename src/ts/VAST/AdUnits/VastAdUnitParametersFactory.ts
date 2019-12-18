@@ -42,7 +42,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
-        const omVendors: string[] = [];
+        let omVendors: string[] = [];
         if (adVerifications) {
             const omInstances: OpenMeasurement[] = [];
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
@@ -50,11 +50,19 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             adVerifications.forEach((adverification) => {
                 omVendors.push(adverification.getVerificationVendor());
                 if (adverification.getVerificationVendor() === 'IAS') {
-                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification, baseParams.programmaticTrackingService);
+                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), baseParams.programmaticTrackingService, adverification);
                     om.setOMAdViewBuilder(omAdViewBuilder);
                     omInstances.push(om);
                 }
             });
+
+            if (baseParams.campaign.getVast().isPublicaTag()) {
+                // adds publica as an om vendor to use for reporting
+                omVendors.push('publica');
+
+                // removes duplicate IAS vendor keys for reporting
+                omVendors = omVendors.unique();
+            }
 
             const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
             omManager.addToViewHierarchy();
