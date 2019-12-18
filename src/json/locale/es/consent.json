@@ -52,5 +52,10 @@
   "privacy-settings-build-info": "Información de la compilación",
   "privacy-settings-close": "Cerrar",
 
-  "disagree": "No, gracias"
+  "disagree": "No, gracias",
+
+  "age-gate-title": "Antes de empezar, por favor verifica tu edad",
+  "age-gate-text": "Para asegurarnos de que te estamos ofreciendo la mejor experiencia de juego, lo cual incluye tus opciones de privacidad y la protección de la misma, por favor confirma tu edad:",
+  "age-gate-over-age-limit-btn": "Tengo {0} años o más",
+  "age-gate-under-age-limit-btn": "Tengo {0} años o menos"
 }

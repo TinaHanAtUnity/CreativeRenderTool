@@ -17,6 +17,7 @@ import {
 } from 'Ads/Views/Privacy/PrivacyRowItemContainer';
 import { MiscellaneousMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Localization } from 'Core/Utilities/Localization';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 export interface IPrivacyViewParameters {
     platform: Platform;
@@ -58,7 +59,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
     constructor(parameters: IPrivacyViewParameters) {
         super(parameters.platform, 'consent');
 
-        this._localization = new Localization(parameters.language, 'consent');
+        this._localization = new PrivacyLocalization(parameters.language, 'consent', parameters.privacyManager.getLegalFramework());
 
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
@@ -70,9 +71,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
         this._isABTest = parameters.consentABTest;
 
         this._template = new Template(ConsentTemplate, this._localization);
-        this._templateData = {
-            'isCCPA': parameters.privacyManager.getLegalFramework() === LegalFramework.CCPA
-        };
+        this._templateData = {};
 
         this._bindings = [
             {

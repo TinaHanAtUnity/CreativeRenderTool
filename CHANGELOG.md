@@ -1,3 +1,27 @@
+# Pending
+
+* Add Hide AR Button Feature [#12105](https://github.com/Applifier/unity-ads-webview/pull/12105)
+
+# Wed Dec 18 13:36:33 UTC 2019
+
+* Spanish translation for CCPA [#12668](https://github.com/Applifier/unity-ads-webview/pull/12668)
+
+# Wed Dec 18 02:07:58 UTC 2019
+
+* Add AB groups to Animated Button experiment [#12454](https://github.com/Applifier/unity-ads-webview/pull/12454)
+* Send out AUI reward on click instead of on hide [#12526](https://github.com/Applifier/unity-ads-webview/pull/12526)
+* Create Jest Mocks for Banners [#12583](https://github.com/Applifier/unity-ads-webview/pull/12583)
+* Send banner impression on reload of banner ad context [#12584](https://github.com/Applifier/unity-ads-webview/pull/12584)
+* Open Measurement - Add Geometry Change call to Admob Impression [#12669](https://github.com/Applifier/unity-ads-webview/pull/12669)
+* Add Admob Nofill ABTest and Whitelist [#12670](https://github.com/Applifier/unity-ads-webview/pull/12670)
+* Release Load Adapter for everyone [#12673](https://github.com/Applifier/unity-ads-webview/pull/12673)
+
+# Tue Dec 17 15:22:32 UTC 2019
+
+* Fix of reportValidity for android 4.x devices [#12641](https://github.com/Applifier/unity-ads-webview/pull/12641)
+* Fix some "Uncaught TypeError: Cannot read property 'removeChild' of null" js errors [#12612](https://github.com/Applifier/unity-ads-webview/pull/12612)
+* Stop error level logging when using developer consent outside GDPR regions [#12640](https://github.com/Applifier/unity-ads-webview/pull/12640)
+
 # Mon Dec 16 23:38:26 UTC 2019
 
 * Fix WEBPLAYER_NULL error on Android [#12465](https://github.com/Applifier/unity-ads-webview/pull/12465)
