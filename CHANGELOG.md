@@ -1,4 +1,4 @@
-# Pending
+# Wed Dec 18 13:36:33 UTC 2019
 
 * Spanish translation for CCPA [#12668](https://github.com/Applifier/unity-ads-webview/pull/12668)
 
