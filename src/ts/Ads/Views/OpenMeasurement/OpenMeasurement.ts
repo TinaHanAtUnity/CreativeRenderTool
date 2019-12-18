@@ -22,7 +22,6 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Campaign } from 'Ads/Models/Campaign';
-import { ICampaign } from '../../Models/Campaign';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;

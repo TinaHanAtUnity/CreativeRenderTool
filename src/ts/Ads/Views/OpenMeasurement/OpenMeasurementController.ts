@@ -2,7 +2,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { VideoPlayerState, InteractionType, ISessionEvent, IImpressionValues, IVastProperties, OMID3pEvents, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { Campaign } from '../../Models/Campaign';
+import { Campaign } from 'Ads/Models/Campaign';
 
 interface IOMController {
     impression(impressionValues: IImpressionValues): void;
