@@ -85,11 +85,13 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, AdmobAdapterV1 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
+import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class Ads implements IAds {
 
@@ -111,6 +113,7 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
+    public AdmobAdapterManager: AdmobAdapterManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -179,6 +182,8 @@ export class Ads implements IAds {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             return this.setupTestEnvironment();
+        }).then(() => {
+            return this.configureMediationManager();
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -302,6 +307,26 @@ export class Ads implements IAds {
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
+    }
+
+    private configureMediationManager(): Promise<void> {
+        const allowedByAbTest = AdmobAdapterV1.isValid(this._core.Config.getAbGroup());
+        const allowedByGameId = CustomFeatures.isAdmobTimeoutWhitelisted(this._core.ClientInfo.getGameId());
+
+        if (allowedByAbTest || allowedByGameId) {
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation) {
+                    const mediationName = mediation.getName();
+                    if (mediationName === 'AdMob') {
+                        this.AdmobAdapterManager = new AdmobAdapterManager(this.Api, this._core.NativeBridge.getPlatform());
+                    }
+                }
+            }).catch(() => {
+                // ingore error
+            });
+        }
+
+        return Promise.resolve();
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
