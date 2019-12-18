@@ -1,6 +1,7 @@
 import { OpenMeasurement as Base } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { Campaign } from 'Ads/Models/Campaign';
 
-export type OpenMeasurementMock = Base & {
+export type OpenMeasurementMock = Base<Campaign> & {
     getOMAdSessionId: jest.Mock;
 };
 

@@ -44,16 +44,16 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
         let omVendors: string[] = [];
         if (adVerifications) {
-            const omInstances: OpenMeasurement[] = [];
+            const omInstances: OpenMeasurement<VastCampaign>[] = [];
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
 
             adVerifications.forEach((adverification) => {
                 omVendors.push(adverification.getVerificationVendor());
-                if (adverification.getVerificationVendor() === 'IAS') {
-                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), baseParams.programmaticTrackingService, adverification);
-                    om.setOMAdViewBuilder(omAdViewBuilder);
-                    omInstances.push(om);
-                }
+                // if (adverification.getVerificationVendor() === 'IAS') {
+                const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), baseParams.programmaticTrackingService, adverification);
+                om.setOMAdViewBuilder(omAdViewBuilder);
+                omInstances.push(om);
+                // }
             });
 
             if (baseParams.campaign.getVast().isPublicaTag()) {

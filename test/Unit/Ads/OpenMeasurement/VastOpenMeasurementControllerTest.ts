@@ -5,13 +5,14 @@ import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpe
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
 
-        const initOMManager = (om: OpenMeasurement[]) => {
+        const initOMManager = (om: OpenMeasurement<VastCampaign>[]) => {
             placement = TestFixtures.getPlacement();
             const adViewBuilder = sandbox.createStubInstance(OpenMeasurementAdViewBuilder);
             return new VastOpenMeasurementController(placement, om, adViewBuilder);
@@ -19,7 +20,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 
         describe('DOM Hierarchy', () => {
             let omManager: VastOpenMeasurementController;
-            let openMeasurement: OpenMeasurement;
+            let openMeasurement: OpenMeasurement<VastCampaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
