@@ -1,3 +1,7 @@
+# Pending
+
+* Spanish translation for CCPA [#12668](https://github.com/Applifier/unity-ads-webview/pull/12668)
+
 # Wed Dec 18 02:07:58 UTC 2019
 
 * Add AB groups to Animated Button experiment [#12454](https://github.com/Applifier/unity-ads-webview/pull/12454)
