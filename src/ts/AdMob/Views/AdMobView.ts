@@ -143,7 +143,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(privacyContainer);
+            }
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {

@@ -146,7 +146,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isForcedLoadAdapterGame', () => {
+    describe('isAdmobTimeoutWhitelisted', () => {
         const tests: {
             gameId: string;
             expected: boolean;
@@ -157,10 +157,10 @@ describe('CustomFeatures', () => {
             gameId: '1781085',
             expected: true
         }, {
-            gameId: '1687868',
+            gameId: '20723',
             expected: true
         }, {
-            gameId: '1781853',
+            gameId: '1225669',
             expected: true
         }, {
             gameId: 'scott',
@@ -169,7 +169,7 @@ describe('CustomFeatures', () => {
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isForcedLoadAdapterGame(t.gameId);
+                const value = CustomFeatures.isAdmobTimeoutWhitelisted(t.gameId);
                 assert.equal(value, t.expected);
             });
         });

@@ -112,7 +112,9 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
             this.initCaptcha();
         } else {
             // todo: triggers browser's built-in ui pop-up, could be replaced with something else
-            this._emailInputElement.reportValidity();
+            if (this._emailInputElement.reportValidity) {
+                this._emailInputElement.reportValidity();
+            }
         }
     }
 
