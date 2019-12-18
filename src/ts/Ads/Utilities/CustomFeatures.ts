@@ -123,6 +123,11 @@ export class CustomFeatures {
         }
     }
 
+    public static isCheetahTestGameForLoad(gameId: string): boolean {
+        return (gameId === '3058518' || gameId === '3058519');
+
+    }
+
     public static isAdmobTimeoutWhitelisted(gameId: string): boolean {
         const fanateeGames = ['1344431', '1346246', '56659', '1225669'];
         const etermaxGames = ['20721', '20723', '89611', '1781085', '1781084'];
