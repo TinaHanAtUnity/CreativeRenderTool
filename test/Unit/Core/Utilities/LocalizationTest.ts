@@ -2,6 +2,8 @@ import { assert } from 'chai';
 
 import { Localization } from 'Core/Utilities/Localization';
 import 'mocha';
+import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 describe('LocalizationTest', () => {
 
@@ -87,7 +89,7 @@ describe('LocalizationTest', () => {
         assert.equal(new Localization('zh_TW_#Hant', 'endscreen').translate(phrase), '免費下載', 'Localization zh_TW_#Hant did not map to correct language');
     });
 
-    describe('Privacy', () => {
+    describe('Privacy - base localization instance', () => {
         // What information we collect and how we use it
         const id = 'privacy-what-we-collect-title';
 
@@ -140,7 +142,7 @@ describe('LocalizationTest', () => {
         });
     });
 
-    describe('Privacy view', () => {
+    describe('Privacy view  - base localization instance', () => {
         // Changing your privacy choice
         const id = 'privacy-dialog-text-li-p6-header';
 
@@ -177,6 +179,158 @@ describe('LocalizationTest', () => {
             assert.equal(new Localization('zh_MO', 'privacy').translate(id), expectedTranslation, 'Localization zh_HK did not map to correct language');
             assert.equal(new Localization('zh_#Hant_TW', 'privacy').translate(id), expectedTranslation, 'Localization zh_#Hant_TW did not map to correct language');
             assert.equal(new Localization('zh_TW_#Hant', 'privacy').translate(id), expectedTranslation, 'Localization zh_TW_#Hant did not map to correct language');
+        });
+    });
+
+    describe ('Privacy Localization tests', () => {
+        describe('Privacy Unit Consent', () => {
+            // What information we collect and how we use it
+            const id = 'privacy-what-we-collect-title';
+
+            it('EN. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('en_GB', 'consent', LegalFramework.GDPR);
+                const phrase = 'What information we collect and how we use it';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('FR. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('fr_GB', 'consent', LegalFramework.GDPR);
+                const phrase = 'Informations collectées et utilisation';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('DE. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('de_AU', 'consent', LegalFramework.GDPR);
+                const phrase = 'Welche Informationen wir sammeln und wie wir sie nutzen';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('ES. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('es', 'consent', LegalFramework.GDPR);
+                const phrase = 'Qué información recopilamos y cómo la utilizamos';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('FI. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('fi_FI', 'consent', LegalFramework.GDPR);
+                const phrase = 'What information we collect and how we use it';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('RU. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('ru', 'consent', LegalFramework.GDPR);
+                const phrase = 'Какую информацию мы собираем и как ее используем';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('PT. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('pt', 'consent', LegalFramework.GDPR);
+                const phrase = 'Que informações recolhemos e como as utilizamos';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('IT. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+                const localization = new PrivacyLocalization('it', 'consent', LegalFramework.GDPR);
+                const phrase = 'Quali informazioni raccogliamo e come le utilizziamo';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+        });
+
+        describe('Privacy Unit Age Gate', () => {
+            // Before you get started, please verify your age
+            const id = 'age-gate-title';
+
+            it('EN. Should return correct translation for id "age-gate-title"', () => {
+                const localization = new PrivacyLocalization('en_GB', 'consent', LegalFramework.GDPR);
+                const phrase = 'Before you get started, please verify your age';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('FR. Should return correct translation for id "age-gate-title"', () => {
+                const localization = new PrivacyLocalization('fr_GB', 'consent', LegalFramework.GDPR);
+                // no French available for Age Gate
+                const phrase = 'Before you get started, please verify your age';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('ES. Should return correct translation for id "age-gate-title"', () => {
+                const localization = new PrivacyLocalization('es', 'consent', LegalFramework.GDPR);
+                const phrase = 'Antes de empezar, por favor verifica tu edad';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('FI. Should return correct translation for id "age-gate-title"', () => {
+                const localization = new PrivacyLocalization('fi_FI', 'consent', LegalFramework.GDPR);
+                const phrase = 'Before you get started, please verify your age'; // No Finnish translation available
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('ZH Hans. Should return correct translation for id "age-gate-title"', () => {
+                const phrase = '在开始之前, 请确认您的年龄';
+                assert.equal(new PrivacyLocalization('zh', 'consent', LegalFramework.GDPR).translate(id), phrase, 'Localization zh did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_CN', 'consent', LegalFramework.GDPR).translate(id), phrase, 'Localization zh_CN did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hans', 'consent', LegalFramework.GDPR).translate(id), phrase, 'Localization zh_Hans did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hans_CN', 'consent', LegalFramework.GDPR).translate(id), phrase, 'Localization zh_Hans_CN did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hans_US', 'consent', LegalFramework.TC260).translate(id), phrase, 'Localization zh_Hans_US did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_#Hans_CN', 'consent', LegalFramework.TC260).translate(id), phrase, 'Localization zh_#Hans_CN did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_CN_#Hans', 'consent', LegalFramework.TC260).translate(id), phrase, 'Localization zh_CN_#Hans did not map to correct language');
+            });
+        });
+
+        describe('Privacy view', () => {
+            // Changing your privacy choice
+            const id = 'privacy-dialog-text-li-p6-header';
+
+            it('EN. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+                const localization = new PrivacyLocalization('en_GB', 'privacy', LegalFramework.NONE);
+                const phrase = 'Changing your privacy choice';
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('FR. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+                const localization = new PrivacyLocalization('fr_FI', 'privacy', LegalFramework.NONE);
+                const phrase = 'Changing your privacy choice'; // no French translation available, should return English phrase
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('ES. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+                const localization = new PrivacyLocalization('es_FI', 'privacy', LegalFramework.NONE);
+                // Spanish translations is available only for CCPA
+                const phrase = 'Changing your privacy choice'; // no French translation available, should return English phrase
+                assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+            });
+
+            it('ZH Hans. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+                const expectedTranslation = '更改您的隐私选项';
+                assert.equal(new PrivacyLocalization('zh', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_CN', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_CN did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hans', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_Hans did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hans_CN', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_Hans_CN did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hans_US', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_Hans_US did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_#Hans_CN', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_#Hans_CN did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_CN_#Hans', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_CN_#Hans did not map to correct language');
+            });
+
+            it('ZH Hant China. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+                const expectedTranslation = 'Changing your privacy choice'; // no translation for Traditional Chinese available
+
+                assert.equal(new PrivacyLocalization('zh_Hant', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_Hant did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_TW', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_TW did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_Hant_TW', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_Hant_TW did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_HK', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_HK did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_MO', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_HK did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_#Hant_TW', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_#Hant_TW did not map to correct language');
+                assert.equal(new PrivacyLocalization('zh_TW_#Hant', 'privacy', LegalFramework.NONE).translate(id), expectedTranslation, 'Localization zh_TW_#Hant did not map to correct language');
+            });
+
+            describe('Privacy View CCPA', () => {
+                it('ES. Should return correct translation for id "privacy-dialog-text-li-p6-header"', () => {
+                    const localization = new PrivacyLocalization('es_FI', 'privacy', LegalFramework.CCPA);
+                    // Spanish translation is only available for CCPA
+                    const phrase = 'Cambiar tu opción de privacidad';
+                    assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+                });
+            });
         });
     });
 });

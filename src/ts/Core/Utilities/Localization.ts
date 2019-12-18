@@ -13,6 +13,7 @@ import SpanishEndscreen from 'json/locale/es/endscreen.json';
 import SpanishOverlay from 'json/locale/es/overlay.json';
 import SpanishConsent from 'json/locale/es/consent.json';
 import SpanishMraid from 'json/locale/es/mraid.json';
+import SpanishPrivacy from 'json/locale/es/privacy.json';
 import FinnishEndscreen from 'json/locale/fi/endscreen.json';
 import FinnishOverlay from 'json/locale/fi/overlay.json';
 import FinnishMraid from 'json/locale/fi/mraid.json';
@@ -170,8 +171,8 @@ export class Localization {
             'endscreen': SpanishEndscreen,
             'overlay': SpanishOverlay,
             'consent': SpanishConsent,
-            'mraid': SpanishMraid
-
+            'mraid': SpanishMraid,
+            'privacy': SpanishPrivacy
         },
         'fr.*': {
             'endscreen': FrenchEndscreen,
@@ -226,10 +227,6 @@ export class Localization {
     private _namespace: string;
 
     constructor(language: string, namespace: string) {
-        if (namespace === 'consent' && !this.isConsentTranslationAvailable(language)) {
-            language = 'en.*';
-        }
-
         this._language = language;
         this._namespace = namespace;
     }
@@ -259,19 +256,4 @@ export class Localization {
         }
         return number.toString();
     }
-
-    private isConsentTranslationAvailable(language: string) {
-        if (language.match('fr.*')
-            || language.match('de.*')
-            || language.match('es.*')
-            || language.match('ru.*')
-            || language.match('pt.*')
-            || language.match('it.*')
-            || language.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
-            return true;
-        }
-
-        return false;
-    }
-
 }
