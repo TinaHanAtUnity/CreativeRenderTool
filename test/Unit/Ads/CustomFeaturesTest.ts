@@ -198,7 +198,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isWhitelistedForLoadApi', () => {
+    describe('isStopGameForLoad', () => {
         const tests: {
             gameId: string;
             expected: boolean;
@@ -218,7 +218,7 @@ describe('CustomFeatures', () => {
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                const value = CustomFeatures.isStopGameForLoad(t.gameId);
                 assert.equal(value, t.expected);
             });
         });
