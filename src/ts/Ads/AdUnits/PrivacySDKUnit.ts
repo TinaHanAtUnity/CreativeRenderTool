@@ -63,7 +63,7 @@ export class PrivacySDKUnit extends BasePrivacyUnit<PrivacySDKView> implements I
     }
 
     public onPrivacyMetric(data: { [key: string]: unknown }): void {
-        this._requestManager.post('http://10.35.34.174/api/v1/metrics', JSON.stringify(data));
+        this._requestManager.post('https://privacy-user-settings.stg.mz.internal.unity3d.com/api/v1/metrics', JSON.stringify(data));
         this._unityPrivacyView.metricCallback();
         this._core.Sdk.logDebug('PRIVACY: Got metric: ' + JSON.stringify(data));
     }
