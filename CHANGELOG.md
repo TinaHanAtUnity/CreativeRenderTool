@@ -1,4 +1,4 @@
-# Pending
+# Thu Dec 19 13:41:58 UTC 2019
 
 * Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)
 
