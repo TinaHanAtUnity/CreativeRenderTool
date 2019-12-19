@@ -90,6 +90,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _vendorKey: string;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
+    private _verificationScriptResource: IVerificationScriptResource;
 
     private _sessionFinishCalled = false;
     private _sessionStartEventData: ISessionEvent;
@@ -259,8 +260,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         //     this._sessionStartEventData.data.vendorkey = this._vendorKey;
         //    // console.log('openmeasurement: ' + JSON.stringify(this._sessionStartEventData));
         // }
-        console.log(this._vendorKey);
-
+        this._sessionStartEventData = sessionEvent;
+        //console.log(this._vendorKey);
         this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
@@ -338,7 +339,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
              * admob-session-interface - calls session start for admob
              * vast video event handler - calls session start for vast
              */
-            if (vendorKey === 'IAS') {
+            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
                 //console.log('openmeasurement: ' + JSON.stringify(this._sessionStartEventData));
                 this.sessionStart(this._sessionStartEventData);
             }
@@ -413,6 +414,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]): Promise<void> {
         const promises: Promise<void>[] = [];
+
+        this._verificationScriptResource = verificationResources[0];
 
         // TODO: Fix to only support one verification resource per OpenMeasurement instance
         verificationResources.forEach((resource) => {
