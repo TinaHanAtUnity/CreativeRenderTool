@@ -198,7 +198,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isStopGameForLoad', () => {
+    describe('isFanateeExtermaxGameForLoad', () => {
         const tests: {
             gameId: string;
             expected: boolean;
@@ -207,6 +207,15 @@ describe('CustomFeatures', () => {
             expected: true
         }, {
             gameId: '1225669',
+            expected: true
+        }, {
+            gameId: '20721',
+            expected: true
+        }, {
+            gameId: '89611',
+            expected: true
+        }, {
+            gameId: '1781085',
             expected: true
         }, {
             gameId: '12256',
@@ -218,7 +227,7 @@ describe('CustomFeatures', () => {
 
         tests.forEach(t => {
             it('should match the expected value', () => {
-                const value = CustomFeatures.isStopGameForLoad(t.gameId);
+                const value = CustomFeatures.isFanateeExtermaxGameForLoad(t.gameId);
                 assert.equal(value, t.expected);
             });
         });
