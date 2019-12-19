@@ -42,7 +42,7 @@ export enum WebplayerEvent {
     FORM_RESUBMISSION,
     UNHANDLED_KEY_EVENT,
     SHOULD_INTERCEPT_REQUEST,
-    CREATE_WEBVIEW,
+    CREATE_WEBVIEW, // Only exists on iOS
     FRAME_UPDATE,
     GET_FRAME_RESPONSE
 }

@@ -30,7 +30,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onPageStarted;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 'testViewId'], // This reflects what is actually sent from native
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onPageFinished',
@@ -38,7 +38,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onPageFinished;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 'testViewId'], // This reflects what is actually sent from native
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onPageFinished',
@@ -46,7 +46,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onPageFinished;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 'testErrorMessage', 'testViewId'], // This reflects what is actually sent from native
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onWebPlayerEvent',
@@ -54,23 +54,31 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onWebPlayerEvent;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
-                calledWithOrder: ['testViewId', 'testUrl']
+                handleEventParams: ['testData', 'testViewId'], // This reflects what is actually sent from native
+                calledWithOrder: ['testViewId', 'testData']
             }, {
                 label: 'shouldOverrideUrlLoading',
                 event: WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING,
                 listener: () => {
                     return webPlayerApi.shouldOverrideUrlLoading;
                 },
-                handleEventParams: ['testUrl', 'testMethod', 'testViewId'],
+                handleEventParams: ['testUrl', 'testMethod', 'testViewId'], // This reflects one of two diffierent data sets for SHOULD_OVERRIDE_URL_LOADING
                 calledWithOrder: ['testViewId', 'testUrl', 'testMethod']
             }, {
+                label: 'shouldOverrideUrlLoading',
+                event: WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING,
+                listener: () => {
+                    return webPlayerApi.shouldOverrideUrlLoading;
+                },
+                handleEventParams: ['testUrl', 'testViewId'], // This reflects one of two diffierent data sets for SHOULD_OVERRIDE_URL_LOADING
+                calledWithOrder: ['testViewId', 'testUrl', undefined]
+            }, {
                 label: 'onCreateWebView',
-                event: WebplayerEvent.CREATE_WEBVIEW,
+                event: WebplayerEvent.CREATE_WEBVIEW, // only exists on iOS
                 listener: () => {
                     return webPlayerApi.onCreateWebView;
                 },
-                handleEventParams: ['testUrl', 'testViewId'],
+                handleEventParams: ['testUrl', 'testViewId'], // This reflects what is sent from iOS Native
                 calledWithOrder: ['testViewId', 'testUrl']
             }, {
                 label: 'onFrameUpdate',
@@ -78,7 +86,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onFrameUpdate;
                 },
-                handleEventParams: ['testViewId', 0, 10, 50, 50, 0.5],
+                handleEventParams: ['testViewId', 0, 10, 50, 50, 0.5], // This reflects what is sent from native
                 calledWithOrder: ['testViewId', 0, 10, 50, 50, 0.5]
             }, {
                 label: 'onGetFrameResponse',
@@ -86,7 +94,7 @@ describe('WebPlayerApi', () => {
                 listener: () => {
                     return webPlayerApi.onGetFrameResponse;
                 },
-                handleEventParams: ['testCallId', 'testViewId', 0, 0, 50, 50, 0.5],
+                handleEventParams: ['testCallId', 'testViewId', 0, 0, 50, 50, 0.5], // This reflects what is sent from native
                 calledWithOrder: ['testCallId', 'testViewId', 0, 0, 50, 50, 0.5]
             }
         ];
