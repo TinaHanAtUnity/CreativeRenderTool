@@ -1,3 +1,38 @@
+# Fri Dec  6 01:04:44 UTC 2019
+
+* Remove animation AB tests [#12331](https://github.com/Applifier/unity-ads-webview/pull/12331)
+* Open Measurement - Admob Viewability Adjustments [#12102](https://github.com/Applifier/unity-ads-webview/pull/12102)
+
+# Thu Dec  5 18:39:42 UTC 2019
+
+* Use LegalFramework.NONE instead of LegalFramework.DEFAULT [#12194](https://github.com/Applifier/unity-ads-webview/pull/12194)
+* Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)
+* Fix forcedConsent-metadata [#12249](https://github.com/Applifier/unity-ads-webview/pull/12249)
+* Add 'NOT_IN_MANIFEST' to AR Permissions [#12222](https://github.com/Applifier/unity-ads-webview/pull/12222)
+* Improve Forced Creative Packs [#11951](https://github.com/Applifier/unity-ads-webview/pull/11951)
+
+# Wed Dec  4 22:44:29 UTC 2019
+
+* Open Measurement - Fix/om dp iab android SDK 3.3 [#12279](https://github.com/Applifier/unity-ads-webview/pull/12279) [#12107](https://github.com/Applifier/unity-ads-webview/pull/12107)
+* Add Support for AUI Contextual Features [#12100](https://github.com/Applifier/unity-ads-webview/pull/12100)
+* Always Merge Staging Branches from Remote [#12277](https://github.com/Applifier/unity-ads-webview/pull/12277)
+* Remove Diagnostic Test Checks [#12305](https://github.com/Applifier/unity-ads-webview/pull/12305)
+
+# Tue Dec  3 15:51:44 UTC 2019
+
+* Privacy protocol V2 changes to AuctionRequests and Operative events [#12247](https://github.com/Applifier/unity-ads-webview/pull/12247)
+* Privacy protocol V2 update auctionReq and operativeEvents, amendment for unity_consent first request [#12278](https://github.com/Applifier/unity-ads-webview/pull/12278)
+
+# Tue Nov 26 23:55:06 UTC 2019
+
+* Add banner fill metric event [#12196](https://github.com/Applifier/unity-ads-webview/pull/12196)
+* Open Measurement - Add basic OM metrics for Admob [#12192](https://github.com/Applifier/unity-ads-webview/pull/12192)
+
+# Tue Nov 26 18:53:05 UTC 2019
+
+* Open Measurement - Density Pixels for Android sdk 3.2 [#11730](https://github.com/Applifier/unity-ads-webview/pull/11730)
+* Disable transparent privacy ad unit for iOS 13 [12197](https://github.com/Applifier/unity-ads-webview/pull/12197)
+
 # Fri Nov 22 07:50:17 UTC 2019
 
 * Rollback Webpack Release Build [#12193](https://github.com/Applifier/unity-ads-webview/pull/12193)

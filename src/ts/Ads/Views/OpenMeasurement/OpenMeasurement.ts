@@ -21,6 +21,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -32,7 +33,7 @@ enum AdSessionType {
 }
 
 interface IOmidJsInfo {
-    omidImplementor: string;
+    omidImplementer: string;
     serviceVersion: string;
     sessionClientVersion: string;
     partnerName: string;
@@ -94,6 +95,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
     private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
+    private _sessionStartEventData: ISessionEvent;
     private _sessionStartProcessedByOmidScript = false;
     private _sessionFinishProcessedByOmidScript = false;
     private _adVerification: VastAdVerification;
@@ -234,7 +236,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
      * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
      * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
-     * TODO: Calculate Geometry change for Privacy coverage
      */
     public geometryChange(viewport: IViewPort, adView: IAdView) {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
@@ -246,22 +247,30 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart() {
-        const event: ISessionEvent = {
-            adSessionId: this.getOMAdSessionId(),
-            timestamp: Date.now(),
-            type: 'sessionStart',
-            data: {}
-        };
-        this._sessionStartCalled = true;
+    public sessionStart(sessionEvent?: ISessionEvent) {
+        if (!sessionEvent) {
+            // Non-Admob code path
+            const event: ISessionEvent = {
+                adSessionId: this.getOMAdSessionId(),
+                timestamp: Date.now(),
+                type: 'sessionStart',
+                data: {}
+            };
+            this._sessionStartCalled = true;
 
-        if (this._verificationVendorMap[this._vendorKey]) {
-            event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+            if (this._verificationVendorMap[this._vendorKey]) {
+                event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
+            }
+            const contextData: IContext = this.buildSessionContext();
+            event.data.context = contextData;
+            event.data.vendorkey = this._vendorKey;
+            this._omBridge.triggerSessionEvent(event);
+        } else {
+            // TODO: Refactor. Admob Code Path
+            this._sessionStartEventData = sessionEvent;
+            this._sessionStartEventData.data.vendorkey = this._vendorKey;
+            this._omBridge.triggerSessionEvent(this._sessionStartEventData);
         }
-        const contextData: IContext = this.buildSessionContext();
-        event.data.context = contextData;
-        event.data.vendorkey = this._vendorKey;
-        this._omBridge.triggerSessionEvent(event);
     }
 
     private buildSessionContext(): IContext {
@@ -269,20 +278,20 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,
+            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             omidJsInfo: {
-                omidImplementor: PARTNER_NAME,
+                omidImplementer: PARTNER_NAME,
                 serviceVersion: this._clientInfo.getSdkVersionName(),
                 sessionClientVersion: OMID_P,
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             app: {
-                libraryVersion: '1.0.0',
+                libraryVersion: OM_JS_VERSION,
                 appId: this._clientInfo.getApplicationName()
             },
             deviceInfo: {
@@ -364,7 +373,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'sessionRegistered') {
-            this.sessionStart();
+            /**
+             * Edge Case:
+             * This check is here to ensure the impression values for native/vast videos are correct when fired
+             * Because IAS registers late and because admob does not use our native video player
+             * the video view data will be accurate by impression time. For non-ias/admob vendors, however,
+             * we must wait for that data to return which is why we dont call session start as soon as the
+             * om session is registered.
+             * admob-session-interface - calls session start for admob
+             * vast video event handler - calls session start for vast
+             */
+            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
+                this.sessionStart(this._sessionStartEventData);
+            }
         }
 
         return Promise.resolve();
@@ -377,8 +398,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
                 if (this._platform === Platform.ANDROID) {
-                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, this._deviceInfo, this._platform);
-                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, this._deviceInfo, this._platform);
+                    screenWidth = OpenMeasurementUtilities.pxToDp(screenWidth, <AndroidDeviceInfo> this._deviceInfo);
+                    screenHeight = OpenMeasurementUtilities.pxToDp(screenHeight, <AndroidDeviceInfo> this._deviceInfo);
                 }
 
                 IASScreenWidth = screenWidth;
