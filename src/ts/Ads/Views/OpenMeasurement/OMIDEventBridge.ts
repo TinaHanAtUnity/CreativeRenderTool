@@ -122,6 +122,7 @@ export class OMIDEventBridge {
     }
 
     public triggerSessionEvent(event: ISessionEvent) {
+        //console.log('triggerSessionEvent' + JSON.stringify(event));
         this._core.Sdk.logDebug('Calling OM session event "' + event.type + '" with data: ' + event.data);
         this.postMessage(event);
     }

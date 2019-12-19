@@ -171,9 +171,14 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._omInstances.forEach((om) => {
             //Need a deep assignment to avoid duplication for events
             const event = JSON.parse(JSON.stringify(sessionEvent));
-            const verification = om.getVastVerification();
-            event.data.vendorkey = verification.getVerificationVendor();
-
+            //console.log('sessionStart' + JSON.stringify(event));
+            //const verification = om.getVastVerification();
+            // if(verification) {
+            //     event.data.vendorkey = verification.getVerificationVendor();
+            // }
+            event.data.vendorkey = om.getVendorkey();
+            console.log(event);
+            
             om.sessionStart(event);
         });
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);

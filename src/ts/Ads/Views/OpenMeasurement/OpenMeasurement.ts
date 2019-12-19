@@ -241,6 +241,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
     }
 
+    public getVendorkey() {
+        return this._vendorKey;
+    }
+
     /*
     * SessionStart:
     * First event that MUST be fired for a session to begin
@@ -248,6 +252,15 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
     public sessionStart(sessionEvent: ISessionEvent) {
+        //this._omBridge.triggerSessionEvent(sessionEvent);
+
+        // if (this._vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
+        //     this._sessionStartEventData = sessionEvent;
+        //     this._sessionStartEventData.data.vendorkey = this._vendorKey;
+        //    // console.log('openmeasurement: ' + JSON.stringify(this._sessionStartEventData));
+        // }
+        console.log(this._vendorKey);
+
         this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
@@ -325,7 +338,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
              * admob-session-interface - calls session start for admob
              * vast video event handler - calls session start for vast
              */
-            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
+            if (vendorKey === 'IAS') {
+                //console.log('openmeasurement: ' + JSON.stringify(this._sessionStartEventData));
                 this.sessionStart(this._sessionStartEventData);
             }
         }
