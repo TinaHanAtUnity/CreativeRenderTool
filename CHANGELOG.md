@@ -1,4 +1,4 @@
-# Pending
+# Thu Dec 19 00:49:02 UTC 2019
 
 * Add Hide AR Button Feature [#12105](https://github.com/Applifier/unity-ads-webview/pull/12105)
 * Add Cheetah GameIDs for Load Testing and Fix Load V4 Experiment [#12482](https://github.com/Applifier/unity-ads-webview/pull/12482)
