@@ -230,6 +230,11 @@ describe('CustomFeatures', () => {
                 const value = CustomFeatures.isFanateeExtermaxGameForLoad(t.gameId);
                 assert.equal(value, t.expected);
             });
+
+            it('should not exist in the load whitelist', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, false);
+            });
         });
     });
 });
