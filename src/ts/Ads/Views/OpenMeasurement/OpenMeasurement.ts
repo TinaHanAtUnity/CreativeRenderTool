@@ -406,8 +406,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]): Promise<void> {
         const promises: Promise<void>[] = [];
 
-        this._verificationScriptResource = verificationResources[0];
-
         // TODO: Fix to only support one verification resource per OpenMeasurement instance
         verificationResources.forEach((resource) => {
             promises.push(this.injectResourceIntoDom(resource.resourceUrl, resource.vendorKey, resource.verificationParameters!));
