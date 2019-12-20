@@ -309,8 +309,7 @@
 
             var startAdSession = function() {
                 var sessionStartEventData = {
-                    context: Context,
-                    verificationParameters: verificationResources[0].verificationParameters
+                    context: Context
                 }
                 var eventData = {
                     adSessionId: getSessionId(),
@@ -319,7 +318,11 @@
                     data: sessionStartEventData
                 }
 
-                sessionCallback(eventData);                         // needs to be called for session interface
+                for (var i = 0; i < verificationResources.length; i++) {
+                    var data = JSON.parse(JSON.stringify(eventData));
+                    data.verificationParameters = verificationResources[i].verificationParameters
+                    sessionCallback(data);                          // needs to be called for session interface
+                }
                 postMessage(AdEventType.SESSION_START, eventData);  // needs to be called for omid3p
             };
 
