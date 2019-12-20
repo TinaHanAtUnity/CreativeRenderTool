@@ -16,9 +16,6 @@ import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasure
 import { assert } from 'chai';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { VastAdVerification } from 'VAST/Models/VastAdVerification';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -174,10 +171,6 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     verificationParameters: 'param2'
                 };
 
-                // const vastVerificationResource1 = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
-                // const vastVerificationResource2 = new VastVerificationResource ('https://something.test.js', 'unity', false, 'Verifications');
-                // const vastAdVerificton1: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource1]);
-                // const vastAdVerificton2: VastAdVerification = new VastAdVerification('test.test', [vastVerificationResource2]);
                 omManager.injectVerificationResources([verificationResource, verificationResource1]);
                 const om = omManager.getOMInstances();
 
