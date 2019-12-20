@@ -133,6 +133,7 @@ else
 test-browser: start-server build-browser
 	node test-utils/headless.js
 	node test-utils/headless-load.js
+	node test-utils/headless-load-adapter.js
 endif
 
 # VPaths

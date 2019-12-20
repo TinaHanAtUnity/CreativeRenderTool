@@ -146,6 +146,35 @@ describe('CustomFeatures', () => {
         });
     });
 
+    describe('isAdmobTimeoutWhitelisted', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '1346246',
+            expected: true
+        }, {
+            gameId: '1781085',
+            expected: true
+        }, {
+            gameId: '20723',
+            expected: true
+        }, {
+            gameId: '1225669',
+            expected: true
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isAdmobTimeoutWhitelisted(t.gameId);
+                assert.equal(value, t.expected);
+            });
+        });
+    });
+
     describe('isWhitelistedForLoadApi', () => {
         const tests: {
             gameId: string;
@@ -165,6 +194,46 @@ describe('CustomFeatures', () => {
             it('should match the expected value', () => {
                 const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
                 assert.equal(value, t.expected);
+            });
+        });
+    });
+
+    describe('isFanateeExtermaxGameForLoad', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '56659',
+            expected: true
+        }, {
+            gameId: '1225669',
+            expected: true
+        }, {
+            gameId: '20721',
+            expected: true
+        }, {
+            gameId: '89611',
+            expected: true
+        }, {
+            gameId: '1781085',
+            expected: true
+        }, {
+            gameId: '12256',
+            expected: false
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isFanateeExtermaxGameForLoad(t.gameId);
+                assert.equal(value, t.expected);
+            });
+
+            it('should not exist in the load whitelist', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, false);
             });
         });
     });

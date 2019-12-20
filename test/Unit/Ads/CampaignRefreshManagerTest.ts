@@ -128,7 +128,6 @@ describe('CampaignRefreshManager', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
     let campaignRefreshManager: RefreshManager;
-    let loadManager: CampaignRefreshManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<Campaign>;
@@ -236,7 +235,7 @@ describe('CampaignRefreshManager', () => {
             adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
             privacySDK = TestFixtures.getPrivacySDK(core);
             campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         it('get campaign should return undefined', () => {
@@ -640,7 +639,7 @@ describe('CampaignRefreshManager', () => {
             adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
             privacySDK = TestFixtures.getPrivacySDK(core);
             campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         afterEach(() => {
@@ -754,70 +753,6 @@ describe('CampaignRefreshManager', () => {
 
         afterEach(() => {
             sandbox.restore();
-        });
-
-        describe('for targeted mediation and adapter version', () => {
-            beforeEach(() => {
-                backend.Api.Storage.setStorageContents(<any>{
-                    mediation: {
-                        name: {value: 'MoPub'},
-                        version: {value: 'test_version'},
-                        adapter_version: {value: '3.3.0.1'}
-                    }
-                });
-                return metaDataManager.fetch(MediationMetaData, true, ['name', 'version', 'adapter_version']).then(metaData => {
-                    if (metaData) {
-                        assert.equal(metaData.getName(), 'MoPub', 'MediationMetaData.getName() did not pass through correctly');
-                        assert.equal(metaData.getVersion(), 'test_version', 'MediationMetaData.getVersion() did not pass through correctly');
-                        assert.equal(metaData.getAdapterVersion(), '3.3.0.1', 'MediationMetaData.getAdapterVersion() did not pass through correctly');
-                    }
-                }).then(() => {
-                    loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
-                });
-            });
-
-            it('should update state for READY state', () => {
-                placement.setState(PlacementState.READY);
-                assert.equal(placement.getState(), PlacementState.READY, 'placement state is set to READY');
-
-                const loadDict: {[key: string]: number} = {};
-                loadDict[placementID] = 1;
-                ads.LoadApi.onLoad.trigger(loadDict);
-
-                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
-                sinon.assert.calledWith(sendReadyEventStub, placementID);
-                assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
-                assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be waiting');
-            });
-
-            it('should update state for NO_FILL', () => {
-                placement.setState(PlacementState.NO_FILL);
-
-                const loadDict: {[key: string]: number} = {};
-                loadDict[placementID] = 1;
-                ads.LoadApi.onLoad.trigger(loadDict);
-
-                sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID);
-                sinon.assert.notCalled(sendReadyEventStub);
-                assert.equal(placement.getPreviousState(), PlacementState.WAITING, 'placement previous state should be waiting');
-                assert.equal(placement.getState(), PlacementState.NO_FILL, 'placement previous state should be waiting');
-            });
-        });
-
-        describe('not targeted mediation and adapter version', () => {
-            it('should not update the placement state', () => {
-                loadManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, metaDataManager);
-                placement.setState(PlacementState.READY);
-
-                const loadDict: {[key: string]: number} = {};
-                loadDict[placementID] = 1;
-                ads.LoadApi.onLoad.trigger(loadDict);
-
-                sinon.assert.notCalled(sendPlacementStateChangedEventStub);
-                sinon.assert.notCalled(sendReadyEventStub);
-                assert.equal(placement.getPreviousState(), PlacementState.NOT_AVAILABLE, 'placement previous state should be not availalbe');
-                assert.equal(placement.getState(), PlacementState.READY, 'placement previous state should be ready as no change');
-            });
         });
     });
 });

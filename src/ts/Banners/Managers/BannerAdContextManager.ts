@@ -39,9 +39,14 @@ export class BannerAdContextManager {
 
     public createContext(placement: Placement, bannerAdViewId: string, size: IBannerDimensions) {
         if (placement.isBannerPlacement()) {
-            const newContext = new BannerAdContext(placement, bannerAdViewId, size, this._bannerModule, this._ads, this._core);
-            this._contexts[bannerAdViewId] = newContext;
-            return newContext;
+            const existingContext = this.getContext(bannerAdViewId);
+            if (existingContext) {
+                return existingContext;
+            } else {
+                const newContext = new BannerAdContext(placement, bannerAdViewId, size, this._bannerModule, this._ads, this._core);
+                this._contexts[bannerAdViewId] = newContext;
+                return newContext;
+            }
         } else {
             throw new Error(`Placement ${placement.getId()} is not a banner placement`);
         }
