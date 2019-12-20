@@ -132,7 +132,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }, this._omIframe, this, this._campaign, this._pts);
     }
 
-    public getVastVerification(): VastAdVerification{
+    public getVastVerification(): VastAdVerification {
         return this._adVerification;
     }
 
@@ -330,7 +330,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
              * vast video event handler - calls session start for vast
              */
             if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
-                if(this._sessionStartEventData) {
+                if (this._sessionStartEventData) {
                     this.sessionStart(this._sessionStartEventData);
                 }
             }
