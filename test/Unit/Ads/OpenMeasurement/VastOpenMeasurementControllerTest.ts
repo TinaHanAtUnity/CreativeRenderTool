@@ -18,6 +18,7 @@ import SimpleVast from 'xml/SimpleVast.xml';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { assert } from 'chai';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
@@ -95,8 +96,9 @@ import { assert } from 'chai';
                 const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
                 const campaign = new VastCampaign(params);
                 const request = sinon.createStubInstance(RequestManager);
-                openMeasurement1 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton1.getVerificationVendor(), vastAdVerificton1);
-                openMeasurement2 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton2.getVerificationVendor(), vastAdVerificton2);
+                const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+                openMeasurement1 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton1.getVerificationVendor(), pts, vastAdVerificton1);
+                openMeasurement2 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton2.getVerificationVendor(), pts, vastAdVerificton2);
                 sinon.stub(Date, 'now').returns(123);
                 sinon.stub(openMeasurement1, 'getOMAdSessionId').returns('456');
                 sinon.stub(openMeasurement2, 'getOMAdSessionId').returns('456');
