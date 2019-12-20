@@ -149,17 +149,17 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     type: 'sessionStart',
                     data: {
                         verificationParameters: null,
-                        vendorkey: 'iabtechlab.com-omid'
+                        vendorkey: 'unity'
                     }
                 };
 
-                const event2: ISessionEvent = {
+                const event1: ISessionEvent = {
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
                     data: {
                         verificationParameters: null,
-                        vendorkey: 'test.test'
+                        vendorkey: 'omid'
                     }
                 };
 
@@ -174,24 +174,20 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
                     verificationParameters: 'param2'
                 };
 
-                const vastVerificationResource1 = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
-                const vastVerificationResource2 = new VastVerificationResource ('https://something.test.js', 'unity', false, 'Verifications');
-                const vastAdVerificton1: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource1]);
-                const vastAdVerificton2: VastAdVerification = new VastAdVerification('test.test', [vastVerificationResource2]);
+                // const vastVerificationResource1 = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
+                // const vastVerificationResource2 = new VastVerificationResource ('https://something.test.js', 'unity', false, 'Verifications');
+                // const vastAdVerificton1: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource1]);
+                // const vastAdVerificton2: VastAdVerification = new VastAdVerification('test.test', [vastVerificationResource2]);
                 omManager.injectVerificationResources([verificationResource, verificationResource1]);
                 const om = omManager.getOMInstances();
-                sinon.stub(om[0], 'getVastVerification').returns(vastAdVerificton1);
-                sinon.stub(om[1], 'getVastVerification').returns(vastAdVerificton2);
 
                 sinon.stub(om[0], 'sessionStart');
                 sinon.stub(om[1], 'sessionStart');
 
                 omManager.sessionStart(event);
 
-                sinon.assert.called(<sinon.SinonStub>om[0].getVastVerification);
                 sinon.assert.calledWith(<sinon.SinonStub>om[0].sessionStart, event);
-                sinon.assert.calledWith(<sinon.SinonStub>om[1].sessionStart, event2);
-                sinon.assert.called(<sinon.SinonStub>om[1].getVastVerification);
+                sinon.assert.calledWith(<sinon.SinonStub>om[1].sessionStart, event1);
             });
         });
 

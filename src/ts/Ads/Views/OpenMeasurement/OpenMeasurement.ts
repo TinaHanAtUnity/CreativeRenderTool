@@ -90,7 +90,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _vendorKey: string;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
-    private _verificationScriptResource: IVerificationScriptResource;
 
     private _sessionFinishCalled = false;
     private _sessionStartEventData: ISessionEvent;
@@ -253,15 +252,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
     public sessionStart(sessionEvent: ISessionEvent) {
-        //this._omBridge.triggerSessionEvent(sessionEvent);
-
-        // if (this._vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
-        //     this._sessionStartEventData = sessionEvent;
-        //     this._sessionStartEventData.data.vendorkey = this._vendorKey;
-        //    // console.log('openmeasurement: ' + JSON.stringify(this._sessionStartEventData));
-        // }
         this._sessionStartEventData = sessionEvent;
-        //console.log(this._vendorKey);
         this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
@@ -289,7 +280,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             errorType: 'video',
             message: description
         };
-
         this._omBridge.triggerSessionEvent(event);
     }
 
@@ -340,8 +330,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
              * vast video event handler - calls session start for vast
              */
             if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
-                //console.log('openmeasurement: ' + JSON.stringify(this._sessionStartEventData));
-                this.sessionStart(this._sessionStartEventData);
+                if(this._sessionStartEventData) {
+                    this.sessionStart(this._sessionStartEventData);
+                }
             }
         }
 

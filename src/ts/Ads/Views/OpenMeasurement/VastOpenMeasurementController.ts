@@ -51,13 +51,11 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             };
             event.adSessionId = om.getOMAdSessionId();
             const verification = om.getVastVerification();
-            if(!verification.getVerificationParameters){
+            if(!verification.getVerificationParameters) {
                 event.data.verificationParameters = verification.getVerificationParameters();
             }
             event.data.vendorkey = verification.getVerificationVendor();
-            console.log(event.data.vendorkey);
             event.data.context = contextData;
-            console.log('vastopenmeasurement.sessionstart: ' + JSON.stringify(event));
             om.sessionStart(event);
         });
 

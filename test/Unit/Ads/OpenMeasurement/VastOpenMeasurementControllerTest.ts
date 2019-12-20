@@ -141,7 +141,6 @@ import { assert } from 'chai';
                     timestamp: 123,
                     type: 'sessionStart',
                     data: {
-                        verificationParameters: null,
                         vendorkey: 'iabtechlab.com-omid',
                         context: contextData
                     }
@@ -151,7 +150,6 @@ import { assert } from 'chai';
                     timestamp: 123,
                     type: 'sessionStart',
                     data: {
-                        verificationParameters: null,
                         vendorkey: 'test.test',
                         context: contextData
                     }
