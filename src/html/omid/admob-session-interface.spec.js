@@ -42,4 +42,47 @@ describe('AdmobSessionInterface', () => {
             }]
         }, '*');
     });
+
+    it('should inject multiple verification resources', () => {
+
+        jest.spyOn(global, 'Date').mockImplementationOnce(() => + new Date('1'));
+
+        const theData1 = {
+            resourceUrl: 'https://team-playa-shaown.scoot.mcdoot.doot',
+            vendorKey: 'team-playa-shaown',
+            verificationParameters: 'scooter.mcdooter'
+        };
+
+        const theData2 = {
+            resourceUrl: 'https://have-you-eva.doot',
+            vendorKey: 'have-you-eva',
+            verificationParameters: 'have-you-eva'
+        };
+
+        window.omidSessionInterface.injectVerificationScriptResources([theData1, theData2]);
+        window.omidSessionInterface.registerAdEvents();
+
+        expect(postMessageSpy).lastCalledWith({
+            type: 'omid',
+            event: 'sessionStart',
+            data: {
+                "adSessionId": undefined,
+                "data": {
+                  "context": {
+                    "accessMode": undefined,
+                    "adSessionType": undefined,
+                    "apiVersion": "{{ OMID_API_VERSION }}",
+                    "app": undefined,
+                    "customReferenceIdentifier": undefined,
+                    "environment": undefined,
+                    "omidJsInfo": undefined,
+                    "omidNativeInfo": undefined,
+                    "supports": undefined,
+                  },
+                },
+                "timestamp": NaN,
+                "type": "sessionStart",
+              }
+        }, '*')
+    });
 });
