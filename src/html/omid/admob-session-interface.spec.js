@@ -4,11 +4,14 @@ describe('AdmobSessionInterface', () => {
     let omid_session_interface;
     let postMessageSpy;
 
+    beforeAll(() => {
+        omid_session_interface = OMIDSessionClient.substring(8, OMIDSessionClient.length - 10);
+        eval(omid_session_interface);
+    });
+
     beforeEach(() => {
         postMessageSpy = jest.fn();
         window.postMessage = postMessageSpy;
-        omid_session_interface = OMIDSessionClient.substring(8, OMIDSessionClient.length - 10);
-        eval(omid_session_interface);
     });
 
     it('should inject multiple verification resources', () => {
