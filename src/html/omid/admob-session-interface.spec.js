@@ -43,7 +43,7 @@ describe('AdmobSessionInterface', () => {
         }, '*');
     });
 
-    it('should inject multiple verification resources', () => {
+    it('should call session start with correct data', () => {
 
         jest.spyOn(global, 'Date').mockImplementationOnce(() => + new Date('1'));
 
