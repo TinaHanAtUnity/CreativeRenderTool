@@ -145,7 +145,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     timestamp: 123,
                     type: 'sessionStart',
                     data: {
-                        verificationParameters: null,
+                        verificationParameters: 'param1',
                         vendorkey: 'unity'
                     }
                 };
@@ -155,7 +155,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     timestamp: 123,
                     type: 'sessionStart',
                     data: {
-                        verificationParameters: null,
+                        verificationParameters: 'param2',
                         vendorkey: 'omid'
                     }
                 };
@@ -173,6 +173,9 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
 
                 omManager.injectVerificationResources([verificationResource, verificationResource1]);
                 const om = omManager.getOMInstances();
+
+                sinon.stub(om[0], 'getVerificationResource').returns({resourceUrl: 'https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', vendorKey: 'unity', verificationParameters: 'param1'});
+                sinon.stub(om[1], 'getVerificationResource').returns({resourceUrl: 'https://something.test.js', vendorKey: 'omid', verificationParameters: 'param2'});
 
                 sinon.stub(om[0], 'sessionStart');
                 sinon.stub(om[1], 'sessionStart');

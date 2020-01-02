@@ -21,6 +21,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -98,6 +99,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _adVerification: VastAdVerification;
     private _pts: ProgrammaticTrackingService | undefined;
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
+    private _verificationResource: IVerificationScriptResource;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
@@ -241,8 +243,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
     }
 
-    public getVendorkey() {
-        return this._vendorKey;
+    public getVerificationResource(): IVerificationScriptResource {
+        return this._verificationResource;
     }
 
     /*
@@ -421,6 +423,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this.checkVendorResourceURL(resourceUrl).then(() => {
             this.injectAsString(resourceUrl, vendorKey);
             this.populateVendorKey(vendorKey);
+            this._verificationResource.resourceUrl = resourceUrl;
+            this._verificationResource.vendorKey = vendorKey;
+            this._verificationResource.verificationParameters = verificationParameters;
 
             if (vendorKey === 'IAS' && this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASVerificatonInjected);

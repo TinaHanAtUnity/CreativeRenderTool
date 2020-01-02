@@ -86,7 +86,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
             const vastVerificationResource1 = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
             const vastVerificationResource2 = new VastVerificationResource ('https://something.test.js', 'unity', false, 'Verifications');
-            const vastAdVerificton1: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource1]);
+            const vastAdVerificton1: VastAdVerification = new VastAdVerification('iabtechlab.com-omid', [vastVerificationResource1], 'AliceWonderland');
             const vastAdVerificton2: VastAdVerification = new VastAdVerification('test.test', [vastVerificationResource2]);
 
             beforeEach(() => {
@@ -144,6 +144,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                     type: 'sessionStart',
                     data: {
                         vendorkey: 'iabtechlab.com-omid',
+                        verificationParameters: 'AliceWonderland',
                         context: contextData
                     }
                 };
