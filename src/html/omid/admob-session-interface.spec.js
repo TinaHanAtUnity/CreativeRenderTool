@@ -48,7 +48,8 @@ describe('AdmobSessionInterface', () => {
 
     it('should call session start with correct data', () => {
 
-        jest.spyOn(global, 'Date').mockImplementationOnce(() => + new Date('1'));
+        const DATE_TO_USE = new Date('2020');
+        global.Date = jest.fn(() => DATE_TO_USE);
 
         const theData1 = {
             resourceUrl: 'https://team-playa-shaown.scoot.mcdoot.doot',
@@ -88,7 +89,7 @@ describe('AdmobSessionInterface', () => {
                     'supports': ['vlid', 'clid'],
                   },
                 },
-                'timestamp': NaN,
+                'timestamp': 1577836800000,
                 'type': 'sessionStart',
               }
         }, '*')
@@ -97,7 +98,8 @@ describe('AdmobSessionInterface', () => {
     // register session observer is not required to be called
     it('should call session start with correct data if register session observer is called', () => {
 
-        jest.spyOn(global, 'Date').mockImplementationOnce(() => + new Date('1'));
+        const DATE_TO_USE = new Date('2020');
+        global.Date = jest.fn(() => DATE_TO_USE);
 
         const theData1 = {
             resourceUrl: 'https://team-playa-shaown.scoot.mcdoot.doot',
@@ -149,7 +151,7 @@ describe('AdmobSessionInterface', () => {
                     'supports': ['vlid', 'clid'],
                   },
                 },
-                'timestamp': NaN,
+                'timestamp': 1577836800000,
                 'type': 'sessionStart',
               }
         }, '*')
