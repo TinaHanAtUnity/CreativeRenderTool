@@ -69,22 +69,22 @@ describe('AdmobSessionInterface', () => {
             type: 'omid',
             event: 'sessionStart',
             data: {
-                "adSessionId": undefined,
-                "data": {
-                  "context": {
-                    "accessMode": undefined,
-                    "adSessionType": undefined,
-                    "apiVersion": "{{ OMID_API_VERSION }}",
-                    "app": undefined,
-                    "customReferenceIdentifier": undefined,
-                    "environment": undefined,
-                    "omidJsInfo": undefined,
-                    "omidNativeInfo": undefined,
-                    "supports": undefined,
+                'adSessionId': undefined,
+                'data': {
+                  'context': {
+                    'accessMode': undefined,
+                    'adSessionType': undefined,
+                    'apiVersion': '{{ OMID_API_VERSION }}',
+                    'app': undefined,
+                    'customReferenceIdentifier': undefined,
+                    'environment': undefined,
+                    'omidJsInfo': undefined,
+                    'omidNativeInfo': undefined,
+                    'supports': undefined,
                   },
                 },
-                "timestamp": NaN,
-                "type": "sessionStart",
+                'timestamp': NaN,
+                'type': 'sessionStart',
               }
         }, '*')
     });
@@ -106,7 +106,9 @@ describe('AdmobSessionInterface', () => {
             verificationParameters: 'have-you-eva'
         };
 
+        window.omidSessionInterface.setClientInfo('1.0', 'google', '1.1')
         window.omidSessionInterface.registerSessionObserver(() => void 0);
+
         window.omidSessionInterface.injectVerificationScriptResources([theData1, theData2]);
         window.omidSessionInterface.registerAdEvents();
 
@@ -114,36 +116,36 @@ describe('AdmobSessionInterface', () => {
             type: 'omid',
             event: 'sessionStart',
             data: {
-                "adSessionId": undefined,
-                "data": {
-                  "context": {
-                    "accessMode": 'limited',
-                    "adSessionType": 'html',
-                    "apiVersion": "{{ OMID_API_VERSION }}",
-                    "app": {
-                        "adId": undefined,
-                        "appId": "com.unity.ads",
-                        "libraryVersion": "1.2.10",
-                        "omidImplementer": "{{ OMID_IMPLEMENTOR }}"
+                'adSessionId': undefined,
+                'data': {
+                  'context': {
+                    'accessMode': 'limited',
+                    'adSessionType': 'html',
+                    'apiVersion': '{{ OMID_API_VERSION }}',
+                    'app': {
+                        'adId': undefined,
+                        'appId': 'com.unity.ads',
+                        'libraryVersion': '1.2.10',
+                        'omidImplementer': '{{ OMID_IMPLEMENTOR }}'
                     },
-                    "customReferenceIdentifier": undefined,
-                    "environment": 'app',
-                    "omidJsInfo": {
+                    'customReferenceIdentifier': undefined,
+                    'environment': 'app',
+                    'omidJsInfo': {
                         'omidImplementer': '{{ OMID_IMPLEMENTOR }}',
-                        "partnerName": undefined,
-                        "partnerVersion": undefined,
-                        "serviceVersion": undefined,
-                        "sessionClientVersion": undefined,
+                        'partnerName': 'google',
+                        'partnerVersion': '1.1',
+                        'serviceVersion': '1.2.10',
+                        'sessionClientVersion': '1.0',
                     },
-                    "omidNativeInfo": {
-                        'partnerName': undefined,
+                    'omidNativeInfo': {
+                        'partnerName': 'Unity3d',
                         'partnerVersion': undefined
                     },
-                    "supports": ['vlid', 'clid'],
+                    'supports': ['vlid', 'clid'],
                   },
                 },
-                "timestamp": NaN,
-                "type": "sessionStart",
+                'timestamp': NaN,
+                'type': 'sessionStart',
               }
         }, '*')
     });
