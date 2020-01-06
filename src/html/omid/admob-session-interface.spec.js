@@ -88,4 +88,63 @@ describe('AdmobSessionInterface', () => {
               }
         }, '*')
     });
+
+    // register session observer is not required to be called
+    it('should call session start with correct data if register session observer is called', () => {
+
+        jest.spyOn(global, 'Date').mockImplementationOnce(() => + new Date('1'));
+
+        const theData1 = {
+            resourceUrl: 'https://team-playa-shaown.scoot.mcdoot.doot',
+            vendorKey: 'team-playa-shaown',
+            verificationParameters: 'scooter.mcdooter'
+        };
+
+        const theData2 = {
+            resourceUrl: 'https://have-you-eva.doot',
+            vendorKey: 'have-you-eva',
+            verificationParameters: 'have-you-eva'
+        };
+
+        window.omidSessionInterface.registerSessionObserver(() => void 0);
+        window.omidSessionInterface.injectVerificationScriptResources([theData1, theData2]);
+        window.omidSessionInterface.registerAdEvents();
+
+        expect(postMessageSpy).lastCalledWith({
+            type: 'omid',
+            event: 'sessionStart',
+            data: {
+                "adSessionId": undefined,
+                "data": {
+                  "context": {
+                    "accessMode": 'limited',
+                    "adSessionType": 'html',
+                    "apiVersion": "{{ OMID_API_VERSION }}",
+                    "app": {
+                        "adId": undefined,
+                        "appId": "com.unity.ads",
+                        "libraryVersion": "1.2.10",
+                        "omidImplementer": "{{ OMID_IMPLEMENTOR }}"
+                    },
+                    "customReferenceIdentifier": undefined,
+                    "environment": 'app',
+                    "omidJsInfo": {
+                        'omidImplementer': '{{ OMID_IMPLEMENTOR }}',
+                        "partnerName": undefined,
+                        "partnerVersion": undefined,
+                        "serviceVersion": undefined,
+                        "sessionClientVersion": undefined,
+                    },
+                    "omidNativeInfo": {
+                        'partnerName': undefined,
+                        'partnerVersion': undefined
+                    },
+                    "supports": ['vlid', 'clid'],
+                  },
+                },
+                "timestamp": NaN,
+                "type": "sessionStart",
+              }
+        }, '*')
+    });
 });
