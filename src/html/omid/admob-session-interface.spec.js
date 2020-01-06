@@ -72,15 +72,20 @@ describe('AdmobSessionInterface', () => {
                 'adSessionId': undefined,
                 'data': {
                   'context': {
-                    'accessMode': undefined,
-                    'adSessionType': undefined,
+                    'accessMode': 'limited',
+                    'adSessionType': 'html',
                     'apiVersion': '{{ OMID_API_VERSION }}',
-                    'app': undefined,
+                    'app': {
+                        'adId': undefined,
+                        'appId': 'com.unity.ads',
+                        'libraryVersion': '1.2.10',
+                        'omidImplementer': '{{ OMID_IMPLEMENTOR }}'
+                    },
                     'customReferenceIdentifier': undefined,
-                    'environment': undefined,
+                    'environment': 'app',
                     'omidJsInfo': undefined,
                     'omidNativeInfo': undefined,
-                    'supports': undefined,
+                    'supports': ['vlid', 'clid'],
                   },
                 },
                 'timestamp': NaN,
