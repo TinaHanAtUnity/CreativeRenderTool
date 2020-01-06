@@ -97,6 +97,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 listener: (event: Event) => {
                     this.hideArAvailableButton();
                     this.showARPermissionPanel();
+                    this.sendMraidAnalyticsEvent('ar_button_clicked', undefined);
                 },
                 selector: '.ar-available-button'
             },
@@ -426,6 +427,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showARPermissionPanel() {
         if (this._arCameraAlreadyAccepted) {
+            this.sendMraidAnalyticsEvent('camera_permission_user_already_accepted', undefined);
             this.onShowAr();
             return;
         }
@@ -454,22 +456,26 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onShowAr() {
-        const observer = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
-            if (permission === PermissionTypes.CAMERA) {
-                this._core.Permissions.onPermissionsResult.unsubscribe(observer);
+        if (!this._arCameraAlreadyAccepted) {
+            const observer = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
+                if (permission === PermissionTypes.CAMERA) {
+                    this._core.Permissions.onPermissionsResult.unsubscribe(observer);
 
-                if (granted) {
-                    // send event only if permission is granted, otherwise would reload fallback scene
-                    this.onCameraPermissionEvent(true);
-                    this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
-                } else {
-                    this.sendMraidAnalyticsEvent('camera_permission_user_denied', undefined);
+                    if (granted) {
+                        // send event only if permission is granted, otherwise would reload fallback scene
+                        this.onCameraPermissionEvent(true);
+                        this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
+                    } else {
+                        this.sendMraidAnalyticsEvent('camera_permission_user_rejected', undefined);
+                    }
                 }
-            }
-        });
+            });
 
-        PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA);
-        this.sendMraidAnalyticsEvent('permission_dialog_system_show', undefined);
+            PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA);
+            this.sendMraidAnalyticsEvent('permission_dialog_system_show', undefined);
+        } else {
+            this.onCameraPermissionEvent(true);
+        }
     }
 
     private onShowFallback() {
@@ -529,16 +535,15 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }).then((result: CurrentPermission) => {
                 if (result === CurrentPermission.NOT_IN_MANIFEST) {
                     this._arAvailableButton.classList.add('hidden');
-                    this.sendMraidAnalyticsEvent('camera_permission_not_in_manifest', undefined);
+                    this.sendMraidAnalyticsEvent('app_camera_permission_not_in_manifest', undefined);
                 } else if (result === CurrentPermission.DENIED) {
                     this._arAvailableButton.classList.add('hidden');
-                    this.sendMraidAnalyticsEvent('camera_permission_user_denied', undefined);
+                    this.sendMraidAnalyticsEvent('app_camera_permission_denied', undefined);
                 } else {
                     // the user can see ar content
                     this._arCameraAlreadyAccepted = false;
 
                     if (result === CurrentPermission.ACCEPTED) {
-                        this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
                         this._arCameraAlreadyAccepted = true;
                     }
 
