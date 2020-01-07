@@ -97,7 +97,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 listener: (event: Event) => {
                     this.hideArAvailableButton();
                     this.showARPermissionPanel();
-                    this.sendMraidAnalyticsEvent('ar_button_clicked', undefined);
+                    this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
                 },
                 selector: '.ar-available-button'
             },
@@ -523,7 +523,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._loadingScreen.classList.add('hidden');
 
             if (!supported) {
-                this.sendMraidAnalyticsEvent('not_supported', undefined);
+                this.sendMraidAnalyticsEvent('ar_not_supported', undefined);
                 return;
             }
 
@@ -547,6 +547,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this._arCameraAlreadyAccepted = true;
                     }
 
+                    this.sendMraidAnalyticsEvent('ar_button_displayed', undefined);
                     this._arAvailableButton.classList.remove('hidden');
                     this._arAvailableButton.style.display = 'block';
                     this._arAvailableButtonShown = true;
