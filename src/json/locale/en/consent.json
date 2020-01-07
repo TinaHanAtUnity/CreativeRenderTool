@@ -55,8 +55,7 @@
   "disagree": "Disagree",
 
   "age-gate-title": "Before you get started, please verify your age",
-  "age-gate-text": "Please confirm your age group so we can offer you the best possible in-game experience while protecting your privacy and safety",
-  "age-gate-text-ccpa": "To ensure we offer you the best possible in-game experience, including your privacy choices and protecting your privacy, please confirm your age:",
+  "age-gate-text": "To ensure we offer you the best possible in-game experience, including your privacy choices and protecting your privacy, please confirm your age:",
   "age-gate-over-age-limit-btn": "I'm {0} or older",
   "age-gate-under-age-limit-btn": "I'm {0} or younger"
 }

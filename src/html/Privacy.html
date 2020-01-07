@@ -49,6 +49,7 @@
                     a full description of our data practices. You can opt-out of Unity Ads’ personalized
                     experiences and ads through your device settings.
                 </p>
+                <div class="padding-block"></div>
             </div>
         </div>
         <% } else if(data.isUserUnderAgeLimit) { %>
@@ -158,7 +159,7 @@
                 <span id="data-deletion-container"><%= data.t("privacy-dialog-text-li-p7-are-you-sure") %><span id="data-deletion-confirm" class="page-link"><%= data.t("privacy-dialog-text-li-p7-yes") %></span>
                     / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
                 <span id="data-deletion-request-container">
-                    <%= data.t("privacy-dialog-text-li-p7-data-deletion-text") %>
+                    <%= data.t("privacy-dialog-text-li-p7-data-deletion-text-ccpa") %>
                 </span>
                 <% } else { %>
                 <span class="header"><%= data.t("privacy-dialog-text-li-p7-header") %></span>

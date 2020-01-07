@@ -1,4 +1,4 @@
-import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy, ReportReason } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 import { Localization } from 'Core/Utilities/Localization';
 import { PrivacyDataRequest } from 'Ads/Views/Privacy/PrivacyDataRequest';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 enum PrivacyCardState {
     PRIVACY,
@@ -35,7 +36,7 @@ export class Privacy extends AbstractPrivacy {
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._language = language;
-        this._localization = new Localization(language, 'privacy');
+        this._localization = new PrivacyLocalization(language, 'privacy', privacyManager.getLegalFramework());
         this._template = new Template(PrivacyTemplate, this._localization);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
@@ -85,7 +86,7 @@ export class Privacy extends AbstractPrivacy {
         if (this._userPrivacyManager.isDataRequestEnabled()) {
             const dataRequestContainer = this._container.querySelector('.data-request-container');
             if (dataRequestContainer) {
-                const dataRequestView = new PrivacyDataRequest(this._platform, this._language);
+                const dataRequestView = new PrivacyDataRequest(this._platform, this._userPrivacyManager, this._language);
                 dataRequestView.render();
                 dataRequestContainer.appendChild(dataRequestView.container());
             }

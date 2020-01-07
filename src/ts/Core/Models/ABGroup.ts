@@ -65,10 +65,10 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 
 // Active AB Tests
-export const MabDecisionButtonTest = new ZyngaFilteredABTest(15, 17);
+export const MabDecisionButtonTest = new ZyngaFilteredABTest(7, 8, 10, 11, 12, 15, 17);
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
-export const LoadAdapterV1 = new ABTest(5, 6);
+export const AdmobAdapterV1 = new ABTest(5, 6);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();

@@ -11,6 +11,8 @@ import {
     IDataRequestResponse,
     PrivacyDataRequestHelper
 } from 'Privacy/PrivacyDataRequestHelper';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
 
@@ -24,11 +26,11 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
     private _emailInputElement: HTMLInputElement;
     private _submitButtonElement: HTMLElement;
 
-    constructor(platform: Platform, language: string) {
+    constructor(platform: Platform, privacyManager: UserPrivacyManager, language: string) {
         super(platform, 'privacy-data-request');
 
         this._language = language;
-        this._localization = new Localization(language, 'privacy');
+        this._localization = new PrivacyLocalization(language, 'privacy', privacyManager.getLegalFramework());
         this._template = new Template(DataRequestTemplate, this._localization);
 
         this._bindings = [
@@ -110,7 +112,9 @@ export class PrivacyDataRequest extends View<{}> implements ICaptchaHandler {
             this.initCaptcha();
         } else {
             // todo: triggers browser's built-in ui pop-up, could be replaced with something else
-            this._emailInputElement.reportValidity();
+            if (this._emailInputElement.reportValidity) {
+                this._emailInputElement.reportValidity();
+            }
         }
     }
 

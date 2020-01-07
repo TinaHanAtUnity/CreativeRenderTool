@@ -20,6 +20,7 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
         this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg) => this.handleSendStats(<number>msg.totalTime, <number>msg.playTime, <number>msg.frameCount);
         this._mraidHandlers[MRAIDEvents.AR] = (msg) => this.handleAr(<MessageEvent>msg);
         this._mraidHandlers[MRAIDEvents.AR_READY_SHOW] = (msg) => this.handleArReadyToShow(<MessageEvent>msg);
+        this._mraidHandlers[MRAIDEvents.AR_BUTTON_HIDE] = (msg) => this.handleArButtonHide(<MessageEvent>msg);
         this._mraidHandlers[MRAIDEvents.CONSOLE_LOG] = (msg) => this.handleConsoleLog(<MessageEvent>msg);
     }
 
@@ -68,6 +69,10 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
 
     private handleArReadyToShow(event: MessageEvent) {
         this._handler.onBridgeArReadyToShow(event);
+    }
+
+    private handleArButtonHide(event: MessageEvent) {
+        this._handler.onBridgeArButtonHide(event);
     }
 
     private handleConsoleLog(event: MessageEvent) {

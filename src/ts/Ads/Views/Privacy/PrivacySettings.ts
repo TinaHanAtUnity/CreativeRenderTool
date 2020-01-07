@@ -8,7 +8,7 @@ import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Privacy/PrivacyRowItemContainer';
 import { PersonalizationSwitchGroup } from 'Ads/Views/Privacy/PersonalizationSwitchGroup';
 import { IPrivacyPermissions } from 'Privacy/Privacy';
-import { Localization } from 'Core/Utilities/Localization';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 enum ViewState {
     INITIAL,
@@ -41,7 +41,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         // https://github.com/Microsoft/TypeScript/issues/13775#issuecomment-276381229 explains "keyof typeof EnumType" cast
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason) => ReportReason[<keyof typeof ReportReason>reason]);
 
-        this._template = new Template(PrivacySettingsTemplate, new Localization(language, 'consent'));
+        this._template = new Template(PrivacySettingsTemplate, new PrivacyLocalization(language, 'consent', privacyManager.getLegalFramework()));
         this._bindings = [
             {
                 event: 'click',

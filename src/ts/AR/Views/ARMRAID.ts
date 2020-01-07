@@ -40,6 +40,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
+    private _arButtonCollapseTimeout?: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -95,9 +96,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
-                    this.hideArAvailableButton();
-                    this.showARPermissionPanel();
-                    this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
+                    if (this._arAvailableButton.classList.contains('collapsed')) {
+                        this.expandArAvailableButton();
+                    } else {
+                        this.hideArAvailableButton();
+                        this.showARPermissionPanel();
+                        this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
+                    }
                 },
                 selector: '.ar-available-button'
             },
@@ -510,12 +515,20 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private hideArAvailableButton() {
+        if (this._arButtonCollapseTimeout) {
+            clearTimeout(this._arButtonCollapseTimeout);
+            this._arButtonCollapseTimeout = undefined;
+        }
         this._arAvailableButton.classList.add('hidden');
         this._arAvailableButton.style.display = 'none';
+        this._arAvailableButton.classList.remove('collapsed', 'expanded');
     }
 
     private showArAvailableButton() {
         if (this._arAvailableButtonShown) {
+            this._arAvailableButton.classList.remove('hidden');
+            this._arAvailableButton.style.display = 'block';
+            this.collapseArAvailableButtonDelayed();
             return;
         }
 
@@ -548,16 +561,39 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     }
 
                     this.sendMraidAnalyticsEvent('ar_button_displayed', undefined);
-                    this._arAvailableButton.classList.remove('hidden');
+                    this._arAvailableButton.classList.remove('hidden', 'collapsed', 'expanded');
                     this._arAvailableButton.style.display = 'block';
                     this._arAvailableButtonShown = true;
+                    this.collapseArAvailableButtonDelayed();
                 }
             });
         });
     }
 
+    private collapseArAvailableButtonDelayed() {
+        if (this._arButtonCollapseTimeout) {
+            clearTimeout(this._arButtonCollapseTimeout);
+            this._arButtonCollapseTimeout = undefined;
+        }
+        this._arButtonCollapseTimeout = window.setTimeout(() => {
+            this._arAvailableButton.classList.add('collapsed');
+            this._arAvailableButton.classList.remove('expanded');
+        }, 5000);
+    }
+
+    private expandArAvailableButton() {
+        this._arAvailableButton.classList.remove('collapsed');
+        this._arAvailableButton.classList.add('expanded');
+        this.collapseArAvailableButtonDelayed();
+    }
+
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
         this.showArAvailableButton();
+        return Promise.resolve();
+    }
+
+    protected onArButtonHideEvent(msg: MessageEvent): Promise<void> {
+        this.hideArAvailableButton();
         return Promise.resolve();
     }
 

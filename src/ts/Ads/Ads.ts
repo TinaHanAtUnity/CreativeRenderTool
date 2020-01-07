@@ -85,11 +85,13 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, LoadAdapterV1 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, AdmobAdapterV1 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
+import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class Ads implements IAds {
 
@@ -111,6 +113,7 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
+    public AdmobAdapterManager: AdmobAdapterManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -180,6 +183,8 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
+            return this.configureMediationManager();
+        }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
@@ -195,10 +200,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
-            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch((error) => {
-                if (error instanceof Error) {
-                    this._core.Api.Sdk.logError('Failed to set developer consent based on metadata: ' + error.message);
-                }
+            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+                // do nothing since it's normal to have undefined developer consent
             });
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
@@ -300,16 +303,30 @@ export class Ads implements IAds {
                 }
             }
         } else if (this._loadApiEnabled) {
-            const isForcedLoadAdapterGame = CustomFeatures.isForcedLoadAdapterGame(this._core.ClientInfo.getGameId());
-
-            if (LoadAdapterV1.isValid(this._core.Config.getAbGroup()) || isForcedLoadAdapterGame) {
-                this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-            } else {
-                this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-            }
+            this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
+    }
+
+    private configureMediationManager(): Promise<void> {
+        const allowedByAbTest = AdmobAdapterV1.isValid(this._core.Config.getAbGroup());
+        const allowedByGameId = CustomFeatures.isAdmobTimeoutWhitelisted(this._core.ClientInfo.getGameId());
+
+        if (allowedByAbTest || allowedByGameId) {
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation) {
+                    const mediationName = mediation.getName();
+                    if (mediationName === 'AdMob') {
+                        this.AdmobAdapterManager = new AdmobAdapterManager(this.Api, this._core.NativeBridge.getPlatform());
+                    }
+                }
+            }).catch(() => {
+                // ingore error
+            });
+        }
+
+        return Promise.resolve();
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
@@ -658,8 +675,12 @@ export class Ads implements IAds {
 
         const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
         const isMopubTestGame = CustomFeatures.isMopubTestGameForLoad(this._core.ClientInfo.getGameId());
-        const isContainedLoadExperiment = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
-        if (isContainedLoadExperiment || isZyngaDealGame || isMopubTestGame) {
+        const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
+        const isFanateeExtermaxGameForLoad = CustomFeatures.isFanateeExtermaxGameForLoad(this._core.ClientInfo.getGameId());
+        const isOriginalLoad = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
+        const isLoadV4 = LoadRefreshV4.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
+
+        if (isOriginalLoad || isLoadV4 || isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad) {
             this._webViewEnabledLoad = true;
         }
     }
