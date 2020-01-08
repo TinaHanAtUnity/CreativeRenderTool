@@ -118,7 +118,8 @@ export enum MraidMetric {
 
 export enum AUIMetric {
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
-    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
+    DecisionNotReady = 'decision_not_ready'
 }
 
 export enum MediationMetric {

@@ -8,29 +8,43 @@ import { ICore } from 'Core/ICore';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import 'mocha';
 import * as sinon from 'sinon';
 
+const FooExperimentDeclaration = {
+    action1: {
+        choiceA: 'action1ChoiceA',
+        choiceB: 'action1ChoiceB'
+    },
+    action2: {
+        choiceA: 'action2ChoiceA',
+        choiceB: 'action2ChoiceB'
+    }
+};
+
+const FooExperimentDefaultActions = {
+    action1: FooExperimentDeclaration.action1.choiceB,
+    action2: FooExperimentDeclaration.action2.choiceA
+};
+
 const FooExperiment = new AutomatedExperiment({
     name: 'FooExperiment',
-    actions: ['FooAction1', 'FooAction2'],
-    defaultAction: 'FooAction2'
+    actions: FooExperimentDeclaration,
+    defaultActions: FooExperimentDefaultActions
 });
 
 const FooExperimentNoCache = new AutomatedExperiment({
     name: 'FooExperiment',
-    actions: ['FooAction1', 'FooAction2'],
-    defaultAction: 'FooAction1',
+    actions: FooExperimentDeclaration,
+    defaultActions: FooExperimentDefaultActions,
     cacheDisabled: true
 });
 
 describe('AutomatedExperimentManagerTest', () => {
-    const baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
+    const baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
     const createEndPoint = 'experiment';
-    const actionEndPoint = 'action';
     const rewardEndPoint = 'reward';
 
     const sandbox = sinon.createSandbox();
@@ -38,7 +52,6 @@ describe('AutomatedExperimentManagerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICore;
     let ads: IAds;
-    let diagnosticTrigger: sinon.SinonStub;
 
     beforeEach(() => {
         backend = TestFixtures.getBackend(Platform.ANDROID);
@@ -46,7 +59,6 @@ describe('AutomatedExperimentManagerTest', () => {
         core = TestFixtures.getCoreModule(nativeBridge);
         ads = TestFixtures.getAdsModule(core);
         core.Ads = ads;
-        diagnosticTrigger = sandbox.stub(Diagnostics, 'trigger');
     });
 
     afterEach(() => {
@@ -131,8 +143,6 @@ describe('AutomatedExperimentManagerTest', () => {
         const writeStub = sandbox.stub(core.Api.Storage, 'write')
             .resolves();
 
-        const postUrl = baseUrl + createEndPoint;
-
         const postStub = sandbox.stub(core.RequestManager, 'post')
             .resolves(<INativeResponse>{
                 responseCode: 200,
@@ -148,8 +158,13 @@ describe('AutomatedExperimentManagerTest', () => {
         });
     });
 
-    ['FooAction1', 'FooAction2'].forEach((action) => {
-        it(`initialize with request ok, use received action ${action}`, () => {
+    [
+        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
+        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB},
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA},
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+    ].forEach((action) => {
+        it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
             const getStub = sandbox.stub(core.Api.Storage, 'get')
                 .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment')
                 .rejects();
@@ -179,13 +194,16 @@ describe('AutomatedExperimentManagerTest', () => {
                 assert.isTrue(setStub.called);
                 assert.isTrue(writeStub.called);
 
-                assert.equal(aem.getExperimentAction(FooExperiment), action, 'Wrong variant...');
+                assert.equal(JSON.stringify(aem.getExperimentAction(FooExperiment)), JSON.stringify(action), 'Wrong variant...');
             });
         });
     });
 
-    ['FooAction1', 'FooAction2'].forEach((action) => {
-        it(`initialize with request ok, use received action ${action}, failed to parse`, () => {
+    [
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: 'badAction'},
+        {action1: 'badAction', action2: FooExperimentDeclaration.action2.choiceA}
+    ].forEach((action) => {
+        it(`initialize with request ok, use received action ${JSON.stringify(action)}, failed to parse`, () => {
             const getStub = sandbox.stub(core.Api.Storage, 'get')
                 .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment')
                 .rejects();
@@ -216,7 +234,7 @@ describe('AutomatedExperimentManagerTest', () => {
 
                 assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-                assert.equal(aem.getExperimentAction(FooExperiment), 'FooAction2', 'Wrong variant...');
+                assert.equal(JSON.stringify(aem.getExperimentAction(FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
             });
         });
     });
@@ -227,7 +245,7 @@ describe('AutomatedExperimentManagerTest', () => {
             .rejects();
 
         const setStub = sandbox.stub(core.Api.Storage, 'set')
-            .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData('FooAction1', ''))
+            .withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData(FooExperimentDefaultActions, ''))
             .resolves();
 
         const writeStub = sandbox.stub(core.Api.Storage, 'write')
@@ -252,12 +270,17 @@ describe('AutomatedExperimentManagerTest', () => {
 
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-            assert.equal(aem.getExperimentAction(FooExperiment), 'FooAction2', 'Wrong variant...');
+            assert.equal(JSON.stringify(aem.getExperimentAction(FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
         });
     });
 
-    ['FooAction1', 'FooAction2'].forEach((action) => {
-        it(`initialize with cached action ${action}`, () => {
+    [
+        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
+        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB},
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA},
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+    ].forEach((action) => {
+        it(`initialize with cached action ${JSON.stringify(action)}`, () => {
             const storedData = new CachableAutomatedExperimentData(action, '');
 
             const getStub = sandbox.stub(core.Api.Storage, 'get')
@@ -285,8 +308,17 @@ describe('AutomatedExperimentManagerTest', () => {
         });
     });
 
-    [['FooAction1', 'FooAction2'], ['FooAction2', 'FooAction1']].forEach(([action, expected]) => {
-        it(`initialize with cached experiment, ignore cached action ${action}`, () => {
+    [
+        [
+            {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
+            {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+        ],
+        [
+            {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB},
+            {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA}
+        ]
+    ].forEach(([action, expected]) => {
+        it(`initialize with cached experiment, ignore cached action ${JSON.stringify(action)}`, () => {
             const storableData = new CachableAutomatedExperimentData(expected, '');
 
             const getStub = sandbox.stub(core.Api.Storage, 'get')
@@ -317,7 +349,7 @@ describe('AutomatedExperimentManagerTest', () => {
                 assert.isTrue(setStub.called);
                 assert.isTrue(writeStub.called);
                 assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
-                assert.equal(aem.getExperimentAction(FooExperimentNoCache), expected, 'Wrong variant...');
+                assert.equal(JSON.stringify(aem.getExperimentAction(FooExperimentNoCache)), JSON.stringify(expected), 'Wrong variant...');
             });
         });
     });
@@ -328,29 +360,21 @@ describe('AutomatedExperimentManagerTest', () => {
             getStub = getStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment').rejects();
 
             let setStub = sandbox.stub(core.Api.Storage, 'set');
-            setStub = setStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData('FooAction1', ''));
+            setStub = setStub.withArgs(StorageType.PRIVATE, 'AUI_OPT_EXPERIMENT_FooExperiment', new CachableAutomatedExperimentData(FooExperimentDefaultActions, ''));
 
             sandbox.stub(core.Api.Storage, 'write').resolves();
 
             const postStub = sandbox.stub(core.RequestManager, 'post');
 
-            const responseText = JSON.stringify({experiments: {FooExperiment: 'FooAction1'}});
+            const responseText = JSON.stringify({experiments: {FooExperiment: FooExperimentDefaultActions}});
             postStub.onCall(0).resolves(<INativeResponse>{
                 responseCode: 200,
                 response: responseText
             });
 
-            const actionPostUrl = baseUrl + actionEndPoint;
-            const actionRequestBodyText = JSON.stringify({user_info: {ab_group: 99}, experiment: 'FooExperiment', action: 'FooAction1'});
-            const actionResponseText = JSON.stringify({success: true});
-            const postStubAction = postStub.onCall(1).resolves(<INativeResponse>{
-                responseCode: 200,
-                response: actionResponseText
-            });
-
             const rewardPostUrl = baseUrl + rewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: {ab_group: 99}, experiment: 'FooExperiment', action: 'FooAction1', reward: rewarded, metadata: ''
+                user_info: {ab_group: 99}, experiment: 'FooExperiment', actions: FooExperimentDefaultActions, reward: rewarded, metadata: ''
             });
             const rewardResponseText = JSON.stringify({success: true});
             const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
@@ -363,7 +387,7 @@ describe('AutomatedExperimentManagerTest', () => {
                 aem.beginExperiment();
                 const variant = aem.getExperimentAction(FooExperiment);
 
-                assert.equal(variant, 'FooAction1', 'Wrong variant name');
+                assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
 
                 aem.sendAction(FooExperiment, undefined);
                 if (rewarded) {
@@ -372,8 +396,7 @@ describe('AutomatedExperimentManagerTest', () => {
             }).then(() => {
                 return aem.endExperiment();
             }).then(() => {
-                assert(postStub.calledThrice);
-                assert(postStubAction.calledWith(actionPostUrl, actionRequestBodyText));
+                assert(postStub.calledTwice);
                 assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
             });
         });
