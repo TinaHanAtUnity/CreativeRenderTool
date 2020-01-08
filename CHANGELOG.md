@@ -1,3 +1,7 @@
+# Thu Dec 19 13:41:58 UTC 2019
+
+* Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)
+
 # Thu Dec 19 00:49:02 UTC 2019
 
 * Add Hide AR Button Feature [#12105](https://github.com/Applifier/unity-ads-webview/pull/12105)
