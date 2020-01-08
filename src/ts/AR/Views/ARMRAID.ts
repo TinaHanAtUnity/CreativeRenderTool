@@ -575,6 +575,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             clearTimeout(this._arButtonCollapseTimeout);
             this._arButtonCollapseTimeout = undefined;
         }
+
         this._arButtonCollapseTimeout = window.setTimeout(() => {
             this._arAvailableButton.classList.add('collapsed');
             this._arAvailableButton.classList.remove('expanded');
