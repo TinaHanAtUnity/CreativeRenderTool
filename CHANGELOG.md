@@ -1,4 +1,100 @@
-# Pending
+# Thu Dec 19 13:41:58 UTC 2019
+
+* Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)
+
+# Thu Dec 19 00:49:02 UTC 2019
+
+* Add Hide AR Button Feature [#12105](https://github.com/Applifier/unity-ads-webview/pull/12105)
+* Add Cheetah GameIDs for Load Testing and Fix Load V4 Experiment [#12482](https://github.com/Applifier/unity-ads-webview/pull/12482)
+* Add 3 more Etermax gameIDs into load experiment whitelists [#12726](https://github.com/Applifier/unity-ads-webview/pull/12726)
+
+# Wed Dec 18 13:36:33 UTC 2019
+
+* Spanish translation for CCPA [#12668](https://github.com/Applifier/unity-ads-webview/pull/12668)
+
+# Wed Dec 18 02:07:58 UTC 2019
+
+* Add AB groups to Animated Button experiment [#12454](https://github.com/Applifier/unity-ads-webview/pull/12454)
+* Send out AUI reward on click instead of on hide [#12526](https://github.com/Applifier/unity-ads-webview/pull/12526)
+* Create Jest Mocks for Banners [#12583](https://github.com/Applifier/unity-ads-webview/pull/12583)
+* Send banner impression on reload of banner ad context [#12584](https://github.com/Applifier/unity-ads-webview/pull/12584)
+* Open Measurement - Add Geometry Change call to Admob Impression [#12669](https://github.com/Applifier/unity-ads-webview/pull/12669)
+* Add Admob Nofill ABTest and Whitelist [#12670](https://github.com/Applifier/unity-ads-webview/pull/12670)
+* Release Load Adapter for everyone [#12673](https://github.com/Applifier/unity-ads-webview/pull/12673)
+
+# Tue Dec 17 15:22:32 UTC 2019
+
+* Fix of reportValidity for android 4.x devices [#12641](https://github.com/Applifier/unity-ads-webview/pull/12641)
+* Fix some "Uncaught TypeError: Cannot read property 'removeChild' of null" js errors [#12612](https://github.com/Applifier/unity-ads-webview/pull/12612)
+* Stop error level logging when using developer consent outside GDPR regions [#12640](https://github.com/Applifier/unity-ads-webview/pull/12640)
+
+# Mon Dec 16 23:38:26 UTC 2019
+
+* Fix WEBPLAYER_NULL error on Android [#12465](https://github.com/Applifier/unity-ads-webview/pull/12465)
+* Adjust Load Adapter V1 Test to Reverse AB Test and Remove Load Adapter Whitelist [#12638](https://github.com/Applifier/unity-ads-webview/pull/12638)
+
+# Sat Dec 14 01:01:49 UTC 2019
+
+* Fix Reporting Options V3 [#12527](https://github.com/Applifier/unity-ads-webview/pull/12527)
+* Open Measurement - Add Admob Impression metric for each OM Instance [#12528](https://github.com/Applifier/unity-ads-webview/pull/12528)
+* Diagnostics for Captcha [#12555](https://github.com/Applifier/unity-ads-webview/pull/12555)
+* Add Forced Load Adapter Games [#12586](https://github.com/Applifier/unity-ads-webview/pull/12586)
+
+# Fri Dec 13 18:12:19 UTC 2019
+
+* Fix bug with squared endscreen with animated button [12529](https://github.com/Applifier/unity-ads-webview/pull/12529)
+
+# Fri Dec 13 02:29:11 UTC 2019
+
+* Add PerPlacementLoadAdapter V1 on Groups 5 and 6 [#12159](https://github.com/Applifier/unity-ads-webview/pull/12159)
+
+# Thu Dec 12 16:24:57 UTC 2019
+
+* Update privacy texts and layout for CCPA [#12447](https://github.com/Applifier/unity-ads-webview/pull/12447)
+
+# Thu Dec 12 14:58:19 UTC 2019
+
+* Revert "Fix Reporting Options V2" [#12483](https://github.com/Applifier/unity-ads-webview/pull/12483)
+
+# Thu Dec 12 11:26:14 UTC 2019
+
+* In-app Human Verification UI [#12446](https://github.com/Applifier/unity-ads-webview/pull/12446)
+* Change permissions for first request [#12452](https://github.com/Applifier/unity-ads-webview/pull/12452)
+* Feature/privacy consent metadata [#12451](https://github.com/Applifier/unity-ads-webview/pull/12451)
+* Open Measurement - Add Impression Metric for Admob [#12416](https://github.com/Applifier/unity-ads-webview/pull/12416)
+* Fix Reporting Options V2 [#12455](https://github.com/Applifier/unity-ads-webview/pull/12455)
+* Limit Load API Experiments [#12356](https://github.com/Applifier/unity-ads-webview/pull/12356)
+
+# Wed Dec 11 18:15:01 UTC 2019
+
+* Revert "Fix Reporting Ad Reasons" [#12453](https://github.com/Applifier/unity-ads-webview/pull/12453)
+
+# Tue Dec 10 17:30:44 UTC 2019
+
+* Open Measurement - Add Publica To Tracking Path [#12160](https://github.com/Applifier/unity-ads-webview/pull/12160)
+* Fix Reporting Ad Reasons [#12418](https://github.com/Applifier/unity-ads-webview/pull/12418)
+* Deployment Scripts: Add Setup and Remove Makefile [#12415](https://github.com/Applifier/unity-ads-webview/pull/12415)
+* Update Consent texts and 3rd party list [#12389](https://github.com/Applifier/unity-ads-webview/pull/12389/files)
+* Move Vast Tag URI Decoding to only Run for IAS [#12388](https://github.com/Applifier/unity-ads-webview/pull/12388)
+
+# Mon Dec  9 21:11:59 UTC 2019
+
+* Update API-Changes.md up to 3.4.0 [#12387](https://github.com/Applifier/unity-ads-webview/pull/12387)
+* Add more Banner Trackign [#12248](https://github.com/Applifier/unity-ads-webview/pull/12248)
+
+# Fri Dec  6 23:28:26 UTC 2019
+
+* Merge 3.4.0 into Master [#12361](https://github.com/Applifier/unity-ads-webview/pull/12361)
+* Add 3.4.0 to Release Process [#12358](https://github.com/Applifier/unity-ads-webview/pull/12358)
+* Update tsconfig.json to Fix Mock Import Paths [#12359](https://github.com/Applifier/unity-ads-webview/pull/12359)
+* Array Prototype Unique [#12360](https://github.com/Applifier/unity-ads-webview/pull/12360)
+
+# Fri Dec  6 01:04:44 UTC 2019
+
+* Remove animation AB tests [#12331](https://github.com/Applifier/unity-ads-webview/pull/12331)
+* Open Measurement - Admob Viewability Adjustments [#12102](https://github.com/Applifier/unity-ads-webview/pull/12102)
+
+# Thu Dec  5 18:39:42 UTC 2019
 
 * Use LegalFramework.NONE instead of LegalFramework.DEFAULT [#12194](https://github.com/Applifier/unity-ads-webview/pull/12194)
 * Remove privacy hack from PrivacyParser [#12195](https://github.com/Applifier/unity-ads-webview/pull/12195)

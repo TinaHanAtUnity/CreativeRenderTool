@@ -24,7 +24,7 @@ import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { Backend } from 'Backend/Backend';
 import { IBannerNativeApi, IBannerModule } from 'Banners/IBannerModule';
 import { BannerApi } from 'Banners/Native/BannerApi';
-import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
+import { BannerListenerApi } from 'Banners/Native/BannerListenerApi';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
@@ -178,6 +178,8 @@ import { Store } from 'Store/Store';
 import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { PromoSize } from 'Promo/Models/PromoSize';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -1048,7 +1050,7 @@ export class TestFixtures {
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
         ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
-        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager, core.MetaDataManager);
+        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         ads.Analytics = new Analytics(core, ads.PrivacySDK!);
         ads.Store = new Store(core, ads.Analytics.AnalyticsManager);
         return <IAds>ads;
@@ -1090,6 +1092,7 @@ export class TestFixtures {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
+            ClassDetection: new ClassDetectionApi(nativeBridge),
             Listener: new CoreListenerApi(nativeBridge),
             Permissions: new PermissionsApi(nativeBridge),
             Request: new RequestApi(nativeBridge),

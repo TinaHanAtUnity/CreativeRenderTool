@@ -10,8 +10,11 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IVerificationScriptResource } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IAdView, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
+import { assert } from 'chai';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -123,9 +126,150 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
 
             it('sessionStart should report to pts', () => {
                 (<sinon.SinonStub>programmaticTrackingService.reportMetricEvent).reset();
-                omManager.sessionStart();
+
+                const sessionEvent: ISessionEvent = {
+                    adSessionId: '',
+                    timestamp: 1,
+                    type: '',
+                    data: {}
+                };
+
+                omManager.sessionStart(sessionEvent);
                 sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
                 sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_start');
+            });
+        });
+
+        describe('impression event handling', () => {
+            let omManager: AdmobOpenMeasurementController;
+            let omAdViewBuilder: OpenMeasurementAdViewBuilder;
+
+            beforeEach(() => {
+                omManager = initAdMobOMManager();
+
+                sinon.stub(deviceInfo, 'getScreenWidth').returns(1080);
+                sinon.stub(deviceInfo, 'getScreenHeight').returns(1920);
+
+                const testAdView: IAdView = {
+                    percentageInView: 100,
+                    geometry: {
+                        x: 0,
+                        y: 200,
+                        width: 300,
+                        height: 300
+                    },
+                    onScreenGeometry: {
+                        x: 0,
+                        y: 200,
+                        width: 300,
+                        height: 300,
+                        obstructions: []
+                    },
+                    measuringElement: false,
+                    reasons: []
+                };
+                omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+
+                sandbox.stub(omAdViewBuilder, 'buildAdmobImpressionView').returns(testAdView);
+                sandbox.stub(omManager, 'setupOMInstance');
+
+                sandbox.stub(OpenMeasurementController.prototype, 'impression');
+                sandbox.stub(omManager, 'geometryChange');
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should build adview and om impression object', () => {
+                const impressionDataAndroid = {'mediaType': 'video', 'viewport': {'width': 540, 'height': 960},
+                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
+                const impressionDataIOS = {'mediaType': 'video', 'viewport': {'width': 1080, 'height': 1920},
+                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.called(<sinon.SinonStub>OpenMeasurementController.prototype.impression);
+                    if (platform === Platform.ANDROID) {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>OpenMeasurementController.prototype.impression).getCall(0).args[0]), JSON.stringify(impressionDataAndroid));
+                    } else {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>OpenMeasurementController.prototype.impression).getCall(0).args[0]), JSON.stringify(impressionDataIOS));
+                    }
+                });
+            });
+
+            it('should not send admob om impression pts metric if no verification exists', () => {
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.notCalled(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                });
+            });
+
+            it('should send admob om impression pts metric if one verification exists', () => {
+
+                const reportSpy = <sinon.SinonStub>programmaticTrackingService.reportMetricEvent;
+
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+
+                omManager.injectVerificationResources([verificationResource]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.calledTwice(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                });
+            });
+
+            it('should send admob om impression pts metric for multiple om instances', () => {
+
+                const reportSpy = <sinon.SinonStub>programmaticTrackingService.reportMetricEvent;
+
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+                const verificationResource1 = {
+                    resourceUrl: 'http://scoot1.com',
+                    vendorKey: 'scoot1',
+                    verificationParameters: 'scootage1'
+                };
+                omManager.injectVerificationResources([verificationResource, verificationResource1]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.calledThrice(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                    assert.equal(reportSpy.getCall(2).args[0], 'admob_om_impression');
+                });
+            });
+
+            it('should call geometry change with impression adview and viewport', () => {
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+                const verificationResource1 = {
+                    resourceUrl: 'http://scoot1.com',
+                    vendorKey: 'scoot1',
+                    verificationParameters: 'scootage1'
+                };
+                omManager.injectVerificationResources([verificationResource, verificationResource1]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.called(<sinon.SinonStub>omManager.geometryChange);
+                    if (platform === Platform.ANDROID) {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({'width': 540, 'height': 960}));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}));
+                    } else {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({'width': 1080, 'height': 1920}));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}));
+                    }
+                });
             });
         });
     });

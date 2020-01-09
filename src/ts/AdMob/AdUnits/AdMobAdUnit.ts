@@ -18,6 +18,9 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { ObstructionReasons, IRectangle, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -39,6 +42,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _clientInfo: ClientInfo;
     private _pts: ProgrammaticTrackingService;
     private _isRewardedPlacement: boolean;
+    private _deviceVolume: number;
+    private _geometryCalled = false;
 
     constructor(parameters: IAdMobAdUnitParameters) {
         super(parameters);
@@ -53,6 +58,19 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._clientInfo = parameters.clientInfo;
         this._pts = parameters.programmaticTrackingService;
         this._isRewardedPlacement = !parameters.placement.allowSkip();
+
+        if (parameters.platform === Platform.ANDROID) {
+            Promise.all([
+                parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
+                parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
+            ]).then(([volume, maxVolume]) => {
+                this.setVolume(volume / maxVolume);
+            });
+        } else if (parameters.platform === Platform.IOS) {
+            parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
+                this.setVolume(volume);
+            });
+        }
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -112,7 +130,21 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendVideoCanPlayEvent() {
+        const omController = this._view.getOpenMeasurementController();
+        if (omController) {
+            omController.setDeviceVolume(this._deviceVolume);
+        }
         this.sendPTSCanPlay();
+    }
+
+    public sendVolumeChange(volume: number, maxVolume: number) {
+        this.setVolume(volume / maxVolume);
+        const omController = this._view.getOpenMeasurementController();
+        if (omController) {
+            // TODO: Add volume change for muted value 0
+            omController.setDeviceVolume(this._deviceVolume);
+            omController.volumeChange(1);
+        }
     }
 
     public sendStartEvent() {
@@ -182,6 +214,23 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerForeground(): void {
         this._foregroundTime = Date.now();
         this.startAccelerometerUpdates();
+
+        const omController = this._view.getOpenMeasurementController();
+        if (omController && this.isShowing()) {
+            const adViewBuilder = omController.getOMAdViewBuilder();
+            const rect: IRectangle = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+            adViewBuilder.buildAdmobAdView([], omController, rect).then((adView) => {
+                if (omController) {
+                    const viewPort = adViewBuilder.getViewPort();
+                    this.geometryChangeDebounce(viewPort, adView, omController);
+                }
+            });
+        }
     }
 
     public onContainerBackground(): void {
@@ -191,6 +240,35 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
+
+        const omController = this._view.getOpenMeasurementController();
+        if (omController) {
+
+            const adViewBuilder = omController.getOMAdViewBuilder();
+            const rect: IRectangle = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+            adViewBuilder.buildAdmobAdView([ObstructionReasons.BACKGROUNDED], omController, rect).then((adView) => {
+                if (omController) {
+                    const viewPort = adViewBuilder.getViewPort();
+                    this.geometryChangeDebounce(viewPort, adView, omController);
+                }
+            });
+        }
+    }
+
+    private geometryChangeDebounce(viewPort: IViewPort, adView: IAdView, omController: OpenMeasurementController): void {
+        const later = () => {
+            if (!this._geometryCalled) {
+                omController.geometryChange(viewPort, adView);
+                this._geometryCalled = true;
+            }
+        };
+        later();
+        setTimeout(() => this._geometryCalled = false, 500);
     }
 
     public onContainerDestroy(): void {
@@ -239,6 +317,14 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         } else if (this.getFinishState() === FinishState.COMPLETED) {
             this.sendCompleteEvent();
         }
+    }
+
+    public getVolume(): number {
+        return this._deviceVolume;
+    }
+
+    public setVolume(volume: number) {
+        this._deviceVolume = volume;
     }
 
     private hideView() {
