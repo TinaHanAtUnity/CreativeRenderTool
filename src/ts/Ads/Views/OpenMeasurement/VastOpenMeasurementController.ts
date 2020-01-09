@@ -2,7 +2,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons, IRectangle, IContext, AdSessionType, PARTNER_NAME, DEFAULT_VENDOR_KEY, OM_JS_VERSION, OMID_P, SDK_APIS} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { AccessMode,  ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';

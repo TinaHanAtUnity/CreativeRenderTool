@@ -12,12 +12,10 @@ import { ICoreApi } from 'Core/ICore';
 import { Backend } from 'Backend/Backend';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
-import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons, IRectangle, IContext, AdSessionType, PARTNER_NAME, DEFAULT_VENDOR_KEY, OM_JS_VERSION, OMID_P, SDK_APIS} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { Campaign } from 'Ads/Models/Campaign';
+import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { assert } from 'chai';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {

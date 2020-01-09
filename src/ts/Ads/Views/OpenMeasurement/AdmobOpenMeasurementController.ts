@@ -187,11 +187,11 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     public sessionStart(sessionEvent: ISessionEvent) {
 
         this._omInstances.forEach((om) => {
-            //Need a deep assignment to avoid duplication for events
+            // Need a deep assignment to avoid duplication for events
             const event = JSON.parse(JSON.stringify(sessionEvent));
-            const verificationre = om.getVerificationResource();
-            event.data.verificationParameters = verificationre.verificationParameters;
-            event.data.vendorkey = verificationre.vendorKey;
+            const verificationresource = om.getVerificationResource();
+            event.data.verificationParameters = verificationresource.verificationParameters;
+            event.data.vendorkey = verificationresource.vendorKey;
             om.sessionStart(event);
         });
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
