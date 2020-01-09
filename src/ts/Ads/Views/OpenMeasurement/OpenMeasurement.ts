@@ -268,6 +268,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             // TODO: Refactor. Admob Code Path
             this._sessionStartEventData = sessionEvent;
             this._sessionStartEventData.data.vendorkey = this._vendorKey;
+            this._sessionStartEventData.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
             this._omBridge.triggerSessionEvent(this._sessionStartEventData);
         }
     }
