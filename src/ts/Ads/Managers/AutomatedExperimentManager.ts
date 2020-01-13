@@ -32,7 +32,7 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number };
+export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number } | number[] | string[];
 
 class OptimizedAutomatedExperiment {
     constructor(experiment: AutomatedExperiment) {
@@ -414,11 +414,43 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         features.gsc_starts = gameSessionCounters.starts;
         features.is_video_cached = CampaignAssetInfo.isCached(campaign);
 
-        // features['gsc_latest_campaign_starts'] =  gameSessionCounters.latestCampaignsStarts;  <- AUI can't read it at the moment...
-        // features['gsc_starts_per_campaign'] = gameSessionCounters.startsPerCampaign;          <- AUI can't read it at the moment...
-        // features['gsc_starts_per_target'] = gameSessionCounters.startsPerTarget;              <- AUI can't read it at the moment...
-        // features['gsc_views_per_campaign'] = gameSessionCounters.viewsPerCampaign;            <- AUI can't read it at the moment...
-        // features['gsc_views_per_target'] = gameSessionCounters.viewsPerTarget;                <- AUI can't read it at the moment...
+        // Extract game session counters: Campaign centric
+        var  ids: string[] = [];
+        var  starts: number[] = [];
+        var  views: number[] = [];
+        var  startsTS: string[] = [];
+        for (const campaignID in gameSessionCounters.startsPerCampaign) {
+            if (gameSessionCounters.startsPerCampaign.hasOwnProperty(campaignID)) {
+                ids = ids.concat(campaignID);
+                starts = starts.concat(gameSessionCounters.startsPerCampaign[campaignID]);
+                views = views.concat(gameSessionCounters.viewsPerCampaign[campaignID] !== undefined ? gameSessionCounters.viewsPerCampaign[campaignID] : 0 );
+                startsTS = startsTS.concat(gameSessionCounters.latestCampaignsStarts[campaignID] !== undefined ? gameSessionCounters.latestCampaignsStarts[campaignID] : "0" );
+            }
+        }
+        if( ids.length > 0 ) {
+            features['gsc_campaigns'] = ids;
+            features['gsc_campaign_starts'] = starts;
+            features['gsc_campaign_views'] = views;
+            features['gsc_campaign_last_start_ts'] = startsTS;
+        }
+
+        // Extract game session counters: targetted game centric
+        ids = [];
+        starts = [];
+        views = [];
+        for (const targetId in gameSessionCounters.startsPerTarget) {
+            if (gameSessionCounters.startsPerTarget.hasOwnProperty(targetId)) {
+                ids = ids.concat(targetId);
+                starts = starts.concat(gameSessionCounters.startsPerTarget[targetId]);
+                views = views.concat(gameSessionCounters.viewsPerTarget[targetId] !== undefined ? gameSessionCounters.viewsPerTarget[targetId] : 0 );
+            }
+        }
+
+        if( ids.length > 0 ) {
+            features['gsc_target_games'] = ids;
+            features['gsc_target_game_starts'] = starts;
+            features['gsc_target_game_views'] = views;
+        }
 
         return features;
     }
