@@ -1,4 +1,4 @@
-# Pending
+# Mon Jan 13 19:17:49 UTC 2020
 
 * Open Measurement - Fix verification params on Admob OM SessionStart [#12779](https://github.com/Applifier/unity-ads-webview/pull/12779)
 * Add WebPlayer api jest tests [#12445](https://github.com/Applifier/unity-ads-webview/pull/12445)
