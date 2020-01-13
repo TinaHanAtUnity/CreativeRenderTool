@@ -67,7 +67,7 @@ class OptimizedCampaign {
     }
 
     public Stage: AutomatedExperimentStage;
-    public experiments: { [experimentId: string]: OptimizedAutomatedExperiment };
+    public Experiments: { [experimentId: string]: OptimizedAutomatedExperiment };
 }
 
 export class CachableAutomatedExperimentData {
