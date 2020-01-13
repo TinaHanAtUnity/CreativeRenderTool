@@ -54,16 +54,16 @@ class OptimizedAutomatedExperiment {
 }
 
 enum AutomatedExperimentStage {
-    AwaitingOptimization,
-    Running,
-    OutcomePublished,
-    Ended
+    AWAITING_OPTIMIZATION,
+    RUNNING,
+    OUTCOME_PUBLISHED,
+    ENDED
 }
 
 class OptimizedCampaign {
     constructor() {
-        this.Stage = AutomatedExperimentStage.AwaitingOptimization;
-        this.experiments = {};
+        this.Stage = AutomatedExperimentStage.AWAITING_OPTIMIZATION;
+        this.Experiments = {};
     }
 
     public Stage: AutomatedExperimentStage;
@@ -129,14 +129,14 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         if (this._campaigns.hasOwnProperty(campaign.getId())) {
             const optmzdCampaign = this._campaigns[campaign.getId()];
 
-            for (const experimentName in optmzdCampaign.experiments.keys) {
-                if (optmzdCampaign.experiments.hasOwnProperty(experimentName)) {
-                    optmzdCampaign.experiments[experimentName].Active = false;
-                    optmzdCampaign.experiments[experimentName].Outcome = 0;
+            for (const experimentName in optmzdCampaign.Experiments.keys) {
+                if (optmzdCampaign.Experiments.hasOwnProperty(experimentName)) {
+                    optmzdCampaign.Experiments[experimentName].Active = false;
+                    optmzdCampaign.Experiments[experimentName].Outcome = 0;
                 }
             }
 
-            optmzdCampaign.Stage = AutomatedExperimentStage.Running;
+            optmzdCampaign.Stage = AutomatedExperimentStage.RUNNING;
         } else {
             this._sdkApi.logError('init_experiments_with_unkown_campaign:' + campaign.getId());
         }
@@ -147,10 +147,10 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         if (this._campaigns.hasOwnProperty(campaign.getId())) {
             const optmzdCampaign = this._campaigns[campaign.getId()];
 
-            for (const experimentName in optmzdCampaign.experiments) {
-                if (optmzdCampaign.experiments.hasOwnProperty(experimentName)) {
-                    optmzdCampaign.experiments[experiment.getName()].Active = true;
-                    return optmzdCampaign.experiments[experiment.getName()].Action;
+            for (const experimentName in optmzdCampaign.Experiments) {
+                if (optmzdCampaign.Experiments.hasOwnProperty(experimentName)) {
+                    optmzdCampaign.Experiments[experiment.getName()].Active = true;
+                    return optmzdCampaign.Experiments[experiment.getName()].Action;
                 }
             }
         } else {
@@ -163,26 +163,26 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         if (this._campaigns.hasOwnProperty(campaign.getId())) {
 
             const optmzdCampaign = this._campaigns[campaign.getId()];
-            if (optmzdCampaign.Stage === AutomatedExperimentStage.OutcomePublished) {
-                optmzdCampaign.Stage = AutomatedExperimentStage.Ended;
+            if (optmzdCampaign.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+                optmzdCampaign.Stage = AutomatedExperimentStage.ENDED;
                 return Promise.resolve();
-            } else if (optmzdCampaign.Stage !== AutomatedExperimentStage.Running) {
+            } else if (optmzdCampaign.Stage !== AutomatedExperimentStage.RUNNING) {
                 return Promise.reject('Experiment session not started.');
             }
 
-            return this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.Ended);
+            return this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.ENDED);
         }
 
-        return Promise.reject('Attempted to end experiments of unkown campaign');
+        return Promise.reject('Attempted to end experiments of unknown campaign');
     }
 
     private publishCampaignOutcomes(campaign: Campaign, optmzCampaign: OptimizedCampaign, nextStage: AutomatedExperimentStage): Promise<void> {
 
         optmzCampaign.Stage = nextStage;
         const promises: Promise<INativeResponse>[] = [];
-        for (const experimentName in optmzCampaign.experiments) {
-            if (optmzCampaign.experiments.hasOwnProperty(experimentName)) {
-                const optmzdExperiment = optmzCampaign.experiments[experimentName];
+        for (const experimentName in optmzCampaign.Experiments) {
+            if (optmzCampaign.Experiments.hasOwnProperty(experimentName)) {
+                const optmzdExperiment = optmzCampaign.Experiments[experimentName];
                 if (optmzdExperiment.Active) {
                     optmzdExperiment.Active = false;
                     promises.push(this.postExperimentOutcome(campaign, optmzdExperiment, AutomatedExperimentManager._rewardEndPoint));
@@ -190,25 +190,31 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
             }
         }
 
-        return Promise.all(promises).then((ignored) => Promise.resolve());
+        return Promise.all(promises)
+        .finally()
+        .then( (ignore) => {
+            if( this._campaigns.hasOwnProperty( campaign.getId() ) ) {
+                delete this._campaigns[campaign.getId()];
+            }
+        });
     }
 
     public rewardExperiments(campaign: Campaign) {
         if (this._campaigns.hasOwnProperty(campaign.getId())) {
             const optmzdCampaign = this._campaigns[campaign.getId()];
-            if (optmzdCampaign.Stage !== AutomatedExperimentStage.Running) {
+            if (optmzdCampaign.Stage !== AutomatedExperimentStage.RUNNING) {
                 return;
             }
 
-            for (const experimentName in optmzdCampaign.experiments) {
-                if (optmzdCampaign.experiments.hasOwnProperty(experimentName)) {
-                    if (optmzdCampaign.experiments[experimentName].Active) {
-                        optmzdCampaign.experiments[experimentName].Outcome = 1;
+            for (const experimentName in optmzdCampaign.Experiments) {
+                if (optmzdCampaign.Experiments.hasOwnProperty(experimentName)) {
+                    if (optmzdCampaign.Experiments[experimentName].Active) {
+                        optmzdCampaign.Experiments[experimentName].Outcome = 1;
                     }
                 }
             }
 
-            this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.OutcomePublished);
+            this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
 
         } else {
             this._sdkApi.logError('reward_experiments_with_unkown_campaign:' + campaign.getId());
@@ -237,11 +243,11 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         if (this._campaigns.hasOwnProperty(campaign.getId())) {
             const optmzdCampaign = this._campaigns[campaign.getId()];
 
-            if (optmzdCampaign.Stage !== AutomatedExperimentStage.AwaitingOptimization) {
+            if (optmzdCampaign.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
                 return Promise.reject('campaign_optimization_response_ignored');
             }
             experiments.forEach(experiment => {
-                const optmzdExperiment = optmzdCampaign.experiments[experiment.name];
+                const optmzdExperiment = optmzdCampaign.Experiments[experiment.name];
                 if (optmzdExperiment) {
                     optmzdExperiment.Action = experiment.action;
                     optmzdExperiment.MetaData = experiment.metadata;
@@ -481,7 +487,7 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         _this._campaigns[campaign.getId()] = optmzdCampaign;
 
         _this._declaredExperiments.forEach(experiment => {
-            optmzdCampaign.experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
+            optmzdCampaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
         });
 
         // Fire and forget... No one resolves it/blocks on it explicitely
