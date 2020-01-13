@@ -1,3 +1,18 @@
+# Pending
+
+* Open Measurement - Fix verification params on Admob OM SessionStart [#12779](https://github.com/Applifier/unity-ads-webview/pull/12779)
+* Add WebPlayer api jest tests [#12445](https://github.com/Applifier/unity-ads-webview/pull/12445)
+
+# Thu Dec 19 13:41:58 UTC 2019
+
+* Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)
+
+# Thu Dec 19 00:49:02 UTC 2019
+
+* Add Hide AR Button Feature [#12105](https://github.com/Applifier/unity-ads-webview/pull/12105)
+* Add Cheetah GameIDs for Load Testing and Fix Load V4 Experiment [#12482](https://github.com/Applifier/unity-ads-webview/pull/12482)
+* Add 3 more Etermax gameIDs into load experiment whitelists [#12726](https://github.com/Applifier/unity-ads-webview/pull/12726)
+
 # Wed Dec 18 13:36:33 UTC 2019
 
 * Spanish translation for CCPA [#12668](https://github.com/Applifier/unity-ads-webview/pull/12668)
