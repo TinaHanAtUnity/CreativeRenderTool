@@ -654,13 +654,6 @@ export class Ads implements IAds {
 
     }
 
-    // private isUsingChineseNetworkOperator(): boolean {
-    //     // return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
-    //     //     return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
-    //     // });
-    //     return this._core.isUsingChinaOperator;
-    // }
-
     private logChinaLocalizationOptimizations(metric: ChinaMetric) {
         const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
         const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));

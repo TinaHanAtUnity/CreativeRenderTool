@@ -36,7 +36,6 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
         coreconfig = new CoreConfiguration();
-        core.isUsingChineseNetworkOperator = false;
     });
 
     describe('createAdsSdkTag', () => {
@@ -409,7 +408,7 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
         const test: {
             input: AdmobMetric;
             expected: IProgrammaticTrackingData;
-        }[] = [{
+        } = {
             input: AdmobMetric.AdmobUsedCachedVideo,
             expected: {
                 metrics: [
@@ -424,20 +423,19 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
                     }
                 ]
             }
-        }];
+        };
 
         it('should fire with china endpoint', () => {
             core.isUsingChineseNetworkOperator = true;
             coreconfig.getAbGroup.mockReturnValue(5);
-
             core.Config = coreconfig;
 
             programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
-            const promise = programmaticTrackingService.reportMetricEvent(test[0].input);
+            const promise = programmaticTrackingService.reportMetricEvent(test.input);
 
             expect(requestManager.post).toBeCalledWith(
                 'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
-                JSON.stringify(test[0].expected),
+                JSON.stringify(test.expected),
                 [['Content-Type', 'application/json']]
             );
 

@@ -3,7 +3,6 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Core } from 'Core/Core';
 import { ChinaEndpoint } from 'Core/Models/ABGroup';
 import { ICore } from 'Core/ICore';
 
