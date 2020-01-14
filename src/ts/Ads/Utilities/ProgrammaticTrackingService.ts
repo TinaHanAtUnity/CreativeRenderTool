@@ -123,7 +123,12 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export enum AdUnitTracking {
+    DuplicateLoadForPlacement = 'duplicate_load_for_placement',
+    PossibleDuplicateLoadForPlacement = 'possible_duplicate_load_for_placement'
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
