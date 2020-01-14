@@ -3,6 +3,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Core } from 'Core/Core';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -137,6 +138,7 @@ interface IPTSEvent {
 
 export class ProgrammaticTrackingService {
     private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+    private productionChinaBaseUel: string = 'https://sdk-diagnostics.prd.mz.internal.unity.cn/';
 
     // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
     private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
@@ -150,14 +152,16 @@ export class ProgrammaticTrackingService {
     private _deviceInfo: DeviceInfo;
     private _countryIso: string;
     private _batchedEvents: IPTSEvent[];
+    private _isUsingChineseNetworkOperator: boolean;
 
-    constructor(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
+    constructor(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string, isUsingChineseNetworkOperator: boolean) {
         this._platform = platform;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
         this._batchedEvents = [];
+        this._isUsingChineseNetworkOperator = isUsingChineseNetworkOperator;
     }
 
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {
@@ -204,7 +208,7 @@ export class ProgrammaticTrackingService {
     }
 
     private postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this.productionBaseUrl + path;
+        const url: string = this._isUsingChineseNetworkOperator ? this.productionBaseUrl + path : this.productionChinaBaseUel + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);

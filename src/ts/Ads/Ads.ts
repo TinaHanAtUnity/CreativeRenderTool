@@ -644,22 +644,22 @@ export class Ads implements IAds {
     }
 
     private identifyUser(isChineseUser: boolean) {
-        this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
-            if (isAChineseNetwork) {
+            if (this._core.isUsingChinaOperator) {
                 const networkMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByNetworkOperator : ChinaMetric.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
                 this._core.ProgrammaticTrackingService.reportMetricEvent(networkMetric);
             } else {
                 const localeMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByLocale : ChinaMetric.ChineseUserIdentifiedIncorrectlyByLocale;
                 this.logChinaLocalizationOptimizations(localeMetric);
             }
-        });
+
     }
 
-    private isUsingChineseNetworkOperator(): Promise<boolean> {
-        return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
-            return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
-        });
-    }
+    // private isUsingChineseNetworkOperator(): boolean {
+    //     // return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+    //     //     return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
+    //     // });
+    //     return this._core.isUsingChinaOperator;
+    // }
 
     private logChinaLocalizationOptimizations(metric: ChinaMetric) {
         const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();

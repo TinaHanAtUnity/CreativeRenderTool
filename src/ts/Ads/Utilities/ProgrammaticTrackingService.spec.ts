@@ -9,6 +9,7 @@ import {
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
+import { Core } from 'Core/Core';
 
 [
     Platform.IOS,
@@ -19,6 +20,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
     let clientInfo: ClientInfoMock;
     let deviceInfo: DeviceInfoMock;
     let requestManager: RequestManagerMock;
+    let isUsingChinaOperator: Boolean;
     const osVersion = '11.2.1';
     const sdkVersion = '2300';
 
@@ -26,9 +28,10 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         requestManager = new RequestManager();
         clientInfo = new ClientInfo();
         deviceInfo = new DeviceInfo();
-        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
+        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', isUsingChinaOperator);
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
+        //core.isUsingChinaOperator.mockReturnValue(true);
     });
 
     describe('createAdsSdkTag', () => {
@@ -393,6 +396,15 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
                     programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
                 }
                 expect(requestManager.post).toBeCalledTimes(1);
+            });
+        });
+
+        describe('requesting with the correct URL', () => {
+            it('should fire with ChinaBase url', () => {
+
+                const expectedURL = '';
+
+
             });
         });
     });
