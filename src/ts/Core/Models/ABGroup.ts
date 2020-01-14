@@ -69,6 +69,7 @@ export const MabDecisionButtonTest = new ZyngaFilteredABTest(7, 8, 10, 11, 12, 1
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
 export const AdmobAdapterV1 = new ABTest(5, 6);
+export const ChinaEndpoint = new ABTest(5);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();

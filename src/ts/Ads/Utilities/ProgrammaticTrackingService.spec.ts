@@ -9,7 +9,9 @@ import {
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
-import { Core } from 'Core/Core';
+import { Core } from 'Core/__mocks__/Core';
+import { ICore } from 'Core/ICore';
+import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/CoreConfiguration.ts';
 
 [
     Platform.IOS,
@@ -20,7 +22,8 @@ import { Core } from 'Core/Core';
     let clientInfo: ClientInfoMock;
     let deviceInfo: DeviceInfoMock;
     let requestManager: RequestManagerMock;
-    let isUsingChinaOperator: Boolean;
+    let core: ICore;
+    let coreconfig: CoreConfigurationMock;
     const osVersion = '11.2.1';
     const sdkVersion = '2300';
 
@@ -28,10 +31,12 @@ import { Core } from 'Core/Core';
         requestManager = new RequestManager();
         clientInfo = new ClientInfo();
         deviceInfo = new DeviceInfo();
-        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', isUsingChinaOperator);
+        core = new Core();
+        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
-        //core.isUsingChinaOperator.mockReturnValue(true);
+        coreconfig = new CoreConfiguration();
+        core.isUsingChineseNetworkOperator = false;
     });
 
     describe('createAdsSdkTag', () => {
@@ -398,14 +403,46 @@ import { Core } from 'Core/Core';
                 expect(requestManager.post).toBeCalledTimes(1);
             });
         });
+    });
 
-        describe('requesting with the correct URL', () => {
-            it('should fire with ChinaBase url', () => {
+    describe('should send with China endpoint', () => {
+        const test: {
+            input: AdmobMetric;
+            expected: IProgrammaticTrackingData;
+        }[] = [{
+            input: AdmobMetric.AdmobUsedCachedVideo,
+            expected: {
+                metrics: [
+                    {
+                        name: 'admob_used_cached_video',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:admob_used_cached_video',
+                            `ads_sdk2_sdv:${sdkVersion}`,
+                            `ads_sdk2_plt:${Platform[platform]}`
+                        ]
+                    }
+                ]
+            }
+        }];
 
-                const expectedURL = '';
+        it('should fire with china endpoint', () => {
+            core.isUsingChineseNetworkOperator = true;
+            coreconfig.getAbGroup.mockReturnValue(5);
 
+            core.Config = coreconfig;
 
-            });
+            programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
+            const promise = programmaticTrackingService.reportMetricEvent(test[0].input);
+
+            expect(requestManager.post).toBeCalledWith(
+                'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
+                JSON.stringify(test[0].expected),
+                [['Content-Type', 'application/json']]
+            );
+
+            return promise;
+
         });
     });
 

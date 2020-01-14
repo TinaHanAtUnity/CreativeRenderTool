@@ -11,7 +11,7 @@ import { RequestManager } from 'Core/Managers/__mocks__/RequestManager';
 import { ResolveManager } from 'Core/Managers/__mocks__/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/__mocks__/WakeUpManager';
 import { ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
+import {  CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
 import { AndroidPreferencesApi } from 'Core/Native/Android/__mocks__/AndroidPreferencesApi';
 import { BroadcastApi } from 'Core/Native/Android/__mocks__/BroadcastApi';
@@ -85,5 +85,6 @@ export const Core = jest.fn(() => {
         Ads: new Ads(),
         Purchasing: new Purchasing(),
         ProgrammaticTrackingService: new ProgrammaticTrackingService(),
+        isUsingChineseNetworkOperator: false
     };
 });
