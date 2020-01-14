@@ -448,7 +448,7 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
             if (gameSessionCounters.startsPerTarget.hasOwnProperty(targetId)) {
                 ids = ids.concat(targetId);
                 starts = starts.concat(gameSessionCounters.startsPerTarget[targetId]);
-                views = views.concat(gameSessionCounters.viewsPerTarget[targetId] !== undefined ? gameSessionCounters.viewsPerTarget[targetId] : 0 );
+                views = views.concat(gameSessionCounters.viewsPerTarget[targetId] !== undefined ? gameSessionCounters.viewsPerTarget[targetId] : 0);
             }
         }
 
