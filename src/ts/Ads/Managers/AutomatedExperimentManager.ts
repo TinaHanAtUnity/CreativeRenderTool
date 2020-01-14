@@ -192,8 +192,8 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
 
         return Promise.all(promises)
         .finally()
-        .then( (ignore) => {
-            if( this._campaigns.hasOwnProperty( campaign.getId() ) ) {
+        .then((ignore) => {
+            if (this._campaigns.hasOwnProperty(campaign.getId())) {
                 delete this._campaigns[campaign.getId()];
             }
         });
@@ -421,23 +421,23 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         features.is_video_cached = CampaignAssetInfo.isCached(campaign);
 
         // Extract game session counters: Campaign centric
-        var  ids: string[] = [];
-        var  starts: number[] = [];
-        var  views: number[] = [];
-        var  startsTS: string[] = [];
+        let  ids: string[] = [];
+        let  starts: number[] = [];
+        let  views: number[] = [];
+        let  startsTS: string[] = [];
         for (const campaignID in gameSessionCounters.startsPerCampaign) {
             if (gameSessionCounters.startsPerCampaign.hasOwnProperty(campaignID)) {
                 ids = ids.concat(campaignID);
                 starts = starts.concat(gameSessionCounters.startsPerCampaign[campaignID]);
-                views = views.concat(gameSessionCounters.viewsPerCampaign[campaignID] !== undefined ? gameSessionCounters.viewsPerCampaign[campaignID] : 0 );
-                startsTS = startsTS.concat(gameSessionCounters.latestCampaignsStarts[campaignID] !== undefined ? gameSessionCounters.latestCampaignsStarts[campaignID] : "0" );
+                views = views.concat(gameSessionCounters.viewsPerCampaign[campaignID] !== undefined ? gameSessionCounters.viewsPerCampaign[campaignID] : 0);
+                startsTS = startsTS.concat(gameSessionCounters.latestCampaignsStarts[campaignID] !== undefined ? gameSessionCounters.latestCampaignsStarts[campaignID] : '');
             }
         }
-        if( ids.length > 0 ) {
-            features['gsc_campaigns'] = ids;
-            features['gsc_campaign_starts'] = starts;
-            features['gsc_campaign_views'] = views;
-            features['gsc_campaign_last_start_ts'] = startsTS;
+        if (ids.length > 0) {
+            features.gsc_campaigns = ids;
+            features.gsc_campaign_starts = starts;
+            features.gsc_campaign_views = views;
+            features.gsc_campaign_last_start_ts = startsTS;
         }
 
         // Extract game session counters: targetted game centric
@@ -452,10 +452,10 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
             }
         }
 
-        if( ids.length > 0 ) {
-            features['gsc_target_games'] = ids;
-            features['gsc_target_game_starts'] = starts;
-            features['gsc_target_game_views'] = views;
+        if (ids.length > 0) {
+            features.gsc_target_games = ids;
+            features.gsc_target_game_starts = starts;
+            features.gsc_target_game_views = views;
         }
 
         return features;
