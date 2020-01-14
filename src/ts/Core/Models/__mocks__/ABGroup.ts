@@ -1,4 +1,4 @@
-import { ABGroup } from 'Core/Models/ABGroup'
+import { ABGroup as Base } from 'Core/Models/ABGroup';
 
 export type ABGroup = Base & {
 };
