@@ -156,8 +156,7 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-
-            const chinaPromise = ():Promise<boolean> => {
+            const chinaPromise = (): Promise<boolean> => {
                return this.DeviceInfo.getNetworkOperator().then(networkOperator  => {
                 return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
                });
