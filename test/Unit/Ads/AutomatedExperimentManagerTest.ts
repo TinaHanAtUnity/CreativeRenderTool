@@ -116,7 +116,14 @@ describe('AutomatedExperimentManagerTests', () => {
         gsc_views: 0,
         gsc_starts: 0,
         video_orientation: 'LANDSCAPE',
-        is_video_cached: false
+        is_video_cached: false,
+        gsc_campaigns: ["1"],
+        gsc_campaign_starts: [1],
+        gsc_campaign_views: [1],
+        gsc_campaign_last_start_ts: ["sdfsfs"],
+        gsc_target_games: ["2"],
+        gsc_target_game_starts: [0],
+        gsc_target_game_views: [0]
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
