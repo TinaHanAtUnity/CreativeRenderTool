@@ -137,8 +137,6 @@ interface IPTSEvent {
 const SAMPLE_PERCENTAGE = 5;
 
 export class ProgrammaticTrackingService {
-    protected productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
-
     // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
     private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
@@ -161,8 +159,8 @@ export class ProgrammaticTrackingService {
         this._batchedEvents = [];
     }
 
-    private getBaseUrl(): string {
-        return this.productionBaseUrl;
+    protected getBaseUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {
