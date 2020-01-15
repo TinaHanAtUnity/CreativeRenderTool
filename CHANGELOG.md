@@ -1,3 +1,7 @@
+# Pending
+
+* Change the SDK diagnostic endpoint for China [#12820](https://github.com/Applifier/unity-ads-webview/pull/12820)
+
 # Mon Jan 13 19:17:49 UTC 2020
 
 * Open Measurement - Fix verification params on Admob OM SessionStart [#12779](https://github.com/Applifier/unity-ads-webview/pull/12779)
