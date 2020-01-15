@@ -9,7 +9,6 @@ import {
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
-import { CustomFeatures as CustomFeaturesFoRealzies } from 'Ads/Utilities/CustomFeatures';
 
 [
     Platform.IOS,
@@ -395,39 +394,6 @@ import { CustomFeatures as CustomFeaturesFoRealzies } from 'Ads/Utilities/Custom
                 }
                 expect(requestManager.post).toBeCalledTimes(1);
             });
-        });
-    });
-
-    describe('reportMetricEvent with Chinese network operator', () => {
-
-        const ogSampleAtGivenPercent = CustomFeaturesFoRealzies.sampleAtGivenPercent;
-
-        beforeEach(() => {
-            const chineseNetworkOperatorSpy = jest.spyOn(deviceInfo, 'isChineseNetworkOperator');
-            chineseNetworkOperatorSpy.mockImplementation(() => true);
-
-            const sampleAtGivenPercentSpy = jest.fn();
-            sampleAtGivenPercentSpy.mockReturnValue(true);
-
-            CustomFeaturesFoRealzies.sampleAtGivenPercent = sampleAtGivenPercentSpy.bind(CustomFeaturesFoRealzies);
-
-            programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
-        });
-
-        afterEach(() => {
-            CustomFeaturesFoRealzies.sampleAtGivenPercent = ogSampleAtGivenPercent;
-        });
-
-        it('should fire with china endpoint', () => {
-            const promise = programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
-            expect(requestManager.post).toBeCalledWith(
-                'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
-                expect.anything(),
-                expect.anything()
-            );
-
-            return promise;
-
         });
     });
 
