@@ -161,6 +161,10 @@ export class ProgrammaticTrackingService {
         this._batchedEvents = [];
     }
 
+    private getBaseUrl(): string {
+        return this.productionBaseUrl;
+    }
+
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {
         const sdkVersion: string = this._clientInfo.getSdkVersionName();
         return [this.createAdsSdkTag('mevt', event),
@@ -205,7 +209,7 @@ export class ProgrammaticTrackingService {
     }
 
     private postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this.productionBaseUrl + path;
+        const url: string = this.getBaseUrl() + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
