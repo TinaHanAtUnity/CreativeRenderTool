@@ -124,8 +124,13 @@ export enum AUIMetric {
 }
 
 export enum AdUnitTracking {
-    DuplicateLoadForPlacement = 'duplicate_load_for_placement',
-    PossibleDuplicateLoadForPlacement = 'possible_duplicate_load_for_placement'
+    DuplicateLoadForPlacement = 'ad_unit_duplicate_load_for_placement',
+    PossibleDuplicateLoadForPlacement = 'ad_unit_possible_duplicate_load_for_placement',
+    InitialLoadRequest = 'ad_unit_initial_load_request',
+    AttemptToShowAd = 'ad_unit_attempt_to_show',
+    SuccessfulInvalidate = 'ad_unit_successful_invalidate',
+    PossibleCampaignExpired = 'ad_unit_possible_campaign_expire',
+    AttemptToInvalidate = 'ad_unit_attempt_to_invalidate'
 }
 
 type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;

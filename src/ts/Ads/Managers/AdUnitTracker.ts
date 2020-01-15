@@ -5,7 +5,8 @@ import { ProgrammaticTrackingService, AdUnitTracking } from 'Ads/Utilities/Progr
 
 enum AdUnitState {
     LOADING,
-    FILL
+    FILL,
+    INVALIDATING
 }
 
 export class AdUnitTracker {
@@ -37,26 +38,35 @@ export class AdUnitTracker {
                 switch (this._states[placementId]) {
                     case AdUnitState.LOADING:
                         this._pts.reportMetricEventWithTags(AdUnitTracking.DuplicateLoadForPlacement, [
-                            this._pts.createAdsSdkTag('med', this._mediation),
-                            this._pts.createAdsSdkTag('pid', placementId)
+                            this._pts.createAdsSdkTag('med', this._mediation)
                         ]);
                         break;
                     case AdUnitState.FILL:
                         this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleDuplicateLoadForPlacement, [
-                            this._pts.createAdsSdkTag('med', this._mediation),
-                            this._pts.createAdsSdkTag('pid', placementId)
+                            this._pts.createAdsSdkTag('med', this._mediation)
                         ]);
                         break;
                     default:
                 }
             } else {
+                this._pts.reportMetricEventWithTags(AdUnitTracking.InitialLoadRequest, [
+                    this._pts.createAdsSdkTag('med', this._mediation)
+                ]);
                 this._states[placementId] = AdUnitState.LOADING;
             }
         });
     }
 
     private onAdUnitChanged(placementId: string): void {
+        if (this._states[placementId] === undefined) {
+            return;
+        }
+
         delete this._states[placementId];
+
+        this._pts.reportMetricEventWithTags(AdUnitTracking.AttemptToShowAd, [
+            this._pts.createAdsSdkTag('med', this._mediation)
+        ]);
     }
 
     private onPlacementStateChanged(placementId: string, placementState: PlacementState): void {
@@ -65,13 +75,27 @@ export class AdUnitTracker {
         }
 
         if (placementState === PlacementState.READY) {
+            if (this._states[placementId] === AdUnitState.INVALIDATING) {
+                this._pts.reportMetricEventWithTags(AdUnitTracking.SuccessfulInvalidate, [
+                    this._pts.createAdsSdkTag('med', this._mediation)
+                ]);
+            }
             this._states[placementId] = AdUnitState.FILL;
         } else if (placementState === PlacementState.NO_FILL) {
+            this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleCampaignExpired, [
+                this._pts.createAdsSdkTag('med', this._mediation)
+            ]);
             delete this._states[placementId];
         } else if (placementState === PlacementState.NOT_AVAILABLE) {
             delete this._states[placementId];
         }  else if (placementState === PlacementState.DISABLED) {
             delete this._states[placementId];
+        } else if (placementState === PlacementState.WAITING && this._states[placementId] === AdUnitState.FILL) {
+            this._pts.reportMetricEventWithTags(AdUnitTracking.AttemptToInvalidate, [
+                this._pts.createAdsSdkTag('med', this._mediation)
+            ]);
+
+            this._states[placementId] = AdUnitState.INVALIDATING;
         }
     }
 }
