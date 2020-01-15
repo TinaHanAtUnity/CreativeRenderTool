@@ -134,8 +134,6 @@ interface IPTSEvent {
     tags: string[];
 }
 
-const SAMPLE_PERCENTAGE = 5;
-
 export class ProgrammaticTrackingService {
     // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
     private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
