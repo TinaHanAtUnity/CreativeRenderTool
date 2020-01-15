@@ -407,14 +407,13 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
 
         beforeEach(() => {
             coreconfig = new CoreConfiguration();
-        });
-
-        it('should fire with china endpoint', () => {
             core.isUsingChineseNetworkOperator = true;
             coreconfig.getAbGroup.mockReturnValue(5);
             core.Config = coreconfig;
-
             programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
+        });
+
+        it('should fire with china endpoint', () => {
             const promise = programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
 
             expect(requestManager.post).toBeCalledWith(
