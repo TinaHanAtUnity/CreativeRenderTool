@@ -139,7 +139,7 @@ interface IPTSEvent {
 
 export class ProgrammaticTrackingService {
     private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
-    private productionChinaBaseUel: string = 'https://sdk-diagnostics.prd.mz.internal.unity.cn/';
+    private productionChinaBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity.cn/';
 
     // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
     private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
@@ -211,7 +211,7 @@ export class ProgrammaticTrackingService {
     }
 
     private postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this._isUsingChineseNetworkOperator && ChinaEndpoint.isValid(this._core.Config.getAbGroup()) ? this.productionChinaBaseUel + path : this.productionBaseUrl + path;
+        const url: string = this._isUsingChineseNetworkOperator && ChinaEndpoint.isValid(this._core.Config.getAbGroup()) ? this.productionChinaBaseUrl + path : this.productionBaseUrl + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
