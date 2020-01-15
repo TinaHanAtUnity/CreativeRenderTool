@@ -3,7 +3,6 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { ICore } from 'Core/ICore';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -155,7 +154,6 @@ export class ProgrammaticTrackingService {
     private _countryIso: string;
     private _batchedEvents: IPTSEvent[];
     private _isUsingChineseNetworkOperator: boolean | undefined;
-    private _core: ICore;
 
     constructor(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
         this._platform = platform;

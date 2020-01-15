@@ -9,8 +9,6 @@ import {
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
-import { Core } from 'Core/__mocks__/Core';
-import { ICore } from 'Core/ICore';
 import { CustomFeatures as CustomFeaturesFoRealzies } from 'Ads/Utilities/CustomFeatures';
 
 [
@@ -22,7 +20,6 @@ import { CustomFeatures as CustomFeaturesFoRealzies } from 'Ads/Utilities/Custom
     let clientInfo: ClientInfoMock;
     let deviceInfo: DeviceInfoMock;
     let requestManager: RequestManagerMock;
-    let core: ICore;
     const osVersion = '11.2.1';
     const sdkVersion = '2300';
 
@@ -30,7 +27,6 @@ import { CustomFeatures as CustomFeaturesFoRealzies } from 'Ads/Utilities/Custom
         requestManager = new RequestManager();
         clientInfo = new ClientInfo();
         deviceInfo = new DeviceInfo();
-        core = new Core();
         programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);

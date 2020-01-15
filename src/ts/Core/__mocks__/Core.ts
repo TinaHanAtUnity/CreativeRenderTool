@@ -84,6 +84,6 @@ export const Core = jest.fn(() => {
         Config: new CoreConfiguration(),
         Ads: new Ads(),
         Purchasing: new Purchasing(),
-        ProgrammaticTrackingService: new ProgrammaticTrackingService()
+        ProgrammaticTrackingService: new ProgrammaticTrackingService(),
     };
 });
