@@ -43,7 +43,7 @@ export const Ads = jest.fn(() => {
                 AdUnit: new IosAdUnitApi(),
                 VideoPlayer: new IosVideoPlayerApi()
             },
-            LoadApi: LoadApi()
+            LoadApi: new LoadApi()
         },
         AdMobSignalFactory: new AdMobSignalFactory(),
         InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(),

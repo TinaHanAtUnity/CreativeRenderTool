@@ -6,7 +6,7 @@ import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { Observable2, Observable1 } from 'Core/Utilities/Observable';
 
-export class TrackableRefreshManager implements  RefreshManager {
+export class TrackableRefreshManager implements RefreshManager {
     private _refreshManager: RefreshManager;
 
     public readonly onPlacementStateChanged = new Observable2<string, PlacementState>();
