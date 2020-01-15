@@ -644,7 +644,7 @@ export class Ads implements IAds {
     }
 
     private identifyUser(isChineseUser: boolean) {
-            if (this._core.isUsingChineseNetworkOperator) {
+            if (this._core.DeviceInfo.isChineseNetworkOperator()) {
                 const networkMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByNetworkOperator : ChinaMetric.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
                 this._core.ProgrammaticTrackingService.reportMetricEvent(networkMetric);
             } else {

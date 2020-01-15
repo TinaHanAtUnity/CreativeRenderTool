@@ -3,7 +3,6 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { ChinaEndpoint } from 'Core/Models/ABGroup';
 import { ICore } from 'Core/ICore';
 
 export enum ProgrammaticTrackingError {
@@ -137,6 +136,8 @@ interface IPTSEvent {
     tags: string[];
 }
 
+const SAMPLE_PERCENTAGE = 5;
+
 export class ProgrammaticTrackingService {
     private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     private productionChinaBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity.cn/';
@@ -153,18 +154,17 @@ export class ProgrammaticTrackingService {
     private _deviceInfo: DeviceInfo;
     private _countryIso: string;
     private _batchedEvents: IPTSEvent[];
-    private _isUsingChineseNetworkOperator: boolean;
+    private _isUsingChineseNetworkOperator: boolean | undefined;
     private _core: ICore;
 
-    constructor(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string, core: ICore) {
+    constructor(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
         this._platform = platform;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
         this._batchedEvents = [];
-        this._isUsingChineseNetworkOperator = core.isUsingChineseNetworkOperator;
-        this._core = core;
+        this._isUsingChineseNetworkOperator = deviceInfo.isChineseNetworkOperator();
     }
 
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {
@@ -211,7 +211,8 @@ export class ProgrammaticTrackingService {
     }
 
     private postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this._isUsingChineseNetworkOperator && ChinaEndpoint.isValid(this._core.Config.getAbGroup()) ? this.productionChinaBaseUrl + path : this.productionBaseUrl + path;
+        const sampleRate = CustomFeatures.sampleAtGivenPercent(SAMPLE_PERCENTAGE);
+        const url: string = this._isUsingChineseNetworkOperator && sampleRate ? this.productionChinaBaseUrl + path : this.productionBaseUrl + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);

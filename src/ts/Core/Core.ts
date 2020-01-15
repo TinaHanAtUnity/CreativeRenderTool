@@ -79,7 +79,6 @@ export class Core implements ICore {
     public Ads: Ads;
     public Purchasing: Purchasing;
     public ProgrammaticTrackingService: ProgrammaticTrackingService;
-    public isUsingChineseNetworkOperator: boolean;
 
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
@@ -156,14 +155,8 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            const chinaPromise = (): Promise<boolean> => {
-                return this.DeviceInfo.getNetworkOperator().then(networkOperator  => {
-                    return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
-                });
-            };
-            return Promise.all([chinaPromise(), this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
-        }).then(([isUsingChineseNetworkOperator]) => {
-            this.isUsingChineseNetworkOperator = isUsingChineseNetworkOperator;
+            return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
+        }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this.WakeUpManager.setListenConnectivity(true);
             this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
@@ -205,7 +198,7 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
-            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry(), this);
+            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
             this.ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
             this.ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 

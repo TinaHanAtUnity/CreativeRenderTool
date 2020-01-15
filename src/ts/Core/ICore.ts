@@ -86,5 +86,4 @@ export interface ICore extends IApiModule {
     Ads: IAds;
     Purchasing: IPurchasing;
     ProgrammaticTrackingService: ProgrammaticTrackingService;
-    isUsingChineseNetworkOperator: boolean;
 }

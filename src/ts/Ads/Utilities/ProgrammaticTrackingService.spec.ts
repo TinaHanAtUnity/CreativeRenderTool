@@ -11,7 +11,7 @@ import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
 import { Core } from 'Core/__mocks__/Core';
 import { ICore } from 'Core/ICore';
-import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/CoreConfiguration.ts';
+import { CustomFeatures as CustomFeaturesFoRealzies } from 'Ads/Utilities/CustomFeatures';
 
 [
     Platform.IOS,
@@ -23,7 +23,6 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
     let deviceInfo: DeviceInfoMock;
     let requestManager: RequestManagerMock;
     let core: ICore;
-    let coreconfig: CoreConfigurationMock;
     const osVersion = '11.2.1';
     const sdkVersion = '2300';
 
@@ -32,7 +31,7 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
         clientInfo = new ClientInfo();
         deviceInfo = new DeviceInfo();
         core = new Core();
-        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
+        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
     });
@@ -406,11 +405,14 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
     describe('reportMetricEvent with Chinese network operator', () => {
 
         beforeEach(() => {
-            coreconfig = new CoreConfiguration();
-            core.isUsingChineseNetworkOperator = true;
-            coreconfig.getAbGroup.mockReturnValue(5);
-            core.Config = coreconfig;
-            programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
+            const chineseNetworkOperatorSpy = jest.spyOn(deviceInfo, 'isChineseNetworkOperator');
+            chineseNetworkOperatorSpy.mockImplementation(() => true);
+
+            const sampleAtGivenPercentSpy = jest.fn();
+            sampleAtGivenPercentSpy.mockReturnValue(true);
+            CustomFeaturesFoRealzies.sampleAtGivenPercent = sampleAtGivenPercentSpy.bind(CustomFeaturesFoRealzies);
+
+            programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
         });
 
         it('should fire with china endpoint', () => {
