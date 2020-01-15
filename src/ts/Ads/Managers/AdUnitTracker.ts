@@ -37,14 +37,12 @@ export class AdUnitTracker {
                 switch (this._states[placementId]) {
                     case AdUnitState.LOADING:
                         this._pts.reportMetricEventWithTags(AdUnitTracking.DuplicateLoadForPlacement, [
-                            this._pts.createAdsSdkTag('gid', this._gameId),
                             this._pts.createAdsSdkTag('med', this._mediation),
                             this._pts.createAdsSdkTag('pid', placementId)
                         ]);
                         break;
                     case AdUnitState.FILL:
                         this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleDuplicateLoadForPlacement, [
-                            this._pts.createAdsSdkTag('gid', this._gameId),
                             this._pts.createAdsSdkTag('med', this._mediation),
                             this._pts.createAdsSdkTag('pid', placementId)
                         ]);
