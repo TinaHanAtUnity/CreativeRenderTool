@@ -1,8 +1,8 @@
 import { ABGroup as Base } from 'Core/Models/ABGroup';
 
-export type ABGroup = Base & {
+export type ABGroupMock = Base & {
 };
 
 export const ABGroup = jest.fn(() => {
-  return <ABGroup>{};
+  return <ABGroupMock>{};
 });

@@ -158,7 +158,7 @@ export class Core implements ICore {
 
             const chinaPromise = (): Promise<boolean> => {
                return this.DeviceInfo.getNetworkOperator().then(networkOperator  => {
-                return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
+                    return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
                });
            };
             return Promise.all([chinaPromise(), this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);

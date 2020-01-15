@@ -35,7 +35,6 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
         programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
-        coreconfig = new CoreConfiguration();
     });
 
     describe('createAdsSdkTag', () => {
@@ -404,26 +403,11 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
         });
     });
 
-    describe('should send with China endpoint', () => {
-        const test: {
-            input: AdmobMetric;
-            expected: IProgrammaticTrackingData;
-        } = {
-            input: AdmobMetric.AdmobUsedCachedVideo,
-            expected: {
-                metrics: [
-                    {
-                        name: 'admob_used_cached_video',
-                        value: 1,
-                        tags: [
-                            'ads_sdk2_mevt:admob_used_cached_video',
-                            `ads_sdk2_sdv:${sdkVersion}`,
-                            `ads_sdk2_plt:${Platform[platform]}`
-                        ]
-                    }
-                ]
-            }
-        };
+    describe('reportMetricEvent with Chinese network operator', () => {
+
+        beforeEach(() => {
+            coreconfig = new CoreConfiguration();
+        });
 
         it('should fire with china endpoint', () => {
             core.isUsingChineseNetworkOperator = true;
@@ -431,12 +415,12 @@ import { CoreConfiguration, CoreConfigurationMock } from 'Core/Models/__mocks__/
             core.Config = coreconfig;
 
             programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us', core);
-            const promise = programmaticTrackingService.reportMetricEvent(test.input);
+            const promise = programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
 
             expect(requestManager.post).toBeCalledWith(
                 'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
-                JSON.stringify(test.expected),
-                [['Content-Type', 'application/json']]
+                expect.anything(),
+                expect.anything()
             );
 
             return promise;
