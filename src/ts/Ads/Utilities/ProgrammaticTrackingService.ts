@@ -2,7 +2,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -136,8 +135,6 @@ interface IPTSEvent {
 }
 
 export class ProgrammaticTrackingService {
-    private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
-
     // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
     private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
@@ -158,6 +155,10 @@ export class ProgrammaticTrackingService {
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
         this._batchedEvents = [];
+    }
+
+    protected getBaseUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {
@@ -204,7 +205,7 @@ export class ProgrammaticTrackingService {
     }
 
     private postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this.productionBaseUrl + path;
+        const url: string = this.getBaseUrl() + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
