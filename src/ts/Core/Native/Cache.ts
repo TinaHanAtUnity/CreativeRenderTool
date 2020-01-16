@@ -16,8 +16,7 @@ export enum CacheError {
     MALFORMED_URL,
     NETWORK_ERROR,
     ILLEGAL_STATE,
-    INVALID_ARGUMENT,
-    UNKNOWN_ERROR
+    INVALID_ARGUMENT
 }
 
 export enum CacheEvent {
