@@ -82,9 +82,11 @@ export class AdUnitTracker {
             }
             this._states[placementId] = AdUnitState.FILL;
         } else if (placementState === PlacementState.NO_FILL) {
-            this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleCampaignExpired, [
-                this._pts.createAdsSdkTag('med', this._mediation)
-            ]);
+            if (this._states[placementId] === AdUnitState.FILL) {
+                this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleCampaignExpired, [
+                    this._pts.createAdsSdkTag('med', this._mediation)
+                ]);
+            }
             delete this._states[placementId];
         } else if (placementState === PlacementState.NOT_AVAILABLE) {
             delete this._states[placementId];
