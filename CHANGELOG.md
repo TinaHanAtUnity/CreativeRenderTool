@@ -1,6 +1,5 @@
 # Pending
 
-* Add new Unknown Error enum to CacheError [#12785](https://github.com/Applifier/unity-ads-webview/pull/12785)
 * Change the SDK diagnostic endpoint for China [#12820](https://github.com/Applifier/unity-ads-webview/pull/12820)
 
 # Mon Jan 13 19:17:49 UTC 2020
