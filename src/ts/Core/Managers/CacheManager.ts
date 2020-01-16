@@ -370,11 +370,6 @@ export class CacheManager {
                     this.handleRetry(callback, url, error);
                     return;
 
-                case CacheError[CacheError.UNKNOWN_ERROR]:
-                    Diagnostics.trigger('CacheError.UNKNOWN_ERROR', new Error('CacheError.UNKNOWN_ERROR'));
-                    this.fulfillCallback(url, CacheStatus.FAILED);
-                    return;
-
                 default:
                     this.fulfillCallback(url, CacheStatus.FAILED);
                     return;
