@@ -1,3 +1,7 @@
+# Pending
+
+* Add Metrics to Investigate Missed Impressions in Mediation [#12824](https://github.com/Applifier/unity-ads-webview/pull/12824)
+
 # Thu Jan 16 18:55:31 UTC 2020
 
 * Change the SDK diagnostic endpoint for China [#12820](https://github.com/Applifier/unity-ads-webview/pull/12820)
