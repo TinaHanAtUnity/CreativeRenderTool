@@ -1,6 +1,7 @@
 # Pending
 
 * Add Metrics to Investigate Missed Impressions in Mediation [#12824](https://github.com/Applifier/unity-ads-webview/pull/12824)
+* Fix Animated Endcard Button on Orientation Change [#12782](https://github.com/Applifier/unity-ads-webview/pull/12782)
 
 # Thu Jan 16 18:55:31 UTC 2020
 
