@@ -164,7 +164,7 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            //expect(pts.reportMetricEventWithTags).toBeCalledTimes(3);
+            expect(pts.reportMetricEventWithTags).toBeCalledTimes(3);
             expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
             expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToInvalidate, [undefined]);
             expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
