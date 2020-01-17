@@ -24,7 +24,7 @@ describe('AdUnitTracker', () => {
 
     describe('when request load for a placement one time', () => {
         beforeEach(() => {
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
         });
 
         it('should not send any events', () => {
@@ -38,7 +38,6 @@ describe('AdUnitTracker', () => {
             beforeEach(() => {
                 for (let i = 0; i < times; i++) {
                     loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-
                 }
             });
 
@@ -54,9 +53,9 @@ describe('AdUnitTracker', () => {
 
     describe('when request load for a filled placement', () => {
         beforeEach(() => {
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
         });
 
         it('should send metric events', () => {
@@ -68,9 +67,9 @@ describe('AdUnitTracker', () => {
 
     describe('setting new ad unit should reset state', () => {
         beforeEach(() => {
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             trackableRefreshManager.onAdUnitChanged.trigger('placementId');
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
         });
 
         it('should not send metric events', () => {
@@ -141,7 +140,7 @@ describe('AdUnitTracker', () => {
 
     describe('successfully invalidation', () => {
         beforeEach(() => {
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
             listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'WAITING');
             listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
@@ -157,10 +156,10 @@ describe('AdUnitTracker', () => {
 
     describe('failed invalidation', () => {
         beforeEach(() => {
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
             listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'NO_FILL');
-            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1})
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
         });
 
         it('should send metric events', () => {
