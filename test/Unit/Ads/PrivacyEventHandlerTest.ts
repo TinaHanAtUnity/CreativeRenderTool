@@ -8,7 +8,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -72,7 +71,6 @@ import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
                 video: sinon.createStubInstance(Video),
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
-                programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
                 privacySDK: sinon.createStubInstance(PrivacySDK)
             };
 

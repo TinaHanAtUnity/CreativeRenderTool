@@ -49,7 +49,6 @@ export class AssetManager {
     private _cache: CacheManager;
     private _cacheMode: CacheMode;
     private _cacheBookkeeping: CacheBookkeepingManager;
-    private _pts: ProgrammaticTrackingService;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
@@ -61,13 +60,12 @@ export class AssetManager {
 
     private _sendCacheDiagnostics = false;
 
-    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager, pts: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager) {
         this._platform = platform;
         this._core = core;
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._cacheBookkeeping = cacheBookkeeping;
-        this._pts = pts;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
         this._caching = false;
@@ -197,7 +195,7 @@ export class AssetManager {
             // disable caching if there is less than 20 megabytes free space in cache directory
             if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
-                this._pts.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
+                ProgrammaticTrackingService.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
             }
 
             return;
@@ -384,7 +382,7 @@ export class AssetManager {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            this._pts.reportErrorEvent(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
         }
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {

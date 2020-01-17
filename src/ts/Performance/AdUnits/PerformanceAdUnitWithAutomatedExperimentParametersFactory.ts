@@ -9,7 +9,7 @@ import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance
 import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
-import { AUIMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AUIMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
@@ -20,7 +20,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         super(core, core.Ads, china);
         this._automatedExperimentManager = new AutomatedExperimentManager(core);
         this._automatedExperimentManager.initialize(AutomatedExperimentsList).catch(() => {
-            this._programmaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
+            ProgrammaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
         });
         this._automatedExperimentManager.beginExperiment();
     }
@@ -46,7 +46,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
             if ((<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
                 endscreenAnimation = <EndScreenAnimation> mabDecision;
             } else {
-                this._programmaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
+                ProgrammaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
             }
         }
 

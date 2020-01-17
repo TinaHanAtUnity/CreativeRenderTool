@@ -23,7 +23,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     protected _campaignManager: CampaignManager;
     protected _pts: ProgrammaticTrackingService;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
         super();
 
         this._ads = ads;
@@ -32,7 +32,6 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
-        this._pts = programmaticTrackingService;
 
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
@@ -125,7 +124,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             });
         } else {
             this.alertPlacementReadyStatus(placement);
-            this._pts.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
+            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
 

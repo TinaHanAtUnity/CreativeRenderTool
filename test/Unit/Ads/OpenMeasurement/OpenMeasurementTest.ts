@@ -16,7 +16,6 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
@@ -44,14 +43,13 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
             }
         };
 

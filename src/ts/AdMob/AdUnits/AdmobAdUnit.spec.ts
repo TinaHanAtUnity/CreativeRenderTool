@@ -9,7 +9,6 @@ import { UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { Platform } from 'Core/Constants/Platform';
@@ -28,7 +27,6 @@ describe('AdmobAdUnitTest', () => {
 
     let admobAdUnit: AdMobAdUnit;
     let admobAdUnitParameters: IAdMobAdUnitParameters;
-    let pts: ProgrammaticTrackingServiceMock;
     let placement: PlacementMock;
 
     beforeEach(() => {
@@ -36,8 +34,6 @@ describe('AdmobAdUnitTest', () => {
         const store = new Store();
         const core = new Core();
         placement = new Placement();
-
-        pts = new ProgrammaticTrackingService();
 
         admobAdUnitParameters = {
             view: new AdMobView(),
@@ -60,7 +56,6 @@ describe('AdmobAdUnitTest', () => {
             request: new RequestManager(),
             options: undefined,
             privacyManager: new UserPrivacyManager(),
-            programmaticTrackingService: pts,
             privacy: new AbstractPrivacy(),
             privacySDK: new PrivacySDK()
         };

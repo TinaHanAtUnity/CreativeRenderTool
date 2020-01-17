@@ -5,7 +5,6 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -83,7 +82,6 @@ describe('DisplayInterstitialEventHandler', () => {
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             const coreConfig = TestFixtures.getCoreConfiguration();
-            const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             const privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
 
@@ -113,7 +111,6 @@ describe('DisplayInterstitialEventHandler', () => {
                 options: {},
                 view: view,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 webPlayerContainer: webPlayerContainer,
                 privacySDK: privacySDK
             };

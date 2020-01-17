@@ -135,8 +135,6 @@ interface IPTSEvent {
 }
 
 export class ProgrammaticTrackingService {
-    // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
-    private static stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
     private static metricPath = 'v1/metrics';
     private static timingPath = 'v1/timing';
@@ -147,6 +145,8 @@ export class ProgrammaticTrackingService {
     private static _deviceInfo: DeviceInfo;
     private static _countryIso: string;
     private static _batchedEvents: IPTSEvent[];
+    // Defaulted to staging endpoint: Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
+    protected static _baseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
     public static initialize(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): void {
         this._platform = platform;
@@ -155,10 +155,7 @@ export class ProgrammaticTrackingService {
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
         this._batchedEvents = [];
-    }
-
-    protected static getBaseUrl(): string {
-        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+        this._baseUrl = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
     private static createMetricTags(event: PTSEvent, tags: string[]): string[] {
@@ -205,7 +202,7 @@ export class ProgrammaticTrackingService {
     }
 
     private static postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this.getBaseUrl() + path;
+        const url: string = this._baseUrl + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);

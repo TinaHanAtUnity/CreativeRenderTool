@@ -19,7 +19,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -136,7 +135,6 @@ describe('CampaignRefreshManager', () => {
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
     let privacyManager: UserPrivacyManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
     let campaignParserManager: ContentTypeHandlerManager;
     let privacy: AbstractPrivacy;
@@ -166,10 +164,9 @@ describe('CampaignRefreshManager', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         campaignParserManager = new ContentTypeHandlerManager();
-        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
@@ -221,7 +218,6 @@ describe('CampaignRefreshManager', () => {
             request: request,
             options: {},
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacy: privacy,
             privacySDK: privacySDK
         };

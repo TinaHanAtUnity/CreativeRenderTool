@@ -841,7 +841,6 @@ export class TestFixtures {
             video: new Video('', TestFixtures.getSession()),
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
@@ -875,7 +874,6 @@ export class TestFixtures {
             video: new Video('', TestFixtures.getSession()),
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
@@ -902,7 +900,6 @@ export class TestFixtures {
             adsConfig: ads.Config,
             request: core.RequestManager,
             privacyManager: ads.PrivacyManager,
-            programmaticTrackingService: core.ProgrammaticTrackingService,
             gameSessionId: ads.SessionManager.getGameSessionId(),
             options: {},
             privacy: privacy,
@@ -1024,7 +1021,6 @@ export class TestFixtures {
             core.DeviceInfo = new IosDeviceInfo(api);
             core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
         }
-        core.ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
 
         return <ICore>core;
@@ -1048,7 +1044,7 @@ export class TestFixtures {
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager, privacySDK);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
-        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping);
         ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         ads.Analytics = new Analytics(core, ads.PrivacySDK!);
@@ -1072,7 +1068,7 @@ export class TestFixtures {
         const banners: Partial<IBannerModule> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config, api),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK, ads.PrivacyManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK, ads.PrivacyManager),
             AdUnitFactory: new BannerAdUnitFactory()
         };
         banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBannerModule>banners, ads, core);
