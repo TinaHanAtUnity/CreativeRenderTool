@@ -282,8 +282,6 @@ export class Ads implements IAds {
                 this.RefreshManager = this._trackableRefreshManager;
             }
 
-            this._adUnitTracker.postInit();
-
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
             promo.initialize();

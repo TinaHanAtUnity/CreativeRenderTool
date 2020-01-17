@@ -72,11 +72,6 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 delete this._activePlacements[placementId];
             }
-            /* else if (placement.getPlacementStateChanged() && placement.getPreviousState() ===  PlacementState.READY && placement.getState() === PlacementState.WAITING) {
-                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.READY, PlacementState.WAITING);
-            } else if (placement.getPlacementStateChanged() && placement.getPreviousState() ===  PlacementState.WAITING && placement.getState() === PlacementState.READY) {
-                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.READY);
-            }*/
         }
         placement.setPlacementStateChanged(false);
     }

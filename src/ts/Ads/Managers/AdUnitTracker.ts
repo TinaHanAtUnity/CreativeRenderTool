@@ -5,8 +5,7 @@ import { ListenerApi } from 'Ads/Native/Listener';
 
 enum AdUnitState {
     LOADING,
-    FILL,
-    INVALIDATING
+    FILL
 }
 
 export class AdUnitTracker {
@@ -15,7 +14,6 @@ export class AdUnitTracker {
     private _listener: ListenerApi;
     private _refreshManager: TrackableRefreshManager;
     private _pts: ProgrammaticTrackingService;
-    private _insideLoad: boolean;
 
     private _states: { [key: string]: AdUnitState };
 
@@ -27,23 +25,13 @@ export class AdUnitTracker {
         this._pts = pts;
 
         this._states = {};
-        this._insideLoad = false;
 
         this._loadApi.onLoad.subscribe((placements) => this.onLoad(placements));
         this._listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, nextState) => this.onPlacementStateChangedEventSent(placementId, oldState, nextState));
         this._refreshManager.onAdUnitChanged.subscribe((placementId) => this.onAdUnitChanged(placementId));
     }
 
-    public postInit() {
-        this._loadApi.onLoad.subscribe((placements) => this.onPostLoad(placements));
-    }
-
-    private onPostLoad(placements: { [key: string]: number }): void {
-        this._insideLoad = false;
-    }
-
     private onLoad(placements: { [key: string]: number }): void {
-        this._insideLoad = true;
         Object.keys(placements).forEach((placementId) => {
             if (this._states[placementId] !== undefined) {
                 switch (this._states[placementId]) {
@@ -86,15 +74,10 @@ export class AdUnitTracker {
         }
 
         if (newState === 'READY') {
-            if (this._states[placementId] === AdUnitState.INVALIDATING) {
-                this._pts.reportMetricEventWithTags(AdUnitTracking.SuccessfulInvalidate, [
-                    this._pts.createAdsSdkTag('med', this._mediationName)
-                ]);
-            }
             this._states[placementId] = AdUnitState.FILL;
         } else if (newState === 'NO_FILL') {
             if (this._states[placementId] === AdUnitState.FILL) {
-                this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleCampaignExpired, [
+                this._pts.reportMetricEventWithTags(AdUnitTracking.FailedToInvalidate, [
                     this._pts.createAdsSdkTag('med', this._mediationName)
                 ]);
             }
@@ -103,14 +86,6 @@ export class AdUnitTracker {
             delete this._states[placementId];
         }  else if (newState === 'DISABLED') {
             delete this._states[placementId];
-        } else if (newState === 'WAITING' && this._states[placementId] === AdUnitState.FILL) {
-            if (!this._insideLoad) {
-                this._pts.reportMetricEventWithTags(AdUnitTracking.AttemptToInvalidate, [
-                    this._pts.createAdsSdkTag('med', this._mediationName)
-                ]);
-
-                this._states[placementId] = AdUnitState.INVALIDATING;
-            }
         }
     }
 }
