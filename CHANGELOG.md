@@ -1,4 +1,4 @@
-# Pending
+# Fri Jan 17 23:44:30 UTC 2020
 
 * Open Measurement - Remove JS string check for OM Verification Scripts [#12815](https://github.com/Applifier/unity-ads-webview/pull/12815)
 * VAST - Pass Ad Verifications to Subsequent Nested Tags [#12819](https://github.com/Applifier/unity-ads-webview/pull/12819)
