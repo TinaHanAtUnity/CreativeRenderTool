@@ -1,3 +1,8 @@
+# Pending
+
+* Open Measurement - Remove JS string check for OM Verification Scripts [#12815](https://github.com/Applifier/unity-ads-webview/pull/12815)
+* VAST - Pass Ad Verifications to Subsequent Nested Tags [#12819](https://github.com/Applifier/unity-ads-webview/pull/12819)
+
 # Fri Jan 17 10:02:07 UTC 2020
 
 * Permission external should be allowed outside GDPR area if the legal framework is legitimate interest [#12852](https://github.com/Applifier/unity-ads-webview/pull/12852)
