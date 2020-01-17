@@ -123,6 +123,7 @@ export enum AUIMetric {
 }
 
 export enum AdUnitTracking {
+    ShowCall = 'ad_unit_showcall',
     DuplicateLoadForPlacement = 'ad_unit_duplicate_load_for_placement',
     PossibleDuplicateLoadForPlacement = 'ad_unit_possible_duplicate_load_for_placement',
     InitialLoadRequest = 'ad_unit_initial_load_request',

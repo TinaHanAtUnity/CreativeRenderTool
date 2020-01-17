@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric, AdUnitTracking } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -192,6 +192,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.configureMediationManager();
         }).then(() => {
+            return this.fetchMediationName();
+        }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
@@ -280,6 +282,8 @@ export class Ads implements IAds {
                 this.RefreshManager = this._trackableRefreshManager;
             }
 
+            this._adUnitTracker.postInit();
+
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
             promo.initialize();
@@ -334,10 +338,6 @@ export class Ads implements IAds {
                     if (mediationName === 'AdMob') {
                         this.AdmobAdapterManager = new AdmobAdapterManager(this.Api, this._core.NativeBridge.getPlatform());
                     }
-
-                    if (mediationName) {
-                        this._mediationName = mediationName;
-                    }
                 }
             }).catch(() => {
                 // ingore error
@@ -345,6 +345,19 @@ export class Ads implements IAds {
         }
 
         return Promise.resolve();
+    }
+
+    private fetchMediationName(): Promise<void> {
+        return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if (mediation) {
+                const mediationName = mediation.getName();
+                if (mediationName) {
+                    this._mediationName = mediationName;
+                }
+            }
+        }).catch(() => {
+            // ingore error
+        });
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
@@ -382,6 +395,10 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
+
+        if (this._adUnitTracker !== undefined) {
+            this._core.ProgrammaticTrackingService.reportMetricEvent(AdUnitTracking.ShowCall);
+        }
 
         if (this.isAttemptingToShowInBackground()) {
             this._core.ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.CampaignAttemptedShowInBackground);
@@ -706,7 +723,7 @@ export class Ads implements IAds {
     private configureAdUnitTracker(): void {
         if (this._loadApiEnabled) {
             this._trackableRefreshManager = new TrackableRefreshManager();
-            this._adUnitTracker = new AdUnitTracker(this._core.ClientInfo.getGameId(), this._mediationName, this.Api.LoadApi, this._trackableRefreshManager, this._core.ProgrammaticTrackingService);
+            this._adUnitTracker = new AdUnitTracker(this._mediationName, this.Api.LoadApi, this.Api.Listener, this._trackableRefreshManager, this._core.ProgrammaticTrackingService);
         }
     }
 }
