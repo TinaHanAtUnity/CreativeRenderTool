@@ -46,6 +46,9 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             placement.set('id', placementId);
             placement.set('adTypes', ['BANNER']);
             bannerAdContext = bannerModule.BannerAdContextManager.createContext(placement, placementId, BannerSizeStandardDimensions);
+            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags').returns(Promise.resolve());
+            sandbox.stub(ProgrammaticTrackingService, 'reportErrorEvent').returns(Promise.resolve());
         });
 
         afterEach(() => {

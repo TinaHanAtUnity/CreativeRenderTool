@@ -196,6 +196,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.notCalled(sendReadyEventStub);
+                sinon.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
             });
 
             it('should not attempt to load a campaign that\'s ready and not expired', () => {
@@ -212,6 +213,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.calledWith(sendReadyEventStub, placementId);
+                sinon.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
             });
 
             it('should attempt to load a campaign that\'s ready and expired', () => {

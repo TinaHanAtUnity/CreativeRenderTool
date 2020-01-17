@@ -8,7 +8,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventMa
 import { UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService as PTSMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { Platform } from 'Core/Constants/Platform';
@@ -22,6 +22,7 @@ import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { Store } from 'Store/__mocks__/Store';
 
 import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('AdmobAdUnitTest', () => {
 
@@ -30,6 +31,7 @@ describe('AdmobAdUnitTest', () => {
     let placement: PlacementMock;
 
     beforeEach(() => {
+        ProgrammaticTrackingService.reportMetricEvent = PTSMock().reportMetricEvent;
         const ads = new Ads();
         const store = new Store();
         const core = new Core();
@@ -75,11 +77,11 @@ describe('AdmobAdUnitTest', () => {
         });
 
         it('should have called reportMetricEvent 1 time', () => {
-            expect(pts.reportMetricEvent).toHaveBeenCalledTimes(1);
+            expect(ProgrammaticTrackingService.reportMetricEvent).toHaveBeenCalledTimes(1);
         });
 
         it('should have called reportMetricEvent with AdmobMetric.AdmobRewardedVideoStart', () => {
-            expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobRewardedVideoStart);
+            expect(ProgrammaticTrackingService.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobRewardedVideoStart);
         });
 
         describe('when sendRewardEvent is called', () => {
@@ -88,11 +90,11 @@ describe('AdmobAdUnitTest', () => {
             });
 
             it('should have called reportMetricEvent 2 times', () => {
-                expect(pts.reportMetricEvent).toHaveBeenCalledTimes(2);
+                expect(ProgrammaticTrackingService.reportMetricEvent).toHaveBeenCalledTimes(2);
             });
 
             it('should have called reportMetricEvent with AdmobMetric.AdmobUserWasRewarded', () => {
-                expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
+                expect(ProgrammaticTrackingService.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
             });
         });
 
@@ -102,11 +104,11 @@ describe('AdmobAdUnitTest', () => {
             });
 
             it('should have called reportMetricEvent 2 times', () => {
-                expect(pts.reportMetricEvent).toHaveBeenCalledTimes(2);
+                expect(ProgrammaticTrackingService.reportMetricEvent).toHaveBeenCalledTimes(2);
             });
 
             it('should have called reportMetricEvent with AdmobMetric.AdmobUserWasRewarded', () => {
-                expect(pts.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserSkippedRewardedVideo);
+                expect(ProgrammaticTrackingService.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserSkippedRewardedVideo);
             });
         });
     });
@@ -120,7 +122,7 @@ describe('AdmobAdUnitTest', () => {
         });
 
         it('should not have called reportMetricEvent', () => {
-            expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+            expect(ProgrammaticTrackingService.reportMetricEvent).not.toHaveBeenCalled();
         });
 
         describe('when sendRewardEvent is called', () => {
@@ -129,7 +131,7 @@ describe('AdmobAdUnitTest', () => {
             });
 
             it('should not have called reportMetricEvent', () => {
-                expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+                expect(ProgrammaticTrackingService.reportMetricEvent).not.toHaveBeenCalled();
             });
         });
 
@@ -139,7 +141,7 @@ describe('AdmobAdUnitTest', () => {
             });
 
             it('should not have called reportMetricEvent', () => {
-                expect(pts.reportMetricEvent).not.toHaveBeenCalled();
+                expect(ProgrammaticTrackingService.reportMetricEvent).not.toHaveBeenCalled();
             });
         });
     });

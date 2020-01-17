@@ -15,6 +15,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { assert } from 'chai';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -45,6 +46,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
             }
             request = sinon.createStubInstance(RequestManager);
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
+            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
 
             return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
@@ -81,6 +83,8 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
                     omManager.injectVerificationResources([verificationResource, verificationResource1]);
                     sinon.assert.calledTwice(<sinon.SinonStub>omManager.setupOMInstance);
                     sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.setTemplateValue, '%25OM_VENDORS%25', 'scoot|scoot1');
+                    sinon.assert.calledOnce(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
+                    sinon.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'admob_om_injected');
                 });
             });
 
@@ -110,6 +114,28 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
             it('sessionFinish should should pass to admob session interface bridge', () => {
                 omManager.sessionFinish();
                 sinon.assert.calledOnce(<sinon.SinonStub>omManager.getAdmobBridge().sendSessionFinish);
+            });
+
+            it('sessionFinish should report to pts', () => {
+                (<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent).reset();
+                omManager.sessionFinish();
+                sinon.assert.calledOnce(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
+                sinon.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'admob_om_session_finish');
+            });
+
+            it('sessionStart should report to pts', () => {
+                (<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent).reset();
+
+                const sessionEvent: ISessionEvent = {
+                    adSessionId: '',
+                    timestamp: 1,
+                    type: '',
+                    data: {}
+                };
+
+                omManager.sessionStart(sessionEvent);
+                sinon.assert.calledOnce(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
+                sinon.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'admob_om_session_start');
             });
         });
 
@@ -167,6 +193,56 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
                     } else {
                         assert.deepEqual(JSON.stringify((<sinon.SinonStub>OpenMeasurementController.prototype.impression).getCall(0).args[0]), JSON.stringify(impressionDataIOS));
                     }
+                });
+            });
+
+            it('should not send admob om impression pts metric if no verification exists', () => {
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.notCalled(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
+                });
+            });
+
+            it('should send admob om impression pts metric if one verification exists', () => {
+
+                const reportSpy = <sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent;
+
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+
+                omManager.injectVerificationResources([verificationResource]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.calledTwice(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                });
+            });
+
+            it('should send admob om impression pts metric for multiple om instances', () => {
+
+                const reportSpy = <sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent;
+
+                const verificationResource = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+                const verificationResource1 = {
+                    resourceUrl: 'http://scoot1.com',
+                    vendorKey: 'scoot1',
+                    verificationParameters: 'scootage1'
+                };
+                omManager.injectVerificationResources([verificationResource, verificationResource1]);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.calledThrice(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                    assert.equal(reportSpy.getCall(2).args[0], 'admob_om_impression');
                 });
             });
 
