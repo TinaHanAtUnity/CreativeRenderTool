@@ -2,7 +2,7 @@ import { ICoreApi } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { CacheError } from 'Core/Native/Cache';
+import { CacheError, IFileInfo } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
@@ -178,16 +178,24 @@ export class CacheManager {
         });
     }
 
+    protected getHeaders(fileInfo: IFileInfo | undefined): HeadersType {
+        let headers: HeadersType = [];
+
+        if (fileInfo && fileInfo.found && fileInfo.size > 0) {
+            headers.push(['Range', 'bytes=' + fileInfo.size + '-']);
+        }
+        return headers;
+    }
+
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
 
         FileInfo.getFileInfo(this._core.Cache, fileId).then(fileInfo => {
             let append = false;
-            let headers: HeadersType = [];
+            const headers: HeadersType = this.getHeaders(fileInfo);
 
             if (fileInfo && fileInfo.found && fileInfo.size > 0) {
                 append = true;
-                headers = [['Range', 'bytes=' + fileInfo.size + '-']];
             }
 
             // note: Emergency hack to prevent file URLs from crashing Android native SDK.
