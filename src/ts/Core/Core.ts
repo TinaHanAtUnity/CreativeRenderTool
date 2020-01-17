@@ -51,6 +51,8 @@ import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
+import { ChinaProgrammaticTrackingService } from 'Ads/Utilities/ChinaProgrammaticTrackingService';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class Core implements ICore {
 
@@ -198,7 +200,12 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
-            this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+            if (this.DeviceInfo.isChineseNetworkOperator() && CustomFeatures.sampleAtGivenPercent(5)) {
+                this.ProgrammaticTrackingService = new ChinaProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+            } else {
+                this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+            }
+
             this.ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
             this.ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 

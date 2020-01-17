@@ -1,3 +1,12 @@
+# Thu Jan 16 18:55:31 UTC 2020
+
+* Change the SDK diagnostic endpoint for China [#12820](https://github.com/Applifier/unity-ads-webview/pull/12820)
+
+# Mon Jan 13 19:17:49 UTC 2020
+
+* Open Measurement - Fix verification params on Admob OM SessionStart [#12779](https://github.com/Applifier/unity-ads-webview/pull/12779)
+* Add WebPlayer api jest tests [#12445](https://github.com/Applifier/unity-ads-webview/pull/12445)
+
 # Thu Dec 19 13:41:58 UTC 2019
 
 * Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)
