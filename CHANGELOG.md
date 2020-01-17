@@ -1,3 +1,6 @@
+# Staged
+* Permission external should be allowed outside GDPR area if the legal framework is legitimate interest [#12852](https://github.com/Applifier/unity-ads-webview/pull/12852)
+
 # Fri Jan 17 00:04:49 UTC 2020
 
 * Add Metrics to Investigate Missed Impressions in Mediation [#12824](https://github.com/Applifier/unity-ads-webview/pull/12824)
