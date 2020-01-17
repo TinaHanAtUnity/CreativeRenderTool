@@ -2,7 +2,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -123,7 +122,17 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export enum AdUnitTracking {
+    DuplicateLoadForPlacement = 'ad_unit_duplicate_load_for_placement',
+    PossibleDuplicateLoadForPlacement = 'ad_unit_possible_duplicate_load_for_placement',
+    InitialLoadRequest = 'ad_unit_initial_load_request',
+    AttemptToShowAd = 'ad_unit_attempt_to_show',
+    SuccessfulInvalidate = 'ad_unit_successful_invalidate',
+    PossibleCampaignExpired = 'ad_unit_possible_campaign_expire',
+    AttemptToInvalidate = 'ad_unit_attempt_to_invalidate'
+}
+
+type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;
 
 export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
@@ -136,8 +145,6 @@ interface IPTSEvent {
 }
 
 export class ProgrammaticTrackingService {
-    private productionBaseUrl: string = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
-
     // Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
     private stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
@@ -158,6 +165,10 @@ export class ProgrammaticTrackingService {
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
         this._batchedEvents = [];
+    }
+
+    protected getBaseUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {
@@ -204,7 +215,7 @@ export class ProgrammaticTrackingService {
     }
 
     private postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this.productionBaseUrl + path;
+        const url: string = this.getBaseUrl() + path;
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);

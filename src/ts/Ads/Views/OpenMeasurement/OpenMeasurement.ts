@@ -498,9 +498,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         if (CustomFeatures.isUnsupportedOMVendor(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_RESOURCE_REJECTED);
             return Promise.reject('verification resource rejected');
-        } else if (!resourceUrl.includes('.js')) {
-            this.sendErrorEvent(VerificationReasonCode.VERIFICATION_NOT_SUPPORTED);
-            return Promise.reject('verification resource not supported');
         } else if (!Url.isValid(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
             return Promise.reject('verification resource is malformed');

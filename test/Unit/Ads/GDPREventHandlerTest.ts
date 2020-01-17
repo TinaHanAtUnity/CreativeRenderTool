@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -27,10 +27,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 describe('GDPREventHandlerTest', () => {
     const sandbox = sinon.createSandbox();
@@ -42,7 +40,6 @@ describe('GDPREventHandlerTest', () => {
     let store: IStoreApi;
     let adUnit: PerformanceAdUnit;
     let adUnitParameters: IPerformanceAdUnitParameters;
-    let privacySDK: PrivacySDK;
     let deviceInfo: AndroidDeviceInfo;
     let clientInfo: ClientInfo;
 
@@ -58,7 +55,6 @@ describe('GDPREventHandlerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        privacySDK = PrivacyParser.parse(ConfigurationAuctionPlc, clientInfo, deviceInfo);
         adUnitParameters = {
             platform,
             core,
@@ -83,24 +79,48 @@ describe('GDPREventHandlerTest', () => {
             privacy: sinon.createStubInstance(Privacy),
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            privacySDK: privacySDK
+            privacySDK: sinon.createStubInstance(PrivacySDK)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
         gdprEventHandler = new OverlayEventHandler(adUnit, adUnitParameters);
     });
 
-    describe('When calling onGDPRPopupSkipped', () => {
+    describe('When calling onGDPRPopupSkipped on legalFramework GDPR', () => {
+        beforeEach(() => {
+            (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.GDPR);
+            (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+        });
+
+        it('should send GDPR skip event', () => {
+            gdprEventHandler.onGDPRPopupSkipped();
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST_GDPR, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIPPED_BANNER);
+        });
+    });
+
+    describe('When calling onGDPRPopupSkipped on legalFramework CCPA', () => {
+        beforeEach(() => {
+            (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.CCPA);
+            (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+        });
+
         it('should send GDPR skip event', () => {
             gdprEventHandler.onGDPRPopupSkipped();
             sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIPPED_BANNER);
         });
 
-        it('GDPR skip event should not be sent', () => {
-            adUnitParameters.privacySDK.getUserPrivacy().setMethod(PrivacyMethod.LEGITIMATE_INTEREST);
-            gdprEventHandler.onGDPRPopupSkipped();
+    });
 
+    describe('GDPR skip event should not be sent if user privacy is already recorded', () => {
+        beforeEach(() => {
+            (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(true);
+
+        });
+
+        it('GDPR skip event should not be sent', () => {
+            gdprEventHandler.onGDPRPopupSkipped();
             sinon.assert.notCalled(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy);
         });
+
     });
 });
