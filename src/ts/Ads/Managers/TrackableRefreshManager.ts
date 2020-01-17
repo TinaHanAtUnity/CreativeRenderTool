@@ -9,7 +9,6 @@ import { Observable2, Observable1 } from 'Core/Utilities/Observable';
 export class TrackableRefreshManager implements RefreshManager {
     private _refreshManager: RefreshManager;
 
-    public readonly onPlacementStateChanged = new Observable2<string, PlacementState>();
     public readonly onAdUnitChanged = new Observable1<string>();
 
     public setRefreshManager(refreshManager: RefreshManager): void {
@@ -33,7 +32,6 @@ export class TrackableRefreshManager implements RefreshManager {
         return this._refreshManager.shouldRefill(timestamp);
     }
     public setPlacementState(placementId: string, placementState: PlacementState): void {
-        this.onPlacementStateChanged.trigger(placementId, placementState);
         this._refreshManager.setPlacementState(placementId, placementState);
     }
     public sendPlacementStateChanges(placementId: string): void {

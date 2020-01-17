@@ -4,22 +4,24 @@ import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
 import { RefreshManager } from 'Ads/Managers/__mocks__/RefreshManager';
 import { AdUnitTracking } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ProgrammaticTrackingService as PTSMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
-import { PlacementState } from 'Ads/Models/Placement';
+import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
 
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('AdUnitTracker', () => {
     let adUnitTracker: AdUnitTracker;
     let loadApi: LoadApiMock;
+    let listenerApi: ListenerMock;
     let trackableRefreshManager: TrackableRefreshManager;
 
     beforeEach(() => {
         loadApi = LoadApi();
+        listenerApi = ListenerApi();
         trackableRefreshManager = new TrackableRefreshManager();
         trackableRefreshManager.setRefreshManager(RefreshManager());
-        adUnitTracker = new AdUnitTracker('0', 'admob', loadApi, trackableRefreshManager);
         ProgrammaticTrackingService.reportMetricEventWithTags = PTSMock().reportMetricEventWithTags;
         ProgrammaticTrackingService.createAdsSdkTag = PTSMock().createAdsSdkTag;
+        adUnitTracker = new AdUnitTracker('admob', loadApi, listenerApi, trackableRefreshManager);
     });
 
     describe('when request load for a placement one time', () => {
@@ -54,7 +56,7 @@ describe('AdUnitTracker', () => {
     describe('when request load for a filled placement', () => {
         beforeEach(() => {
             loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.READY);
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
             loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
         });
 
@@ -82,14 +84,14 @@ describe('AdUnitTracker', () => {
     });
 
     [
-        PlacementState.DISABLED,
-        PlacementState.NOT_AVAILABLE,
-        PlacementState.NO_FILL
+        'DISABLED',
+        'NOT_AVAILABLE',
+        'NO_FILL'
     ].forEach((nextState) => {
-        describe(`setting following ${PlacementState[nextState]} state should reset`, () => {
+        describe(`setting following ${nextState} state should reset`, () => {
             beforeEach(() => {
                 loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-                trackableRefreshManager.onPlacementStateChanged.trigger('placementId', nextState);
+                listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', nextState);
                 loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             });
 
@@ -103,12 +105,12 @@ describe('AdUnitTracker', () => {
     });
 
     [
-        PlacementState.WAITING
+        'WAITING'
     ].forEach((nextState) => {
-        describe(`setting following ${PlacementState[nextState]} state should not reset`, () => {
+        describe(`setting following ${nextState} state should not reset`, () => {
             beforeEach(() => {
                 loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-                trackableRefreshManager.onPlacementStateChanged.trigger('placementId', nextState);
+                listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', nextState);
                 loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             });
 
@@ -121,12 +123,12 @@ describe('AdUnitTracker', () => {
     });
 
     [
-        PlacementState.READY
+        'READY'
     ].forEach((nextState) => {
-        describe(`setting following ${PlacementState[nextState]} state should not reset`, () => {
+        describe(`setting following ${nextState} state should not reset`, () => {
             beforeEach(() => {
                 loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-                trackableRefreshManager.onPlacementStateChanged.trigger('placementId', nextState);
+                listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', nextState);
                 loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
             });
 
@@ -141,34 +143,31 @@ describe('AdUnitTracker', () => {
     describe('successfully invalidation', () => {
         beforeEach(() => {
             loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.READY);
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.WAITING);
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.READY);
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'WAITING');
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
             trackableRefreshManager.onAdUnitChanged.trigger('placementId');
         });
 
         it('should send metric events', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(4);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
             expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToInvalidate, [undefined]);
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.SuccessfulInvalidate, [undefined]);
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(4, AdUnitTracking.AttemptToShowAd, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToShowAd, [undefined]);
         });
     });
 
     describe('failed invalidation', () => {
         beforeEach(() => {
             loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.READY);
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.WAITING);
-            trackableRefreshManager.setPlacementState('placementId', PlacementState.NO_FILL);
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'READY');
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', '', 'NO_FILL');
             loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1});
         });
 
         it('should send metric events', () => {
             expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(3);
             expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToInvalidate, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.FailedToInvalidate, [undefined]);
             expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
         });
     });
