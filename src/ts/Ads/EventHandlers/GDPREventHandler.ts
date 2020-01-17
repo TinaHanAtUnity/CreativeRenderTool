@@ -1,7 +1,7 @@
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { PrivacyMethod, UserPrivacy} from 'Privacy/Privacy';
+import { UserPrivacy } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export interface IGDPREventHandler {
@@ -25,7 +25,9 @@ export abstract class GDPREventHandler implements IGDPREventHandler {
     public onGDPRPopupSkipped(): void {
         if (!this._privacySDK.isOptOutRecorded()) {
             // todo: add age gate choice
-            this._privacyManager.updateUserPrivacy(UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIPPED_BANNER);
+            const legalFramework = this._privacySDK.getLegalFramework();
+            const permissions = legalFramework === LegalFramework.GDPR ? UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST_GDPR : UserPrivacy.PERM_SKIPPED_LEGITIMATE_INTEREST;
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER_INDIRECT, GDPREventAction.SKIPPED_BANNER);
         }
     }
 }
