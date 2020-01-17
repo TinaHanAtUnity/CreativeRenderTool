@@ -32,7 +32,6 @@ import { Vast } from 'VAST/Models/Vast';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('VastParserStrict', () => {
@@ -151,6 +150,22 @@ describe('VastParserStrict', () => {
 
                 return TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah', isPublica).then((vast) => {
                     assert.equal(vast.isPublicaTag(), true);
+                });
+            });
+
+            it('should create a Vast tag that includes all AdVerification tags including those from nested vast tags', () => {
+                const wrappedVAST = WrappedVastIAS;
+                sinon.stub(request, 'get').returns(Promise.resolve({
+                    response: VastAdVerificationAsStandAlone
+                }));
+
+                const isPublica = true;
+
+                return TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah', isPublica).then((vast) => {
+                    const verifications = vast.getAdVerifications();
+                    assert.equal(verifications.length, 2);
+                    assert.equal(verifications[0].getVerificationVendor(), 'doubleverify.com-omid');
+                    assert.equal(verifications[1].getVerificationVendor(), 'IAS');
                 });
             });
         });

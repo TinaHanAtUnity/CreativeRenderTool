@@ -17,6 +17,7 @@ import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
@@ -113,13 +114,14 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 });
 
                 describe('on failure', () => {
-                    describe('VERIFICATION_NOT_SUPPORTED', () => {
-                        const resource1 = new VastVerificationResource('http://url1.html', 'test1');
+                    describe('VERIFICATION_RESOURCE_REJECTED', () => {
+                        const resource1 = new VastVerificationResource('http://url1.js', 'test1');
                         const verificationResources = [resource1];
                         const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D');
                         const vastAdVerifications = [vastAdVerification];
 
                         beforeEach(() => {
+                            sandbox.stub(CustomFeatures, 'isUnsupportedOMVendor').returns(true);
                             om = initWithVastVerifications(vastAdVerifications);
                             om.render();
                             om.addMessageListener();
@@ -130,8 +132,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                             om.removeMessageListener();
                         });
 
-                        it('should error with VERIFICATION_NOT_SUPPORTED when resource is not a js file', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=2');
+                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file', () => {
+                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1');
                         });
                     });
 
