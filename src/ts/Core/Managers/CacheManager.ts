@@ -179,7 +179,7 @@ export class CacheManager {
     }
 
     protected getHeaders(fileInfo: IFileInfo | undefined): HeadersType {
-        let headers: HeadersType = [];
+        const headers: HeadersType = [];
 
         if (fileInfo && fileInfo.found && fileInfo.size > 0) {
             headers.push(['Range', 'bytes=' + fileInfo.size + '-']);

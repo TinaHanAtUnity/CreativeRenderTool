@@ -8,7 +8,7 @@ import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 export class CustomFeatures {
 
     public static isCSR2GameId(gameId: string): boolean {
-        return gameId === '15004'
+        return gameId === '15004';
     }
 
     public static isExampleGameId(gameId: string): boolean {
