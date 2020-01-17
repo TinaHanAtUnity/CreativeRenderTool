@@ -394,7 +394,7 @@ export class Ads implements IAds {
         callback(CallbackStatus.OK);
 
         if (this._adUnitTracker !== undefined) {
-            this._core.ProgrammaticTrackingService.reportMetricEvent(AdUnitTracking.ShowCall);
+            ProgrammaticTrackingService.reportMetricEvent(AdUnitTracking.ShowCall);
         }
 
         if (this.isAttemptingToShowInBackground()) {
