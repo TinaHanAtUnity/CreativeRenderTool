@@ -181,9 +181,11 @@ export class UserPrivacyManager {
             };
         }
 
-        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
-            return Promise.resolve();
-        });
+        // todo: for now, avoid mixing new implementation with production data
+        return Promise.resolve();
+//        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
+//            return Promise.resolve();
+//        });
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
@@ -271,7 +273,9 @@ export class UserPrivacyManager {
             });
         }
 
-        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
+        // todo: for now, avoid mixing new implementation with production data
+        return Promise.resolve(<INativeResponse>{});
+        // return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {

@@ -40,25 +40,24 @@ export class HttpKafka {
     }
 
     public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: unknown): Promise<INativeResponse> {
-        // const messages: unknown[] = [];
-        //         // messages.push({
-        //         //     'type': type,
-        //         //     'msg': data
-        //         // });
-        //         //
-        //         // return HttpKafka.createCommonObject(objectType, this._platform, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
-        //         //     if (commonObject) {
-        //         //         messages.unshift(commonObject);
-        //         //     }
-        //         //
-        //         //     const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
-        //         //     if (HttpKafka._request) {
-        //         //         return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
-        //         //     } else {
-        //         //         return Promise.resolve(<INativeResponse>{});
-        //         //     }
-        //         // });
-        return Promise.resolve(<INativeResponse>{});
+        const messages: unknown[] = [];
+        messages.push({
+            'type': type,
+            'msg': data
+        });
+
+        return HttpKafka.createCommonObject(objectType, this._platform, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
+            if (commonObject) {
+                messages.unshift(commonObject);
+            }
+
+            const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
+            if (HttpKafka._request) {
+                return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
+            } else {
+                return Promise.resolve(<INativeResponse>{});
+            }
+        });
     }
 
     public static setTestBaseUrl(baseUrl: string) {
