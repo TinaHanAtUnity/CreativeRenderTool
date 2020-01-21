@@ -200,7 +200,7 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
-            if (this.DeviceInfo.isChineseNetworkOperator() && CustomFeatures.sampleAtGivenPercent(5)) {
+            if (this.DeviceInfo.isChineseNetworkOperator() && CustomFeatures.sampleAtGivenPercent(50)) {
                 this.ProgrammaticTrackingService = new ChinaProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
             } else {
                 this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
