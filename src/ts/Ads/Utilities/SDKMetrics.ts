@@ -153,9 +153,32 @@ export enum MediationMetric {
     AdCaching = 'ad_caching_time'
 }
 
+export enum LoadV5 {
+    PreloadRequestFailed = 'v5_preload_request_failed',
+    PreloadRequestParsingResponse = 'v5_preload_request_parsing_response',
+    PreloadRequestStarted = 'v5_preload_request_started',
+    PreloadRequestAlreadyActive = 'v5_preload_request_already_active',
+    LoadRequestNoPreloadData = 'v5_load_request_no_preload_data',
+    LoadRequestPreloadDataExpired = 'v5_load_request_preload_data_expired',
+    LoadRequestWhilePreloadOngoing = 'v5_load_request_while_preload_ongoing',
+    LoadRequestWhileReloadOngoing = 'v5_load_request_while_reload_ongoing',
+    LoadRequestCurrentSessionIsNotSet = 'v5_load_request_current_session_is_not_set',
+    LoadRequestStarted = 'v5_load_request_started',
+    LoadRequestParsingResponse = 'v5_load_request_parsing_response',
+    LoadRequestFailed = 'v5_load_request_failed',
+    LoadRequestWasCanceled = 'v5_load_request_was_canceled',
+    LoadRequestCurrentSessionMissing = 'v5_load_request_current_session_missing',
+    ReloadRequestOngoing = 'v5_reload_request_ongoing',
+    ReloadRequestFailed = 'v5_reload_request_failed',
+    ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
+    ReloadRequestStarted = 'v5_reload_request_started',
+    ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
+    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
 
 export class SDKMetrics {
 
