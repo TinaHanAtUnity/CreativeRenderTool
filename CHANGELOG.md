@@ -1,4 +1,4 @@
-# Pending
+# Tue Jan 21 23:01:23 UTC 2020
 
 * Open Measurement Refactor - Fix Generic Use [#12725](https://github.com/Applifier/unity-ads-webview/pull/12725)
 * Improve metrics for AR ads [#12787](https://github.com/Applifier/unity-ads-webview/pull/12787)
