@@ -17,12 +17,13 @@ import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
         const sandbox = sinon.createSandbox();
-        let om: OpenMeasurement;
+        let om: OpenMeasurement<Campaign>;
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -49,10 +50,10 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
             }
         };
 

@@ -7,13 +7,14 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlayerState, InteractionType, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { Campaign } from 'Ads/Models/Campaign';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMController`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
 
-        const initOMManager = (om: OpenMeasurement[]) => {
+        const initOMManager = (om: OpenMeasurement<Campaign>[]) => {
             placement = TestFixtures.getPlacement();
             const adViewBuilder = sandbox.createStubInstance(OpenMeasurementAdViewBuilder);
             return new OpenMeasurementController(placement, adViewBuilder, om);
@@ -21,7 +22,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 
         describe('session events', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement;
+            let openMeasurement: OpenMeasurement<Campaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
@@ -43,7 +44,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 
         describe('adEvents', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement;
+            let openMeasurement: OpenMeasurement<Campaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
