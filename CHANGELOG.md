@@ -1,5 +1,9 @@
 # Pending
 
+* Open Measurement Refactor - Fix Generic Use [#12725](https://github.com/Applifier/unity-ads-webview/pull/12725)
+
+# Fri Jan 17 23:44:30 UTC 2020
+
 * Open Measurement - Remove JS string check for OM Verification Scripts [#12815](https://github.com/Applifier/unity-ads-webview/pull/12815)
 * VAST - Pass Ad Verifications to Subsequent Nested Tags [#12819](https://github.com/Applifier/unity-ads-webview/pull/12819)
 * Fix Ad Unit Tracker Metrics [#12904](https://github.com/Applifier/unity-ads-webview/pull/12904)

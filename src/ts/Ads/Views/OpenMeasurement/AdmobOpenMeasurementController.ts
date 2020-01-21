@@ -75,7 +75,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
         const omVendors: string[] = [];
         verificationResources.forEach((resource) => {
-            const om = new OpenMeasurement(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
+            const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
             this._omInstances.push(om);
             this.setupOMInstance(om, resource);
             omVendors.push(resource.vendorKey);
@@ -85,7 +85,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
-    public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
+    public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
         om.setAdmobOMSessionId(this._omAdSessionId);
         om.addToViewHierarchy();
         om.injectVerificationResources([resource]);

@@ -35,7 +35,7 @@ export class OMIDEventBridge {
     private _messageListener: (e: Event) => void;
     private _handler: IOMIDEventHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
-    private _openMeasurement: OpenMeasurement;
+    private _openMeasurement: OpenMeasurement<Campaign>;
     private _verificationsInjected = false;
     private _campaign: Campaign;
 
@@ -45,7 +45,7 @@ export class OMIDEventBridge {
     private _eventHistory: { [event: string]: IVerificationEvent[] } = {};
     private _registeredFuncs: { [eventType: string]: string[] } = {};
 
-    constructor(core: ICoreApi, handler: IOMIDEventHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement, campaign: Campaign) {
+    constructor(core: ICoreApi, handler: IOMIDEventHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement<Campaign>, campaign: Campaign) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._omidHandlers = {};
