@@ -37,7 +37,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 onAFMATrackingEvent: sinon.spy(),
                 onAFMAClickSignalRequest: sinon.spy(),
                 onAFMAUserSeeked: sinon.spy(),
-                onVolumeChnage: sinon.spy()            };
+                onVolumeChnage: sinon.spy()
+            };
             afmaBridge = new AFMABridge(core, handler);
             iframe = document.createElement('iframe');
             document.body.appendChild(iframe);

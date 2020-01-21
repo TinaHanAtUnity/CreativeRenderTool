@@ -94,7 +94,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo),
             onAFMAUserSeeked: () => this.onUserSeeked(),
-            onVolumeChnage: (MUTED) => { this._muted = MUTED;  }
+            onVolumeChnage: (MUTED) => { this._muted = MUTED; }
         });
         this._mraidBridge = new MRAIDBridge(core, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
