@@ -6,7 +6,6 @@ import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { IChina } from 'China/IChina';
 import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -16,8 +15,8 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
     private _automatedExperimentManager: AutomatedExperimentManager;
 
-    constructor(core: ICore, china?: IChina) {
-        super(core, core.Ads, china);
+    constructor(core: ICore, ads: IAds, china?: IChina) {
+        super(core, ads, china);
         this._automatedExperimentManager = new AutomatedExperimentManager(core);
         this._automatedExperimentManager.initialize(AutomatedExperimentsList).catch(() => {
             this._programmaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);

@@ -9,8 +9,8 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { IARApi } from 'AR/AR';
 import { IChina } from 'China/IChina';
 import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceAdUnitWithAutomatedExperimentFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentFactory';
+import { MabDisabledABTest } from 'Core/Models/ABGroup';
 
 export class Performance extends AbstractParserModule {
     constructor(ar: IARApi, core: ICore, ads: IAds, china?: IChina) {
@@ -18,11 +18,11 @@ export class Performance extends AbstractParserModule {
         const parser = new CometCampaignParser(core);
 
         let performanceFactory: PerformanceAdUnitFactory;
-        if (MabDecisionButtonTest.isValid(core.Config.getAbGroup())) {
-            performanceFactory = new PerformanceAdUnitWithAutomatedExperimentFactory(
-                new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, china));
-        } else {
+        if (MabDisabledABTest.isValid(core.Config.getAbGroup())) {
             performanceFactory = new PerformanceAdUnitFactory(new PerformanceAdUnitParametersFactory(core, ads, china));
+        } else {
+            performanceFactory = new PerformanceAdUnitWithAutomatedExperimentFactory(
+                new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, ads, china));
         }
 
         contentTypeHandlerMap[CometCampaignParser.ContentType] = {
