@@ -2,6 +2,7 @@
 
 * Open Measurement Refactor - Fix Generic Use [#12725](https://github.com/Applifier/unity-ads-webview/pull/12725)
 * Improve metrics for AR ads [#12787](https://github.com/Applifier/unity-ads-webview/pull/12787)
+* Increase sample percentage for cn diagnostic endpoint switching [#12932](https://github.com/Applifier/unity-ads-webview/pull/12932)
 
 # Fri Jan 17 23:44:30 UTC 2020
 
