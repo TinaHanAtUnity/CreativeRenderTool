@@ -172,4 +172,58 @@ describe('AdUnitTracker', () => {
             expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
         });
     });
+
+    describe('send missed impression', () => {
+        beforeEach(() => {
+            storageApi.onSet.subscribe.mock.calls[0][0]('', {
+                mediation: {
+                    missedImpressionOrdinal: {
+                        value: 1
+                    }
+                }
+            });
+        });
+
+        it('should send metric events', () => {
+            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MissedImpression, [undefined]);
+        });
+    });
+
+    describe('send impression', () => {
+        beforeEach(() => {
+            storageApi.onSet.subscribe.mock.calls[0][0]('', {
+                mediation: {
+                    ordinal: {
+                        value: 1
+                    }
+                }
+            });
+        });
+
+        it('should send metric events', () => {
+            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MediationShowCall, [undefined]);
+        });
+    });
+
+    describe('possible missed impression call', () => {
+        beforeEach(() => {
+            storageApi.onSet.subscribe.mock.calls[0][0]('', {
+                mediation: {
+                    ordinal: {
+                        value: 1
+                    },
+                    missedImpressionOrdinal: {
+                        value: 1
+                    }
+                }
+            });
+        });
+
+        it('should send metric events', () => {
+            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MissedImpression, [undefined]);
+        });
+    });
 });
