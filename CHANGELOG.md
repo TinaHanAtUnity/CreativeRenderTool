@@ -1,3 +1,27 @@
+# Fri Jan 17 23:44:30 UTC 2020
+
+* Open Measurement - Remove JS string check for OM Verification Scripts [#12815](https://github.com/Applifier/unity-ads-webview/pull/12815)
+* VAST - Pass Ad Verifications to Subsequent Nested Tags [#12819](https://github.com/Applifier/unity-ads-webview/pull/12819)
+* Fix Ad Unit Tracker Metrics [#12904](https://github.com/Applifier/unity-ads-webview/pull/12904)
+
+# Fri Jan 17 10:02:07 UTC 2020
+
+* Permission external should be allowed outside GDPR area if the legal framework is legitimate interest [#12852](https://github.com/Applifier/unity-ads-webview/pull/12852)
+
+# Fri Jan 17 00:04:49 UTC 2020
+
+* Add Metrics to Investigate Missed Impressions in Mediation [#12824](https://github.com/Applifier/unity-ads-webview/pull/12824)
+* Fix Animated Endcard Button on Orientation Change [#12782](https://github.com/Applifier/unity-ads-webview/pull/12782)
+
+# Thu Jan 16 18:55:31 UTC 2020
+
+* Change the SDK diagnostic endpoint for China [#12820](https://github.com/Applifier/unity-ads-webview/pull/12820)
+
+# Mon Jan 13 19:17:49 UTC 2020
+
+* Open Measurement - Fix verification params on Admob OM SessionStart [#12779](https://github.com/Applifier/unity-ads-webview/pull/12779)
+* Add WebPlayer api jest tests [#12445](https://github.com/Applifier/unity-ads-webview/pull/12445)
+
 # Thu Dec 19 13:41:58 UTC 2019
 
 * Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)

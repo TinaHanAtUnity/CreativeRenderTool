@@ -291,6 +291,12 @@ export class VastParserStrict {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
                 }
+
+                const verifications = [];
+                for (const adVerifications of ad.getAdVerifications()) {
+                    verifications.push(adVerifications);
+                }
+                parsedAd.addAdVerifications(verifications);
             }
         }
     }

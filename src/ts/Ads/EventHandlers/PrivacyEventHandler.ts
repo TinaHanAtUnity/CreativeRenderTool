@@ -1,4 +1,4 @@
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -53,7 +53,8 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             if (this._privacy.getGamePrivacy().getMethod() === PrivacyMethod.DEVELOPER_CONSENT) {
                 permissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
             } else {
-                permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
+                const legalFramework = this._privacy.getLegalFramework();
+                permissions = legalFramework === LegalFramework.GDPR ? UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST_GDPR : UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
             }
         }
         this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);

@@ -268,6 +268,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             // TODO: Refactor. Admob Code Path
             this._sessionStartEventData = sessionEvent;
             this._sessionStartEventData.data.vendorkey = this._vendorKey;
+            this._sessionStartEventData.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
             this._omBridge.triggerSessionEvent(this._sessionStartEventData);
         }
     }
@@ -496,9 +497,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (CustomFeatures.isUnsupportedOMVendor(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_RESOURCE_REJECTED);
             return Promise.reject('verification resource rejected');
-        } else if (!resourceUrl.includes('.js')) {
-            this.sendErrorEvent(VerificationReasonCode.VERIFICATION_NOT_SUPPORTED);
-            return Promise.reject('verification resource not supported');
         } else if (!Url.isValid(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
             return Promise.reject('verification resource is malformed');
