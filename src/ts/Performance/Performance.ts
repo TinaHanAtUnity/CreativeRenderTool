@@ -22,7 +22,7 @@ export class Performance extends AbstractParserModule {
             performanceFactory = new PerformanceAdUnitFactory(new PerformanceAdUnitParametersFactory(core, ads, china));
         } else {
             performanceFactory = new PerformanceAdUnitWithAutomatedExperimentFactory(
-                new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, ads, china));
+                new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, china));
         }
 
         contentTypeHandlerMap[CometCampaignParser.ContentType] = {
