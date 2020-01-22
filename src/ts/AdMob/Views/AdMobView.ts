@@ -64,7 +64,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _admobOMController: AdmobOpenMeasurementController | undefined;
     private _deviceInfo: DeviceInfo;
-    private _muted: number;
+    private _volume: number;
 
     constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
         super(platform, 'admob');
@@ -94,7 +94,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo),
             onAFMAUserSeeked: () => this.onUserSeeked(),
-            onVolumeChnage: (MUTED) => { this._muted = MUTED; }
+            onVolumeChnage: (volume) => { this._volume = volume; }
         });
         this._mraidBridge = new MRAIDBridge(core, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -137,8 +137,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this.choosePrivacyShown();
     }
 
-    public getVideoPlayerMuted(): number {
-        return this._muted;
+    public getVideoPlayerVolume(): number {
+        return this._volume;
     }
 
     public hide() {

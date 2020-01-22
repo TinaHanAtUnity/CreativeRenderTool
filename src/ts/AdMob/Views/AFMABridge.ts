@@ -78,7 +78,7 @@ export interface IAFMAHandler {
     onAFMATrackingEvent(event: TrackingEvent, data?: unknown): void;
     onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
     onAFMAUserSeeked(): void;
-    onVolumeChnage(muted: number): void;
+    onVolumeChnage(volume: number): void;
 }
 
 export class AFMABridge {
@@ -107,7 +107,7 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(<TrackingEvent>msg.data.event, msg.data.data);
         this._afmaHandlers[AFMAEvents.GET_CLICK_SIGNAL] = (msg) => this._handler.onAFMAClickSignalRequest(<ITouchInfo>msg.data);
         this._afmaHandlers[AFMAEvents.USER_SEEKED] = (msg) => this._handler.onAFMAUserSeeked();
-        this._afmaHandlers[AFMAEvents.VOLMUE_CHANGE] =  (msg) => this._handler.onVolumeChnage(<number>msg.data.event);
+        this._afmaHandlers[AFMAEvents.VOLMUE_CHANGE] =  (msg) => this._handler.onVolumeChnage(<number>msg.data.volume);
     }
 
     public connect(iframe: HTMLIFrameElement) {

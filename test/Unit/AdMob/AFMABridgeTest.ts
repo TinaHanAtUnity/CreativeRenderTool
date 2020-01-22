@@ -151,9 +151,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }, {
                 event: AFMAEvents.VOLMUE_CHANGE,
                 data: {
-                    event: 1
+                    volume: 1
                 },
-                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onVolumeChnage, data.event)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onVolumeChnage, data.volume)
             }];
 
             for (const test of tests) {

@@ -163,7 +163,7 @@
 
                 videoEl.addEventListener('volumechange', function() {
                     self.postMessage('volumechanged', {
-                        event: videoEl.volume
+                        volume: videoEl.volume
                     })
                 })
 
