@@ -15,9 +15,6 @@ jobs:
     - name: Install Dependencies
       run: |
         npm install
-        npm install -g akamai-cli
-        npm i dep
-        echo "N" | akamai install purge --force
     - name: Lint
       run: make lint
     - name: Jest Unit Tests
