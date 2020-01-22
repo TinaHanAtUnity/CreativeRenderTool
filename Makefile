@@ -306,7 +306,7 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 	watchman-make -p $(TEST_BUILD_DIR)/IntegrationBundle.js -t test-integration
 
 start-server:
-	curl -s http://localhost:8000/tools/serverLauncher.command && xdg-open tools/serverLauncher.command >/dev/null 2>&1 &)
+	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || ([ -z "$$CI" ] && (open tools/serverLauncher.command || xdg-open tools/serverLauncher.command) || python3 -m http.server 8000 >/dev/null 2>&1 &)
 else
 lint:
 	parallel --ungroup ::: \
