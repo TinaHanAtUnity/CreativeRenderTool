@@ -1,6 +1,8 @@
 # Pending
 
 * Improve Missed Impression Metrics V3 [#12959](https://github.com/Applifier/unity-ads-webview/pull/12959)
+* Increase the cn diagnostic endpoint traffic to 100% [#12961](https://github.com/Applifier/unity-ads-webview/pull/12961)
+* Run with Accept-Encoding header for CSR2 game id [#12905](https://github.com/Applifier/unity-ads-webview/pull/12905)
 
 # Tue Jan 21 23:01:23 UTC 2020
 
