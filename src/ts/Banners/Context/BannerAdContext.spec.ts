@@ -8,9 +8,7 @@ import { IAds } from 'Ads/IAds';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { BannerCampaign } from 'Banners/Models/__mocks__/BannerCampaign';
 import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks__/HTMLBannerAdUnit';
-import { ProgrammaticTrackingService as PTSMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
-
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 
 [
     Platform.IOS,
@@ -25,9 +23,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
     const placementId: string = 'testBannerViewId';
 
     beforeEach(() => {
-        ProgrammaticTrackingService.reportMetricEvent = PTSMock().reportMetricEvent;
-        ProgrammaticTrackingService.reportMetricEventWithTags = PTSMock().reportMetricEventWithTags;
-        ProgrammaticTrackingService.reportErrorEvent = PTSMock().reportErrorEvent;
+        MockPTS();
         placement = Placement();
         core = Core();
         ads = Ads();

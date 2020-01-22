@@ -1,6 +1,6 @@
 import { ProgrammaticTrackingService as Base } from 'Ads/Utilities/ProgrammaticTrackingService';
 
-export type ProgrammaticTrackingServiceMock = Base & {
+type ProgrammaticTrackingServiceMock = Base & {
     createAdsSdkTag: jest.Mock;
     reportErrorEvent: jest.Mock;
     reportMetricEvent: jest.Mock;
@@ -10,14 +10,14 @@ export type ProgrammaticTrackingServiceMock = Base & {
     sendBatchedEvents: jest.Mock;
 };
 
-export const ProgrammaticTrackingService = jest.fn(() => {
-    return <ProgrammaticTrackingServiceMock>{
-        createAdsSdkTag: jest.fn(),
-        reportErrorEvent: jest.fn(),
-        reportMetricEvent: jest.fn(),
-        reportMetricEventWithTags: jest.fn(),
-        reportTimingEvent: jest.fn(),
-        batchEvent: jest.fn(),
-        sendBatchedEvents: jest.fn()
-    };
-});
+// Used to not directly use PTS in Jest Tests
+export function MockPTS(): void {
+    const basePts = <ProgrammaticTrackingServiceMock><unknown>Base;
+    basePts.createAdsSdkTag = jest.fn();
+    basePts.reportErrorEvent = jest.fn();
+    basePts.reportMetricEvent = jest.fn();
+    basePts.reportMetricEventWithTags = jest.fn();
+    basePts.reportTimingEvent = jest.fn();
+    basePts.batchEvent = jest.fn();
+    basePts.sendBatchedEvents = jest.fn();
+}

@@ -3,7 +3,7 @@ import { LoadApi, LoadApiMock } from 'Core/Native/__mocks__/LoadApi';
 import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
 import { RefreshManager } from 'Ads/Managers/__mocks__/RefreshManager';
 import { AdUnitTracking } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ProgrammaticTrackingService as PTSMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
+import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
 
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -15,12 +15,11 @@ describe('AdUnitTracker', () => {
     let trackableRefreshManager: TrackableRefreshManager;
 
     beforeEach(() => {
+        MockPTS();
         loadApi = LoadApi();
         listenerApi = ListenerApi();
         trackableRefreshManager = new TrackableRefreshManager();
         trackableRefreshManager.setRefreshManager(RefreshManager());
-        ProgrammaticTrackingService.reportMetricEventWithTags = PTSMock().reportMetricEventWithTags;
-        ProgrammaticTrackingService.createAdsSdkTag = PTSMock().createAdsSdkTag;
         adUnitTracker = new AdUnitTracker('admob', loadApi, listenerApi, trackableRefreshManager);
     });
 
