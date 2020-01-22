@@ -721,7 +721,7 @@ export class Ads implements IAds {
     private configureAdUnitTracker(): void {
         if (this._loadApiEnabled) {
             this._trackableRefreshManager = new TrackableRefreshManager();
-            this._adUnitTracker = new AdUnitTracker(this._mediationName, this.Api.LoadApi, this.Api.Listener, this._trackableRefreshManager, this._core.ProgrammaticTrackingService);
+            this._adUnitTracker = new AdUnitTracker(this._mediationName, this.Api.LoadApi, this._core.Api.Storage, this.Api.Listener, this._trackableRefreshManager, this._core.ProgrammaticTrackingService);
         }
     }
 }
