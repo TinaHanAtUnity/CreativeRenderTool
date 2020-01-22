@@ -6,7 +6,6 @@ import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { IChina } from 'China/IChina';
 import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';

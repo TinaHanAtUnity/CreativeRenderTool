@@ -1,3 +1,10 @@
+# Wed Jan 22 21:11:27 UTC 2020
+
+* Improve Missed Impression Metrics V3 [#12959](https://github.com/Applifier/unity-ads-webview/pull/12959)
+* Increase the cn diagnostic endpoint traffic to 100% [#12961](https://github.com/Applifier/unity-ads-webview/pull/12961)
+* Run with Accept-Encoding header for CSR2 game id [#12905](https://github.com/Applifier/unity-ads-webview/pull/12905)
+* Begin Reverse Zynga ABTest on MAB Endcard Animation on Group 7 [#12933](https://github.com/Applifier/unity-ads-webview/pull/12933)
+
 # Tue Jan 21 23:01:23 UTC 2020
 
 * Open Measurement Refactor - Fix Generic Use [#12725](https://github.com/Applifier/unity-ads-webview/pull/12725)
