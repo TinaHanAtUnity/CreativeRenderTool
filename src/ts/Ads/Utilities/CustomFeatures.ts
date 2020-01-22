@@ -6,6 +6,11 @@ import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
+
+    public static isCSR2GameId(gameId: string): boolean {
+        return gameId === '15004';
+    }
+
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
     }
