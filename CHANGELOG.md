@@ -1,4 +1,4 @@
-# Pending
+# Wed Jan 22 21:11:27 UTC 2020
 
 * Improve Missed Impression Metrics V3 [#12959](https://github.com/Applifier/unity-ads-webview/pull/12959)
 * Increase the cn diagnostic endpoint traffic to 100% [#12961](https://github.com/Applifier/unity-ads-webview/pull/12961)
