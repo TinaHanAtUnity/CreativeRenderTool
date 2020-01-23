@@ -17,6 +17,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 
 interface IUserSummary extends ITemplateData {
@@ -131,34 +132,49 @@ export class UserPrivacyManager {
                 agreedOverAgeLimit = false;
         }
 
+        // TODO: Remember to remove this when the Privacy WebView is bundled into the Ads WebView
         const privacyUrl = TestEnvironment.get<string>('privacyUrl');
         if (!privacyUrl) {
             return Promise.reject(new Error('No privacy url'));
         }
 
         return this._request.get(privacyUrl).then((privacyHtml) => {
-            return Promise.resolve(new PrivacyConfig(PrivacySDKFlow,
-                {
-                    ads: this._userPrivacy.getPermissions().ads,
-                    external: this._userPrivacy.getPermissions().external,
-                    gameExp: this._userPrivacy.getPermissions().gameExp,
-                    agreedOverAgeLimit: agreedOverAgeLimit
-                },
-                {
-                    buildOsVersion: this._deviceInfo.getOsVersion(),
-                    platform: this._platform,
-                    userLocale: this._deviceInfo.getLanguage(),
-                    country: this._coreConfig.getCountry(),
-                    // todo: add api level
-                    // todo: add subcountry
+            let env: { [key: string]: unknown } = {
+                buildOsVersion: this._deviceInfo.getOsVersion(),
+                platform: this._platform,
+                userLocale: this._deviceInfo.getLanguage(),
+                country: this._coreConfig.getCountry(),
+                subCountry: this._coreConfig.getSubdivision(),
+                privacyMethod: this._gamePrivacy.getMethod(),
+                ageGateLimit: this._privacy.getAgeGateLimit(),
+                legalFramework: this._privacy.getLegalFramework(),
+                isCoppa: this._coreConfig.isCoppaCompliant()
+            };
 
-                    privacyMethod: this._gamePrivacy.getMethod(),
-                    ageGateLimit: this._privacy.getAgeGateLimit(),
-                    legalFramework: this._privacy.getLegalFramework(),
-                    isCoppa: this._coreConfig.isCoppaCompliant()
-                },
-                privacyHtml.response));
+            if (this._platform === Platform.ANDROID) {
+                return this._core.DeviceInfo.Android!.getApiLevel().then((apiLevel) => {
+                    env = {
+                        ... env,
+                        apiLevel: apiLevel
+                    };
+                    return Promise.resolve(this.getBasePrivacyConfig(PrivacySDKFlow, agreedOverAgeLimit, env, privacyHtml.response));
+                });
+            }
+
+            return Promise.resolve(this.getBasePrivacyConfig(PrivacySDKFlow, agreedOverAgeLimit, env, privacyHtml.response));
         });
+    }
+
+    public getBasePrivacyConfig(flow: string, agreedOverAgeLimit: boolean, env: { [key: string]: unknown }, html: string): PrivacyConfig {
+        return new PrivacyConfig(PrivacySDKFlow,
+            {
+                ads: this._userPrivacy.getPermissions().ads,
+                external: this._userPrivacy.getPermissions().external,
+                gameExp: this._userPrivacy.getPermissions().gameExp,
+                agreedOverAgeLimit: agreedOverAgeLimit
+            },
+            env,
+            html);
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -181,11 +197,9 @@ export class UserPrivacyManager {
             };
         }
 
-        // todo: for now, avoid mixing new implementation with production data
-        return Promise.resolve();
-//        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
-//            return Promise.resolve();
-//        });
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
+            return Promise.resolve();
+        });
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {

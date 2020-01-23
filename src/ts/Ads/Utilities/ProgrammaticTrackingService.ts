@@ -218,9 +218,8 @@ export class ProgrammaticTrackingService {
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
-       // TODO: uncomment once privacy uses own html container instead of MRAID, that gives PTS error
-        //return this._request.post(url, data, headers);
-        return Promise.resolve(<INativeResponse>{});
+
+        return this._request.post(url, data, headers);
     }
 
     public createAdsSdkTag(suffix: string, tagValue: string): string {
