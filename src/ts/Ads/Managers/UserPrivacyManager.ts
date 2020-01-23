@@ -139,23 +139,6 @@ export class UserPrivacyManager {
         }
 
         return this._request.get(privacyUrl).then((privacyHtml) => {
-            let env: { [key: string]: unknown } = {
-                buildOsVersion: this._deviceInfo.getOsVersion(),
-                platform: this._platform,
-                userLocale: this._deviceInfo.getLanguage(),
-                country: this._coreConfig.getCountry(),
-                subCountry: this._coreConfig.getSubdivision(),
-                privacyMethod: this._gamePrivacy.getMethod(),
-                ageGateLimit: this._privacy.getAgeGateLimit(),
-                legalFramework: this._privacy.getLegalFramework(),
-                isCoppa: this._coreConfig.isCoppaCompliant()
-            };
-
-            env = {
-                ... env,
-                apiLevel: this._platform === Platform.ANDROID ? this._core.DeviceInfo.Android!.getApiLevel() : undefined
-            };
-
             return new PrivacyConfig(PrivacySDKFlow,
                 {
                     ads: this._userPrivacy.getPermissions().ads,
@@ -163,7 +146,18 @@ export class UserPrivacyManager {
                     gameExp: this._userPrivacy.getPermissions().gameExp,
                     agreedOverAgeLimit: agreedOverAgeLimit
                 },
-                env,
+                {
+                    buildOsVersion: this._deviceInfo.getOsVersion(),
+                    platform: this._platform,
+                    userLocale: this._deviceInfo.getLanguage(),
+                    country: this._coreConfig.getCountry(),
+                    subCountry: this._coreConfig.getSubdivision(),
+                    privacyMethod: this._gamePrivacy.getMethod(),
+                    ageGateLimit: this._privacy.getAgeGateLimit(),
+                    legalFramework: this._privacy.getLegalFramework(),
+                    isCoppa: this._coreConfig.isCoppaCompliant(),
+                    apiLevel: this._platform === Platform.ANDROID ? this._core.DeviceInfo.Android!.getApiLevel() : undefined
+                },
                 privacyHtml.response);
         });
     }
