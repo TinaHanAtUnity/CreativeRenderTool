@@ -15,10 +15,8 @@ if (!process.env.BRANCH) {
 }
 const branch = process.env.BRANCH;
 
-if (branch === 'master') {
-    branch = 'development';
-} else if (WebviewVersionMap[branch] && WebviewVersionMap[branch].length > 1) {
-    branch = WebviewVersionMap[0];
+if (WebviewVersionMap[branch]) {
+    branch = WebviewVersionMap[branch][0];
 }
 
 if (!process.env.COMMIT_ID) {

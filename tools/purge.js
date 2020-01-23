@@ -62,8 +62,8 @@ if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-if (branch === 'master') {
-    branch = 'development';
+if (WebviewVersionMap[branch]) {
+    branch = WebviewVersionMap[branch][0];
 }
 
 const commit = process.env.TRAVIS_COMMIT;
