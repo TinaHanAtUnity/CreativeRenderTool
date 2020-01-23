@@ -272,9 +272,7 @@ export class UserPrivacyManager {
             });
         }
 
-        // todo: for now, avoid mixing new implementation with production data
-        return Promise.resolve(<INativeResponse>{});
-        // return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
