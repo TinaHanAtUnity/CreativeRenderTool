@@ -19,6 +19,7 @@ import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
+import { AndroidDeviceInfo } from 'src/ts/Core/Models/AndroidDeviceInfo';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -151,30 +152,21 @@ export class UserPrivacyManager {
                 isCoppa: this._coreConfig.isCoppaCompliant()
             };
 
-            if (this._platform === Platform.ANDROID) {
-                return this._core.DeviceInfo.Android!.getApiLevel().then((apiLevel) => {
-                    env = {
-                        ... env,
-                        apiLevel: apiLevel
-                    };
-                    return Promise.resolve(this.getBasePrivacyConfig(PrivacySDKFlow, agreedOverAgeLimit, env, privacyHtml.response));
-                });
-            }
+            env = {
+                ... env,
+                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._core.DeviceInfo).getApiLevel() : undefined
+            };
 
-            return Promise.resolve(this.getBasePrivacyConfig(PrivacySDKFlow, agreedOverAgeLimit, env, privacyHtml.response));
+            return new PrivacyConfig(PrivacySDKFlow,
+                {
+                    ads: this._userPrivacy.getPermissions().ads,
+                    external: this._userPrivacy.getPermissions().external,
+                    gameExp: this._userPrivacy.getPermissions().gameExp,
+                    agreedOverAgeLimit: agreedOverAgeLimit
+                },
+                env,
+                privacyHtml.response);
         });
-    }
-
-    public getBasePrivacyConfig(flow: string, agreedOverAgeLimit: boolean, env: { [key: string]: unknown }, html: string): PrivacyConfig {
-        return new PrivacyConfig(PrivacySDKFlow,
-            {
-                ads: this._userPrivacy.getPermissions().ads,
-                external: this._userPrivacy.getPermissions().external,
-                gameExp: this._userPrivacy.getPermissions().gameExp,
-                agreedOverAgeLimit: agreedOverAgeLimit
-            },
-            env,
-            html);
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
