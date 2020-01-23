@@ -17,7 +17,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 
@@ -154,7 +153,7 @@ export class UserPrivacyManager {
 
             env = {
                 ... env,
-                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._core.DeviceInfo).getApiLevel() : undefined
+                apiLevel: this._platform === Platform.ANDROID ? this._core.DeviceInfo.Android!.getApiLevel() : undefined
             };
 
             return new PrivacyConfig(PrivacySDKFlow,
