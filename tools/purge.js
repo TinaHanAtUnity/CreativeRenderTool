@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
+import WebviewVersionMap from '../webview-version-map.json';
 
 const cdnConfig = {
     'akamai': {
@@ -323,30 +324,24 @@ let purgeTencent = (urlRoot) => {
     });
 };
 
-let urlRoot = '/webview/' + branch;
-if (branch === '2.0.6') {
-    urlRoot = '/webview/master';
-} else if (branch === '3.0.1') {
-    urlRoot = '/webview/3.0.1-rc2';
-}
+let purgeList = [];
 
-let purgeList = [
-    purgeAkamai(urlRoot),
-    purgeHighwinds(urlRoot),
-    purgeAliBabaCloud(urlRoot),
-    purgeTencent(urlRoot)
-];
-
-if (branch === '2.0.6') {
-    purgeList.push(purgeAkamai('/webview/2.0.6'));
-    purgeList.push(purgeHighwinds('/webview/2.0.6'));
-    purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
-    purgeList.push(purgeTencent('/webview/2.0.6'));
-} else if (branch === '3.0.1') {
-    purgeList.push(purgeAkamai('/webview/3.0.1'));
-    purgeList.push(purgeHighwinds('/webview/3.0.1'));
-    purgeList.push(purgeAliBabaCloud('/webview/3.0.1'));
-    purgeList.push(purgeTencent('/webview/3.0.1'));
+if (WebviewVersionMap[branch] && WebviewVersionMap[branch] > 1) {
+    WebviewVersionMap[branch].forEach((version) => {
+        purgeList.push([
+            purgeAkamai('/webview/' + version),
+            purgeHighwinds('/webview/' + version),
+            purgeAliBabaCloud('/webview/' + version),
+            purgeTencent('/webview/' + version)
+        ]);
+    });
+} else {
+    purgeList = [
+        purgeAkamai('/webview/' + branch),
+        purgeHighwinds('/webview/' + branch),
+        purgeAliBabaCloud('/webview/' + branch),
+        purgeTencent('/webview/' + branch)
+    ];
 }
 
 Promise.all(purgeList).then(() => {
