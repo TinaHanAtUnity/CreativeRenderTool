@@ -44,7 +44,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
         let omVendors: string[] = [];
         if (adVerifications) {
-            const omInstances: OpenMeasurement[] = [];
+            const omInstances: OpenMeasurement<VastCampaign>[] = [];
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
 
             adVerifications.forEach((adverification) => {

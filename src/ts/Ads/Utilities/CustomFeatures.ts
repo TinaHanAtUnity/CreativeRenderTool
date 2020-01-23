@@ -6,6 +6,11 @@ import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
+
+    public static isCSR2GameId(gameId: string): boolean {
+        return gameId === '15004';
+    }
+
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
     }
@@ -121,6 +126,19 @@ export class CustomFeatures {
         } else {
             return false;
         }
+    }
+
+    public static isCheetahTestGameForLoad(gameId: string): boolean {
+        return (gameId === '3058518' || gameId === '3058519');
+
+    }
+
+    public static isFanateeExtermaxGameForLoad(gameId: string): boolean {
+        const fanateeGames = ['56659', '1225669'];
+        const etermaxGames = ['20721', '20723', '89611', '1781085', '1781084'];
+
+        return this.existsInList(fanateeGames, gameId) ||
+               this.existsInList(etermaxGames, gameId);
     }
 
     public static isAdmobTimeoutWhitelisted(gameId: string): boolean {

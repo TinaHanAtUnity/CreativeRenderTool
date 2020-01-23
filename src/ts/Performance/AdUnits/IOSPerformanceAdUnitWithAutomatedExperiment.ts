@@ -1,6 +1,5 @@
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
 import { ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
 import { IPerformanceAdUnitWithAutomatedExperimentParameters } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperiment';

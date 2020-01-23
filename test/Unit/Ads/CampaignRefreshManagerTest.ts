@@ -151,6 +151,7 @@ describe('CampaignRefreshManager', () => {
         coreModule = TestFixtures.getCoreModule(nativeBridge);
         core = coreModule.Api;
         adsModule = TestFixtures.getAdsModule(coreModule);
+        coreModule.Ads = adsModule;
         ads = adsModule.Api;
         ar = TestFixtures.getARApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
