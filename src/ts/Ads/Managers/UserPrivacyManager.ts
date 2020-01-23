@@ -17,9 +17,9 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
-import { AndroidDeviceInfo } from 'src/ts/Core/Models/AndroidDeviceInfo';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
