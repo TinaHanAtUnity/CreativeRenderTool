@@ -426,9 +426,11 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         return this.checkVendorResourceURL(resourceUrl).then(() => {
             this.injectAsString(resourceUrl, vendorKey);
             this.populateVendorKey(vendorKey);
-            this._verificationResource.resourceUrl = resourceUrl;
-            this._verificationResource.vendorKey = vendorKey;
-            this._verificationResource.verificationParameters = verificationParameters;
+            this._verificationResource = {
+                resourceUrl: resourceUrl,
+                vendorKey: vendorKey,
+                verificationParameters: verificationParameters
+            };
 
             if (vendorKey === 'IAS' && this._pts) {
                 this._pts.reportMetricEvent(OMMetric.IASVerificatonInjected);
