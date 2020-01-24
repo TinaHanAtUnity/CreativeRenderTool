@@ -128,7 +128,10 @@ export enum AdUnitTracking {
     PossibleDuplicateLoadForPlacement = 'ad_unit_possible_duplicate_load_for_placement',
     InitialLoadRequest = 'ad_unit_initial_load_request',
     AttemptToShowAd = 'ad_unit_attempt_to_show',
-    FailedToInvalidate = 'ad_unit_failed_to_invalidate'
+    FailedToInvalidate = 'ad_unit_failed_to_invalidate',
+    MissedImpression = 'ad_unit_missed_impression',
+    MediationShowCall = 'ad_unit_mediation_show_call',
+    RealMissedImpression = 'ad_unit_real_missed_impression'
 }
 
 type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;

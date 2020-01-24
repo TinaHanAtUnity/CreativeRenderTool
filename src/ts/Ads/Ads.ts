@@ -103,7 +103,7 @@ export class Ads implements IAds {
     public readonly InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
 
     public readonly SessionManager: SessionManager;
-    public readonly MissedImpressionManager: MissedImpressionManager;
+    public MissedImpressionManager: MissedImpressionManager;
     public readonly ContentTypeHandlerManager: ContentTypeHandlerManager;
     public readonly ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 
@@ -177,7 +177,6 @@ export class Ads implements IAds {
             this.Container = new ViewController(this._core.Api, this.Api, <IosDeviceInfo> this._core.DeviceInfo, this._core.FocusManager, this._core.ClientInfo);
         }
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
-        this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
 
@@ -196,6 +195,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
+            this.MissedImpressionManager = new MissedImpressionManager(this._core.Api, this._core.ProgrammaticTrackingService, this._mediationName, this._core.ClientInfo.getSdkVersionName());
+
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
@@ -721,7 +722,7 @@ export class Ads implements IAds {
     private configureAdUnitTracker(): void {
         if (this._loadApiEnabled) {
             this._trackableRefreshManager = new TrackableRefreshManager();
-            this._adUnitTracker = new AdUnitTracker(this._mediationName, this.Api.LoadApi, this.Api.Listener, this._trackableRefreshManager, this._core.ProgrammaticTrackingService);
+            this._adUnitTracker = new AdUnitTracker(this._mediationName, this.Api.LoadApi, this._core.Api.Storage, this.Api.Listener, this._trackableRefreshManager, this._core.ProgrammaticTrackingService);
         }
     }
 }

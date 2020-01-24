@@ -53,6 +53,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { ChinaProgrammaticTrackingService } from 'Ads/Utilities/ChinaProgrammaticTrackingService';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 
 export class Core implements ICore {
 
@@ -142,7 +143,11 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
+            if (CustomFeatures.isNoGzipGame(this.ClientInfo.getGameId())) {
+                this.CacheManager = new NoGzipCacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
+            } else {
+                this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
+            }
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
             this.SdkDetectionInfo = new SdkDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
@@ -200,7 +205,7 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
-            if (this.DeviceInfo.isChineseNetworkOperator() && CustomFeatures.sampleAtGivenPercent(50)) {
+            if (this.DeviceInfo.isChineseNetworkOperator()) {
                 this.ProgrammaticTrackingService = new ChinaProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
             } else {
                 this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
