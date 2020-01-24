@@ -1,5 +1,5 @@
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { OpenMeasurement, OpenMeasurementMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import { OpenMeasurementVast, OpenMeasurementMockVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
@@ -16,7 +16,7 @@ import { Platform } from 'Core/Constants/Platform';
       let deviceInfo: DeviceInfoMock;
       let adViewBuilder: OpenMeasurementAdViewBuilderMock;
 
-      const initOMManager = (om: OpenMeasurementMock[]) => {
+      const initOMManager = (om: OpenMeasurementMockVast[]) => {
           placement = new Placement();
           clientInfo = new ClientInfo();
           deviceInfo = new DeviceInfo();
@@ -26,15 +26,15 @@ import { Platform } from 'Core/Constants/Platform';
 
       describe('session start', () => {
           let omManager: VastOpenMeasurementController;
-          let openMeasurement1: OpenMeasurementMock;
-          let openMeasurement2: OpenMeasurementMock;
+          let openMeasurement1: OpenMeasurementMockVast;
+          let openMeasurement2: OpenMeasurementMockVast;
           let vastAdVerificton1: VastAdVerificationMock;
           let vastAdVerificton2:  VastAdVerificationMock;
 
           beforeEach(() => {
 
-              openMeasurement1 = new OpenMeasurement();
-              openMeasurement2 = new OpenMeasurement();
+              openMeasurement1 = new OpenMeasurementVast();
+              openMeasurement2 = new OpenMeasurementVast();
               jest.spyOn(Date, 'now').mockImplementation(() => 123);
               vastAdVerificton1 = new VastAdVerification();
               vastAdVerificton2 = new VastAdVerification();

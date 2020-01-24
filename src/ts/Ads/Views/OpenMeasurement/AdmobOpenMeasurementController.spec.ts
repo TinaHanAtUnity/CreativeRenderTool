@@ -2,7 +2,7 @@ import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCa
 import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
-import { OpenMeasurement, OpenMeasurementMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import { OpenMeasurementAdmob, OpenMeasurementMockAdmob } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
@@ -23,8 +23,8 @@ import { Platform } from 'Core/Constants/Platform';
         let request: RequestManagerMock;
         let thirdPartyEventManager: ThirdPartyEventManagerMock;
         let programmaticTrackingService: ProgrammaticTrackingServiceMock;
-        let openMeasurement0: OpenMeasurementMock;
-        let openMeasurement1: OpenMeasurementMock;
+        let openMeasurement0: OpenMeasurementMockAdmob;
+        let openMeasurement1: OpenMeasurementMockAdmob;
 
         const initAdMobOMManager = () => {
             placement = new Placement();
@@ -37,8 +37,8 @@ import { Platform } from 'Core/Constants/Platform';
             thirdPartyEventManager = new ThirdPartyEventManager();
             request = new RequestManager();
             programmaticTrackingService = new ProgrammaticTrackingService();
-            openMeasurement0 = new OpenMeasurement();
-            openMeasurement1 = new OpenMeasurement();
+            openMeasurement0 = new OpenMeasurementAdmob();
+            openMeasurement1 = new OpenMeasurementAdmob();
 
             return new AdmobOpenMeasurementController(platform, core.Api, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager, programmaticTrackingService);
         };

@@ -2,14 +2,14 @@ import { OMIDEventBridge, IOMIDEventHandler } from 'Ads/Views/OpenMeasurement/OM
 import { Core } from 'Core/__mocks__/Core';
 import { AdMobCampaign } from 'AdMob/Models/__mocks__/AdMobCampaign';
 import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
-import { OpenMeasurementMock, OpenMeasurement } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import { OpenMeasurementMockVast, OpenMeasurementVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
 
 describe('OmidEventBridge', () => {
 
     let omidEventBridge: OMIDEventBridge;
     let handler: IOMIDEventHandler;
 
-    let omInstance: OpenMeasurementMock;
+    let omInstance: OpenMeasurementMockVast;
     let pts: ProgrammaticTrackingServiceMock;
 
     const iframe: HTMLIFrameElement = document.createElement('iframe');
@@ -28,7 +28,7 @@ describe('OmidEventBridge', () => {
         const campaign = new AdMobCampaign();
 
         pts = new ProgrammaticTrackingService();
-        omInstance = new OpenMeasurement();
+        omInstance = new OpenMeasurementVast();
         jest.spyOn(Date, 'now').mockImplementation(() => 1000);
 
         omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign, pts);

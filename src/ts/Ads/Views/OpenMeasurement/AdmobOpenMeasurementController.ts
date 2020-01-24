@@ -14,6 +14,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Campaign } from 'Ads/Models/Campaign';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -92,7 +93,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this.mountOMInstance(om, resource);
     }
 
-    public mountOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource): void {
+    public mountOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource): void {
         om.addToViewHierarchy();
         om.injectVerificationResources([resource]);
     }
@@ -184,7 +185,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
     }
 
-    public getOMInstances(): OpenMeasurement[] {
+    public getOMInstances(): OpenMeasurement<Campaign>[] {
         return this._omInstances;
     }
 
