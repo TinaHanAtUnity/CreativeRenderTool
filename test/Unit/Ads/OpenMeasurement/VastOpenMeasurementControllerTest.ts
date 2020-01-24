@@ -79,8 +79,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
         describe('session start', () => {
             let omManager: VastOpenMeasurementController;
-            let openMeasurement1: OpenMeasurement;
-            let openMeasurement2: OpenMeasurement;
+            let openMeasurement1: OpenMeasurement<VastCampaign>;
+            let openMeasurement2: OpenMeasurement<VastCampaign>;
 
             const vastVerificationResource1 = new VastVerificationResource ('https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js', 'omid', true, 'AdVerifications');
             const vastVerificationResource2 = new VastVerificationResource ('https://something.test.js', 'unity', false, 'Verifications');

@@ -4,7 +4,6 @@ import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from '
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks__/VastAdVerification';
-
 import { AccessMode, AdSessionType, IContext, ISessionEvent, OMID_P, OM_JS_VERSION, PARTNER_NAME } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { Platform } from 'Core/Constants/Platform';

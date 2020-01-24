@@ -13,6 +13,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ICoreApi } from 'Core/ICore';
 import { Backend } from 'Backend/Backend';
+import { Campaign } from 'Ads/Models/Campaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMController`, () => {
@@ -24,7 +26,7 @@ import { Backend } from 'Backend/Backend';
         let backend: Backend;
         let nativeBridge: NativeBridge;
 
-        const initOMManager = (om: OpenMeasurement<Campaign>[]) => {
+        const initOMManager = (om: OpenMeasurement<VastCampaign>[]) => {
             placement = TestFixtures.getPlacement();
             clientInfo = TestFixtures.getClientInfo(platform);
             backend = TestFixtures.getBackend(platform);
@@ -42,7 +44,7 @@ import { Backend } from 'Backend/Backend';
 
         describe('session events', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement<Campaign>;
+            let openMeasurement: OpenMeasurement<VastCampaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
@@ -60,7 +62,7 @@ import { Backend } from 'Backend/Backend';
 
         describe('adEvents', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement<Campaign>;
+            let openMeasurement: OpenMeasurement<VastCampaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
