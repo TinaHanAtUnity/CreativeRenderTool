@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
-import WebviewVersionMap from '../webview-version-map.json';
+import * as WebviewVersionMap from '../webview-version-map.json';
 
 const cdnConfig = {
     'akamai': {

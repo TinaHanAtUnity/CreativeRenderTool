@@ -1,4 +1,4 @@
-import WebviewVersionMap from '../webview-version-map.json';
+import * as WebviewVersionMap from '../webview-version-map.json';
 
 if (!process.env.INPUT) {
     throw new Error('Missing INPUT env parameter');
