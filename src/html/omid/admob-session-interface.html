@@ -233,16 +233,6 @@
             };
 
             this.registerSessionObserver = function(sessionEventsCallback) {
-                Context.apiVersion = getOMIDAPIVersion();
-                Context.environment = Environment.APP;
-                Context.accessMode = AccessMode.LIMITED;
-                Context.adSessionType = AdSessionType.HTML;
-                Context.supports = [SupportedFeatures.VIDEO, SupportedFeatures.CONTAINER];
-                Context.omidNativeInfo = omidNativeInfo;
-                Context.omidJsInfo = omidJSInfo;
-                Context.app = App;
-                Context.customReferenceIdentifier = undefined;
-
                 if (sessionEventsCallback) {
                     sessionCallback = sessionEventsCallback;
                 }
