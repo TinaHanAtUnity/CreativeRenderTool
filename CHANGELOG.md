@@ -1,3 +1,7 @@
+# Pending
+
+* Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+
 # Fri Jan 24 21:20:44 UTC 2020
 
 * Add spec.ts Support in tsconfig [#12988](https://github.com/Applifier/unity-ads-webview/pull/12988)
