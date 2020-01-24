@@ -1,20 +1,17 @@
-import * as sinon from 'sinon';
-import { Platform } from 'Core/Constants/Platform';
-import { PlacementMock, Placement } from 'Ads/Models/__mocks__/Placement';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { AdMobCampaignMock, AdMobCampaign } from 'AdMob/Models/__mocks__/AdMobCampaign';
-import { Backend } from 'Backend/Backend';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
-import { OpenMeasurementAdViewBuilderMock, OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
-import { RequestManagerMock, RequestManager } from 'Core/Managers/__mocks__/RequestManager';
+import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCampaign';
+import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
+import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
+import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
+import { OpenMeasurement, OpenMeasurementMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
+import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
+import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
+import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { Core } from 'Core/__mocks__/Core';
-import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
-import { IAdView, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ThirdPartyEventManagerMock, ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
-import { ProgrammaticTrackingServiceMock,  ProgrammaticTrackingService } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
-import { OpenMeasurementMock, OpenMeasurement } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+
+import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
+import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { Platform } from 'Core/Constants/Platform';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {

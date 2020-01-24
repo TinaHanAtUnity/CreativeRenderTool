@@ -1,12 +1,13 @@
-import { Platform } from 'Core/Constants/Platform';
-import { PlacementMock, Placement } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
+import { OpenMeasurement, OpenMeasurementMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
+import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
+import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
+import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks__/VastAdVerification';
+
+import { AccessMode, AdSessionType, IContext, ISessionEvent, OMID_P, OM_JS_VERSION, PARTNER_NAME } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
-import { OpenMeasurementMock, OpenMeasurement } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
-import { OpenMeasurementAdViewBuilderMock, OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
-import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
-import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
-import { VastAdVerificationMock, VastAdVerification } from 'VAST/Models/__mocks__/VastAdVerification';
-import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { Platform } from 'Core/Constants/Platform';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
   describe(`${platform} OMManager`, () => {
