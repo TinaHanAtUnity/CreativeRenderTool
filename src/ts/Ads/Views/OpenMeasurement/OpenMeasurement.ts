@@ -100,13 +100,12 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _sessionStartProcessedByOmidScript = false;
     private _sessionFinishProcessedByOmidScript = false;
     private _adVerification: VastAdVerification;
-    private _pts: ProgrammaticTrackingService | undefined;
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, pts?: ProgrammaticTrackingService, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -126,7 +125,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         this._placement = placement;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._pts = pts;
 
         if (vastAdVerification) {
             this._adVerification = vastAdVerification;
@@ -134,7 +132,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
-        }, this._omIframe, this, this._campaign, this._pts);
+        }, this._omIframe, this, this._campaign);
     }
 
     // only needed to build impression adview for VAST campaigns
@@ -347,8 +345,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         if (eventType === SessionEvents.SESSION_START) {
             this._sessionStartProcessedByOmidScript = true;
 
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
             }
 
             if (this._campaign instanceof VastCampaign) {
@@ -358,8 +356,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
         if (eventType === SessionEvents.SESSION_FINISH) {
             this._sessionFinishProcessedByOmidScript = true;
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
+            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
             }
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
@@ -477,15 +475,15 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
             this.populateVendorKey(vendorKey);
             this._verificationVendorMap[vendorKey] = verificationParameters;
 
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificatonInjected);
+            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjected);
             }
 
             return Promise.resolve();
         }).catch((e) => {
             this._core.Sdk.logDebug(`Could not load open measurement verification script: ${e}`);
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
+            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
             }
         });
     }

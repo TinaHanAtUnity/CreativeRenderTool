@@ -18,7 +18,6 @@ import { IAdsApi } from 'Ads/IAds';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
@@ -116,7 +115,6 @@ describe('MraidAdUnit', () => {
             endScreen: undefined,
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false, 'en'),
             privacyManager: userPrivacyManager,
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             webPlayerContainer: webPlayerContainer,
             privacySDK: privacySDK
         };

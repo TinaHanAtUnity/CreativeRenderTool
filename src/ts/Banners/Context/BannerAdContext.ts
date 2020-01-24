@@ -42,7 +42,6 @@ export class BannerAdContext {
     private _adUnitParametersFactory: BannerAdUnitParametersFactory;
     private _bannerAdUnitFactory: BannerAdUnitFactory;
     private _focusManager: FocusManager;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
     public _webPlayerContainer: WebPlayerContainer;
     private _clientInfo: ClientInfo;
     private _bannerAttached: boolean;
@@ -71,7 +70,6 @@ export class BannerAdContext {
         this._deviceInfo = core.DeviceInfo;
         this._webPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api, bannerAdViewId);
         this._clientInfo = core.ClientInfo;
-        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._bannerAttached = false;
         this._adUnitOnShowHasBeenCalled = false;
         this.subscribeListeners();
@@ -113,8 +111,8 @@ export class BannerAdContext {
     }
 
     public load(): Promise<void> {
-        this._programmaticTrackingService.reportMetricEventWithTags(BannerMetric.BannerAdLoad, [
-            this._programmaticTrackingService.createAdsSdkTag('bls', BannerLoadState[this._loadState]) // banner load state
+        ProgrammaticTrackingService.reportMetricEventWithTags(BannerMetric.BannerAdLoad, [
+            ProgrammaticTrackingService.createAdsSdkTag('bls', BannerLoadState[this._loadState]) // banner load state
         ]);
         switch (this._loadState) {
             case BannerLoadState.Unloaded:
@@ -129,10 +127,10 @@ export class BannerAdContext {
 
     public getCampaign(): Promise<void> {
         this._loadState = BannerLoadState.Loading;
-        this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdRequest);
+        ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdRequest);
         return this._campaignManager.request(this._placement, this._size).then((campaign) => {
                 this._campaign = <BannerCampaign>campaign;
-                this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdFill);
+                ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdFill);
                 return this.createAdUnit().then((adUnit) => {
                     return this.loadBanner().then(() => {
                         return adUnit.onLoad().then(() => {
@@ -142,16 +140,16 @@ export class BannerAdContext {
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
-                    this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdUnitLoaded);
+                    ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdUnitLoaded);
                     return this._bannerNativeApi.BannerListenerApi.sendLoadEvent(this._bannerAdViewId);
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
                 if (e instanceof NoFillError) {
-                    this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdNoFill);
+                    ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdNoFill);
                     return this.onBannerNoFill();
                 } else {
-                    this._programmaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
+                    ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
                     return this.sendBannerError(new Error(`Banner failed to load : ${e.message}`));
                 }
             });

@@ -11,7 +11,6 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -65,7 +64,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let endScreenEventHandler: XPromoEndScreenEventHandler;
     let campaign: XPromoCampaign;
     let placement: Placement;
-    let programmaticTrackingService: ProgrammaticTrackingService;
 
     afterEach(() => {
         xPromoAdUnit.setShowing(true);
@@ -99,7 +97,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const adsConfig = TestFixtures.getAdsConfiguration();
             const privacySDK = sinon.createStubInstance(PrivacySDK);
             const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
                 core,
@@ -174,7 +171,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 video: video,
                 privacy: privacy,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 privacySDK: privacySDK
             };
 
@@ -347,7 +343,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 video: video,
                 privacy: privacy,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 privacySDK: privacySDK
             };
 
