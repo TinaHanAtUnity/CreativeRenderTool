@@ -1035,7 +1035,7 @@ export class TestFixtures {
             AdMobSignalFactory: new AdMobSignalFactory(platform, core.Api, api, core.ClientInfo, core.DeviceInfo, core.FocusManager),
             InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
-            MissedImpressionManager: new MissedImpressionManager(core.Api),
+            MissedImpressionManager: new MissedImpressionManager(core.Api, core.ProgrammaticTrackingService, 'test', ''),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),

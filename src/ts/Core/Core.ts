@@ -142,7 +142,7 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            if (CustomFeatures.isCSR2GameId(this.ClientInfo.getGameId())) {
+            if (CustomFeatures.isNoGzipGame(this.ClientInfo.getGameId())) {
                 this.CacheManager = new NoGzipCacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             } else {
                 this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);

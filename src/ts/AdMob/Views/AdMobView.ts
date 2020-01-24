@@ -28,6 +28,7 @@ import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobO
 import { ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { Localization } from 'Core/Utilities/Localization';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -44,8 +45,11 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
-const OMIDImplementerMacro = '{{ OMID_IMPLEMENTOR }}';
-const OMIDApiVersionMacro = '{{ OMID_API_VERSION }}';
+
+const omidMacroMap = {
+    '{{ OMID_IMPLEMENTOR }}': PARTNER_NAME,
+    '{{ OMID_API_VERSION }}': OM_JS_VERSION
+};
 
 export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandlerView {
 
@@ -201,7 +205,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             iframe.srcdoc = markup;
 
             if (this._admobOMController) {
-                iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementerMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
+                iframe.srcdoc += MacroUtil.replaceMacro(OMIDSessionClient, omidMacroMap);
                 this._admobOMController.getAdmobBridge().setAdmobIframe(iframe);
             }
         });
