@@ -282,6 +282,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
             errorType: 'video',
             message: description
         };
+
         this._omBridge.triggerSessionEvent(event);
     }
 

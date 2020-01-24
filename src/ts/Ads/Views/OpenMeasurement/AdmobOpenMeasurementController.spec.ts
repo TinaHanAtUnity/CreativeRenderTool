@@ -53,10 +53,6 @@ import { OpenMeasurementMock, OpenMeasurement } from 'Ads/Views/OpenMeasurement/
                 omManager = initAdMobOMManager();
             });
 
-            afterEach(() => {
-                // sandbox.restore();
-            });
-
             it('sessionStart should be called with correct data', () => {
                 const sessionInterfaceEvent : ISessionEvent = {
                   adSessionId: '456',
@@ -99,28 +95,14 @@ import { OpenMeasurementMock, OpenMeasurement } from 'Ads/Views/OpenMeasurement/
                     vendorKey: 'omid',
                     verificationParameters: 'param2'
                 };
-                // omManager.injectVerificationResources([verificationResource, verificationResource1]);
-                // const om = omManager.getOMInstances();
 
                 omManager.setupOMInstance(openMeasurement0, verificationResource0);
                 omManager.setupOMInstance(openMeasurement1, verificationResource1);
 
-
-                // sinon.stub(om[0], 'getVerificationResource').returns(verificationResource);
-                // sinon.stub(om[1], 'getVerificationResource').returns(verificationResource1);
-                // jest.spyOn(openMeasurement0, 'getVerificationResource').mockImplementation(() => verificationResource0);
-                // jest.spyOn(openMeasurement1, 'getVerificationResource').mockImplementation(() => verificationResource1);
                 openMeasurement0.getVerificationResource.mockReturnValue(verificationResource0);
                 openMeasurement1.getVerificationResource.mockReturnValue(verificationResource1);
 
-
-                // sinon.stub(om[0], 'sessionStart');
-                // sinon.stub(om[1], 'sessionStart');
-
                 omManager.sessionStart(sessionInterfaceEvent);
-
-                // sinon.assert.calledWith(<sinon.SinonStub>om[0].sessionStart, event);
-                // sinon.assert.calledWith(<sinon.SinonStub>om[1].sessionStart, event1);
 
                 expect(openMeasurement0.sessionStart).toHaveBeenCalledWith(event);
                 expect(openMeasurement1.sessionStart).toHaveBeenCalledWith(event1);
