@@ -3,6 +3,7 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
+import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
@@ -62,7 +63,8 @@ export class CustomFeatures {
         // this should be cleaned once there is proper backend support for these features
         return this.existsInList(CheetahGamesJson, gameId)
             || this.existsInList(BitmangoGamesJson, gameId)
-            || this.existsInList(Game7GamesJson, gameId);
+            || this.existsInList(Game7GamesJson, gameId)
+            || this.existsInList(MobilityWareGamesJson, gameId);
 
     }
 
