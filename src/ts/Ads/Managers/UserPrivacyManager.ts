@@ -17,6 +17,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 
@@ -156,7 +157,7 @@ export class UserPrivacyManager {
                     ageGateLimit: this._privacy.getAgeGateLimit(),
                     legalFramework: this._privacy.getLegalFramework(),
                     isCoppa: this._coreConfig.isCoppaCompliant(),
-                    apiLevel: this._platform === Platform.ANDROID ? this._core.DeviceInfo.Android!.getApiLevel() : undefined
+                    apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() : undefined
                 },
                 privacyHtml.response);
         });
