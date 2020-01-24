@@ -86,7 +86,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._pts.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
-    public setupOMInstance(om: OpenMeasurement, resource: IVerificationScriptResource) {
+    public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
         this._omInstances.push(om);
         om.setAdmobOMSessionId(this._omAdSessionId);
         this.mountOMInstance(om, resource);

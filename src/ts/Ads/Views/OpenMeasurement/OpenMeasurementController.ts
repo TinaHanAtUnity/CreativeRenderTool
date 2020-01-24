@@ -2,6 +2,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { VideoPlayerState, InteractionType, ISessionEvent, IImpressionValues, IVastProperties, OMID3pEvents, IViewPort, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { Campaign } from 'Ads/Models/Campaign';
 
 interface IOMController {
     impression(impressionValues: IImpressionValues): void;
@@ -38,9 +39,9 @@ export abstract class OpenMeasurementController implements IOMController {
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
 
     protected _placement: Placement;
-    protected _omInstances: OpenMeasurement[] = [];
+    protected _omInstances: OpenMeasurement<Campaign>[] = [];
 
-    constructor(placement: Placement, omAdViewBuilder: OpenMeasurementAdViewBuilder, omInstances?: OpenMeasurement[]) {
+    constructor(placement: Placement, omAdViewBuilder: OpenMeasurementAdViewBuilder, omInstances?: OpenMeasurement<Campaign>[]) {
         this._placement = placement;
         this._omAdViewBuilder = omAdViewBuilder;
 

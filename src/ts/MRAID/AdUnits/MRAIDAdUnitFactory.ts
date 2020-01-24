@@ -5,7 +5,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
-import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -31,8 +30,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
         } else {
             if (isPerformanceMRAID) {
                 return new PerformanceMRAIDEventHandler(mraidAdUnit, parameters);
-            } else if (isARMRAID) {
-                return new ARMRAIDEventHandler(mraidAdUnit, parameters);
             } else {
                 return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
             }

@@ -22,6 +22,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import { Campaign } from 'Ads/Models/Campaign';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -79,11 +80,11 @@ export const OM_JS_VERSION = '1.2.10';
 export const OMID_P = `${PARTNER_NAME}/${OM_JS_VERSION}`;
 export const SDK_APIS = '7';
 
-export class OpenMeasurement extends View<AdMobCampaign> {
+export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _omIframe: HTMLIFrameElement;
     private _core: ICoreApi;
     private _clientInfo: ClientInfo;
-    private _campaign: AdMobCampaign | VastCampaign;
+    private _campaign: T;
     private _omBridge: OMIDEventBridge;
     private _request: RequestManager;
     private _omAdSessionId: string;
@@ -104,7 +105,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, pts?: ProgrammaticTrackingService, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, pts?: ProgrammaticTrackingService, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -450,9 +451,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (CustomFeatures.isUnsupportedOMVendor(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_RESOURCE_REJECTED);
             return Promise.reject('verification resource rejected');
-        } else if (!resourceUrl.includes('.js')) {
-            this.sendErrorEvent(VerificationReasonCode.VERIFICATION_NOT_SUPPORTED);
-            return Promise.reject('verification resource not supported');
         } else if (!Url.isValid(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
             return Promise.reject('verification resource is malformed');

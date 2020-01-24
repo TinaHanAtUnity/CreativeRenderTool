@@ -28,7 +28,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
         let backend: Backend;
         let nativeBridge: NativeBridge;
 
-        const initOMManager = (om: OpenMeasurement[]) => {
+        const initOMManager = (om: OpenMeasurement<VastCampaign>[]) => {
             placement = TestFixtures.getPlacement();
             clientInfo = TestFixtures.getClientInfo(platform);
             backend = TestFixtures.getBackend(platform);
@@ -46,7 +46,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
         describe('DOM Hierarchy', () => {
             let omManager: VastOpenMeasurementController;
-            let openMeasurement: OpenMeasurement;
+            let openMeasurement: OpenMeasurement<VastCampaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);

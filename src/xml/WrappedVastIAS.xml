@@ -6,6 +6,17 @@
             <VASTAdTagURI>https://vast.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot</VASTAdTagURI>
             <Error>http://myErrorURL/wrapper/error</Error>
             <Impression>http://myTrackingURL/wrapper/impression</Impression>
+            <AdVerifications>
+                <Verification vendor="IAS">
+                    <JavaScriptResource apiFramework="omid" browserOptional="true"><![CDATA[https://cdn.doubleverify.com/dvtp_src.js]]></JavaScriptResource>
+                    <TrackingEvents>
+                        <Tracking event="verificationNotExecuted">
+                            <![CDATA[https://tps.doubleverify.com/visit.jpg?ctx=818052&cmp=DV064005&sid=123&plc=verificationRejection&advid=818053&adsrv=118&tagtype=video&dvtagver=6.1.img&verr=[REASON]&dup=1lte9o1553552890042]]>
+                        </Tracking>
+                    </TrackingEvents>
+                    <VerificationParameters><![CDATA[tagtype=video&dvtagver=6.1.src&ctx=10733345&cmp=69189&amp;sid=2928&amp;plc=1229669&amp;adsrv=118&amp;dup=1lte9o1553552890042]]></VerificationParameters>
+                </Verification>
+            </AdVerifications>
             <Creatives>
                 <Creative AdID="602833">
                     <Linear>

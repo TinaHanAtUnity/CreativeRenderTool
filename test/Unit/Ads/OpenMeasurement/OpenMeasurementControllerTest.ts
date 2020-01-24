@@ -24,7 +24,7 @@ import { Backend } from 'Backend/Backend';
         let backend: Backend;
         let nativeBridge: NativeBridge;
 
-        const initOMManager = (om: OpenMeasurement[]) => {
+        const initOMManager = (om: OpenMeasurement<Campaign>[]) => {
             placement = TestFixtures.getPlacement();
             clientInfo = TestFixtures.getClientInfo(platform);
             backend = TestFixtures.getBackend(platform);
@@ -42,7 +42,7 @@ import { Backend } from 'Backend/Backend';
 
         describe('session events', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement;
+            let openMeasurement: OpenMeasurement<Campaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
@@ -60,7 +60,7 @@ import { Backend } from 'Backend/Backend';
 
         describe('adEvents', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement;
+            let openMeasurement: OpenMeasurement<Campaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);

@@ -6,13 +6,14 @@ import { AccessMode,  ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_J
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class VastOpenMeasurementController extends OpenMeasurementController {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _platform: Platform;
 
-    constructor(platform: Platform, placement: Placement, omInstances: OpenMeasurement[], omAdViewBuilder: OpenMeasurementAdViewBuilder, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(platform: Platform, placement: Placement, omInstances: OpenMeasurement<VastCampaign>[], omAdViewBuilder: OpenMeasurementAdViewBuilder, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         super(placement, omAdViewBuilder, omInstances);
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
