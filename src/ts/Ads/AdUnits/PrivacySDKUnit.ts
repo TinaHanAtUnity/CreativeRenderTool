@@ -27,13 +27,13 @@ export class PrivacySDKUnit extends BasePrivacyUnit<PrivacySDKView> implements I
             return super.show(options);
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Privacy view ' + e);
+            this.closePrivacy();
         });
     }
 
     public onPrivacyCompleted(userSettings: IPrivacySettings): void {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
 
-        // TODO: Can we always use GDPREventSource.USER ?
         this.setConsent({
                 ... userSettings.user,
                 profiling: false
