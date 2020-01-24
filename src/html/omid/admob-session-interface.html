@@ -230,6 +230,7 @@
                 omidJSInfo.serviceVersion = '1.2.10';
                 Context.omidJsInfo = omidJSInfo;
                 Context.omidNativeInfo = omidNativeInfo;
+                startAdSession();
             };
 
             this.registerSessionObserver = function(sessionEventsCallback) {
@@ -362,7 +363,6 @@
 
             this.registerAdEvents = function() {
                 adEventsRegistered = true;
-                startAdSession();
             };
 
             // We will support video events until OMID 1.3 is released. Then this will be removed.
