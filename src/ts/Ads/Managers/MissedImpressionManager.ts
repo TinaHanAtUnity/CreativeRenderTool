@@ -15,11 +15,13 @@ export class MissedImpressionManager {
     private _core: ICoreApi;
     private _pts: ProgrammaticTrackingService;
     private _mediationName: string;
+    private _sdkVersion: string;
 
-    constructor(core: ICoreApi, pts: ProgrammaticTrackingService, mediationName: string) {
+    constructor(core: ICoreApi, pts: ProgrammaticTrackingService, mediationName: string, sdkVersion: string) {
         this._core = core;
         this._pts = pts;
         this._mediationName = mediationName;
+        this._sdkVersion = sdkVersion;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IMissedImpressionOrdinalData>data));
     }
 
@@ -29,7 +31,8 @@ export class MissedImpressionManager {
                 ordinal: data.mediation.missedImpressionOrdinal.value
             });
             this._pts.reportMetricEventWithTags(AdUnitTracking.RealMissedImpression, [
-                this._pts.createAdsSdkTag('med', this._mediationName)
+                this._pts.createAdsSdkTag('med', this._mediationName),
+                this._pts.createAdsSdkTag('sdv', this._sdkVersion)
             ]);
             this._core.Storage.delete(StorageType.PUBLIC, 'mediation.missedImpressionOrdinal');
             this._core.Storage.write(StorageType.PUBLIC);

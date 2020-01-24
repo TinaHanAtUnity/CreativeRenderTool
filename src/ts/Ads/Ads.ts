@@ -195,7 +195,7 @@ export class Ads implements IAds {
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
-            this.MissedImpressionManager = new MissedImpressionManager(this._core.Api, this._core.ProgrammaticTrackingService, this._mediationName);
+            this.MissedImpressionManager = new MissedImpressionManager(this._core.Api, this._core.ProgrammaticTrackingService, this._mediationName, this._core.ClientInfo.getSdkVersionName());
 
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);

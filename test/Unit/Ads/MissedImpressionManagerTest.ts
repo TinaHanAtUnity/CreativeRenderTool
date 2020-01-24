@@ -28,7 +28,7 @@ describe('MissedImpressionManagerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         core.Storage = new StorageApi(nativeBridge);
         pts = TestFixtures.getCoreModule(nativeBridge).ProgrammaticTrackingService;
-        missedImpressionManager = new MissedImpressionManager(core, pts, '');
+        missedImpressionManager = new MissedImpressionManager(core, pts, '', '');
         kafkaSpy = sinon.spy(HttpKafka, 'sendEvent');
     });
 
