@@ -1,4 +1,4 @@
-import * as WebviewVersionMap from '../webview-version-map.json';
+import versionMap from '../webview-version-map.json';
 
 if (!process.env.INPUT) {
     throw new Error('Missing INPUT env parameter');
@@ -15,8 +15,8 @@ if (!process.env.BRANCH) {
 }
 const branch = process.env.BRANCH;
 
-if (WebviewVersionMap[branch]) {
-    branch = WebviewVersionMap[branch][0];
+if (versionMap[branch]) {
+    branch = versionMap[branch][0];
 }
 
 if (!process.env.COMMIT_ID) {

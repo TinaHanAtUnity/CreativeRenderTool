@@ -1,4 +1,8 @@
-{
+/**
+ * Exports the mapping of Native release => Webview Releases
+ */
+
+export default {
     "master": ["development"],
     "2.0.0-beta2": ["2.0.0-beta2"],
     "2.0.0-beta3": ["2.0.0-beta3"],
@@ -24,5 +28,5 @@
     "3.1.0": ["3.1.0"],
     "3.2.0": ["3.2.0"],
     "3.3.0": ["3.3.0"],
-    "3.4.0": ["3.4.0"]    
-}
+    "3.4.0": ["3.4.0"]
+};

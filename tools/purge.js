@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
-import * as WebviewVersionMap from '../webview-version-map.json';
+import versionMap from '../webview-version-map.js';
 
 const cdnConfig = {
     'akamai': {
@@ -62,8 +62,8 @@ if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-if (WebviewVersionMap[branch]) {
-    branch = WebviewVersionMap[branch][0];
+if (versionMap[branch]) {
+    branch = versionMap[branch][0];
 }
 
 const commit = process.env.TRAVIS_COMMIT;
@@ -326,8 +326,8 @@ let purgeTencent = (urlRoot) => {
 
 let purgeList = [];
 
-if (WebviewVersionMap[branch] && WebviewVersionMap[branch] > 1) {
-    WebviewVersionMap[branch].forEach((version) => {
+if (versionMap[branch] && versionMap[branch] > 1) {
+    versionMap[branch].forEach((version) => {
         purgeList.push([
             purgeAkamai('/webview/' + version),
             purgeHighwinds('/webview/' + version),
