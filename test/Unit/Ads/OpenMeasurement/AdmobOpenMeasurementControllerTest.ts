@@ -105,7 +105,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
             beforeEach(() => {
                 omManager = initAdMobOMManager();
                 sandbox.stub(omManager.getAdmobBridge(), 'sendSessionFinish');
-                sandbox.stub(omManager, 'setupOMInstance');
+                sandbox.stub(omManager, 'mountOMInstance');
             });
 
             afterEach(() => {
@@ -137,53 +137,6 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 omManager.sessionStart(sessionEvent);
                 sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
                 sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_start');
-            });
-
-            it('sessionStart should be called with correct data', () => {
-                const event: ISessionEvent = {
-                    adSessionId: '456',
-                    timestamp: 123,
-                    type: 'sessionStart',
-                    data: {
-                        verificationParameters: 'param1',
-                        vendorkey: 'unity'
-                    }
-                };
-
-                const event1: ISessionEvent = {
-                    adSessionId: '456',
-                    timestamp: 123,
-                    type: 'sessionStart',
-                    data: {
-                        verificationParameters: 'param2',
-                        vendorkey: 'omid'
-                    }
-                };
-
-                const verificationResource = {
-                    resourceUrl: 'https://s3-us-west-2.amazonaws.com/omsdk-files/compliance-js/omid-validation-verification-script-v1.js',
-                    vendorKey: 'unity',
-                    verificationParameters: 'param1'
-                };
-                const verificationResource1 = {
-                    resourceUrl: 'https://something.test.js',
-                    vendorKey: 'omid',
-                    verificationParameters: 'param2'
-                };
-
-                omManager.injectVerificationResources([verificationResource, verificationResource1]);
-                const om = omManager.getOMInstances();
-
-                sinon.stub(om[0], 'getVerificationResource').returns(verificationResource);
-                sinon.stub(om[1], 'getVerificationResource').returns(verificationResource1);
-
-                sinon.stub(om[0], 'sessionStart');
-                sinon.stub(om[1], 'sessionStart');
-
-                omManager.sessionStart(event);
-
-                sinon.assert.calledWith(<sinon.SinonStub>om[0].sessionStart, event);
-                sinon.assert.calledWith(<sinon.SinonStub>om[1].sessionStart, event1);
             });
         });
 
@@ -218,7 +171,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
                 sandbox.stub(omAdViewBuilder, 'buildAdmobImpressionView').returns(testAdView);
-                sandbox.stub(omManager, 'setupOMInstance');
+                sandbox.stub(omManager, 'mountOMInstance');
 
                 sandbox.stub(OpenMeasurementController.prototype, 'impression');
                 sandbox.stub(omManager, 'geometryChange');

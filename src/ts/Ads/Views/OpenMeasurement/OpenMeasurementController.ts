@@ -19,7 +19,7 @@ interface IOMController {
     volumeChange(videoPlayerVolume: number): void;
     playerStateChanged(videoPlayerState: VideoPlayerState): void;
     adUserInteraction(interactionType: InteractionType): void;
-    sessionStart(): void;
+    sessionStart(sessionEvent: ISessionEvent): void;
     sessionFinish(): void;
     sessionError(event: ISessionEvent): void;
 }
@@ -31,7 +31,7 @@ export enum OMState {
     STOPPED
 }
 
-export class OpenMeasurementController implements IOMController {
+export abstract class OpenMeasurementController implements IOMController {
 
     private _state: OMState = OMState.STOPPED;
     private _deviceVolume: number;
@@ -215,9 +215,7 @@ export class OpenMeasurementController implements IOMController {
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart(sessionEvent?: ISessionEvent) {
-        // handled by concrete definitions
-    }
+    public abstract sessionStart(sessionEvent: ISessionEvent): void;
 
     /**
      * SessionFinish:
