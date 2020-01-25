@@ -18,7 +18,6 @@ describe('MissedImpressionManagerTest', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
-    let pts: ProgrammaticTrackingService;
     let kafkaSpy: any;
 
     beforeEach(() => {
@@ -27,8 +26,8 @@ describe('MissedImpressionManagerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         core.Storage = new StorageApi(nativeBridge);
-        pts = TestFixtures.getCoreModule(nativeBridge).ProgrammaticTrackingService;
-        missedImpressionManager = new MissedImpressionManager(core, pts, '', '');
+        sinon.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags').returns(Promise.resolve());
+        missedImpressionManager = new MissedImpressionManager(core, '', '');
         kafkaSpy = sinon.spy(HttpKafka, 'sendEvent');
     });
 
@@ -42,13 +41,13 @@ describe('MissedImpressionManagerTest', () => {
         assert.isTrue(kafkaSpy.calledOnce, 'missed impression event was not sent to httpkafka');
         assert.isTrue(kafkaSpy.calledWith('ads.sdk2.events.missedimpression.json', KafkaCommonObjectType.ANONYMOUS, { ordinal: 1 }), 'missed impression event arguments incorrect');
 
-        assert.isTrue((<sinon.SinonStub>pts.reportMetricEventWithTags).calledOnce, 'missed impression event was not sent to pts');
+        assert.isTrue((<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEventWithTags).calledOnce, 'missed impression event was not sent to pts');
     });
 
     it('should not send events when other metadata is set', () => {
         core.Storage.onSet.trigger(StorageType[StorageType.PUBLIC], {'player': {'server_id': { 'value': 'test', 'ts': 123456789 }}});
 
         assert.isFalse(kafkaSpy.called, 'missed impression event was triggered for unrelated storage event');
-        assert.isFalse((<sinon.SinonStub>pts.reportMetricEventWithTags).called, 'missed impression event was triggered for unrelated storage event');
+        assert.isFalse((<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEventWithTags).called, 'missed impression event was triggered for unrelated storage event');
     });
 });

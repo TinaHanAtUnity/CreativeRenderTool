@@ -13,7 +13,6 @@ import { ChinaProgrammaticTrackingService } from 'Ads/Utilities/ChinaProgrammati
     Platform.ANDROID
 ].forEach(platform => describe('ChinaProgrammaticTrackingService', () => {
 
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let clientInfo: ClientInfoMock;
     let deviceInfo: DeviceInfoMock;
     let requestManager: RequestManagerMock;
@@ -24,7 +23,7 @@ import { ChinaProgrammaticTrackingService } from 'Ads/Utilities/ChinaProgrammati
         requestManager = new RequestManager();
         clientInfo = new ClientInfo();
         deviceInfo = new DeviceInfo();
-        programmaticTrackingService = new ChinaProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
+        ChinaProgrammaticTrackingService.initialize(platform, requestManager, clientInfo, deviceInfo, 'us');
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
     });
@@ -32,7 +31,7 @@ import { ChinaProgrammaticTrackingService } from 'Ads/Utilities/ChinaProgrammati
     describe('reportMetricEvent with Chinese network operator', () => {
 
       it('should fire with china endpoint', () => {
-          const promise = programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+          const promise = ChinaProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
           expect(requestManager.post).toBeCalledWith(
               'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
               expect.anything(),

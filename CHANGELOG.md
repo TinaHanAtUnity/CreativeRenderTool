@@ -1,5 +1,9 @@
 # Pending
 
+* Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+
+# Fri Jan 24 21:20:44 UTC 2020
+
 * Add spec.ts Support in tsconfig [#12988](https://github.com/Applifier/unity-ads-webview/pull/12988)
 * Add isNoGzipGame GameID [#12987](https://github.com/Applifier/unity-ads-webview/pull/12987)
 * Add MacroUtil class to do string replacement [#12191](https://github.com/Applifier/unity-ads-webview/pull/12191)

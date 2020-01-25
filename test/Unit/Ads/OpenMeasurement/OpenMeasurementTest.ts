@@ -47,14 +47,14 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
             }
         };
 

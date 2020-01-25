@@ -17,14 +17,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private _vastCampaign: VastCampaign;
     private _om?: VastOpenMeasurementController;
     private _omStartCalled = false;
-    private _pts: ProgrammaticTrackingService;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
         this._om = this._vastAdUnit.getOpenMeasurementController();
-        this._pts = params.programmaticTrackingService;
     }
 
     public onProgress(progress: number): void {
@@ -49,7 +47,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onCompleted(url);
 
         if (!this._vastAdUnit.hasImpressionOccurred()) {
-            this._pts.reportMetricEvent(VastMetric.VastVideoImpressionFailed);
+            ProgrammaticTrackingService.reportMetricEvent(VastMetric.VastVideoImpressionFailed);
         }
 
         const session = this._vastCampaign.getSession();

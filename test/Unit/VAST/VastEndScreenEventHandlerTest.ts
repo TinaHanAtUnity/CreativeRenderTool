@@ -77,6 +77,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
             sinon.stub(request, 'followRedirectChain').callsFake((url) => {
                 return Promise.resolve(url);
             });
+            sinon.stub(ProgrammaticTrackingService, 'reportErrorEvent').returns(Promise.resolve());
 
             const campaign = TestFixtures.getCompanionStaticVastCampaign();
             const thirdPartyEventManager = new ThirdPartyEventManager(core, request);
@@ -116,7 +117,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 ads: ads
             };
             const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-            const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             vastAdUnitParameters = {
                 platform,
@@ -140,7 +140,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 overlay: overlay,
                 video: video,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 privacySDK: privacySDK,
                 privacy
             };

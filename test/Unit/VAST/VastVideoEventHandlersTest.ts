@@ -68,7 +68,6 @@ describe('VastVideoEventHandler tests', () => {
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let privacyManager: UserPrivacyManager;
     let privacy: Privacy;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let openMeasurement: VastOpenMeasurementController | undefined;
 
     before(() => {
@@ -122,7 +121,7 @@ describe('VastVideoEventHandler tests', () => {
             ads: ads
         };
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
 
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
@@ -188,7 +187,6 @@ describe('VastVideoEventHandler tests', () => {
             overlay: overlay,
             video: campaign.getVideo(),
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacy,
             om: omController,
             privacySDK: privacySDK
@@ -216,8 +214,7 @@ describe('VastVideoEventHandler tests', () => {
             placement: placement,
             video: campaign.getVideo(),
             adUnitStyle: undefined,
-            clientInfo: clientInfo,
-            programmaticTrackingService: programmaticTrackingService
+            clientInfo: clientInfo
         };
 
         vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);

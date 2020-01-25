@@ -12,12 +12,10 @@ export class CustomCloseMRAID extends MRAID {
     protected _mraidCustomCloseCalled: boolean;
     protected _mraidCustomCloseDelay: number;
     private _mraidCustomCloseTimeout: number;
-    private _pts: ProgrammaticTrackingService;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, programmaticTrackingService: ProgrammaticTrackingService, gameSessionId: number = 0, hidePrivacy: boolean = false) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number = 0, hidePrivacy: boolean = false) {
         super(platform, core, deviceInfo, placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId, hidePrivacy);
 
-        this._pts = programmaticTrackingService;
         this._mraidCustomCloseCalled = false;
 
         this._mraidCustomCloseDelay = placement.allowSkip() ? 5 : 40;
@@ -34,18 +32,18 @@ export class CustomCloseMRAID extends MRAID {
 
     public onCloseEvent(event: Event) {
         super.onCloseEvent(event);
-        this._pts.reportMetricEvent(MraidMetric.ClosedByUnityAds);
+        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.ClosedByUnityAds);
     }
 
     public onBridgeClose() {
         super.onBridgeClose();
         this.clearCustomCloseTimeout();
-        this._pts.reportMetricEvent(MraidMetric.ClosedByAdUnit);
+        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.ClosedByAdUnit);
     }
 
     public onUseCustomClose(shouldHideClose: boolean) {
         super.onUseCustomClose(shouldHideClose);
-        this._pts.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
+        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
 
         if (!shouldHideClose) {
             this.clearCustomCloseTimeout();
@@ -69,7 +67,7 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     private setupCustomClose() {
-        this._pts.reportMetricEvent(MraidMetric.CloseHidden);
+        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.CloseHidden);
         this.setCloseVisibility(false);
         const hideDuration = this._mraidCustomCloseDelay * 1000;
         this._mraidCustomCloseTimeout = window.setTimeout(() => {
@@ -82,7 +80,7 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     private moveCloseGraphicLeft() {
-        this._pts.reportMetricEvent(MraidMetric.CloseMovedToLeft);
+        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.CloseMovedToLeft);
         const closeRegionElement = <HTMLElement> this._container.querySelector('.close-region');
         if (closeRegionElement) {
             closeRegionElement.style.removeProperty('right');

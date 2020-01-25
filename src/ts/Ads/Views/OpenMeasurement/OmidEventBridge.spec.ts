@@ -31,7 +31,7 @@ describe('OmidEventBridge', () => {
         omInstance = new OpenMeasurementVast();
         jest.spyOn(Date, 'now').mockImplementation(() => 1000);
 
-        omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign, pts);
+        omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign);
     });
 
     describe('when triggering admob impression event', () => {
