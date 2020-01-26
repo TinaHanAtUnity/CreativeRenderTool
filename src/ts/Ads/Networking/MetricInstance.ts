@@ -22,22 +22,25 @@ export class MetricInstance {
     private _deviceInfo: DeviceInfo;
     private _countryIso: string;
     private _batchedEvents: IPTSEvent[];
-    protected _baseUrl: string;
+    private _baseUrl: string;
 
-    private _stagingBaseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
-    private _productionBaseUrl = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
 
     private metricPath = 'v1/metrics';
     private timingPath = 'v1/timing';
 
     constructor(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
-        this._baseUrl = clientInfo.getTestMode() ? this._stagingBaseUrl : this._productionBaseUrl;
         this._platform = platform;
         this._requestManager = requestManager;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
         this._batchedEvents = [];
+        this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+    }
+
+    protected getProductionUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
     private createMetricTags(event: PTSEvent, tags: string[]): string[] {

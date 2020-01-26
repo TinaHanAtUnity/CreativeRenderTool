@@ -33,7 +33,6 @@ import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
     });
 
     describe('reportMetricEvent with Chinese network operator', () => {
-
       it('should fire with china endpoint', () => {
           const promise = metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
           expect(requestManager.post).toBeCalledWith(
@@ -45,5 +44,21 @@ import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
           return promise;
 
       });
+    });
+
+    describe('When test mode is enabled', () => {
+        beforeEach(() => {
+            clientInfo.getTestMode.mockReturnValue(true);
+            metricInstance = new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            return metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+        });
+
+        it('should call the (non-china) staging endpoint', () => {
+            expect(requestManager.post).toBeCalledWith(
+                'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics',
+                expect.anything(),
+                expect.anything()
+            );
+        });
     });
 }));
