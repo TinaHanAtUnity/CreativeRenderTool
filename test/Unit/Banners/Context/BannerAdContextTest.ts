@@ -49,6 +49,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             sandbox.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
             sandbox.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags').returns(Promise.resolve());
             sandbox.stub(ProgrammaticTrackingService, 'reportErrorEvent').returns(Promise.resolve());
+            sandbox.stub(ProgrammaticTrackingService, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
         });
 
         afterEach(() => {

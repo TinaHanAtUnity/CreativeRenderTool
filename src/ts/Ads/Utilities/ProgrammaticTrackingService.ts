@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MetricInstance } from 'Ads/Networking/MetricInstance';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -134,145 +135,43 @@ export enum AdUnitTracking {
     RealMissedImpression = 'ad_unit_real_missed_impression'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;
-
-export interface IProgrammaticTrackingData {
-    metrics: IPTSEvent[];
-}
-
-interface IPTSEvent {
-    name: string;
-    value: number;
-    tags: string[];
-}
+export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;
 
 export class ProgrammaticTrackingService {
 
-    private static metricPath = 'v1/metrics';
-    private static timingPath = 'v1/timing';
+    private static _metricInstance: MetricInstance;
 
-    private static _platform: Platform;
-    private static _request: RequestManager;
-    private static _clientInfo: ClientInfo;
-    private static _deviceInfo: DeviceInfo;
-    private static _countryIso: string;
-    private static _batchedEvents: IPTSEvent[];
-    // Defaulted to staging endpoint: Used for manual verification of PRs merged to ads-sdk-diagnostics that are not yet deployed
-    protected static _baseUrl: string = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
-
-    public static initialize(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): void {
-        this._platform = platform;
-        this._request = request;
-        this._clientInfo = clientInfo;
-        this._deviceInfo = deviceInfo;
-        this._countryIso = country;
-        this._batchedEvents = [];
-        this._baseUrl = 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
-    }
-
-    private static createMetricTags(event: PTSEvent, tags: string[]): string[] {
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-        return [this.createAdsSdkTag('mevt', event),
-                this.createAdsSdkTag('sdv', sdkVersion),
-                this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
-    }
-
-    private static createTimingTags(): string[] {
-        return [
-            this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
-            this.createAdsSdkTag('iso', this._countryIso),
-            this.createAdsSdkTag('plt', Platform[this._platform])
-        ];
-    }
-
-    private static createErrorTags(event: PTSEvent, adType?: string, seatId?: number): string[] {
-
-        const platform: Platform = this._platform;
-        const osVersion: string = this._deviceInfo.getOsVersion();
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-
-        return [
-            this.createAdsSdkTag('eevt', event),
-            this.createAdsSdkTag('plt', Platform[platform]),
-            this.createAdsSdkTag('osv', osVersion),
-            this.createAdsSdkTag('sdv', sdkVersion),
-            this.createAdsSdkTag('adt', `${adType}`),
-            this.createAdsSdkTag('sid', `${seatId}`)
-        ];
-    }
-
-    private static createData(event: PTSEvent, value: number, tags: string[]): IProgrammaticTrackingData {
-        return {
-            metrics: [
-                {
-                    name: event,
-                    value: value,
-                    tags: tags
-                }
-            ]
-        };
-    }
-
-    private static postToDatadog(metricData: IProgrammaticTrackingData, path: string): Promise<INativeResponse> {
-        const url: string = this._baseUrl + path;
-        const data: string = JSON.stringify(metricData);
-        const headers: [string, string][] = [];
-        headers.push(['Content-Type', 'application/json']);
-        return this._request.post(url, data, headers);
+    public static initialize(metricInstance: MetricInstance): void {
+        if (!this._metricInstance) {
+            this._metricInstance = metricInstance;
+        }
     }
 
     public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return `ads_sdk2_${suffix}:${tagValue}`;
+        return this._metricInstance.createAdsSdkTag(suffix, tagValue);
     }
 
     public static reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
-        return this.reportMetricEventWithTags(event, []);
+        return this._metricInstance.reportMetricEventWithTags(event, []);
     }
 
     public static reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
-        const metricData = this.createData(event, 1, this.createMetricTags(event, tags));
-        return this.postToDatadog(metricData, this.metricPath);
+        return this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
     public static reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
-        const errorData = this.createData(event, 1, this.createErrorTags(event, adType, seatId));
-        return this.postToDatadog(errorData, this.metricPath);
+        return this._metricInstance.reportErrorEvent(event, adType, seatId);
     }
 
     public static reportTimingEvent(event: TimingMetric, value: number): Promise<INativeResponse> {
-        // Gate Negative Values
-        if (value > 0) {
-            const timingData = this.createData(event, value, this.createTimingTags());
-            return this.postToDatadog(timingData, this.timingPath);
-        } else {
-            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
-            return this.postToDatadog(metricData, this.metricPath);
-        }
+        return this._metricInstance.reportTimingEvent(event, value);
     }
 
-    // TODO: Extend this to all events
     public static batchEvent(metric: TimingMetric, value: number): void {
-        // Curently ignore additional negative time values
-        if (value > 0) {
-            this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, this.createTimingTags()).metrics);
-        }
-
-        // Failsafe so we aren't storing too many events at once
-        if (this._batchedEvents.length >= 10) {
-            this.sendBatchedEvents();
-        }
+        return this._metricInstance.batchEvent(metric, value);
     }
 
     public static async sendBatchedEvents(): Promise<void> {
-        if (this._batchedEvents.length > 0) {
-            const data = {
-                metrics: this._batchedEvents
-            };
-            await this.postToDatadog(data, this.timingPath);
-            this._batchedEvents = [];
-            return;
-        }
-        return Promise.resolve();
+        return this._metricInstance.sendBatchedEvents();
     }
-
 }
