@@ -10,7 +10,7 @@ type ProgrammaticTrackingServiceMock = Base & {
     sendBatchedEvents: jest.Mock;
 };
 
-// Used to not directly use PTS in Jest Tests
+// Called from test_utils/jest.setup.js to automatically mock before every test
 export function MockPTS(): void {
     const basePts = <ProgrammaticTrackingServiceMock><unknown>Base;
     basePts.createAdsSdkTag = jest.fn();

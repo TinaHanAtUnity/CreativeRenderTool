@@ -14,5 +14,7 @@ module.exports = {
     'ts-jest': {
       tsConfig: 'tsconfig.webpack.json'
     }
-  }
+  },
+  setupFiles: ['<rootDir>/test-utils/jest.setup.js'],
+  clearMocks: true,
 };
