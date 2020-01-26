@@ -76,7 +76,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
         const omVendors: string[] = [];
         verificationResources.forEach((resource) => {
-            const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey, this._pts);
+            const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
             this.setupOMInstance(om, resource);
             omVendors.push(resource.vendorKey);
         });

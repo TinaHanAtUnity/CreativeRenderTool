@@ -1,7 +1,7 @@
 import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCampaign';
 import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
+import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { OpenMeasurementAdmob, OpenMeasurementMockAdmob } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
@@ -22,7 +22,6 @@ import { Platform } from 'Core/Constants/Platform';
         let deviceInfo: DeviceInfoMock;
         let request: RequestManagerMock;
         let thirdPartyEventManager: ThirdPartyEventManagerMock;
-        let programmaticTrackingService: ProgrammaticTrackingServiceMock;
         let openMeasurement0: OpenMeasurementMockAdmob;
         let openMeasurement1: OpenMeasurementMockAdmob;
 
@@ -36,12 +35,15 @@ import { Platform } from 'Core/Constants/Platform';
             campaign = new AdMobCampaign();
             thirdPartyEventManager = new ThirdPartyEventManager();
             request = new RequestManager();
-            programmaticTrackingService = new ProgrammaticTrackingService();
             openMeasurement0 = new OpenMeasurementAdmob();
             openMeasurement1 = new OpenMeasurementAdmob();
 
-            return new AdmobOpenMeasurementController(platform, core.Api, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager, programmaticTrackingService);
+            return new AdmobOpenMeasurementController(platform, core.Api, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
+
+        beforeEach(() => {
+            MockPTS();
+        });
 
         describe('session event additional handling', () => {
             let omManager: AdmobOpenMeasurementController;
