@@ -1,4 +1,4 @@
-# Pending
+# Mon Jan 27 23:30:22 UTC 2020
 
 * Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
 * Refactor PTS to Instance-Based Implementation [#13044](https://github.com/Applifier/unity-ads-webview/pull/13044)
