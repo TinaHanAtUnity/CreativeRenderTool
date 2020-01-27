@@ -6,7 +6,6 @@ import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOper
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ListenerApi } from 'Ads/Native/Listener';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Closer } from 'Ads/Views/Closer';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -88,7 +87,6 @@ describe('VPAIDAdUnit', () => {
             forceOrientation: Orientation.NONE,
             options: {},
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             privacySDK: sinon.createStubInstance(PrivacySDK)
     };
 

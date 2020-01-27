@@ -8,7 +8,6 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
@@ -200,9 +199,8 @@ describe('Event parameters should match specifications', () => {
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
-            const programmaticTrackingService: ProgrammaticTrackingService = sandbox.createStubInstance(ProgrammaticTrackingService);
             const wakeUpManager = new WakeUpManager(core);
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
@@ -239,9 +237,8 @@ describe('Event parameters should match specifications', () => {
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
-            const programmaticTrackingService: ProgrammaticTrackingService = sandbox.createStubInstance(ProgrammaticTrackingService);
             const wakeUpManager = new WakeUpManager(core);
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
@@ -332,7 +329,6 @@ describe('Event parameters should match specifications', () => {
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
                     sessionManager: sessionManager,
-                    programmaticTrackingService: core.ProgrammaticTrackingService,
                     privacySDK: privacySDK,
                     userPrivacyManager: userPrivacyManager
                 };

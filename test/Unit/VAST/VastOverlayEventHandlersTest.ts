@@ -7,7 +7,6 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -66,7 +65,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
         let moat: MOAT;
         let sandbox: sinon.SinonSandbox;
         let privacy: Privacy;
-        let programmaticTrackingService: ProgrammaticTrackingService;
         let om: VastOpenMeasurementController | undefined;
 
         before(() => {
@@ -109,8 +107,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 ads: ads
             };
             overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             const wakeUpManager = new WakeUpManager(core);
             request = new RequestManager(platform, core, wakeUpManager);
@@ -173,7 +169,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 overlay: overlay,
                 video: campaign.getVideo(),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 privacy,
                 om: omController,
                 privacySDK: privacySDK

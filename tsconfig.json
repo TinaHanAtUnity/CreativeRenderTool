@@ -43,8 +43,5 @@
   "include": [
     "src/ts/**/*.ts",
     "test/**/*.ts"
-  ],
-  "exclude": [
-    "src/ts/**/*.spec.ts",
   ]
 }

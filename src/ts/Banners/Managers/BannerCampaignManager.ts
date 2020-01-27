@@ -19,7 +19,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
@@ -55,13 +54,12 @@ export class BannerCampaignManager {
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _pts: ProgrammaticTrackingService;
     private _privacySDK: PrivacySDK;
     private _userPrivacyManager: UserPrivacyManager;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -72,7 +70,6 @@ export class BannerCampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
-        this._pts = pts;
         this._privacySDK = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
     }
@@ -90,7 +87,6 @@ export class BannerCampaignManager {
             metaDataManager: this._metaDataManager,
             request: this._request,
             sessionManager: this._sessionManager,
-            programmaticTrackingService: this._pts,
             bannerSize: bannerSize,
             privacySDK: this._privacySDK,
             userPrivacyManager: this._userPrivacyManager

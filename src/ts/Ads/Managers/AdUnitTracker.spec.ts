@@ -4,25 +4,26 @@ import { StorageApi, StorageApiMock } from 'Core/Native/__mocks__/StorageApi';
 import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
 import { RefreshManager } from 'Ads/Managers/__mocks__/RefreshManager';
 import { AdUnitTracking } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ProgrammaticTrackingService, ProgrammaticTrackingServiceMock } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
+import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
+
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('AdUnitTracker', () => {
     let adUnitTracker: AdUnitTracker;
     let loadApi: LoadApiMock;
     let storageApi: StorageApiMock;
     let listenerApi: ListenerMock;
-    let pts: ProgrammaticTrackingServiceMock;
     let trackableRefreshManager: TrackableRefreshManager;
 
     beforeEach(() => {
-        pts = new ProgrammaticTrackingService();
+        MockPTS();
         loadApi = LoadApi();
         storageApi = StorageApi();
         listenerApi = ListenerApi();
         trackableRefreshManager = new TrackableRefreshManager();
         trackableRefreshManager.setRefreshManager(RefreshManager());
-        adUnitTracker = new AdUnitTracker('admob', loadApi, storageApi, listenerApi, trackableRefreshManager, pts);
+        adUnitTracker = new AdUnitTracker('admob', loadApi, storageApi, listenerApi, trackableRefreshManager);
     });
 
     describe('when request load for a placement one time', () => {
@@ -31,8 +32,8 @@ describe('AdUnitTracker', () => {
         });
 
         it('should not send any events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
-            expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
         });
     });
 
@@ -45,10 +46,10 @@ describe('AdUnitTracker', () => {
             });
 
             it('should send metric events', () => {
-                expect(pts.reportMetricEventWithTags).toBeCalledTimes(times);
-                expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(times);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
                 for (let i = 2; i <= times; i++) {
-                    expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(i, AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
+                    expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(i, AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
                 }
             });
         });
@@ -62,9 +63,9 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(2);
-            expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.PossibleDuplicateLoadForPlacement, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.PossibleDuplicateLoadForPlacement, [undefined]);
         });
     });
 
@@ -76,11 +77,11 @@ describe('AdUnitTracker', () => {
         });
 
         it('should not send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(3);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToShowAd, [undefined]);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(pts.reportMetricEventWithTags).not.toBeCalledWith(AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(3);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToShowAd, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).not.toBeCalledWith(AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
         });
     });
 
@@ -97,10 +98,10 @@ describe('AdUnitTracker', () => {
             });
 
             it('should not send metric events', () => {
-                expect(pts.reportMetricEventWithTags).toBeCalledTimes(2);
-                expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
-                expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.InitialLoadRequest, [undefined]);
-                expect(pts.reportMetricEventWithTags).not.toBeCalledWith(AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.InitialLoadRequest, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).not.toBeCalledWith(AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
             });
         });
     });
@@ -116,9 +117,9 @@ describe('AdUnitTracker', () => {
             });
 
             it('should send metric events', () => {
-                expect(pts.reportMetricEventWithTags).toBeCalledTimes(2);
-                expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
-                expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.DuplicateLoadForPlacement, [undefined]);
             });
         });
     });
@@ -134,9 +135,9 @@ describe('AdUnitTracker', () => {
             });
 
             it('should send metric events', () => {
-                expect(pts.reportMetricEventWithTags).toBeCalledTimes(2);
-                expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
-                expect(pts.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.PossibleDuplicateLoadForPlacement, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.InitialLoadRequest, [undefined]);
+                expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledWith(AdUnitTracking.PossibleDuplicateLoadForPlacement, [undefined]);
             });
         });
     });
@@ -151,9 +152,9 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(2);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToShowAd, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.AttemptToShowAd, [undefined]);
         });
     });
 
@@ -166,10 +167,10 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(3);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.FailedToInvalidate, [undefined]);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(3);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.InitialLoadRequest, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(2, AdUnitTracking.FailedToInvalidate, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(3, AdUnitTracking.InitialLoadRequest, [undefined]);
         });
     });
 
@@ -185,8 +186,8 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MissedImpression, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MissedImpression, [undefined]);
         });
     });
 
@@ -202,8 +203,8 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MediationShowCall, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MediationShowCall, [undefined]);
         });
     });
 
@@ -222,8 +223,8 @@ describe('AdUnitTracker', () => {
         });
 
         it('should send metric events', () => {
-            expect(pts.reportMetricEventWithTags).toBeCalledTimes(1);
-            expect(pts.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MissedImpression, [undefined]);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toHaveBeenNthCalledWith(1, AdUnitTracking.MissedImpression, [undefined]);
         });
     });
 });
