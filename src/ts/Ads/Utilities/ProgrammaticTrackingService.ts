@@ -143,8 +143,8 @@ export class ProgrammaticTrackingService {
         }
     }
 
-    public static createAdsSdkTag(suffix: string, tagValue: string): void {
-        this._metricInstance.createAdsSdkTag(suffix, tagValue);
+    public static createAdsSdkTag(suffix: string, tagValue: string): string {
+        return this._metricInstance.createAdsSdkTag(suffix, tagValue);
     }
 
     public static reportMetricEvent(event: PTSEvent): void {
