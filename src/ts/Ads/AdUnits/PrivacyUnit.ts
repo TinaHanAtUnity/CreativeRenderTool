@@ -11,7 +11,6 @@ export class PrivacyUnit extends BasePrivacyUnit<Privacy> implements IPrivacyVie
 
         this._unityPrivacyView = new Privacy(this.getViewParams(parameters));
         this._privacyManager = parameters.privacyManager;
-        this._core = parameters.core;
 
         const viewParams = this.getViewParams(parameters);
         this._unityPrivacyView = new Privacy(viewParams);

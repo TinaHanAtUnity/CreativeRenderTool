@@ -101,6 +101,14 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._frameEventAdapter.postMessage('metricCallback');
     }
 
+    public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
+        this._handlers.forEach(handler => handler.onPrivacyFetch(url, data));
+    }
+
+    public fetchCallback(response: string): void {
+        this._frameEventAdapter.postMessage('fetchCallback', response);
+    }
+
     public postMessage(event: string, data?: unknown) {
         this._frameEventAdapter.postMessage(event, data);
     }

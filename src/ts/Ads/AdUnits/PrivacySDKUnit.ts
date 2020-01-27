@@ -67,4 +67,10 @@ export class PrivacySDKUnit extends BasePrivacyUnit<PrivacySDKView> implements I
     public onPrivacyMetric(data: { [key: string]: unknown }): void {
         // EMPTY
     }
+
+    public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
+        this._requestManager.get(url).then((response) => {
+           this._unityPrivacyView.fetchCallback(response.response);
+        });
+    }
 }

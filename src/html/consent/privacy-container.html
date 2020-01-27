@@ -42,6 +42,10 @@
                                 window.privacyAdapter.openUrlCallback(event.data.data);
                             }
                             break;
+                        case 'fetchCallback':
+                            if (window.privacyAdapter.fetchCallback) {
+                                window.privacyAdapter.fetchCallback(event.data.data);
+                            }
                         default:
                             console.log('Unhandled message: ' + event.data.type);
                             break;
@@ -83,6 +87,14 @@
                         data: JSON.parse(data)
                     }, '*');
                 };
+
+                this.onPrivacyFetch = function(url, data) {
+                    window.parent.postMessage({
+                        type: 'onPrivacyFetch',
+                        url: url,
+                        data: JSON.parse(data)
+                    }, '*');
+                }
             };
 
             window.privacyAdapter = new AdsPrivacyAdapter();
