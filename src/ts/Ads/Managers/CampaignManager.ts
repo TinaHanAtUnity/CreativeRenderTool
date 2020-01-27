@@ -119,7 +119,6 @@ export class CampaignManager {
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
-    private _pts: ProgrammaticTrackingService;
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _auctionRequestStart: number;
@@ -140,7 +139,6 @@ export class CampaignManager {
         this._contentTypeHandlerManager = contentTypeHandlerManager;
         this._requesting = false;
         this._auctionProtocol = RequestManager.getAuctionProtocol();
-        this._pts = core.ProgrammaticTrackingService;
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
     }
@@ -187,7 +185,7 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                this._pts.batchEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
+                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
@@ -239,7 +237,7 @@ export class CampaignManager {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
-            this._pts.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
+            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
@@ -250,15 +248,15 @@ export class CampaignManager {
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
-                    this._pts.reportMetricEvent(LoadMetric.LoadEnabledFill);
+                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledFill);
                     loadedCampaign.campaign.setIsLoadEnabled(true);
                 } else {
-                    this._pts.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 }
                 return loadedCampaign;
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
-                this._pts.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
         });

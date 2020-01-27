@@ -1,3 +1,20 @@
+# Pending
+
+* Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+* Refactor PTS to Instance-Based Implementation [#13044](https://github.com/Applifier/unity-ads-webview/pull/13044)
+* Add URL Parameters to Game Configuration Requests [#13016](https://github.com/Applifier/unity-ads-webview/pull/13016)
+* Remove Jest Haste Map and TS Jest Diagnostic Errors [#13045](https://github.com/Applifier/unity-ads-webview/pull/13045)
+* Add Basic Github Actions CI Support [#12724](https://github.com/Applifier/unity-ads-webview/pull/12724)
+* Fix AR Creatives Timestamp [#12784](https://github.com/Applifier/unity-ads-webview/pull/12784)
+
+# Fri Jan 24 21:20:44 UTC 2020
+
+* Add spec.ts Support in tsconfig [#12988](https://github.com/Applifier/unity-ads-webview/pull/12988)
+* Add isNoGzipGame GameID [#12987](https://github.com/Applifier/unity-ads-webview/pull/12987)
+* Add MacroUtil class to do string replacement [#12191](https://github.com/Applifier/unity-ads-webview/pull/12191)
+* Add MobilityWareGames to isCloseIconSkipEnabled [#13017](https://github.com/Applifier/unity-ads-webview/pull/13017)
+* Duplicate missed impression event to PTS [#13018](https://github.com/Applifier/unity-ads-webview/pull/13018)
+
 # Wed Jan 22 21:11:27 UTC 2020
 
 * Improve Missed Impression Metrics V3 [#12959](https://github.com/Applifier/unity-ads-webview/pull/12959)

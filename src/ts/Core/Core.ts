@@ -51,9 +51,10 @@ import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
-import { ChinaProgrammaticTrackingService } from 'Ads/Utilities/ChinaProgrammaticTrackingService';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
+import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
+import { MetricInstance } from 'Ads/Networking/MetricInstance';
 
 export class Core implements ICore {
 
@@ -81,7 +82,6 @@ export class Core implements ICore {
 
     public Ads: Ads;
     public Purchasing: Purchasing;
-    public ProgrammaticTrackingService: ProgrammaticTrackingService;
 
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
@@ -143,7 +143,7 @@ export class Core implements ICore {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            if (CustomFeatures.isCSR2GameId(this.ClientInfo.getGameId())) {
+            if (CustomFeatures.isNoGzipGame(this.ClientInfo.getGameId())) {
                 this.CacheManager = new NoGzipCacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
             } else {
                 this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
@@ -206,13 +206,13 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
             if (this.DeviceInfo.isChineseNetworkOperator()) {
-                this.ProgrammaticTrackingService = new ChinaProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+                ProgrammaticTrackingService.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             } else {
-                this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry());
+                ProgrammaticTrackingService.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             }
 
-            this.ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
-            this.ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
+            ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
+            ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
@@ -231,10 +231,10 @@ export class Core implements ICore {
             const adsInitializeStart = Date.now();
             return this.Ads.initialize().then(() => {
                 const initializeFinished = Date.now();
-                this.ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
-                this.ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
-                this.ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
-                this.ProgrammaticTrackingService.sendBatchedEvents();
+                ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
+                ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
+                ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
+                ProgrammaticTrackingService.sendBatchedEvents();
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {

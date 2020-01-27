@@ -228,12 +228,19 @@
              * @param {!VRFrameData} frameData
              */
             this.getFrameData = function(frameData) {
-                frameData.timestamp = performance.now();
+                frameData.timestamp = this.timestamp_;
                 frameData.pose = this.getPose();
                 // TODO: FieldOfView does not have the correct values. Not important for now as devs should not rely on it
                 frameData.leftProjectionMatrix = frameData.rightProjectionMatrix = this.projectionMatrix_;
                 frameData.leftViewMatrix = frameData.rightViewMatrix = this.viewMatrix_;
             };
+
+            /**
+             * The timestamp of the current frame.
+             * @type {number}
+             * @private
+             */
+            this.timestamp_ = 0;
 
             /**
              * The current pose of the device.
@@ -1110,6 +1117,7 @@
          */
 
         window.WebARonARKitSetData = function(data) {
+            WebARonARKitVRDisplay.timestamp_ = performance.now();
             WebARonARKitVRDisplay.pose_.position[0] = data.position[0];
             WebARonARKitVRDisplay.pose_.position[1] = data.position[1];
             WebARonARKitVRDisplay.pose_.position[2] = data.position[2];
@@ -1124,7 +1132,7 @@
                 WebARonARKitVRDisplay.projectionMatrix_[i] = data.projectionMatrix[i];
             }
 
-            callRafCallbacks(performance.now());
+            callRafCallbacks(WebARonARKitVRDisplay.timestamp_);
             nativeAdvanceFrame();
         };
 

@@ -98,7 +98,6 @@
 | agreedOverAgeLimit | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 
 
-
 ### Configuration request
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
@@ -110,9 +109,14 @@
 | osVersion | all | True | False | string | Device operating system version | SDK | all |
 | deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | language | all | True | False | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
+| connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
+| screenHeight | all | True | False | number | Screen height in pixels | SDK | all |
+| screenWidth | all | True | False | number | Screen width in pixels | SDK | all |
 | test | all | True | False | boolean | Test mode | App | all |
 | forceAbGroup | no | True | False | number | Force A/B group for internal testing purposes | SDK | all |
 | deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
+| screenDensity | android | True | False | number | Screen density in DPI | SDK | android |
+| screenSize | android | True | False | number | Android raw screen layout value | SDK | android |
 | advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
 | limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |
 | androidId | no | True | False | string | Android ID | SDK | android |
@@ -247,8 +251,6 @@
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 
-
-
 ### Click event
 | key | required | queryString | body | type | description | provider | platforms |
 |---|---|---|---|---|---|---|---|
@@ -299,4 +301,3 @@
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
-
