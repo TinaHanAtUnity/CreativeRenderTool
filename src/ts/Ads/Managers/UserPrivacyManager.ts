@@ -157,7 +157,7 @@ export class UserPrivacyManager {
                     ageGateLimit: this._privacy.getAgeGateLimit(),
                     legalFramework: this._privacy.getLegalFramework(),
                     isCoppa: this._coreConfig.isCoppaCompliant(),
-                    apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() : undefined
+                    apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined
                 },
                 privacyHtml.response);
         });
