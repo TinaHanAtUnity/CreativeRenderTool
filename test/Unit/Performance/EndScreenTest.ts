@@ -15,6 +15,7 @@ import 'mocha';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 
 describe('EndScreenTest', () => {
     let platform: Platform;
@@ -53,6 +54,24 @@ describe('EndScreenTest', () => {
         return new PerformanceEndScreen(params, campaign);
     };
 
+    const createAnimatedDownloadButtonEndScreen = (language: string): AnimatedDownloadButtonEndScreen => {
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const campaign = TestFixtures.getCampaign();
+        privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
+        const params: IEndScreenParameters = {
+            platform,
+            core,
+            language,
+            gameId: 'testGameId',
+            targetGameName: TestFixtures.getCampaign().getGameName(),
+            abGroup: configuration.getAbGroup(),
+            privacy,
+            showGDPRBanner: false,
+            campaignId: campaign.getId()
+        };
+        return new AnimatedDownloadButtonEndScreen(EndScreenAnimation.BOUNCING, params, campaign);
+    };
+
     xit('should render', () => {
         const endScreen = createEndScreen('en');
         endScreen.render();
@@ -60,15 +79,19 @@ describe('EndScreenTest', () => {
     });
 
     it('should render with translations', () => {
-        const endScreen = createEndScreen('fi');
-        endScreen.render();
-        const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
-        assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
-        const container = privacy.container();
-        if (container && container.parentElement) {
-            container.parentElement.removeChild(container);
-        } else {
-            assert.fail(`${container.parentElement}`);
-        }
+        const validateTranslation = (endScreen: PerformanceEndScreen) => {
+            endScreen.render();
+            const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
+            assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
+            const container = privacy.container();
+            if (container && container.parentElement) {
+                container.parentElement.removeChild(container);
+            } else {
+                assert.fail(`${container.parentElement}`);
+            }
+        };
+
+        validateTranslation(createEndScreen('fi'));
+        validateTranslation(createAnimatedDownloadButtonEndScreen('fi'));
     });
 });

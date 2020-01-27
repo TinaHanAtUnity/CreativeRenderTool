@@ -15,13 +15,16 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Campaign } from 'Ads/Models/Campaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
         const sandbox = sinon.createSandbox();
-        let om: OpenMeasurement;
+        let om: OpenMeasurement<Campaign>;
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -44,14 +47,14 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
             }
         };
 
@@ -68,7 +71,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
@@ -113,13 +116,14 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 });
 
                 describe('on failure', () => {
-                    describe('VERIFICATION_NOT_SUPPORTED', () => {
-                        const resource1 = new VastVerificationResource('http://url1.html', 'test1');
+                    describe('VERIFICATION_RESOURCE_REJECTED', () => {
+                        const resource1 = new VastVerificationResource('http://url1.js', 'test1');
                         const verificationResources = [resource1];
                         const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D');
                         const vastAdVerifications = [vastAdVerification];
 
                         beforeEach(() => {
+                            sandbox.stub(CustomFeatures, 'isUnsupportedOMVendor').returns(true);
                             om = initWithVastVerifications(vastAdVerifications);
                             om.render();
                             om.addMessageListener();
@@ -130,8 +134,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                             om.removeMessageListener();
                         });
 
-                        it('should error with VERIFICATION_NOT_SUPPORTED when resource is not a js file', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=2');
+                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file', () => {
+                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1');
                         });
                     });
 

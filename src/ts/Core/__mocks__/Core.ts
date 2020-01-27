@@ -1,4 +1,3 @@
-import { ProgrammaticTrackingService } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { CacheBookkeepingManager } from 'Core/Managers/__mocks__/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/__mocks__/CacheManager';
@@ -83,7 +82,6 @@ export const Core = jest.fn(() => {
         DeviceInfo: new DeviceInfo(),
         Config: new CoreConfiguration(),
         Ads: new Ads(),
-        Purchasing: new Purchasing(),
-        ProgrammaticTrackingService: new ProgrammaticTrackingService(),
+        Purchasing: new Purchasing()
     };
 });

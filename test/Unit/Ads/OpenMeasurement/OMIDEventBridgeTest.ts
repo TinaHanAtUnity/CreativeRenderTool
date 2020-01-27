@@ -13,10 +13,11 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { OMIDEventBridge, IOMIDEventHandler, EventQueuePostbackEvents } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { OMID3pEvents } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { assert } from 'chai';
+import { Campaign } from 'Ads/Models/Campaign';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     const sandbox = sinon.createSandbox();
-    let omInstance: OpenMeasurement;
+    let omInstance: OpenMeasurement<Campaign>;
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;

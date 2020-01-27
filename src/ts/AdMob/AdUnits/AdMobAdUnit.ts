@@ -40,7 +40,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
     private _clientInfo: ClientInfo;
-    private _pts: ProgrammaticTrackingService;
     private _isRewardedPlacement: boolean;
     private _deviceVolume: number;
     private _geometryCalled = false;
@@ -56,7 +55,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
-        this._pts = parameters.programmaticTrackingService;
         this._isRewardedPlacement = !parameters.placement.allowSkip();
 
         if (parameters.platform === Platform.ANDROID) {
@@ -82,7 +80,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
 
         if (this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobRewardedVideoStart);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobRewardedVideoStart);
         }
 
         this.sendTrackingEvent(TrackingEvent.SHOW);
@@ -158,7 +156,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendSkipEvent() {
         if (this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobUserSkippedRewardedVideo);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserSkippedRewardedVideo);
         }
         this.sendTrackingEvent(TrackingEvent.SKIP);
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
@@ -173,7 +171,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
         if (this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobUserWasRewarded);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserWasRewarded);
         }
     }
 
@@ -348,29 +346,29 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private sendPTSCanPlay() {
         // TODO: Add Tagging to remove the below logic
-        this._pts.reportMetricEvent(AdmobMetric.AdmobVideoCanPlay);
+        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobVideoCanPlay);
         if (this.isDBMCreative() && this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMRewardedCanPlay);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobDBMRewardedCanPlay);
         } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedCanPlay);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedCanPlay);
         } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedCanPlay);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedCanPlay);
         } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedCanPlay);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedCanPlay);
         }
     }
 
     private sendPTSStart() {
         // TODO: Add Tagging to remove the below logic
-        this._pts.reportMetricEvent(AdmobMetric.AdmobVideoStarted);
+        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobVideoStarted);
         if (this.isDBMCreative() && this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMRewardedStarted);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobDBMRewardedStarted);
         } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedStarted);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedStarted);
         } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedStarted);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedStarted);
         } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedStarted);
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedStarted);
         }
     }
 

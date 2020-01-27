@@ -88,14 +88,12 @@ export class VastParserStrict {
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
     private _coreConfig: CoreConfiguration | undefined;
-    private _pts: ProgrammaticTrackingService | undefined;
 
-    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration, pts?: ProgrammaticTrackingService) {
+    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
         this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
         this._compiledCampaignErrors = [];
         this._coreConfig = coreConfig;
-        this._pts = pts;
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -213,9 +211,7 @@ export class VastParserStrict {
             wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
             headers.push(['User-Agent', navigator.userAgent]);
-            if (this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
-            }
+            ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             wrapperURL = decodeURIComponent(wrapperURL);
             isPublica = true;
         }
@@ -291,6 +287,12 @@ export class VastParserStrict {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
                 }
+
+                const verifications = [];
+                for (const adVerifications of ad.getAdVerifications()) {
+                    verifications.push(adVerifications);
+                }
+                parsedAd.addAdVerifications(verifications);
             }
         }
     }
@@ -426,8 +428,8 @@ export class VastParserStrict {
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
             verifications.forEach((verification) => {
-                if (verification.getVerificationVendor() === 'IAS' && this._pts) {
-                    this._pts.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
+                if (verification.getVerificationVendor() === 'IAS') {
+                    ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
                 }
             });
             vastAd.addAdVerifications(verifications);
@@ -439,8 +441,8 @@ export class VastParserStrict {
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
                 verifications.forEach((verification) => {
-                    if (verification.getVerificationVendor() === 'IAS' && this._pts) {
-                        this._pts.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
+                    if (verification.getVerificationVendor() === 'IAS') {
+                        ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
                     }
                 });
 

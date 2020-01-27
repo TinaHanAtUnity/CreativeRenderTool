@@ -2,13 +2,12 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -72,7 +71,6 @@ import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
                 video: sinon.createStubInstance(Video),
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
-                programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
                 privacySDK: sinon.createStubInstance(PrivacySDK)
             };
 
@@ -102,9 +100,44 @@ import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
             }
         });
 
-        describe('on onGDPROptOut', () => {
+        describe('on onGDPROptOut on legalFramework GDPR', () => {
             beforeEach(() => {
                 (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+                (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.GDPR);
+
+            });
+
+            it('should send operative event with action BANNER_PERMISSIONS', () => {
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(false);
+
+                privacyEventHandler.onGDPROptOut(true);
+
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_ALL_FALSE, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
+            });
+
+            it('should send operative event with action BANNER_PERMISSIONS', () => {
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(true);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(true);
+
+                privacyEventHandler.onGDPROptOut(false);
+
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST_GDPR, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
+            });
+
+            it('should send operative event with action BANNER_PERMISSIONS', () => {
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutEnabled).returns(true);
+                (<sinon.SinonStub>adUnitParameters.privacySDK.isOptOutRecorded).returns(false);
+
+                privacyEventHandler.onGDPROptOut(false);
+
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.updateUserPrivacy, UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST_GDPR, GDPREventSource.USER, GDPREventAction.BANNER_PERMISSIONS);
+            });
+        });
+
+        describe('on onGDPROptOut on legalFramework CCPA', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+                (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.CCPA);
             });
 
             it('should send operative event with action BANNER_PERMISSIONS', () => {

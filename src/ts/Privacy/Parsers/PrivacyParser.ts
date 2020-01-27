@@ -115,7 +115,7 @@ export class PrivacyParser {
             let permissions: IPrivacyPermissions | undefined;
             if (profiling) {
                 if (rawUserPrivacy.method === PrivacyMethod.LEGITIMATE_INTEREST) {
-                    permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST;
+                    permissions = UserPrivacy.PERM_OPTIN_LEGITIMATE_INTEREST_GDPR;
                 }
                 if (rawUserPrivacy.method === PrivacyMethod.DEVELOPER_CONSENT) {
                     permissions = UserPrivacy.PERM_DEVELOPER_CONSENTED;
