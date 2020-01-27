@@ -324,7 +324,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onUserSeeked() {
-        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked).catch();
+        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked);
     }
 
     private onGDPRPopupEvent(event: Event) {
