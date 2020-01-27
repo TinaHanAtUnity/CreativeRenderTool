@@ -15,7 +15,6 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
     Platform.ANDROID
 ].forEach(platform => describe('ProgrammaticTrackingService', () => {
 
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let clientInfo: ClientInfoMock;
     let deviceInfo: DeviceInfoMock;
     let requestManager: RequestManagerMock;
@@ -26,7 +25,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         requestManager = new RequestManager();
         clientInfo = new ClientInfo();
         deviceInfo = new DeviceInfo();
-        programmaticTrackingService = new ProgrammaticTrackingService(platform, requestManager, clientInfo, deviceInfo, 'us');
+        ProgrammaticTrackingService.initialize(platform, requestManager, clientInfo, deviceInfo, 'us');
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
     });
@@ -48,7 +47,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
 
         tests.forEach((t) => {
             it(`should send "${t.expected}" with suffix "${t.inputSuffix}" and value "${t.inputValue}"`, () => {
-                const tag = programmaticTrackingService.createAdsSdkTag(t.inputSuffix, t.inputValue);
+                const tag = ProgrammaticTrackingService.createAdsSdkTag(t.inputSuffix, t.inputValue);
                 expect(tag).toEqual(t.expected);
             });
         });
@@ -102,7 +101,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
+                const promise = ProgrammaticTrackingService.reportErrorEvent(t.input, adType, seatId);
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -110,7 +109,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             });
 
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportErrorEvent(t.input, adType, seatId);
+                const promise = ProgrammaticTrackingService.reportErrorEvent(t.input, adType, seatId);
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
@@ -161,7 +160,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = programmaticTrackingService.reportMetricEvent(t.input);
+                const promise = ProgrammaticTrackingService.reportMetricEvent(t.input);
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -169,7 +168,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             });
 
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportMetricEvent(t.input);
+                const promise = ProgrammaticTrackingService.reportMetricEvent(t.input);
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
@@ -226,7 +225,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = programmaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
+                const promise = ProgrammaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -234,7 +233,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             });
 
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
+                const promise = ProgrammaticTrackingService.reportMetricEventWithTags(t.input, t.inputTags);
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
@@ -292,7 +291,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value);
+                const promise = ProgrammaticTrackingService.reportTimingEvent(t.metric, t.value);
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -300,7 +299,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             });
 
             it(`should send "${t.expected.metrics[0].name}" with "${t.metric}" and "${t.value}" is passed in`, () => {
-                const promise = programmaticTrackingService.reportTimingEvent(t.metric, t.value);
+                const promise = ProgrammaticTrackingService.reportTimingEvent(t.metric, t.value);
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path,
@@ -316,14 +315,14 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
     describe('Batching Events', () => {
 
         it('should not fire events when no events are batched', () => {
-            return programmaticTrackingService.sendBatchedEvents().then(() => {
+            return ProgrammaticTrackingService.sendBatchedEvents().then(() => {
                 expect(requestManager.post).toBeCalledTimes(0);
             });
         });
 
         it('should not fire events when negative valued events are batched', () => {
-            programmaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, -200);
-            return programmaticTrackingService.sendBatchedEvents().then(() => {
+            ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, -200);
+            return ProgrammaticTrackingService.sendBatchedEvents().then(() => {
                 expect(requestManager.post).toBeCalledTimes(0);
             });
         });
@@ -331,12 +330,12 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
         describe('Batch two events', () => {
 
             beforeEach(() => {
-                programmaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, 999);
-                programmaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
+                ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, 999);
+                ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
             });
 
             it('should call post once', () => {
-                const promise = programmaticTrackingService.sendBatchedEvents();
+                const promise = ProgrammaticTrackingService.sendBatchedEvents();
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
                 return promise;
             });
@@ -363,7 +362,7 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
                         }
                     ]
                 };
-                const promise = programmaticTrackingService.sendBatchedEvents();
+                const promise = ProgrammaticTrackingService.sendBatchedEvents();
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
                     JSON.stringify(expected),
@@ -374,8 +373,9 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             });
 
             it('should clear batchedEvents', () => {
-                return programmaticTrackingService.sendBatchedEvents().then(() => {
-                    expect(programmaticTrackingService['_batchedEvents']).toEqual([]);
+                return ProgrammaticTrackingService.sendBatchedEvents().then(() => {
+                    //tslint:disable-next-line
+                    expect(ProgrammaticTrackingService['_batchedEvents']).toEqual([]);
                 });
             });
         });
@@ -384,13 +384,13 @@ import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
             it('should not fire events when below 10', () => {
                 for (let i = 0; i < 10; i++) {
                     expect(requestManager.post).toBeCalledTimes(0);
-                    programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                    ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
                 }
             });
 
             it('should fire events when 10 events are reached', () => {
                 for (let i = 0; i < 10; i++) {
-                    programmaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                    ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
                 }
                 expect(requestManager.post).toBeCalledTimes(1);
             });

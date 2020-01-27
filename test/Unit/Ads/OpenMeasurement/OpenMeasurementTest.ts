@@ -15,6 +15,7 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -46,14 +47,14 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
             }
         };
 
@@ -70,7 +71,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {

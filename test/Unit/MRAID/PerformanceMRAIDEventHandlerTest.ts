@@ -5,7 +5,6 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -52,7 +51,6 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
     let performanceMraidEventHandler: PerformanceMRAIDEventHandler;
     let extendedMraidCampaign: MRAIDCampaign;
     let privacyManager: UserPrivacyManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let privacySDK: PrivacySDK;
 
     describe('with onClick', () => {
@@ -88,7 +86,6 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
             const viewContainer = document.createElement('div');
             sinon.stub(mraidView, 'container').returns(viewContainer);
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
             privacySDK = sinon.createStubInstance(PrivacySDK);
 
@@ -115,7 +112,6 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                 endScreen: undefined,
                 privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false, 'en'),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 webPlayerContainer: webPlayerContainer,
                 privacySDK: privacySDK
             };

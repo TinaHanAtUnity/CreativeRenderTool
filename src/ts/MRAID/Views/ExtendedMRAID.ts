@@ -14,6 +14,7 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 
 export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -115,7 +116,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
             originalUrl = htmlResource.getOriginalUrl();
         }
 
-        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MRAIDContainer.replace('{{ CREATIVE_URL }}', originalUrl);
+        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, {'{{ CREATIVE_URL }}': originalUrl});
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if (playableConfiguration) {
             // check configuration based on the ab group

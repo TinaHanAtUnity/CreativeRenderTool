@@ -7,7 +7,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -40,7 +39,6 @@ export interface IAdUnitParameters<T extends Campaign> {
     request: RequestManager;
     options: unknown;
     privacyManager: UserPrivacyManager;
-    programmaticTrackingService: ProgrammaticTrackingService;
     gameSessionId?: number;
     privacy: AbstractPrivacy;
     privacySDK: PrivacySDK;

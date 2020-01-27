@@ -7,7 +7,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi, ICore } from 'Core/ICore';
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IAds } from 'Ads/IAds';
 import { IBannerNativeApi, IBannerModule } from 'Banners/IBannerModule';
 
@@ -17,7 +16,6 @@ export class BannerAdUnitParametersFactory {
     private _core: ICoreApi;
     private _clientInfo: ClientInfo;
     private _thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
     private _bannerNativeApi: IBannerNativeApi;
 
     constructor(bannerModule: IBannerModule, ads: IAds, core: ICore) {
@@ -25,7 +23,6 @@ export class BannerAdUnitParametersFactory {
         this._core = core.Api;
         this._clientInfo = core.ClientInfo;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
-        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._bannerNativeApi = bannerModule.Api;
     }
 
@@ -39,7 +36,6 @@ export class BannerAdUnitParametersFactory {
                 [ThirdPartyEventMacro.ZONE]: placement.getId(),
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString()
             }),
-            programmaticTrackingService: this._programmaticTrackingService,
             webPlayerContainer: webPlayerContainer,
             bannerNativeApi: this._bannerNativeApi,
             placementId: placement.getId(),
