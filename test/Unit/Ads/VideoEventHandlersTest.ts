@@ -16,7 +16,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -85,7 +84,6 @@ describe('Vast VideoEventHandlersTest', () => {
     let vastCampaign: VastCampaign;
     let videoEventHandlerParams: IVideoEventHandlerParams<VastAdUnit, VastCampaign>;
     let vastVideoEventHandler: VastVideoEventHandler;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let privacySDK: PrivacySDK;
 
     beforeEach(() => {
@@ -111,7 +109,6 @@ describe('Vast VideoEventHandlersTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
         vastCampaign = TestFixtures.getEventVastCampaign();
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         privacySDK = sinon.createStubInstance(PrivacySDK);
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
@@ -178,7 +175,6 @@ describe('Vast VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacySDK: privacySDK
         };
 
@@ -197,8 +193,7 @@ describe('Vast VideoEventHandlersTest', () => {
             placement: TestFixtures.getPlacement(),
             video: video,
             adUnitStyle: undefined,
-            clientInfo: clientInfo,
-            programmaticTrackingService: programmaticTrackingService
+            clientInfo: clientInfo
         };
 
         vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
@@ -320,7 +315,6 @@ describe('Performance VideoEventHandlersTest', () => {
     let performanceCampaign: PerformanceCampaign;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let privacySDK: PrivacySDK;
 
     beforeEach(() => {
@@ -346,7 +340,6 @@ describe('Performance VideoEventHandlersTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
         performanceCampaign = TestFixtures.getCampaign();
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         privacySDK = sinon.createStubInstance(PrivacySDK);
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
@@ -419,7 +412,6 @@ describe('Performance VideoEventHandlersTest', () => {
             video: video,
             privacy: privacy,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacySDK: privacySDK
         };
 
@@ -438,8 +430,7 @@ describe('Performance VideoEventHandlersTest', () => {
             placement: TestFixtures.getPlacement(),
             video: video,
             adUnitStyle: undefined,
-            clientInfo: clientInfo,
-            programmaticTrackingService: programmaticTrackingService
+            clientInfo: clientInfo
         };
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
@@ -803,7 +794,6 @@ describe('xpromo VideoEventHandlersTest', () => {
     let xPromoAdUnitParameters: IXPromoAdUnitParameters;
     let xPromoEndScreen: XPromoEndScreen;
     let videoEventHandlerParams: IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let xPromoAdUnit: XPromoAdUnit;
     let xPromoVideoEventHandler: XPromoVideoEventHandler;
     let privacySDK: PrivacySDK;
@@ -830,7 +820,6 @@ describe('xpromo VideoEventHandlersTest', () => {
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         sessionManager = new SessionManager(core, request, storageBridge);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         xPromoCampaign = TestFixtures.getXPromoCampaign();
         privacySDK = sinon.createStubInstance(PrivacySDK);
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -903,7 +892,6 @@ describe('xpromo VideoEventHandlersTest', () => {
             video: video,
             privacy: xpromoPrivacy,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacySDK: privacySDK
         };
 
@@ -922,8 +910,7 @@ describe('xpromo VideoEventHandlersTest', () => {
             placement: TestFixtures.getPlacement(),
             video: video,
             adUnitStyle: undefined,
-            clientInfo: clientInfo,
-            programmaticTrackingService: programmaticTrackingService
+            clientInfo: clientInfo
         };
 
         xPromoVideoEventHandler = new XPromoVideoEventHandler(videoEventHandlerParams);

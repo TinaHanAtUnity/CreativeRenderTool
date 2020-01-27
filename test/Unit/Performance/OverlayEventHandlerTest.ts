@@ -10,7 +10,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -139,8 +138,6 @@ describe('OverlayEventHandlerTest', () => {
 
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-
         performanceAdUnitParameters = {
             platform,
             core,
@@ -164,7 +161,6 @@ describe('OverlayEventHandlerTest', () => {
             video: video,
             privacy: privacy,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacySDK: privacySDK
         };
 

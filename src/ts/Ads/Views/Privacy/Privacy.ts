@@ -27,9 +27,9 @@ export interface IPrivacyViewParameters {
     language: string;
     apiLevel?: number;
     osVersion?: string;
-    pts: ProgrammaticTrackingService;
     consentABTest: boolean;
     ageGateLimit: number;
+    pts: ProgrammaticTrackingService;
     core: ICoreApi;
 }
 
@@ -48,7 +48,6 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
-    private _pts: ProgrammaticTrackingService;
     private _ageGateLimit: number;
 
     private _landingPage: ConsentPage;
@@ -66,7 +65,6 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
         this._osVersion = parameters.osVersion;
-        this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
         this._ageGateLimit = parameters.ageGateLimit;
 
@@ -349,7 +347,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
         // To get a rough estimate how often users click links on the homescreen
-        this._pts.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
+        ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
     }

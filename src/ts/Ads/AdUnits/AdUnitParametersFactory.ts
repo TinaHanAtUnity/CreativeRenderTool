@@ -18,7 +18,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IPrivacyEventHandlerParameters, PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
@@ -59,7 +58,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _coreConfig: CoreConfiguration;
     private _sessionManager: SessionManager;
     private _privacyManager: UserPrivacyManager;
-    protected _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
     private _privacySDK: PrivacySDK;
 
@@ -85,7 +83,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._coreConfig = core.Config;
         this._sessionManager = ads.SessionManager;
         this._privacyManager = ads.PrivacyManager;
-        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
         this._osVersion = core.DeviceInfo.getOsVersion();
@@ -129,7 +126,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             adsConfig: this._adsConfig,
             request: this._requestManager,
             privacyManager: this._privacyManager,
-            programmaticTrackingService: this._programmaticTrackingService,
             gameSessionId: this._sessionManager.getGameSessionId(),
             options: this._options,
             privacy: this.createPrivacy(),
