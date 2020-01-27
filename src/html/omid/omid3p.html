@@ -70,10 +70,9 @@
 
                     let handleSessionStart = function(event) {
                         let data = event.data.data;
-                        // If passed vendor matches the registered vendor
                         if (sessionObservers.length > 0) {
                             sessionStartData = event.data;
-                            if (!sessionStartCalled) {
+                            if (!sessionStartCalled && sessionStartData) {
                                 sendSessionStartForKey(data.vendorkey);
                                 sessionStartCalled = true;
                             }
@@ -101,9 +100,9 @@
                         if (event.data.uuid) {
                             payload = event.data.payload;
                             const eventData = {
-                                    adSessionId: event.data.adSessionId,
-                                    timestamp: event.data.timestamp,
-                                    type: stripEventString(event.data.type),
+                                adSessionId: event.data.adSessionId,
+                                timestamp: event.data.timestamp,
+                                type: stripEventString(event.data.type),
                             }
                             if (payload) {
                                 eventData.data = payload;
