@@ -31,17 +31,17 @@ import { Platform } from 'Core/Constants/Platform';
     });
 
     describe('reportMetricEvent with Chinese network operator', () => {
-      it('should fire with china endpoint', () => {
-          const promise = metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
-          expect(requestManager.post).toBeCalledWith(
-              'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
-              expect.anything(),
-              expect.anything()
-          );
+        beforeEach(() => {
+            return metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+        });
 
-          return promise;
-
-      });
+        it('should fire with china endpoint', () => {
+            expect(requestManager.post).toBeCalledWith(
+                'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
+                expect.anything(),
+                expect.anything()
+            );
+        });
     });
 
     describe('When test mode is enabled', () => {

@@ -1,7 +1,3 @@
-import { Platform } from 'Core/Constants/Platform';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 
 export enum ProgrammaticTrackingError {
@@ -147,31 +143,31 @@ export class ProgrammaticTrackingService {
         }
     }
 
-    public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return this._metricInstance.createAdsSdkTag(suffix, tagValue);
+    public static createAdsSdkTag(suffix: string, tagValue: string): void {
+        this._metricInstance.createAdsSdkTag(suffix, tagValue);
     }
 
-    public static reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
-        return this._metricInstance.reportMetricEventWithTags(event, []);
+    public static reportMetricEvent(event: PTSEvent): void {
+        this._metricInstance.reportMetricEventWithTags(event, []);
     }
 
-    public static reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
-        return this._metricInstance.reportMetricEventWithTags(event, tags);
+    public static reportMetricEventWithTags(event: PTSEvent, tags: string[]): void {
+        this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
-    public static reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
-        return this._metricInstance.reportErrorEvent(event, adType, seatId);
+    public static reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): void {
+        this._metricInstance.reportErrorEvent(event, adType, seatId);
     }
 
-    public static reportTimingEvent(event: TimingMetric, value: number): Promise<INativeResponse> {
-        return this._metricInstance.reportTimingEvent(event, value);
+    public static reportTimingEvent(event: TimingMetric, value: number): void {
+        this._metricInstance.reportTimingEvent(event, value);
     }
 
     public static batchEvent(metric: TimingMetric, value: number): void {
-        return this._metricInstance.batchEvent(metric, value);
+        this._metricInstance.batchEvent(metric, value);
     }
 
-    public static async sendBatchedEvents(): Promise<void> {
-        return this._metricInstance.sendBatchedEvents();
+    public static sendBatchedEvents(): void {
+        this._metricInstance.sendBatchedEvents();
     }
 }
