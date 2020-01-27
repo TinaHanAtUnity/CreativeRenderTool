@@ -1,6 +1,7 @@
 # Pending
 
 * Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+* Refactor PTS to Instance-Based Implementation [#13044](https://github.com/Applifier/unity-ads-webview/pull/13044)
 * Add URL Parameters to Game Configuration Requests [#13016](https://github.com/Applifier/unity-ads-webview/pull/13016)
 * Remove Jest Haste Map and TS Jest Diagnostic Errors [#13045](https://github.com/Applifier/unity-ads-webview/pull/13045)
 
