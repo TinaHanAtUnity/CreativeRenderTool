@@ -1,31 +1,32 @@
 import { LoadApi } from 'Core/Native/LoadApi';
 import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
+import { PlacementState } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService, AdUnitTracking } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ListenerApi } from 'Ads/Native/Listener';
 
 enum AdUnitState {
     LOADING,
-    FILL
+    FILL,
+    INVALIDATING
 }
 
 export class AdUnitTracker {
-    private _mediationName: string;
+    private _gameId: string;
+    private _mediation: string;
     private _loadApi: LoadApi;
-    private _listener: ListenerApi;
     private _refreshManager: TrackableRefreshManager;
 
     private _states: { [key: string]: AdUnitState };
 
-    constructor(mediation: string, loadApi: LoadApi, listener: ListenerApi, refreshManager: TrackableRefreshManager, pts: ProgrammaticTrackingService) {
-        this._mediationName = mediation;
+    constructor(gameId: string, mediation: string, loadApi: LoadApi, refreshManager: TrackableRefreshManager, pts: ProgrammaticTrackingService) {
+        this._gameId = gameId;
+        this._mediation = mediation;
         this._loadApi = loadApi;
-        this._listener = listener;
         this._refreshManager = refreshManager;
 
         this._states = {};
 
         this._loadApi.onLoad.subscribe((placements) => this.onLoad(placements));
-        this._listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, nextState) => this.onPlacementStateChangedEventSent(placementId, oldState, nextState));
+        this._refreshManager.onPlacementStateChanged.subscribe((placementId, placementState) => this.onPlacementStateChanged(placementId, placementState));
         this._refreshManager.onAdUnitChanged.subscribe((placementId) => this.onAdUnitChanged(placementId));
     }
 
@@ -34,20 +35,20 @@ export class AdUnitTracker {
             if (this._states[placementId] !== undefined) {
                 switch (this._states[placementId]) {
                     case AdUnitState.LOADING:
-                        ProgrammaticTrackingService.reportMetricEventWithTags(AdUnitTracking.DuplicateLoadForPlacement, [
-                            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName)
+                        this._pts.reportMetricEventWithTags(AdUnitTracking.DuplicateLoadForPlacement, [
+                            this._pts.createAdsSdkTag('med', this._mediation)
                         ]);
                         break;
                     case AdUnitState.FILL:
-                        ProgrammaticTrackingService.reportMetricEventWithTags(AdUnitTracking.PossibleDuplicateLoadForPlacement, [
-                            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName)
+                        this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleDuplicateLoadForPlacement, [
+                            this._pts.createAdsSdkTag('med', this._mediation)
                         ]);
                         break;
                     default:
                 }
             } else {
-                ProgrammaticTrackingService.reportMetricEventWithTags(AdUnitTracking.InitialLoadRequest, [
-                    ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName)
+                this._pts.reportMetricEventWithTags(AdUnitTracking.InitialLoadRequest, [
+                    this._pts.createAdsSdkTag('med', this._mediation)
                 ]);
                 this._states[placementId] = AdUnitState.LOADING;
             }
@@ -61,29 +62,40 @@ export class AdUnitTracker {
 
         delete this._states[placementId];
 
-        ProgrammaticTrackingService.reportMetricEventWithTags(AdUnitTracking.AttemptToShowAd, [
-            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName)
+        this._pts.reportMetricEventWithTags(AdUnitTracking.AttemptToShowAd, [
+            this._pts.createAdsSdkTag('med', this._mediation)
         ]);
     }
 
-    private onPlacementStateChangedEventSent(placementId: string, oldState: string, newState: string): void {
+    private onPlacementStateChanged(placementId: string, placementState: PlacementState): void {
         if (this._states[placementId] === undefined) {
             return;
         }
 
-        if (newState === 'READY') {
+        if (placementState === PlacementState.READY) {
+            if (this._states[placementId] === AdUnitState.INVALIDATING) {
+                this._pts.reportMetricEventWithTags(AdUnitTracking.SuccessfulInvalidate, [
+                    this._pts.createAdsSdkTag('med', this._mediation)
+                ]);
+            }
             this._states[placementId] = AdUnitState.FILL;
-        } else if (newState === 'NO_FILL') {
+        } else if (placementState === PlacementState.NO_FILL) {
             if (this._states[placementId] === AdUnitState.FILL) {
-                ProgrammaticTrackingService.reportMetricEventWithTags(AdUnitTracking.FailedToInvalidate, [
-                    ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName)
+                this._pts.reportMetricEventWithTags(AdUnitTracking.PossibleCampaignExpired, [
+                    this._pts.createAdsSdkTag('med', this._mediation)
                 ]);
             }
             delete this._states[placementId];
-        } else if (newState === 'NOT_AVAILABLE') {
+        } else if (placementState === PlacementState.NOT_AVAILABLE) {
             delete this._states[placementId];
-        }  else if (newState === 'DISABLED') {
+        }  else if (placementState === PlacementState.DISABLED) {
             delete this._states[placementId];
+        } else if (placementState === PlacementState.WAITING && this._states[placementId] === AdUnitState.FILL) {
+            this._pts.reportMetricEventWithTags(AdUnitTracking.AttemptToInvalidate, [
+                this._pts.createAdsSdkTag('med', this._mediation)
+            ]);
+
+            this._states[placementId] = AdUnitState.INVALIDATING;
         }
     }
 }
