@@ -15,6 +15,10 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager'
+import { AUIMetric } from 'Ads/Utilities/ProgrammaticTrackingService'
+import { arAvailableButtonExperiment } from 'AR/Experiments/ARUIExperiments'
+import { ArAutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList'
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
@@ -31,11 +35,26 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     private _ar: IARApi;
     private _webPlayerContainer: WebPlayerContainer;
+    private _automatedExperimentManager: AutomatedExperimentManager;
+    private _myCore: ICore;
 
-    constructor(ar: IARApi, core: ICore, ads: IAds) {
+    constructor(ar: IARApi, core: ICore, ads: IAds, supportArAds = false) {
         super(core, ads);
+
+        if (supportArAds) {
+
+            this._automatedExperimentManager = new AutomatedExperimentManager(core);
+
+            this._automatedExperimentManager.initialize(ArAutomatedExperimentsList).catch(() => {
+                this._programmaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
+            });
+            this._automatedExperimentManager.beginExperiment();
+        }
+
         this._ar = ar;
         this._webPlayerContainer = ads.InterstitialWebPlayerContainer;
+        core.Api.Sdk.logDebug('AR Ads experiment has been started...');
+        this._myCore = core;
     }
 
     protected createParameters(baseParams: IAdUnitParameters<MRAIDCampaign>): IMRAIDAdUnitParameters {
@@ -53,7 +72,9 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             if ((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitParametersFactory._forcedExtendedMRAID) {
                 mraid = new ExtendedMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else if (ARUtil.isARCreative(baseParams.campaign) || MRAIDAdUnitParametersFactory._forcedARMRAID) {
-                mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
+                const arUIExperiments = arAvailableButtonExperiment(this._automatedExperimentManager, this._programmaticTrackingService);
+
+                mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy(), this._automatedExperimentManager, arUIExperiments);
             } else if (baseParams.campaign.isCustomCloseEnabled()) {
                 mraid = new CustomCloseMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.programmaticTrackingService, baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else {

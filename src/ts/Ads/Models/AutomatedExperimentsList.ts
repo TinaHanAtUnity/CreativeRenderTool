@@ -1,5 +1,6 @@
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
+import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
 
 // List experiments to run here and add them to the list
 // Examples:
@@ -23,3 +24,14 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
 });
 
 export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
+
+// AR Ads
+
+export const ARAvailableButtonColorsExperiment = new AutomatedExperiment({
+    name: 'ArAvailableButtonColorsExperiment',
+    actions: Object.values(ARAvailableButtonColors),
+    defaultAction: ARAvailableButtonColors.BLACK,
+    cacheDisabled: true
+});
+
+export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ARAvailableButtonColorsExperiment];

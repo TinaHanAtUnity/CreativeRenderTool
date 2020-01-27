@@ -18,6 +18,9 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
+import { ARUIExperiments } from 'AR/Experiments/ARUIExperiments'
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager'
+import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -52,19 +55,22 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
     private _arAndroidEnumsReceivedObserver: IObserver1<unknown>;
+    private _arUIExperiments: ARUIExperiments
+    private _automatedExperimentManager: AutomatedExperimentManager
 
     private _hasCameraPermission = false;
     private _viewable: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean = false) {
-        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, hidePrivacy, gameSessionId);
+    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUIExperiments: ARUIExperiments) {
+        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, !!hidePrivacy, gameSessionId);
 
         this._ar = ar;
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
-
+        this._arUIExperiments = arUIExperiments;
+        this._automatedExperimentManager = automatedExperimentManager;
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
         this._permissionLearnMoreOpen = false;
         this._viewable = false;
@@ -96,6 +102,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
+                    this._automatedExperimentManager.sendReward();
+
                     if (this._arAvailableButton.classList.contains('collapsed')) {
                         this.expandArAvailableButton();
                     } else {
@@ -171,6 +179,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
 
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
+
+        // MAB
+        switch (this._arUIExperiments.arAvailableButtonColor) {
+            case ARAvailableButtonColors.BLUE: this._arAvailableButton.classList.add('mab-color__blue'); break;
+            default:
+            case ARAvailableButtonColors.BLACK: this._arAvailableButton.classList.add('mab-color__black'); break;
+        }
     }
 
     public setViewableState(viewable: boolean): void {
