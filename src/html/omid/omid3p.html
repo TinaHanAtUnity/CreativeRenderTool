@@ -179,7 +179,7 @@
                     this.setInterval = function() {}
                     this.clearInterval = function() {}
 
-                    let fnwhitelist = ['handleSessionStart', 'postMessageCallback'];
+                    let fnwhitelist = ['handleSessionStart'];
                     this.get = function(name) {
                         return fnwhitelist.indexOf(name) > -1 ? eval(name) : console.log('fn not gettable');
                     }

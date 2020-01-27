@@ -6,12 +6,12 @@ describe('omid3p', () => {
 
     beforeAll(() => {
         omid3p = OmidVerification.substring(34, OmidVerification.length - 30);
-        eval(omid3p);
     });
 
     describe('omid3p api', () => {
 
         beforeEach(() => {
+            eval(omid3p);
             postMessageSpy = jest.fn();
             window.postMessage = postMessageSpy;
         });
@@ -37,6 +37,7 @@ describe('omid3p', () => {
 
     describe('session start', () => {
         beforeEach(() => {
+            eval(omid3p);
             postMessageSpy = jest.fn();
             window.postMessage = postMessageSpy;
         });
@@ -59,7 +60,7 @@ describe('omid3p', () => {
             expect(window.postMessage).not.toHaveBeenCalled();
         });
 
-        it('should call session start registered observer', () => {
+        it('should call session start for registered observer', () => {
             const sessionEvent = {
                 adSessionId: '1',
                 timestamp: 1,
@@ -76,6 +77,9 @@ describe('omid3p', () => {
             const observer = jest.fn();
             window.omid3p.registerSessionObserver(observer, 'beforekey');
             window.omid3p.get('handleSessionStart')(messageEvent);
+
+            expect(window.postMessage).toHaveBeenCalledTimes(2);
+
             expect(observer).toHaveBeenCalledWith({
                 adSessionId: '1',
                 timestamp: 1,
@@ -84,7 +88,46 @@ describe('omid3p', () => {
                     context: {}
                 }
             });
+
+            expect(window.postMessage).lastCalledWith({
+                event: 'onEventProcessed',
+                type: 'omid',
+                data: {
+                    eventType: 'sessionStart',
+                    vendorKey: 'default_key'
+                }
+            }, '*');
+        });
+
+        it('should call session start for registered observer even without vendor key from verification', () => {
+            const sessionEvent = {
+                adSessionId: '1',
+                timestamp: 1,
+                type: 'sessionStart',
+                data: {
+                    context: {},
+                    vendorkey: 'default_key'
+                }
+            }
+
+            const messageEvent = {
+                data: sessionEvent
+            }
+            const observer = jest.fn();
+            window.omid3p.registerSessionObserver(observer);
+            window.omid3p.get('handleSessionStart')(messageEvent);
+
             expect(window.postMessage).toHaveBeenCalledTimes(2);
+
+            expect(observer).toHaveBeenCalledWith({
+                adSessionId: '1',
+                timestamp: 1,
+                type: 'sessionStart',
+                data: {
+                    context: {}
+                }
+            });
+
             expect(window.postMessage).lastCalledWith({
                 event: 'onEventProcessed',
                 type: 'omid',
