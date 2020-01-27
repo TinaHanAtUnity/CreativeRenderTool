@@ -218,7 +218,6 @@ export class ProgrammaticTrackingService {
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
-
         return this._request.post(url, data, headers);
     }
 
