@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
-import versionMap from './webview.version.map';
+const versionMap = require('./webview.version.map.json');
 
 const cdnConfig = {
     'akamai': {
@@ -324,25 +324,24 @@ let purgeTencent = (urlRoot) => {
     });
 };
 
+let branchList = [];
+
+if (versionMap[branch]) {
+    versionMap[branch].forEach((version) => branchList.push(version));
+} else {
+    branchList.push(branch);
+}
+
 let purgeList = [];
 
-if (versionMap[branch] && versionMap[branch] > 1) {
-    versionMap[branch].forEach((version) => {
-        purgeList.push([
-            purgeAkamai('/webview/' + version),
-            purgeHighwinds('/webview/' + version),
-            purgeAliBabaCloud('/webview/' + version),
-            purgeTencent('/webview/' + version)
-        ]);
-    });
-} else {
-    purgeList = [
+branchList.forEach((branch) => {
+    purgeList.push([
         purgeAkamai('/webview/' + branch),
         purgeHighwinds('/webview/' + branch),
         purgeAliBabaCloud('/webview/' + branch),
         purgeTencent('/webview/' + branch)
-    ];
-}
+    ]);
+});
 
 Promise.all(purgeList).then(() => {
     console.log('Successfully purged all CDNs!');

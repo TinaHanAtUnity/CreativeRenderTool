@@ -1,4 +1,6 @@
-import versionMap from './webview.version.map';
+const fs = require('fs');
+const crypto = require('crypto');
+const versionMap = require('./webview.version.map.json');
 
 if (!process.env.INPUT) {
     throw new Error('Missing INPUT env parameter');
@@ -13,7 +15,7 @@ const output = process.env.OUTPUT;
 if (!process.env.BRANCH) {
     throw new Error('Missing BRANCH env parameter');
 }
-const branch = process.env.BRANCH;
+let branch = process.env.BRANCH;
 
 if (versionMap[branch]) {
     branch = versionMap[branch][0];
@@ -28,9 +30,6 @@ if (!process.env.TARGET) {
     throw new Error('Missing TARGET env parameter');
 }
 const target = process.env.TARGET;
-
-const fs = require('fs');
-const crypto = require('crypto');
 
 const options = {
     encoding: 'utf-8'
