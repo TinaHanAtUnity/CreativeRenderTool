@@ -163,31 +163,6 @@ export class UserPrivacyManager {
         });
     }
 
-    public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
-        let infoJson: unknown = {
-            'v': 1,
-            'adid': this._deviceInfo.getAdvertisingIdentifier(),
-            'action': action,
-            'projectId': this._coreConfig.getUnityProjectId(),
-            'platform': Platform[this._platform].toLowerCase(),
-            'country': this._coreConfig.getCountry(),
-            'gameId': this._clientInfo.getGameId(),
-            'bundleId': this._clientInfo.getApplicationName(),
-            'legalFramework': this._privacy.getLegalFramework(),
-            'agreedOverAgeLimit': this._ageGateChoice
-        };
-        if (source) {
-            infoJson = {
-                ... infoJson,
-                'source': source
-            };
-        }
-
-        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
-            return Promise.resolve();
-        });
-    }
-
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
         const userPrivacy = this._userPrivacy;
