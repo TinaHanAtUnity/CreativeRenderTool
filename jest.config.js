@@ -12,7 +12,8 @@ module.exports = {
   },
   globals: {
     'ts-jest': {
-      tsConfig: 'tsconfig.webpack.json'
+      tsConfig: 'tsconfig.webpack.json',
+      diagnostics: false,
     }
   }
 };
