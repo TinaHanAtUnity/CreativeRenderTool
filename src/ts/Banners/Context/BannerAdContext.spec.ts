@@ -8,7 +8,6 @@ import { IAds } from 'Ads/IAds';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { BannerCampaign } from 'Banners/Models/__mocks__/BannerCampaign';
 import { HTMLBannerAdUnit, HTMLBannerAdUnitMock } from 'Banners/AdUnits/__mocks__/HTMLBannerAdUnit';
-import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 
 [
     Platform.IOS,
@@ -23,7 +22,6 @@ import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
     const placementId: string = 'testBannerViewId';
 
     beforeEach(() => {
-        MockPTS();
         placement = Placement();
         core = Core();
         ads = Ads();
