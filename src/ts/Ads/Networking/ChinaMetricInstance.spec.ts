@@ -1,12 +1,10 @@
-import { Platform } from 'Core/Constants/Platform';
-import { RequestManagerMock, RequestManager } from 'Core/Managers/__mocks__/RequestManager';
-import {
-    ProgrammaticTrackingService,
-    AdmobMetric
-} from 'Ads/Utilities/ProgrammaticTrackingService';
-import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
-import { DeviceInfoMock, DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
+import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
+import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
+import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
+
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
+import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Platform } from 'Core/Constants/Platform';
 
 [
     Platform.IOS,

@@ -1,10 +1,10 @@
-import { AdmobMetric, ProgrammaticTrackingError, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Platform } from 'Core/Constants/Platform';
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
-import { MetricInstance, IProgrammaticTrackingData } from 'Ads/Networking/MetricInstance';
+import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
+import { AdmobMetric, ProgrammaticTrackingError, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Platform } from 'Core/Constants/Platform';
 
 [
     Platform.IOS,
