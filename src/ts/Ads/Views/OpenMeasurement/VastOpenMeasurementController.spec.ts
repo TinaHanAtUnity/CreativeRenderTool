@@ -51,10 +51,10 @@ import { Platform } from 'Core/Constants/Platform';
           it('should be called with correct data', () => {
 
               const contextData: IContext = {
-                  apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
-                  environment: 'app',                                   // OMID JS Verification Client API
-                  accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-                  adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
+                  apiVersion: OMID_P,
+                  environment: 'app',
+                  accessMode: AccessMode.LIMITED,
+                  adSessionType: AdSessionType.NATIVE,
                   omidNativeInfo: {
                       partnerName: PARTNER_NAME,
                       partnerVersion: ''
@@ -71,8 +71,8 @@ import { Platform } from 'Core/Constants/Platform';
                       appId: clientInfo.getApplicationName()
                   },
                   deviceInfo: {
-                      deviceType: deviceInfo.getModel(), //this._deviceInfo.getModel(),
-                      os: Platform[platform].toLocaleLowerCase(), //platform.toLowerCase(),
+                      deviceType: deviceInfo.getModel(),
+                      os: Platform[platform].toLocaleLowerCase(),
                       osVersion: deviceInfo.getOsVersion()
                   },
                   supports: ['vlid', 'clid']

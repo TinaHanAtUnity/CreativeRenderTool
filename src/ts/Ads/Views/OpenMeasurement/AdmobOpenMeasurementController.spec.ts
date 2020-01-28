@@ -1,7 +1,6 @@
 import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCampaign';
 import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { OpenMeasurementAdmob, OpenMeasurementMockAdmob } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
@@ -41,10 +40,6 @@ import { Platform } from 'Core/Constants/Platform';
             return new AdmobOpenMeasurementController(platform, core.Api, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
 
-        beforeEach(() => {
-            MockPTS();
-        });
-
         describe('session event additional handling', () => {
             let omManager: AdmobOpenMeasurementController;
 
@@ -53,16 +48,16 @@ import { Platform } from 'Core/Constants/Platform';
             });
 
             it('sessionStart should be called with correct data', () => {
-                const sessionInterfaceEvent : ISessionEvent = {
-                  adSessionId: '456',
-                  timestamp: 123,
-                  type: 'sessionStart',
-                  data: {
-                      context: {}
-                  }
-              };
+                const sessionInterfaceEvent: ISessionEvent = {
+                    adSessionId: '456',
+                    timestamp: 123,
+                    type: 'sessionStart',
+                    data: {
+                        context: {}
+                    }
+                };
 
-                const event: ISessionEvent = {
+                const event0: ISessionEvent = {
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
@@ -103,7 +98,7 @@ import { Platform } from 'Core/Constants/Platform';
 
                 omManager.sessionStart(sessionInterfaceEvent);
 
-                expect(openMeasurement0.sessionStart).toHaveBeenCalledWith(event);
+                expect(openMeasurement0.sessionStart).toHaveBeenCalledWith(event0);
                 expect(openMeasurement1.sessionStart).toHaveBeenCalledWith(event1);
             });
         });
