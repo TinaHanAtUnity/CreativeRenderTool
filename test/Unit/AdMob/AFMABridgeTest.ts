@@ -149,7 +149,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 event: AFMAEvents.USER_SEEKED,
                 verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAUserSeeked)
             }, {
-                event: AFMAEvents.VOLMUE_CHANGE,
+                event: AFMAEvents.VOLUME_CHANGE,
                 data: {
                     volume: 1
                 },
