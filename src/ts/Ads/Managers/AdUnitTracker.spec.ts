@@ -3,11 +3,8 @@ import { LoadApi, LoadApiMock } from 'Core/Native/__mocks__/LoadApi';
 import { StorageApi, StorageApiMock } from 'Core/Native/__mocks__/StorageApi';
 import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
 import { RefreshManager } from 'Ads/Managers/__mocks__/RefreshManager';
-import { AdUnitTracking } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
+import { AdUnitTracking, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
-
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('AdUnitTracker', () => {
     let adUnitTracker: AdUnitTracker;
@@ -17,7 +14,6 @@ describe('AdUnitTracker', () => {
     let trackableRefreshManager: TrackableRefreshManager;
 
     beforeEach(() => {
-        MockPTS();
         loadApi = LoadApi();
         storageApi = StorageApi();
         listenerApi = ListenerApi();
