@@ -1,3 +1,7 @@
+# Pending
+
+* Adds Unknown Enum on CacheError [#13052](https://github.com/Applifier/unity-ads-webview/pull/13052)
+
 # Mon Jan 27 23:30:22 UTC 2020
 
 * Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
