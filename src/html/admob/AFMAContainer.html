@@ -162,7 +162,7 @@
                 });
 
                 videoEl.addEventListener('volumechange', function() {
-                    self.postMessage('volumechanged', {
+                    self.postMessage('volumeChanged', {
                         volume: videoEl.volume
                     })
                 })
