@@ -28,7 +28,7 @@ export enum AFMAEvents {
     TRACKING                = 'tracking',
     GET_CLICK_SIGNAL        = 'getClickSignal',
     USER_SEEKED             = 'seeked',
-    VOLMUE_CHANGE           = 'volumeChanged'
+    VOLUMUE_CHANGE           = 'volumeChanged'
 }
 
 export interface IPoint {
