@@ -63,9 +63,9 @@ if (!branch) {
 }
 
 let branchList = [];
-const releaseVersions = releaseChecker.getNativeVersions(branch);
+const releaseVersion = releaseChecker.getReleaseVersion(branch);
 
-if (releaseVersions) {
+if (releaseVersion) {
     branchList = releaseVersions.native;
 } else {
     branchList.push(branch)

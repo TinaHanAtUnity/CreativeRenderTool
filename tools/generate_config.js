@@ -17,11 +17,10 @@ if (!process.env.BRANCH) {
 }
 let branch = process.env.BRANCH;
 
-let branchList = [];
-const isReleaseVersion = releaseChecker.getNativeVersions(branch);
+const releaseVersion = releaseChecker.getReleaseVersion(branch);
 
-if (releaseBranch) {
-    branch = releaseBranch.webview;
+if (releaseVersion) {
+    branch = releaseVersion.webview;
 }
 
 if (!process.env.COMMIT_ID) {
