@@ -9,7 +9,6 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
@@ -53,7 +52,6 @@ describe('PerPlacementLoadManagerV3', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let campaignParserManager: ContentTypeHandlerManager;
     let privacySDK: PrivacySDK;
     let userPrivacyManager: UserPrivacyManager;
@@ -68,7 +66,6 @@ describe('PerPlacementLoadManagerV3', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
         privacySDK = TestFixtures.getPrivacySDK(core.Api);
 
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
 
@@ -83,10 +80,10 @@ describe('PerPlacementLoadManagerV3', () => {
         sessionManager = new SessionManager(core.Api, request, storageBridge);
         cacheBookkeeping = new CacheBookkeepingManager(core.Api);
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
-        loadManager = new PerPlacementLoadManagerV3(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+        loadManager = new PerPlacementLoadManagerV3(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager);
     });
 
     describe('setCurrentAdUnit', () => {

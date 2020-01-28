@@ -273,6 +273,41 @@ lint-es-fix:
 lint-es-test-fix:
 	$(ESLINT) --fix $(TESTS)
 
+setup: clean
+	rm -rf node_modules
+	npm install
+
+ifeq ($(GITHUB_ACTIONS), true)
+lint:
+	$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json
+	$(ESLINT) $(TS_SOURCES)
+	$(ESLINT) $(TESTS)
+
+lint-fix:
+	$(ESLINT) --fix $(TS_SOURCES)
+	$(ESLINT) --fix $(TESTS)
+
+watch-dev: build-dev
+	$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput
+	$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl
+	$(ROLLUP) --watch --config rollup.config.device.js
+	watchman-make -p build/src/ts/Bundle.js $(CSS_TARGETS) -t build-dev
+
+watch-browser: build-browser
+	$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput
+	$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl
+	$(ROLLUP) --watch --config rollup.config.browser.js
+
+watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
+	$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput
+	$(ROLLUP) --watch --config rollup.config.test.unit.js
+	$(ROLLUP) --watch --config rollup.config.test.integration.js
+	watchman-make -p $(TEST_BUILD_DIR)/UnitBundle.js -t test-unit
+	watchman-make -p $(TEST_BUILD_DIR)/IntegrationBundle.js -t test-integration
+
+start-server:
+	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || ([ -z "$$CI" ] && (open tools/serverLauncher.command || xdg-open tools/serverLauncher.command) || python3 -m http.server 8000 >/dev/null 2>&1 &)
+else
 lint:
 	parallel --ungroup ::: \
 		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
@@ -283,10 +318,6 @@ lint-fix:
 	parallel --ungroup ::: \
 		"$(ESLINT) --fix $(TS_SOURCES)" \
 		"$(ESLINT) --fix $(TESTS)"
-
-setup: clean
-	rm -rf node_modules
-	npm install
 
 watch-dev: build-dev
 	parallel --ungroup --tty --jobs 0 ::: \
@@ -311,6 +342,7 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 
 start-server:
 	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || ([ -z "$$CI" ] && (open tools/serverLauncher.command || gnome-open tools/serverLauncher.command || xdg-open tools/serverLauncher.command) || python3 -m http.server 8000 >/dev/null 2>&1 &)
+endif
 
 deploy:
 ifeq ($(TRAVIS_PULL_REQUEST), false)

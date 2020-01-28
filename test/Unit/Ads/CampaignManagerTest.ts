@@ -118,7 +118,6 @@ describe('CampaignManager', () => {
     let sessionManager: SessionManager;
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let contentTypeHandlerManager: ContentTypeHandlerManager;
     let adUnitParametersFactory: IAbstractAdUnitParametersFactory<Campaign, IAdUnitParameters<Campaign>>;
     let privacySDK: PrivacySDK;
@@ -156,7 +155,8 @@ describe('CampaignManager', () => {
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(ProgrammaticTrackingService, 'batchEvent');
         contentTypeHandlerManager = new ContentTypeHandlerManager();
         adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
@@ -171,7 +171,7 @@ describe('CampaignManager', () => {
                 response: JSON.stringify(OnProgrammaticVastPlcCampaignJson)
             }));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: Campaign;
@@ -208,7 +208,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(1);
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: VastCampaign;
@@ -287,7 +287,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(2);
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: VastCampaign;
@@ -404,7 +404,7 @@ describe('CampaignManager', () => {
                 }
             }
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             campaignManager.onError.subscribe((err) => {
@@ -421,7 +421,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredError: any;
@@ -448,7 +448,7 @@ describe('CampaignManager', () => {
                 }
             }
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredError: WebViewError | Error;
@@ -543,7 +543,7 @@ describe('CampaignManager', () => {
                 const mockRequest = sinon.mock(request);
                 mockRequest.expects('post').returns(Promise.resolve(response));
 
-                const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+                const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
                 const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
                 let noFillTriggered = false;
                 let triggeredError: any;
@@ -582,7 +582,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: VastCampaign;
@@ -613,7 +613,7 @@ describe('CampaignManager', () => {
                 response: JSON.stringify(OnProgrammaticVastPlcCampaignCustomTracking)
             }));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: VastCampaign;
@@ -666,7 +666,7 @@ describe('CampaignManager', () => {
             const json = OnProgrammaticMraidUrlPlcCampaignJson;
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(platform), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: MRAIDCampaign;
@@ -711,7 +711,7 @@ describe('CampaignManager', () => {
             const json = OnProgrammaticMraidPlcCampaignJson;
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(platform), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: MRAIDCampaign;
@@ -752,7 +752,7 @@ describe('CampaignManager', () => {
 
             let doneCalled = false;
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(platform), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredError: any;
@@ -780,7 +780,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(platform), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredError: any;
@@ -803,7 +803,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(platform), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredError: any;
@@ -826,7 +826,7 @@ describe('CampaignManager', () => {
                 response: JSON.stringify(OnStaticInterstitialDisplayHtmlCampaign)
             }));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeHtml, { parser: new ProgrammaticStaticInterstitialParser(platform), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
@@ -856,7 +856,7 @@ describe('CampaignManager', () => {
                 response: JSON.stringify(OnStaticInterstitialDisplayJsCampaign)
             }));
 
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeJs, { parser: new ProgrammaticStaticInterstitialParser(platform), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
@@ -884,7 +884,7 @@ describe('CampaignManager', () => {
         let mockRequest: any;
 
         beforeEach(() => {
-            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager = new ContentTypeHandlerManager();
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             contentTypeHandlerManager.addHandler(XPromoCampaignParser.ContentType, { parser: new XPromoCampaignParser(platform), factory: new XPromoAdUnitFactory(<XPromoAdUnitParametersFactory>adUnitParametersFactory) });
@@ -1076,7 +1076,7 @@ describe('CampaignManager', () => {
                     return Platform.ANDROID;
                 };
 
-                assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+                assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
                 campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -1111,7 +1111,7 @@ describe('CampaignManager', () => {
                 const parser = contentTypeHandlerManager.getParser(ProgrammaticMraidParser.ContentType);
                 (<any>parser)._platform = platform;
 
-                assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+                assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
                 campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -1139,7 +1139,7 @@ describe('CampaignManager', () => {
     });
 
     it('test previous campaign', () => {
-        const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
         let previousCampaign = campaignManager.getPreviousPlacementId();
 
@@ -1161,7 +1161,7 @@ describe('CampaignManager', () => {
                 requestData = data;
                 return Promise.resolve();
             });
-            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
         });
 
@@ -1191,7 +1191,7 @@ describe('CampaignManager', () => {
             sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V5);
 
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
-            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
 
             mockRequest = sinon.mock(request);
@@ -1285,7 +1285,7 @@ describe('CampaignManager', () => {
 
         beforeEach(() => {
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
-            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             mockRequest = sinon.mock(request);
             sinon.stub(Diagnostics, 'trigger').callsFake(() => {
@@ -1374,7 +1374,7 @@ describe('CampaignManager', () => {
             requestMock.expects('post').returns(Promise.resolve({
                 response: OnProgrammaticVastPlcCampaignJson
             }));
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
         });

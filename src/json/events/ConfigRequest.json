@@ -50,6 +50,24 @@
       "body": false
     },
     {
+      "parameter": "connectionType",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenHeight",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenWidth",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "test",
       "required": "all",
       "queryString": true,
@@ -63,6 +81,18 @@
     },
     {
       "parameter": "deviceMake",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenDensity",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenSize",
       "required": "android",
       "queryString": true,
       "body": false

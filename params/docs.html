@@ -7,7 +7,7 @@
                }
                </style>
                <body><br><br><h3> TOC <h3>
-<a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3> 
+<a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3>
  <table> <tr><th>key</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>adapterName</td><td>string</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>string</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
@@ -94,7 +94,7 @@
 <tr><td>legalFramework</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
 <tr><td>nofillRetry</td><td>boolean</td><td>Retrying after no fill</td><td>SDK</td><td>all</td></tr>
 <tr><td>agreedOverAgeLimit</td><td>string</td><td>User answer to age gate "yes" or "no", "missing" if no age gate has been presented</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
+ </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3>
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>encrypted</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>If true, app is encrypted for app store distribution and game is live</td><td>SDK</td><td>all</td></tr>
@@ -104,9 +104,14 @@
 <tr><td>osVersion</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Device operating system version</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceModel</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Android or iOS device model, example 'iPhone7,1'</td><td>SDK</td><td>all</td></tr>
 <tr><td>language</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
+<tr><td>connectionType</td><td>all</td><td>True</td><td>False</td><td>string</td><td>"wifi", "cellular" or "none"</td><td>SDK</td><td>all</td></tr>
+<tr><td>screenHeight</td><td>all</td><td>True</td><td>False</td><td>number</td><td>Screen height in pixels</td><td>SDK</td><td>all</td></tr>
+<tr><td>screenWidth</td><td>all</td><td>True</td><td>False</td><td>number</td><td>Screen width in pixels</td><td>SDK</td><td>all</td></tr>
 <tr><td>test</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
 <tr><td>forceAbGroup</td><td>no</td><td>True</td><td>False</td><td>number</td><td>Force A/B group for internal testing purposes</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceMake</td><td>android</td><td>True</td><td>False</td><td>string</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
+<tr><td>screenDensity</td><td>android</td><td>True</td><td>False</td><td>number</td><td>Screen density in DPI</td><td>SDK</td><td>android</td></tr>
+<tr><td>screenSize</td><td>android</td><td>True</td><td>False</td><td>number</td><td>Android raw screen layout value</td><td>SDK</td><td>android</td></tr>
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
 <tr><td>androidId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
@@ -117,7 +122,7 @@
 <tr><td>imei</td><td>no</td><td>True</td><td>False</td><td>string</td><td>default or slot 0 from getDeviceId </td><td>SDK</td><td>android</td></tr>
 <tr><td>analyticsUserId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)</td><td>SDK</td><td>all</td></tr>
 <tr><td>analyticsSessionId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3> 
+ </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3>
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
@@ -183,7 +188,7 @@
 <tr><td>omidJSVersion</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Flag describing the omid js implementation version indicating omid is supported</td><td>SDK</td><td>all</td></tr>
 <tr><td>legalFramework</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
 <tr><td>agreedOverAgeLimit</td><td>all</td><td>False</td><td>True</td><td>string</td><td>User answer to age gate "yes" or "no", "missing" if no age gate has been presented</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
+ </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3>
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
 <tr><td>auctionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
@@ -232,7 +237,7 @@
 <tr><td>isLoadEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded using Load API or from Precached Initialization</td><td>SDK</td><td>all</td></tr>
 <tr><td>legalFramework</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
 <tr><td>agreedOverAgeLimit</td><td>all</td><td>False</td><td>True</td><td>string</td><td>User answer to age gate "yes" or "no", "missing" if no age gate has been presented</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
+ </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3>
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>redirect</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Legacy parameter, always false</td><td>SDK</td><td>all</td></tr>
@@ -281,4 +286,4 @@
 <tr><td>isLoadEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Flag describing if the campaign was loaded using Load API or from Precached Initialization</td><td>SDK</td><td>all</td></tr>
 <tr><td>legalFramework</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Current legal framework e.g. "gdpr", "ccpa" or "default"</td><td>Server</td><td>all</td></tr>
 <tr><td>agreedOverAgeLimit</td><td>all</td><td>False</td><td>True</td><td>string</td><td>User answer to age gate "yes" or "no", "missing" if no age gate has been presented</td><td>SDK</td><td>all</td></tr>
- </table></body></html>
+</table></body></html>

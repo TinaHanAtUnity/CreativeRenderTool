@@ -4,7 +4,6 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore, ICoreApi } from 'Core/ICore';
 import 'mocha';
-import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
@@ -13,7 +12,6 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -105,7 +103,6 @@ describe('PerPlacementLoadAdapterTest', () => {
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
     let privacyManager: UserPrivacyManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let privacySDK: PrivacySDK;
     let perPlacementLoadAdapter: PerPlacementLoadAdapter;
     let adMobSignalFactory: AdMobSignalFactory;
@@ -129,10 +126,9 @@ describe('PerPlacementLoadAdapterTest', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
         adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
@@ -421,7 +417,6 @@ describe('PerPlacementLoadAdapterTest', () => {
                     request: request,
                     options: {},
                     privacyManager: privacyManager,
-                    programmaticTrackingService: programmaticTrackingService,
                     privacy: privacy,
                     privacySDK: privacySDK
                 };

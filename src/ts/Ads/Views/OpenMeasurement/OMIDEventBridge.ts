@@ -35,10 +35,9 @@ export class OMIDEventBridge {
     private _messageListener: (e: Event) => void;
     private _handler: IOMIDEventHandler;
     private _omidHandlers: { [event: string]: (msg: IOMIDMessage) => void };
-    private _openMeasurement: OpenMeasurement;
+    private _openMeasurement: OpenMeasurement<Campaign>;
     private _verificationsInjected = false;
     private _campaign: Campaign;
-    private _pts: ProgrammaticTrackingService | undefined;
 
     private _iframe3p: HTMLIFrameElement;
 
@@ -46,7 +45,7 @@ export class OMIDEventBridge {
     private _eventHistory: { [event: string]: IVerificationEvent[] } = {};
     private _registeredFuncs: { [eventType: string]: string[] } = {};
 
-    constructor(core: ICoreApi, handler: IOMIDEventHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement, campaign: Campaign, pts?: ProgrammaticTrackingService) {
+    constructor(core: ICoreApi, handler: IOMIDEventHandler, iframe: HTMLIFrameElement, openMeasurement: OpenMeasurement<Campaign>, campaign: Campaign) {
         this._core = core;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._omidHandlers = {};
@@ -54,7 +53,6 @@ export class OMIDEventBridge {
         this._iframe3p = iframe;
         this._openMeasurement = openMeasurement;
         this._campaign = campaign;
-        this._pts = pts;
 
         this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
         this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey, <string>msg.data.uuid);
@@ -139,8 +137,8 @@ export class OMIDEventBridge {
             ...event,
             uuid: uuid
         };
-        if (event.type === 'omidImpression' && this._campaign instanceof AdMobCampaign && this._pts) {
-            this._pts.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+        if (event.type === 'omidImpression' && this._campaign instanceof AdMobCampaign) {
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
         }
         this.postMessage(jsEvent);
     }
