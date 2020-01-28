@@ -129,6 +129,9 @@ export class ConfigManager {
             osVersion: this._deviceInfo.getOsVersion(),
             deviceModel: this._deviceInfo.getModel(),
             language: this._deviceInfo.getLanguage(),
+            connectionType: this._deviceInfo.getConnectionType(),
+            screenHeight: this._deviceInfo.getScreenHeight(),
+            screenWidth: this._deviceInfo.getScreenWidth(),
             test: this._clientInfo.getTestMode(),
             gamerToken: gamerToken,
             analyticsUserId: this._unityInfo.getAnalyticsUserId(),
@@ -138,7 +141,9 @@ export class ConfigManager {
 
         if (this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: (<AndroidDeviceInfo> this._deviceInfo).getManufacturer()
+                deviceMake: (<AndroidDeviceInfo> this._deviceInfo).getManufacturer(),
+                screenDensity: (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity(),
+                screenSize: (<AndroidDeviceInfo> this._deviceInfo).getScreenLayout()
             });
         }
 
