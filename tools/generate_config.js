@@ -1,6 +1,6 @@
 const fs = require('fs');
 const crypto = require('crypto');
-const versionMap = require('./webview.version.map.json');
+const releaseChecker = require('./release_version_verifier');
 
 if (!process.env.INPUT) {
     throw new Error('Missing INPUT env parameter');
@@ -17,8 +17,11 @@ if (!process.env.BRANCH) {
 }
 let branch = process.env.BRANCH;
 
-if (versionMap[branch]) {
-    branch = versionMap[branch][0];
+let branchList = [];
+const isReleaseVersion = releaseChecker.getNativeVersions(branch);
+
+if (releaseBranch) {
+    branch = releaseBranch.webview;
 }
 
 if (!process.env.COMMIT_ID) {

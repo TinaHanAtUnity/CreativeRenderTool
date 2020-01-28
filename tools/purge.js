@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
-const versionMap = require('./webview.version.map.json');
+const releaseChecker = require('./release_version_verifier');
 
 const cdnConfig = {
     'akamai': {
@@ -62,8 +62,13 @@ if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-if (versionMap[branch]) {
-    branch = versionMap[branch][0];
+let branchList = [];
+const releaseVersions = releaseChecker.getNativeVersions(branch);
+
+if (releaseVersions) {
+    branchList = releaseVersions.native;
+} else {
+    branchList.push(branch)
 }
 
 const commit = process.env.TRAVIS_COMMIT;
@@ -323,14 +328,6 @@ let purgeTencent = (urlRoot) => {
         return Promise.all(paths.map(path => checkConfigJson('https://' + cdnConfig.tencentcloud.check_url + urlRoot + path, commit)));
     });
 };
-
-let branchList = [];
-
-if (versionMap[branch]) {
-    versionMap[branch].forEach((version) => branchList.push(version));
-} else {
-    branchList.push(branch);
-}
 
 let purgeList = [];
 
