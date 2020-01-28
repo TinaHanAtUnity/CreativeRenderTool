@@ -27,6 +27,7 @@ describe('MissedImpressionManagerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         core.Storage = new StorageApi(nativeBridge);
         sinon.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags').returns(Promise.resolve());
+        sinon.stub(ProgrammaticTrackingService, 'createAdsSdkTag').returns(Promise.resolve());
         missedImpressionManager = new MissedImpressionManager(core, '', '');
         kafkaSpy = sinon.spy(HttpKafka, 'sendEvent');
     });

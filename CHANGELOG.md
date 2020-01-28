@@ -1,6 +1,11 @@
-# Pending
+# Mon Jan 27 23:30:22 UTC 2020
 
 * Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+* Refactor PTS to Instance-Based Implementation [#13044](https://github.com/Applifier/unity-ads-webview/pull/13044)
+* Add URL Parameters to Game Configuration Requests [#13016](https://github.com/Applifier/unity-ads-webview/pull/13016)
+* Remove Jest Haste Map and TS Jest Diagnostic Errors [#13045](https://github.com/Applifier/unity-ads-webview/pull/13045)
+* Add Basic Github Actions CI Support [#12724](https://github.com/Applifier/unity-ads-webview/pull/12724)
+* Fix AR Creatives Timestamp [#12784](https://github.com/Applifier/unity-ads-webview/pull/12784)
 
 # Fri Jan 24 21:20:44 UTC 2020
 
