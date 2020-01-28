@@ -68,7 +68,7 @@ const releaseVersion = releaseChecker.getReleaseVersion(branch);
 if (releaseVersion) {
     branchList = releaseVersions.native;
 } else {
-    branchList.push(branch)
+    branchList.push(branch);
 }
 
 const commit = process.env.TRAVIS_COMMIT;
