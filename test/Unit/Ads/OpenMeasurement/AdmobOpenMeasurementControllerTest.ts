@@ -104,7 +104,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
             beforeEach(() => {
                 omManager = initAdMobOMManager();
                 sandbox.stub(omManager.getAdmobBridge(), 'sendSessionFinish');
-                sandbox.stub(omManager, 'setupOMInstance');
+                sandbox.stub(omManager, 'mountOMInstance');
             });
 
             afterEach(() => {
@@ -170,7 +170,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
                 sandbox.stub(omAdViewBuilder, 'buildAdmobImpressionView').returns(testAdView);
-                sandbox.stub(omManager, 'setupOMInstance');
+                sandbox.stub(omManager, 'mountOMInstance');
 
                 sandbox.stub(OpenMeasurementController.prototype, 'impression');
                 sandbox.stub(omManager, 'geometryChange');

@@ -328,6 +328,8 @@ if (branch === '2.0.6') {
     urlRoot = '/webview/master';
 } else if (branch === '3.0.1') {
     urlRoot = '/webview/3.0.1-rc2';
+} else if (branch === '3.4.0') {
+    urlRoot = '/webview/3.4.2';
 }
 
 let purgeList = [
@@ -347,6 +349,11 @@ if (branch === '2.0.6') {
     purgeList.push(purgeHighwinds('/webview/3.0.1'));
     purgeList.push(purgeAliBabaCloud('/webview/3.0.1'));
     purgeList.push(purgeTencent('/webview/3.0.1'));
+} else if (branch === '3.4.0') {
+    purgeList.push(purgeAkamai('/webview/3.4.0'));
+    purgeList.push(purgeHighwinds('/webview/3.4.0'));
+    purgeList.push(purgeAliBabaCloud('/webview/3.4.0'));
+    purgeList.push(purgeTencent('/webview/3.4.0'));
 }
 
 Promise.all(purgeList).then(() => {

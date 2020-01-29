@@ -149,7 +149,7 @@ describe('VastAdUnitTest', () => {
 
         const omInstance = sinon.createStubInstance(OpenMeasurement);
         const omViewBuilder = new OpenMeasurementAdViewBuilder(vastCampaign, deviceInfo, platform);
-        const vastOMController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+        const vastOMController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
         sandbox.stub(vastOMController, 'geometryChange');
         sandbox.stub(vastOMController, 'resume');
         sandbox.stub(vastOMController, 'pause');

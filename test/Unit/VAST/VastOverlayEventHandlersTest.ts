@@ -140,7 +140,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
 
             const omInstance = sinon.createStubInstance(OpenMeasurement);
             const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
-            const omController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+            const omController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
             sandbox.stub(omController, 'skipped');
             sandbox.stub(omController, 'setDeviceVolume');
             sandbox.stub(omController, 'geometryChange');
