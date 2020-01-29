@@ -28,7 +28,7 @@ export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimations
 // AR Ads
 
 export const ARAvailableButtonColorsExperiment = new AutomatedExperiment({
-    name: 'ArAvailableButtonColorsExperiment',
+    name: 'wbvw-ar-v1',
     actions: Object.values(ARAvailableButtonColors),
     defaultAction: ARAvailableButtonColors.BLACK,
     cacheDisabled: true

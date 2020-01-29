@@ -36,13 +36,12 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     private _ar: IARApi;
     private _webPlayerContainer: WebPlayerContainer;
     private _automatedExperimentManager: AutomatedExperimentManager;
-    private _myCore: ICore;
 
+    // todo: figure out why this constructor is called twice
     constructor(ar: IARApi, core: ICore, ads: IAds, supportArAds = false) {
         super(core, ads);
 
         if (supportArAds) {
-
             this._automatedExperimentManager = new AutomatedExperimentManager(core);
 
             this._automatedExperimentManager.initialize(ArAutomatedExperimentsList).catch(() => {
@@ -53,8 +52,6 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
         this._ar = ar;
         this._webPlayerContainer = ads.InterstitialWebPlayerContainer;
-        core.Api.Sdk.logDebug('AR Ads experiment has been started...');
-        this._myCore = core;
     }
 
     protected createParameters(baseParams: IAdUnitParameters<MRAIDCampaign>): IMRAIDAdUnitParameters {

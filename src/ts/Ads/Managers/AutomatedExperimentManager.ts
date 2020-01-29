@@ -83,7 +83,7 @@ export class AutomatedExperimentManager {
     private _userInfo: UserInfo;
     private _gameSessionId: number;
 
-    private static readonly _baseUrl = 'http://10.1.34.40:8082/';
+    private static readonly _baseUrl = 'https://auiopt.staging.unityads.unity3d.com/';
     private static readonly _createEndPoint = 'experiment';
     private static readonly _actionEndPoint = 'action';
     private static readonly _rewardEndPoint = 'reward';
