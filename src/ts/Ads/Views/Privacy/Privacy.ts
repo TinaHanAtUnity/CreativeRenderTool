@@ -29,8 +29,6 @@ export interface IPrivacyViewParameters {
     osVersion?: string;
     consentABTest: boolean;
     ageGateLimit: number;
-    pts: ProgrammaticTrackingService;
-    core: ICoreApi;
 }
 
 export enum ConsentPage {

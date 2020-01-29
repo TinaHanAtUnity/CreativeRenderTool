@@ -6,13 +6,28 @@ import { ICoreApi } from 'Core/ICore';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacySettings, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
+import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
 import PrivacyContainer from 'html/consent/privacy-container.html';
+
+export interface IPrivacySDKViewParameters {
+    platform: Platform;
+    privacyManager: UserPrivacyManager;
+    landingPage: ConsentPage;
+    language: string;
+    apiLevel?: number;
+    osVersion?: string;
+    consentABTest: boolean;
+    ageGateLimit: number;
+    pts: ProgrammaticTrackingService;
+    core: ICoreApi;
+}
 
 export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     private readonly _coreApi: ICoreApi;
@@ -25,7 +40,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     private _privacyConfig: PrivacyConfig;
     private _frameEventAdapter: PrivacyFrameEventAdapter;
 
-    constructor(params: IPrivacyViewParameters) {
+    constructor(params: IPrivacySDKViewParameters) {
         super(params.platform, 'consent');
         this._template = new Template(PrivacyTemplate);
         this._privacyManager = params.privacyManager;

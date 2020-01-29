@@ -95,6 +95,9 @@ import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { AdUnitTracker } from 'Ads/Managers/AdUnitTracker';
 import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
+import { ABGroup } from 'src/ts/Core/Models/ABGroup';
+import { ICoreApi } from 'src/ts/Core/ICore';
+import { DeviceInfo } from 'src/ts/Core/Models/DeviceInfo';
 
 export class Ads implements IAds {
 
@@ -379,23 +382,34 @@ export class Ads implements IAds {
 
         this._showingPrivacy = true;
 
-        const privacyAdUnitParams = {
-            requestManager: this._core.RequestManager,
-            abGroup: this._core.Config.getAbGroup(),
-            platform: this._core.NativeBridge.getPlatform(),
-            privacyManager: this.PrivacyManager,
-            adUnitContainer: this.Container,
-            adsConfig: this.Config,
-            core: this._core.Api,
-            deviceInfo: this._core.DeviceInfo,
-            privacySDK: this.PrivacySDK,
-            pts: ProgrammaticTrackingService
-        };
-
         let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
         if (this.PrivacyManager.useLegacyPrivacy()) {
-            privacyAdUnit = new PrivacyUnit(privacyAdUnitParams);
+            const consentAdUnitParams = {
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK,
+            };
+
+            privacyAdUnit = new PrivacyUnit(consentAdUnitParams);
         } else {
+            const privacyAdUnitParams = {
+                requestManager: this._core.RequestManager,
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK,
+                pts: ProgrammaticTrackingService
+            };
+
             privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
         }
 
