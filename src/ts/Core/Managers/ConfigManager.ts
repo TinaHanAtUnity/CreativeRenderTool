@@ -74,41 +74,42 @@ export class ConfigManager {
                     this.deleteGamerToken();
                 }
 
-                const url: string = this.createConfigUrl(framework, adapter, gamerToken);
-                this._core.Sdk.logInfo('Requesting configuration from ' + url);
-                return this._request.get(url, [], {
-                    retries: 2,
-                    retryDelay: 10000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: true
-                }).then(response => {
-                    try {
-                        this._rawConfig = JsonParser.parse(response.response);
-                        return this._rawConfig;
-                    } catch (error) {
-                        Diagnostics.trigger('config_parsing_failed', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-                        this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
-                        throw new Error(error);
-                    }
-                }).catch(error => {
-                    let modifiedError = error;
-                    if (modifiedError instanceof RequestError) {
-                        const requestError = modifiedError;
-                        if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                            const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
-                            modifiedError = new ConfigError((new Error(responseObj.error)));
+                return this.createConfigUrl(framework, adapter, gamerToken).then(url => {
+                    this._core.Sdk.logInfo('Requesting configuration from ' + url);
+                    return this._request.get(url, [], {
+                        retries: 2,
+                        retryDelay: 10000,
+                        followRedirects: false,
+                        retryWithConnectionEvents: true
+                    }).then(response => {
+                        try {
+                            this._rawConfig = JsonParser.parse(response.response);
+                            return this._rawConfig;
+                        } catch (error) {
+                            Diagnostics.trigger('config_parsing_failed', {
+                                configUrl: url,
+                                configResponse: response.response
+                            });
+                            this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
+                            throw new Error(error);
                         }
-                    }
-                    throw modifiedError;
+                    }).catch(error => {
+                        let modifiedError = error;
+                        if (modifiedError instanceof RequestError) {
+                            const requestError = modifiedError;
+                            if (requestError.nativeResponse && requestError.nativeResponse.response) {
+                                const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
+                                modifiedError = new ConfigError((new Error(responseObj.error)));
+                            }
+                        }
+                        throw modifiedError;
+                    });
                 });
             });
         }
     }
 
-    private createConfigUrl(framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private createConfigUrl(framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): Promise<string> {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -129,9 +130,6 @@ export class ConfigManager {
             osVersion: this._deviceInfo.getOsVersion(),
             deviceModel: this._deviceInfo.getModel(),
             language: this._deviceInfo.getLanguage(),
-            connectionType: this._deviceInfo.getConnectionType(),
-            screenHeight: this._deviceInfo.getScreenHeight(),
-            screenWidth: this._deviceInfo.getScreenWidth(),
             test: this._clientInfo.getTestMode(),
             gamerToken: gamerToken,
             analyticsUserId: this._unityInfo.getAnalyticsUserId(),
@@ -164,7 +162,18 @@ export class ConfigManager {
             });
         }
 
-        return url;
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._deviceInfo.getConnectionType()
+        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            url = Url.addParameters(url, {
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                connectionType: connectionType,
+            });
+            return url;
+        });
     }
 
     private fetchValue(key: string): Promise<string | undefined> {
