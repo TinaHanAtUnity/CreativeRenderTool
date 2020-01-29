@@ -62,7 +62,8 @@ export class ConfigManager {
             return Promise.all([
                 this._deviceInfo.getConnectionType(),
                 this._deviceInfo.getScreenHeight(),
-                this._deviceInfo.getScreenWidth(),                this._metaDataManager.fetch(FrameworkMetaData),
+                this._deviceInfo.getScreenWidth(),
+                this._metaDataManager.fetch(FrameworkMetaData),
                 this._metaDataManager.fetch(AdapterMetaData),
                 this.fetchGamerToken()
             ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken]) => {
