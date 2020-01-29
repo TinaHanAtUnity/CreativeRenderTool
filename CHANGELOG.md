@@ -3,6 +3,7 @@
 * Adds Unknown Enum on CacheError [#13052](https://github.com/Applifier/unity-ads-webview/pull/13052)
 * Point Native 3.4.2 to 3.4.0 Webview [#13051](https://github.com/Applifier/unity-ads-webview/pull/13051)
 * Open Measurement - Refactor sessionStart [#12780](https://github.com/Applifier/unity-ads-webview/pull/12780)
+* Open Measurement - Remove Vendor Key Map Checks for Session Start Event [#13049](https://github.com/Applifier/unity-ads-webview/pull/13049)
 
 # Mon Jan 27 23:30:22 UTC 2020
 
