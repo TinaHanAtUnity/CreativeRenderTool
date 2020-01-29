@@ -170,7 +170,7 @@ export class ConfigManager {
             url = Url.addParameters(url, {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
-                connectionType: connectionType,
+                connectionType: connectionType
             });
             return url;
         });
