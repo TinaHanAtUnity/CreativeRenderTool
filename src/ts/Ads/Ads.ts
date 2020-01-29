@@ -95,9 +95,6 @@ import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { AdUnitTracker } from 'Ads/Managers/AdUnitTracker';
 import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
-import { ABGroup } from 'src/ts/Core/Models/ABGroup';
-import { ICoreApi } from 'src/ts/Core/ICore';
-import { DeviceInfo } from 'src/ts/Core/Models/DeviceInfo';
 
 export class Ads implements IAds {
 
@@ -392,7 +389,7 @@ export class Ads implements IAds {
                 adsConfig: this.Config,
                 core: this._core.Api,
                 deviceInfo: this._core.DeviceInfo,
-                privacySDK: this.PrivacySDK,
+                privacySDK: this.PrivacySDK
             };
 
             privacyAdUnit = new PrivacyUnit(consentAdUnitParams);
