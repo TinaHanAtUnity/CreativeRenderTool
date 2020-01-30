@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';

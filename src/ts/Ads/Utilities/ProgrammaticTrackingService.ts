@@ -120,17 +120,7 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
-
-export interface IProgrammaticTrackingData {
-    metrics: IPTSEvent[];
-}
-
-interface IPTSEvent {
-    name: string;
-    value: number;
-    tags: string[];
-}
+export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 
