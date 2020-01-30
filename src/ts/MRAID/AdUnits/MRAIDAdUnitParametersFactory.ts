@@ -37,7 +37,6 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     private _webPlayerContainer: WebPlayerContainer;
     private _automatedExperimentManager: AutomatedExperimentManager;
 
-    // todo: figure out why this constructor is called twice
     constructor(ar: IARApi, core: ICore, ads: IAds, supportArAds = false) {
         super(core, ads);
 
