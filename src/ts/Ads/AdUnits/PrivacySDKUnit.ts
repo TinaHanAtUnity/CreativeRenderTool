@@ -38,15 +38,13 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     private _adsConfig: AdsConfiguration;
     private _privacyConfig: PrivacyConfig;
     private _requestManager: RequestManager;
+    private _useTransparency: boolean;
+    private _core: ICoreApi;
+    private _showing: boolean;
+    private _privacyManager: UserPrivacyManager;
+    private _unityPrivacyView: PrivacySDKView;
     private readonly _platform: Platform;
     private readonly _landingPage: ConsentPage;
-
-    private _useTransparency: boolean;
-
-    protected _core: ICoreApi;
-    protected _showing: boolean;
-    protected _privacyManager: UserPrivacyManager;
-    protected _unityPrivacyView: PrivacySDKView;
 
     constructor(parameters: IPrivacyUnitParameters) {
         this._adUnitContainer = parameters.adUnitContainer;
@@ -229,7 +227,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         });
     }
 
-    protected getViewParams(parameters: IPrivacyUnitParameters): IPrivacySDKViewParameters {
+    private getViewParams(parameters: IPrivacyUnitParameters): IPrivacySDKViewParameters {
         let viewParams: IPrivacySDKViewParameters = {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
