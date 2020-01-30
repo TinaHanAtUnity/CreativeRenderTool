@@ -1,6 +1,7 @@
 # Pending
 
 * Open Measurement - Log When Admob Session Start Observer is Called [#13081](https://github.com/Applifier/unity-ads-webview/pull/13081/files)
+* Fix New Parameters in Ads Configuration Request [#13079](https://github.com/Applifier/unity-ads-webview/pull/13079)
 
 # Wed Jan 29 00:59:44 UTC 2020
 
