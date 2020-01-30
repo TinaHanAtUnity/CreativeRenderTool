@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
-const releaseChecker = require('./release_version_verifier');
+const releases = require('./release_version_verifier');
 
 const cdnConfig = {
     'akamai': {
@@ -62,13 +62,11 @@ if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-let branchList = [];
-const releaseVersion = releaseChecker.getReleaseVersion(branch);
+let branchList = [branch];
+const releaseVersion = releases.getReleaseVersion(branch);
 
 if (releaseVersion) {
-    branchList = releaseVersions.native;
-} else {
-    branchList.push(branch);
+    branchList = releaseVersion.native;
 }
 
 const commit = process.env.TRAVIS_COMMIT;

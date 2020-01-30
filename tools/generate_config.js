@@ -1,6 +1,6 @@
 const fs = require('fs');
 const crypto = require('crypto');
-const releaseChecker = require('./release_version_verifier');
+const releases = require('./releases');
 
 if (!process.env.INPUT) {
     throw new Error('Missing INPUT env parameter');
@@ -17,7 +17,7 @@ if (!process.env.BRANCH) {
 }
 let branch = process.env.BRANCH;
 
-const releaseVersion = releaseChecker.getReleaseVersion(branch);
+const releaseVersion = releases.getReleaseVersion(branch);
 
 if (releaseVersion) {
     branch = releaseVersion.webview;
