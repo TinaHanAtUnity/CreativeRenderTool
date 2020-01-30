@@ -1,4 +1,4 @@
-const releases = require('./release_version_verifier');
+const releases = require('./releases');
 const childProcess = require('child_process');
 
 let branch = process.env.TRAVIS_BRANCH;

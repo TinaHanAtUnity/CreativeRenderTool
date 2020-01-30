@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
-const releases = require('./release_version_verifier');
+const releases = require('./releases');
 
 const cdnConfig = {
     'akamai': {
