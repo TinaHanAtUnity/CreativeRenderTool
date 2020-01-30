@@ -1,7 +1,7 @@
 import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPrivacyPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Privacy/ButtonSpinner';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
@@ -17,7 +17,6 @@ import {
 } from 'Ads/Views/Privacy/PrivacyRowItemContainer';
 import { MiscellaneousMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Localization } from 'Core/Utilities/Localization';
-import { ICoreApi } from 'Core/ICore';
 import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 export interface IPrivacyViewParameters {
