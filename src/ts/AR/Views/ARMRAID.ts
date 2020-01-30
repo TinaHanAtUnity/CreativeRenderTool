@@ -181,11 +181,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         // MAB
-        switch (this._arUIExperiments.arAvailableButtonColor) {
-            case ARAvailableButtonColors.BLUE: this._arAvailableButton.classList.add('mab-color__blue'); break;
-            default:
-            case ARAvailableButtonColors.BLACK: this._arAvailableButton.classList.add('mab-color__black'); break;
-        }
+        const arAvailableButtonColor = this._arUIExperiments.arAvailableButtonColor || ARAvailableButtonColors.BLACK;
+        this._arAvailableButton.classList.add('mab-color__' + arAvailableButtonColor);
     }
 
     public setViewableState(viewable: boolean): void {
