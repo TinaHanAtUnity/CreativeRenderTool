@@ -183,19 +183,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                         assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(sessionEvent));
                         assert.equal((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0].data.vendorkey, sessionEvent.data.vendorkey);
                     });
-
-                    it('should construct vast event data when no data is passed', () => {
-                        const constructedEventIOS = {'adSessionId': '10', 'timestamp': 1, 'type': 'sessionStart', 'data': {'context': {'apiVersion': 'Unity3d/1.2.10', 'environment': 'app', 'accessMode': 'limited', 'adSessionType': 'native', 'omidNativeInfo': {'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'omidJsInfo': {'omidImplementer': 'Unity3d', 'serviceVersion': '2.0.0-alpha2', 'sessionClientVersion': 'Unity3d/1.2.10', 'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'app': {'libraryVersion': '1.2.10', 'appId': 'com.unity3d.ads.example'}, 'deviceInfo': {'deviceType': 'TestModel', 'os': 'ios', 'osVersion': '1.0'}, 'supports': ['vlid', 'clid']}, 'vendorkey': 'test'}};
-                        const constructedEventAndroid = {'adSessionId': '10', 'timestamp': 1, 'type': 'sessionStart', 'data': {'context': {'apiVersion': 'Unity3d/1.2.10', 'environment': 'app', 'accessMode': 'limited', 'adSessionType': 'native', 'omidNativeInfo': {'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'omidJsInfo': {'omidImplementer': 'Unity3d', 'serviceVersion': '2.0.0-alpha2', 'sessionClientVersion': 'Unity3d/1.2.10', 'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'app': {'libraryVersion': '1.2.10', 'appId': 'com.unity3d.ads.example'}, 'deviceInfo': {'deviceType': 'TestModel', 'os': 'android', 'osVersion': '1.0'}, 'supports': ['vlid', 'clid']}, 'vendorkey': 'test'}};
-
-                        om.sessionStart(undefined);
-                        sinon.assert.called(<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent);
-                        if (platform === Platform.IOS) {
-                            assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(constructedEventIOS));
-                        } else {
-                            assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(constructedEventAndroid));
-                        }
-                    });
                 });
 
                 describe('onEventProcessed', () => {
