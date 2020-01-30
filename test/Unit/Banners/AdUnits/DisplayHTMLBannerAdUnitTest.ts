@@ -22,7 +22,6 @@ import { asSpy, asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { BannerViewType } from 'Banners/Native/BannerApi';
 
@@ -37,7 +36,6 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
         let campaign: BannerCampaign;
         let thirdPartyEventManager: ThirdPartyEventManager;
         let webPlayerContainer: WebPlayerContainer;
-        let programmaticTrackingService: ProgrammaticTrackingService;
         let bannerAdUnitParameters: IBannerAdUnitParameters;
 
         const getBannerCampaign = (session: Session) => {
@@ -92,15 +90,12 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
             asStub(webPlayerContainer.setEventSettings).resolves();
             asStub(webPlayerContainer.setSettings).resolves();
 
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-
             bannerAdUnitParameters = {
                 platform,
                 core,
                 campaign,
                 webPlayerContainer,
                 thirdPartyEventManager,
-                programmaticTrackingService,
                 bannerNativeApi: bannerNativeApi,
                 placementId,
                 bannerAdViewId: bannerAdViewId

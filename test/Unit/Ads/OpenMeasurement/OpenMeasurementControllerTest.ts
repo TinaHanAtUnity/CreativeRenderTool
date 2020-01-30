@@ -7,22 +7,44 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { IImpressionValues, MediaType, IVastProperties, VideoPosition, VideoPlayerState, InteractionType, IAdView } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
+import { Backend } from 'Backend/Backend';
 import { Campaign } from 'Ads/Models/Campaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMController`, () => {
         const sandbox = sinon.createSandbox();
         let placement: Placement;
+        let clientInfo: ClientInfo;
+        let deviceInfo: DeviceInfo;
+        let core: ICoreApi;
+        let backend: Backend;
+        let nativeBridge: NativeBridge;
 
-        const initOMManager = (om: OpenMeasurement<Campaign>[]) => {
+        const initOMManager = (om: OpenMeasurement<VastCampaign>[]) => {
             placement = TestFixtures.getPlacement();
+            clientInfo = TestFixtures.getClientInfo(platform);
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            core = TestFixtures.getCoreApi(nativeBridge);
+
+            if (platform === Platform.ANDROID) {
+                deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            } else {
+                deviceInfo = TestFixtures.getIosDeviceInfo(core);
+            }
             const adViewBuilder = sandbox.createStubInstance(OpenMeasurementAdViewBuilder);
-            return new OpenMeasurementController(placement, adViewBuilder, om);
+            return new VastOpenMeasurementController(platform, placement, om, adViewBuilder, clientInfo, deviceInfo);
         };
 
         describe('session events', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement<Campaign>;
+            let openMeasurement: OpenMeasurement<VastCampaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);
@@ -32,10 +54,6 @@ import { Campaign } from 'Ads/Models/Campaign';
                 sandbox.restore();
             });
 
-            it('sessionStart should be called twice', () => {
-                omManager.sessionStart();
-                sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionStart);
-            });
             it('sessionFinish should be called twice', () => {
                 omManager.sessionFinish();
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.sessionFinish);
@@ -44,7 +62,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 
         describe('adEvents', () => {
             let omManager: OpenMeasurementController;
-            let openMeasurement: OpenMeasurement<Campaign>;
+            let openMeasurement: OpenMeasurement<VastCampaign>;
 
             beforeEach(() => {
                 openMeasurement = sandbox.createStubInstance(OpenMeasurement);

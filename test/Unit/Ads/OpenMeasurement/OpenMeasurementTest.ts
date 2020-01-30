@@ -15,6 +15,7 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -46,14 +47,14 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
             }
         };
 
@@ -70,7 +71,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
@@ -181,19 +182,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                         sinon.assert.calledWith(<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent, sessionEvent);
                         assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(sessionEvent));
                         assert.equal((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0].data.vendorkey, sessionEvent.data.vendorkey);
-                    });
-
-                    it('should construct vast event data when no data is passed', () => {
-                        const constructedEventIOS = {'adSessionId': '10', 'timestamp': 1, 'type': 'sessionStart', 'data': {'context': {'apiVersion': 'Unity3d/1.2.10', 'environment': 'app', 'accessMode': 'limited', 'adSessionType': 'native', 'omidNativeInfo': {'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'omidJsInfo': {'omidImplementer': 'Unity3d', 'serviceVersion': '2.0.0-alpha2', 'sessionClientVersion': 'Unity3d/1.2.10', 'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'app': {'libraryVersion': '1.2.10', 'appId': 'com.unity3d.ads.example'}, 'deviceInfo': {'deviceType': 'TestModel', 'os': 'ios', 'osVersion': '1.0'}, 'supports': ['vlid', 'clid']}, 'vendorkey': 'test'}};
-                        const constructedEventAndroid = {'adSessionId': '10', 'timestamp': 1, 'type': 'sessionStart', 'data': {'context': {'apiVersion': 'Unity3d/1.2.10', 'environment': 'app', 'accessMode': 'limited', 'adSessionType': 'native', 'omidNativeInfo': {'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'omidJsInfo': {'omidImplementer': 'Unity3d', 'serviceVersion': '2.0.0-alpha2', 'sessionClientVersion': 'Unity3d/1.2.10', 'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'app': {'libraryVersion': '1.2.10', 'appId': 'com.unity3d.ads.example'}, 'deviceInfo': {'deviceType': 'TestModel', 'os': 'android', 'osVersion': '1.0'}, 'supports': ['vlid', 'clid']}, 'vendorkey': 'test'}};
-
-                        om.sessionStart(undefined);
-                        sinon.assert.called(<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent);
-                        if (platform === Platform.IOS) {
-                            assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(constructedEventIOS));
-                        } else {
-                            assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(constructedEventAndroid));
-                        }
                     });
                 });
 

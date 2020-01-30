@@ -14,7 +14,6 @@ import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup, ConsentUXTest } from 'Core/Models/ABGroup';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
@@ -28,7 +27,6 @@ export interface IConsentUnitParameters {
     adsConfig: AdsConfiguration;
     core: ICoreApi;
     deviceInfo: DeviceInfo;
-    pts: ProgrammaticTrackingService;
     privacySDK: PrivacySDK;
 }
 
@@ -60,7 +58,6 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
-            pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
             consentABTest: false,
             ageGateLimit: this._privacySDK.getAgeGateLimit()

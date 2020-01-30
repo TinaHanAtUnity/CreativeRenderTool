@@ -1,3 +1,39 @@
+# Pending
+
+* Open Measurement - Log When Admob Session Start Observer is Called [#13081](https://github.com/Applifier/unity-ads-webview/pull/13081/files)
+* Fix New Parameters in Ads Configuration Request [#13079](https://github.com/Applifier/unity-ads-webview/pull/13079)
+
+# Wed Jan 29 00:59:44 UTC 2020
+
+* Adds Unknown Enum on CacheError [#13052](https://github.com/Applifier/unity-ads-webview/pull/13052)
+* Point Native 3.4.2 to 3.4.0 Webview [#13051](https://github.com/Applifier/unity-ads-webview/pull/13051)
+* Open Measurement - Refactor sessionStart [#12780](https://github.com/Applifier/unity-ads-webview/pull/12780)
+* Open Measurement - Remove Vendor Key Map Checks for Session Start Event [#13049](https://github.com/Applifier/unity-ads-webview/pull/13049)
+
+# Mon Jan 27 23:30:22 UTC 2020
+
+* Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+* Refactor PTS to Instance-Based Implementation [#13044](https://github.com/Applifier/unity-ads-webview/pull/13044)
+* Add URL Parameters to Game Configuration Requests [#13016](https://github.com/Applifier/unity-ads-webview/pull/13016)
+* Remove Jest Haste Map and TS Jest Diagnostic Errors [#13045](https://github.com/Applifier/unity-ads-webview/pull/13045)
+* Add Basic Github Actions CI Support [#12724](https://github.com/Applifier/unity-ads-webview/pull/12724)
+* Fix AR Creatives Timestamp [#12784](https://github.com/Applifier/unity-ads-webview/pull/12784)
+
+# Fri Jan 24 21:20:44 UTC 2020
+
+* Add spec.ts Support in tsconfig [#12988](https://github.com/Applifier/unity-ads-webview/pull/12988)
+* Add isNoGzipGame GameID [#12987](https://github.com/Applifier/unity-ads-webview/pull/12987)
+* Add MacroUtil class to do string replacement [#12191](https://github.com/Applifier/unity-ads-webview/pull/12191)
+* Add MobilityWareGames to isCloseIconSkipEnabled [#13017](https://github.com/Applifier/unity-ads-webview/pull/13017)
+* Duplicate missed impression event to PTS [#13018](https://github.com/Applifier/unity-ads-webview/pull/13018)
+
+# Wed Jan 22 21:11:27 UTC 2020
+
+* Improve Missed Impression Metrics V3 [#12959](https://github.com/Applifier/unity-ads-webview/pull/12959)
+* Increase the cn diagnostic endpoint traffic to 100% [#12961](https://github.com/Applifier/unity-ads-webview/pull/12961)
+* Run with Accept-Encoding header for CSR2 game id [#12905](https://github.com/Applifier/unity-ads-webview/pull/12905)
+* Begin Reverse Zynga ABTest on MAB Endcard Animation on Group 7 [#12933](https://github.com/Applifier/unity-ads-webview/pull/12933)
+
 # Tue Jan 21 23:01:23 UTC 2020
 
 * Open Measurement Refactor - Fix Generic Use [#12725](https://github.com/Applifier/unity-ads-webview/pull/12725)

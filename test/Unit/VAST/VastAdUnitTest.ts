@@ -7,7 +7,6 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -148,10 +147,9 @@ describe('VastAdUnitTest', () => {
         };
         const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const omInstance = sinon.createStubInstance(OpenMeasurement);
         const omViewBuilder = new OpenMeasurementAdViewBuilder(vastCampaign, deviceInfo, platform);
-        const vastOMController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+        const vastOMController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
         sandbox.stub(vastOMController, 'geometryChange');
         sandbox.stub(vastOMController, 'resume');
         sandbox.stub(vastOMController, 'pause');
@@ -180,7 +178,6 @@ describe('VastAdUnitTest', () => {
             overlay: overlay,
             video: video,
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             om: vastOMController,
             privacySDK: privacySDK
         };

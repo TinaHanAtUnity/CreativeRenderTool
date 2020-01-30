@@ -8,7 +8,6 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -93,7 +92,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 thirdPartyEventManager = new ThirdPartyEventManager(core, request);
                 sessionManager = new SessionManager(core, request, storageBridge);
                 const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-                const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
                 privacySDK = sinon.createStubInstance(PrivacySDK);
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                     platform: platform,
@@ -148,7 +146,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                     options: {},
                     view: view,
                     privacyManager: privacyManager,
-                    programmaticTrackingService: programmaticTrackingService,
                     privacySDK: privacySDK
                 };
 

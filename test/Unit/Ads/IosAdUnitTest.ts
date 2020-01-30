@@ -11,7 +11,6 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { UIInterfaceOrientationMask } from 'Core/Constants/iOS/UIInterfaceOrientationMask';
@@ -74,7 +73,6 @@ describe('IosAdUnitTest', () => {
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const privacy = sinon.createStubInstance(AbstractPrivacy);
         const privacySDK = sinon.createStubInstance(PrivacySDK);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -114,7 +112,6 @@ describe('IosAdUnitTest', () => {
             request: request,
             options: {},
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacy: privacy,
             privacySDK: privacySDK
         };

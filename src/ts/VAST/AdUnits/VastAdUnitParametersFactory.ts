@@ -50,7 +50,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             adVerifications.forEach((adverification) => {
                 omVendors.push(adverification.getVerificationVendor());
                 if (adverification.getVerificationVendor() === 'IAS') {
-                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), baseParams.programmaticTrackingService, adverification);
+                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification);
                     om.setOMAdViewBuilder(omAdViewBuilder);
                     omInstances.push(om);
                 }
@@ -64,7 +64,8 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 omVendors = omVendors.unique();
             }
 
-            const omManager = new VastOpenMeasurementController(baseParams.placement, omInstances, omAdViewBuilder);
+            const omManager = new VastOpenMeasurementController(baseParams.platform, baseParams.placement, omInstances, omAdViewBuilder, baseParams.clientInfo, baseParams.deviceInfo);
+
             omManager.addToViewHierarchy();
             omManager.injectVerifications();
 
