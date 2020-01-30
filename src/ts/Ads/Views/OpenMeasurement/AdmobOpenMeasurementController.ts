@@ -14,6 +14,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Campaign } from 'Ads/Models/Campaign';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -76,7 +77,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         const omVendors: string[] = [];
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
-            this._omInstances.push(om);
             this.setupOMInstance(om, resource);
             omVendors.push(resource.vendorKey);
         });
@@ -86,7 +86,12 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
+        this._omInstances.push(om);
         om.setAdmobOMSessionId(this._omAdSessionId);
+        this.mountOMInstance(om, resource);
+    }
+
+    public mountOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource): void {
         om.addToViewHierarchy();
         om.injectVerificationResources([resource]);
     }
@@ -178,8 +183,20 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
     }
 
+    public getOMInstances(): OpenMeasurement<Campaign>[] {
+        return this._omInstances;
+    }
+
     public sessionStart(sessionEvent: ISessionEvent) {
-        super.sessionStart(sessionEvent);
+
+        this._omInstances.forEach((om) => {
+            // Need a deep assignment to avoid duplication for events
+            const event = JSON.parse(JSON.stringify(sessionEvent));
+            const verificationresource = om.getVerificationResource();
+            event.data.verificationParameters = verificationresource.verificationParameters;
+            event.data.vendorkey = verificationresource.vendorKey;
+            om.sessionStart(event);
+        });
         ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 

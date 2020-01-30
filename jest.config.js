@@ -12,7 +12,10 @@ module.exports = {
   },
   globals: {
     'ts-jest': {
-      tsConfig: 'tsconfig.webpack.json'
+      tsConfig: 'tsconfig.webpack.json',
+      diagnostics: false,
     }
-  }
+  },
+  setupFiles: ['<rootDir>/test-utils/jest.setup.js'],
+  clearMocks: true,
 };

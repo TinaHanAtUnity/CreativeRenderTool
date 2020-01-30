@@ -8,7 +8,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventMa
 import { UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { MockPTS } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { Platform } from 'Core/Constants/Platform';
@@ -31,7 +30,6 @@ describe('AdmobAdUnitTest', () => {
     let placement: PlacementMock;
 
     beforeEach(() => {
-        MockPTS();
         const ads = new Ads();
         const store = new Store();
         const core = new Core();
