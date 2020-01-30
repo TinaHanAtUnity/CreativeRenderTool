@@ -16,7 +16,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, OMMetric, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
@@ -294,8 +294,12 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         if (eventType === SessionEvents.SESSION_START) {
             this._sessionStartProcessedByOmidScript = true;
 
-            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+            if (vendorKey === 'IAS') {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+            }
+
+            if (this._campaign instanceof AdMobCampaign) {
+                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMSessionStartObserverCalled);
             }
 
             if (this._campaign instanceof VastCampaign) {
