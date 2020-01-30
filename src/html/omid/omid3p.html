@@ -10,7 +10,7 @@
                     SESSION_ERROR = 'sessionError',
                     SESSION_REGISTERED = 'sessionRegistered';
                     let DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
-                    let sessionObserversMap = {};
+                    let sessionObservers = [];
                     let sessionStartData = {};
                     let sessionStartCalled = false;
                     var scriptVendor = '';
@@ -23,10 +23,6 @@
                      * @param {Object} eventData structured data to indicate type for observer to fire
                      */
                     let triggerSessionObserver = function(eventData) {
-                        const observerList = Object.keys(sessionObserversMap).map(function(vendorKey) {
-                            return sessionObserversMap[vendorKey];
-                        });
-                        const sessionObservers = [].concat.apply([], observerList);
                         sessionObservers.forEach(function(sessionObserver) {
                             if (!eventData.data || Object.keys(eventData.data).length === 0) {
                                 delete eventData.data;
@@ -54,8 +50,8 @@
                      * @param {string} vendorkey
                      */
                     let sendSessionStart = function(observer, vendorkey) {
-                        delete sessionStartData[vendorkey].data.vendorkey;
-                        observer(sessionStartData[vendorkey]);
+                        delete sessionStartData.data.vendorkey;
+                        observer(sessionStartData);
                         postMessageCallback(ON_EVENT_PROCESSED, {
                             eventType: SESSION_START,
                             vendorKey: vendorkey
@@ -67,41 +63,22 @@
                      * @param {string} key
                      */
                     let sendSessionStartForKey = function(key) {
-                        sessionObserversMap[key].forEach((sessionObserver) => {
+                        sessionObservers.forEach((sessionObserver) => {
                             sendSessionStart(sessionObserver, key);
                         });
                     }
 
                     let handleSessionStart = function(event) {
                         let data = event.data.data;
-                        // If passed vendor matches the registered vendor
-                        if (sessionObserversMap[data.vendorkey]) {
-                            sessionStartData[data.vendorkey] = event.data;
-                            if (!sessionStartCalled) {
+                        if (sessionObservers.length > 0) {
+                            sessionStartData = event.data;
+                            if (!sessionStartCalled && sessionStartData) {
                                 sendSessionStartForKey(data.vendorkey);
                                 sessionStartCalled = true;
                             }
                         } else {
                             // It is possible session start was called before a vendor registers so we must always store the data
-                            sessionStartData[data.vendorkey] = event.data;
-
-                            if (!data.verificationParameters) {
-                                // If we've already stored data for a default key, we can send SessionStart since the params do not matter
-                                if (sessionStartData[DEFAULT_VENDOR_KEY] && !sessionStartCalled) {
-                                    sendSessionStartForKey(DEFAULT_VENDOR_KEY);
-                                    sessionStartCalled = true;
-                                } else {
-                                    // Logs even if registration will happen later
-                                    postMessageCallback(ON_EVENT_PROCESSED, {
-                                        eventType: 'vendorkeyMismatch'
-                                    });
-                                }
-                            } else {
-                                // Logs even if registration will happen later
-                                postMessageCallback(ON_EVENT_PROCESSED, {
-                                    eventType: 'vendorkeyMismatch'
-                                });
-                            }
+                            sessionStartData = event.data;
                         }
                     }
         
@@ -123,9 +100,9 @@
                         if (event.data.uuid) {
                             payload = event.data.payload;
                             const eventData = {
-                                    adSessionId: event.data.adSessionId,
-                                    timestamp: event.data.timestamp,
-                                    type: stripEventString(event.data.type),
+                                adSessionId: event.data.adSessionId,
+                                timestamp: event.data.timestamp,
+                                type: stripEventString(event.data.type),
                             }
                             if (payload) {
                                 eventData.data = payload;
@@ -169,15 +146,7 @@
                      * @param {function} vendorKey optional param to attribute given vendor key to sessionObserver
                      */
                     this.registerSessionObserver = function(functionToExecute, vendorKey) {
-                        if (!vendorKey) {
-                            vendorKey = DEFAULT_VENDOR_KEY;
-                        }
-
-                        if (!sessionObserversMap[vendorKey]) {
-                            sessionObserversMap[vendorKey] = [];
-                        }
-
-                        sessionObserversMap[vendorKey].push(functionToExecute);
+                        sessionObservers.push(functionToExecute);
 
                         if (!sessionStartCalled) {
                             scriptVendor = vendorKey;
@@ -209,6 +178,11 @@
                     this.setClearTimeout = function() {}
                     this.setInterval = function() {}
                     this.clearInterval = function() {}
+
+                    let fnwhitelist = ['handleSessionStart'];
+                    this.get = function(name) {
+                        return fnwhitelist.indexOf(name) > -1 ? eval(name) : console.log('fn not gettable');
+                    }
                 }
         
                 /**

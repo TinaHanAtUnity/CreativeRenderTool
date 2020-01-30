@@ -1,14 +1,14 @@
 import { OMIDEventBridge, IOMIDEventHandler } from 'Ads/Views/OpenMeasurement/OMIDEventBridge';
 import { Core } from 'Core/__mocks__/Core';
 import { AdMobCampaign } from 'AdMob/Models/__mocks__/AdMobCampaign';
-import { OpenMeasurementMock, OpenMeasurement } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import { OpenMeasurementMockVast, OpenMeasurementVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
 
 describe('OmidEventBridge', () => {
 
     let omidEventBridge: OMIDEventBridge;
     let handler: IOMIDEventHandler;
 
-    let omInstance: OpenMeasurementMock;
+    let omInstance: OpenMeasurementMockVast;
 
     const iframe: HTMLIFrameElement = document.createElement('iframe');
     Object.defineProperty(iframe, 'contentWindow', {
@@ -25,7 +25,7 @@ describe('OmidEventBridge', () => {
         const core = new Core();
         const campaign = new AdMobCampaign();
 
-        omInstance = new OpenMeasurement();
+        omInstance = new OpenMeasurementVast();
         jest.spyOn(Date, 'now').mockImplementation(() => 1000);
 
         omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign);

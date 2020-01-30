@@ -29,6 +29,9 @@ if [ $BRANCH == 2.0.6 ]; then
 elif [ $BRANCH == 3.0.1 ]; then
     deploy_branch $BRANCH
     BRANCH='3.0.1-rc2'
+elif [ $BRANCH == 3.4.0 ]; then
+    deploy_branch $BRANCH
+    BRANCH='3.4.2'
 elif [ $BRANCH == master ]; then
     BRANCH='development'
 fi
