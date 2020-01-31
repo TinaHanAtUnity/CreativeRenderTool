@@ -255,7 +255,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     */
     public sessionStart(sessionEvent: ISessionEvent) {
         this._sessionStartEventData = sessionEvent;
-
         this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
