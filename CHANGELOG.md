@@ -1,3 +1,8 @@
+# Pending
+
+* Open Measurement: Add volume change event for admob ads [#13048](https://github.com/Applifier/unity-ads-webview/pull/13048)
+* Add GameID 3427556 to Load Whitelist [#13108](https://github.com/Applifier/unity-ads-webview/pull/13108)
+
 # Thu Jan 30 21:26:04 UTC 2020
 
 * Open Measurement - Log When Admob Session Start Observer is Called [#13081](https://github.com/Applifier/unity-ads-webview/pull/13081/files)
