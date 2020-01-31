@@ -221,6 +221,11 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     }
 
     public impression(impressionValues: IImpressionValues) {
+
+        if (this._vendorKey.startsWith('doubleclickbygoogle.com') && this._campaign instanceof AdMobCampaign) {
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMImpressions);
+        }
+
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_IMPRESSION, impressionValues);
     }
 
@@ -255,6 +260,11 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     */
     public sessionStart(sessionEvent: ISessionEvent) {
         this._sessionStartEventData = sessionEvent;
+
+        if (this._vendorKey.startsWith('doubleclickbygoogle.com') && this._campaign instanceof AdMobCampaign) {
+            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMStarts);
+        }
+
         this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
@@ -436,6 +446,10 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
             if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjected);
+            }
+
+            if (vendorKey.startsWith('doubleclickbygoogle.com') && this._campaign instanceof AdMobCampaign) {
+                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMInjections);
             }
 
             return Promise.resolve();
