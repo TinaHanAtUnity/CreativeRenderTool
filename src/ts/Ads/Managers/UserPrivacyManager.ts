@@ -20,6 +20,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
+import PrivacyWebUI from 'html/PrivacyWebUI.html';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -120,6 +121,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
     }
 
+    // todo: remove promise from return value
     public getPrivacyConfig(): Promise<PrivacyConfig> {
         let agreedOverAgeLimit = false;
         switch (this.getAgeGateChoice()) {
@@ -133,34 +135,26 @@ export class UserPrivacyManager {
                 agreedOverAgeLimit = false;
         }
 
-        // TODO: Remember to remove this when the Privacy WebView is bundled into the Ads WebView
-        const privacyUrl = TestEnvironment.get<string>('privacyUrl');
-        if (!privacyUrl) {
-            return Promise.reject(new Error('No privacy url'));
-        }
-
-        return this._request.get(privacyUrl).then((privacyHtml) => {
-            return new PrivacyConfig(PrivacySDKFlow,
-                {
-                    ads: this._userPrivacy.getPermissions().ads,
-                    external: this._userPrivacy.getPermissions().external,
-                    gameExp: this._userPrivacy.getPermissions().gameExp,
-                    agreedOverAgeLimit: agreedOverAgeLimit
-                },
-                {
-                    buildOsVersion: this._deviceInfo.getOsVersion(),
-                    platform: this._platform,
-                    userLocale: this._deviceInfo.getLanguage(),
-                    country: this._coreConfig.getCountry(),
-                    subCountry: this._coreConfig.getSubdivision(),
-                    privacyMethod: this._gamePrivacy.getMethod(),
-                    ageGateLimit: this._privacy.getAgeGateLimit(),
-                    legalFramework: this._privacy.getLegalFramework(),
-                    isCoppa: this._coreConfig.isCoppaCompliant(),
-                    apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined
-                },
-                privacyHtml.response);
-        });
+        return Promise.resolve(new PrivacyConfig(PrivacySDKFlow,
+            {
+                ads: this._userPrivacy.getPermissions().ads,
+                external: this._userPrivacy.getPermissions().external,
+                gameExp: this._userPrivacy.getPermissions().gameExp,
+                agreedOverAgeLimit: agreedOverAgeLimit
+            },
+            {
+                buildOsVersion: this._deviceInfo.getOsVersion(),
+                platform: this._platform,
+                userLocale: this._deviceInfo.getLanguage(),
+                country: this._coreConfig.getCountry(),
+                subCountry: this._coreConfig.getSubdivision(),
+                privacyMethod: this._gamePrivacy.getMethod(),
+                ageGateLimit: this._privacy.getAgeGateLimit(),
+                legalFramework: this._privacy.getLegalFramework(),
+                isCoppa: this._coreConfig.isCoppaCompliant(),
+                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined
+            },
+            PrivacyWebUI));
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
