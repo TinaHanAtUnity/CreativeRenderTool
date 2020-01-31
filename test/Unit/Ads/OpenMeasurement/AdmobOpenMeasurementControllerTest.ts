@@ -203,7 +203,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 });
             });
 
-            it('should send admob om impression pts metric if one verification exists', () => {
+            xit('should send admob om impression pts metric if one verification exists', () => {
 
                 const reportSpy = <sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent;
 
@@ -222,7 +222,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 });
             });
 
-            it('should send admob om impression pts metric for multiple om instances', () => {
+            xit('should send admob om impression pts metric for multiple om instances', () => {
 
                 const reportSpy = <sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent;
 
@@ -246,7 +246,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 });
             });
 
-            it('should call geometry change with impression adview and viewport', () => {
+            xit('should call geometry change with impression adview and viewport', () => {
                 const verificationResource = {
                     resourceUrl: 'http://scoot.com',
                     vendorKey: 'scoot',
@@ -258,7 +258,6 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     verificationParameters: 'scootage1'
                 };
                 omManager.injectVerificationResources([verificationResource, verificationResource1]);
-
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
                     sinon.assert.called(<sinon.SinonStub>omManager.geometryChange);
                     if (platform === Platform.ANDROID) {
