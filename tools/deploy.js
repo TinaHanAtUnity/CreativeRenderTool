@@ -17,7 +17,9 @@ const executeShell = (command) => {
     childProcess.execSync(command, (err, stdout, stderr) => {
         console.log(stdout);
         console.log(stderr);
-        // Should we immediately fail if stderr is written to?
+        if (stdout) {
+            throw new Error('Failed deployment');
+        }
     });
 };
 
