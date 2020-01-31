@@ -121,8 +121,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
     }
 
-    // todo: remove promise from return value
-    public getPrivacyConfig(): Promise<PrivacyConfig> {
+    public getPrivacyConfig(): PrivacyConfig {
         let agreedOverAgeLimit = false;
         switch (this.getAgeGateChoice()) {
             case AgeGateChoice.YES:
@@ -135,7 +134,7 @@ export class UserPrivacyManager {
                 agreedOverAgeLimit = false;
         }
 
-        return Promise.resolve(new PrivacyConfig(PrivacySDKFlow,
+        return new PrivacyConfig(PrivacySDKFlow,
             {
                 ads: this._userPrivacy.getPermissions().ads,
                 external: this._userPrivacy.getPermissions().external,
@@ -154,7 +153,7 @@ export class UserPrivacyManager {
                 isCoppa: this._coreConfig.isCoppaCompliant(),
                 apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined
             },
-            PrivacyWebUI));
+            PrivacyWebUI);
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {

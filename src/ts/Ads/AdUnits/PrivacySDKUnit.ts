@@ -68,28 +68,26 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
 
     public show(options: unknown): Promise<void> {
         this._showing = true;
-        return this._privacyManager.getPrivacyConfig().then((privacyConfig) => {
-            this._privacyConfig = privacyConfig;
-            this._unityPrivacyView.setPrivacyConfig(privacyConfig);
+        this._privacyConfig = this._privacyManager.getPrivacyConfig();
+        this._unityPrivacyView.setPrivacyConfig(this._privacyConfig);
 
-            return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, this._useTransparency, true, false, options).then(() => {
-                const donePromise = new Promise<void>((resolve) => {
-                    this._donePromiseResolve = resolve;
-                });
-                this._adUnitContainer.addEventHandler(this);
-                this._unityPrivacyView.render();
-                document.body.appendChild(this._unityPrivacyView.container());
-
-                this._unityPrivacyView.show();
-
-                if (this._privacySDK.isAgeGateEnabled()) {
-                    PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
-                } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-                    PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
-                }
-
-                return donePromise;
+        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, this._useTransparency, true, false, options).then(() => {
+            const donePromise = new Promise<void>((resolve) => {
+                this._donePromiseResolve = resolve;
             });
+            this._adUnitContainer.addEventHandler(this);
+            this._unityPrivacyView.render();
+            document.body.appendChild(this._unityPrivacyView.container());
+
+            this._unityPrivacyView.show();
+
+            if (this._privacySDK.isAgeGateEnabled()) {
+                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
+            } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+            }
+
+            return donePromise;
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Privacy view ' + e);
             this.closePrivacy();
@@ -188,10 +186,9 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
 
         this.setConsent({
-                ... userSettings.user,
-                profiling: false
+                ... userSettings.user, // todo: do not pass the raw returned object to Ads permissions object
             },
-            GDPREventAction.CONSENT_SAVE_CHOICES,
+            GDPREventAction.CONSENT_SAVE_CHOICES, // todo: review the correct actions for each case and set them correctly
             GDPREventSource.USER);
 
         if (userSettings.user.agreedOverAgeLimit) {
