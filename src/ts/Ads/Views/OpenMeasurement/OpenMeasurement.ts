@@ -318,6 +318,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         }
 
         if (eventType === 'loadError') {
+            ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMInjectionFailure);
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
         }
 
