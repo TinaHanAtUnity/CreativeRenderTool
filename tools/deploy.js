@@ -17,7 +17,7 @@ const executeShell = (command) => {
     childProcess.execSync(command, (err, stdout, stderr) => {
         console.log(stdout);
         console.log(stderr);
-        if (stdout) {
+        if (stderr) {
             throw new Error('Failed deployment');
         }
     });
