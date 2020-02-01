@@ -16,6 +16,7 @@ import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasure
 import { assert } from 'chai';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -203,30 +204,60 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 });
             });
 
-            xit('should send admob om impression pts metric if one verification exists', () => {
+            it('should send admob om impression pts metric if one verification exists', () => {
 
                 const reportSpy = <sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent;
 
-                const verificationResource = {
+                const verificationResource0 = {
                     resourceUrl: 'http://scoot.com',
                     vendorKey: 'scoot',
                     verificationParameters: 'scootage'
                 };
 
-                omManager.injectVerificationResources([verificationResource]);
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scoot');
+                sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
+
+                omManager.setupOMInstance(openMeasurement0, verificationResource0);
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.calledTwice(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
-                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
-                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                    sinon.assert.callCount(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 1);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_impression');
                 });
             });
 
-            xit('should send admob om impression pts metric for multiple om instances', () => {
+            it('should send admob om impression pts metric for multiple om instances', () => {
 
                 const reportSpy = <sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent;
 
-                const verificationResource = {
+                const verificationResource0 = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+                const verificationResource1 = {
+                    resourceUrl: 'http://scoot1.com',
+                    vendorKey: 'doubleclickbygoogle.com.booyah',
+                    verificationParameters: 'scootage1'
+                };
+
+                const openMeasurement0 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage');
+                const openMeasurement1 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage1');
+                sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
+                sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
+
+                omManager.setupOMInstance(openMeasurement0, verificationResource0);
+                omManager.setupOMInstance(openMeasurement1, verificationResource1);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.callCount(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 3);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_impression');
+                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                    assert.equal(reportSpy.getCall(2).args[0], 'doubleclick_om_impressions');
+                });
+            });
+
+            it('should call geometry change with impression adview and viewport', () => {
+                const verificationResource0 = {
                     resourceUrl: 'http://scoot.com',
                     vendorKey: 'scoot',
                     verificationParameters: 'scootage'
@@ -236,28 +267,15 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     vendorKey: 'scoot1',
                     verificationParameters: 'scootage1'
                 };
-                omManager.injectVerificationResources([verificationResource, verificationResource1]);
 
-                return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.calledThrice(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent);
-                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
-                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
-                    assert.equal(reportSpy.getCall(2).args[0], 'admob_om_impression');
-                });
-            });
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage');
+                const openMeasurement1 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage1');
+                sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
+                sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
 
-            xit('should call geometry change with impression adview and viewport', () => {
-                const verificationResource = {
-                    resourceUrl: 'http://scoot.com',
-                    vendorKey: 'scoot',
-                    verificationParameters: 'scootage'
-                };
-                const verificationResource1 = {
-                    resourceUrl: 'http://scoot1.com',
-                    vendorKey: 'scoot1',
-                    verificationParameters: 'scootage1'
-                };
-                omManager.injectVerificationResources([verificationResource, verificationResource1]);
+                omManager.setupOMInstance(openMeasurement0, verificationResource0);
+                omManager.setupOMInstance(openMeasurement1, verificationResource1);
+
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
                     sinon.assert.called(<sinon.SinonStub>omManager.geometryChange);
                     if (platform === Platform.ANDROID) {
