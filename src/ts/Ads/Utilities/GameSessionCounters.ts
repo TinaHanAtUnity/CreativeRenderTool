@@ -1,5 +1,6 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IGameSessionCounters {
@@ -39,8 +40,8 @@ export class GameSessionCounters {
             this._campaignStartCounter[campaignId] = 1;
         }
 
-        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
-            const targetGameId = campaign.getGameId();
+        const targetGameId = this.getTargetGameId(campaign);
+        if (targetGameId) {
             if (this._targetStartCounter[targetGameId]) {
                 let targetStartCount = this._targetStartCounter[targetGameId];
                 this._targetStartCounter[targetGameId] = ++targetStartCount;
@@ -61,8 +62,8 @@ export class GameSessionCounters {
             this._campaignViewCounter[campaignId] = 1;
         }
 
-        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
-            const targetGameId = campaign.getGameId();
+        const targetGameId = this.getTargetGameId(campaign);
+        if (targetGameId) {
             if (this._targetViewCounter[targetGameId]) {
                 let targetViewCount = this._targetViewCounter[targetGameId];
                 this._targetViewCounter[targetGameId] = ++targetViewCount;
@@ -87,6 +88,17 @@ export class GameSessionCounters {
             viewsPerTarget: { ...this._targetViewCounter },
             latestCampaignsStarts: { ...this._latestCampaignsStarts }
         };
+    }
+
+    private static getTargetGameId(campaign: Campaign): number | undefined {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+            return campaign.getGameId();
+        }
+        let targetGameId;
+        if (campaign instanceof MRAIDCampaign) {
+            targetGameId = campaign.getTargetGameId();
+        }
+        return targetGameId;
     }
 
     private static _adRequestCount: number = 0;
