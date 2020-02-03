@@ -1,7 +1,6 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IGameSessionCounters {
     adRequests: number;
