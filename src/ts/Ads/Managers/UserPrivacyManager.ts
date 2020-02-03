@@ -18,6 +18,7 @@ import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { PrivacySDKTest } from 'Core/Models/ABGroup';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
@@ -347,16 +348,16 @@ export class UserPrivacyManager {
         return methodChangedSinceConsent || versionUpdatedSinceConsent;
     }
 
-    public useLegacyPrivacy(): boolean {
-        return TestEnvironment.get<boolean>('legacyPrivacy');
-    }
-
     public getLegalFramework(): LegalFramework {
         return this._privacy.getLegalFramework();
     }
 
     public isDataRequestEnabled(): boolean {
         return this._privacy.getLegalFramework() === LegalFramework.CCPA;
+    }
+
+    public isPrivacySDKTestActive(): boolean {
+        return TestEnvironment.get('forceprivacysdk') || (PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI');
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {

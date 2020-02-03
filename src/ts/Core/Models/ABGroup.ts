@@ -75,3 +75,4 @@ export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new DisabledABTest();
+export const PrivacySDKTest = new DisabledABTest();

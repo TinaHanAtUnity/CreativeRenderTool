@@ -85,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, AdmobAdapterV1 } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, AdmobAdapterV1, PrivacySDKTest } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -380,20 +380,7 @@ export class Ads implements IAds {
         this._showingPrivacy = true;
 
         let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
-        if (this.PrivacyManager.useLegacyPrivacy()) {
-            const consentAdUnitParams = {
-                abGroup: this._core.Config.getAbGroup(),
-                platform: this._core.NativeBridge.getPlatform(),
-                privacyManager: this.PrivacyManager,
-                adUnitContainer: this.Container,
-                adsConfig: this.Config,
-                core: this._core.Api,
-                deviceInfo: this._core.DeviceInfo,
-                privacySDK: this.PrivacySDK
-            };
-
-            privacyAdUnit = new PrivacyUnit(consentAdUnitParams);
-        } else {
+        if(this.PrivacyManager.isPrivacySDKTestActive()) {
             const privacyAdUnitParams = {
                 requestManager: this._core.RequestManager,
                 abGroup: this._core.Config.getAbGroup(),
@@ -408,6 +395,19 @@ export class Ads implements IAds {
             };
 
             privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
+        } else {
+            const consentAdUnitParams = {
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK
+            };
+
+            privacyAdUnit = new PrivacyUnit(consentAdUnitParams);
         }
 
         return privacyAdUnit.show(options);
