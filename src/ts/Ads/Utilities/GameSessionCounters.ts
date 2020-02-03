@@ -91,7 +91,7 @@ export class GameSessionCounters {
     }
 
     private static getTargetGameId(campaign: Campaign): number | undefined {
-        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+        if (campaign instanceof PerformanceCampaign) {
             return campaign.getGameId();
         }
         let targetGameId;
