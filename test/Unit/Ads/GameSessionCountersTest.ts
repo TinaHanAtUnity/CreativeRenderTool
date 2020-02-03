@@ -7,7 +7,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 describe('GameSessionCountersTest', () => {
 
     const videoCampaign = TestFixtures.getCampaign();
-    const cometPlayableCampaign = TestFixtures.getExtendedMRAIDCampaign();
+    const cometPlayableCampaign = TestFixtures.getPerformanceMRAIDCampaign();
     let clock: sinon.SinonFakeTimers;
 
     beforeEach(() => {
