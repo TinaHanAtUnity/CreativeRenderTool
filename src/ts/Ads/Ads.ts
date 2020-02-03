@@ -380,7 +380,7 @@ export class Ads implements IAds {
         this._showingPrivacy = true;
 
         let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
-        if(this.PrivacyManager.isPrivacySDKTestActive()) {
+        if (this.PrivacyManager.isPrivacySDKTestActive()) {
             const privacyAdUnitParams = {
                 requestManager: this._core.RequestManager,
                 abGroup: this._core.Config.getAbGroup(),
