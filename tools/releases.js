@@ -2,9 +2,9 @@ const map = require('../webview.version.map.json');
 
 module.exports = {
     // Used in generate_config.js, purge.js, and deploy.js
-    // Returns true if the input branch exists as an element in the native versions
+    // Returns the webview/native version element if found, otherwise returns undefined
     getReleaseVersion: function(branch) {
-        const isReleaseBranch = (element, index, array) => {
+        const isReleaseBranch = (element) => {
             return element.native.includes(branch);
         };
 
