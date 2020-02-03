@@ -10,6 +10,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Url } from 'Core/Utilities/Url';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
@@ -27,6 +28,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         let metaDataManager: MetaDataManager;
         let request: RequestManager;
         let configManager: ConfigManager;
+        let requestGetStub: sinon.SinonStub;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -47,7 +49,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     headers: []
                 };
                 configPromise = Promise.resolve(nativeResponse);
-                sinon.stub(request, 'get').returns(configPromise);
+                requestGetStub = sinon.stub(request, 'get').returns(configPromise);
             });
 
             it('calling fetch should return configuration', () => {
@@ -56,6 +58,19 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
                 return configPromise.then((configuration) => {
                     assert.isNotNull(configuration);
+                });
+            });
+
+            it('add the expected query parameters to the URL', () => {
+                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
+                configPromise = configManager.getConfig();
+
+                return configPromise.then((configuration) => {
+                    assert.isNotNull(configuration);
+                    const url = requestGetStub.firstCall.args[0];
+                    assert.equal(Url.getQueryParameter(url, 'connectionType'), 'cellular');
+                    assert.equal(Url.getQueryParameter(url, 'screenWidth'), '567');
+                    assert.equal(Url.getQueryParameter(url, 'screenHeight'), '1234');
                 });
             });
         });

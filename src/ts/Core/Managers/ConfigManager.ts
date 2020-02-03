@@ -60,10 +60,13 @@ export class ConfigManager {
             return Promise.resolve(this._rawConfig);
         } else {
             return Promise.all([
+                this._deviceInfo.getConnectionType(),
+                this._deviceInfo.getScreenHeight(),
+                this._deviceInfo.getScreenWidth(),
                 this._metaDataManager.fetch(FrameworkMetaData),
                 this._metaDataManager.fetch(AdapterMetaData),
                 this.fetchGamerToken()
-            ]).then(([framework, adapter, storedGamerToken]) => {
+            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken]) => {
                 let gamerToken: string | undefined;
 
                 if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
@@ -74,7 +77,7 @@ export class ConfigManager {
                     this.deleteGamerToken();
                 }
 
-                const url: string = this.createConfigUrl(framework, adapter, gamerToken);
+                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter, gamerToken);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -108,7 +111,7 @@ export class ConfigManager {
         }
     }
 
-    private createConfigUrl(framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -129,9 +132,9 @@ export class ConfigManager {
             osVersion: this._deviceInfo.getOsVersion(),
             deviceModel: this._deviceInfo.getModel(),
             language: this._deviceInfo.getLanguage(),
-            connectionType: this._deviceInfo.getConnectionType(),
-            screenHeight: this._deviceInfo.getScreenHeight(),
-            screenWidth: this._deviceInfo.getScreenWidth(),
+            connectionType: connectionType,
+            screenHeight: screenHeight,
+            screenWidth: screenWidth,
             test: this._clientInfo.getTestMode(),
             gamerToken: gamerToken,
             analyticsUserId: this._unityInfo.getAnalyticsUserId(),

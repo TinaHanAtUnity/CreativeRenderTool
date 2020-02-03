@@ -36,7 +36,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 onAFMAResolveOpenableIntents: sinon.spy(),
                 onAFMATrackingEvent: sinon.spy(),
                 onAFMAClickSignalRequest: sinon.spy(),
-                onAFMAUserSeeked: sinon.spy()
+                onAFMAUserSeeked: sinon.spy(),
+                onVolumeChange: sinon.spy()
             };
             afmaBridge = new AFMABridge(core, handler);
             iframe = document.createElement('iframe');
@@ -147,6 +148,12 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }, {
                 event: AFMAEvents.USER_SEEKED,
                 verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAUserSeeked)
+            }, {
+                event: AFMAEvents.VOLUME_CHANGE,
+                data: {
+                    volume: 1
+                },
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onVolumeChange, data.volume)
             }];
 
             for (const test of tests) {

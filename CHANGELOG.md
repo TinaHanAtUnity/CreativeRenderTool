@@ -1,3 +1,14 @@
+# Sat Feb  1 01:32:06 UTC 2020
+
+* Open Measurement: Add volume change event for admob ads [#13048](https://github.com/Applifier/unity-ads-webview/pull/13048)
+* Add GameID 3427556 to Load Whitelist [#13108](https://github.com/Applifier/unity-ads-webview/pull/13108)
+* Open Measurement - Add Temporary Metrics for DoubleClick Admob [#13110](https://github.com/Applifier/unity-ads-webview/pull/13110)
+
+# Thu Jan 30 21:26:04 UTC 2020
+
+* Open Measurement - Log When Admob Session Start Observer is Called [#13081](https://github.com/Applifier/unity-ads-webview/pull/13081/files)
+* Fix New Parameters in Ads Configuration Request [#13079](https://github.com/Applifier/unity-ads-webview/pull/13079)
+
 # Wed Jan 29 00:59:44 UTC 2020
 
 * Adds Unknown Enum on CacheError [#13052](https://github.com/Applifier/unity-ads-webview/pull/13052)
