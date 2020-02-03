@@ -14,13 +14,12 @@ if (releaseVersion) {
 }
 
 const executeShell = (command) => {
-    childProcess.execSync(command, (err, stdout, stderr) => {
-        console.log(stdout);
-        console.log(stderr);
-        if (stderr) {
-            throw new Error('Failed deployment');
-        }
-    });
+    try {
+        return childProcess.execSync(command).toString();
+    } catch (error) {
+        console.log(error.stderr.toString());
+        throw new Error('Failed deployment');
+    }
 };
 
 return branchList.forEach(branch => {

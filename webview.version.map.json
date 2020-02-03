@@ -42,7 +42,7 @@
         },
         {
             "webview": "2.0.6",
-            "native": ["2.0.6"]
+            "native": ["2.0.6", "master"]
         },
         {
             "webview": "2.0.7",
