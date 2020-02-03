@@ -186,7 +186,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
 
         this.setConsent({
-                ... userSettings.user, // todo: do not pass the raw returned object to Ads permissions object
+                ... userSettings.user // todo: do not pass the raw returned object to Ads permissions object
             },
             GDPREventAction.CONSENT_SAVE_CHOICES, // todo: review the correct actions for each case and set them correctly
             GDPREventSource.USER);
