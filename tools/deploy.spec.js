@@ -3,22 +3,33 @@ const childProcess = require('child_process');
 
 describe('deploy', () => {
     describe('deployBranch', () => {
-
-        beforeEach(() => {
-            // Never allow the actual commands to be ran during tests
-            childProcess.execSync = jest.fn();
-        });
-
-        describe('calling with webview branch: master', () => {
-
-            let branch = 'master'
-
+        describe('calling with webview branch 3.0.1', () => {
             describe('when execSync does not throw error', () => {
                 beforeEach(() => {
-                    return deploy.deployBranch(branch);
+                    return deploy.deployBranch('3.0.1');
                 });
     
-                it('should call execSync', () => {
+                it('should call execSync twice', () => {
+                    expect(childProcess.execSync).toBeCalledTimes(2);
+                });
+    
+                it('should call execSync the first time with the proper commands', () => {
+                    expect(childProcess.execSync.mock.calls[0]).toEqual(['( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/3.0.1 ) && ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/3.0.1 ) && aws s3 sync deploy s3://unityads-cdn-origin/webview/3.0.1/ --acl public-read']);
+                });
+
+                it('should call execSync the second time with the proper commands', () => {
+                    expect(childProcess.execSync.mock.calls[1]).toEqual(['( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/3.0.1-rc2 ) && ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/3.0.1-rc2 ) && aws s3 sync deploy s3://unityads-cdn-origin/webview/3.0.1-rc2/ --acl public-read']);
+                });
+            });
+        });
+
+        describe('calling with webview branch master', () => {
+            describe('when execSync does not throw error', () => {
+                beforeEach(() => {
+                    return deploy.deployBranch('master');
+                });
+    
+                it('should call execSync once', () => {
                     expect(childProcess.execSync).toBeCalledTimes(1);
                 });
     
@@ -33,7 +44,7 @@ describe('deploy', () => {
                 });
     
                 it('should throw error', () => {
-                    expect(() => deploy.deployBranch(branch)).toThrowError('Failed Deployment');
+                    expect(() => deploy.deployBranch('master')).toThrowError('Failed Deployment');
                 });
             });
         });
