@@ -5,6 +5,7 @@ describe('deploy', () => {
     describe('deployBranch', () => {
 
         beforeEach(() => {
+            // Never allow the actual commands to be ran during tests
             childProcess.execSync = jest.fn();
         });
 
