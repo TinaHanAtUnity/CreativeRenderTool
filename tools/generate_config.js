@@ -15,13 +15,8 @@ const output = process.env.OUTPUT;
 if (!process.env.BRANCH) {
     throw new Error('Missing BRANCH env parameter');
 }
-let branch = process.env.BRANCH;
 
-const releaseVersion = releases.getReleaseVersion(branch);
-
-if (releaseVersion) {
-    branch = releaseVersion.webview;
-}
+const branch = releases.getSupportedWebviewVersion(process.env.BRANCH);
 
 if (!process.env.COMMIT_ID) {
     throw new Error('Missing COMMIT_ID env parameter');

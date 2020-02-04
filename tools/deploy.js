@@ -8,12 +8,7 @@ module.exports = {
             throw new Error('Invalid branch: ' + branch);
         }
 
-        let branchList = [branch];
-        const releaseVersion = releases.getReleaseVersion(branch);
-
-        if (releaseVersion) {
-            branchList = releaseVersion.native;
-        }
+        const branchList = releases.getSupportedNativeVersions(branch);
 
         const executeShell = (command) => {
             try {
