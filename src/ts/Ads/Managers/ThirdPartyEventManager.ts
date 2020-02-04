@@ -7,6 +7,8 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -18,7 +20,8 @@ export enum ThirdPartyEventMacro {
     SDK_VERSION = '%SDK_VERSION%',
     GAMER_SID = '%GAMER_SID%',
     OM_ENABLED = '%25OM_ENABLED%25',
-    OM_VENDORS = '%25OM_VENDORS%25'
+    OM_VENDORS = '%25OM_VENDORS%25',
+    OMIDPARTNER = '%5BOMIDPARTNER%5D'
 }
 
 export enum TrackingEvent {
@@ -110,8 +113,10 @@ export class ThirdPartyEventManager {
                 headers.push(['User-Agent', navigator.userAgent]);
             }
         }
-
+        //console.log(url);
         url = this.replaceTemplateValuesAndEncodeUrl(url);
+        //url = this.replaceVastTrackingMacro(url);
+        console.log(event +' '+ url);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
@@ -175,10 +180,18 @@ export class ThirdPartyEventManager {
             for (const key in this._templateValues) {
                 if (this._templateValues.hasOwnProperty(key)) {
                     url = url.replace(key, this._templateValues[key]);
+                    url = this.replaceTiimeStampMacro(url);
                 }
             }
         }
 
         return Url.encode(url);
+    }
+
+    private replaceTiimeStampMacro(url: string): string {
+        const time =  new Date();
+        const timestamp = time.toISOString();
+
+        return MacroUtil.replaceMacro(url, {'%5BTIMESTAMP%5D': timestamp});
     }
 }
