@@ -69,10 +69,10 @@ export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
 export const AdmobAdapterV1 = new ABTest(5, 6);
+export const PrivacySDKTest = new ABTest(16);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new DisabledABTest();
-export const PrivacySDKTest = new DisabledABTest();
