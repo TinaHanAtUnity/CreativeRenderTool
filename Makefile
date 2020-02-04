@@ -393,7 +393,7 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	rsync -r deploy-china/release deploy-china/$(COMMIT_ID)
 	rsync -r deploy-china/test deploy-china/$(COMMIT_ID)
 
-	node tools/deploy.js && node tools/purge.js
+	node -e 'require("./tools/deploy").deployBranch($(BRANCH))' && node tools/purge.js
 else
 	echo 'Skipping deployment for pull requests'
 endif

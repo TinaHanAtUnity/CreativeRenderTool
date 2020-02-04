@@ -1,29 +1,30 @@
 const releases = require('./releases');
 const childProcess = require('child_process');
 
-let branch = process.env.TRAVIS_BRANCH;
-if (!branch) {
-    throw new Error('Invalid branch: ' + branch);
-}
+module.exports = {
+    deployBranch: function (branch) {
 
-let branchList = [branch];
-const releaseVersion = releases.getReleaseVersion(branch);
+        if (!branch) {
+            throw new Error('Invalid branch: ' + branch);
+        }
 
-if (releaseVersion) {
-    branchList = releaseVersion.native;
-}
+        let branchList = [branch];
+        const releaseVersion = releases.getReleaseVersion(branch);
 
-const executeShell = (command) => {
-    try {
-        return childProcess.execSync(command).toString();
-    } catch (error) {
-        console.log(error.stderr.toString());
-        throw new Error('Failed deployment');
+        if (releaseVersion) {
+            branchList = releaseVersion.native;
+        }
+
+        const executeShell = (command) => {
+            try {
+                return childProcess.execSync(command);
+            } catch (error) {
+                throw new Error('Failed Deployment');
+            }
+        };
+
+        return branchList.forEach(branch => {
+            executeShell(`( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/${branch} ) && ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/${branch} ) && aws s3 sync deploy s3://unityads-cdn-origin/webview/${branch}/ --acl public-read`);
+        });
     }
-};
-
-return branchList.forEach(branch => {
-    executeShell(`( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/${branch} )`);
-    executeShell(`( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/${branch} )`);
-    executeShell(`aws s3 sync deploy s3://unityads-cdn-origin/webview/${branch}/ --acl public-read`);    
-});
+}
