@@ -74,15 +74,8 @@ describe('GameSessionCountersTest', () => {
         assert.equal(countersObj.viewsPerTarget[videoCampaign.getGameId()], 1);
         assert.equal(countersObj.startsPerCampaign[cometPlayableCampaign.getId()], 1);
         assert.equal(countersObj.viewsPerCampaign[cometPlayableCampaign.getId()], 1);
-        const cometPlayableTargetGameId = cometPlayableCampaign.getTargetGameId();
-        if (cometPlayableTargetGameId) {
-            // The target game event counter maps have string keys although the target game IDs are in practice numbers.
-            // The map key types cannot be changed in SDK as ads-brand has a schema that assumes strings.
-            // Instead we need to do an explicit existence check here
-            // as MRAIDCampaign.getTargetGameId() can return undefined where PerformanceCampaign.getGameId() cannot.
-            assert.equal(countersObj.startsPerTarget[cometPlayableTargetGameId], 1);
-            assert.equal(countersObj.viewsPerTarget[cometPlayableTargetGameId], 1);
-        }
+        assert.equal(countersObj.startsPerTarget[cometPlayableCampaign.getTargetGameId()!], 1);
+        assert.equal(countersObj.viewsPerTarget[cometPlayableCampaign.getTargetGameId()!], 1);
 
         latestCampaignStartTimestamp = countersObj.latestCampaignsStarts[cometPlayableCampaign.getId()];
         assert.equal(Object.keys(countersObj.latestCampaignsStarts).length, 2, 'latestsCampaign, new campaign start was not recorded correctly');
