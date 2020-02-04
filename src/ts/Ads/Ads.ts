@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric, AdUnitTracking, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -92,8 +92,6 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { AdUnitTracker } from 'Ads/Managers/AdUnitTracker';
-import { TrackableRefreshManager } from 'Ads/Managers/TrackableRefreshManager';
 
 export class Ads implements IAds {
 
@@ -103,7 +101,7 @@ export class Ads implements IAds {
     public readonly InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
 
     public readonly SessionManager: SessionManager;
-    public MissedImpressionManager: MissedImpressionManager;
+    public readonly MissedImpressionManager: MissedImpressionManager;
     public readonly ContentTypeHandlerManager: ContentTypeHandlerManager;
     public readonly ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 
@@ -125,9 +123,6 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
     private _core: ICore;
-    private _adUnitTracker: AdUnitTracker;
-    private _trackableRefreshManager: TrackableRefreshManager;
-    private _mediationName: string;
 
     public BannerModule: BannerModule;
     public Monetization: Monetization;
@@ -177,10 +172,9 @@ export class Ads implements IAds {
             this.Container = new ViewController(this._core.Api, this.Api, <IosDeviceInfo> this._core.DeviceInfo, this._core.FocusManager, this._core.ClientInfo);
         }
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
+        this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
-
-        this._mediationName = 'unknown';
     }
 
     public initialize(): Promise<void> {
@@ -191,12 +185,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.configureMediationManager();
         }).then(() => {
-            return this.fetchMediationName();
-        }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
-            this.MissedImpressionManager = new MissedImpressionManager(this._core.Api, this._mediationName, this._core.ClientInfo.getSdkVersionName());
-
             this.SessionManager.setGameSessionId(gameSessionId);
             this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
@@ -275,14 +265,7 @@ export class Ads implements IAds {
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
-            this.configureAdUnitTracker();
             this.configureRefreshManager();
-
-            if (this._trackableRefreshManager) {
-                this._trackableRefreshManager.setRefreshManager(this.RefreshManager);
-                this.RefreshManager = this._trackableRefreshManager;
-            }
-
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
             promo.initialize();
@@ -346,19 +329,6 @@ export class Ads implements IAds {
         return Promise.resolve();
     }
 
-    private fetchMediationName(): Promise<void> {
-        return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-            if (mediation) {
-                const mediationName = mediation.getName();
-                if (mediationName) {
-                    this._mediationName = mediationName;
-                }
-            }
-        }).catch(() => {
-            // ingore error
-        });
-    }
-
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
         if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
@@ -393,10 +363,6 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
-
-        if (this._adUnitTracker !== undefined) {
-            ProgrammaticTrackingService.reportMetricEvent(AdUnitTracking.ShowCall);
-        }
 
         if (this.isAttemptingToShowInBackground()) {
             ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.CampaignAttemptedShowInBackground);
@@ -715,13 +681,6 @@ export class Ads implements IAds {
 
         if (isOriginalLoad || isLoadV4 || isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad) {
             this._webViewEnabledLoad = true;
-        }
-    }
-
-    private configureAdUnitTracker(): void {
-        if (this._loadApiEnabled) {
-            this._trackableRefreshManager = new TrackableRefreshManager();
-            this._adUnitTracker = new AdUnitTracker(this._mediationName, this.Api.LoadApi, this._core.Api.Storage, this.Api.Listener, this._trackableRefreshManager);
         }
     }
 }
