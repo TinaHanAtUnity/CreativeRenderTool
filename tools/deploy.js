@@ -24,7 +24,8 @@ module.exports = {
         };
 
         return branchList.forEach(branch => {
-            executeShell(`( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/${branch} ) && ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/${branch} ) && aws s3 sync deploy s3://unityads-cdn-origin/webview/${branch}/ --acl public-read`);
+            const result = executeShell(`( cd deploy && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-prd/webview/${branch} ) && ( cd deploy-china && gsutil -m cp -r -z "html, json" -a public-read . gs://unity-ads-webview-cn-prd/webview/${branch} ) && aws s3 sync deploy s3://unityads-cdn-origin/webview/${branch}/ --acl public-read`);
+            console.log(result);
         });
     }
 }
