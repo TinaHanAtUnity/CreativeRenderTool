@@ -1,3 +1,7 @@
+# Pending
+
+* Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
+
 # Sat Feb  1 01:32:06 UTC 2020
 
 * Open Measurement: Add volume change event for admob ads [#13048](https://github.com/Applifier/unity-ads-webview/pull/13048)
