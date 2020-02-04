@@ -62,7 +62,7 @@ if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-const branchList = releases.getSupportedNativeVersions(branch);
+const branchList = releases.getNativeVersionsSupportedByBranch(branch);
 
 const commit = process.env.TRAVIS_COMMIT;
 if (!commit) {

@@ -20,15 +20,15 @@ describe('releases', () => {
         }
     ].forEach((test) => {
 
-        describe('getSupportedWebviewVersion', () => {
-            it(`should return ${test.getSupportedWebviewVersion} with input ${test.inputBranch}`, () => {
-                expect(releases.getSupportedWebviewVersion(test.inputBranch)).toEqual(test.expectedWebview);
+        describe('getTranslatedWebviewReleaseVersion', () => {
+            it(`should return ${test.getTranslatedWebviewReleaseVersion} with input ${test.inputBranch}`, () => {
+                expect(releases.getTranslatedWebviewReleaseVersion(test.inputBranch)).toEqual(test.expectedWebview);
             });
         });
 
-        describe('getSupportedNativeVersions', () => {
+        describe('getNativeVersionsSupportedByBranch', () => {
             it(`should return ${test.expectedNative.toString()} with input ${test.inputBranch}`, () => {
-                expect(releases.getSupportedNativeVersions(test.inputBranch)).toEqual(test.expectedNative);
+                expect(releases.getNativeVersionsSupportedByBranch(test.inputBranch)).toEqual(test.expectedNative);
             });
         });
 
