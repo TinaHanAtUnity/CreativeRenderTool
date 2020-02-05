@@ -74,7 +74,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             vastAdUnitParameters.om = omManager;
 
             // For brandv1 and brandv2 tracking
-            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, `${baseParams.campaign.isOMEnabled()}`);
+            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
             baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
         }
 
