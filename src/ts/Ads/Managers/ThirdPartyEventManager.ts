@@ -8,7 +8,6 @@ import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
-import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 enum ThirdPartyEventMethod {
     POST,
