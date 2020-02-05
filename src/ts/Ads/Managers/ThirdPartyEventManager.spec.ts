@@ -35,5 +35,18 @@ describe('ThirdPartyEventManagerTest', () => {
             thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
             expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&omidpartner=Unity3d/1.2.10', expect.anything(), expect.anything());
         });
+
+        it('should replace timestamp macro correctly', () => {
+            urlTemplate = 'http://foo.biz/123?timestamp=%5BTIMESTAMP%5D';
+            const date = new Date('2020');
+            const _GLOBAL: any = global;
+                const DATE_TO_USE = new Date('2020');
+                _GLOBAL.Date = jest.fn(() => date);
+            
+
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
+
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?timestamp=' + date.toISOString(), expect.anything(), expect.anything());
+        });
     });
 });

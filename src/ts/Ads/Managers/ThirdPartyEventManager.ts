@@ -189,8 +189,7 @@ export class ThirdPartyEventManager {
     }
 
     private replaceTiimeStampMacro(url: string): string {
-        const time =  new Date();
-        const timestamp = time.toISOString();
+        const timestamp = (new Date()).toISOString();
 
         return MacroUtil.replaceMacro(url, {'%5BTIMESTAMP%5D': timestamp});
     }
