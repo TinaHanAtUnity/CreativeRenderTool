@@ -1,4 +1,4 @@
-# Pending
+# Wed Feb  5 20:48:25 UTC 2020
 
 * Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
 * Update GameSessionCounters for Comet MRAID Playables [#13136](https://github.com/Applifier/unity-ads-webview/pull/13136)
