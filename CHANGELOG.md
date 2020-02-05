@@ -4,6 +4,8 @@
 * Update GameSessionCounters for Comet MRAID Playables [#13136](https://github.com/Applifier/unity-ads-webview/pull/13136)
 * Update UnityAds logo to SVG [#12817](https://github.com/Applifier/unity-ads-webview/pull/12817)
 * Fix AR.getSupportedVideoFormats Native Method [#13050](https://github.com/Applifier/unity-ads-webview/pull/13050)
+* Remove async/await in Production Code to Reduce Bundle Size [#13162](https://github.com/Applifier/unity-ads-webview/pull/13162)
+* Track Stored GamerToken Deletion on iOS [#13164](https://github.com/Applifier/unity-ads-webview/pull/13164)
 
 # Sat Feb  1 01:32:06 UTC 2020
 
