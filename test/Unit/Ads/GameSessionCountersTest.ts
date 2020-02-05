@@ -7,7 +7,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 describe('GameSessionCountersTest', () => {
 
     const videoCampaign = TestFixtures.getCampaign();
-    const cometPlayableCampaign = TestFixtures.getExtendedMRAIDCampaign();
+    const cometPlayableCampaign = TestFixtures.getPerformanceMRAIDCampaign();
     let clock: sinon.SinonFakeTimers;
 
     beforeEach(() => {
@@ -62,17 +62,20 @@ describe('GameSessionCountersTest', () => {
 
         clock.setSystemTime(Date.parse('2018-07-24T10:00:00.000Z'));
         GameSessionCounters.addStart(cometPlayableCampaign);
+        GameSessionCounters.addView(cometPlayableCampaign);
         countersObj = GameSessionCounters.getCurrentCounters();
         assert.equal(Object.keys(countersObj.startsPerCampaign).length, 2);
         assert.equal(countersObj.starts, 3);
         assert.equal(countersObj.adRequests, 2);
-        assert.equal(countersObj.views, 1);
+        assert.equal(countersObj.views, 2);
         assert.equal(countersObj.startsPerCampaign[videoCampaign.getId()], 2);
         assert.equal(countersObj.startsPerTarget[videoCampaign.getGameId()], 2);
         assert.equal(countersObj.viewsPerCampaign[videoCampaign.getId()], 1);
         assert.equal(countersObj.viewsPerTarget[videoCampaign.getGameId()], 1);
         assert.equal(countersObj.startsPerCampaign[cometPlayableCampaign.getId()], 1);
-        assert.equal(countersObj.viewsPerCampaign[cometPlayableCampaign.getId()], undefined);
+        assert.equal(countersObj.viewsPerCampaign[cometPlayableCampaign.getId()], 1);
+        assert.equal(countersObj.startsPerTarget[cometPlayableCampaign.getTargetGameId()!], 1);
+        assert.equal(countersObj.viewsPerTarget[cometPlayableCampaign.getTargetGameId()!], 1);
 
         latestCampaignStartTimestamp = countersObj.latestCampaignsStarts[cometPlayableCampaign.getId()];
         assert.equal(Object.keys(countersObj.latestCampaignsStarts).length, 2, 'latestsCampaign, new campaign start was not recorded correctly');

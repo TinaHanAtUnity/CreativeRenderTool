@@ -95,8 +95,8 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAnchor', [identifier]);
     }
 
-    public getSupportedVideoFormats(): Promise<IARVideoFormat[]> {
-        return this._nativeBridge.invoke<IARVideoFormat[]>(this._fullApiClassName, 'getSupportedVideoFormats');
+    public getSupportedVideoFormats(configName: string): Promise<IARVideoFormat[]> {
+        return this._nativeBridge.invoke<IARVideoFormat[]>(this._fullApiClassName, 'getSupportedVideoFormats', [configName]);
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {
