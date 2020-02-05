@@ -17,10 +17,10 @@ module.exports = {
 
     /**
      * Used in generate_config.js
-     * Returns a string of the translated webview version for the input branch if it exists
-     * If a translated version of the branch does not exist, then the input branch is returned
+     * Returns a string value of the webview version if the input branch exists in any supported native versions
+     * If the branch is not a supported native version, then the input branch is returned
      */
-    getTranslatedWebviewReleaseVersion: function(branch) {
+    getWebviewReleaseVersionForBranch: function(branch) {
         const isReleaseBranch = (element) => {
             return element.native.includes(branch);
         };

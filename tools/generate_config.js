@@ -16,7 +16,7 @@ if (!process.env.BRANCH) {
     throw new Error('Missing BRANCH env parameter');
 }
 
-const branch = releases.getTranslatedWebviewReleaseVersion(process.env.BRANCH);
+const branch = releases.getWebviewReleaseVersionForBranch(process.env.BRANCH);
 
 if (!process.env.COMMIT_ID) {
     throw new Error('Missing COMMIT_ID env parameter');

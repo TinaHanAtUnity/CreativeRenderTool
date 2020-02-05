@@ -20,9 +20,9 @@ describe('releases', () => {
         }
     ].forEach((test) => {
 
-        describe('getTranslatedWebviewReleaseVersion', () => {
-            it(`should return ${test.getTranslatedWebviewReleaseVersion} with input ${test.inputBranch}`, () => {
-                expect(releases.getTranslatedWebviewReleaseVersion(test.inputBranch)).toEqual(test.expectedWebview);
+        describe('getWebviewReleaseVersionForBranch', () => {
+            it(`should return ${test.getWebviewReleaseVersionForBranch} with input ${test.inputBranch}`, () => {
+                expect(releases.getWebviewReleaseVersionForBranch(test.inputBranch)).toEqual(test.expectedWebview);
             });
         });
 
