@@ -72,7 +72,8 @@ export enum VastMetric {
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-    CampaignAttemptedShowInBackground = 'ad_attempted_show_background'
+    CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
+    IOSDeleteStoredGamerToken = 'ios_delete_stored_gamer_token'
 }
 
 export enum LoadMetric {
