@@ -40,9 +40,7 @@ describe('ThirdPartyEventManagerTest', () => {
             urlTemplate = 'http://foo.biz/123?timestamp=%5BTIMESTAMP%5D';
             const date = new Date('2020');
             const _GLOBAL: any = global;
-                const DATE_TO_USE = new Date('2020');
-                _GLOBAL.Date = jest.fn(() => date);
-            
+            _GLOBAL.Date = jest.fn(() => date);
 
             thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
 

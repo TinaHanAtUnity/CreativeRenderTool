@@ -113,10 +113,8 @@ export class ThirdPartyEventManager {
                 headers.push(['User-Agent', navigator.userAgent]);
             }
         }
-        //console.log(url);
+
         url = this.replaceTemplateValuesAndEncodeUrl(url);
-        //url = this.replaceVastTrackingMacro(url);
-        console.log(event +' '+ url);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
