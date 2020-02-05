@@ -136,14 +136,14 @@ export class MetricInstance {
         }
     }
 
-    public async sendBatchedEvents(): Promise<void> {
+    public sendBatchedEvents(): Promise<void> {
         if (this._batchedEvents.length > 0) {
             const data = {
                 metrics: this._batchedEvents
             };
-            await this.postToDatadog(data, this.timingPath);
-            this._batchedEvents = [];
-            return;
+            return this.postToDatadog(data, this.timingPath).then(() => {
+                this._batchedEvents = [];
+            });
         }
         return Promise.resolve();
     }
