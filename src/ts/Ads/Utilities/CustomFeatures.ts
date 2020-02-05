@@ -183,4 +183,9 @@ export class CustomFeatures {
                creativeId === 'gg_bounzy'        ||
                creativeId === 'social_dc';
     }
+
+    public static isSupportedOMVendor(omVendor: string) {
+        return omVendor === 'IAS' ||
+               omVendor === 'integralads.com-omid';
+    }
 }
