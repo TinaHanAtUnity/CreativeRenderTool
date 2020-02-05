@@ -646,9 +646,9 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
-    public static getPerformanceMRAIDCampaign(customParams: Partial<ICampaign> = {}): PerformanceMRAIDCampaign {
-        const json = OnProgrammaticMraidUrlPlcCampaign;
-        return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
+    public static getPerformanceMRAIDCampaign(session?: Session): PerformanceMRAIDCampaign {
+        const json = OnCometMraidPlcCampaign;
+        return new PerformanceMRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getCompanionStaticVastCampaign(): VastCampaign {
