@@ -10,6 +10,7 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { Url } from 'Core/Utilities/Url';
+import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -76,6 +77,9 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             // For brandv1 and brandv2 tracking
             baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
             baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
+            if (baseParams.campaign.getSeatId() === 9078) {
+                ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMEnabledLiftOff);
+            }
         }
 
         return vastAdUnitParameters;
