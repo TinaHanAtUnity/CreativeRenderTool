@@ -35,6 +35,25 @@ describe('omid3p', () => {
         });
     });
 
+    describe('postback', () => {
+        beforeEach(() => {
+            eval(omid3p);
+            postMessageSpy = jest.fn();
+            window.postMessage = postMessageSpy;
+        });
+
+        it ('should postmessage to typescript with omid event', () => {
+            window.omid3p.postback('onEventProcessed', { eventType: 'loadError' });
+            expect(window.postMessage).toBeCalledWith({
+                type: 'omid', 
+                event: 'onEventProcessed',
+                data: {
+                    eventType: 'loadError'
+                }
+            }, '*');
+        });
+    });
+
     describe('session start', () => {
         beforeEach(() => {
             eval(omid3p);
