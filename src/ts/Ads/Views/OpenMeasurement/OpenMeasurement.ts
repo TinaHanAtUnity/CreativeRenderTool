@@ -471,7 +471,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
         const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
         if (adVerificationErrorURL) {
-            this.replaceVastTrackingMacro(adVerificationErrorURL);
+            this.replaceVastTrackingMacros(adVerificationErrorURL);
             this._request.get(adVerificationErrorURL);
         }
     }
@@ -487,9 +487,9 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         this._omIframe.setAttribute('srcdoc', dom.documentElement.outerHTML);
     }
 
-    private replaceVastTrackingMacro(url: string): string {
+    private replaceVastTrackingMacros(url: string): string {
         const timestamp =  (new Date()).toISOString();
 
-        return MacroUtil.replaceMacro(url, {'%5BOMIDPARTNER%5D': OMID_P, '%5BTIMESTAMP%5D': timestamp});
+        return MacroUtil.replaceMacro(url, {'[OMIDPARTNER]': OMID_P, '[TIMESTAMP]': timestamp, '[CACHEBUSTING]': '-1'});
     }
 }

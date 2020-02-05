@@ -31,20 +31,20 @@ describe('ThirdPartyEventManagerTest', () => {
         });
 
         it('should replace omidpartner macro correctly', () => {
-            urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&omidpartner=%5BOMIDPARTNER%5D';
+            urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&omidpartner=[OMIDPARTNER]';
             thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
             expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&omidpartner=Unity3d/1.2.10', expect.anything(), expect.anything());
         });
 
         it('should replace timestamp macro correctly', () => {
-            urlTemplate = 'http://foo.biz/123?timestamp=%5BTIMESTAMP%5D';
+            urlTemplate = 'http://foo.biz/123?timestamp=[TIMESTAMP]&cachebusting=[CACHEBUSTING]';
             const date = new Date('2020');
             const _GLOBAL: any = global;
             _GLOBAL.Date = jest.fn(() => date);
 
             thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
 
-            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?timestamp=' + date.toISOString(), expect.anything(), expect.anything());
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?timestamp=2020-01-01T00:00:00.000Z&cachebusting=-1', expect.anything(), expect.anything());
         });
     });
 });
