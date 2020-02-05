@@ -12,8 +12,7 @@ describe('omid3p', () => {
 
         beforeEach(() => {
             eval(omid3p);
-            postMessageSpy = jest.fn();
-            window.postMessage = postMessageSpy;
+            window.postMessage = jest.fn();
         });
 
         it('isSupported should return true', () => {
@@ -38,8 +37,7 @@ describe('omid3p', () => {
     describe('postback', () => {
         beforeEach(() => {
             eval(omid3p);
-            postMessageSpy = jest.fn();
-            window.postMessage = postMessageSpy;
+            window.postMessage = jest.fn();
         });
 
         it ('should postmessage to typescript with omid event', () => {
