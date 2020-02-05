@@ -325,12 +325,12 @@ let purgeTencent = (urlRoot) => {
 let purgeList = [];
 
 branchList.forEach((branch) => {
-    purgeList.push([
+    purgeList.push(
         purgeAkamai('/webview/' + branch),
         purgeHighwinds('/webview/' + branch),
         purgeAliBabaCloud('/webview/' + branch),
         purgeTencent('/webview/' + branch)
-    ]);
+    );
 });
 
 Promise.all(purgeList).then(() => {
