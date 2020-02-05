@@ -184,7 +184,7 @@ export class CustomFeatures {
                creativeId === 'social_dc';
     }
 
-    public static isSupportedOMVendor(omVendor: string) {
+    public static isIASVendor(omVendor: string | undefined) {
         return omVendor === 'IAS' ||
                omVendor === 'integralads.com-omid';
     }
