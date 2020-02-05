@@ -646,9 +646,9 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
-    public static getPerformanceMRAIDCampaign(customParams: Partial<ICampaign> = {}): PerformanceMRAIDCampaign {
-        const json = OnProgrammaticMraidUrlPlcCampaign;
-        return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
+    public static getPerformanceMRAIDCampaign(session?: Session): PerformanceMRAIDCampaign {
+        const json = OnCometMraidPlcCampaign;
+        return new PerformanceMRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getCompanionStaticVastCampaign(): VastCampaign {
@@ -1035,7 +1035,7 @@ export class TestFixtures {
             AdMobSignalFactory: new AdMobSignalFactory(platform, core.Api, api, core.ClientInfo, core.DeviceInfo, core.FocusManager),
             InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
-            MissedImpressionManager: new MissedImpressionManager(core.Api, 'test', ''),
+            MissedImpressionManager: new MissedImpressionManager(core.Api),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),

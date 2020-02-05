@@ -72,7 +72,8 @@ export enum VastMetric {
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-    CampaignAttemptedShowInBackground = 'ad_attempted_show_background'
+    CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
+    IOSDeleteStoredGamerToken = 'ios_delete_stored_gamer_token'
 }
 
 export enum LoadMetric {
@@ -123,19 +124,7 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-export enum AdUnitTracking {
-    ShowCall = 'ad_unit_showcall',
-    DuplicateLoadForPlacement = 'ad_unit_duplicate_load_for_placement',
-    PossibleDuplicateLoadForPlacement = 'ad_unit_possible_duplicate_load_for_placement',
-    InitialLoadRequest = 'ad_unit_initial_load_request',
-    AttemptToShowAd = 'ad_unit_attempt_to_show',
-    FailedToInvalidate = 'ad_unit_failed_to_invalidate',
-    MissedImpression = 'ad_unit_missed_impression',
-    MediationShowCall = 'ad_unit_mediation_show_call',
-    RealMissedImpression = 'ad_unit_real_missed_impression'
-}
-
-export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;
+export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 
