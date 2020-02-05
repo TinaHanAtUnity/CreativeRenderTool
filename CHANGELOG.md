@@ -2,6 +2,7 @@
 
 * Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
 * Update GameSessionCounters for Comet MRAID Playables [#13136](https://github.com/Applifier/unity-ads-webview/pull/13136)
+* Update UnityAds logo to SVG [#12817](https://github.com/Applifier/unity-ads-webview/pull/12817)
 
 # Sat Feb  1 01:32:06 UTC 2020
 
