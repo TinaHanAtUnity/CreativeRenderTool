@@ -11,6 +11,7 @@ export interface IGameSessionCounters {
     viewsPerCampaign: {[id: string]: number};
     viewsPerTarget: {[id: string]: number};
     latestCampaignsStarts: {[id: string]: string};
+    latestTargetStarts: {[id: string]: string};
 }
 
 export class GameSessionCounters {
@@ -24,6 +25,7 @@ export class GameSessionCounters {
         this._campaignStartCounter = {};
         this._campaignViewCounter = {};
         this._latestCampaignsStarts = {};
+        this._latestTargetStarts = {};
     }
 
     public static addStart(campaign: Campaign) {
@@ -41,6 +43,8 @@ export class GameSessionCounters {
 
         const targetGameId = this.getTargetGameId(campaign);
         if (targetGameId) {
+            this._latestTargetStarts[targetGameId] = (new Date()).toISOString();
+
             if (this._targetStartCounter[targetGameId]) {
                 let targetStartCount = this._targetStartCounter[targetGameId];
                 this._targetStartCounter[targetGameId] = ++targetStartCount;
@@ -85,7 +89,8 @@ export class GameSessionCounters {
             startsPerTarget: { ...this._targetStartCounter },
             viewsPerCampaign: { ...this._campaignViewCounter },
             viewsPerTarget: { ...this._targetViewCounter },
-            latestCampaignsStarts: { ...this._latestCampaignsStarts }
+            latestCampaignsStarts: { ...this._latestCampaignsStarts },
+            latestTargetStarts: { ...this._latestTargetStarts }
         };
     }
 
@@ -108,4 +113,5 @@ export class GameSessionCounters {
     private static _campaignStartCounter: {[id: string]: number} = {};
     private static _campaignViewCounter: {[id: string]: number} = {};
     private static _latestCampaignsStarts: {[id: string]: string} = {};
+    private static _latestTargetStarts: {[id: string]: string} = {};
 }
