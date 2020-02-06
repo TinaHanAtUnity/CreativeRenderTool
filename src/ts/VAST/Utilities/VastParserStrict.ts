@@ -428,7 +428,7 @@ export class VastParserStrict {
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
             verifications.forEach((verification) => {
-                if (verification.getVerificationVendor() === 'IAS') {
+                if (CustomFeatures.isIASVendor(verification.getVerificationVendor())) {
                     ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
                 }
             });
@@ -441,7 +441,7 @@ export class VastParserStrict {
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
                 verifications.forEach((verification) => {
-                    if (verification.getVerificationVendor() === 'IAS') {
+                    if (CustomFeatures.isIASVendor(verification.getVerificationVendor())) {
                         ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
                     }
                 });
