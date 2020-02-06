@@ -796,7 +796,7 @@ export class CampaignManager {
     private createRequestUrl(nofillRetry?: boolean, session?: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
-        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
 
         url = Url.addParameters(url, trackingIDs);
 

@@ -311,7 +311,7 @@ export class AuctionRequest {
             return Promise.resolve(this._url);
         }
         let url = this.getBaseURL();
-        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
+        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo));
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),
