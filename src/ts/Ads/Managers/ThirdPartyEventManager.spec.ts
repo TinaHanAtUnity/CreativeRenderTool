@@ -15,7 +15,7 @@ describe('ThirdPartyEventManagerTest', () => {
         request = new RequestManager();
         urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
 
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P});
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
     });
 
     describe('when replacing Open Measurement Macros', () => {

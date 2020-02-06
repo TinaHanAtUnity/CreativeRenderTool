@@ -30,7 +30,6 @@ import { PrivacySettings } from 'Ads/Views/Privacy/PrivacySettings';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -118,8 +117,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
                 [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
                 [ThirdPartyEventMacro.OM_ENABLED]: 'false',
-                [ThirdPartyEventMacro.OM_VENDORS]: '',
-                [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P
+                [ThirdPartyEventMacro.OM_VENDORS]: ''
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,

@@ -8,6 +8,7 @@ import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -61,6 +62,7 @@ export class ThirdPartyEventManager {
     constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
         this._core = core;
         this._request = request;
+        this._templateValues = {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P};
 
         if (templateValues) {
             this.setTemplateValues(templateValues);
