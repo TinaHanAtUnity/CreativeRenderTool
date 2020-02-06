@@ -11,6 +11,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { IBannerModule } from 'Banners/IBannerModule';
 import { IAds } from 'Ads/IAds';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 describe('BannerAdUnitParameterFactory', () => {
 
@@ -38,7 +39,9 @@ describe('BannerAdUnitParameterFactory', () => {
         return factory.create('test', campaign, placement, webPlayerContainer).then((params) => {
             assert.deepEqual((<any>params.thirdPartyEventManager)._templateValues, {
                 '%ZONE%': '1',
-                '%SDK_VERSION%': sdkVersion
+                '%SDK_VERSION%': sdkVersion,
+                '[OMIDPARTNER]': OMID_P,
+                '[CACHEBUSTING]': '-1'
             });
         });
     });

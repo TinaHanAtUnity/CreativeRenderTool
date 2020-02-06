@@ -63,11 +63,12 @@ export class ThirdPartyEventManager {
     constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
         this._core = core;
         this._request = request;
-        this._templateValues = {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1'};
 
         if (templateValues) {
             this.setTemplateValues(templateValues);
         }
+        this._templateValues[ThirdPartyEventMacro.OMIDPARTNER] = OMID_P;
+        this._templateValues[ThirdPartyEventMacro.CACHEBUSTING] = '-1';
     }
 
     public sendTrackingEvents(campaign: Campaign, event: TrackingEvent, adDescription: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse[]> {

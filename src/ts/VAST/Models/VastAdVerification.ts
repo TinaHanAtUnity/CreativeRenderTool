@@ -1,5 +1,7 @@
 import { Model } from 'Core/Models/Model';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export enum VerificationReasonCode {
     VERIFICATION_RESOURCE_REJECTED = 1, // The publisher does not recognize or allow code from the vendor in the parent <Verification>
@@ -49,7 +51,7 @@ export class VastAdVerification extends Model<IVastAdVerification> {
     public getFormattedVerificationTrackingEvent(reasonCode: VerificationReasonCode): string | null {
         let trackingEvent = this.getVerificationTrackingEvent();
         if (trackingEvent) {
-            trackingEvent = trackingEvent.replace('%5BREASON%5D', reasonCode.toString());
+            trackingEvent = MacroUtil.replaceMacro(trackingEvent, {'%5BREASON%5D': reasonCode.toString(), '[OMIPARTNEER]': OMID_P, '[CACHEBUSTING]': '-1', '[TIMESTAMP]': (new Date()).toISOString()});
         }
         return trackingEvent;
     }

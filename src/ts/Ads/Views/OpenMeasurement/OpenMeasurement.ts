@@ -469,9 +469,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     }
 
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
-        let adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
+        const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
         if (adVerificationErrorURL) {
-            adVerificationErrorURL = MacroUtil.replaceMacro(adVerificationErrorURL, {'[OMIDPARTNER]': OMID_P, '[TIMESTAMP]': (new Date()).toISOString(), '[CACHEBUSTING]': '-1'});
             this._request.get(adVerificationErrorURL);
         }
     }
