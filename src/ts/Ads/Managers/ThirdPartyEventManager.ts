@@ -21,7 +21,8 @@ export enum ThirdPartyEventMacro {
     GAMER_SID = '%GAMER_SID%',
     OM_ENABLED = '%25OM_ENABLED%25',
     OM_VENDORS = '%25OM_VENDORS%25',
-    OMIDPARTNER = '[OMIDPARTNER]'
+    OMIDPARTNER = '[OMIDPARTNER]',
+    CACHEBUSTING = '[CACHEBUSTING]'
 }
 
 export enum TrackingEvent {
@@ -62,7 +63,7 @@ export class ThirdPartyEventManager {
     constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
         this._core = core;
         this._request = request;
-        this._templateValues = {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P};
+        this._templateValues = {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1'};
 
         if (templateValues) {
             this.setTemplateValues(templateValues);
@@ -179,17 +180,11 @@ export class ThirdPartyEventManager {
             for (const key in this._templateValues) {
                 if (this._templateValues.hasOwnProperty(key)) {
                     url = url.replace(key, this._templateValues[key]);
-                    url = this.replaceVastTrackingMacros(url);
                 }
             }
+            url = MacroUtil.replaceMacro(url, {'[TIMESTAMP]': (new Date()).toISOString()});
         }
 
         return Url.encode(url);
-    }
-
-    private replaceVastTrackingMacros(url: string): string {
-        const timestamp = (new Date()).toISOString();
-
-        return MacroUtil.replaceMacro(url, {'[TIMESTAMP]': timestamp, '[CACHEBUSTING]': '-1'});
     }
 }
