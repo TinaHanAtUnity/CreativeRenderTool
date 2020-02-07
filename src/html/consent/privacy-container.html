@@ -21,8 +21,8 @@
                     switch(event.data.type) {
                         case 'readyCallback':
                             if (window.privacyAdapter.readyCallback) {
-                                const data = event.data.data;
-                                const flow = event.data.data.flow;
+                                var data = event.data.data;
+                                var flow = event.data.data.flow;
                                 delete data.flow;
                                 window.privacyAdapter.readyCallback(flow, data);
                             }
