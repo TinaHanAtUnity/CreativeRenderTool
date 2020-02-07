@@ -209,13 +209,17 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                             });
                         });
 
-                        it('should call session begin ad events for IAS', () => {
-                            return om.onEventProcessed('sessionStart', 'IAS').then(() => {
-                                clock.tick(1000);
-                                clock.restore();
-                                sinon.assert.called(<sinon.SinonSpy>om.impression);
-                                sinon.assert.called(<sinon.SinonSpy>om.loaded);
-                                sinon.assert.calledWith(<sinon.SinonSpy>om.geometryChange);
+                        const customGeometryVendors = ['IAS', 'integralads.com-omid'];
+
+                        customGeometryVendors.forEach((vendor) => {
+                            it('should call session begin ad events for IAS', () => {
+                                return om.onEventProcessed('sessionStart', vendor).then(() => {
+                                    clock.tick(1000);
+                                    clock.restore();
+                                    sinon.assert.called(<sinon.SinonSpy>om.impression);
+                                    sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                                    sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
+                                });
                             });
                         });
                     });

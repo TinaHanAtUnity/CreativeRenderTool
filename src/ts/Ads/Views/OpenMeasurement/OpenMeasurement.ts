@@ -294,7 +294,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         if (eventType === SessionEvents.SESSION_START) {
             this._sessionStartProcessedByOmidScript = true;
 
-            if (vendorKey === 'IAS') {
+            if (CustomFeatures.isIASVendor(vendorKey)) {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
             }
 
@@ -309,7 +309,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
         if (eventType === SessionEvents.SESSION_FINISH) {
             this._sessionFinishProcessedByOmidScript = true;
-            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+            if (CustomFeatures.isIASVendor(vendorKey)) {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
             }
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
@@ -337,7 +337,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
              * admob-session-interface - calls session start for admob
              * vast video event handler - calls session start for vast
              */
-            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
+            if (CustomFeatures.isIASVendor(vendorKey) || this._campaign instanceof AdMobCampaign) {
                 if (this._sessionStartEventData) {
                     this.sessionStart(this._sessionStartEventData);
                 }
@@ -363,7 +363,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
                 this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight));
 
-                if (vendorKey === 'IAS') {
+                if (CustomFeatures.isIASVendor(vendorKey)) {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
                 }
 
@@ -435,7 +435,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
                 verificationParameters: verificationParameters
             };
 
-            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+            if (CustomFeatures.isIASVendor(vendorKey)) {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjected);
             }
 
@@ -446,7 +446,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
             return Promise.resolve();
         }).catch((e) => {
             this._core.Sdk.logDebug(`Could not load open measurement verification script: ${e}`);
-            if (vendorKey === 'IAS' && ProgrammaticTrackingService) {
+            if (CustomFeatures.isIASVendor(vendorKey)) {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
             }
         });

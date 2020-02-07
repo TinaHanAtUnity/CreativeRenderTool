@@ -182,4 +182,9 @@ export class CustomFeatures {
                creativeId === 'gg_bounzy'        ||
                creativeId === 'social_dc';
     }
+
+    public static isIASVendor(omVendor: string | undefined) {
+        return omVendor === 'IAS' ||
+               omVendor === 'integralads.com-omid';
+    }
 }
