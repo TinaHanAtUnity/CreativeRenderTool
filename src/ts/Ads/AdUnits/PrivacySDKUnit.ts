@@ -186,7 +186,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
 
         let action: GDPREventAction;
-        switch(userSettings.lastInteraction.id) {
+        switch (userSettings.lastInteraction.id) {
             case 'acceptTracking':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
