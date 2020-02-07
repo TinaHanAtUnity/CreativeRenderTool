@@ -98,7 +98,8 @@ export enum OMMetric {
     IASVerificatonInjected = 'ias_verification_injected',
     IASVerificationSessionStarted = 'ias_verification_session_started',
     IASVerificationSessionFinished = 'ias_verification_session_finished',
-    IASVerificatonInjectionFailed = 'ias_verification_injection_failed'
+    IASVerificatonInjectionFailed = 'ias_verification_injection_failed',
+    OMInjectionFailure = 'om_injection_failure'
 }
 
 export enum TimingMetric {
