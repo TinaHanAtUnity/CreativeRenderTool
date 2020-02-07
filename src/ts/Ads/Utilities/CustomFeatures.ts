@@ -9,7 +9,11 @@ import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 export class CustomFeatures {
 
     public static isNoGzipGame(gameId: string): boolean {
-        return gameId === '1475968' || gameId === '1708468';
+        return gameId === '1475968' ||
+               gameId === '1708468' ||
+               gameId === '3391175' ||
+               gameId === '37214' ||
+               gameId === '37215';
     }
 
     public static isExampleGameId(gameId: string): boolean {
