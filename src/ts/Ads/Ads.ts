@@ -73,7 +73,6 @@ import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
-import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -127,7 +126,6 @@ export class Ads implements IAds {
     public BannerModule: BannerModule;
     public Monetization: Monetization;
     public AR: AR;
-    public China: China;
     public Analytics: Analytics;
     public Store: IStore;
 
@@ -224,11 +222,6 @@ export class Ads implements IAds {
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
-            if (CustomFeatures.isChinaSDK(this._core.NativeBridge.getPlatform(), this._core.ClientInfo.getSdkVersionName())) {
-                this.China = new China(this._core);
-                this.China.initialize();
-            }
-
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
                 Promise.all([
                     ARUtil.isARSupported(this.AR.Api),
@@ -247,7 +240,7 @@ export class Ads implements IAds {
                 new AdMob(this._core, this),
                 new Display(this._core, this),
                 new MRAID(this.AR.Api, this._core, this),
-                new Performance(this.AR.Api, this._core, this, this.China),
+                new Performance(this.AR.Api, this._core, this),
                 new VAST(this._core, this),
                 new VPAID(this._core, this),
                 new XPromo(this._core, this)

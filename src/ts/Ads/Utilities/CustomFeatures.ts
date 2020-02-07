@@ -68,11 +68,6 @@ export class CustomFeatures {
 
     }
 
-    public static isChinaSDK(platform: Platform, versionName: string): boolean {
-        return platform === Platform.ANDROID
-            && versionName.endsWith('china');
-    }
-
     public static isTimerExpirationExperiment(gameId: string): boolean {
         return gameId === '1453434';
     }

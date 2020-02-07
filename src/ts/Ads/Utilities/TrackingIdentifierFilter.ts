@@ -1,6 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface ITrackingIdentifier {
@@ -11,42 +10,22 @@ export interface ITrackingIdentifier {
 }
 
 export class TrackingIdentifierFilter {
-    public static getDeviceTrackingIdentifiers(platform: Platform, sdkVersionName: string, deviceInfo: DeviceInfo): ITrackingIdentifier {
+    public static getDeviceTrackingIdentifiers(platform: Platform, deviceInfo: DeviceInfo): ITrackingIdentifier {
         let trackingIdentifiers: ITrackingIdentifier = {};
-
-        if (CustomFeatures.isChinaSDK(platform, sdkVersionName) && deviceInfo instanceof AndroidDeviceInfo) {
-            if (deviceInfo.getAndroidId() || deviceInfo.getDeviceId1()) {
+        if (deviceInfo.getAdvertisingIdentifier()) {
+            trackingIdentifiers = {
+                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: deviceInfo.getLimitAdTracking()
+            };
+        } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+            trackingIdentifiers = {
+                androidId: deviceInfo.getAndroidId()
+            };
+            if (deviceInfo.getDeviceId1()) {
                 trackingIdentifiers = {
-                    androidId: deviceInfo.getAndroidId()
+                    ...trackingIdentifiers,
+                    imei: deviceInfo.getDeviceId1()
                 };
-                if (deviceInfo.getDeviceId1()) {
-                    trackingIdentifiers = {
-                        ...trackingIdentifiers,
-                        imei: deviceInfo.getDeviceId1()
-                    };
-                }
-            } else {
-                trackingIdentifiers = {
-                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
-                    limitAdTracking: deviceInfo.getLimitAdTracking()
-                };
-            }
-        } else {
-            if (deviceInfo.getAdvertisingIdentifier()) {
-                trackingIdentifiers = {
-                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
-                    limitAdTracking: deviceInfo.getLimitAdTracking()
-                };
-            } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-                trackingIdentifiers = {
-                    androidId: deviceInfo.getAndroidId()
-                };
-                if (deviceInfo.getDeviceId1()) {
-                    trackingIdentifiers = {
-                        ...trackingIdentifiers,
-                        imei: deviceInfo.getDeviceId1()
-                    };
-                }
             }
         }
         return trackingIdentifiers;
