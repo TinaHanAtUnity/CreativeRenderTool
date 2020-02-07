@@ -185,12 +185,34 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     public onPrivacyCompleted(userSettings: IPrivacySettings): void {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
 
+        let action: GDPREventAction;
+        switch(userSettings.lastInteraction.id) {
+            case 'acceptTracking':
+                action = GDPREventAction.CONSENT_AGREE_ALL;
+                break;
+
+            case 'allowAll':
+                action = GDPREventAction.CONSENT_AGREE; // this is correct, naming is just different in privacy UI
+                break;
+
+            case 'disagree':
+                action = GDPREventAction.CONSENT_DISAGREE;
+                break;
+
+            case 'saveChoices':
+                action = GDPREventAction.CONSENT_SAVE_CHOICES;
+                break;
+
+            default:
+                action = GDPREventAction.CONSENT_SAVE_CHOICES;
+        }
+
         this.setConsent({
                 ads: userSettings.user.ads,
                 external: userSettings.user.external,
                 gameExp: userSettings.user.gameExp
             },
-            GDPREventAction.CONSENT_SAVE_CHOICES, // todo: review the correct actions for each case and set them correctly
+            action,
             GDPREventSource.USER);
 
         this._unityPrivacyView.completeCallback();
