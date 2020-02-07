@@ -51,7 +51,11 @@ export class VastAdVerification extends Model<IVastAdVerification> {
     public getFormattedVerificationTrackingEvent(reasonCode: VerificationReasonCode): string | null {
         let trackingEvent = this.getVerificationTrackingEvent();
         if (trackingEvent) {
-            trackingEvent = MacroUtil.replaceMacro(trackingEvent, {'%5BREASON%5D': reasonCode.toString(), '[OMIPARTNEER]': OMID_P, '[CACHEBUSTING]': '-1', '[TIMESTAMP]': (new Date()).toISOString()});
+            trackingEvent = MacroUtil.replaceMacro(trackingEvent, {
+                '%5BREASON%5D': reasonCode.toString(),
+                '[OMIDPARTNER]': OMID_P,
+                '[CACHEBUSTING]': '-1',
+                '[TIMESTAMP]': (new Date()).toISOString()});
         }
         return trackingEvent;
     }
