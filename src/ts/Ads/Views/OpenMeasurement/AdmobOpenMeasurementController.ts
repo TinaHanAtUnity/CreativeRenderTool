@@ -166,6 +166,11 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
             this._omInstances.forEach((om) => {
                 ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+
+                const verificationresource = om.getVerificationResource();
+                if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                    ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMImpressions);
+                }
             });
             super.impression(impressionObject);
 
@@ -178,6 +183,11 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
             this._omInstances.forEach((om) => {
                 ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+
+                const verificationresource = om.getVerificationResource();
+                if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                    ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMImpressions);
+                }
             });
             super.impression(impressionObject);
         });
@@ -196,6 +206,11 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             event.data.verificationParameters = verificationresource.verificationParameters;
             event.data.vendorkey = verificationresource.vendorKey;
             om.sessionStart(event);
+
+            if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMStarts);
+            }
+
         });
         ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }

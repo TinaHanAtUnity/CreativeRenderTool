@@ -141,7 +141,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if (omController) {
             // TODO: Add volume change for muted value 0
             omController.setDeviceVolume(this._deviceVolume);
-            omController.volumeChange(1);
+            omController.volumeChange(this._view.getVideoPlayerVolume());
         }
     }
 

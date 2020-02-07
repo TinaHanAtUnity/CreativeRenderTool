@@ -1,3 +1,23 @@
+# Pending
+
+* Remove China Module [#13167](https://github.com/Applifier/unity-ads-webview/pull/13167)
+* Cleaning up Jest output [#13171](https://github.com/Applifier/unity-ads-webview/pull/13171)
+
+# Wed Feb  5 20:48:25 UTC 2020
+
+* Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
+* Update GameSessionCounters for Comet MRAID Playables [#13136](https://github.com/Applifier/unity-ads-webview/pull/13136)
+* Update UnityAds logo to SVG [#12817](https://github.com/Applifier/unity-ads-webview/pull/12817)
+* Fix AR.getSupportedVideoFormats Native Method [#13050](https://github.com/Applifier/unity-ads-webview/pull/13050)
+* Remove async/await in Production Code to Reduce Bundle Size [#13162](https://github.com/Applifier/unity-ads-webview/pull/13162)
+* Track Stored GamerToken Deletion on iOS [#13164](https://github.com/Applifier/unity-ads-webview/pull/13164)
+
+# Sat Feb  1 01:32:06 UTC 2020
+
+* Open Measurement: Add volume change event for admob ads [#13048](https://github.com/Applifier/unity-ads-webview/pull/13048)
+* Add GameID 3427556 to Load Whitelist [#13108](https://github.com/Applifier/unity-ads-webview/pull/13108)
+* Open Measurement - Add Temporary Metrics for DoubleClick Admob [#13110](https://github.com/Applifier/unity-ads-webview/pull/13110)
+
 # Thu Jan 30 21:26:04 UTC 2020
 
 * Open Measurement - Log When Admob Session Start Observer is Called [#13081](https://github.com/Applifier/unity-ads-webview/pull/13081/files)

@@ -3,8 +3,6 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
-import { IAds } from 'Ads/IAds';
-import { IChina } from 'China/IChina';
 import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
@@ -15,8 +13,8 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
     private _automatedExperimentManager: AutomatedExperimentManager;
 
-    constructor(core: ICore, china?: IChina) {
-        super(core, core.Ads, china);
+    constructor(core: ICore) {
+        super(core, core.Ads);
         this._automatedExperimentManager = new AutomatedExperimentManager(core);
         this._automatedExperimentManager.initialize(AutomatedExperimentsList).catch(() => {
             ProgrammaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
@@ -57,8 +55,6 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
             overlay: overlay,
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
-            downloadManager: this._downloadManager,
-            deviceIdManager: this._deviceIdManager,
             automatedExperimentManager: this._automatedExperimentManager
         };
     }

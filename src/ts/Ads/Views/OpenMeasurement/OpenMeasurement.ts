@@ -438,6 +438,10 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
                 ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjected);
             }
 
+            if (vendorKey.startsWith('doubleclickbygoogle.com') && this._campaign instanceof AdMobCampaign) {
+                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMInjections);
+            }
+
             return Promise.resolve();
         }).catch((e) => {
             this._core.Sdk.logDebug(`Could not load open measurement verification script: ${e}`);

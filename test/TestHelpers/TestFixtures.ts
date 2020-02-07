@@ -154,9 +154,6 @@ import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParam
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { AndroidDownloadApi } from 'China/Native/Android/Download';
-import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
-import { IChinaApi } from 'China/IChina';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -646,9 +643,9 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
-    public static getPerformanceMRAIDCampaign(customParams: Partial<ICampaign> = {}): PerformanceMRAIDCampaign {
-        const json = OnProgrammaticMraidUrlPlcCampaign;
-        return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
+    public static getPerformanceMRAIDCampaign(session?: Session): PerformanceMRAIDCampaign {
+        const json = OnCometMraidPlcCampaign;
+        return new PerformanceMRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getCompanionStaticVastCampaign(): VastCampaign {
@@ -1035,7 +1032,7 @@ export class TestFixtures {
             AdMobSignalFactory: new AdMobSignalFactory(platform, core.Api, api, core.ClientInfo, core.DeviceInfo, core.FocusManager),
             InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
-            MissedImpressionManager: new MissedImpressionManager(core.Api, 'test', ''),
+            MissedImpressionManager: new MissedImpressionManager(core.Api),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
             Container: TestFixtures.getTestContainer(core, api),
@@ -1187,15 +1184,6 @@ export class TestFixtures {
             iOS: platform === Platform.IOS ? {
                 AR: new IosARApi(nativeBridge)
             } : undefined
-        };
-    }
-
-    public static getChinaApi(nativeBridge: NativeBridge): IChinaApi {
-        return {
-            Android: {
-                Download: new AndroidDownloadApi(nativeBridge),
-                InstallListener: new AndroidInstallListenerApi(nativeBridge)
-            }
         };
     }
 

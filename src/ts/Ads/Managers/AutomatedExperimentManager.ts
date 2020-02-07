@@ -311,7 +311,7 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private async collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
+    private collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id'},
@@ -414,7 +414,7 @@ export class AutomatedExperimentManager {
 
     // not used at the moment. but will be soon: when we do an inference / ad display.
     // incomplete implementation
-    private async collectAdRelatedFeatures(deviceInfo: DeviceInfo): Promise<{ [key: string]: ContextualFeature }>  {
+    private collectAdRelatedFeatures(deviceInfo: DeviceInfo): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             // CAMPAIGN, THE AD
             'campaignId', 'targetGameId', 'rating', 'ratingCount', 'gameSessionCounters', 'cached',
