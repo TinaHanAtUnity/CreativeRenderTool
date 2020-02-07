@@ -65,10 +65,11 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     }
 
     public createPrivacyFrame(container: string): string {
-        const privacyHtml = this._privacyConfig.getHtml();
+        let privacyHtml = this._privacyConfig.getHtml();
 
         if (privacyHtml) {
             container = container.replace('<script id=\"deviceorientation-support\"></script>', DeviceOrientationScript);
+            privacyHtml = privacyHtml.replace(/\$/g, '$$$');
             return container.replace('<body></body>', '<body>' + privacyHtml + '</body>');
         }
 
