@@ -1,3 +1,8 @@
+# Pending
+
+* Remove China Module [#13167](https://github.com/Applifier/unity-ads-webview/pull/13167)
+* Cleaning up Jest output [#13171](https://github.com/Applifier/unity-ads-webview/pull/13171)
+
 # Wed Feb  5 20:48:25 UTC 2020
 
 * Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
