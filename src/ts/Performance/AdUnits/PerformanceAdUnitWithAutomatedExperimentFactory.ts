@@ -32,9 +32,7 @@ export class PerformanceAdUnitWithAutomatedExperimentFactory extends Performance
             placement: parameters.placement,
             adUnit: performanceAdUnit,
             campaign: parameters.campaign,
-            coreConfig: parameters.coreConfig,
-            downloadManager: parameters.downloadManager,
-            deviceIdManager: parameters.deviceIdManager
+            coreConfig: parameters.coreConfig
         };
         const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 

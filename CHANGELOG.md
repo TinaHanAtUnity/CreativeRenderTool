@@ -1,5 +1,15 @@
 # Pending
 
+* Remove China Module [#13167](https://github.com/Applifier/unity-ads-webview/pull/13167)
+* Cleaning up Jest output [#13171](https://github.com/Applifier/unity-ads-webview/pull/13171)
+* Fix GamerToken Storage on IOS and Remove GamerToken from Config Request [#13168](https://github.com/Applifier/unity-ads-webview/pull/13168)
+* Open Measurement - Add injection failure metric and postback [#13109](https://github.com/Applifier/unity-ads-webview/pull/13109)
+* Add latest target game start timestamp to game session counters [#13170](https://github.com/Applifier/unity-ads-webview/pull/13170)
+* Add more game ids in whitelist to prevents the Android 10 gzip crash [#13173](https://github.com/Applifier/unity-ads-webview/pull/13173)
+* Open Measurement - Whitelist `integralads` as IAS [#13163](https://github.com/Applifier/unity-ads-webview/pull/13163)
+
+# Wed Feb  5 20:48:25 UTC 2020
+
 * Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
 * Update GameSessionCounters for Comet MRAID Playables [#13136](https://github.com/Applifier/unity-ads-webview/pull/13136)
 * Update UnityAds logo to SVG [#12817](https://github.com/Applifier/unity-ads-webview/pull/12817)

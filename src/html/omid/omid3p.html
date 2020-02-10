@@ -183,6 +183,9 @@
                     this.get = function(name) {
                         return fnwhitelist.indexOf(name) > -1 ? eval(name) : console.log('fn not gettable');
                     }
+                    this.postback = function(event, data) {
+                        postMessageCallback(event, data);
+                    }
                 }
         
                 /**

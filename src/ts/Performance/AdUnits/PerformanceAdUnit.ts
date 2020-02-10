@@ -5,14 +5,10 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { DownloadManager } from 'China/Managers/DownloadManager';
-import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
-    downloadManager?: DownloadManager;
-    deviceIdManager?: DeviceIdManager;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
