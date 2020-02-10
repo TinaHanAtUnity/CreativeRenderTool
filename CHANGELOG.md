@@ -1,4 +1,4 @@
-# Pending
+# Mon Feb 10 22:37:45 UTC 2020
 
 * Remove China Module [#13167](https://github.com/Applifier/unity-ads-webview/pull/13167)
 * Cleaning up Jest output [#13171](https://github.com/Applifier/unity-ads-webview/pull/13171)
