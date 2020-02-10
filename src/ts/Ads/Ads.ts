@@ -360,8 +360,7 @@ export class Ads implements IAds {
                 adsConfig: this.Config,
                 core: this._core.Api,
                 deviceInfo: this._core.DeviceInfo,
-                privacySDK: this.PrivacySDK,
-                pts: ProgrammaticTrackingService
+                privacySDK: this.PrivacySDK
             };
 
             privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);

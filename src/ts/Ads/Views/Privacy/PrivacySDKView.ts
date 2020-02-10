@@ -25,7 +25,6 @@ export interface IPrivacySDKViewParameters {
     osVersion?: string;
     consentABTest: boolean;
     ageGateLimit: number;
-    pts: ProgrammaticTrackingService;
     core: ICoreApi;
 }
 

@@ -27,7 +27,6 @@ export interface IPrivacyUnitParameters {
     adsConfig: AdsConfiguration;
     core: ICoreApi;
     deviceInfo: DeviceInfo;
-    pts: ProgrammaticTrackingService;
     privacySDK: PrivacySDK;
 }
 
@@ -249,7 +248,6 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
-            pts: parameters.pts,
             language: parameters.deviceInfo.getLanguage(),
             consentABTest: false,
             ageGateLimit: this._privacySDK.getAgeGateLimit(),
