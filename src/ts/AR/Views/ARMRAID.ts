@@ -21,6 +21,7 @@ import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapt
 import { ARUIExperiments } from 'AR/Experiments/ARUIExperiments'
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager'
 import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
+import { ARAvailableButtonShapes } from 'AR/Experiments/ARAvailableButtonShapes'
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -104,7 +105,9 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 listener: (event: Event) => {
                     this._automatedExperimentManager.sendReward();
 
-                    if (this._arAvailableButton.classList.contains('collapsed')) {
+                    if (this._arAvailableButton.classList.contains('ar-available-button--collapsed')
+                        // @ts-ignore
+                        && !this._arUIExperiments.arAvailableButtonSkip) {
                         this.expandArAvailableButton();
                     } else {
                         this.hideArAvailableButton();
@@ -180,9 +183,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
-        // MAB
+        // MAB - AR Available Button Color
         const arAvailableButtonColor = this._arUIExperiments.arAvailableButtonColor || ARAvailableButtonColors.BLACK;
-        this._arAvailableButton.classList.add('mab-color__' + arAvailableButtonColor);
+        this._arAvailableButton.classList.add('ar-available-button--color--' + arAvailableButtonColor);
+
+        // MAB - AR Available Button Shape
+        const arAvailableButtonShape = ARAvailableButtonShapes.DEFAULT;
+        this._arAvailableButton.classList.add('ar-available-button--shape--' + arAvailableButtonShape);
     }
 
     public setViewableState(viewable: boolean): void {
@@ -533,13 +540,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
         this._arAvailableButton.classList.add('hidden');
         this._arAvailableButton.style.display = 'none';
-        this._arAvailableButton.classList.remove('collapsed', 'expanded');
+        this._arAvailableButton.classList.remove('ar-available-button--collapsed', 'ar-available-button--expanded');
     }
 
     private showArAvailableButton() {
         if (this._arAvailableButtonShown) {
             this._arAvailableButton.classList.remove('hidden');
-            this._arAvailableButton.style.display = 'block';
+            this._arAvailableButton.style.display = 'inline-flex';
             this.collapseArAvailableButtonDelayed();
             return;
         }
@@ -573,8 +580,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     }
 
                     this.sendMraidAnalyticsEvent('ar_button_displayed', undefined);
-                    this._arAvailableButton.classList.remove('hidden', 'collapsed', 'expanded');
-                    this._arAvailableButton.style.display = 'block';
+                    this._arAvailableButton.classList.remove('hidden', 'ar-available-button--collapsed', 'ar-available-button--expanded');
+                    this._arAvailableButton.style.display = 'inline-flex';
                     this._arAvailableButtonShown = true;
                     this.collapseArAvailableButtonDelayed();
                 }
@@ -589,14 +596,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         this._arButtonCollapseTimeout = window.setTimeout(() => {
-            this._arAvailableButton.classList.add('collapsed');
-            this._arAvailableButton.classList.remove('expanded');
+            this._arAvailableButton.classList.add('ar-available-button--collapsed');
+            this._arAvailableButton.classList.remove('ar-available-button--expanded');
         }, 5000);
     }
 
     private expandArAvailableButton() {
-        this._arAvailableButton.classList.remove('collapsed');
-        this._arAvailableButton.classList.add('expanded');
+        this._arAvailableButton.classList.remove('ar-available-button--collapsed');
+        this._arAvailableButton.classList.add('ar-available-button--expanded');
         this.collapseArAvailableButtonDelayed();
     }
 
