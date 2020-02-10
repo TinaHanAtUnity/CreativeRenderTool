@@ -1,444 +1,455 @@
 {
-    "start": "ageGateDecision",
-    "nodes": {
-      "ageGateDecision": {
-        "isSelfEvaluating": true,
-        "links": [
+  "start": "ageGateDecision",
+  "nodes": {
+    "ageGateDecision": {
+      "isSelfEvaluating": true,
+      "links": [
+        {
+          "node": "ageSelect",
+          "condition": {
+            ">": [
+              {
+                "var": "env.ageGateLimit"
+              },
+              0
+            ]
+          }
+        },
+        {
+          "node": "consent",
+          "condition": {
+            "==": [
+              {
+                "var": "env.ageGateLimit"
+              },
+              0
+            ]
+          }
+        }
+      ]
+    },
+    "ageSelect": {
+      "components": {
+        "body": [
           {
-            "node": "ageSelect",
-            "condition": {
-              ">": [
+            "id": "consentTitle",
+            "text": "ageSelect.title",
+            "type": "heading",
+            "isHidden": false,
+            "level": 6
+          },
+          {
+            "id": "consentSubitle",
+            "text": "ageSelect.subtitle",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          }
+        ],
+        "footer": [
+          {
+            "id": "underAgeLimit",
+            "text": "underAgeLimit",
+            "type": "button",
+            "isSubmit": true,
+            "variant": "secondary",
+            "actions": [
+              {
+                "property": "user.agreedOverAgeLimit",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "overAgeLimit",
+            "text": "overAgeLimit",
+            "type": "button",
+            "isSubmit": true,
+            "variant": "primary",
+            "actions": [
+              {
+                "property": "user.agreedOverAgeLimit",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "links": [
+        {
+          "node": "consent",
+          "condition": {
+            "==": [
+              {
+                "var": "user.agreedOverAgeLimit"
+              },
+              true
+            ]
+          }
+        }
+      ]
+    },
+    "consent": {
+      "components": {
+        "body": [
+          {
+            "id": "consentTitle",
+            "text": "consent.title",
+            "type": "heading",
+            "isHidden": false,
+            "level": 6
+          },
+          {
+            "id": "consentSubtitle",
+            "text": "consent.subtitle",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          }
+        ],
+        "footer": [
+          {
+            "id": "showChoices",
+            "type": "button",
+            "text": "showChoices",
+            "variant": "secondary",
+            "isSubmit": true,
+            "actions": [
+              {
+                "property": "state.hasAcceptedTracking",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "acceptTracking",
+            "type": "button",
+            "text": "acceptTracking",
+            "variant": "primary",
+            "actions": [
+              {
+                "property": "user.gameExp",
+                "value": true
+              },
+              {
+                "property": "user.ads",
+                "value": true
+              },
+              {
+                "property": "user.external",
+                "value": true
+              },
+              {
+                "property": "state.hasAcceptedTracking",
+                "value": true
+              }
+            ],
+            "isSubmit": true
+          }
+        ]
+      },
+      "links": [
+        {
+          "node": "customization",
+          "condition": {
+            "!=": [
+              {
+                "var": "state.hasAcceptedTracking"
+              },
+              true
+            ]
+          }
+        }
+      ]
+    },
+    "customization": {
+      "components": {
+        "body": [
+          {
+            "id": "consentTitle",
+            "text": "consent.title",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          },
+          {
+            "id": "consentSubtitle",
+            "text": "consent.subtitle",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          },
+          {
+            "id": "allowGameExperienceDataCollection",
+            "type": "switch",
+            "text": "allowGameExperienceDataCollection",
+            "isChecked": {
+              "==": [
                 {
-                  "var": "env.ageGateLimit"
+                  "var": "user.gameExp"
                 },
-                0
+                true
+              ]
+            },
+            "actions": [
+              {
+                "property": "user.gameExp",
+                "value": {
+                  "!": [
+                    {
+                      "var": [
+                        "user.gameExp"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "allowGameAdsDataCollection",
+            "type": "switch",
+            "text": "allowGameAdsDataCollection",
+            "isChecked": {
+              "==": [
+                {
+                  "var": "user.ads"
+                },
+                true
+              ]
+            },
+            "actions": [
+              {
+                "property": "user.ads",
+                "value": {
+                  "!": [
+                    {
+                      "var": [
+                        "user.ads"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "property": "user.external",
+                "value": {
+                  "if": [
+                    {
+                      "!": [
+                        {
+                          "var": [
+                            "user.ads"
+                          ]
+                        }
+                      ]
+                    },
+                    false,
+                    {
+                      "var": [
+                        "user.external"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "allowThirdPartyDataCollection",
+            "type": "switch",
+            "text": "allowThirdPartyDataCollection",
+            "isChecked": {
+              "==": [
+                {
+                  "var": "user.external"
+                },
+                true
+              ]
+            },
+            "isDisabled": {
+              "==": [
+                {
+                  "var": [
+                    "user.ads",
+                    false
+                  ]
+                },
+                false
+              ]
+            },
+            "actions": [
+              {
+                "property": "user.external",
+                "value": {
+                  "!": [
+                    {
+                      "var": [
+                        "user.external"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "property": "user.ads",
+                "value": {
+                  "if": [
+                    {
+                      "!": [
+                        {
+                          "var": [
+                            "user.external"
+                          ]
+                        }
+                      ]
+                    },
+                    false,
+                    {
+                      "var": [
+                        "user.ads"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "footer": [
+          {
+            "id": "disagree",
+            "type": "button",
+            "text": "disagree",
+            "isSubmit": true,
+            "variant": "secondary",
+            "isHidden": {
+              "or": [
+                {
+                  "==": [
+                    {
+                      "var": "user.gameExp"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": "user.ads"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": "user.external"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           },
           {
-            "node": "consent",
-            "condition": {
-              "==": [
+            "id": "allowAll",
+            "type": "button",
+            "text": "allowAll",
+            "actions": [
+              {
+                "property": "user.gameExp",
+                "value": true
+              },
+              {
+                "property": "user.ads",
+                "value": true
+              },
+              {
+                "property": "user.external",
+                "value": true
+              }
+            ],
+            "isSubmit": true,
+            "submitDelay": 1000,
+            "variant": "primary",
+            "isHidden": {
+              "or": [
                 {
-                  "var": "env.ageGateLimit"
+                  "==": [
+                    {
+                      "var": "user.gameExp"
+                    },
+                    true
+                  ]
                 },
-                0
-              ]
-            }
-          }
-        ]
-      },
-      "ageSelect": {
-        "components": {
-          "body": [
-            {
-              "id": "consentTitle",
-              "text": "ageSelect.title",
-              "type": "heading",
-              "isHidden": false,
-              "level": 6
-            },
-            {
-              "id": "consentSubitle",
-              "text": "ageSelect.subtitle",
-              "type": "text",
-              "isHidden": false,
-              "variant": "dark"
-            }
-          ],
-          "footer": [
-            {
-              "id": "underAgeLimit",
-              "text": "underAgeLimit",
-              "type": "button",
-              "isSubmit": true,
-              "variant": "secondary",
-              "actions": [
                 {
-                  "property": "agreedOverAgeLimit",
-                  "value": false
-                }
-              ]
-            },
-            {
-              "id": "overAgeLimit",
-              "text": "overAgeLimit",
-              "type": "button",
-              "isSubmit": true,
-              "variant": "primary",
-              "actions": [
+                  "==": [
+                    {
+                      "var": "user.ads"
+                    },
+                    true
+                  ]
+                },
                 {
-                  "property": "agreedOverAgeLimit",
-                  "value": true
+                  "==": [
+                    {
+                      "var": "user.external"
+                    },
+                    true
+                  ]
                 }
               ]
             }
-          ]
-        },
-        "links": [
+          },
           {
-            "node": "consent",
-            "condition": {
-              "==": [
+            "id": "saveChoices",
+            "type": "button",
+            "text": "saveChoices",
+            "isSubmit": true,
+            "variant": "primary",
+            "isHidden": {
+              "and": [
                 {
-                  "var": "user.agreedOverAgeLimit"
-                },
-                true
-              ]
-            }
-          }
-        ]
-      },
-      "consent": {
-        "components": {
-          "body": [
-            {
-              "id": "consentTitle",
-              "text": "consent.title",
-              "type": "heading",
-              "isHidden": false,
-              "level": 6
-            },
-            {
-              "id": "consentSubtitle",
-              "text": "consent.subtitle",
-              "type": "text",
-              "isHidden": false,
-              "variant": "dark"
-            }
-          ],
-          "footer": [
-            {
-              "id": "showChoices",
-              "type": "button",
-              "text": "showChoices",
-              "variant": "secondary",
-              "isSubmit": true
-            },
-            {
-              "id": "acceptTracking",
-              "type": "button",
-              "text": "acceptTracking",
-              "variant": "primary",
-              "actions": [
-                {
-                  "property": "gameExp",
-                  "value": true
+                  "==": [
+                    {
+                      "var": [
+                        "user.gameExp",
+                        false
+                      ]
+                    },
+                    false
+                  ]
                 },
                 {
-                  "property": "ads",
-                  "value": true
+                  "==": [
+                    {
+                      "var": [
+                        "user.ads",
+                        false
+                      ]
+                    },
+                    false
+                  ]
                 },
                 {
-                  "property": "external",
-                  "value": true
-                }
-              ],
-              "isSubmit": true
-            }
-          ]
-        },
-        "links": [
-          {
-            "node": "customization",
-            "condition": {
-              "!": [
-                {
-                  "var": "user.gameExp"
+                  "==": [
+                    {
+                      "var": [
+                        "user.external",
+                        false
+                      ]
+                    },
+                    false
+                  ]
                 }
               ]
             }
           }
         ]
       },
-      "customization": {
-        "components": {
-          "body": [
-            {
-              "id": "consentTitle",
-              "text": "consent.title",
-              "type": "text",
-              "isHidden": false,
-              "variant": "dark"
-            },
-            {
-              "id": "consentSubtitle",
-              "text": "consent.subtitle",
-              "type": "text",
-              "isHidden": false,
-              "variant": "dark"
-            },
-            {
-              "id": "allowGameExperienceDataCollection",
-              "type": "switch",
-              "text": "allowGameExperienceDataCollection",
-              "isChecked": {
-                "==": [
-                  {
-                    "var": "user.gameExp"
-                  },
-                  true
-                ]
-              },
-              "actions": [
-                {
-                  "property": "gameExp",
-                  "value": {
-                    "!": [
-                      {
-                        "var": [
-                          "user.gameExp"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "id": "allowGameAdsDataCollection",
-              "type": "switch",
-              "text": "allowGameAdsDataCollection",
-              "isChecked": {
-                "==": [
-                  {
-                    "var": "user.ads"
-                  },
-                  true
-                ]
-              },
-              "actions": [
-                {
-                  "property": "ads",
-                  "value": {
-                    "!": [
-                      {
-                        "var": [
-                          "user.ads"
-                        ]
-                      }
-                    ]
-                  }
-                },
-                {
-                  "property": "external",
-                  "value": {
-                    "if": [
-                      {
-                        "!": [
-                          {
-                            "var": [
-                              "user.ads"
-                            ]
-                          }
-                        ]
-                      },
-                      false,
-                      {
-                        "var": [
-                          "user.external"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "id": "allowThirdPartyDataCollection",
-              "type": "switch",
-              "text": "allowThirdPartyDataCollection",
-              "isChecked": {
-                "==": [
-                  {
-                    "var": "user.external"
-                  },
-                  true
-                ]
-              },
-              "isDisabled": {
-                "==": [
-                  {
-                    "var": [
-                      "user.ads",
-                      false
-                    ]
-                  },
-                  false
-                ]
-              },
-              "actions": [
-                {
-                  "property": "external",
-                  "value": {
-                    "!": [
-                      {
-                        "var": [
-                          "user.external"
-                        ]
-                      }
-                    ]
-                  }
-                },
-                {
-                  "property": "ads",
-                  "value": {
-                    "if": [
-                      {
-                        "!": [
-                          {
-                            "var": [
-                              "user.external"
-                            ]
-                          }
-                        ]
-                      },
-                      false,
-                      {
-                        "var": [
-                          "user.ads"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          ],
-          "footer": [
-            {
-              "id": "disagree",
-              "type": "button",
-              "text": "disagree",
-              "isSubmit": true,
-              "variant": "secondary",
-              "isHidden": {
-                "or": [
-                  {
-                    "==": [
-                      {
-                        "var": "user.gameExp"
-                      },
-                      true
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": "user.ads"
-                      },
-                      true
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": "user.external"
-                      },
-                      true
-                    ]
-                  }
-                ]
-              }
-            },
-            {
-              "id": "allowAll",
-              "type": "button",
-              "text": "allowAll",
-              "actions": [
-                {
-                  "property": "gameExp",
-                  "value": true
-                },
-                {
-                  "property": "ads",
-                  "value": true
-                },
-                {
-                  "property": "external",
-                  "value": true
-                }
-              ],
-              "isSubmit": true,
-              "submitDelay": 1000,
-              "variant": "primary",
-              "isHidden": {
-                "or": [
-                  {
-                    "==": [
-                      {
-                        "var": "user.gameExp"
-                      },
-                      true
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": "user.ads"
-                      },
-                      true
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": "user.external"
-                      },
-                      true
-                    ]
-                  }
-                ]
-              }
-            },
-            {
-              "id": "saveChoices",
-              "type": "button",
-              "text": "saveChoices",
-              "isSubmit": true,
-              "variant": "primary",
-              "isHidden": {
-                "and": [
-                  {
-                    "==": [
-                      {
-                        "var": [
-                          "user.gameExp",
-                          false
-                        ]
-                      },
-                      false
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": [
-                          "user.ads",
-                          false
-                        ]
-                      },
-                      false
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": [
-                          "user.external",
-                          false
-                        ]
-                      },
-                      false
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "links": [],
-        "allowGoBack": true
-      }
+      "links": [],
+      "allowGoBack": true
     }
   }
+}
