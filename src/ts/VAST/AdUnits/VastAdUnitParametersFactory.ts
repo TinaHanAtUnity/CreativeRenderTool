@@ -9,7 +9,7 @@ import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpe
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-import { Url } from 'Core/Utilities/Url';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -49,7 +49,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
 
             adVerifications.forEach((adverification) => {
                 omVendors.push(adverification.getVerificationVendor());
-                if (adverification.getVerificationVendor() === 'IAS') {
+                if (CustomFeatures.isIASVendor(adverification.getVerificationVendor())) {
                     const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification);
                     om.setOMAdViewBuilder(omAdViewBuilder);
                     omInstances.push(om);

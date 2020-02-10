@@ -9,7 +9,11 @@ import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 export class CustomFeatures {
 
     public static isNoGzipGame(gameId: string): boolean {
-        return gameId === '1475968' || gameId === '1708468';
+        return gameId === '1475968' ||
+               gameId === '1708468' ||
+               gameId === '3391175' ||
+               gameId === '37214' ||
+               gameId === '37215';
     }
 
     public static isExampleGameId(gameId: string): boolean {
@@ -66,11 +70,6 @@ export class CustomFeatures {
             || this.existsInList(Game7GamesJson, gameId)
             || this.existsInList(MobilityWareGamesJson, gameId);
 
-    }
-
-    public static isChinaSDK(platform: Platform, versionName: string): boolean {
-        return platform === Platform.ANDROID
-            && versionName.endsWith('china');
     }
 
     public static isTimerExpirationExperiment(gameId: string): boolean {
@@ -182,5 +181,10 @@ export class CustomFeatures {
                creativeId === 'lions_hooke_p1'   ||
                creativeId === 'gg_bounzy'        ||
                creativeId === 'social_dc';
+    }
+
+    public static isIASVendor(omVendor: string | undefined) {
+        return omVendor === 'IAS' ||
+               omVendor === 'integralads.com-omid';
     }
 }

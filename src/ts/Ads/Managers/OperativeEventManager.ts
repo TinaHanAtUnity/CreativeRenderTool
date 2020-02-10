@@ -446,7 +446,7 @@ export class OperativeEventManager {
                 infoJson.privacyType = privacyMethod;
             }
 
-            const trackingIDs: Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+            const trackingIDs: Partial<IInfoJson> = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
             Object.assign(infoJson, trackingIDs);
 
             infoJson.videoOrientation = params.videoOrientation;

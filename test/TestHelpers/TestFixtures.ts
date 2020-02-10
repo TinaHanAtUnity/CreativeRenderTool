@@ -154,9 +154,6 @@ import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParam
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { AndroidDownloadApi } from 'China/Native/Android/Download';
-import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
-import { IChinaApi } from 'China/IChina';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -1187,15 +1184,6 @@ export class TestFixtures {
             iOS: platform === Platform.IOS ? {
                 AR: new IosARApi(nativeBridge)
             } : undefined
-        };
-    }
-
-    public static getChinaApi(nativeBridge: NativeBridge): IChinaApi {
-        return {
-            Android: {
-                Download: new AndroidDownloadApi(nativeBridge),
-                InstallListener: new AndroidInstallListenerApi(nativeBridge)
-            }
         };
     }
 

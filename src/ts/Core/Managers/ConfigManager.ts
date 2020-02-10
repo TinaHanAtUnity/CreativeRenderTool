@@ -70,6 +70,7 @@ export class ConfigManager {
             ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken]) => {
                 let gamerToken: string | undefined;
 
+                // TODO: Fix or remove following code
                 if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
                     // only use stored gamerToken for iOS when ad tracking is limited
                     gamerToken = storedGamerToken;
@@ -79,7 +80,7 @@ export class ConfigManager {
                     ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
                 }
 
-                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter, gamerToken);
+                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -113,7 +114,7 @@ export class ConfigManager {
         }
     }
 
-    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -138,7 +139,6 @@ export class ConfigManager {
             screenHeight: screenHeight,
             screenWidth: screenWidth,
             test: this._clientInfo.getTestMode(),
-            gamerToken: gamerToken,
             analyticsUserId: this._unityInfo.getAnalyticsUserId(),
             analyticsSessionId: this._unityInfo.getAnalyticsSessionId(),
             forceAbGroup: abGroup
@@ -152,7 +152,7 @@ export class ConfigManager {
             });
         }
 
-        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
         url = Url.addParameters(url, trackingIDs);
 
         if (framework) {
