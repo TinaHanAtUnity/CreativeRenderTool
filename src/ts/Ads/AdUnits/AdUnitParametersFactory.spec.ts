@@ -36,8 +36,8 @@ describe('AdUnitParametresFactoryTest', () => {
         adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
     });
 
-    describe('when create ad', () => {
-        it('do thing', () => {
+    describe('when getBaseParameters', () => {
+        it('it should set third party event macros on creation', () => {
             expect(thirdPartyEventManagerFactory.create).toHaveBeenCalledWith({
                 [ThirdPartyEventMacro.ZONE]: undefined,
                 [ThirdPartyEventMacro.SDK_VERSION]: '',
