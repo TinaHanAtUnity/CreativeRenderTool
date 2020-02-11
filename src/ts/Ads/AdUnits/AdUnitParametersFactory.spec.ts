@@ -13,7 +13,9 @@ import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventMana
 import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 
+jest.mock('Ads/Views/Privacy.ts');
 jest.mock('AdMob/Views/AdMobView.ts');
+
 describe('AdUnitParametresFactoryTest', () => {
     let campaign: AdMobCampaignMock;
     let placement: PlacementMock;
@@ -21,6 +23,7 @@ describe('AdUnitParametresFactoryTest', () => {
     let adUnitParametersFactory: AbstractAdUnitParametersFactory<Campaign, IAdMobAdUnitParameters>;
     let thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
     let clientInfo: ClientInfoMock;
+    // let coreconfig: CoreConfiguration;
 
     beforeEach(() => {
         const core = new Core();
@@ -31,8 +34,6 @@ describe('AdUnitParametresFactoryTest', () => {
         thirPartyEventManager = new ThirdPartyEventManager();
         thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         adUnitParametersFactory = new AdMobAdUnitParametersFactory(core, ads);
-        jest.spyOn(adUnitParametersFactory, 'createPrivacy').mockImplementation(jest.fn());
-        jest.spyOn(adUnitParametersFactory, 'showGDPRBanner').mockImplementation(jest.fn());
         adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
     });
 

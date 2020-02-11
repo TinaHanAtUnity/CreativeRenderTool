@@ -124,7 +124,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
                         beforeEach(() => {
                             sandbox.stub(CustomFeatures, 'isUnsupportedOMVendor').returns(true);
-                            sinon.stub(Date.prototype, 'toISOString').returns('2020-02-06T23:45:18.458Z');
+                            sandbox.stub(Date.prototype, 'toISOString').returns('2020-02-06T23:45:18.458Z');
                             om = initWithVastVerifications(vastAdVerifications);
                             om.render();
                             om.addMessageListener();
