@@ -23,7 +23,6 @@ describe('AdUnitParametresFactoryTest', () => {
     let adUnitParametersFactory: AbstractAdUnitParametersFactory<Campaign, IAdMobAdUnitParameters>;
     let thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
     let clientInfo: ClientInfoMock;
-    // let coreconfig: CoreConfiguration;
 
     beforeEach(() => {
         const core = new Core();
