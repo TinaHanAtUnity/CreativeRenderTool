@@ -4,7 +4,6 @@ import { ProgrammaticTrackingService as Base } from 'Ads/Utilities/ProgrammaticT
 export function MockPTS(): void {
     Base.initialize = jest.fn();
     Base.createAdsSdkTag = jest.fn();
-    Base.reportErrorEvent = jest.fn();
     Base.reportMetricEvent = jest.fn();
     Base.reportMetricEventWithTags = jest.fn();
     Base.reportTimingEvent = jest.fn();

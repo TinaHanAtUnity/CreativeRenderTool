@@ -1,4 +1,4 @@
-import { ProgrammaticTrackingError, PTSEvent, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ErrorMetric, PTSEvent, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -58,22 +58,6 @@ export class MetricInstance {
         ];
     }
 
-    private createErrorTags(event: PTSEvent, adType?: string, seatId?: number): string[] {
-
-        const platform: Platform = this._platform;
-        const osVersion: string = this._deviceInfo.getOsVersion();
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-
-        return [
-            this.createAdsSdkTag('eevt', event),
-            this.createAdsSdkTag('plt', Platform[platform]),
-            this.createAdsSdkTag('osv', osVersion),
-            this.createAdsSdkTag('sdv', sdkVersion),
-            this.createAdsSdkTag('adt', `${adType}`),
-            this.createAdsSdkTag('sid', `${seatId}`)
-        ];
-    }
-
     private createData(event: PTSEvent, value: number, tags: string[]): IProgrammaticTrackingData {
         return {
             metrics: [
@@ -107,18 +91,13 @@ export class MetricInstance {
         return this.postToDatadog(metricData, this.metricPath);
     }
 
-    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
-        const errorData = this.createData(event, 1, this.createErrorTags(event, adType, seatId));
-        return this.postToDatadog(errorData, this.metricPath);
-    }
-
     public reportTimingEvent(event: TimingMetric, value: number): Promise<INativeResponse> {
         // Gate Negative Values
         if (value > 0) {
             const timingData = this.createData(event, value, this.createTimingTags());
             return this.postToDatadog(timingData, this.timingPath);
         } else {
-            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
+            const metricData = this.createData(ErrorMetric.TimingValueNegative, 1, this.createMetricTags(event, []));
             return this.postToDatadog(metricData, this.metricPath);
         }
     }

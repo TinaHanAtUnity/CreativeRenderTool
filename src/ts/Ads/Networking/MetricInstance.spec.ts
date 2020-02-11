@@ -3,7 +3,7 @@ import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
 import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
-import { AdmobMetric, ProgrammaticTrackingError, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AdmobMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 
 [
@@ -49,75 +49,6 @@ import { Platform } from 'Core/Constants/Platform';
             it(`should send "${t.expected}" with suffix "${t.inputSuffix}" and value "${t.inputValue}"`, () => {
                 const tag = metricInstance.createAdsSdkTag(t.inputSuffix, t.inputValue);
                 expect(tag).toEqual(t.expected);
-            });
-        });
-    });
-
-    describe('reportErrorEvent', () => {
-        const adType = 'test';
-        const seatId = 1234;
-
-        const tagBuilder = [
-            `ads_sdk2_plt:${Platform[platform]}`,
-            `ads_sdk2_osv:${osVersion}`,
-            `ads_sdk2_sdv:${sdkVersion}`,
-            `ads_sdk2_adt:${adType}`,
-            `ads_sdk2_sid:${seatId}`
-        ];
-
-        const tests: {
-            input: ProgrammaticTrackingError;
-            expected: IProgrammaticTrackingData;
-        }[] = [{
-            input: ProgrammaticTrackingError.TooLargeFile,
-            expected: {
-                metrics: [
-                    {
-                        name: 'too_large_file',
-                        value: 1,
-                        tags: [
-                            'ads_sdk2_eevt:too_large_file',
-                            ...tagBuilder
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            input: ProgrammaticTrackingError.BannerRequestError,
-            expected: {
-                metrics: [
-                    {
-                        name: 'banner_request_error',
-                        value: 1,
-                        tags: [
-                            'ads_sdk2_eevt:banner_request_error',
-                            ...tagBuilder
-                        ]
-                    }
-                ]
-            }
-        }];
-        tests.forEach((t) => {
-
-            it(`should call post once`, () => {
-                const promise = metricInstance.reportErrorEvent(t.input, adType, seatId);
-
-                expect(requestManager.post).toHaveBeenCalledTimes(1);
-
-                return promise;
-            });
-
-            it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = metricInstance.reportErrorEvent(t.input, adType, seatId);
-
-                expect(requestManager.post).toBeCalledWith(
-                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
-                    JSON.stringify(t.expected),
-                    [['Content-Type', 'application/json']]
-                    );
-
-                return promise;
             });
         });
     });

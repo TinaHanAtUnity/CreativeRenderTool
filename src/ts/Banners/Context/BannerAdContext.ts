@@ -13,7 +13,7 @@ import { ICore } from 'Core/ICore';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerSizeUtil, IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ErrorMetric, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IObserver0, IObserver1 } from 'Core/Utilities/IObserver';
 import { BannerViewType } from 'Banners/Native/BannerApi';
@@ -149,7 +149,7 @@ export class BannerAdContext {
                     ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdNoFill);
                     return this.onBannerNoFill();
                 } else {
-                    ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
+                    ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.BannerRequestError);
                     return this.sendBannerError(new Error(`Banner failed to load : ${e.message}`));
                 }
             });

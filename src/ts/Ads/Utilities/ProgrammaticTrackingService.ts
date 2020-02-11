@@ -1,6 +1,6 @@
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 
-export enum ProgrammaticTrackingError {
+export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
     AdmobTestHttpError = 'admob_video_http_error',
@@ -126,7 +126,7 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | TimingMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 
@@ -148,10 +148,6 @@ export class ProgrammaticTrackingService {
 
     public static reportMetricEventWithTags(event: PTSEvent, tags: string[]): void {
         this._metricInstance.reportMetricEventWithTags(event, tags);
-    }
-
-    public static reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): void {
-        this._metricInstance.reportErrorEvent(event, adType, seatId);
     }
 
     public static reportTimingEvent(event: TimingMetric, value: number): void {

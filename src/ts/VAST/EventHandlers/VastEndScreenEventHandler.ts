@@ -10,7 +10,7 @@ import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ErrorMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IAdsApi } from 'Ads/IAds';
 import { Placement } from 'Ads/Models/Placement';
 
@@ -45,7 +45,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._ads.Listener.sendClickEvent(this._placement.getId());
 
         if (!this._vastAdUnit.hasImpressionOccurred()) {
-            ProgrammaticTrackingService.reportErrorEvent(ProgrammaticTrackingError.VastClickWithoutImpressionError, this._vastAdUnit.description());
+            ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.VastClickWithoutImpressionError);
         }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
