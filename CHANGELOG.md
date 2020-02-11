@@ -2,6 +2,7 @@
 
 * Add willExpireAt Support for Comet Campaigns [#13201](https://github.com/Applifier/unity-ads-webview/pull/13201)
 * Add Webview to Native Version Mapping Support [#13015](https://github.com/Applifier/unity-ads-webview/pull/13015)
+* Open Measurement - (Temporary) Don't use stored campaign OMEnabled Value for brand tracking [#13165](https://github.com/Applifier/unity-ads-webview/pull/13165)
 
 # Mon Feb 10 22:37:45 UTC 2020
 
