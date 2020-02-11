@@ -11,7 +11,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { IBannerModule } from 'Banners/IBannerModule';
 import { IAds } from 'Ads/IAds';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 describe('BannerAdUnitParameterFactory', () => {
 

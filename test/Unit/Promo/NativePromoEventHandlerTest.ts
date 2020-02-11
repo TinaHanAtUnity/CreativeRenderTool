@@ -16,7 +16,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ThirdPartyEventManager, ThirdPartyEventMacro, ITemplateValueMap } from 'Ads/Managers/ThirdPartyEventManager';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
-import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 describe('NativePromoEventHandlerTest', () => {
     let sandbox: sinon.SinonSandbox;
