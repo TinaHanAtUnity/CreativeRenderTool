@@ -92,6 +92,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
 export class Ads implements IAds {
 
@@ -276,6 +277,9 @@ export class Ads implements IAds {
             const initializeAuctionTimespan = Date.now();
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
                 ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
+                if (this.PrivacyManager.isPrivacySDKTestActive()) {
+                    CachedUserSummary.fetch(this.PrivacyManager);
+                }
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());

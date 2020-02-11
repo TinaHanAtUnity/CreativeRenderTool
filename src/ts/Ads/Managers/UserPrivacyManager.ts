@@ -19,11 +19,12 @@ import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { PrivacySDKTest } from 'Core/Models/ABGroup';
+import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
 
-interface IUserSummary extends ITemplateData {
+export interface IUserSummary extends ITemplateData {
     deviceModel: string;
     country: string;
     gamePlaysThisWeek: number;
@@ -135,6 +136,8 @@ export class UserPrivacyManager {
                 agreedOverAgeLimit = false;
         }
 
+        const userSummary = CachedUserSummary.get();
+
         return new PrivacyConfig(PrivacySDKFlow,
             {
                 ads: this._userPrivacy.getPermissions().ads,
@@ -152,7 +155,14 @@ export class UserPrivacyManager {
                 ageGateLimit: this._privacy.getAgeGateLimit(),
                 legalFramework: this._privacy.getLegalFramework(),
                 isCoppa: this._coreConfig.isCoppaCompliant(),
-                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined
+                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
+                userSummary: {
+                    deviceModel: userSummary ? userSummary.deviceModel : '-',
+                    country: userSummary ? userSummary.country : '-',
+                    gamePlaysThisWeek: userSummary ? userSummary.gamePlaysThisWeek.toString() : '-',
+                    adsSeenInGameThisWeek: userSummary ? userSummary.adsSeenInGameThisWeek.toString() : '-',
+                    installsFromAds: userSummary ? userSummary.installsFromAds.toString() : '-'
+                }
             },
             PrivacyWebUI);
     }
