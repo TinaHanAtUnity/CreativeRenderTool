@@ -12,7 +12,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';

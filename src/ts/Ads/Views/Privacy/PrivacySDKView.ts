@@ -10,7 +10,6 @@ import { IPrivacySettings, IUserPrivacySettings } from 'Privacy/IPrivacySettings
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 import DeviceOrientationScript from 'html/mraid/deviceorientation-support.html';
 import PrivacyTemplate from 'html/Privacy-iframe.html';
