@@ -8,7 +8,6 @@ import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
-import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -67,8 +66,6 @@ export class ThirdPartyEventManager {
         if (templateValues) {
             this.setTemplateValues(templateValues);
         }
-        this._templateValues[ThirdPartyEventMacro.OMIDPARTNER] = OMID_P;
-        this._templateValues[ThirdPartyEventMacro.CACHEBUSTING] = '-1';
     }
 
     public sendTrackingEvents(campaign: Campaign, event: TrackingEvent, adDescription: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse[]> {

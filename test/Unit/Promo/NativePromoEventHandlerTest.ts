@@ -76,9 +76,7 @@ describe('NativePromoEventHandlerTest', () => {
                 assert.deepEqual(templateValues, {
                     [ThirdPartyEventMacro.ZONE]: 'test',
                     [ThirdPartyEventMacro.SDK_VERSION]: '3000',
-                    [ThirdPartyEventMacro.GAMER_SID]: 'test-serverId',
-                    [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P,
-                    [ThirdPartyEventMacro.CACHEBUSTING]: '-1'
+                    [ThirdPartyEventMacro.GAMER_SID]: 'test-serverId'
                 });
                 sinon.assert.calledThrice(<sinon.SinonStub>thirdPartyEventManager.sendWithGet);
                 sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'impression', '12345', 'http://test.impression.com/blah1');

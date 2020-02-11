@@ -1,9 +1,9 @@
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
-import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { Platform } from 'Core/Constants/Platform';
 import { Core } from 'Core/__mocks__/Core';
-import { ICoreApi } from 'Core/ICore';
+
+import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { ICoreApi } from 'Core/ICore';
 
 describe('ThirdPartyEventManagerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -15,7 +15,7 @@ describe('ThirdPartyEventManagerTest', () => {
         request = new RequestManager();
         urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
 
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1'});
     });
 
     describe('when replacing Open Measurement Macros', () => {

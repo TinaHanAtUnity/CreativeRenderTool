@@ -39,9 +39,7 @@ describe('BannerAdUnitParameterFactory', () => {
         return factory.create('test', campaign, placement, webPlayerContainer).then((params) => {
             assert.deepEqual((<any>params.thirdPartyEventManager)._templateValues, {
                 '%ZONE%': '1',
-                '%SDK_VERSION%': sdkVersion,
-                '[OMIDPARTNER]': OMID_P,
-                '[CACHEBUSTING]': '-1'
+                '%SDK_VERSION%': sdkVersion
             });
         });
     });
