@@ -40,7 +40,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     private _frameEventAdapter: PrivacyFrameEventAdapter;
 
     constructor(params: IPrivacySDKViewParameters) {
-        super(params.platform, 'consent');
+        super(params.platform, 'privacy-sdk-container');
         this._template = new Template(PrivacyTemplate);
         this._privacyManager = params.privacyManager;
         this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
