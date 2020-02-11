@@ -1,4 +1,4 @@
-# Pending
+# Tue Feb 11 23:23:12 UTC 2020
 
 * Add willExpireAt Support for Comet Campaigns [#13201](https://github.com/Applifier/unity-ads-webview/pull/13201)
 * Add Webview to Native Version Mapping Support [#13015](https://github.com/Applifier/unity-ads-webview/pull/13015)
