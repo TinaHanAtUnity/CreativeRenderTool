@@ -287,7 +287,8 @@ export class Ads implements IAds {
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         }).then(() => {
-            if (CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 0, 0, 0, 0)) {
+            const isPerformanceDefined = performance && performance.now;
+            if (isPerformanceDefined && CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 0, 0, 0, 0)) {
                 SdkInitLatency.execute(this._core.ClientInfo, this._core.RequestManager);
             }
         });
