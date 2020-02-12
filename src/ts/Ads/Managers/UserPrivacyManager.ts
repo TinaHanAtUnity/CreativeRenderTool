@@ -147,7 +147,7 @@ export class UserPrivacyManager {
             },
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
-                platform: this._platform,
+                platform: Platform[this._platform],
                 userLocale: this._deviceInfo.getLanguage(),
                 country: this._coreConfig.getCountry(),
                 subCountry: this._coreConfig.getSubdivision(),
