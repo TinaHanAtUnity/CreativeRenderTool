@@ -7,6 +7,8 @@ export class MediationLoadTrackingManager {
     private _listener: ListenerApi;
     private _mediationName: string;
     private _webviewEnabledLoad: boolean;
+    private _usingPerformanceTime: boolean = false;
+    private _initialAdRequest: boolean = false;
 
     private _activeLoads: { [key: string]: number };
 
@@ -22,12 +24,15 @@ export class MediationLoadTrackingManager {
         this._listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, nextState) => this.onPlacementStateChangedEventSent(placementId, nextState));
     }
 
+    public setInitComplete(): void {
+        this._initialAdRequest = true;
+    }
+
     private onLoad(placements: { [key: string]: number }): void {
+        this.checkForTimedOutPlacements();
         Object.keys(placements).forEach((placementId) => {
             if (!this._activeLoads[placementId]) {
                 this._activeLoads[placementId] = this.getTime();
-            } else {
-                // Log duplicate?
             }
         });
     }
@@ -42,27 +47,43 @@ export class MediationLoadTrackingManager {
         if (newState === 'READY') {
             ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, [
                 ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                ProgrammaticTrackingService.createAdsSdkTag('upt', `${this._usingPerformanceTime}`),
+                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
-
         } else if (newState === 'NO_FILL') {
-            ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, [
+            ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, [
                 ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                ProgrammaticTrackingService.createAdsSdkTag('upt', `${this._usingPerformanceTime}`),
+                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
-
-        } else {
-            // Log separate state?
         }
     }
 
     private getTime(): number {
         if (performance && performance.now) {
+            this._usingPerformanceTime = true;
             return performance.now();
         } else {
             return Date.now();
         }
+    }
+
+    private checkForTimedOutPlacements(): void {
+        Object.keys(this._activeLoads).forEach((placementId) => {
+            const timeValue = this.getTime() - this._activeLoads[placementId];
+            if (timeValue >= 30000) {
+                ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, [
+                    ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+                    ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                    ProgrammaticTrackingService.createAdsSdkTag('upt', `${this._usingPerformanceTime}`),
+                    ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._initialAdRequest}`)
+                ]);
+                delete this._activeLoads[placementId];
+            }
+        });
     }
 }

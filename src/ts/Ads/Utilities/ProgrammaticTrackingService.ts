@@ -127,8 +127,9 @@ export enum AUIMetric {
 }
 
 export enum MediationMetric {
-    LoadRequestFill = 'load_request_fill',
-    LoadRequestNofill = 'load_request_nofill'
+    LoadRequestFill = 'load_request_fill_time',
+    LoadRequestNofill = 'load_request_nofill_time',
+    LoadRequestTimeout = 'load_request_timeout'
 }
 
 // TODO Clean up naming
