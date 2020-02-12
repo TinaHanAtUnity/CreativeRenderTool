@@ -3,7 +3,7 @@ import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
 import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
-import { AdmobMetric, ProgrammaticTrackingError, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AdmobMetric, ProgrammaticTrackingError, TimingMetric, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 
 [
@@ -334,7 +334,7 @@ import { Platform } from 'Core/Constants/Platform';
             });
         });
 
-        describe('Batch two events', () => {
+        describe('Batch two timing events', () => {
 
             beforeEach(() => {
                 metricInstance.reportTimingEvent(TimingMetric.CoreInitializeTime, 999);
@@ -383,6 +383,58 @@ import { Platform } from 'Core/Constants/Platform';
                 return metricInstance.sendBatchedTimingEvents().then(() => {
                     //tslint:disable-next-line
                     expect(metricInstance['_batchedTimingEvents']).toEqual([]);
+                });
+            });
+        });
+
+        describe('Batch two metric events', () => {
+            beforeEach(() => {
+                metricInstance.reportMetricEvent(BannerMetric.BannerAdLoad);
+                metricInstance.reportMetricEvent(BannerMetric.BannerAdImpression);
+            });
+
+            it('should call post once', () => {
+                const promise = metricInstance.sendBatchedMetricEvents();
+                expect(requestManager.post).toHaveBeenCalledTimes(1);
+                return promise;
+            });
+
+            it('should fire events when events are batched', () => {
+                const expected = {
+                    metrics: [
+                        {
+                            name: 'banner_ad_load',
+                            value: 1,
+                            tags: [
+                                'ads_sdk2_mevt:banner_ad_load',
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }, {
+                            name: 'banner_ad_impression',
+                            value: 1,
+                            tags: [
+                                'ads_sdk2_mevt:banner_ad_impression',
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }
+                    ]
+                };
+                const promise = metricInstance.sendBatchedMetricEvents();
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
+                    JSON.stringify(expected),
+                    [['Content-Type', 'application/json']]
+                    );
+
+                return promise;
+            });
+
+            it('should clear batchedMetricEvents', () => {
+                return metricInstance.sendBatchedMetricEvents().then(() => {
+                    //tslint:disable-next-line
+                    expect(metricInstance['_batchedMetricEvents']).toEqual([]);
                 });
             });
         });
