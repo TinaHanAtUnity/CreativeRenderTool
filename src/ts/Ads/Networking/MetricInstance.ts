@@ -111,7 +111,7 @@ export class MetricInstance {
         this.batchMetricEvent(event, 1, this.createErrorTags(event, adType, seatId));
     }
 
-    public reportTimingEvent(event: TimingMetric, value: number) {
+    public reportTimingEvent(event: TimingEvent, value: number) {
         // Gate Negative Values
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTimingTags([]));
@@ -153,7 +153,7 @@ export class MetricInstance {
         }
     }
 
-    public sendBatchedEvents(): void {
+    public async sendBatchedEvents() {
         this.sendBatchedMetricEvents();
         this.sendBatchedTimingEvents();
     }
