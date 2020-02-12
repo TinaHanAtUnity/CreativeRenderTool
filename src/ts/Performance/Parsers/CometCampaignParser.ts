@@ -53,9 +53,11 @@ export class CometCampaignParser extends CampaignParser {
                 throw new Error('Unknown store value "' + json.store + '"');
         }
 
+        const cacheTTL = response.getCacheTTL();
+
         const baseCampaignParams: ICampaign = {
             id: json.id,
-            willExpireAt: undefined,
+            willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,

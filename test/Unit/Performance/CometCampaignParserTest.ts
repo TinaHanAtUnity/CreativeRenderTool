@@ -42,6 +42,7 @@ describe('CometCampaignParser', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreModule(nativeBridge);
         (<any>core.Api).Sdk = sinon.createStubInstance(SdkApi);
+        sinon.stub(Date, 'now').returns(0); // To easily calculate willExpireAt
 
         request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve('http://s3-us-west-1.amazonaws.com/ads-load-testing/AssetPack1/b30-400.mp4'));
@@ -101,6 +102,7 @@ describe('CometCampaignParser', () => {
             assert.equal(campaign.getBypassAppSheet(), content.bypassAppSheet, 'Bypass App Sheet is not equal');
             assert.equal(campaign.getStore(), getStore(content.store), 'Store is not equal');
             assert.equal(campaign.getAppStoreId(), content.appStoreId, 'App Store ID is not equal');
+            assert.equal(campaign.getWillExpireAt(), 3600000, 'willExpireAt was not set correctly');
         };
 
         describe('when it is an mraid campaign', () => {
