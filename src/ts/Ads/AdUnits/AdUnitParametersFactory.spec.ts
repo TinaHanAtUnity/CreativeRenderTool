@@ -33,11 +33,12 @@ describe('AdUnitParametresFactoryTest', () => {
         thirPartyEventManager = new ThirdPartyEventManager();
         thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         adUnitParametersFactory = new AdMobAdUnitParametersFactory(core, ads);
-        adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
     });
 
     describe('when getBaseParameters', () => {
         it('it should set third party event macros on creation', () => {
+            adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+
             expect(thirdPartyEventManagerFactory.create).toHaveBeenCalledWith({
                 [ThirdPartyEventMacro.ZONE]: undefined,
                 [ThirdPartyEventMacro.SDK_VERSION]: '',
