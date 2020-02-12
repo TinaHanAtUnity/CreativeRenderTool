@@ -92,6 +92,7 @@ import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { SdkInitLatency } from 'Core/Managers/SdkInitLatency';
 
 export class Ads implements IAds {
 
@@ -285,6 +286,10 @@ export class Ads implements IAds {
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
+        }).then(() => {
+            if (CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 0, 0, 0, 0)) {
+                SdkInitLatency.execute(this._core.ClientInfo, this._core.RequestManager);
+            }
         });
     }
 
