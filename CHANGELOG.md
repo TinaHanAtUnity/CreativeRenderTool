@@ -1,3 +1,7 @@
+# Wed Feb 12 21:54:20 UTC 2020
+
+* Fix Mediation Tracking Bug and Add Test to 3.2.0 [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
+
 # Wed Feb 12 20:50:59 UTC 2020
 
 * Add Mediation Load Tracking to Webview Version 3.2.0 [#13230](https://github.com/Applifier/unity-ads-webview/pull/13230)
