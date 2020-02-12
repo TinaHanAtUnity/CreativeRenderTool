@@ -68,7 +68,6 @@ export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
-export const AdmobAdapterV1 = new ABTest(5, 6);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
