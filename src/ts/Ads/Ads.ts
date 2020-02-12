@@ -91,6 +91,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 
 export class Ads implements IAds {
 
@@ -113,6 +114,7 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public AdmobAdapterManager: AdmobAdapterManager;
+    public MediationLoadTrackingManager: MediationLoadTrackingManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -198,6 +200,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
+            return this.setupMediationTrackingManager();
+        }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing since it's normal to have undefined developer consent
             });
@@ -274,6 +278,9 @@ export class Ads implements IAds {
         }).then(() => {
             const initializeAuctionTimespan = Date.now();
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
+                if (this.MediationLoadTrackingManager) {
+                    this.MediationLoadTrackingManager.setInitComplete();
+                }
                 ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
             }));
         }).then(() => {
@@ -319,6 +326,19 @@ export class Ads implements IAds {
             });
         }
 
+        return Promise.resolve();
+    }
+
+    private setupMediationTrackingManager(): Promise<void> {
+        if (this._loadApiEnabled) {
+
+            // Potentially use SDK Detection
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation && mediation.getName()) {
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
+                }
+            }).catch();
+        }
         return Promise.resolve();
     }
 
