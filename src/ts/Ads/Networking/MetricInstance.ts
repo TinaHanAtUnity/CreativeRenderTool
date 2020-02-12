@@ -145,7 +145,7 @@ export class MetricInstance {
         }
     }
 
-    public async sendBatchedEvents() {
+    public sendBatchedEvents(): void {
         this.sendBatchedMetricEvents();
         this.sendBatchedTimingEvents();
     }
