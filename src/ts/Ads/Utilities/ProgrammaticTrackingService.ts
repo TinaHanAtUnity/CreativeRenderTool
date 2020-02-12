@@ -99,6 +99,7 @@ export enum OMMetric {
     IASVerificationSessionStarted = 'ias_verification_session_started',
     IASVerificationSessionFinished = 'ias_verification_session_finished',
     IASVerificatonInjectionFailed = 'ias_verification_injection_failed',
+    OMEnabledLiftOff = 'om_enabled_liftoff',
     OMInjectionFailure = 'om_injection_failure'
 }
 
@@ -125,7 +126,16 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export enum MediationMetric {
+    LoadRequestFill = 'load_request_fill_time',
+    LoadRequestNofill = 'load_request_nofill_time',
+    LoadRequestTimeout = 'load_request_timeout'
+}
+
+// TODO Clean up naming
+export type TimingEvent = TimingMetric | MediationMetric;
+
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 
@@ -153,8 +163,16 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportErrorEvent(event, adType, seatId);
     }
 
-    public static reportTimingEvent(event: TimingMetric, value: number): void {
+    public static reportTimingEvent(event: TimingEvent, value: number): void {
         this._metricInstance.reportTimingEvent(event, value);
+    }
+
+    public static reportTimingEventWithTags(event: TimingMetric, value: number, tags: string[]): void {
+        this._metricInstance.reportTimingEventWithTags(event, value, tags);
+    }
+
+    public static batchEvent(metric: TimingMetric, value: number): void {
+        this._metricInstance.batchEvent(metric, value);
     }
 
     public static sendBatchedEvents(): void {

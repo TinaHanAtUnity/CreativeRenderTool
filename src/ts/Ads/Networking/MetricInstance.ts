@@ -1,4 +1,4 @@
-import { ProgrammaticTrackingError, PTSEvent, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, PTSEvent, TimingMetric, TimingEvent } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -52,12 +52,11 @@ export class MetricInstance {
                 this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
     }
 
-    private createTimingTags(): string[] {
+    private createTimingTags(tags: string[]): string[] {
         return [
             this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
             this.createAdsSdkTag('iso', this._countryIso),
-            this.createAdsSdkTag('plt', Platform[this._platform])
-        ];
+            this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
     }
 
     private createErrorTags(event: PTSEvent, adType?: string, seatId?: number): string[] {
@@ -115,12 +114,21 @@ export class MetricInstance {
     public reportTimingEvent(event: TimingMetric, value: number) {
         // Gate Negative Values
         if (value > 0) {
-            this.batchTimingEvent(event, value, this.createTimingTags());
+            this.batchTimingEvent(event, value, this.createTimingTags([]));
         } else {
             this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
         }
     }
 
+    public reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]) {
+        if (value > 0) {
+            this.batchTimingEvent(event, value, this.createTimingTags(tags));
+        } else {
+            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
+        }
+    }
+
+    // TODO: Extend this to all events
     private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {
         // Curently ignore additional negative time values
         if (value > 0) {
