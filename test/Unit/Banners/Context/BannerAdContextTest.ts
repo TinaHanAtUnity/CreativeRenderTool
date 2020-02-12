@@ -46,9 +46,10 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             placement.set('id', placementId);
             placement.set('adTypes', ['BANNER']);
             bannerAdContext = bannerModule.BannerAdContextManager.createContext(placement, placementId, BannerSizeStandardDimensions);
-            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
-            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags').returns(Promise.resolve());
-            sandbox.stub(ProgrammaticTrackingService, 'reportErrorEvent').returns(Promise.resolve());
+            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEvent');
+            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags');
+            sandbox.stub(ProgrammaticTrackingService, 'reportErrorEvent');
+            sandbox.stub(ProgrammaticTrackingService, 'sendBatchedEvents');
             sandbox.stub(ProgrammaticTrackingService, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
         });
 
