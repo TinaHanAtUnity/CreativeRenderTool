@@ -8,7 +8,7 @@ export class MediationLoadTrackingManager {
     private _mediationName: string;
     private _webviewEnabledLoad: boolean;
     private _usingPerformanceTime: boolean = false;
-    private _initialAdRequest: boolean = false;
+    private _initialAdRequest: boolean = true;
 
     private _activeLoads: { [key: string]: number };
 
@@ -25,7 +25,7 @@ export class MediationLoadTrackingManager {
     }
 
     public setInitComplete(): void {
-        this._initialAdRequest = true;
+        this._initialAdRequest = false;
     }
 
     private onLoad(placements: { [key: string]: number }): void {
