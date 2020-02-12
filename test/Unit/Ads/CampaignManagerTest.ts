@@ -155,8 +155,8 @@ describe('CampaignManager', () => {
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
-        sinon.stub(ProgrammaticTrackingService, 'batchEvent');
+        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent');
+        sinon.stub(ProgrammaticTrackingService, 'reportTimingEvent');
         contentTypeHandlerManager = new ContentTypeHandlerManager();
         adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);

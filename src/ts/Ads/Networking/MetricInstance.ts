@@ -98,36 +98,31 @@ export class MetricInstance {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
-    public reportMetricEvent(event: PTSEvent): Promise<INativeResponse> {
-        return this.reportMetricEventWithTags(event, []);
+    public reportMetricEvent(event: PTSEvent) {
+        this.reportMetricEventWithTags(event, []);
     }
 
     public reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
-        const metricData = this.createData(event, 1, this.createMetricTags(event, tags));
-        return this.postToDatadog(metricData, this.metricPath);
+        this.batchEvent(event, 1, this.createMetricTags(event, tags));
     }
 
-    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): Promise<INativeResponse> {
-        const errorData = this.createData(event, 1, this.createErrorTags(event, adType, seatId));
-        return this.postToDatadog(errorData, this.metricPath);
+    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
+        this.batchEvent(event, 1, this.createErrorTags(event, adType, seatId));
     }
 
-    public reportTimingEvent(event: TimingMetric, value: number): Promise<INativeResponse> {
+    public reportTimingEvent(event: TimingMetric, value: number) {
         // Gate Negative Values
         if (value > 0) {
-            const timingData = this.createData(event, value, this.createTimingTags());
-            return this.postToDatadog(timingData, this.timingPath);
+            this.batchEvent(event, value, this.createTimingTags());
         } else {
-            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
-            return this.postToDatadog(metricData, this.metricPath);
+            this.batchEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
         }
     }
 
-    // TODO: Extend this to all events
-    public batchEvent(metric: TimingMetric, value: number): void {
+    private batchEvent(metric: PTSEvent, value: number, tags: string[]): void {
         // Curently ignore additional negative time values
         if (value > 0) {
-            this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, this.createTimingTags()).metrics);
+            this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, tags).metrics);
         }
 
         // Failsafe so we aren't storing too many events at once

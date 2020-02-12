@@ -321,7 +321,7 @@ import { Platform } from 'Core/Constants/Platform';
         });
 
         it('should not fire events when negative valued events are batched', () => {
-            metricInstance.batchEvent(TimingMetric.AdsInitializeTime, -200);
+            metricInstance.reportTimingEvent(TimingMetric.AdsInitializeTime, -200);
             return metricInstance.sendBatchedEvents().then(() => {
                 expect(requestManager.post).toBeCalledTimes(0);
             });
@@ -330,8 +330,8 @@ import { Platform } from 'Core/Constants/Platform';
         describe('Batch two events', () => {
 
             beforeEach(() => {
-                metricInstance.batchEvent(TimingMetric.CoreInitializeTime, 999);
-                metricInstance.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
+                metricInstance.reportTimingEvent(TimingMetric.CoreInitializeTime, 999);
+                metricInstance.reportTimingEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
             });
 
             it('should call post once', () => {
@@ -384,13 +384,13 @@ import { Platform } from 'Core/Constants/Platform';
             it('should not fire events when below 10', () => {
                 for (let i = 0; i < 10; i++) {
                     expect(requestManager.post).toBeCalledTimes(0);
-                    metricInstance.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                    metricInstance.reportTimingEvent(TimingMetric.TotalWebviewInitializationTime, 200);
                 }
             });
 
             it('should fire events when 10 events are reached', () => {
                 for (let i = 0; i < 10; i++) {
-                    metricInstance.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                    metricInstance.reportTimingEvent(TimingMetric.TotalWebviewInitializationTime, 200);
                 }
                 expect(requestManager.post).toBeCalledTimes(1);
             });

@@ -185,7 +185,7 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
+                ProgrammaticTrackingService.reportTimingEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 

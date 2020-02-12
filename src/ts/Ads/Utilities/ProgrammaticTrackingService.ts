@@ -157,10 +157,6 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
-    public static batchEvent(metric: TimingMetric, value: number): void {
-        this._metricInstance.batchEvent(metric, value);
-    }
-
     public static sendBatchedEvents(): void {
         this._metricInstance.sendBatchedEvents();
     }

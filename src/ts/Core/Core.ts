@@ -211,8 +211,8 @@ export class Core implements ICore {
                 ProgrammaticTrackingService.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             }
 
-            ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
-            ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
+            ProgrammaticTrackingService.reportTimingEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
+            ProgrammaticTrackingService.reportTimingEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
@@ -231,9 +231,9 @@ export class Core implements ICore {
             const adsInitializeStart = Date.now();
             return this.Ads.initialize().then(() => {
                 const initializeFinished = Date.now();
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
-                ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
-                ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
+                ProgrammaticTrackingService.reportTimingEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
+                ProgrammaticTrackingService.reportTimingEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
+                ProgrammaticTrackingService.reportTimingEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
                 ProgrammaticTrackingService.sendBatchedEvents();
             });
         }).catch((error: { message: string; name: unknown }) => {
