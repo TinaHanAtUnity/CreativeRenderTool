@@ -126,7 +126,15 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export enum MediationMetric {
+    LoadRequestFill = 'load_request_fill',
+    LoadRequestNofill = 'load_request_nofill'
+}
+
+// TODO Clean up naming
+export type TimingEvent = TimingMetric | MediationMetric;
+
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 
@@ -154,8 +162,12 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportErrorEvent(event, adType, seatId);
     }
 
-    public static reportTimingEvent(event: TimingMetric, value: number): void {
+    public static reportTimingEvent(event: TimingEvent, value: number): void {
         this._metricInstance.reportTimingEvent(event, value);
+    }
+
+    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
+        this._metricInstance.reportTimingEventWithTags(event, value, tags);
     }
 
     public static batchEvent(metric: TimingMetric, value: number): void {
