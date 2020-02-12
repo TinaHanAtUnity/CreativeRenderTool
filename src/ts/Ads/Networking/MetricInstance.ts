@@ -133,7 +133,7 @@ export class MetricInstance {
         }
     }
 
-    private batchMetricEvent(metric: PTSEvent, value: number, tags:string[] ): void {
+    private batchMetricEvent(metric: PTSEvent, value: number, tags: string[]): void {
         // Curently ignore additional negative time values
         if (value > 0) {
             this._batchedMetricEvents = this._batchedMetricEvents.concat(this.createData(metric, value, tags).metrics);
@@ -152,7 +152,7 @@ export class MetricInstance {
 
     public async sendBatchedMetricEvents(): Promise<void> {
         await this._sendBatchedEvents(this._batchedMetricEvents, this.metricPath).then(() => {
-            this._batchedMetricEvents = []; 
+            this._batchedMetricEvents = [];
             return;
         });
         return Promise.resolve();
@@ -160,18 +160,18 @@ export class MetricInstance {
 
     public async sendBatchedTimingEvents(): Promise<void> {
         await this._sendBatchedEvents(this._batchedTimingEvents, this.timingPath).then(() => {
-            this._batchedTimingEvents = []; 
+            this._batchedTimingEvents = [];
             return;
          });
          return Promise.resolve();
     }
 
-    private async _sendBatchedEvents(events:IPTSEvent[], path:string): Promise<void> {
+    private async _sendBatchedEvents(events: IPTSEvent[], path: string): Promise<void> {
         if (events.length > 0) {
             const data = {
                 metrics: events
             };
-            await this.postToDatadog(data, path);	
+            await this.postToDatadog(data, path);
             return;
         }
         return Promise.resolve();
