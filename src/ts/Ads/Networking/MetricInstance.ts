@@ -21,7 +21,8 @@ export class MetricInstance {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _countryIso: string;
-    private _batchedEvents: IPTSEvent[];
+    private _batchedTimingEvents: IPTSEvent[];
+    private _batchedMetricEvents: IPTSEvent[];
     private _baseUrl: string;
 
     private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
@@ -35,7 +36,8 @@ export class MetricInstance {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._countryIso = country;
-        this._batchedEvents = [];
+        this._batchedTimingEvents = [];
+        this._batchedMetricEvents = [];
         this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
     }
 
@@ -103,44 +105,75 @@ export class MetricInstance {
     }
 
     public reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
-        this.batchEvent(event, 1, this.createMetricTags(event, tags));
+        this.batchMetricEvent(event, 1, this.createMetricTags(event, tags));
     }
 
     public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
-        this.batchEvent(event, 1, this.createErrorTags(event, adType, seatId));
+        this.batchMetricEvent(event, 1, this.createErrorTags(event, adType, seatId));
     }
 
     public reportTimingEvent(event: TimingMetric, value: number) {
         // Gate Negative Values
         if (value > 0) {
-            this.batchEvent(event, value, this.createTimingTags());
+            this.batchTimingEvent(event, value, this.createTimingTags());
         } else {
-            this.batchEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
+            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
         }
     }
 
-    private batchEvent(metric: PTSEvent, value: number, tags: string[]): void {
+    private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {
         // Curently ignore additional negative time values
         if (value > 0) {
-            this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, tags).metrics);
+            this._batchedTimingEvents = this._batchedTimingEvents.concat(this.createData(metric, value, tags).metrics);
         }
 
         // Failsafe so we aren't storing too many events at once
-        if (this._batchedEvents.length >= 10) {
-            this.sendBatchedEvents();
+        if (this._batchedTimingEvents.length >= 10) {
+            this.sendBatchedTimingEvents();
         }
     }
 
-    public sendBatchedEvents(): Promise<void> {
-        if (this._batchedEvents.length > 0) {
-            const data = {
-                metrics: this._batchedEvents
-            };
-            return this.postToDatadog(data, this.timingPath).then(() => {
-                this._batchedEvents = [];
-            });
+    private batchMetricEvent(metric: PTSEvent, value: number, tags:string[] ): void {
+        // Curently ignore additional negative time values
+        if (value > 0) {
+            this._batchedMetricEvents = this._batchedMetricEvents.concat(this.createData(metric, value, tags).metrics);
         }
+
+        // Failsafe so we aren't storing too many events at once
+        if (this._batchedMetricEvents.length >= 10) {
+            this.sendBatchedMetricEvents();
+        }
+    }
+
+    public async sendBatchedEvents() {
+        this.sendBatchedMetricEvents();
+        this.sendBatchedTimingEvents();
+    }
+
+    public async sendBatchedMetricEvents(): Promise<void> {
+        await this._sendBatchedEvents(this._batchedMetricEvents, this.metricPath).then(() => {
+            this._batchedMetricEvents = []; 
+            return;
+        });
         return Promise.resolve();
     }
 
+    public async sendBatchedTimingEvents(): Promise<void> {
+        await this._sendBatchedEvents(this._batchedTimingEvents, this.timingPath).then(() => {
+            this._batchedTimingEvents = []; 
+            return;
+         });
+         return Promise.resolve();
+    }
+
+    private async _sendBatchedEvents(events:IPTSEvent[], path:string): Promise<void> {
+        if (events.length > 0) {
+            const data = {
+                metrics: events
+            };
+            await this.postToDatadog(data, path);	
+            return;
+        }
+        return Promise.resolve();
+    }
 }

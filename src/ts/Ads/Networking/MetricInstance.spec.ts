@@ -101,15 +101,16 @@ import { Platform } from 'Core/Constants/Platform';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = metricInstance.reportErrorEvent(t.input, adType, seatId);
-
+                metricInstance.reportErrorEvent(t.input, adType, seatId);
+                const promise = metricInstance.sendBatchedEvents();
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
                 return promise;
             });
 
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = metricInstance.reportErrorEvent(t.input, adType, seatId);
+                metricInstance.reportErrorEvent(t.input, adType, seatId);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
@@ -160,7 +161,8 @@ import { Platform } from 'Core/Constants/Platform';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = metricInstance.reportMetricEvent(t.input);
+                metricInstance.reportMetricEvent(t.input);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -168,7 +170,8 @@ import { Platform } from 'Core/Constants/Platform';
             });
 
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = metricInstance.reportMetricEvent(t.input);
+                metricInstance.reportMetricEvent(t.input);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
@@ -225,7 +228,8 @@ import { Platform } from 'Core/Constants/Platform';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = metricInstance.reportMetricEventWithTags(t.input, t.inputTags);
+                metricInstance.reportMetricEventWithTags(t.input, t.inputTags);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -233,7 +237,8 @@ import { Platform } from 'Core/Constants/Platform';
             });
 
             it(`should send "${t.expected.metrics[0].name}" when "${t.input}" is passed in`, () => {
-                const promise = metricInstance.reportMetricEventWithTags(t.input, t.inputTags);
+                metricInstance.reportMetricEventWithTags(t.input, t.inputTags);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
@@ -291,7 +296,8 @@ import { Platform } from 'Core/Constants/Platform';
         tests.forEach((t) => {
 
             it(`should call post once`, () => {
-                const promise = metricInstance.reportTimingEvent(t.metric, t.value);
+                metricInstance.reportTimingEvent(t.metric, t.value);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
 
@@ -299,7 +305,8 @@ import { Platform } from 'Core/Constants/Platform';
             });
 
             it(`should send "${t.expected.metrics[0].name}" with "${t.metric}" and "${t.value}" is passed in`, () => {
-                const promise = metricInstance.reportTimingEvent(t.metric, t.value);
+                metricInstance.reportTimingEvent(t.metric, t.value);
+                const promise = metricInstance.sendBatchedEvents();
 
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path,
@@ -322,7 +329,7 @@ import { Platform } from 'Core/Constants/Platform';
 
         it('should not fire events when negative valued events are batched', () => {
             metricInstance.reportTimingEvent(TimingMetric.AdsInitializeTime, -200);
-            return metricInstance.sendBatchedEvents().then(() => {
+            return metricInstance.sendBatchedTimingEvents().then(() => {
                 expect(requestManager.post).toBeCalledTimes(0);
             });
         });
@@ -362,7 +369,7 @@ import { Platform } from 'Core/Constants/Platform';
                         }
                     ]
                 };
-                const promise = metricInstance.sendBatchedEvents();
+                const promise = metricInstance.sendBatchedTimingEvents();
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
                     JSON.stringify(expected),
@@ -372,10 +379,10 @@ import { Platform } from 'Core/Constants/Platform';
                 return promise;
             });
 
-            it('should clear batchedEvents', () => {
-                return metricInstance.sendBatchedEvents().then(() => {
+            it('should clear batchedTimingEvents', () => {
+                return metricInstance.sendBatchedTimingEvents().then(() => {
                     //tslint:disable-next-line
-                    expect(metricInstance['_batchedEvents']).toEqual([]);
+                    expect(metricInstance['_batchedTimingEvents']).toEqual([]);
                 });
             });
         });
@@ -401,7 +408,9 @@ import { Platform } from 'Core/Constants/Platform';
         beforeEach(() => {
             clientInfo.getTestMode.mockReturnValue(true);
             metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-            return metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            for (let x=0;x<11;x++) {
+                metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            }
         });
 
         it('should call the staging endpoint', () => {
