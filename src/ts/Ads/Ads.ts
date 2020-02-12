@@ -278,7 +278,7 @@ export class Ads implements IAds {
         }).then(() => {
             const initializeAuctionTimespan = Date.now();
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-            	if (this.MediationLoadTrackingManager) {
+                if (this.MediationLoadTrackingManager) {
                     this.MediationLoadTrackingManager.setInitComplete();
                 }
                 ProgrammaticTrackingService.reportTimingEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);

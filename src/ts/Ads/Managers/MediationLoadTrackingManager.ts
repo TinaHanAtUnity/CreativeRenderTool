@@ -31,14 +31,14 @@ export class MediationLoadTrackingManager {
     private onLoad(placements: { [key: string]: number }): void {
         this.checkForTimedOutPlacements();
         Object.keys(placements).forEach((placementId) => {
-            if (!this._activeLoads[placementId]) {
+            if (this._activeLoads[placementId] === undefined) {
                 this._activeLoads[placementId] = this.getTime();
             }
         });
     }
 
     private onPlacementStateChangedEventSent(placementId: string, newState: string): void {
-        if (!!this._activeLoads[placementId]) {
+        if (this._activeLoads[placementId] === undefined) {
             return;
         }
 
