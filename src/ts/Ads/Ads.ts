@@ -92,7 +92,6 @@ import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
-import { SdkInitLatency } from 'Core/Managers/SdkInitLatency';
 
 export class Ads implements IAds {
 
@@ -124,7 +123,6 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
-    private _executedWebviewTest: boolean = false;
     private _mediationName: string;
     private _core: ICore;
 
@@ -548,17 +546,6 @@ export class Ads implements IAds {
                     ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
                 }
             });
-
-            if (!this._executedWebviewTest) {
-                this._currentAdUnit.onFinish.subscribe(() => {
-                    const isPerformanceDefined = performance && performance.now;
-                    // End experiment automatically at 14:10 PST <=> 22:10 UTC
-                    if (isPerformanceDefined && CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 22, 10)) {
-                        SdkInitLatency.execute(this._core.ClientInfo, this._core.RequestManager);
-                        this._executedWebviewTest = true;
-                    }
-                });
-            }
         });
     }
 
