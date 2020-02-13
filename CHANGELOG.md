@@ -1,3 +1,7 @@
+# Thu Feb 13 00:39:30 UTC 2020
+
+* Remove Initialization Stages and Add Webview Init Timestamp on Webview Version 3.2.0 [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
+
 # Wed Feb 12 21:54:20 UTC 2020
 
 * Fix Mediation Tracking Bug and Add Test to 3.2.0 [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
