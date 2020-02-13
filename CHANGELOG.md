@@ -1,4 +1,4 @@
-# Thu Feb 13 21:32:44 UTC 2020
+# Thu Feb 13 21:38:43 UTC 2020
 
 * Hack: Test Native Initialization Speed through Webview on 3.2.0 [#13238](https://github.com/Applifier/unity-ads-webview/pull/13238)
 
