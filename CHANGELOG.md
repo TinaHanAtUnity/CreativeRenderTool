@@ -1,3 +1,7 @@
+# Thu Feb 13 18:53:39 UTC 2020
+
+* Adjust tagging on Mediation metrics [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
+
 # Thu Feb 13 00:39:30 UTC 2020
 
 * Remove Initialization Stages and Add Webview Init Timestamp on Webview Version 3.2.0 [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
