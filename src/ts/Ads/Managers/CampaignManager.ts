@@ -378,10 +378,6 @@ export class CampaignManager {
                 }
             }
 
-            if (this._mediationLoadTracking) {
-                this._mediationLoadTracking.reportMediaCount(campaigns);
-            }
-
             this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
             this.onAdPlanReceived.trigger(refreshDelay, campaigns, auctionStatusCode);
 
@@ -536,6 +532,10 @@ export class CampaignManager {
                     refreshDelay = cacheTTL;
                 }
             }
+        }
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportMediaCount(campaignCount);
         }
 
         this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
