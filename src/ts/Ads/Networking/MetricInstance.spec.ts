@@ -16,7 +16,7 @@ import { Platform } from 'Core/Constants/Platform';
     let requestManager: RequestManagerMock;
     const osVersion = '11.2.1';
     const sdkVersion = '2300';
-    const country = 'us';
+    const country = 'US';
 
     let metricInstance: MetricInstance;
 
