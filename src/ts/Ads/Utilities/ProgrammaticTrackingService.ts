@@ -131,7 +131,6 @@ export enum HackInitMetrics {
     WebViewFetchTime = 'hack_init_metrics_webview'
 }
 
-// TODO Clean up naming
 export type TimingEvent = InitializationMetric | MediationMetric | HackInitMetrics;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
