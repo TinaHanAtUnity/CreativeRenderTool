@@ -125,7 +125,10 @@ export enum MediationMetric {
     LoadRequestNofill = 'load_request_nofill_time',
     LoadRequestTimeout = 'load_request_timeout',
     PlacementCount = 'placement_count',
-    MediaCount = 'media_count'
+    MediaCount = 'media_count',
+    AuctionRequest = 'auction_request_time',
+    AdCaching = 'ad_caching_time',
+    LoadToReadyTime = 'load_to_ready_time'
 }
 
 export enum HackInitMetrics {
