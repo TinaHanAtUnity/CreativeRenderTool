@@ -25,4 +25,29 @@ describe('MediationLoadTrackingManager', () => {
             expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(1);
         });
     });
+
+    describe('should send timeout', () => {
+        let windowSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            windowSpy = jest.spyOn(performance, 'now');
+            windowSpy.mockReturnValue(0.01);
+
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1 });
+            loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId2': 1 });
+
+            windowSpy.mockReturnValue(31000.01);
+
+            listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', 'NOT_AVAILABLE', 'READY');
+        });
+
+        afterEach(() => {
+            windowSpy.mockRestore();
+        });
+
+        it('should send event', () => {
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(0);
+        });
+    });
 });
