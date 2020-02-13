@@ -584,10 +584,6 @@ export class CampaignManager {
         }
 
         if (mediaId && trackingUrls) {
-            if (this._mediationLoadTracking) {
-                this._mediationLoadTracking.reportMediaCount(1);
-            }
-
             const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
             const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
 
