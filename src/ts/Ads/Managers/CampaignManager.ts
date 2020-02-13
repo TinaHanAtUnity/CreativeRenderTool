@@ -53,7 +53,7 @@ import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { MediationLoadTrackingManager } from 'Ads/Manager/MediationLoadTrackingManager';
+import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
