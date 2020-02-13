@@ -94,7 +94,8 @@ export class MetricInstance {
     }
 
     private getCountryIso(country: string): string {
-        switch (country) {
+        const lowercaseCountry = country.toLowerCase();
+        switch (lowercaseCountry) {
             case 'us':
             case 'cn':
             case 'jp':
@@ -105,7 +106,7 @@ export class MetricInstance {
             case 'fr':
             case 'ca':
             case 'au':
-                return country;
+                return lowercaseCountry;
             default:
                 return 'row';
         }

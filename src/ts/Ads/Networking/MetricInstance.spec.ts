@@ -270,6 +270,23 @@ import { Platform } from 'Core/Constants/Platform';
                     }
                 ]
             }
+        }, {
+            metric: InitializationMetric.WebviewInitialization,
+            value: -1,
+            path: '/metrics',
+            expected: {
+                metrics: [
+                    {
+                        name: 'timing_value_negative',
+                        value: 1,
+                        tags: [
+                            'ads_sdk2_mevt:webview_initialization_time', // Intentional to track which timing metrics are negative
+                            `ads_sdk2_sdv:${sdkVersion}`,
+                            `ads_sdk2_plt:${Platform[platform]}`
+                        ]
+                    }
+                ]
+            }
         }];
         tests.forEach((t) => {
 
