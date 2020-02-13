@@ -1,3 +1,7 @@
+# Thu Feb 13 21:32:44 UTC 2020
+
+* Hack: Test Native Initialization Speed through Webview on 3.2.0 [#13238](https://github.com/Applifier/unity-ads-webview/pull/13238)
+
 # Thu Feb 13 18:53:39 UTC 2020
 
 * Adjust tagging on Mediation metrics on 3.2.0 [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
