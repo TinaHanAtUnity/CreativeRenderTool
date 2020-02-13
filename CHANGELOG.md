@@ -1,3 +1,8 @@
+# Thu Feb 13 23:12:45 UTC 2020
+
+* Add Metrics around Auction, Placements, and Caching on 3.2.0 [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
+* Revert "Hack: Test Native Initialization Speed through Webview" on 3.2.0 [#13268](https://github.com/Applifier/unity-ads-webview/pull/13268)
+
 # Thu Feb 13 21:38:43 UTC 2020
 
 * Hack: Test Native Initialization Speed through Webview on 3.2.0 [#13238](https://github.com/Applifier/unity-ads-webview/pull/13238)
