@@ -59,6 +59,12 @@ export enum AgeGateChoice {
     NO = 'no'
 }
 
+export enum AgeGateSource {
+    MISSING = 'missing',
+    USER = 'user',
+    DEVELOPER = 'developer'
+}
+
 export interface IUserPrivacyStorageDataGdpr {
     gdpr: {
         consent: {
@@ -82,6 +88,7 @@ export class UserPrivacyManager {
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static PrivacyConsentStorageKey = 'privacy.consent.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
+    private static AgeGateSourceStorageKey = 'privacy.agegatesource';
 
     public _forcedConsentUnit: boolean;
 
@@ -97,6 +104,7 @@ export class UserPrivacyManager {
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
     private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
+    private _ageGateSource: AgeGateSource = AgeGateSource.MISSING;
     private _privacyFormatMetadataSeenInSession: boolean;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
@@ -190,7 +198,8 @@ export class UserPrivacyManager {
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
-            agreedOverAgeLimit: this._ageGateChoice
+            agreedOverAgeLimit: this._ageGateChoice,
+            ageGateSource: this._ageGateSource
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
@@ -255,7 +264,7 @@ export class UserPrivacyManager {
         return this._privacy.getUserPrivacy().getPermissions();
     }
 
-    public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
+    public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice, ageGateSource: AgeGateSource) {
         if (ageGateChoice === AgeGateChoice.YES) {
             PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
             if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
@@ -355,13 +364,28 @@ export class UserPrivacyManager {
             this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey).then((data: unknown) => {
                 const value: boolean | undefined = this.getConsentTypeHack(data);
                 if (typeof(value) !== 'undefined') {
+                    // stored value is if user is under age limit, apparent "flipping" of boolean is intentional
                     this._ageGateChoice = value ? AgeGateChoice.NO : AgeGateChoice.YES;
                 } else {
                     this._ageGateChoice = AgeGateChoice.MISSING;
                 }
             });
-        }
 
+            this._core.Storage.get<string>(StorageType.PRIVATE, UserPrivacyManager.AgeGateSourceStorageKey).then(value => {
+                switch (value) {
+                    case AgeGateSource.USER:
+                        this._ageGateSource = AgeGateSource.USER;
+                        break;
+
+                    case AgeGateSource.DEVELOPER:
+                        this._ageGateSource = AgeGateSource.DEVELOPER;
+                        break;
+
+                    default:
+                        this._ageGateSource = AgeGateSource.MISSING;
+                }
+            });
+        }
     }
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
