@@ -7,10 +7,9 @@ export class MediationLoadTrackingManager {
     private _listener: ListenerApi;
     private _mediationName: string;
     private _webviewEnabledLoad: boolean;
-    private _usingPerformanceTime: boolean = false;
     private _initialAdRequest: boolean = true;
 
-    private _activeLoads: { [key: string]: number };
+    private _activeLoads: { [key: string]: { time: number; initialAdRequest: boolean } };
 
     constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean) {
         this._loadApi = loadApi;
@@ -32,55 +31,51 @@ export class MediationLoadTrackingManager {
         this.checkForTimedOutPlacements();
         Object.keys(placements).forEach((placementId) => {
             if (this._activeLoads[placementId] === undefined) {
-                this._activeLoads[placementId] = this.getTime();
+                this._activeLoads[placementId] = {
+                    time: this.getTime(),
+                    initialAdRequest: this._initialAdRequest
+                };
             }
         });
     }
 
     private onPlacementStateChangedEventSent(placementId: string, newState: string): void {
+        this.checkForTimedOutPlacements();
         if (this._activeLoads[placementId] === undefined) {
             return;
         }
 
-        const timeValue = this.getTime() - this._activeLoads[placementId];
+        const timeValue = this.getTime() - this._activeLoads[placementId].time;
 
         if (newState === 'READY') {
             ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, [
                 ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
                 ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                ProgrammaticTrackingService.createAdsSdkTag('upt', `${this._usingPerformanceTime}`),
-                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._initialAdRequest}`)
+                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
         } else if (newState === 'NO_FILL') {
             ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, [
                 ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
                 ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                ProgrammaticTrackingService.createAdsSdkTag('upt', `${this._usingPerformanceTime}`),
-                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._initialAdRequest}`)
+                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
         }
     }
 
     private getTime(): number {
-        if (performance && performance.now) {
-            this._usingPerformanceTime = true;
-            return performance.now();
-        } else {
-            return Date.now();
-        }
+        return performance.now();
     }
 
     private checkForTimedOutPlacements(): void {
         Object.keys(this._activeLoads).forEach((placementId) => {
-            const timeValue = this.getTime() - this._activeLoads[placementId];
+            const timeValue = this.getTime() - this._activeLoads[placementId].time;
             if (timeValue >= 30000) {
                 ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, [
                     ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
                     ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                    ProgrammaticTrackingService.createAdsSdkTag('upt', `${this._usingPerformanceTime}`),
-                    ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._initialAdRequest}`)
+                    ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
                 ]);
                 delete this._activeLoads[placementId];
             }
