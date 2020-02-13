@@ -552,8 +552,8 @@ export class Ads implements IAds {
             if (!this._executedWebviewTest) {
                 this._currentAdUnit.onFinish.subscribe(() => {
                     const isPerformanceDefined = performance && performance.now;
-                    // End experiment automatically at 13:40 PST <=> 21:40 UTC
-                    if (isPerformanceDefined && CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 21, 40)) {
+                    // End experiment automatically at 14:10 PST <=> 22:10 UTC
+                    if (isPerformanceDefined && CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 22, 10)) {
                         SdkInitLatency.execute(this._core.ClientInfo, this._core.RequestManager);
                         this._executedWebviewTest = true;
                     }
