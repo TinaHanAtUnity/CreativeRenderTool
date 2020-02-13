@@ -4,7 +4,7 @@ import { ABGroup, DiagnosticsRampDown } from 'Core/Models/ABGroup';
 
 export class Diagnostics {
     public static trigger(type: string, error: {}): Promise<INativeResponse> {
-        if (Diagnostics.shouldNotSendEvents()) {
+        if (this.shouldNotSendEvents()) {
             return Promise.resolve(<INativeResponse>{});
         }
 
@@ -24,11 +24,11 @@ export class Diagnostics {
     }
 
     public static setAbGroup(group: ABGroup) {
-        Diagnostics._abGroup = group;
+        this._abGroup = group;
     }
 
     private static shouldNotSendEvents(): boolean {
-        return Diagnostics._abGroup !== undefined && DiagnosticsRampDown.isValid(Diagnostics._abGroup) === false;
+        return this._abGroup !== undefined && DiagnosticsRampDown.isValid(this._abGroup) === false;
     }
     private static _abGroup: ABGroup | undefined;
 }
