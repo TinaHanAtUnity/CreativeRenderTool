@@ -58,9 +58,4 @@ export class PrivacySDK {
     public getLegalFramework(): LegalFramework {
         return this._legalFramework;
     }
-
-    // todo: implement proper functionality
-    public isDeveloperAgeGateActive(): boolean {
-        return true;
-    }
 }

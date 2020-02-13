@@ -87,6 +87,7 @@ export class UserPrivacyManager {
 
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static PrivacyConsentStorageKey = 'privacy.consent.value';
+    private static PrivacyAgeGateKey = 'privacy.useroveragelimit.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
     private static AgeGateSourceStorageKey = 'privacy.agegatesource';
 
