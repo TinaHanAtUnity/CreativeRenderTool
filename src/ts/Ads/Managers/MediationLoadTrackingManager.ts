@@ -27,6 +27,20 @@ export class MediationLoadTrackingManager {
         this._initialAdRequest = false;
     }
 
+    public reportPlacementCount(placementCount: number) {
+        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.PlacementCount, placementCount, [
+            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        ]);
+    }
+
+    public reportMediaCount(placementCount: number) {
+        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.MediaCount, placementCount, [
+            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        ]);
+    }
+
     private onLoad(placements: { [key: string]: number }): void {
         this.checkForTimedOutPlacements();
         Object.keys(placements).forEach((placementId) => {

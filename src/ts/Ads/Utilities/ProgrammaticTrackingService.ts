@@ -123,7 +123,9 @@ export enum AUIMetric {
 export enum MediationMetric {
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
-    LoadRequestTimeout = 'load_request_timeout'
+    LoadRequestTimeout = 'load_request_timeout',
+    PlacementCount = 'placement_count',
+    MediaCount = 'media_count'
 }
 
 export enum HackInitMetrics {

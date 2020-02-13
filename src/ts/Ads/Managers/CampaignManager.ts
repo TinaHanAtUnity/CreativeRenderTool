@@ -53,6 +53,7 @@ import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { MediationLoadTrackingManager } from 'Ads/Manager/MediationLoadTrackingManager';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -121,8 +122,9 @@ export class CampaignManager {
     private _auctionProtocol: AuctionProtocol;
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
+    private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -140,6 +142,7 @@ export class CampaignManager {
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
+        this._mediationLoadTracking = mediationLoadTracking;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -342,6 +345,10 @@ export class CampaignManager {
                         refreshDelay = cacheTTL;
                     }
                 }
+            }
+
+            if (this._mediationLoadTracking) {
+                this._mediationLoadTracking.reportMediaCount(campaigns);
             }
 
             this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
@@ -577,6 +584,10 @@ export class CampaignManager {
         }
 
         if (mediaId && trackingUrls) {
+            if (this._mediationLoadTracking) {
+                this._mediationLoadTracking.reportMediaCount(1);
+            }
+
             const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
             const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
 
