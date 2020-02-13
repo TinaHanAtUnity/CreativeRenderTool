@@ -335,7 +335,7 @@ export class Ads implements IAds {
 
             // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-                if (mediation && mediation.getName()) {
+                if (mediation && mediation.getName() && performance && performance.now) {
                     this._mediationName = mediation.getName()!;
                     this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
                 }
