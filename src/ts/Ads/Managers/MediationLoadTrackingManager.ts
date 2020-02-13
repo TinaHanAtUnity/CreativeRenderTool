@@ -41,6 +41,21 @@ export class MediationLoadTrackingManager {
         ]);
     }
 
+    public reportAuctionRequest(latency: number) {
+        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, [
+            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        ]);
+    }
+
+    public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {
+        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.AdCaching, latency, [
+            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+            ProgrammaticTrackingService.createAdsSdkTag('acs', `${adCachedSuccessfully}`)
+        ]);
+    }
+
     private onLoad(placements: { [key: string]: number }): void {
         this.checkForTimedOutPlacements();
         Object.keys(placements).forEach((placementId) => {

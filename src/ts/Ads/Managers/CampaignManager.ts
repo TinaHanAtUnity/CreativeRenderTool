@@ -146,6 +146,7 @@ export class CampaignManager {
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
+        const requestStartTime = this.getTime();
         this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
@@ -186,11 +187,22 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
+                const cachingTime = this.getTime();
+                if (this._mediationLoadTracking && performance && performance.now) {
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                }
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if (this._auctionProtocol === AuctionProtocol.V5) {
-                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
+                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
+                            if (this._mediationLoadTracking && performance && performance.now) {
+                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                            }
+                        }).catch((e) => {
+                            if (this._mediationLoadTracking && performance && performance.now) {
+                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                            }
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
@@ -221,6 +233,8 @@ export class CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+        const requestStartTime = this.getTime();
+        let cachingTime: number;
         this._isLoadEnabled = true;
 
         // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
@@ -245,13 +259,23 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: 10000
             }).then(response => {
+                cachingTime = this.getTime();
+                if (this._mediationLoadTracking && performance && performance.now) {
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
                     ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledFill);
                     loadedCampaign.campaign.setIsLoadEnabled(true);
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                    }
                 } else {
                     ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                    }
                 }
                 return loadedCampaign;
             }).catch(() => {
@@ -276,6 +300,13 @@ export class CampaignManager {
         }).catch(() => {
             return [];
         });
+    }
+
+    private getTime(): number {
+        if (performance && performance.now) {
+            return performance.now();
+        }
+        return 0;
     }
 
     private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
