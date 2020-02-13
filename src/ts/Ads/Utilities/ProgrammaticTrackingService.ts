@@ -126,12 +126,7 @@ export enum MediationMetric {
     LoadRequestTimeout = 'load_request_timeout'
 }
 
-export enum HackInitMetrics {
-    ConfigFetchTime = 'hack_init_metrics_config',
-    WebViewFetchTime = 'hack_init_metrics_webview'
-}
-
-export type TimingEvent = InitializationMetric | MediationMetric | HackInitMetrics;
+export type TimingEvent = InitializationMetric | MediationMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
 
