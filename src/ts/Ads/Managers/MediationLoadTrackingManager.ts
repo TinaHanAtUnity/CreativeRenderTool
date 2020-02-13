@@ -34,8 +34,8 @@ export class MediationLoadTrackingManager {
         ]);
     }
 
-    public reportMediaCount(placementCount: number) {
-        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.MediaCount, placementCount, [
+    public reportMediaCount(mediaCount: number) {
+        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.MediaCount, mediaCount, [
             ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
             ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
         ]);
