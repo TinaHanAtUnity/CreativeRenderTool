@@ -197,9 +197,12 @@ export class CampaignManager {
                     if (this._auctionProtocol === AuctionProtocol.V5) {
                         return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
                             if (this._mediationLoadTracking && performance && performance.now) {
-                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime);
+                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
                             }
                         }).catch((e) => {
+                            if (this._mediationLoadTracking && performance && performance.now) {
+                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                            }
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
@@ -262,14 +265,17 @@ export class CampaignManager {
                 }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
-                if (this._mediationLoadTracking && performance && performance.now) {
-                    this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime);
-                }
                 if (loadedCampaign) {
                     ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledFill);
                     loadedCampaign.campaign.setIsLoadEnabled(true);
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                    }
                 } else {
                     ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                    }
                 }
                 return loadedCampaign;
             }).catch(() => {

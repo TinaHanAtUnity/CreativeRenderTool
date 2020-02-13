@@ -48,10 +48,11 @@ export class MediationLoadTrackingManager {
         ]);
     }
 
-    public reportingAdCaching(latency: number) {
+    public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {
         ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.AdCaching, latency, [
             ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+            ProgrammaticTrackingService.createAdsSdkTag('acs', `${adCachedSuccessfully}`)
         ]);
     }
 
