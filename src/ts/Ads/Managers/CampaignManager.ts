@@ -47,7 +47,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -121,7 +121,6 @@ export class CampaignManager {
     private _auctionProtocol: AuctionProtocol;
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
-    private _auctionRequestStart: number;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
         this._platform = platform;
@@ -177,7 +176,6 @@ export class CampaignManager {
                     });
                 }
                 const headers: [string, string][] = [];
-                this._auctionRequestStart = Date.now();
                 return this._request.post(requestUrl, body, headers, {
                     retries: 2,
                     retryDelay: 10000,
@@ -185,7 +183,6 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 

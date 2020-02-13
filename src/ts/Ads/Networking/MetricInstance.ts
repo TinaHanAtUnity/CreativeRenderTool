@@ -1,4 +1,4 @@
-import { ProgrammaticTrackingError, PTSEvent, TimingMetric, TimingEvent } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, PTSEvent, TimingEvent } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -34,7 +34,7 @@ export class MetricInstance {
         this._requestManager = requestManager;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._countryIso = country;
+        this._countryIso = this.getCountryIso(country);
         this._batchedEvents = [];
         this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
     }
@@ -93,6 +93,25 @@ export class MetricInstance {
         return this._requestManager.post(url, data, headers);
     }
 
+    private getCountryIso(country: string): string {
+        const lowercaseCountry = country.toLowerCase();
+        switch (lowercaseCountry) {
+            case 'us':
+            case 'cn':
+            case 'jp':
+            case 'gb':
+            case 'ru':
+            case 'de':
+            case 'kr':
+            case 'fr':
+            case 'ca':
+            case 'au':
+                return lowercaseCountry;
+            default:
+                return 'row';
+        }
+    }
+
     public createAdsSdkTag(suffix: string, tagValue: string): string {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
@@ -132,7 +151,7 @@ export class MetricInstance {
     }
 
     // TODO: Extend this to all events
-    public batchEvent(metric: TimingMetric, value: number): void {
+    public batchEvent(metric: TimingEvent, value: number): void {
         // Curently ignore additional negative time values
         if (value > 0) {
             this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, this.createTimingTags([])).metrics);
