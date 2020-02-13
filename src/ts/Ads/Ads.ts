@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, ProgrammaticTrackingService, InitializationMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -125,6 +125,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
     private _executedWebviewTest: boolean = false;
+    private _mediationName: string;
     private _core: ICore;
 
     public BannerModule: BannerModule;
@@ -278,12 +279,12 @@ export class Ads implements IAds {
         }).then(() => {
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
-            const initializeAuctionTimespan = Date.now();
+            return this.logInitializationLatency();
+        }).then(() => {
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
                 if (this.MediationLoadTrackingManager) {
                     this.MediationLoadTrackingManager.setInitComplete();
                 }
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
@@ -337,11 +338,29 @@ export class Ads implements IAds {
             // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation && mediation.getName()) {
+                    this._mediationName = mediation.getName()!;
                     this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
                 }
             }).catch();
         }
         return Promise.resolve();
+    }
+
+    private logInitializationLatency(): void {
+        //tslint:disable-next-line
+        const initTimestamp = (<any>window).unityAdsWebviewInitTimestamp;
+        if (initTimestamp && performance && performance.now) {
+            const webviewInitTime = performance.now() - initTimestamp;
+            const tags = [
+                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
+                ProgrammaticTrackingService.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
+            ];
+
+            if (this._mediationName) {
+                tags.push(ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName));
+            }
+            ProgrammaticTrackingService.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
+        }
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
