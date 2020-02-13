@@ -124,6 +124,7 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
+    private _executedWebviewTest: boolean = false;
     private _core: ICore;
 
     public BannerModule: BannerModule;
@@ -286,11 +287,6 @@ export class Ads implements IAds {
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
-        }).then(() => {
-            const isPerformanceDefined = performance && performance.now;
-            if (isPerformanceDefined && CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 0, 0, 0, 0)) {
-                SdkInitLatency.execute(this._core.ClientInfo, this._core.RequestManager);
-            }
         });
     }
 
@@ -533,6 +529,17 @@ export class Ads implements IAds {
                     ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
                 }
             });
+
+            if (!this._executedWebviewTest) {
+                this._currentAdUnit.onFinish.subscribe(() => {
+                    const isPerformanceDefined = performance && performance.now;
+                    // End experiment automatically at 13:40 PST <=> 21:40 UTC
+                    if (isPerformanceDefined && CustomFeatures.sampleAtGivenPercent(1) && Date.now() < Date.UTC(2020, 1, 13, 21, 40)) {
+                        SdkInitLatency.execute(this._core.ClientInfo, this._core.RequestManager);
+                        this._executedWebviewTest = true;
+                    }
+                });
+            }
         });
     }
 
