@@ -275,10 +275,11 @@ export class UserPrivacyManager {
         }
 
         this._ageGateChoice = ageGateChoice;
+        this._ageGateSource = ageGateSource;
 
-        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey, this.isUserUnderAgeLimit()).then(() => {
-            this._core.Storage.write(StorageType.PRIVATE);
-        });
+        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey, this.isUserUnderAgeLimit());
+        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateSourceStorageKey, ageGateSource);
+        this._core.Storage.write(StorageType.PRIVATE);
     }
 
     public isUserUnderAgeLimit(): boolean {
