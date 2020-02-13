@@ -103,14 +103,8 @@ export enum OMMetric {
     OMInjectionFailure = 'om_injection_failure'
 }
 
-export enum TimingMetric {
-    TotalWebviewInitializationTime = 'webview_initialization_time',
-    InitializeCallToWebviewLoadTime = 'initialization_call_to_webview_load_time',
-    WebviewLoadToConfigurationCompleteTime = 'webview_load_to_configuration_complete_time',
-    AuctionRequestTime = 'auction_request_round_trip_time',
-    AuctionToFillStatusTime = 'auction_request_to_fill_status_time',
-    CoreInitializeTime = 'uads_core_initialize_time',
-    AdsInitializeTime = 'uads_ads_initialize_time'
+export enum InitializationMetric {
+    WebviewInitialization = 'webview_initialization_time'
 }
 
 export enum MraidMetric {
@@ -132,8 +126,7 @@ export enum MediationMetric {
     LoadRequestTimeout = 'load_request_timeout'
 }
 
-// TODO Clean up naming
-export type TimingEvent = TimingMetric | MediationMetric;
+export type TimingEvent = InitializationMetric | MediationMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
 
@@ -171,7 +164,7 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportTimingEventWithTags(event, value, tags);
     }
 
-    public static batchEvent(metric: TimingMetric, value: number): void {
+    public static batchEvent(metric: TimingEvent, value: number): void {
         this._metricInstance.batchEvent(metric, value);
     }
 

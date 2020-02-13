@@ -3,7 +3,7 @@ import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
 import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
-import { AdmobMetric, ProgrammaticTrackingError, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AdmobMetric, ProgrammaticTrackingError, TimingEvent, InitializationMetric, MediationMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 
 [
@@ -249,12 +249,12 @@ import { Platform } from 'Core/Constants/Platform';
     describe('reportTimingEvent', () => {
 
         const tests: {
-            metric: TimingMetric;
+            metric: TimingEvent;
             value: number;
             path: string;
             expected: IProgrammaticTrackingData;
         }[] = [{
-            metric: TimingMetric.TotalWebviewInitializationTime,
+            metric: InitializationMetric.WebviewInitialization,
             value: 18331,
             path: '/timing',
             expected: {
@@ -265,23 +265,6 @@ import { Platform } from 'Core/Constants/Platform';
                         tags: [
                             `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:${Platform[platform]}`
-                        ]
-                    }
-                ]
-            }
-        }, {
-            metric: TimingMetric.TotalWebviewInitializationTime,
-            value: -1,
-            path: '/metrics',
-            expected: {
-                metrics: [
-                    {
-                        name: 'timing_value_negative',
-                        value: 1,
-                        tags: [
-                            'ads_sdk2_mevt:webview_initialization_time', // Intentional to track which timing metrics are negative
-                            `ads_sdk2_sdv:${sdkVersion}`,
                             `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
@@ -310,6 +293,36 @@ import { Platform } from 'Core/Constants/Platform';
                 return promise;
             });
         });
+
+        describe('with untracked countries', () => {
+            beforeEach(() => {
+                metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, 'mz');
+                return metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, 10);
+            });
+
+            it('should call with the expected row country', () => {
+                const expected = {
+                    metrics: [
+                        {
+                            name: 'webview_initialization_time',
+                            value: 10,
+                            tags: [
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                'ads_sdk2_iso:row',
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }
+                    ]
+                };
+
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
+                    JSON.stringify(expected),
+                    [['Content-Type', 'application/json']]
+                );
+
+            });
+        });
     });
 
     describe('Batching Events', () => {
@@ -321,7 +334,7 @@ import { Platform } from 'Core/Constants/Platform';
         });
 
         it('should not fire events when negative valued events are batched', () => {
-            metricInstance.batchEvent(TimingMetric.AdsInitializeTime, -200);
+            metricInstance.batchEvent(InitializationMetric.WebviewInitialization, -200);
             return metricInstance.sendBatchedEvents().then(() => {
                 expect(requestManager.post).toBeCalledTimes(0);
             });
@@ -330,8 +343,8 @@ import { Platform } from 'Core/Constants/Platform';
         describe('Batch two events', () => {
 
             beforeEach(() => {
-                metricInstance.batchEvent(TimingMetric.CoreInitializeTime, 999);
-                metricInstance.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, 100);
+                metricInstance.batchEvent(InitializationMetric.WebviewInitialization, 999);
+                metricInstance.batchEvent(MediationMetric.LoadRequestNofill, 100);
             });
 
             it('should call post once', () => {
@@ -344,7 +357,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expected = {
                     metrics: [
                         {
-                            name: 'uads_core_initialize_time',
+                            name: 'webview_initialization_time',
                             value: 999,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -352,7 +365,7 @@ import { Platform } from 'Core/Constants/Platform';
                                 `ads_sdk2_plt:${Platform[platform]}`
                             ]
                         }, {
-                            name: 'webview_load_to_configuration_complete_time',
+                            name: 'load_request_nofill_time',
                             value: 100,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -384,13 +397,13 @@ import { Platform } from 'Core/Constants/Platform';
             it('should not fire events when below 10', () => {
                 for (let i = 0; i < 10; i++) {
                     expect(requestManager.post).toBeCalledTimes(0);
-                    metricInstance.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                    metricInstance.batchEvent(InitializationMetric.WebviewInitialization, 200);
                 }
             });
 
             it('should fire events when 10 events are reached', () => {
                 for (let i = 0; i < 10; i++) {
-                    metricInstance.batchEvent(TimingMetric.TotalWebviewInitializationTime, 200);
+                    metricInstance.batchEvent(InitializationMetric.WebviewInitialization, 200);
                 }
                 expect(requestManager.post).toBeCalledTimes(1);
             });
