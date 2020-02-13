@@ -127,8 +127,7 @@ export enum MediationMetric {
     PlacementCount = 'placement_count',
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
-    AdCaching = 'ad_caching_time',
-    LoadToReadyTime = 'load_to_ready_time'
+    AdCaching = 'ad_caching_time'
 }
 
 export enum HackInitMetrics {
