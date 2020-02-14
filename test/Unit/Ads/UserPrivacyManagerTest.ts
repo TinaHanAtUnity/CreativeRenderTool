@@ -643,7 +643,9 @@ describe('UserPrivacyManagerTest', () => {
                 bundleId: testBundleId,
                 permissions: permissions,
                 legalFramework: 'none',
-                agreedOverAgeLimit: 'missing' };
+                agreedOverAgeLimit: 'missing',
+                ageGateSource: 'missing'
+            };
 
             return privacyManager.updateUserPrivacy(permissions, source, action, layout).then(() => {
                 const sentKafkaObject = httpKafkaSpy.firstCall.args[2];
