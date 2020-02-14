@@ -134,8 +134,8 @@ import { Platform } from 'Core/Constants/Platform';
                         name: 'admob_used_cached_video',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:admob_used_cached_video',
                             `ads_sdk2_sdv:${sdkVersion}`,
+                            'ads_sdk2_iso:us',
                             `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
@@ -149,8 +149,8 @@ import { Platform } from 'Core/Constants/Platform';
                         name: 'admob_used_streamed_video',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:admob_used_streamed_video',
                             `ads_sdk2_sdv:${sdkVersion}`,
+                            'ads_sdk2_iso:us',
                             `ads_sdk2_plt:${Platform[platform]}`
                         ]
                     }
@@ -196,8 +196,8 @@ import { Platform } from 'Core/Constants/Platform';
                         name: 'admob_used_cached_video',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:admob_used_cached_video',
                             `ads_sdk2_sdv:${sdkVersion}`,
+                            'ads_sdk2_iso:us',
                             `ads_sdk2_plt:${Platform[platform]}`,
                             'ads_sdk2_blt:3.0.0'
                         ]
@@ -213,8 +213,8 @@ import { Platform } from 'Core/Constants/Platform';
                         name: 'admob_used_streamed_video',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:admob_used_streamed_video',
                             `ads_sdk2_sdv:${sdkVersion}`,
+                            'ads_sdk2_iso:us',
                             `ads_sdk2_plt:${Platform[platform]}`,
                             'ads_sdk2_test:testValue'
                         ]
@@ -280,9 +280,10 @@ import { Platform } from 'Core/Constants/Platform';
                         name: 'timing_value_negative',
                         value: 1,
                         tags: [
-                            'ads_sdk2_mevt:webview_initialization_time', // Intentional to track which timing metrics are negative
                             `ads_sdk2_sdv:${sdkVersion}`,
-                            `ads_sdk2_plt:${Platform[platform]}`
+                            'ads_sdk2_iso:us',
+                            `ads_sdk2_plt:${Platform[platform]}`,
+                            'ads_sdk2_mevt:webview_initialization_time' // Intentional to track which timing metrics are negative
                         ]
                     }
                 ]
