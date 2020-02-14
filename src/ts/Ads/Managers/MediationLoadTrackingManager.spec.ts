@@ -2,7 +2,6 @@ import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { LoadApi, LoadApiMock } from 'Core/Native/__mocks__/LoadApi';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
-import { PlacementState } from 'Ads/Models/Placement';
 
 describe('MediationLoadTrackingManager', () => {
     let medLoadTrackingManager: MediationLoadTrackingManager;
