@@ -44,9 +44,12 @@ describe('MediationLoadTrackingManager', () => {
             windowSpy.mockRestore();
         });
 
-        it('should send event', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(0);
+        it('should report metric event with tags four times', () => {
+            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(4);
+        });
+
+        it('should not report timing events', () => {
+            expect(ProgrammaticTrackingService.reportTimingEventWithTags).not.toBeCalled();
         });
     });
 });
