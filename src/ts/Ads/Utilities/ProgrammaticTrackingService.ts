@@ -103,14 +103,8 @@ export enum OMMetric {
     OMInjectionFailure = 'om_injection_failure'
 }
 
-export enum TimingMetric {
-    TotalWebviewInitializationTime = 'webview_initialization_time',
-    InitializeCallToWebviewLoadTime = 'initialization_call_to_webview_load_time',
-    WebviewLoadToConfigurationCompleteTime = 'webview_load_to_configuration_complete_time',
-    AuctionRequestTime = 'auction_request_round_trip_time',
-    AuctionToFillStatusTime = 'auction_request_to_fill_status_time',
-    CoreInitializeTime = 'uads_core_initialize_time',
-    AdsInitializeTime = 'uads_ads_initialize_time'
+export enum InitializationMetric {
+    WebviewInitialization = 'webview_initialization_time'
 }
 
 export enum MraidMetric {
@@ -126,7 +120,19 @@ export enum AUIMetric {
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
 }
 
-export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export enum MediationMetric {
+    LoadRequestFill = 'load_request_fill_time',
+    LoadRequestNofill = 'load_request_nofill_time',
+    LoadRequestTimeout = 'load_request_timeout',
+    PlacementCount = 'placement_count',
+    MediaCount = 'media_count',
+    AuctionRequest = 'auction_request_time',
+    AdCaching = 'ad_caching_time'
+}
+
+export type TimingEvent = InitializationMetric | MediationMetric;
+
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 
@@ -154,11 +160,15 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportErrorEvent(event, adType, seatId);
     }
 
-    public static reportTimingEvent(event: TimingMetric, value: number): void {
+    public static reportTimingEvent(event: TimingEvent, value: number): void {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
-    public static batchEvent(metric: TimingMetric, value: number): void {
+    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
+        this._metricInstance.reportTimingEventWithTags(event, value, tags);
+    }
+
+    public static batchEvent(metric: TimingEvent, value: number): void {
         this._metricInstance.batchEvent(metric, value);
     }
 
