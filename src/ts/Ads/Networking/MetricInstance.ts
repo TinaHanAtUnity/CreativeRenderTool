@@ -43,14 +43,7 @@ export class MetricInstance {
         return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
-    private createMetricTags(event: PTSEvent, tags: string[]): string[] {
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-        return [this.createAdsSdkTag('mevt', event),
-                this.createAdsSdkTag('sdv', sdkVersion),
-                this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
-    }
-
-    private createTimingTags(tags: string[]): string[] {
+    private createTags(tags: string[]): string[] {
         return [
             this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
             this.createAdsSdkTag('iso', this._countryIso),
@@ -121,7 +114,7 @@ export class MetricInstance {
     }
 
     public reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
-        const metricData = this.createData(event, 1, this.createMetricTags(event, tags));
+        const metricData = this.createData(event, 1, this.createTags(tags));
         return this.postToDatadog(metricData, this.metricPath);
     }
 
@@ -133,17 +126,19 @@ export class MetricInstance {
     public reportTimingEvent(event: TimingEvent, value: number): Promise<INativeResponse> {
         // Gate Negative Values
         if (value > 0) {
-            const timingData = this.createData(event, value, this.createTimingTags([]));
+            const timingData = this.createData(event, value, this.createTags([]));
             return this.postToDatadog(timingData, this.timingPath);
         } else {
-            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
+            const metricData = this.createData(ProgrammaticTrackingError.TimingValueNegative, 1, this.createTags([
+                this.createAdsSdkTag('mevt', event)
+            ]));
             return this.postToDatadog(metricData, this.metricPath);
         }
     }
 
     public reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): Promise<INativeResponse> {
         if (value > 0) {
-            const timingData = this.createData(event, value, this.createTimingTags(tags));
+            const timingData = this.createData(event, value, this.createTags(tags));
             return this.postToDatadog(timingData, this.timingPath);
         }
         // Probably don't care about logging negative
@@ -154,7 +149,7 @@ export class MetricInstance {
     public batchEvent(metric: TimingEvent, value: number): void {
         // Curently ignore additional negative time values
         if (value > 0) {
-            this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, this.createTimingTags([])).metrics);
+            this._batchedEvents = this._batchedEvents.concat(this.createData(metric, value, this.createTags([])).metrics);
         }
 
         // Failsafe so we aren't storing too many events at once
