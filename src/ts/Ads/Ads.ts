@@ -359,6 +359,7 @@ export class Ads implements IAds {
                 tags.push(ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName));
             }
             ProgrammaticTrackingService.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
+            ProgrammaticTrackingService.reportTimingEventWithTags(InitializationMetric.WebviewPageLoading, initTimestamp, tags);
         }
     }
 
