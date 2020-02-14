@@ -1,3 +1,7 @@
+# Fri Feb 14 18:18:50 UTC 2020
+
+* Add Load Request, Page Load Metrics, Add Tests, Refine Metric Behavior [#13269](https://github.com/Applifier/unity-ads-webview/pull/13269)
+
 # Thu Feb 13 23:12:45 UTC 2020
 
 * Add Metrics around Auction, Placements, and Caching on 3.2.0 [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
