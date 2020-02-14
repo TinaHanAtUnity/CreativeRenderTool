@@ -64,17 +64,26 @@ export class MediationLoadTrackingManager {
                     time: this.getTime(),
                     initialAdRequest: this._initialAdRequest
                 };
+                ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequest, [
+                    ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+                    ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                    ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
+                ]);
             }
         });
     }
 
     private onPlacementStateChangedEventSent(placementId: string, newState: string): void {
-        this.checkForTimedOutPlacements();
         if (this._activeLoads[placementId] === undefined) {
             return;
         }
 
         const timeValue = this.getTime() - this._activeLoads[placementId].time;
+        if (this.hasPlacementTimedOut(placementId, timeValue)) {
+            return;
+        }
+
+        this.checkForTimedOutPlacements();
 
         if (newState === 'READY') {
             ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, [
@@ -97,17 +106,23 @@ export class MediationLoadTrackingManager {
         return performance.now();
     }
 
+    private hasPlacementTimedOut(placementId: string, timeValue: number): boolean {
+        if (timeValue >= 30000) {
+            ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, [
+                ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
+                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
+            ]);
+            delete this._activeLoads[placementId];
+            return true;
+        }
+        return false;
+    }
+
     private checkForTimedOutPlacements(): void {
         Object.keys(this._activeLoads).forEach((placementId) => {
             const timeValue = this.getTime() - this._activeLoads[placementId].time;
-            if (timeValue >= 30000) {
-                ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, [
-                    ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                    ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                    ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
-                ]);
-                delete this._activeLoads[placementId];
-            }
+            this.hasPlacementTimedOut(placementId, timeValue);
         });
     }
 }
