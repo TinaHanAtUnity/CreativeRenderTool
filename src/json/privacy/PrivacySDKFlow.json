@@ -36,7 +36,7 @@
             "text": "ageSelect.title",
             "type": "heading",
             "isHidden": false,
-            "level": 6
+            "level": 1
           },
           {
             "id": "consentSubitle",
@@ -97,7 +97,7 @@
             "text": "consent.title",
             "type": "heading",
             "isHidden": false,
-            "level": 6
+            "level": 1
           },
           {
             "id": "consentSubtitle",
