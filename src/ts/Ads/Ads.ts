@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, TimingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, ProgrammaticTrackingService, InitializationMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -92,6 +92,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { AdmobAdapterManager } from 'Ads/Managers/AdmobAdapterManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
 export class Ads implements IAds {
@@ -115,6 +116,7 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public AdmobAdapterManager: AdmobAdapterManager;
+    public MediationLoadTrackingManager: MediationLoadTrackingManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -123,6 +125,7 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
+    private _mediationName: string;
     private _core: ICore;
 
     public BannerModule: BannerModule;
@@ -200,6 +203,8 @@ export class Ads implements IAds {
         }).then(() => {
             return this.setupLoadApiEnabled();
         }).then(() => {
+            return this.setupMediationTrackingManager();
+        }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing since it's normal to have undefined developer consent
             });
@@ -259,7 +264,7 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
@@ -274,9 +279,13 @@ export class Ads implements IAds {
         }).then(() => {
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
-            const initializeAuctionTimespan = Date.now();
+            return this.logInitializationLatency();
+        }).then(() => {
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
+                if (this.MediationLoadTrackingManager) {
+                    this.MediationLoadTrackingManager.setInitComplete();
+                }
+                
                 if (this.PrivacyManager.isPrivacySDKTestActive()) {
                     CachedUserSummary.fetch(this.PrivacyManager);
                 }
@@ -325,6 +334,38 @@ export class Ads implements IAds {
         }
 
         return Promise.resolve();
+    }
+
+    private setupMediationTrackingManager(): Promise<void> {
+        if (this._loadApiEnabled) {
+
+            // Potentially use SDK Detection
+            return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+                if (mediation && mediation.getName() && performance && performance.now) {
+                    this._mediationName = mediation.getName()!;
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
+                    this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
+                }
+            }).catch();
+        }
+        return Promise.resolve();
+    }
+
+    private logInitializationLatency(): void {
+        //tslint:disable-next-line
+        const initTimestamp = (<any>window).unityAdsWebviewInitTimestamp;
+        if (initTimestamp && performance && performance.now) {
+            const webviewInitTime = performance.now() - initTimestamp;
+            const tags = [
+                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
+                ProgrammaticTrackingService.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
+            ];
+
+            if (this._mediationName) {
+                tags.push(ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName));
+            }
+            ProgrammaticTrackingService.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
+        }
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
