@@ -64,7 +64,7 @@ export class MediationLoadTrackingManager {
                     time: this.getTime(),
                     initialAdRequest: this._initialAdRequest
                 };
-                ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequestFill, [
+                ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequest, [
                     ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
                     ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
                     ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
