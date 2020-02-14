@@ -285,7 +285,7 @@ export class Ads implements IAds {
                 if (this.MediationLoadTrackingManager) {
                     this.MediationLoadTrackingManager.setInitComplete();
                 }
-                
+
                 if (this.PrivacyManager.isPrivacySDKTestActive()) {
                     CachedUserSummary.fetch(this.PrivacyManager);
                 }
