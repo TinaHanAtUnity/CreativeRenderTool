@@ -1,8 +1,9 @@
-import { ProgrammaticTrackingError, PTSEvent, TimingMetric, TimingEvent } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, PTSEvent, TimingEvent } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Promises } from 'Core/Utilities/Promises';
 
 interface IPTSEvent {
     name: string;
@@ -35,7 +36,7 @@ export class MetricInstance {
         this._requestManager = requestManager;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._countryIso = country;
+        this._countryIso = this.getCountryIso(country);
         this._batchedTimingEvents = [];
         this._batchedMetricEvents = [];
         this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
@@ -45,14 +46,7 @@ export class MetricInstance {
         return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
-    private createMetricTags(event: PTSEvent, tags: string[]): string[] {
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-        return [this.createAdsSdkTag('mevt', event),
-                this.createAdsSdkTag('sdv', sdkVersion),
-                this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
-    }
-
-    private createTimingTags(tags: string[]): string[] {
+    private createTags(tags: string[]): string[] {
         return [
             this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
             this.createAdsSdkTag('iso', this._countryIso),
@@ -95,6 +89,25 @@ export class MetricInstance {
         return this._requestManager.post(url, data, headers);
     }
 
+    private getCountryIso(country: string): string {
+        const lowercaseCountry = country.toLowerCase();
+        switch (lowercaseCountry) {
+            case 'us':
+            case 'cn':
+            case 'jp':
+            case 'gb':
+            case 'ru':
+            case 'de':
+            case 'kr':
+            case 'fr':
+            case 'ca':
+            case 'au':
+                return lowercaseCountry;
+            default:
+                return 'row';
+        }
+    }
+
     public createAdsSdkTag(suffix: string, tagValue: string): string {
         return `ads_sdk2_${suffix}:${tagValue}`;
     }
@@ -104,7 +117,7 @@ export class MetricInstance {
     }
 
     public reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
-        this.batchMetricEvent(event, 1, this.createMetricTags(event, tags));
+        this.batchMetricEvent(event, 1, this.createTags(tags));
     }
 
     public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
@@ -114,17 +127,21 @@ export class MetricInstance {
     public reportTimingEvent(event: TimingEvent, value: number) {
         // Gate Negative Values
         if (value > 0) {
-            this.batchTimingEvent(event, value, this.createTimingTags([]));
+            this.batchTimingEvent(event, value, this.createTags([]));
         } else {
-            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
+            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createTags([
+                this.createAdsSdkTag('mevt', event)
+            ]));
         }
     }
 
     public reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]) {
         if (value > 0) {
-            this.batchTimingEvent(event, value, this.createTimingTags(tags));
+            this.batchTimingEvent(event, value, this.createTags(tags));
         } else {
-            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createMetricTags(event, []));
+            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createTags([
+                this.createAdsSdkTag('mevt', event)
+            ]));
         }
     }
 
@@ -153,34 +170,33 @@ export class MetricInstance {
         }
     }
 
-    public async sendBatchedEvents() {
-        this.sendBatchedMetricEvents();
-        this.sendBatchedTimingEvents();
+    public sendBatchedEvents(): Promise<void[]> {
+        const promises = [
+            this.sendBatchedMetricEvents(),
+            this.sendBatchedTimingEvents()
+        ];
+        return Promise.all(promises);
     }
 
-    public async sendBatchedMetricEvents(): Promise<void> {
-        await this._sendBatchedEvents(this._batchedMetricEvents, this.metricPath).then(() => {
+    public sendBatchedMetricEvents(): Promise<void> {
+        return this._sendBatchedEvents(this._batchedMetricEvents, this.metricPath).then(() => {
             this._batchedMetricEvents = [];
-            return;
         });
-        return Promise.resolve();
     }
 
-    public async sendBatchedTimingEvents(): Promise<void> {
-        await this._sendBatchedEvents(this._batchedTimingEvents, this.timingPath).then(() => {
+    public sendBatchedTimingEvents(): Promise<void> {
+        return this._sendBatchedEvents(this._batchedTimingEvents, this.timingPath).then(() => {
             this._batchedTimingEvents = [];
             return;
          });
-         return Promise.resolve();
     }
 
-    private async _sendBatchedEvents(events: IPTSEvent[], path: string): Promise<void> {
+    private _sendBatchedEvents(events: IPTSEvent[], path: string): Promise<void> {
         if (events.length > 0) {
             const data = {
                 metrics: events
             };
-            await this.postToDatadog(data, path);
-            return;
+            return Promises.voidResult(this.postToDatadog(data, path));
         }
         return Promise.resolve();
     }

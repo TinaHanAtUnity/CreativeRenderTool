@@ -103,14 +103,9 @@ export enum OMMetric {
     OMInjectionFailure = 'om_injection_failure'
 }
 
-export enum TimingMetric {
-    TotalWebviewInitializationTime = 'webview_initialization_time',
-    InitializeCallToWebviewLoadTime = 'initialization_call_to_webview_load_time',
-    WebviewLoadToConfigurationCompleteTime = 'webview_load_to_configuration_complete_time',
-    AuctionRequestTime = 'auction_request_round_trip_time',
-    AuctionToFillStatusTime = 'auction_request_to_fill_status_time',
-    CoreInitializeTime = 'uads_core_initialize_time',
-    AdsInitializeTime = 'uads_ads_initialize_time'
+export enum InitializationMetric {
+    WebviewInitialization = 'webview_initialization_time',
+    WebviewPageLoading = 'webview_page_loading_time'
 }
 
 export enum MraidMetric {
@@ -127,15 +122,19 @@ export enum AUIMetric {
 }
 
 export enum MediationMetric {
+    LoadRequest = 'load_request',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
-    LoadRequestTimeout = 'load_request_timeout'
+    LoadRequestTimeout = 'load_request_timeout',
+    PlacementCount = 'placement_count',
+    MediaCount = 'media_count',
+    AuctionRequest = 'auction_request_time',
+    AdCaching = 'ad_caching_time'
 }
 
-// TODO Clean up naming
-export type TimingEvent = TimingMetric | MediationMetric;
+export type TimingEvent = InitializationMetric | MediationMetric;
 
-export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric;
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
 
 export class ProgrammaticTrackingService {
 

@@ -10,6 +10,11 @@ import 'styl/main.styl';
 interface IExtendedWindow extends Window {
     nativebridge: NativeBridge;
     webview: WebView;
+    unityAdsWebviewInitTimestamp: number;
+}
+
+if (performance && performance.now) {
+    (<IExtendedWindow>window).unityAdsWebviewInitTimestamp = performance.now();
 }
 
 let platform: string | null = null;
