@@ -114,6 +114,7 @@ export class MediationLoadTrackingManager {
                 ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
+            ProgrammaticTrackingService.sendBatchedEvents();
             return true;
         }
         return false;
