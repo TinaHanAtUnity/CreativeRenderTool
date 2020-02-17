@@ -145,31 +145,6 @@ export class MetricInstance {
         }
     }
 
-    // TODO: Extend this to all events
-    private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {
-        // Curently ignore additional negative time values
-        if (value > 0) {
-            this._batchedTimingEvents = this._batchedTimingEvents.concat(this.createData(metric, value, tags).metrics);
-        }
-
-        // Failsafe so we aren't storing too many events at once
-        if (this._batchedTimingEvents.length >= 10) {
-            this.sendBatchedTimingEvents();
-        }
-    }
-
-    private batchMetricEvent(metric: PTSEvent, value: number, tags: string[]): void {
-        // Curently ignore additional negative time values
-        if (value > 0) {
-            this._batchedMetricEvents = this._batchedMetricEvents.concat(this.createData(metric, value, tags).metrics);
-        }
-
-        // Failsafe so we aren't storing too many events at once
-        if (this._batchedMetricEvents.length >= 10) {
-            this.sendBatchedMetricEvents();
-        }
-    }
-
     public sendBatchedEvents(): Promise<void[]> {
         const promises = [
             this.sendBatchedMetricEvents(),
@@ -178,20 +153,37 @@ export class MetricInstance {
         return Promise.all(promises);
     }
 
-    public sendBatchedMetricEvents(): Promise<void> {
-        return this._sendBatchedEvents(this._batchedMetricEvents, this.metricPath).then(() => {
+    private sendBatchedMetricEvents(): Promise<void> {
+        return this.constructAndSendEvents(this._batchedMetricEvents, this.metricPath).then(() => {
             this._batchedMetricEvents = [];
         });
     }
 
-    public sendBatchedTimingEvents(): Promise<void> {
-        return this._sendBatchedEvents(this._batchedTimingEvents, this.timingPath).then(() => {
+    private sendBatchedTimingEvents(): Promise<void> {
+        return this.constructAndSendEvents(this._batchedTimingEvents, this.timingPath).then(() => {
             this._batchedTimingEvents = [];
-            return;
          });
     }
 
-    private _sendBatchedEvents(events: IPTSEvent[], path: string): Promise<void> {
+    private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {
+        this._batchedTimingEvents = this._batchedTimingEvents.concat(this.createData(metric, value, tags).metrics);
+
+        // Failsafe so we aren't storing too many events at once
+        if (this._batchedTimingEvents.length >= 30) {
+            this.sendBatchedTimingEvents();
+        }
+    }
+
+    private batchMetricEvent(metric: PTSEvent, value: number, tags: string[]): void {
+        this._batchedMetricEvents = this._batchedMetricEvents.concat(this.createData(metric, value, tags).metrics);
+
+        // Failsafe so we aren't storing too many events at once
+        if (this._batchedMetricEvents.length >= 30) {
+            this.sendBatchedMetricEvents();
+        }
+    }
+
+    private constructAndSendEvents(events: IPTSEvent[], path: string): Promise<void> {
         if (events.length > 0) {
             const data = {
                 metrics: events

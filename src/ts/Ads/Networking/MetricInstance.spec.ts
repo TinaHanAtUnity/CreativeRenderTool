@@ -393,7 +393,7 @@ import { Platform } from 'Core/Constants/Platform';
                         }
                     ]
                 };
-                const promise = metricInstance.sendBatchedTimingEvents();
+                const promise = metricInstance.sendBatchedEvents();
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
                     JSON.stringify(expected),
@@ -403,8 +403,8 @@ import { Platform } from 'Core/Constants/Platform';
                 return promise;
             });
 
-            it('should clear batchedTimingEvents', () => {
-                return metricInstance.sendBatchedTimingEvents().then(() => {
+            it('should clear batched timing events', () => {
+                return metricInstance.sendBatchedEvents().then(() => {
                     //tslint:disable-next-line
                     expect(metricInstance['_batchedTimingEvents']).toEqual([]);
                 });
@@ -418,7 +418,7 @@ import { Platform } from 'Core/Constants/Platform';
             });
 
             it('should call post once', () => {
-                const promise = metricInstance.sendBatchedMetricEvents();
+                const promise = metricInstance.sendBatchedEvents();
                 expect(requestManager.post).toHaveBeenCalledTimes(1);
                 return promise;
             });
@@ -445,7 +445,7 @@ import { Platform } from 'Core/Constants/Platform';
                         }
                     ]
                 };
-                const promise = metricInstance.sendBatchedMetricEvents();
+                const promise = metricInstance.sendBatchedEvents();
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
                     JSON.stringify(expected),
@@ -455,24 +455,24 @@ import { Platform } from 'Core/Constants/Platform';
                 return promise;
             });
 
-            it('should clear batchedMetricEvents', () => {
-                return metricInstance.sendBatchedMetricEvents().then(() => {
+            it('should clear batched metric events', () => {
+                return metricInstance.sendBatchedEvents().then(() => {
                     //tslint:disable-next-line
                     expect(metricInstance['_batchedMetricEvents']).toEqual([]);
                 });
             });
         });
 
-        describe('batch 10 events', () => {
-            it('should not fire events when below 10', () => {
-                for (let i = 0; i < 10; i++) {
+        describe('batch 30 events', () => {
+            it('should not fire events when below 30', () => {
+                for (let i = 0; i < 30; i++) {
                     expect(requestManager.post).toBeCalledTimes(0);
                     metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, 200);
                 }
             });
 
-            it('should fire events when 10 events are reached', () => {
-                for (let i = 0; i < 10; i++) {
+            it('should fire events when 30 events are reached', () => {
+                for (let i = 0; i < 30; i++) {
                     metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, 200);
                 }
                 expect(requestManager.post).toBeCalledTimes(1);
@@ -484,7 +484,7 @@ import { Platform } from 'Core/Constants/Platform';
         beforeEach(() => {
             clientInfo.getTestMode.mockReturnValue(true);
             metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-            for (let i = 0; i < 11; i++) {
+            for (let i = 0; i < 30; i++) {
                 metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
             }
         });
