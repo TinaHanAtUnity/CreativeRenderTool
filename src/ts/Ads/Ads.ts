@@ -182,6 +182,7 @@ export class Ads implements IAds {
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
+            Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
         }).then(() => {
             return this.configureMediationManager();
@@ -359,6 +360,7 @@ export class Ads implements IAds {
                 tags.push(ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName));
             }
             ProgrammaticTrackingService.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
+            ProgrammaticTrackingService.reportTimingEventWithTags(InitializationMetric.WebviewPageLoading, initTimestamp, tags);
         }
     }
 

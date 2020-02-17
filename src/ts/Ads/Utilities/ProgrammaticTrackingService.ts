@@ -104,7 +104,8 @@ export enum OMMetric {
 }
 
 export enum InitializationMetric {
-    WebviewInitialization = 'webview_initialization_time'
+    WebviewInitialization = 'webview_initialization_time',
+    WebviewPageLoading = 'webview_page_loading_time'
 }
 
 export enum MraidMetric {
@@ -121,6 +122,7 @@ export enum AUIMetric {
 }
 
 export enum MediationMetric {
+    LoadRequest = 'load_request',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
     LoadRequestTimeout = 'load_request_timeout',
