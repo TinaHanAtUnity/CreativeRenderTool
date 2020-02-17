@@ -358,6 +358,17 @@ import { Platform } from 'Core/Constants/Platform';
             });
         });
 
+        it('should fire to metric endpoint with negative timing events', () => {
+            metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, -200);
+            return metricInstance.sendBatchedEvents().then(() => {
+                expect(requestManager.post).toBeCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
+                    expect.anything(),
+                    [['Content-Type', 'application/json']]
+                );
+            });
+        });
+
         describe('Batch two timing events', () => {
 
             beforeEach(() => {
