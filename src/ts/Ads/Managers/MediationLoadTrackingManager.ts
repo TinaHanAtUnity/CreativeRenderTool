@@ -92,6 +92,7 @@ export class MediationLoadTrackingManager {
                 ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
+            ProgrammaticTrackingService.sendBatchedEvents();
         } else if (newState === 'NO_FILL') {
             ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, [
                 ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
@@ -99,6 +100,7 @@ export class MediationLoadTrackingManager {
                 ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
+            ProgrammaticTrackingService.sendBatchedEvents();
         }
     }
 
