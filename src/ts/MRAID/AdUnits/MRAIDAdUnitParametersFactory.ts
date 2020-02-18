@@ -17,7 +17,10 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager'
 import { AUIMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService'
-import { arAvailableButtonExperiment } from 'AR/Experiments/ARUIExperiments'
+import {
+    arAvailableButtonColorExperiment,
+    arAvailableButtonSkipTextExperiment,
+} from 'AR/Experiments/ARUIExperiments'
 import { ArAutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList'
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
@@ -68,7 +71,13 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             if ((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitParametersFactory._forcedExtendedMRAID) {
                 mraid = new ExtendedMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else if (ARUtil.isARCreative(baseParams.campaign) || MRAIDAdUnitParametersFactory._forcedARMRAID) {
-                const arUIExperiments = arAvailableButtonExperiment(this._automatedExperimentManager);
+                // const arAvailableButtonColor = arAvailableButtonColorExperiment(this._automatedExperimentManager);
+                // const arAvailableButtonSkipText = arAvailableButtonSkipTextExperiment(this._automatedExperimentManager);
+
+                const arUIExperiments = {
+                    // arAvailableButtonColor,
+                    // arAvailableButtonSkipText,
+                }
 
                 mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy(), this._automatedExperimentManager, arUIExperiments);
             } else if (baseParams.campaign.isCustomCloseEnabled()) {

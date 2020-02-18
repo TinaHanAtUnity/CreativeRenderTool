@@ -34,4 +34,11 @@ export const ARAvailableButtonColorsExperiment = new AutomatedExperiment({
     cacheDisabled: true
 });
 
-export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ARAvailableButtonColorsExperiment];
+export const ARAvailableButtonSkipExperiment = new AutomatedExperiment({
+    name: 'wbvw-ar-v1',
+    actions: ['true', 'false'],
+    defaultAction: 'false',
+    cacheDisabled: true
+});
+
+export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ARAvailableButtonColorsExperiment, ARAvailableButtonSkipExperiment];
