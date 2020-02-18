@@ -1,7 +1,11 @@
+# Tue Feb 18 20:24:04 UTC 2020
+
+* Batch Metric and Timing Events on 3.2.0 [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
+
 # Fri Feb 14 19:19:55 UTC 2020
 
-* Align metric and timing tags [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
-* Add ABGroup for Diagnostics trigger method [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
+* Align metric and timing tags on 3.2.0 [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
+* Add ABGroup for Diagnostics trigger method on 3.2.0 [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
 
 # Fri Feb 14 18:18:50 UTC 2020
 
