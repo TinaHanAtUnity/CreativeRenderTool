@@ -243,6 +243,10 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         });
     }
 
+    public onPrivacyViewError(event: ErrorEvent): void {
+        this.closePrivacy();
+    }
+
     private getViewParams(parameters: IPrivacyUnitParameters): IPrivacySDKViewParameters {
         let viewParams: IPrivacySDKViewParameters = {
             platform: parameters.platform,

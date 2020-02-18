@@ -37,6 +37,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     private _domContentLoaded = false;
     private _privacyConfig: PrivacyConfig;
     private _frameEventAdapter: PrivacyFrameEventAdapter;
+    private _errorListener: (e: ErrorEvent) => void;
 
     constructor(params: IPrivacySDKViewParameters) {
         super(params.platform, 'consent');
@@ -50,6 +51,12 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
         this._frameEventAdapter = new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame);
         this._iFrameAdapterContainer.connect(this._frameEventAdapter);
+
+        if (this._iFrame.contentWindow) {
+            this._errorListener = (event: ErrorEvent) => this.onWindowError(event);
+            this._iFrame.contentWindow.addEventListener('error', this._errorListener, false);
+        }
+
         this._iFrame.srcdoc = this.loadPrivacyHtml(PrivacyContainer);
     }
 
@@ -82,8 +89,18 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         }
     }
 
+    private onWindowError(event: ErrorEvent): boolean {
+        this._handlers.forEach(handler => handler.onPrivacyViewError(event));
+        return true;
+    }
+
     public onPrivacyReady(): void {
         this._domContentLoaded = true;
+
+        if (this._iFrame.contentWindow) {
+            this._iFrame.contentWindow.removeEventListener('error', this._errorListener, false);
+        }
+
         this._handlers.forEach(handler => handler.onPrivacyReady());
     }
 
