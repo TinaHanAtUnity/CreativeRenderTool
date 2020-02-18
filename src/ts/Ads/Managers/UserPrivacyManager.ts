@@ -337,6 +337,14 @@ export class UserPrivacyManager {
         return this._privacy.getLegalFramework() === LegalFramework.CCPA;
     }
 
+    public isDeveloperAgeGateActive(): boolean {
+        return this._developerAgeGateActive;
+    }
+
+    public getDeveloperAgeGateChoice(): boolean {
+        return this._developerAgeGateChoice;
+    }
+
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
         let permissions = UserPrivacy.PERM_ALL_FALSE;
         let action = GDPREventAction.DEVELOPER_OPTOUT;
