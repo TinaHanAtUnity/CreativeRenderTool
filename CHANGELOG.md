@@ -1,3 +1,16 @@
+# Pending
+
+* Adds the following changes to applicable branches other than 3.2.0:
+* Batch Metric and Timing Events [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
+* Align metric and timing tags [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
+* Add ABGroup for Diagnostics trigger method [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
+* Add Load Request, Page Load Metrics, Add Tests, Refine Metric Behavior [#13269](https://github.com/Applifier/unity-ads-webview/pull/13269)
+* Add Metrics around Auction, Placements, and Caching [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
+* Adjust tagging on Mediation metrics on [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
+* Remove Initialization Stages and Add Webview Init Timestamp on Webview Version [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
+* Fix Mediation Tracking Bug and Add Test [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
+* Add Mediation Load Tracking to Webview Version [#13230](https://github.com/Applifier/unity-ads-webview/pull/13230)
+
 # Tue Feb 18 20:24:04 UTC 2020
 
 * Batch Metric and Timing Events on 3.2.0 [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
