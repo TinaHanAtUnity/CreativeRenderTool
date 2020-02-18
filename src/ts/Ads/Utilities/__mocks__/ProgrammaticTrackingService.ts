@@ -9,6 +9,5 @@ export function MockPTS(): void {
     Base.reportMetricEventWithTags = jest.fn();
     Base.reportTimingEvent = jest.fn();
     Base.reportTimingEventWithTags = jest.fn();
-    Base.batchEvent = jest.fn();
     Base.sendBatchedEvents = jest.fn();
 }

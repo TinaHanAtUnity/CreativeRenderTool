@@ -32,7 +32,8 @@ import { Platform } from 'Core/Constants/Platform';
 
     describe('reportMetricEvent with Chinese network operator', () => {
         beforeEach(() => {
-            return metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+            metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+            metricInstance.sendBatchedEvents();
         });
 
         it('should fire with china endpoint', () => {
@@ -48,7 +49,8 @@ import { Platform } from 'Core/Constants/Platform';
         beforeEach(() => {
             clientInfo.getTestMode.mockReturnValue(true);
             metricInstance = new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-            return metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            metricInstance.sendBatchedEvents();
         });
 
         it('should call the (non-china) staging endpoint', () => {

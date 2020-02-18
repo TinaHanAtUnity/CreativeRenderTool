@@ -517,7 +517,12 @@ export class Ads implements IAds {
             if (this.Monetization.isInitialized()) {
                 this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
             }
-            this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
+            this._currentAdUnit.onClose.subscribe(() =>  {
+                this.onAdUnitClose();
+                ProgrammaticTrackingService.sendBatchedEvents();
+            });
+            this._currentAdUnit.onFinish.subscribe(() => ProgrammaticTrackingService.sendBatchedEvents());
+            this._currentAdUnit.onError.subscribe(() => ProgrammaticTrackingService.sendBatchedEvents());
 
             if (this._core.NativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
                 if (!IosUtils.isAppSheetBroken(this._core.DeviceInfo.getOsVersion(), this._core.DeviceInfo.getModel(), orientation) && !campaign.getBypassAppSheet()) {
