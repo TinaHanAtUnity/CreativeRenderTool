@@ -81,7 +81,15 @@ export interface IUserPrivacyStorageDataPrivacy {
     };
 }
 
-export type IUserPrivacyStorageData = IUserPrivacyStorageDataGdpr | IUserPrivacyStorageDataPrivacy;
+export interface IUserPrivacyStorageUserOverAgeLimit {
+    privacy: {
+        useroveragelimit: {
+            value: unknown;
+        };
+    };
+}
+
+export type IUserPrivacyStorageData = IUserPrivacyStorageDataGdpr | IUserPrivacyStorageDataPrivacy | IUserPrivacyStorageUserOverAgeLimit;
 
 export class UserPrivacyManager {
 
@@ -106,6 +114,8 @@ export class UserPrivacyManager {
     private readonly _request: RequestManager;
     private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
     private _ageGateSource: AgeGateSource = AgeGateSource.MISSING;
+    private _developerAgeGateActive: boolean;
+    private _developerAgeGateChoice: boolean;
     private _privacyFormatMetadataSeenInSession: boolean;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
@@ -120,6 +130,8 @@ export class UserPrivacyManager {
         this._deviceInfo = deviceInfo;
         this._request = request;
         this._forcedConsentUnit = forcedConsentUnit || false;
+        this._developerAgeGateActive = false;
+        this._developerAgeGateChoice = false;
         this._privacyFormatMetadataSeenInSession = false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
     }
@@ -363,6 +375,15 @@ export class UserPrivacyManager {
 
     private initAgeGateChoice(): void {
         if (this._privacy.isAgeGateEnabled()) {
+            this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.PrivacyAgeGateKey).then((data: unknown) => {
+                const value: boolean | undefined = this.getConsentTypeHack(data);
+
+                if (typeof(value) !== 'undefined') {
+                    this._developerAgeGateActive = true;
+                    this._developerAgeGateChoice = value;
+                }
+            });
+
             this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey).then((data: unknown) => {
                 const value: boolean | undefined = this.getConsentTypeHack(data);
                 if (typeof(value) !== 'undefined') {
@@ -391,6 +412,21 @@ export class UserPrivacyManager {
     }
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
+        if (this._privacy.isAgeGateEnabled()) {
+            const ageGateData = <IUserPrivacyStorageUserOverAgeLimit> data;
+
+            if (ageGateData && ageGateData.privacy && ageGateData.privacy.useroveragelimit) {
+                const ageGateValue: boolean | undefined = this.getConsentTypeHack(data);
+
+                if (typeof(ageGateValue) !== 'undefined') {
+                    this._developerAgeGateActive = true;
+                    this._developerAgeGateChoice = ageGateValue;
+                }
+
+                return;
+            }
+        }
+
         // should only use consent when gdpr is enabled in configuration
         if (!this._privacy.isGDPREnabled()) {
             return;
