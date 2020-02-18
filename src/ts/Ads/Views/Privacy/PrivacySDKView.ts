@@ -42,15 +42,15 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         super(params.platform, 'consent');
         this._template = new Template(PrivacyTemplate);
         this._privacyManager = params.privacyManager;
-        this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
         this._coreApi = params.core;
     }
 
     private loadIframe() {
         this._iFrame = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
+        this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
         this._frameEventAdapter = new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame);
         this._iFrameAdapterContainer.connect(this._frameEventAdapter);
-        this._iFrame.srcdoc = this.createPrivacyFrame(PrivacyContainer);
+        this._iFrame.srcdoc = this.loadPrivacyHtml(PrivacyContainer);
     }
 
     public setPrivacyConfig(privacyConfig: PrivacyConfig): void {
@@ -62,7 +62,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this.loadIframe();
     }
 
-    public createPrivacyFrame(container: string): string {
+    public loadPrivacyHtml(container: string): string {
         let privacyHtml = this._privacyConfig.getHtml();
 
         if (privacyHtml) {
@@ -76,7 +76,10 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
 
     public hide() {
         super.hide();
-        this._iFrameAdapterContainer.disconnect();
+
+        if (this._iFrameAdapterContainer) {
+            this._iFrameAdapterContainer.disconnect();
+        }
     }
 
     public onPrivacyReady(): void {
