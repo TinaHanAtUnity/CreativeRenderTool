@@ -104,6 +104,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
             this._adUnitContainer.removeEventHandler(this);
             if (this._unityPrivacyView.container().parentElement) {
                 document.body.removeChild(this._unityPrivacyView.container());
+                delete this._unityPrivacyView;
             }
 
             // Fixes browser build for android. TODO: find a neater way
