@@ -4,11 +4,11 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurement, OpenMeasurement as Base } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -43,45 +43,63 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
-        let omVendors: string[] = [];
         if (adVerifications) {
-            const omInstances: OpenMeasurement<VastCampaign>[] = [];
-            const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
-
-            adVerifications.forEach((adverification) => {
-                omVendors.push(adverification.getVerificationVendor());
-                if (CustomFeatures.isIASVendor(adverification.getVerificationVendor())) {
-                    const om = new OpenMeasurement(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification);
-                    om.setOMAdViewBuilder(omAdViewBuilder);
-                    omInstances.push(om);
-                }
-            });
-
-            if (baseParams.campaign.getVast().isPublicaTag()) {
-                // adds publica as an om vendor to use for reporting
-                omVendors.push('publica');
-
-                // removes duplicate IAS vendor keys for reporting
-                omVendors = omVendors.unique();
-            }
-
-            const omManager = new VastOpenMeasurementController(baseParams.platform, baseParams.placement, omInstances, omAdViewBuilder, baseParams.clientInfo, baseParams.deviceInfo);
-
-            omManager.addToViewHierarchy();
-            omManager.injectVerifications();
-
-            baseParams.campaign.setOmEnabled(true);
-            baseParams.campaign.setOMVendors(omVendors);
-            vastAdUnitParameters.om = omManager;
-
-            // For brandv1 and brandv2 tracking
-            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
-            baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
-            if (baseParams.campaign.getSeatId() === 9078) {
-                ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMEnabledLiftOff);
-            }
+            vastAdUnitParameters.om = this.createOpenMeasurementManager(baseParams, adVerifications);
+            this.setOMVendorTracking(adVerifications, baseParams.campaign, baseParams.thirdPartyEventManager);
         }
 
         return vastAdUnitParameters;
+    }
+
+    private createOpenMeasurementManager(baseParams: IAdUnitParameters<VastCampaign>, adVerifications: VastAdVerification[]): VastOpenMeasurementController {
+        const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
+        const omInstances: OpenMeasurement<VastCampaign>[] = this.getOMInstances(adVerifications, baseParams, omAdViewBuilder);
+        const omManager = new VastOpenMeasurementController(baseParams.platform, baseParams.placement, omInstances, omAdViewBuilder, baseParams.clientInfo, baseParams.deviceInfo);
+        omManager.addToViewHierarchy();
+        omManager.injectVerifications();
+
+        return omManager;
+    }
+
+    private getOMInstances(adVerifications: VastAdVerification[], baseParams: IAdUnitParameters<VastCampaign>, omAdViewBuilder: OpenMeasurementAdViewBuilder): OpenMeasurement<VastCampaign>[] {
+        const omInstances: OpenMeasurement<VastCampaign>[] = [];
+        adVerifications.forEach((adverification) => {
+            if (CustomFeatures.isIASVendor(adverification.getVerificationVendor()) && adverification.getVerficationResources()[0].getApiFramework() === 'omid') {
+                const om = new OpenMeasurement<VastCampaign>(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, adverification.getVerificationVendor(), adverification);
+                om.setOMAdViewBuilder(omAdViewBuilder);
+                omInstances.push(om);
+            }
+        });
+
+        return omInstances;
+    }
+
+    private setOMVendorTracking(adVerifications: VastAdVerification[], campaign: VastCampaign, thirdPartyEventManager: ThirdPartyEventManager) {
+        let omVendors: string[] = [];
+        adVerifications.forEach((adverification) => {
+            if (adverification.getVerficationResources()[0].getApiFramework() === 'omid') {
+                omVendors.push(adverification.getVerificationVendor());
+            }
+        });
+
+        if (campaign.getVast().isPublicaTag()) {
+            // adds publica as an om vendor to use for reporting
+            omVendors.push('publica');
+
+            // removes duplicate IAS vendor keys for reporting
+            omVendors = omVendors.unique();
+        }
+
+        campaign.setOmEnabled(true);
+        campaign.setOMVendors(omVendors);
+
+        // For brandv1 and brandv2 tracking
+        thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
+        thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
+        if (campaign.getSeatId() === 9078) {
+            ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMEnabledLiftOff);
+        }
+
+        return omVendors;
     }
 }
