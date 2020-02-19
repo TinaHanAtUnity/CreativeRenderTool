@@ -25,7 +25,6 @@ export const OpenMeasurementAdmob = jest.fn(() => {
 });
 
 export type OpenMeasurementMockVast = Base<VastCampaignMock> & {
-    super: jest.Mock;
     getOMAdSessionId: jest.Mock;
     sessionStart: jest.Mock;
     getVastVerification: jest.Mock;
@@ -37,7 +36,6 @@ export type OpenMeasurementMockVast = Base<VastCampaignMock> & {
 
 export const OpenMeasurementVast = jest.fn(() => {
     return <OpenMeasurementMockVast>{
-        super: jest.fn(),
         getOMAdSessionId: jest.fn().mockImplementation(() => ''),
         sessionStart: jest.fn().mockImplementation(() => ''),
         getVastVerification: jest.fn(),
