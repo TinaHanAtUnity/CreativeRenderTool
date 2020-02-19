@@ -1,5 +1,5 @@
 import { ListenerApi } from 'Ads/Native/Listener';
-import { MediationMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { MediationMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { LoadApi } from 'Core/Native/LoadApi';
 
 export class MediationLoadTrackingManager {
@@ -28,31 +28,31 @@ export class MediationLoadTrackingManager {
     }
 
     public reportPlacementCount(placementCount: number) {
-        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.PlacementCount, placementCount, [
-            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.PlacementCount, placementCount, [
+            SDKMetrics.createAdsSdkTag('med', this._mediationName),
+            SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
         ]);
     }
 
     public reportMediaCount(mediaCount: number) {
-        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.MediaCount, mediaCount, [
-            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.MediaCount, mediaCount, [
+            SDKMetrics.createAdsSdkTag('med', this._mediationName),
+            SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
         ]);
     }
 
     public reportAuctionRequest(latency: number) {
-        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, [
-            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, [
+            SDKMetrics.createAdsSdkTag('med', this._mediationName),
+            SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
         ]);
     }
 
     public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {
-        ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.AdCaching, latency, [
-            ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-            ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-            ProgrammaticTrackingService.createAdsSdkTag('acs', `${adCachedSuccessfully}`)
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.AdCaching, latency, [
+            SDKMetrics.createAdsSdkTag('med', this._mediationName),
+            SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+            SDKMetrics.createAdsSdkTag('acs', `${adCachedSuccessfully}`)
         ]);
     }
 
@@ -64,10 +64,10 @@ export class MediationLoadTrackingManager {
                     time: this.getTime(),
                     initialAdRequest: this._initialAdRequest
                 };
-                ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequest, [
-                    ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                    ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                    ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
+                SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequest, [
+                    SDKMetrics.createAdsSdkTag('med', this._mediationName),
+                    SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                    SDKMetrics.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
                 ]);
             }
         });
@@ -86,21 +86,21 @@ export class MediationLoadTrackingManager {
         this.checkForTimedOutPlacements();
 
         if (newState === 'READY') {
-            ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, [
-                ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
+            SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, [
+                SDKMetrics.createAdsSdkTag('med', this._mediationName),
+                SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                SDKMetrics.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
-            ProgrammaticTrackingService.sendBatchedEvents();
+            SDKMetrics.sendBatchedEvents();
         } else if (newState === 'NO_FILL') {
-            ProgrammaticTrackingService.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, [
-                ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
+            SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, [
+                SDKMetrics.createAdsSdkTag('med', this._mediationName),
+                SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                SDKMetrics.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
-            ProgrammaticTrackingService.sendBatchedEvents();
+            SDKMetrics.sendBatchedEvents();
         }
     }
 
@@ -110,13 +110,13 @@ export class MediationLoadTrackingManager {
 
     private hasPlacementTimedOut(placementId: string, timeValue: number): boolean {
         if (timeValue >= 30000) {
-            ProgrammaticTrackingService.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, [
-                ProgrammaticTrackingService.createAdsSdkTag('med', this._mediationName),
-                ProgrammaticTrackingService.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
-                ProgrammaticTrackingService.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
+            SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, [
+                SDKMetrics.createAdsSdkTag('med', this._mediationName),
+                SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`),
+                SDKMetrics.createAdsSdkTag('iar', `${this._activeLoads[placementId].initialAdRequest}`)
             ]);
             delete this._activeLoads[placementId];
-            ProgrammaticTrackingService.sendBatchedEvents();
+            SDKMetrics.sendBatchedEvents();
             return true;
         }
         return false;

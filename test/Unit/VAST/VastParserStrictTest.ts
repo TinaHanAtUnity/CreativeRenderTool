@@ -32,7 +32,7 @@ import { Vast } from 'VAST/Models/Vast';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('VastParserStrict', () => {
 
@@ -50,7 +50,7 @@ describe('VastParserStrict', () => {
             core = TestFixtures.getCoreApi(nativeBridge);
             const wakeUpManager = new WakeUpManager(core);
             request = new RequestManager(platform, core, wakeUpManager);
-            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         });
 
         it('should throw when given vast has no Ad element', () => {

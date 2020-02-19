@@ -2,7 +2,7 @@ import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/Requ
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
-import { AdmobMetric, ProgrammaticTrackingError, TimingEvent, InitializationMetric, MediationMetric, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AdmobMetric, ProgrammaticTrackingError, TimingEvent, InitializationMetric, MediationMetric, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 
 [

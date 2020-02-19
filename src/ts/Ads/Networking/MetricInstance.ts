@@ -1,4 +1,4 @@
-import { ProgrammaticTrackingError, PTSEvent, TimingEvent } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingError, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
