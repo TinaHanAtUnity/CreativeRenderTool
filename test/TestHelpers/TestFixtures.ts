@@ -126,7 +126,7 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';

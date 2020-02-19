@@ -9,7 +9,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
@@ -69,7 +69,7 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
         privacySDK = TestFixtures.getPrivacySDK(core.Api);
 
-        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
 

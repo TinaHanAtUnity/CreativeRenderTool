@@ -1,5 +1,5 @@
 import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { LoadApi, LoadApiMock } from 'Core/Native/__mocks__/LoadApi';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 
@@ -21,7 +21,7 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should send event', () => {
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
         });
     });
 
@@ -45,11 +45,11 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report metric event with tags three times', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(3);
+            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(3);
         });
 
         it('should not report timing events', () => {
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).not.toBeCalled();
+            expect(SDKMetrics.reportTimingEventWithTags).not.toBeCalled();
         });
     });
 
@@ -60,7 +60,7 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should only log two new active load requests', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(2);
         });
     });
 
@@ -85,12 +85,12 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report metric event with tags four times', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
         });
 
         it('should not report timing events', () => {
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(1);
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 999.99, expect.anything());
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 999.99, expect.anything());
         });
     });
 
@@ -115,12 +115,12 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report metric event', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
         });
 
         it('should report timing event', () => {
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(1);
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 999.99, expect.anything());
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 999.99, expect.anything());
         });
     });
 
@@ -145,11 +145,11 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report metric event', () => {
-            expect(ProgrammaticTrackingService.reportMetricEventWithTags).toBeCalledTimes(2);
+            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(2);
         });
 
         it('should report timing event', () => {
-            expect(ProgrammaticTrackingService.reportTimingEventWithTags).toBeCalledTimes(0);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(0);
         });
     });
 });

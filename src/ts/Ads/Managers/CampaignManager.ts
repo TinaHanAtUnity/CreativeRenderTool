@@ -47,7 +47,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -251,7 +251,7 @@ export class CampaignManager {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
-            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
+            SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
@@ -266,13 +266,13 @@ export class CampaignManager {
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledFill);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledFill);
                     loadedCampaign.campaign.setIsLoadEnabled(true);
                     if (this._mediationLoadTracking && performance && performance.now) {
                         this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
                     }
                 } else {
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                     if (this._mediationLoadTracking && performance && performance.now) {
                         this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
                     }
@@ -280,7 +280,7 @@ export class CampaignManager {
                 return loadedCampaign;
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
-                ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
         });
