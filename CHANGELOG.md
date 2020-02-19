@@ -1,4 +1,4 @@
-# Pending
+# Wed Feb 19 22:00:38 UTC 2020
 
 * Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
 * Remove reportErrorEvent Implementation [#13228](https://github.com/Applifier/unity-ads-webview/pull/13228)
