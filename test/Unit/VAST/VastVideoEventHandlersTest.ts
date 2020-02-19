@@ -9,7 +9,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { MOAT } from 'Ads/Views/MOAT';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -121,7 +121,7 @@ describe('VastVideoEventHandler tests', () => {
             ads: ads
         };
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);

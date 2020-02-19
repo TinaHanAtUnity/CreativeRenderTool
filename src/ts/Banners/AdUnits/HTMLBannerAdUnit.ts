@@ -8,7 +8,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
-import { ProgrammaticTrackingService, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { IBannerNativeApi } from 'Banners/IBannerModule';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
@@ -75,7 +75,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         GameSessionCounters.addStart(this._campaign);
         GameSessionCounters.addView(this._campaign);
         if (!this._impressionEventsSent) {
-            ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdImpression);
+            SDKMetrics.reportMetricEvent(BannerMetric.BannerAdImpression);
             this.sendTrackingEvent(TrackingEvent.IMPRESSION);
             this._impressionEventsSent = true;
         }

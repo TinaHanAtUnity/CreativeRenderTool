@@ -136,7 +136,7 @@ export type TimingEvent = InitializationMetric | MediationMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
 
-export class ProgrammaticTrackingService {
+export class SDKMetrics {
 
     private static _metricInstance: MetricInstance;
 

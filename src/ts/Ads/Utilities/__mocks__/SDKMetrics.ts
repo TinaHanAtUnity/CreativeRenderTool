@@ -1,7 +1,7 @@
-import { ProgrammaticTrackingService as Base } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics as Base } from 'Ads/Utilities/SDKMetrics';
 
 // Called from test_utils/jest.setup.js to mock before every test
-export function MockPTS(): void {
+export function MockMetrics(): void {
     Base.initialize = jest.fn();
     Base.createAdsSdkTag = jest.fn();
     Base.reportErrorEvent = jest.fn();

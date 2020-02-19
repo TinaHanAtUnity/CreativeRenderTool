@@ -16,7 +16,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ProgrammaticAdMobParser', () => {
