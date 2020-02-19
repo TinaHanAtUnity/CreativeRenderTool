@@ -4,13 +4,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
-import { OpenMeasurement, OpenMeasurement as Base } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
-import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { VastOpenMeasurementSetup } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementSetup';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
@@ -45,9 +39,9 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
         if (adVerifications) {
-            const openMeasurementSetup = new VastOpenMeasurementSetup(baseParams, adVerifications);
-            vastAdUnitParameters.om = openMeasurementSetup.createOpenMeasurementManager();
-            openMeasurementSetup.setOMVendorTracking(adVerifications, baseParams.campaign, baseParams.thirdPartyEventManager);
+            const openMeasurementSetup = new VastOpenMeasurementSetup(adVerifications, baseParams.campaign, baseParams.deviceInfo, baseParams.platform, baseParams.clientInfo, baseParams.placement);
+            vastAdUnitParameters.om = openMeasurementSetup.createOpenMeasurementManager(baseParams.core, baseParams.request);
+            openMeasurementSetup.setOMVendorTracking(baseParams.thirdPartyEventManager);
         }
 
         return vastAdUnitParameters;
