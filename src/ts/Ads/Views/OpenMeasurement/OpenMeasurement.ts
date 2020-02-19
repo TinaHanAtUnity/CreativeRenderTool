@@ -24,6 +24,7 @@ import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { Campaign } from 'Ads/Models/Campaign';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -101,11 +102,12 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _adVerification: VastAdVerification;
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
     private _verificationResource: IVerificationScriptResource;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager,  thirdPartyEventManager: ThirdPartyEventManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -472,7 +474,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
         const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
         if (adVerificationErrorURL) {
-            this._request.get(adVerificationErrorURL);
+            //this._request.get(adVerificationErrorURL);
+            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL);
         }
     }
 
