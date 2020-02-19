@@ -1,4 +1,4 @@
-# Pending
+# Wed Feb 19 00:20:54 UTC 2020
 
 * Adds the following changes to applicable branches other than 3.2.0:
 * Batch Metric and Timing Events [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
