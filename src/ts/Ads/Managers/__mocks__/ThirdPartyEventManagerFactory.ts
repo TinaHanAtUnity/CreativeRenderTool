@@ -1,4 +1,5 @@
 import { ThirdPartyEventManagerFactory as Base } from 'Ads/Managers/ThirdPartyEventManagerFactory';
+import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventManager.ts';
 
 export type ThirdPartyEventManagerFactoryMock = Base & {
     create: jest.Mock;
@@ -6,6 +7,6 @@ export type ThirdPartyEventManagerFactoryMock = Base & {
 
 export const ThirdPartyEventManagerFactory = jest.fn(() => {
     return <ThirdPartyEventManagerFactoryMock>{
-        create: jest.fn()
+        create: jest.fn().mockReturnValue(new ThirdPartyEventManager())
     };
 });

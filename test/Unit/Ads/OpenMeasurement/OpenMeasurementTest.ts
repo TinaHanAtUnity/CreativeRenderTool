@@ -119,11 +119,12 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                     describe('VERIFICATION_RESOURCE_REJECTED', () => {
                         const resource1 = new VastVerificationResource('http://url1.js', 'test1');
                         const verificationResources = [resource1];
-                        const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D');
+                        const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D&PARTNER=[OMIDPARTNER]&cachebusting=[CACHEBUSTING]&timestamp=[TIMESTAMP]');
                         const vastAdVerifications = [vastAdVerification];
 
                         beforeEach(() => {
                             sandbox.stub(CustomFeatures, 'isUnsupportedOMVendor').returns(true);
+                            sandbox.stub(Date.prototype, 'toISOString').returns('2020-02-06T23:45:18.458Z');
                             om = initWithVastVerifications(vastAdVerifications);
                             om.render();
                             om.addMessageListener();
@@ -134,8 +135,8 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                             om.removeMessageListener();
                         });
 
-                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1');
+                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file and replace OMIDPARTNER,OMIDPARTNER,OMIDPARTNER macros', () => {
+                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1&PARTNER=Unity3d/1.2.10&cachebusting=-1&timestamp=2020-02-06T23:45:18.458Z');
                         });
                     });
 
