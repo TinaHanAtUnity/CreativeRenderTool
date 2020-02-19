@@ -46,8 +46,9 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             placement.set('id', placementId);
             placement.set('adTypes', ['BANNER']);
             bannerAdContext = bannerModule.BannerAdContextManager.createContext(placement, placementId, BannerSizeStandardDimensions);
-            sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
-            sandbox.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
+            sandbox.stub(SDKMetrics, 'reportMetricEvent');
+            sandbox.stub(SDKMetrics, 'reportMetricEventWithTags');
+            sandbox.stub(SDKMetrics, 'sendBatchedEvents');
             sandbox.stub(SDKMetrics, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
         });
 

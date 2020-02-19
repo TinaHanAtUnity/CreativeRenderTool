@@ -376,6 +376,7 @@ export class AssetManager {
             headers: headers
         }, campaign.getSession());
         const seatId = campaign.getSeatId();
+
         SDKMetrics.reportMetricEvent(ErrorMetric.TooLargeFile);
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {

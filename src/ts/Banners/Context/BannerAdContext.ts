@@ -117,7 +117,10 @@ export class BannerAdContext {
         switch (this._loadState) {
             case BannerLoadState.Unloaded:
             case BannerLoadState.Loaded:
-                return this.getCampaign();
+                return this.getCampaign().then(() => {
+                    // Flush batched messages
+                    SDKMetrics.sendBatchedEvents();
+                });
             case BannerLoadState.Loading:
             default:
                 // Do nothing while loading a separate banner

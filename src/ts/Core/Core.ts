@@ -48,7 +48,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { SDKMetrics, TimingMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -123,11 +123,8 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const coreInitializeStart = Date.now();
-        let initCallToWebviewLoad: number;
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
-            initCallToWebviewLoad = coreInitializeStart - this.ClientInfo.getInitTimestamp();
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
@@ -211,9 +208,6 @@ export class Core implements ICore {
                 SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             }
 
-            SDKMetrics.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
-            SDKMetrics.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
-
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
@@ -228,12 +222,7 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
 
-            const adsInitializeStart = Date.now();
             return this.Ads.initialize().then(() => {
-                const initializeFinished = Date.now();
-                SDKMetrics.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
-                SDKMetrics.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
-                SDKMetrics.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
                 SDKMetrics.sendBatchedEvents();
             });
         }).catch((error: { message: string; name: unknown }) => {
