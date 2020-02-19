@@ -1,7 +1,7 @@
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { PlacementState } from 'Ads/Models/Placement';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { LoadMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { LoadMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 export class PerPlacementLoadManagerWithCometRefreshBase extends PerPlacementLoadManager {
 
@@ -15,17 +15,17 @@ export class PerPlacementLoadManagerWithCometRefreshBase extends PerPlacementLoa
 
                 if (campaign && campaign instanceof PerformanceCampaign) {
 
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadCometRefreshRequest);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadCometRefreshRequest);
                     loadCampaignPromises.push(this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
                         if (loadedCampaign) {
                             // Don't update state since this is just swapping a ready campaign for a ready campaign
                             placement.setCurrentCampaign(loadedCampaign.campaign);
                             placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
-                            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadCometRefreshFill);
+                            SDKMetrics.reportMetricEvent(LoadMetric.LoadCometRefreshFill);
                         } else {
                             placement.setCurrentCampaign(undefined);
                             this.setPlacementState(placementId, PlacementState.NO_FILL);
-                            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadCometRefreshNoFill);
+                            SDKMetrics.reportMetricEvent(LoadMetric.LoadCometRefreshNoFill);
                         }
                     }));
                 }

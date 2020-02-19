@@ -15,7 +15,7 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Privacy/PrivacyRowItemContainer';
-import { MiscellaneousMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { MiscellaneousMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Localization } from 'Core/Utilities/Localization';
 import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
@@ -344,7 +344,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
         // To get a rough estimate how often users click links on the homescreen
-        ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
+        SDKMetrics.reportMetricEvent(MiscellaneousMetric.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
     }

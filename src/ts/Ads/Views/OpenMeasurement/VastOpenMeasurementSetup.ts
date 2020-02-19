@@ -5,7 +5,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -64,7 +64,7 @@ export class VastOpenMeasurementSetup {
         thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
         thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
         if (this.campaign.getSeatId() === 9078) {
-            ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMEnabledLiftOff);
+            SDKMetrics.reportMetricEvent(OMMetric.OMEnabledLiftOff);
         }
     }
 
