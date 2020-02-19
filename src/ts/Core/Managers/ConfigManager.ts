@@ -16,7 +16,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
 import { UnityInfo } from 'Core/Models/UnityInfo';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
-import { ProgrammaticTrackingService, MiscellaneousMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class ConfigManager {
 
@@ -77,7 +77,7 @@ export class ConfigManager {
                 } else if (storedGamerToken) {
                     // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
                     this.deleteGamerToken();
-                    ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
+                    SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
                 }
 
                 const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter);

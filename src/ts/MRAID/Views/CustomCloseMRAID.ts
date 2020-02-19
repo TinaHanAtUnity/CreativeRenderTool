@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { MraidMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { MraidMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -32,18 +32,18 @@ export class CustomCloseMRAID extends MRAID {
 
     public onCloseEvent(event: Event) {
         super.onCloseEvent(event);
-        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.ClosedByUnityAds);
+        SDKMetrics.reportMetricEvent(MraidMetric.ClosedByUnityAds);
     }
 
     public onBridgeClose() {
         super.onBridgeClose();
         this.clearCustomCloseTimeout();
-        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.ClosedByAdUnit);
+        SDKMetrics.reportMetricEvent(MraidMetric.ClosedByAdUnit);
     }
 
     public onUseCustomClose(shouldHideClose: boolean) {
         super.onUseCustomClose(shouldHideClose);
-        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
+        SDKMetrics.reportMetricEvent(MraidMetric.UseCustomCloseCalled);
 
         if (!shouldHideClose) {
             this.clearCustomCloseTimeout();
@@ -67,7 +67,7 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     private setupCustomClose() {
-        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.CloseHidden);
+        SDKMetrics.reportMetricEvent(MraidMetric.CloseHidden);
         this.setCloseVisibility(false);
         const hideDuration = this._mraidCustomCloseDelay * 1000;
         this._mraidCustomCloseTimeout = window.setTimeout(() => {
@@ -80,7 +80,7 @@ export class CustomCloseMRAID extends MRAID {
     }
 
     private moveCloseGraphicLeft() {
-        ProgrammaticTrackingService.reportMetricEvent(MraidMetric.CloseMovedToLeft);
+        SDKMetrics.reportMetricEvent(MraidMetric.CloseMovedToLeft);
         const closeRegionElement = <HTMLElement> this._container.querySelector('.close-region');
         if (closeRegionElement) {
             closeRegionElement.style.removeProperty('right');

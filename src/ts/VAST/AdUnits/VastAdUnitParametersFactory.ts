@@ -9,7 +9,7 @@ import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpe
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
@@ -78,7 +78,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_ENABLED, 'true');
             baseParams.thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
             if (baseParams.campaign.getSeatId() === 9078) {
-                ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMEnabledLiftOff);
+                SDKMetrics.reportMetricEvent(OMMetric.OMEnabledLiftOff);
             }
         }
 

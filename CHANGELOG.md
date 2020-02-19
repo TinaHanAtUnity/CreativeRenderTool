@@ -1,3 +1,61 @@
+# Pending
+
+* Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
+* Remove reportErrorEvent Implementation [#13228](https://github.com/Applifier/unity-ads-webview/pull/13228)
+* Remove AdmobAdapterManager AB Test [#13233](https://github.com/Applifier/unity-ads-webview/pull/13233)
+* Add Vast 4.1 URL Macro Support [#13166](https://github.com/Applifier/unity-ads-webview/pull/13166)
+
+# Wed Feb 19 00:20:54 UTC 2020
+
+* Adds the following changes to applicable branches other than 3.2.0:
+* Batch Metric and Timing Events [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
+* Align metric and timing tags [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
+* Add ABGroup for Diagnostics trigger method [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
+* Add Load Request, Page Load Metrics, Add Tests, Refine Metric Behavior [#13269](https://github.com/Applifier/unity-ads-webview/pull/13269)
+* Add Metrics around Auction, Placements, and Caching [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
+* Adjust tagging on Mediation metrics on [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
+* Remove Initialization Stages and Add Webview Init Timestamp on Webview Version [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
+* Fix Mediation Tracking Bug and Add Test [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
+* Add Mediation Load Tracking to Webview Version [#13230](https://github.com/Applifier/unity-ads-webview/pull/13230)
+
+# Tue Feb 18 20:24:04 UTC 2020
+
+* Batch Metric and Timing Events on 3.2.0 [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
+
+# Fri Feb 14 19:19:55 UTC 2020
+
+* Align metric and timing tags on 3.2.0 [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
+* Add ABGroup for Diagnostics trigger method on 3.2.0 [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
+
+# Fri Feb 14 18:18:50 UTC 2020
+
+* Add Load Request, Page Load Metrics, Add Tests, Refine Metric Behavior on 3.2.0[#13269](https://github.com/Applifier/unity-ads-webview/pull/13269)
+
+# Thu Feb 13 23:12:45 UTC 2020
+
+* Add Metrics around Auction, Placements, and Caching on 3.2.0 [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
+* Revert "Hack: Test Native Initialization Speed through Webview" on 3.2.0 [#13268](https://github.com/Applifier/unity-ads-webview/pull/13268)
+
+# Thu Feb 13 21:38:43 UTC 2020
+
+* Hack: Test Native Initialization Speed through Webview on 3.2.0 [#13238](https://github.com/Applifier/unity-ads-webview/pull/13238)
+
+# Thu Feb 13 18:53:39 UTC 2020
+
+* Adjust tagging on Mediation metrics on 3.2.0 [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
+
+# Thu Feb 13 00:39:30 UTC 2020
+
+* Remove Initialization Stages and Add Webview Init Timestamp on Webview Version 3.2.0 [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
+
+# Wed Feb 12 21:54:20 UTC 2020
+
+* Fix Mediation Tracking Bug and Add Test to 3.2.0 [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
+
+# Wed Feb 12 20:50:59 UTC 2020
+
+* Add Mediation Load Tracking to Webview Version 3.2.0 [#13230](https://github.com/Applifier/unity-ads-webview/pull/13230)
+
 # Tue Feb 11 23:23:12 UTC 2020
 
 * Add willExpireAt Support for Comet Campaigns [#13201](https://github.com/Applifier/unity-ads-webview/pull/13201)

@@ -16,7 +16,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService, OMMetric, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, OMMetric, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
@@ -297,11 +297,11 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
             this._sessionStartProcessedByOmidScript = true;
 
             if (CustomFeatures.isIASVendor(vendorKey)) {
-                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
             }
 
             if (this._campaign instanceof AdMobCampaign) {
-                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMSessionStartObserverCalled);
+                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStartObserverCalled);
             }
 
             if (this._campaign instanceof VastCampaign) {
@@ -312,7 +312,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         if (eventType === SessionEvents.SESSION_FINISH) {
             this._sessionFinishProcessedByOmidScript = true;
             if (CustomFeatures.isIASVendor(vendorKey)) {
-                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
             }
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
@@ -320,7 +320,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         }
 
         if (eventType === 'loadError') {
-            ProgrammaticTrackingService.reportMetricEvent(OMMetric.OMInjectionFailure);
+            SDKMetrics.reportMetricEvent(OMMetric.OMInjectionFailure);
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
         }
 
@@ -438,18 +438,18 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
             };
 
             if (CustomFeatures.isIASVendor(vendorKey)) {
-                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjected);
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificatonInjected);
             }
 
             if (vendorKey.startsWith('doubleclickbygoogle.com') && this._campaign instanceof AdMobCampaign) {
-                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.DoubleClickOMInjections);
+                SDKMetrics.reportMetricEvent(AdmobMetric.DoubleClickOMInjections);
             }
 
             return Promise.resolve();
         }).catch((e) => {
             this._core.Sdk.logDebug(`Could not load open measurement verification script: ${e}`);
             if (CustomFeatures.isIASVendor(vendorKey)) {
-                ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
             }
         });
     }
