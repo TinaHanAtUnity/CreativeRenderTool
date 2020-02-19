@@ -13,7 +13,7 @@ import { ICore } from 'Core/ICore';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerSizeUtil, IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
-import { SDKMetrics, ProgrammaticTrackingError, BannerMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, ErrorMetric, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IObserver0, IObserver1 } from 'Core/Utilities/IObserver';
 import { BannerViewType } from 'Banners/Native/BannerApi';
@@ -152,7 +152,7 @@ export class BannerAdContext {
                     SDKMetrics.reportMetricEvent(BannerMetric.BannerAdNoFill);
                     return this.onBannerNoFill();
                 } else {
-                    SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.BannerRequestError, 'banner');
+                    SDKMetrics.reportMetricEvent(ErrorMetric.BannerRequestError);
                     return this.sendBannerError(new Error(`Banner failed to load : ${e.message}`));
                 }
             });

@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ProgrammaticTrackingError, MiscellaneousMetric, LoadMetric, SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
+import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -411,13 +411,10 @@ export class Ads implements IAds {
             return;
         }
 
-        const contentType = campaign.getContentType();
-        const seatId = campaign.getSeatId();
-
         if (this._showing || this._showingPrivacy) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
-            SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.AdUnitAlreadyShowing, contentType, seatId);
+            SDKMetrics.reportMetricEvent(ErrorMetric.AdUnitAlreadyShowing);
             return;
         }
 
@@ -438,7 +435,7 @@ export class Ads implements IAds {
         const placement: Placement = this.Config.getPlacement(placementId);
         if (!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
-            SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.PlacementWithIdDoesNotExist, contentType, seatId);
+            SDKMetrics.reportMetricEvent(ErrorMetric.PlacementWithIdDoesNotExist);
             return;
         }
 
@@ -446,7 +443,7 @@ export class Ads implements IAds {
 
         if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
             this.showError(false, placementId, 'No creatives found for promo campaign');
-            SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.PromoWithoutCreatives, contentType, seatId);
+            SDKMetrics.reportMetricEvent(ErrorMetric.PromoWithoutCreatives);
             return;
         }
 
@@ -460,7 +457,7 @@ export class Ads implements IAds {
                 contentType: campaign.getContentType()
             });
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
-            SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.CampaignExpired, contentType, seatId);
+            SDKMetrics.reportMetricEvent(ErrorMetric.CampaignExpired);
             return;
         }
 
@@ -469,7 +466,7 @@ export class Ads implements IAds {
             // Do not remove: Removing will currently break all tracking
             campaign.setTrackingUrls(trackingUrls);
         } else {
-            SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.MissingTrackingUrlsOnShow, contentType);
+            SDKMetrics.reportMetricEvent(ErrorMetric.MissingTrackingUrlsOnShow);
         }
 
         this.showPrivacyIfNeeded(options).then(() => {
@@ -506,7 +503,7 @@ export class Ads implements IAds {
                 });
                 SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
-                SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.NoConnectionWhenNeeded, campaign.getContentType(), campaign.getSeatId());
+                SDKMetrics.reportMetricEvent(ErrorMetric.NoConnectionWhenNeeded);
                 return;
             }
 

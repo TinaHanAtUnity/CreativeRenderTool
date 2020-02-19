@@ -48,7 +48,6 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             bannerAdContext = bannerModule.BannerAdContextManager.createContext(placement, placementId, BannerSizeStandardDimensions);
             sandbox.stub(SDKMetrics, 'reportMetricEvent');
             sandbox.stub(SDKMetrics, 'reportMetricEventWithTags');
-            sandbox.stub(SDKMetrics, 'reportErrorEvent');
             sandbox.stub(SDKMetrics, 'sendBatchedEvents');
             sandbox.stub(SDKMetrics, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
         });
@@ -140,7 +139,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             it('should report banner ad request error', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportErrorEvent, 'banner_request_error');
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_request_error');
             });
         });
 
@@ -177,7 +176,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
             it('should report banner ad request error', () => {
                 return bannerAdContext.load().catch((e) => {
-                    sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportErrorEvent, 'banner_request_error');
+                    sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_request_error');
                 });
             });
         });

@@ -12,7 +12,7 @@ import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { SDKMetrics, ProgrammaticTrackingError } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, ErrorMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
@@ -187,7 +187,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private reportHttpFailure(e: RequestError, session: Session): void {
-        SDKMetrics.reportErrorEvent(ProgrammaticTrackingError.AdmobTestHttpError, 'AdMob', this.seatID);
+        SDKMetrics.reportMetricEvent(ErrorMetric.AdmobTestHttpError);
         const failureTimestamp = Math.floor(Date.now() / 1000);
         const urlTimestamp = Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP);
 

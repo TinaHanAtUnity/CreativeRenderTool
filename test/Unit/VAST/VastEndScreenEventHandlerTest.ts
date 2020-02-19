@@ -77,7 +77,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
             sinon.stub(request, 'followRedirectChain').callsFake((url) => {
                 return Promise.resolve(url);
             });
-            sinon.stub(SDKMetrics, 'reportErrorEvent').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
             const campaign = TestFixtures.getCompanionStaticVastCampaign();
             const thirdPartyEventManager = new ThirdPartyEventManager(core, request);

@@ -1,4 +1,4 @@
-import { ProgrammaticTrackingError, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
+import { ErrorMetric, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -53,22 +53,6 @@ export class MetricInstance {
             this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
     }
 
-    private createErrorTags(event: PTSEvent, adType?: string, seatId?: number): string[] {
-
-        const platform: Platform = this._platform;
-        const osVersion: string = this._deviceInfo.getOsVersion();
-        const sdkVersion: string = this._clientInfo.getSdkVersionName();
-
-        return [
-            this.createAdsSdkTag('eevt', event),
-            this.createAdsSdkTag('plt', Platform[platform]),
-            this.createAdsSdkTag('osv', osVersion),
-            this.createAdsSdkTag('sdv', sdkVersion),
-            this.createAdsSdkTag('adt', `${adType}`),
-            this.createAdsSdkTag('sid', `${seatId}`)
-        ];
-    }
-
     private createData(event: PTSEvent, value: number, tags: string[]): IProgrammaticTrackingData {
         return {
             metrics: [
@@ -120,16 +104,12 @@ export class MetricInstance {
         this.batchMetricEvent(event, 1, this.createTags(tags));
     }
 
-    public reportErrorEvent(event: PTSEvent, adType: string, seatId?: number) {
-        this.batchMetricEvent(event, 1, this.createErrorTags(event, adType, seatId));
-    }
-
     public reportTimingEvent(event: TimingEvent, value: number) {
         // Gate Negative Values
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags([]));
         } else {
-            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createTags([
+            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags([
                 this.createAdsSdkTag('mevt', event)
             ]));
         }
@@ -139,7 +119,7 @@ export class MetricInstance {
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags(tags));
         } else {
-            this.batchMetricEvent(ProgrammaticTrackingError.TimingValueNegative, 1, this.createTags([
+            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags([
                 this.createAdsSdkTag('mevt', event)
             ]));
         }
