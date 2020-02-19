@@ -1,3 +1,7 @@
+# Pending
+
+* Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
+
 # Wed Feb 19 00:20:54 UTC 2020
 
 * Adds the following changes to applicable branches other than 3.2.0:
