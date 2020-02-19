@@ -2,6 +2,7 @@
 
 * Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
 * Remove reportErrorEvent Implementation [#13228](https://github.com/Applifier/unity-ads-webview/pull/13228)
+* Remove AdmobAdapterManager AB Test [#13233](https://github.com/Applifier/unity-ads-webview/pull/13233)
 
 # Wed Feb 19 00:20:54 UTC 2020
 
