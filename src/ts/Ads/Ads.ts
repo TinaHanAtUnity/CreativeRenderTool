@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, TimingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, TimingMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -274,7 +274,7 @@ export class Ads implements IAds {
         }).then(() => {
             const initializeAuctionTimespan = Date.now();
             return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
+                SDKMetrics.batchEvent(TimingMetric.AuctionToFillStatusTime, Date.now() - initializeAuctionTimespan);
             }));
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
@@ -358,21 +358,21 @@ export class Ads implements IAds {
         callback(CallbackStatus.OK);
 
         if (this.isAttemptingToShowInBackground()) {
-            ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.CampaignAttemptedShowInBackground);
+            SDKMetrics.reportMetricEvent(MiscellaneousMetric.CampaignAttemptedShowInBackground);
             return;
         }
 
         const campaign = this.RefreshManager.getCampaign(placementId);
         if (!campaign) {
             this.showError(true, placementId, 'Campaign not found');
-            ProgrammaticTrackingService.reportMetricEvent(MiscellaneousMetric.CampaignNotFound);
+            SDKMetrics.reportMetricEvent(MiscellaneousMetric.CampaignNotFound);
             return;
         }
 
         if (this._showing || this._showingPrivacy) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
-            ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.AdUnitAlreadyShowing);
+            SDKMetrics.reportMetricEvent(ErrorMetric.AdUnitAlreadyShowing);
             return;
         }
 
@@ -393,7 +393,7 @@ export class Ads implements IAds {
         const placement: Placement = this.Config.getPlacement(placementId);
         if (!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
-            ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.PlacementWithIdDoesNotExist);
+            SDKMetrics.reportMetricEvent(ErrorMetric.PlacementWithIdDoesNotExist);
             return;
         }
 
@@ -401,7 +401,7 @@ export class Ads implements IAds {
 
         if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
             this.showError(false, placementId, 'No creatives found for promo campaign');
-            ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.PromoWithoutCreatives);
+            SDKMetrics.reportMetricEvent(ErrorMetric.PromoWithoutCreatives);
             return;
         }
 
@@ -415,7 +415,7 @@ export class Ads implements IAds {
                 contentType: campaign.getContentType()
             });
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
-            ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.CampaignExpired);
+            SDKMetrics.reportMetricEvent(ErrorMetric.CampaignExpired);
             return;
         }
 
@@ -424,7 +424,7 @@ export class Ads implements IAds {
             // Do not remove: Removing will currently break all tracking
             campaign.setTrackingUrls(trackingUrls);
         } else {
-            ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.MissingTrackingUrlsOnShow);
+            SDKMetrics.reportMetricEvent(ErrorMetric.MissingTrackingUrlsOnShow);
         }
 
         this.showPrivacyIfNeeded(options).then(() => {
@@ -461,7 +461,7 @@ export class Ads implements IAds {
                 });
                 SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
-                ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.NoConnectionWhenNeeded);
+                SDKMetrics.reportMetricEvent(ErrorMetric.NoConnectionWhenNeeded);
                 return;
             }
 
@@ -501,7 +501,7 @@ export class Ads implements IAds {
 
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled && this._webViewEnabledLoad) {
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledShow);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledShow);
                 }
             });
         });
@@ -627,7 +627,7 @@ export class Ads implements IAds {
     private logChinaMetrics() {
         const isChineseUser = this._core.Config.getCountry() === 'CN';
         if (isChineseUser) {
-            ProgrammaticTrackingService.reportMetricEvent(ChinaMetric.ChineseUserInitialized);
+            SDKMetrics.reportMetricEvent(ChinaMetric.ChineseUserInitialized);
         }
         this.identifyUser(isChineseUser);
     }
@@ -636,7 +636,7 @@ export class Ads implements IAds {
         this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
             if (isAChineseNetwork) {
                 const networkMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByNetworkOperator : ChinaMetric.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
-                ProgrammaticTrackingService.reportMetricEvent(networkMetric);
+                SDKMetrics.reportMetricEvent(networkMetric);
             } else {
                 const localeMetric = isChineseUser ? ChinaMetric.ChineseUserIdentifiedCorrectlyByLocale : ChinaMetric.ChineseUserIdentifiedIncorrectlyByLocale;
                 this.logChinaLocalizationOptimizations(localeMetric);
@@ -655,7 +655,7 @@ export class Ads implements IAds {
         const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));
         const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
         if (chineseLanguage && chineseTimeZone) {
-            ProgrammaticTrackingService.reportMetricEvent(metric);
+            SDKMetrics.reportMetricEvent(metric);
         }
     }
 

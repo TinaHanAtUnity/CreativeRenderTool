@@ -14,7 +14,7 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { MraidMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { MraidMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 

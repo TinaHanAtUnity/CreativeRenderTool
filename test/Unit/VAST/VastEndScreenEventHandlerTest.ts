@@ -7,7 +7,7 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -77,7 +77,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
             sinon.stub(request, 'followRedirectChain').callsFake((url) => {
                 return Promise.resolve(url);
             });
-            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
             const campaign = TestFixtures.getCompanionStaticVastCampaign();
             const thirdPartyEventManager = new ThirdPartyEventManager(core, request);

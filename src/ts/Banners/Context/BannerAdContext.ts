@@ -13,7 +13,7 @@ import { ICore } from 'Core/ICore';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerSizeUtil, IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
-import { ProgrammaticTrackingService, ErrorMetric, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, ErrorMetric, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IObserver0, IObserver1 } from 'Core/Utilities/IObserver';
 import { BannerViewType } from 'Banners/Native/BannerApi';
@@ -111,8 +111,8 @@ export class BannerAdContext {
     }
 
     public load(): Promise<void> {
-        ProgrammaticTrackingService.reportMetricEventWithTags(BannerMetric.BannerAdLoad, [
-            ProgrammaticTrackingService.createAdsSdkTag('bls', BannerLoadState[this._loadState]) // banner load state
+        SDKMetrics.reportMetricEventWithTags(BannerMetric.BannerAdLoad, [
+            SDKMetrics.createAdsSdkTag('bls', BannerLoadState[this._loadState]) // banner load state
         ]);
         switch (this._loadState) {
             case BannerLoadState.Unloaded:
@@ -127,10 +127,10 @@ export class BannerAdContext {
 
     public getCampaign(): Promise<void> {
         this._loadState = BannerLoadState.Loading;
-        ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdRequest);
+        SDKMetrics.reportMetricEvent(BannerMetric.BannerAdRequest);
         return this._campaignManager.request(this._placement, this._size).then((campaign) => {
                 this._campaign = <BannerCampaign>campaign;
-                ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdFill);
+                SDKMetrics.reportMetricEvent(BannerMetric.BannerAdFill);
                 return this.createAdUnit().then((adUnit) => {
                     return this.loadBanner().then(() => {
                         return adUnit.onLoad().then(() => {
@@ -140,16 +140,16 @@ export class BannerAdContext {
                     });
                 }).then(() => {
                     this._loadState = BannerLoadState.Loaded;
-                    ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdUnitLoaded);
+                    SDKMetrics.reportMetricEvent(BannerMetric.BannerAdUnitLoaded);
                     return this._bannerNativeApi.BannerListenerApi.sendLoadEvent(this._bannerAdViewId);
                 });
             }).catch((e) => {
                 this._loadState = BannerLoadState.Unloaded;
                 if (e instanceof NoFillError) {
-                    ProgrammaticTrackingService.reportMetricEvent(BannerMetric.BannerAdNoFill);
+                    SDKMetrics.reportMetricEvent(BannerMetric.BannerAdNoFill);
                     return this.onBannerNoFill();
                 } else {
-                    ProgrammaticTrackingService.reportMetricEvent(ErrorMetric.BannerRequestError);
+                    SDKMetrics.reportMetricEvent(ErrorMetric.BannerRequestError);
                     return this.sendBannerError(new Error(`Banner failed to load : ${e.message}`));
                 }
             });

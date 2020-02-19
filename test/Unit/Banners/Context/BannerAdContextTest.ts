@@ -15,7 +15,7 @@ import { NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerViewType } from 'Banners/Native/BannerApi';
 import { BannerSizeStandardDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { BannerErrorCode } from 'Banners/Native/BannerErrorCode';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [
     Platform.IOS,
@@ -46,9 +46,9 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             placement.set('id', placementId);
             placement.set('adTypes', ['BANNER']);
             bannerAdContext = bannerModule.BannerAdContextManager.createContext(placement, placementId, BannerSizeStandardDimensions);
-            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
-            sandbox.stub(ProgrammaticTrackingService, 'reportMetricEventWithTags').returns(Promise.resolve());
-            sandbox.stub(ProgrammaticTrackingService, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
+            sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
+            sandbox.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
+            sandbox.stub(SDKMetrics, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
         });
 
         afterEach(() => {
@@ -82,19 +82,19 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             });
 
             it('should report banner ad unit loaded', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'banner_ad_unit_loaded');
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_ad_unit_loaded');
             });
 
             it('should report banner load', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
             });
 
             it('should report banner ad request', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'banner_ad_request');
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_ad_request');
             });
 
             it('should report banner ad fill', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'banner_ad_fill');
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_ad_fill');
             });
 
             it('should call onLoad again when banner has aleady loaded', () => {
@@ -130,7 +130,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             });
 
             it('should report banner load', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
             });
 
             it('should call sendErrorEvent with web view error', () => {
@@ -138,7 +138,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             });
 
             it('should report banner ad request error', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'banner_request_error');
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_request_error');
             });
         });
 
@@ -149,7 +149,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             });
 
             it('should report banner load', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
             });
 
             it('should call sendErrorEvent with no fill', () => {
@@ -157,7 +157,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             });
 
             it('should report banner ad no fill metric', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'banner_ad_no_fill');
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_ad_no_fill');
             });
         });
 
@@ -175,7 +175,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
             it('should report banner ad request error', () => {
                 return bannerAdContext.load().catch((e) => {
-                    sandbox.assert.calledWith(<sinon.SinonStub>ProgrammaticTrackingService.reportMetricEvent, 'banner_request_error');
+                    sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'banner_request_error');
                 });
             });
         });

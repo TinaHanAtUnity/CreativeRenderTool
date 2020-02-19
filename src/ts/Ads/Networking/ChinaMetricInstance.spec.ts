@@ -3,7 +3,7 @@ import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
-import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 
 [
