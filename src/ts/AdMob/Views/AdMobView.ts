@@ -9,7 +9,7 @@ import {
 } from 'AdMob/Views/AFMABridge';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -244,19 +244,19 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
                     if (scriptEl.textContent.includes(cachedFileURL)) {
                         // report using cached video
-                        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo);
+                        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo);
                     } else {
                         // report using streaming video
-                        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+                        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
                     }
                 } else {
                     // report using streaming video
-                    ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+                    SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
                 }
             }
         } else {
             // report using streaming video
-            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
         }
     }
 
@@ -330,7 +330,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onUserSeeked() {
-        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked);
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked);
     }
 
     private onGDPRPopupEvent(event: Event) {

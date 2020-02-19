@@ -1,7 +1,7 @@
 import { ICoreApi } from 'Core/ICore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OMID3pEvents, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 
@@ -138,7 +138,7 @@ export class OMIDEventBridge {
             uuid: uuid
         };
         if (event.type === 'omidImpression' && this._campaign instanceof AdMobCampaign) {
-            ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
         }
         this.postMessage(jsEvent);
     }
