@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IViewPort, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IViewPort, IRectangle, DoubleClickAdmobVendorTags } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class OpenMeasurementUtilities {
 
@@ -175,5 +175,20 @@ export class OpenMeasurementUtilities {
         }
 
         return topLeftY;
+    }
+
+    public static setMetricTag(vendor: string) {
+        let tag = 'undefined';
+        switch(vendor) {
+            case DoubleClickAdmobVendorTags.SSP:
+                tag = 'ssp';
+            case DoubleClickAdmobVendorTags.DSP:
+                tag = 'dsp';
+            case DoubleClickAdmobVendorTags.Neutral:
+                tag = 'neut';
+            default:
+        }
+
+        return tag;
     }
 }

@@ -40,7 +40,8 @@ export enum AdmobMetric {
     AdmobOMSessionStartObserverCalled = 'admob_om_session_start_observer_called',
     DoubleClickOMInjections = 'doubleclick_om_injections',
     DoubleClickOMStarts = 'doubleclick_om_starts',
-    DoubleClickOMImpressions = 'doubleclick_om_impressions'
+    DoubleClickOMImpressions = 'doubleclick_om_impressions',
+    DoubleClickInstanceCreated = 'doubleclick_om_instance_created'
 }
 
 export enum BannerMetric {

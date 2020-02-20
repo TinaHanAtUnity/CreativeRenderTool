@@ -442,7 +442,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
             if (vendorKey.startsWith('doubleclickbygoogle.com') && this._campaign instanceof AdMobCampaign) {
                 SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMInjections,
                 [
-                    SDKMetrics.createAdsSdkTag('dckey', vendorKey)
+                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.setMetricTag(vendorKey))
                 ]);
             }
 

@@ -183,3 +183,9 @@ export const DEFAULT_VENDOR_KEY = 'default_key';
 export const OM_JS_VERSION = '1.2.10';
 export const OMID_P = `${PARTNER_NAME}/${OM_JS_VERSION}`;
 export const SDK_APIS = '7';
+
+export enum DoubleClickAdmobVendorTags {
+    SSP = 'doubleclickbygoogle.com-ssp',
+    DSP = 'doubleclickbygoogle.com-dsp',
+    Neutral = 'doubleclickbygoogle.com'
+}
