@@ -178,8 +178,8 @@ export class OpenMeasurementUtilities {
     }
 
     public static setMetricTag(vendor: string) {
-        let tag = 'undefined';
-        switch(vendor) {
+        let tag = '';
+        switch (vendor) {
             case DoubleClickAdmobVendorTags.SSP:
                 tag = 'ssp';
             case DoubleClickAdmobVendorTags.DSP:
@@ -187,6 +187,7 @@ export class OpenMeasurementUtilities {
             case DoubleClickAdmobVendorTags.Neutral:
                 tag = 'neut';
             default:
+                tag = 'undefined';
         }
 
         return tag;
