@@ -22,7 +22,7 @@ import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Mo
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -211,7 +211,7 @@ export class VastParserStrict {
             wrapperURL = this.setIASURLHack(wrapperURL, bundleId);
             headers.push(['X-Device-Type', 'unity']);
             headers.push(['User-Agent', navigator.userAgent]);
-            ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
+            SDKMetrics.reportMetricEvent(OMMetric.IASNestedVastTagHackApplied);
             wrapperURL = decodeURIComponent(wrapperURL);
             isPublica = true;
         }
@@ -428,8 +428,8 @@ export class VastParserStrict {
         this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
             const verifications = this.parseAdVerification(element, urlProtocol);
             verifications.forEach((verification) => {
-                if (verification.getVerificationVendor() === 'IAS') {
-                    ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
+                if (CustomFeatures.isIASVendor(verification.getVerificationVendor())) {
+                    SDKMetrics.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
                 }
             });
             vastAd.addAdVerifications(verifications);
@@ -441,8 +441,8 @@ export class VastParserStrict {
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
                 verifications.forEach((verification) => {
-                    if (verification.getVerificationVendor() === 'IAS') {
-                        ProgrammaticTrackingService.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
+                    if (CustomFeatures.isIASVendor(verification.getVerificationVendor())) {
+                        SDKMetrics.reportMetricEvent(OMMetric.IASVASTVerificationParsed);
                     }
                 });
 

@@ -47,12 +47,13 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService, LoadMetric, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -121,9 +122,9 @@ export class CampaignManager {
     private _auctionProtocol: AuctionProtocol;
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
-    private _auctionRequestStart: number;
+    private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -141,9 +142,11 @@ export class CampaignManager {
         this._auctionProtocol = RequestManager.getAuctionProtocol();
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
+        this._mediationLoadTracking = mediationLoadTracking;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
+        const requestStartTime = this.getTime();
         this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
@@ -177,7 +180,6 @@ export class CampaignManager {
                     });
                 }
                 const headers: [string, string][] = [];
-                this._auctionRequestStart = Date.now();
                 return this._request.post(requestUrl, body, headers, {
                     retries: 2,
                     retryDelay: 10000,
@@ -185,12 +187,22 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AuctionRequestTime, Date.now() - this._auctionRequestStart);
+                const cachingTime = this.getTime();
+                if (this._mediationLoadTracking && performance && performance.now) {
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                }
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if (this._auctionProtocol === AuctionProtocol.V5) {
-                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
+                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
+                            if (this._mediationLoadTracking && performance && performance.now) {
+                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                            }
+                        }).catch((e) => {
+                            if (this._mediationLoadTracking && performance && performance.now) {
+                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                            }
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
@@ -221,6 +233,8 @@ export class CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+        const requestStartTime = this.getTime();
+        let cachingTime: number;
         this._isLoadEnabled = true;
 
         // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
@@ -237,7 +251,7 @@ export class CampaignManager {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
-            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
+            SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
@@ -245,18 +259,28 @@ export class CampaignManager {
                 retryWithConnectionEvents: false,
                 timeout: 10000
             }).then(response => {
+                cachingTime = this.getTime();
+                if (this._mediationLoadTracking && performance && performance.now) {
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledFill);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledFill);
                     loadedCampaign.campaign.setIsLoadEnabled(true);
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                    }
                 } else {
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                    }
                 }
                 return loadedCampaign;
             }).catch(() => {
                 Diagnostics.trigger('load_campaign_response_failure', {});
-                ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
+                SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
         });
@@ -276,6 +300,13 @@ export class CampaignManager {
         }).catch(() => {
             return [];
         });
+    }
+
+    private getTime(): number {
+        if (performance && performance.now) {
+            return performance.now();
+        }
+        return 0;
     }
 
     private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
@@ -501,6 +532,10 @@ export class CampaignManager {
                     refreshDelay = cacheTTL;
                 }
             }
+        }
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportMediaCount(campaignCount);
         }
 
         this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
@@ -796,7 +831,7 @@ export class CampaignManager {
     private createRequestUrl(nofillRetry?: boolean, session?: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
-        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
 
         url = Url.addParameters(url, trackingIDs);
 

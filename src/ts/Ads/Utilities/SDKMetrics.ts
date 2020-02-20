@@ -1,6 +1,6 @@
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 
-export enum ProgrammaticTrackingError {
+export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
     AdmobTestHttpError = 'admob_video_http_error',
@@ -37,7 +37,10 @@ export enum AdmobMetric {
     AdmobOMSessionFinish = 'admob_om_session_finish',
     AdmobOMImpression = 'admob_om_impression',
     AdmobOMRegisteredImpression = 'admob_om_registered_impression',
-    AdmobOMSessionStartObserverCalled = 'admob_om_session_start_observer_called'
+    AdmobOMSessionStartObserverCalled = 'admob_om_session_start_observer_called',
+    DoubleClickOMInjections = 'doubleclick_om_injections',
+    DoubleClickOMStarts = 'doubleclick_om_starts',
+    DoubleClickOMImpressions = 'doubleclick_om_impressions'
 }
 
 export enum BannerMetric {
@@ -69,7 +72,8 @@ export enum VastMetric {
 export enum MiscellaneousMetric {
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
-    CampaignAttemptedShowInBackground = 'ad_attempted_show_background'
+    CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
+    IOSDeleteStoredGamerToken = 'ios_delete_stored_gamer_token'
 }
 
 export enum LoadMetric {
@@ -94,17 +98,14 @@ export enum OMMetric {
     IASVerificatonInjected = 'ias_verification_injected',
     IASVerificationSessionStarted = 'ias_verification_session_started',
     IASVerificationSessionFinished = 'ias_verification_session_finished',
-    IASVerificatonInjectionFailed = 'ias_verification_injection_failed'
+    IASVerificatonInjectionFailed = 'ias_verification_injection_failed',
+    OMEnabledLiftOff = 'om_enabled_liftoff',
+    OMInjectionFailure = 'om_injection_failure'
 }
 
-export enum TimingMetric {
-    TotalWebviewInitializationTime = 'webview_initialization_time',
-    InitializeCallToWebviewLoadTime = 'initialization_call_to_webview_load_time',
-    WebviewLoadToConfigurationCompleteTime = 'webview_load_to_configuration_complete_time',
-    AuctionRequestTime = 'auction_request_round_trip_time',
-    AuctionToFillStatusTime = 'auction_request_to_fill_status_time',
-    CoreInitializeTime = 'uads_core_initialize_time',
-    AdsInitializeTime = 'uads_ads_initialize_time'
+export enum InitializationMetric {
+    WebviewInitialization = 'webview_initialization_time',
+    WebviewPageLoading = 'webview_page_loading_time'
 }
 
 export enum MraidMetric {
@@ -117,24 +118,26 @@ export enum MraidMetric {
 
 export enum AUIMetric {
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
-    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
+    DecisionNotReady = 'decision_not_ready'
 }
 
-export enum AdUnitTracking {
-    ShowCall = 'ad_unit_showcall',
-    DuplicateLoadForPlacement = 'ad_unit_duplicate_load_for_placement',
-    PossibleDuplicateLoadForPlacement = 'ad_unit_possible_duplicate_load_for_placement',
-    InitialLoadRequest = 'ad_unit_initial_load_request',
-    AttemptToShowAd = 'ad_unit_attempt_to_show',
-    FailedToInvalidate = 'ad_unit_failed_to_invalidate',
-    MissedImpression = 'ad_unit_missed_impression',
-    MediationShowCall = 'ad_unit_mediation_show_call',
-    RealMissedImpression = 'ad_unit_real_missed_impression'
+export enum MediationMetric {
+    LoadRequest = 'load_request',
+    LoadRequestFill = 'load_request_fill_time',
+    LoadRequestNofill = 'load_request_nofill_time',
+    LoadRequestTimeout = 'load_request_timeout',
+    PlacementCount = 'placement_count',
+    MediaCount = 'media_count',
+    AuctionRequest = 'auction_request_time',
+    AdCaching = 'ad_caching_time'
 }
 
-export type PTSEvent = AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | TimingMetric | AUIMetric | AdUnitTracking;
+export type TimingEvent = InitializationMetric | MediationMetric;
 
-export class ProgrammaticTrackingService {
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
+
+export class SDKMetrics {
 
     private static _metricInstance: MetricInstance;
 
@@ -156,16 +159,12 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
-    public static reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): void {
-        this._metricInstance.reportErrorEvent(event, adType, seatId);
-    }
-
-    public static reportTimingEvent(event: TimingMetric, value: number): void {
+    public static reportTimingEvent(event: TimingEvent, value: number): void {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
-    public static batchEvent(metric: TimingMetric, value: number): void {
-        this._metricInstance.batchEvent(metric, value);
+    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
+        this._metricInstance.reportTimingEventWithTags(event, value, tags);
     }
 
     public static sendBatchedEvents(): void {

@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const childProcess = require('child_process');
+const releases = require('./releases');
 
 const cdnConfig = {
     'akamai': {
@@ -61,9 +62,7 @@ if (!branch) {
     throw new Error('Invalid branch: ' + branch);
 }
 
-if (branch === 'master') {
-    branch = 'development';
-}
+const branchList = releases.getNativeVersionsSupportedByBranch(branch);
 
 const commit = process.env.TRAVIS_COMMIT;
 if (!commit) {
@@ -323,38 +322,16 @@ let purgeTencent = (urlRoot) => {
     });
 };
 
-let urlRoot = '/webview/' + branch;
-if (branch === '2.0.6') {
-    urlRoot = '/webview/master';
-} else if (branch === '3.0.1') {
-    urlRoot = '/webview/3.0.1-rc2';
-} else if (branch === '3.4.0') {
-    urlRoot = '/webview/3.4.2';
-}
+let purgeList = [];
 
-let purgeList = [
-    purgeAkamai(urlRoot),
-    purgeHighwinds(urlRoot),
-    purgeAliBabaCloud(urlRoot),
-    purgeTencent(urlRoot)
-];
-
-if (branch === '2.0.6') {
-    purgeList.push(purgeAkamai('/webview/2.0.6'));
-    purgeList.push(purgeHighwinds('/webview/2.0.6'));
-    purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
-    purgeList.push(purgeTencent('/webview/2.0.6'));
-} else if (branch === '3.0.1') {
-    purgeList.push(purgeAkamai('/webview/3.0.1'));
-    purgeList.push(purgeHighwinds('/webview/3.0.1'));
-    purgeList.push(purgeAliBabaCloud('/webview/3.0.1'));
-    purgeList.push(purgeTencent('/webview/3.0.1'));
-} else if (branch === '3.4.0') {
-    purgeList.push(purgeAkamai('/webview/3.4.0'));
-    purgeList.push(purgeHighwinds('/webview/3.4.0'));
-    purgeList.push(purgeAliBabaCloud('/webview/3.4.0'));
-    purgeList.push(purgeTencent('/webview/3.4.0'));
-}
+branchList.forEach((branch) => {
+    purgeList.push(
+        purgeAkamai('/webview/' + branch),
+        purgeHighwinds('/webview/' + branch),
+        purgeAliBabaCloud('/webview/' + branch),
+        purgeTencent('/webview/' + branch)
+    );
+});
 
 Promise.all(purgeList).then(() => {
     console.log('Successfully purged all CDNs!');

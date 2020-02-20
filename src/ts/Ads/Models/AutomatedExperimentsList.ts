@@ -1,3 +1,4 @@
+import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
@@ -16,10 +17,30 @@ import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
 //     cacheDisabled: true
 // });
 
+export const ButtonExperimentDeclaration: IExperimentDeclaration = {
+  animation: {
+      STATIC: 'static',
+      HEARTBEATING: 'heartbeating',
+      BOUNCING: 'bouncing',
+      SHINING: 'shining'
+  },
+  color: {
+      BLUE: '167dfb',
+      GREEN: '33cc00',
+      PINK: 'cc0099',
+      RED: 'c31e25'
+  }
+};
+
+export const ButtonExperimentDefaultActions: IExperimentActionChoice = {
+  color: ButtonExperimentDeclaration.color.BLUE,
+  animation: ButtonExperimentDeclaration.animation.STATIC
+};
+
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
-    name: 'ButtonAnimationsExperiment',
-    actions: Object.values(EndScreenAnimation),
-    defaultAction: EndScreenAnimation.STATIC,
+    name: 'wbvw-endcard-v1',
+    actions: ButtonExperimentDeclaration,
+    defaultActions: ButtonExperimentDefaultActions,
     cacheDisabled: true
 });
 

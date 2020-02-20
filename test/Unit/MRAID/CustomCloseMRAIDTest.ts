@@ -1,6 +1,6 @@
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -38,7 +38,7 @@ describe('CustomCloseMRAID', () => {
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         mraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
         privacy = new Privacy(platform, mraidCampaign, privacyManager, false, false, 'en');
-        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         placement = TestFixtures.getPlacement();
         clock = sinon.useFakeTimers();
     });

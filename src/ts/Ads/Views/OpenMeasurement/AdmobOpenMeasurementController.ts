@@ -13,7 +13,7 @@ import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, Inter
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
@@ -82,7 +82,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
         this._campaign.setOMVendors(omVendors);
         this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
-        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMInjected);
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
     public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
@@ -165,7 +165,12 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             impressionObject.adView = adView;
 
             this._omInstances.forEach((om) => {
-                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+
+                const verificationresource = om.getVerificationResource();
+                if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                    SDKMetrics.reportMetricEvent(AdmobMetric.DoubleClickOMImpressions);
+                }
             });
             super.impression(impressionObject);
 
@@ -177,7 +182,12 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             };
 
             this._omInstances.forEach((om) => {
-                ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
+
+                const verificationresource = om.getVerificationResource();
+                if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                    SDKMetrics.reportMetricEvent(AdmobMetric.DoubleClickOMImpressions);
+                }
             });
             super.impression(impressionObject);
         });
@@ -196,8 +206,13 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             event.data.verificationParameters = verificationresource.verificationParameters;
             event.data.vendorkey = verificationresource.vendorKey;
             om.sessionStart(event);
+
+            if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                SDKMetrics.reportMetricEvent(AdmobMetric.DoubleClickOMStarts);
+            }
+
         });
-        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
     /**
@@ -205,7 +220,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
      */
     public sessionFinish() {
         super.sessionFinish();
-        ProgrammaticTrackingService.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
         this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }

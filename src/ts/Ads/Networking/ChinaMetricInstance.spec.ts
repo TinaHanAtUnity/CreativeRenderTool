@@ -3,7 +3,7 @@ import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
-import { AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 
 [
@@ -32,7 +32,8 @@ import { Platform } from 'Core/Constants/Platform';
 
     describe('reportMetricEvent with Chinese network operator', () => {
         beforeEach(() => {
-            return metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+            metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
+            metricInstance.sendBatchedEvents();
         });
 
         it('should fire with china endpoint', () => {
@@ -48,7 +49,8 @@ import { Platform } from 'Core/Constants/Platform';
         beforeEach(() => {
             clientInfo.getTestMode.mockReturnValue(true);
             metricInstance = new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-            return metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            metricInstance.sendBatchedEvents();
         });
 
         it('should call the (non-china) staging endpoint', () => {

@@ -1,5 +1,6 @@
 @import "components.styl";
 @import "gdpr-pop-up.styl";
+@import "vars.styl";
 
 $progress-bar-width = 60%;
 $filling-bar-width = $progress-bar-width * .3;
@@ -46,15 +47,7 @@ $ar-available-button-color = #0c292feb;
   }
 
   .unityads-logo {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    width: 68px;
-    height: 16px;
-    background-image: url("../img/unityads.png");
-    background-position: center;
-    background-size: cover;
-    transform: translate(-50%, 0);
+    $unityads-logo-default($default-size);
   }
 
   .name-container {
@@ -787,10 +780,5 @@ $ar-available-button-color = #0c292feb;
       font-size: 30pt;
     }
 
-    .unityads-logo {
-      bottom: 20px;
-      width: 136px;
-      height: 32px;
-    }
   }
 }

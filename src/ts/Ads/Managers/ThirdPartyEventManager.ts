@@ -7,6 +7,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -18,7 +19,9 @@ export enum ThirdPartyEventMacro {
     SDK_VERSION = '%SDK_VERSION%',
     GAMER_SID = '%GAMER_SID%',
     OM_ENABLED = '%25OM_ENABLED%25',
-    OM_VENDORS = '%25OM_VENDORS%25'
+    OM_VENDORS = '%25OM_VENDORS%25',
+    OMIDPARTNER = '[OMIDPARTNER]',
+    CACHEBUSTING = '[CACHEBUSTING]'
 }
 
 export enum TrackingEvent {
@@ -177,6 +180,7 @@ export class ThirdPartyEventManager {
                     url = url.replace(key, this._templateValues[key]);
                 }
             }
+            url = MacroUtil.replaceMacro(url, {'[TIMESTAMP]': (new Date()).toISOString()});
         }
 
         return Url.encode(url);

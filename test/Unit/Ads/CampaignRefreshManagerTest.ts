@@ -19,7 +19,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -166,7 +166,7 @@ describe('CampaignRefreshManager', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
-        sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
@@ -194,7 +194,7 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        const performance = new Performance(ar, coreModule, adsModule, undefined);
+        const performance = new Performance(ar, coreModule, adsModule);
         const contentTypeHandlerMap = performance.getContentTypeHandlerMap();
         for (const contentType in contentTypeHandlerMap) {
             if (contentTypeHandlerMap.hasOwnProperty(contentType)) {

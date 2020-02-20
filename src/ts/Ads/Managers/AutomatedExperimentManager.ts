@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { Platform } from 'Core/Constants/Platform';
@@ -17,26 +17,26 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 interface IAutomatedExperimentResponse {
-    experiments: { [key: string]: string };
+    experiments: { [key: string]: IExperimentActionChoice };
     metadata: { [key: string]: string };
 }
 
 interface IParsedExperiment {
     name: string;
-    action: string;
+    actions: IExperimentActionChoice;
     metadata: string;
 }
 
 export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
 
 class StateItem {
-    constructor(experiment: AutomatedExperiment, action: string) {
+    constructor(experiment: AutomatedExperiment, actions: IExperimentActionChoice) {
         this._experiment = experiment;
-        this.Action = action;
+        this.Actions = actions;
     }
 
     private _experiment: AutomatedExperiment;
-    public Action: string;
+    public Actions: IExperimentActionChoice;
     public SendReward = false;
     public SendAction = false;
     public MetaData: string;
@@ -53,12 +53,12 @@ class UserInfo {
 }
 
 export class CachableAutomatedExperimentData {
-    constructor(action: string, metadata: string) {
-        this.Action = action;
+    constructor(actions: IExperimentActionChoice, metadata: string) {
+        this.Actions = actions;
         this.Metadata = metadata;
     }
 
-    public Action: string;
+    public Actions: IExperimentActionChoice;
     public Metadata: string;
 }
 
@@ -83,9 +83,8 @@ export class AutomatedExperimentManager {
     private _userInfo: UserInfo;
     private _gameSessionId: number;
 
-    private static readonly _baseUrl = 'https://auiopt.staging.unityads.unity3d.com/v1/';
+    private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
     private static readonly _createEndPoint = 'experiment';
-    private static readonly _actionEndPoint = 'action';
     private static readonly _rewardEndPoint = 'reward';
     private static readonly _settingsPrefix = 'AUI_OPT_EXPERIMENT';
 
@@ -112,7 +111,7 @@ export class AutomatedExperimentManager {
             );
 
         experiments.forEach(experiment => {
-            this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultAction());
+            this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultActions());
         });
 
         this._userInfo.ABGroup = this._coreConfig.getAbGroup();
@@ -125,7 +124,7 @@ export class AutomatedExperimentManager {
                     .forEach((storedExperiment) => {
                         const stateItem = this._state[storedExperiment.experiment.getName()];
                         if (stateItem) {
-                            stateItem.Action = storedExperiment.data!.Action;
+                            stateItem.Actions = storedExperiment.data!.Actions;
                             stateItem.MetaData = storedExperiment.data!.Metadata;
                         }
                     });
@@ -181,10 +180,6 @@ export class AutomatedExperimentManager {
             const promises: Promise<INativeResponse>[] = [];
             for (const stateKey in this._state) {
                 if (this._state.hasOwnProperty(stateKey)) {
-                    if (this._state[stateKey].SendAction) {
-                        promises.push(this.submit(this._state[stateKey], AutomatedExperimentManager._actionEndPoint));
-                    }
-
                     promises.push(this.submitExperimentOutcome(this._state[stateKey], AutomatedExperimentManager._rewardEndPoint));
                 }
             }
@@ -225,29 +220,13 @@ export class AutomatedExperimentManager {
         this.reportExperiments(AutomatedExperimentStage.ResultReported);
     }
 
-    public getExperimentAction(experiment: AutomatedExperiment): string|undefined {
+    public getExperimentAction(experiment: AutomatedExperiment): IExperimentActionChoice|undefined {
         const stateItem = this._state[experiment.getName()];
         if (!stateItem) {
             return undefined;
         }
 
-        return stateItem.Action;
-    }
-
-    private submit(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
-        const action = {
-            user_info: {
-                ab_group: this._userInfo.ABGroup,
-                auction_id: this._userInfo.AuctionID,
-                game_session_id: this._userInfo.GameSessionID
-            },
-            experiment: item.getExperiment().getName(),
-            action: item.Action
-        };
-
-        const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
-        const body = JSON.stringify(action);
-        return this._requestManager.post(url, body);
+        return stateItem.Actions;
     }
 
     private submitExperimentOutcome(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
@@ -263,7 +242,7 @@ export class AutomatedExperimentManager {
                 game_session_id: this._userInfo.GameSessionID
             },
             experiment: item.getExperiment().getName(),
-            action: item.Action,
+            actions: item.Actions,
             reward: rewardVal,
             metadata: item.MetaData
         };
@@ -277,7 +256,7 @@ export class AutomatedExperimentManager {
         experiments.forEach(experiment => {
             const stateItem = this._state[experiment.name];
             if (stateItem) {
-                stateItem.Action = experiment.action;
+                stateItem.Actions = experiment.actions;
                 stateItem.MetaData = experiment.metadata;
             }
         });
@@ -286,7 +265,7 @@ export class AutomatedExperimentManager {
 
     private storeExperiments(experiments: IParsedExperiment[]): Promise<void> {
         experiments.forEach(experiment => {
-            this.storeExperimentData(experiment.name, new CachableAutomatedExperimentData(experiment.action, experiment.metadata));
+            this.storeExperimentData(experiment.name, new CachableAutomatedExperimentData(experiment.actions, experiment.metadata));
         });
         return Promise.resolve();
     }
@@ -299,7 +278,7 @@ export class AutomatedExperimentManager {
 
                 return Object.keys(json.experiments).map(experiment => ({
                     name: experiment,
-                    action: json.experiments[experiment],
+                    actions: json.experiments[experiment],
                     metadata: (json.metadata === null || json.metadata === undefined ? '' : json.metadata[experiment])
                 }));
             } catch (e) {
@@ -311,7 +290,7 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private async collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
+    private collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id'},
@@ -414,7 +393,7 @@ export class AutomatedExperimentManager {
 
     // not used at the moment. but will be soon: when we do an inference / ad display.
     // incomplete implementation
-    private async collectAdRelatedFeatures(deviceInfo: DeviceInfo): Promise<{ [key: string]: ContextualFeature }>  {
+    private collectAdRelatedFeatures(deviceInfo: DeviceInfo): Promise<{ [key: string]: ContextualFeature }>  {
         const filter = [
             // CAMPAIGN, THE AD
             'campaignId', 'targetGameId', 'rating', 'ratingCount', 'gameSessionCounters', 'cached',
@@ -450,9 +429,21 @@ export class AutomatedExperimentManager {
                 game_session_id: this._userInfo.GameSessionID
                 // auction_id: Left out on purpose, as experiments are used accross multiple actions at the moment
             },
-            experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
+            experiments: experiments.map(e => { return {
+                name: e.getName(),
+                actions: this.getExperimentSpace(e.getActions())
+            }; }),
             contextual_features: contextualFeatures
         });
+    }
+
+    private getExperimentSpace(experimentComponentsDictionary: IExperimentDeclaration): IExperimentActionsPossibleValues {
+        const experimentSpace: {[actionName: string]: string[]} = {};
+        for (const [actionName, variants] of Object.entries(experimentComponentsDictionary)) {
+            experimentSpace[actionName] = Object.values(variants);
+        }
+
+        return experimentSpace;
     }
 
     private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableAutomatedExperimentData> {

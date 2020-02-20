@@ -48,7 +48,7 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { ProgrammaticTrackingService, TimingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -123,11 +123,8 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const coreInitializeStart = Date.now();
-        let initCallToWebviewLoad: number;
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
-            initCallToWebviewLoad = coreInitializeStart - this.ClientInfo.getInitTimestamp();
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
@@ -206,13 +203,10 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
             if (this.DeviceInfo.isChineseNetworkOperator()) {
-                ProgrammaticTrackingService.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
+                SDKMetrics.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             } else {
-                ProgrammaticTrackingService.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
+                SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             }
-
-            ProgrammaticTrackingService.batchEvent(TimingMetric.InitializeCallToWebviewLoadTime, initCallToWebviewLoad);
-            ProgrammaticTrackingService.batchEvent(TimingMetric.WebviewLoadToConfigurationCompleteTime, Date.now() - coreInitializeStart);
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
@@ -228,13 +222,8 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
 
-            const adsInitializeStart = Date.now();
             return this.Ads.initialize().then(() => {
-                const initializeFinished = Date.now();
-                ProgrammaticTrackingService.batchEvent(TimingMetric.AdsInitializeTime, initializeFinished - adsInitializeStart);
-                ProgrammaticTrackingService.batchEvent(TimingMetric.CoreInitializeTime, initializeFinished - coreInitializeStart);
-                ProgrammaticTrackingService.batchEvent(TimingMetric.TotalWebviewInitializationTime, initializeFinished - this.ClientInfo.getInitTimestamp());
-                ProgrammaticTrackingService.sendBatchedEvents();
+                SDKMetrics.sendBatchedEvents();
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {

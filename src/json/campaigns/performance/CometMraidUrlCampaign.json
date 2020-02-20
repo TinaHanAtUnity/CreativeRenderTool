@@ -7,5 +7,6 @@
         "https://pixel.com/start"
     ]
     },
-    "adType": "comet-mraid-sample-ad-type"
+    "adType": "comet-mraid-sample-ad-type",
+    "cacheTTL": 3600
 }
