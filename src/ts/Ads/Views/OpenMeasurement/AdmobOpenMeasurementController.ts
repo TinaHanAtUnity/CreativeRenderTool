@@ -71,7 +71,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             onSessionFinish: (sessionEvent: ISessionEvent) => this.sessionFinish(),
             onSessionError: (sessionEvent: ISessionEvent) => this.sessionError(sessionEvent)
         }, this);
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMEnabled);
     }
 
     public injectVerificationResources(verificationResources: IVerificationScriptResource[]) {
@@ -152,6 +151,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const impressionObject: IImpressionValues = {
                 mediaType: MediaType.VIDEO
@@ -172,8 +172,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             impressionObject.adView = adView;
 
             this._omInstances.forEach((om) => {
-                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
-
                 const verificationresource = om.getVerificationResource();
                 if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
                     SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
@@ -192,8 +190,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             };
 
             this._omInstances.forEach((om) => {
-                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
-
                 const verificationresource = om.getVerificationResource();
                 if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
                     SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
@@ -226,8 +222,8 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                     SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.setMetricTag(verificationresource.vendorKey))
                 ]);
             }
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
         });
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
     /**
@@ -235,6 +231,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
      */
     public sessionFinish() {
         super.sessionFinish();
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
         this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }
