@@ -1,4 +1,4 @@
-# Pending
+# Thu Feb 20 22:37:07 UTC 2020
 
 * Add color variants to animated CTA button [#12786](https://github.com/Applifier/unity-ads-webview/pull/12786)
 * Open Measurement - Add Admob OM DoubleClick Tag [#13327](https://github.com/Applifier/unity-ads-webview/pull/13327)
