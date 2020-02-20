@@ -20,6 +20,7 @@ import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataType
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
@@ -34,6 +35,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
         let clock: sinon.SinonFakeTimers;
+        let thirdPartyEventManager: ThirdPartyEventManager;
 
         const initWithVastVerifications = (verifications?: VastAdVerification[]) => {
             backend = TestFixtures.getBackend(platform);
@@ -42,6 +44,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
             clientInformation = TestFixtures.getClientInfo(platform);
             campaign = TestFixtures.getAdVerificationsVastCampaign();
             placement = TestFixtures.getPlacement();
+            thirdPartyEventManager = sandbox.createStubInstance(ThirdPartyEventManager);
             if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             } else {
@@ -51,10 +54,10 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'test', verification);
             }
         };
 
@@ -119,7 +122,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                     describe('VERIFICATION_RESOURCE_REJECTED', () => {
                         const resource1 = new VastVerificationResource('http://url1.js', 'test1');
                         const verificationResources = [resource1];
-                        const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D&PARTNER=[OMIDPARTNER]&cachebusting=[CACHEBUSTING]&timestamp=[TIMESTAMP]');
+                        const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D');
                         const vastAdVerifications = [vastAdVerification];
 
                         beforeEach(() => {
@@ -136,7 +139,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                         });
 
                         it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file and replace OMIDPARTNER,OMIDPARTNER,OMIDPARTNER macros', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1&PARTNER=Unity3d/1.2.10&cachebusting=-1&timestamp=2020-02-06T23:45:18.458Z');
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=1');
                         });
                     });
 
@@ -158,7 +161,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                         });
 
                         it('should error with ERROR_RESOURCE_LOADING when resource is invalid url', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=3');
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=3');
                         });
                     });
                 });
