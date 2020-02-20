@@ -271,7 +271,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerDestroy(): void {
         if (this.isShowing()) {
-            this._campaign.omClosedEarly.trigger();
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
