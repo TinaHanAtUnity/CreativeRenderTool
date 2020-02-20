@@ -30,8 +30,8 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         if (isOMEnabled) {
             const omAdViewBuilder = new OpenMeasurementAdViewBuilder(baseParams.campaign, baseParams.deviceInfo, baseParams.platform);
             om = new AdmobOpenMeasurementController(baseParams.platform, baseParams.core, baseParams.clientInfo, baseParams.campaign, baseParams.placement, baseParams.deviceInfo, baseParams.request, omAdViewBuilder, baseParams.thirdPartyEventManager);
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMEnabled);
             om.addToViewHierarchy();
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMEnabled);
         }
 
         const view = new AdMobView(baseParams.platform, baseParams.core, this._adMobSignalFactory, baseParams.container, baseParams.campaign, baseParams.deviceInfo, baseParams.clientInfo.getGameId(), baseParams.privacy, showGDPRBanner, om);
