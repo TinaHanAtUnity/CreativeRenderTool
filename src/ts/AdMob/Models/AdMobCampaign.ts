@@ -2,6 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { Model } from 'Core/Models/Model';
+import { Observable0 } from 'Core/Utilities/Observable';
 
 export interface IAdMobVideo {
     mediaFileURL: string;
@@ -47,6 +48,9 @@ export interface IAdMobCampaign extends IProgrammaticCampaign {
 }
 
 export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
+
+    public readonly omClosedEarly: Observable0;
+
     constructor(campaign: IAdMobCampaign) {
         super('AdMobCampaign', {
             ... ProgrammaticCampaign.Schema,

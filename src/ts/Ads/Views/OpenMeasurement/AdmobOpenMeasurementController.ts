@@ -83,6 +83,16 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         this._campaign.setOMVendors(omVendors);
         this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMInjected);
+
+        this._campaign.omClosedEarly.subscribe(() => {
+            omVendors.forEach((vendor) => {
+                if (vendor.startsWith('doubleclickbygoogle.com')) {
+                    SDKMetrics.reportMetricEvent(AdmobMetric.DoubleClickOMSkipped);
+                }
+                // only call once
+                this._campaign.omClosedEarly.unsubscribe();
+            });
+        });
     }
 
     public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
