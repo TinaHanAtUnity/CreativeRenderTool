@@ -1,3 +1,7 @@
+# Pending
+
+* Add color variants to animated CTA button [#12786](https://github.com/Applifier/unity-ads-webview/pull/12786)
+
 # Wed Feb 19 22:00:38 UTC 2020
 
 * Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
