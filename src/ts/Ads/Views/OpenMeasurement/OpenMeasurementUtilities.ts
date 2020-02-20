@@ -178,19 +178,15 @@ export class OpenMeasurementUtilities {
     }
 
     public static getDcKeyMetricTag(vendor: string) {
-        let tag = '';
-        switch (vendor) {
-            case DoubleClickAdmobVendorTags.SSP:
-                tag = 'ssp';
-            case DoubleClickAdmobVendorTags.DSP:
-                tag = 'dsp';
-            case DoubleClickAdmobVendorTags.Neutral:
-                tag = 'neut';
-            default:
-                tag = 'unknown';
+        if (vendor === DoubleClickAdmobVendorTags.SSP) {
+            return 'ssp';
+        } else if (vendor === DoubleClickAdmobVendorTags.DSP) {
+            return 'dsp';
+        } else if (vendor === DoubleClickAdmobVendorTags.Neutral) {
+            return 'neut';
+        } else {
+            return 'unknown';
         }
-
-        return tag;
     }
 
     public static isDoubleClickGoogle(vendorKey: string): boolean {
