@@ -78,10 +78,10 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._request, resource.vendorKey);
             this.setupOMInstance(om, resource);
-            if (resource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+            if (OpenMeasurementUtilities.isDoubleClickGoogle(resource.vendorKey)) {
                 SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickInstanceCreated,
                 [
-                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.setMetricTag(resource.vendorKey))
+                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(resource.vendorKey))
                 ]);
             }
             omVendors.push(resource.vendorKey);
@@ -173,10 +173,10 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
             this._omInstances.forEach((om) => {
                 const verificationresource = om.getVerificationResource();
-                if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                if (OpenMeasurementUtilities.isDoubleClickGoogle(verificationresource.vendorKey)) {
                     SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
                     [
-                        SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.setMetricTag(verificationresource.vendorKey))
+                        SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
                     ]);
                 }
             });
@@ -191,10 +191,10 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
             this._omInstances.forEach((om) => {
                 const verificationresource = om.getVerificationResource();
-                if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+                if (OpenMeasurementUtilities.isDoubleClickGoogle((verificationresource.vendorKey))) {
                     SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
                     [
-                        SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.setMetricTag(verificationresource.vendorKey))
+                        SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
                     ]);
                 }
             });
@@ -216,10 +216,10 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             event.data.vendorkey = verificationresource.vendorKey;
             om.sessionStart(event);
 
-            if (verificationresource.vendorKey.startsWith('doubleclickbygoogle.com')) {
+            if (OpenMeasurementUtilities.isDoubleClickGoogle(verificationresource.vendorKey)) {
                 SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMStarts,
                 [
-                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.setMetricTag(verificationresource.vendorKey))
+                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
                 ]);
             }
         });

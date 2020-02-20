@@ -177,7 +177,7 @@ export class OpenMeasurementUtilities {
         return topLeftY;
     }
 
-    public static setMetricTag(vendor: string) {
+    public static getDcKeyMetricTag(vendor: string) {
         let tag = '';
         switch (vendor) {
             case DoubleClickAdmobVendorTags.SSP:
@@ -187,9 +187,13 @@ export class OpenMeasurementUtilities {
             case DoubleClickAdmobVendorTags.Neutral:
                 tag = 'neut';
             default:
-                tag = 'undefined';
+                tag = 'unknown';
         }
 
         return tag;
+    }
+
+    public static isDoubleClickGoogle(vendorKey: string): boolean {
+        return vendorKey.startsWith('doubleclickbygoogle.com');
     }
 }
