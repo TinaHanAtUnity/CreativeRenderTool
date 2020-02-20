@@ -13,7 +13,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 
-export class VastOpenMeasurementSetup {
+export class VastOpenMeasurementFactory {
 
     private adVerifications: VastAdVerification[];
     private campaign: VastCampaign;

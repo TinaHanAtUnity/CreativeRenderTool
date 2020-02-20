@@ -1,4 +1,4 @@
-import { VastOpenMeasurementSetup } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementSetup';
+import { VastOpenMeasurementFactory } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementFactory';
 import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { VastCampaign, VastCampaignMock } from 'VAST/Models/__mocks__/VastCampaign';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
@@ -9,8 +9,8 @@ import { VastAdVerificationMock, VastAdVerification } from 'VAST/Models/__mocks_
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { Vast } from 'VAST/Models/__mocks__/Vast';
 
-describe(`VastOpenMeasurementSetup`, () => {
-    let omSetup: VastOpenMeasurementSetup;
+describe(`VastOpenMeasurementFactory`, () => {
+    let omSetup: VastOpenMeasurementFactory;
     let adVerifications: VastAdVerificationMock[];
     let campaign: VastCampaignMock;
     let deviceInfo: DeviceInfoMock;
@@ -31,7 +31,7 @@ describe(`VastOpenMeasurementSetup`, () => {
         verification.getVerficationResources.mockReturnValue([verificationResource]);
         adVerifications = [verification];
 
-        omSetup = new VastOpenMeasurementSetup(adVerifications, campaign, deviceInfo, platform, clientInfo, placement);
+        omSetup = new VastOpenMeasurementFactory(adVerifications, campaign, deviceInfo, platform, clientInfo, placement);
     });
 
     describe('setting up OM tracking', () => {

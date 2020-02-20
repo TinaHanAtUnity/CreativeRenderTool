@@ -5,7 +5,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
-import { VastOpenMeasurementSetup } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementSetup';
+import { VastOpenMeasurementFactory } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementFactory';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
@@ -39,7 +39,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
         if (adVerifications) {
-            const openMeasurementSetup = new VastOpenMeasurementSetup(adVerifications, baseParams.campaign, baseParams.deviceInfo, baseParams.platform, baseParams.clientInfo, baseParams.placement);
+            const openMeasurementSetup = new VastOpenMeasurementFactory(adVerifications, baseParams.campaign, baseParams.deviceInfo, baseParams.platform, baseParams.clientInfo, baseParams.placement);
             vastAdUnitParameters.om = openMeasurementSetup.createOpenMeasurementManager(baseParams.core, baseParams.request);
             openMeasurementSetup.setOMVendorTracking(baseParams.thirdPartyEventManager);
         }
