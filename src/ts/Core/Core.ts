@@ -184,6 +184,7 @@ export class Core implements ICore {
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
+
                 if (this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
                     this.ConfigManager.storeGamerToken(coreConfig.getToken());
                 }

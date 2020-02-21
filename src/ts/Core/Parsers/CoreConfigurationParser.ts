@@ -15,6 +15,7 @@ export interface IRawCoreConfiguration {
     jaegerTracing?: boolean;
     organizationId: string;
     developerId: number;
+    features: string[];
 }
 
 export class CoreConfigurationParser {
@@ -32,7 +33,8 @@ export class CoreConfigurationParser {
             token: configJson.token,
             jaegerTracing: configJson.jaegerTracing ? true : false,
             organizationId: configJson.organizationId,
-            developerId: configJson.developerId
+            developerId: configJson.developerId,
+            features: configJson.features ? configJson.features : []
         };
 
         const coreConfig = new CoreConfiguration(configurationParams);

@@ -18,7 +18,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
-import { Placement } from 'Ads/Models/Placement';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
@@ -91,6 +91,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { Features } from 'Core/Constants/Features';
 
 export class Ads implements IAds {
 
@@ -177,6 +178,15 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
+
+        if (this._core.Config.getFeatures().includes(Features.NofillPlacementOnInitialization)) {
+            const placementIds = this.Config.getPlacementIds();
+            placementIds.forEach((placementId) => {
+                this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
+                this.Api.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
+            });
+        }
+
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
