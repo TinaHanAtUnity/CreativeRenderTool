@@ -1,41 +1,24 @@
-import { AUIMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
-import { ARAvailableButtonColorsExperiment, ARAvailableButtonSkipExperiment } from 'Ads/Models/AutomatedExperimentsList'
+import { ArAvailableButtonExperiment } from 'Ads/Models/AutomatedExperimentsList';
+import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-export interface ARUIExperiments {
-    arAvailableButtonColor?: string;
-    arAvailableButtonSkipText?: string;
+export interface IArUiExperiments {
+    color: string;
+    skip: string;
 }
 
-export function arAvailableButtonColorExperiment(automatedExperimentManager: AutomatedExperimentManager): ARAvailableButtonColors {
-    let arAvailableButtonColor = ARAvailableButtonColors.BLACK;
-
-    const mabDecision = automatedExperimentManager.getExperimentAction(ARAvailableButtonColorsExperiment);
-
-    if (mabDecision) {
-        if ((<string[]>Object.values(ARAvailableButtonColors)).includes(mabDecision)) {
-            arAvailableButtonColor = <ARAvailableButtonColors>mabDecision;
-        } else {
-            ProgrammaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-        }
-    }
-
-    return arAvailableButtonColor;
-}
-
-export function arAvailableButtonSkipTextExperiment(automatedExperimentManager: AutomatedExperimentManager): string {
-    let arAvailableButtonSkipText = 'false';
-
-    const mabDecision = automatedExperimentManager.getExperimentAction(ARAvailableButtonSkipExperiment);
+export function arAvailableButtonDecision(automatedExperimentManager: AutomatedExperimentManager): IArUiExperiments {
+    let arAvailableButtonCombination = ArAvailableButtonExperiment.getDefaultActions();
+    const mabDecision = automatedExperimentManager.getExperimentAction(ArAvailableButtonExperiment);
 
     if (mabDecision) {
-        if (['true', 'false'].includes(mabDecision)) {
-            arAvailableButtonSkipText = mabDecision;
-        } else {
-            ProgrammaticTrackingService.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-        }
+        arAvailableButtonCombination = mabDecision;
+    } else {
+        SDKMetrics.reportMetricEvent(AUIMetric.DecisionNotReady);
     }
 
-    return arAvailableButtonSkipText;
+    return {
+        color: arAvailableButtonCombination.color,
+        skip: arAvailableButtonCombination.skip
+    };
 }

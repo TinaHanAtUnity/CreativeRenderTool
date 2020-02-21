@@ -18,10 +18,8 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
-import { ARUIExperiments } from 'AR/Experiments/ARUIExperiments'
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager'
-import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
-import { ARAvailableButtonShapes } from 'AR/Experiments/ARAvailableButtonShapes'
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { IArUiExperiments } from 'AR/Experiments/ARUIExperiments';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -56,13 +54,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
     private _arAndroidEnumsReceivedObserver: IObserver1<unknown>;
-    private _arUIExperiments: ARUIExperiments
-    private _automatedExperimentManager: AutomatedExperimentManager
+    private _arUiExperiments: IArUiExperiments;
+    private _automatedExperimentManager: AutomatedExperimentManager;
 
     private _hasCameraPermission = false;
     private _viewable: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUIExperiments: ARUIExperiments) {
+    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUiExperiments: IArUiExperiments) {
         super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, !!hidePrivacy, gameSessionId);
 
         this._ar = ar;
@@ -70,7 +68,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
-        this._arUIExperiments = arUIExperiments;
+        this._arUiExperiments = arUiExperiments;
         this._automatedExperimentManager = automatedExperimentManager;
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
         this._permissionLearnMoreOpen = false;
@@ -106,8 +104,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this._automatedExperimentManager.sendReward();
 
                     if (this._arAvailableButton.classList.contains('ar-available-button--collapsed')
-                        // @ts-ignore
-                        && !this._arUIExperiments.arAvailableButtonSkip) {
+                        && this._arUiExperiments.skip === 'false') {
                         this.expandArAvailableButton();
                     } else {
                         this.hideArAvailableButton();
@@ -184,12 +181,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         // MAB - AR Available Button Color
-        const arAvailableButtonColor = this._arUIExperiments.arAvailableButtonColor || ARAvailableButtonColors.BLACK;
-        this._arAvailableButton.classList.add('ar-available-button--color--' + arAvailableButtonColor);
-
-        // MAB - AR Available Button Shape
-        const arAvailableButtonShape = ARAvailableButtonShapes.DEFAULT;
-        this._arAvailableButton.classList.add('ar-available-button--shape--' + arAvailableButtonShape);
+        const arAvailableButtonColor = this._arUiExperiments.color;
+        this._arAvailableButton.style.backgroundColor = `#${arAvailableButtonColor}`;
     }
 
     public setViewableState(viewable: boolean): void {

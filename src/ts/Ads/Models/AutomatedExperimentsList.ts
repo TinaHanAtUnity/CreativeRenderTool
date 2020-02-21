@@ -1,7 +1,4 @@
 import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
-import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
-import { EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { ARAvailableButtonColors } from 'AR/Experiments/ARAvailableButtonColors'
 
 // List experiments to run here and add them to the list
 // Examples:
@@ -48,18 +45,29 @@ export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimations
 
 // AR Ads
 
-export const ARAvailableButtonColorsExperiment = new AutomatedExperiment({
+export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
+    skip: {
+        YES: 'true',
+        NO: 'false'
+    },
+    color: {
+        BLUE: '00002feb',
+        GREEN: '003700eb',
+        RED: '2f0000eb',
+        BLACK: '0c292feb'
+    }
+};
+
+export const ArAvailableButtonExperimentDefaultActions: IExperimentActionChoice = {
+    color: ArAvailableButtonExperimentDeclaration.color.BLACK,
+    skip: ArAvailableButtonExperimentDeclaration.skip.NO
+};
+
+export const ArAvailableButtonExperiment = new AutomatedExperiment({
     name: 'wbvw-ar-v1',
-    actions: Object.values(ARAvailableButtonColors),
-    defaultAction: ARAvailableButtonColors.BLACK,
+    actions: ArAvailableButtonExperimentDeclaration,
+    defaultActions: ArAvailableButtonExperimentDefaultActions,
     cacheDisabled: true
 });
 
-export const ARAvailableButtonSkipExperiment = new AutomatedExperiment({
-    name: 'wbvw-ar-v1',
-    actions: ['true', 'false'],
-    defaultAction: 'false',
-    cacheDisabled: true
-});
-
-export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ARAvailableButtonColorsExperiment, ARAvailableButtonSkipExperiment];
+export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ArAvailableButtonExperiment];

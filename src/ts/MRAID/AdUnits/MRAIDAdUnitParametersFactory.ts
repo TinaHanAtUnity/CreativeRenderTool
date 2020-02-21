@@ -15,13 +15,10 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager'
-import { AUIMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService'
-import {
-    arAvailableButtonColorExperiment,
-    arAvailableButtonSkipTextExperiment,
-} from 'AR/Experiments/ARUIExperiments'
-import { ArAutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList'
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { ArAutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList';
+import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { arAvailableButtonDecision } from 'AR/Experiments/ARUIExperiments';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
@@ -47,7 +44,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             this._automatedExperimentManager = new AutomatedExperimentManager(core);
 
             this._automatedExperimentManager.initialize(ArAutomatedExperimentsList).catch(() => {
-                ProgrammaticTrackingService.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
+                SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
             });
             this._automatedExperimentManager.beginExperiment();
         }
@@ -71,15 +68,9 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             if ((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitParametersFactory._forcedExtendedMRAID) {
                 mraid = new ExtendedMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else if (ARUtil.isARCreative(baseParams.campaign) || MRAIDAdUnitParametersFactory._forcedARMRAID) {
-                // const arAvailableButtonColor = arAvailableButtonColorExperiment(this._automatedExperimentManager);
-                // const arAvailableButtonSkipText = arAvailableButtonSkipTextExperiment(this._automatedExperimentManager);
+                const decision = arAvailableButtonDecision(this._automatedExperimentManager);
 
-                const arUIExperiments = {
-                    // arAvailableButtonColor,
-                    // arAvailableButtonSkipText,
-                }
-
-                mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy(), this._automatedExperimentManager, arUIExperiments);
+                mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy(), this._automatedExperimentManager, decision);
             } else if (baseParams.campaign.isCustomCloseEnabled()) {
                 mraid = new CustomCloseMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
             } else {
