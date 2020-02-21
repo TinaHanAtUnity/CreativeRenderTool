@@ -10,7 +10,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
@@ -33,7 +32,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
         let campaign: VastCampaign;
         let placement: Placement;
         let deviceInfo: DeviceInfo;
-        let request: RequestManager;
         let clock: sinon.SinonFakeTimers;
         let thirdPartyEventManager: ThirdPartyEventManager;
 
@@ -52,7 +50,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
             }
             sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
-            request = sinon.createStubInstance(RequestManager);
             if (verifications) {
                 return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'test', verifications[0]);
             } else {
