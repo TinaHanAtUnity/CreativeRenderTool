@@ -298,9 +298,15 @@ $ar-available-button-color = #0c292feb;
   }
 
   @keyframes bounce-right {
-    0%,20%, 50%, 80%, 100% { transform: translateX(0); }
-    40% { transform: translateX(-15px); }
-    60% { transform: translateX(-10px); }
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateX(0);
+    }
+    40% {
+      transform: translateX(-15px);
+    }
+    60% {
+      transform: translateX(-10px);
+    }
   }
 
   @keyframes collapse-ar-button {
@@ -346,9 +352,9 @@ $ar-available-button-color = #0c292feb;
     // Experiment on shape
     &--shape {
       &--default {
+        right: 0;
         padding: 0 1.7em 0 1.3em;
         border-radius: .7em 0 0 .7em;
-        right: 0;
         animation: bounce-in-right--default 1s;
 
         &.ar-available-button--collapsed {
@@ -357,7 +363,7 @@ $ar-available-button-color = #0c292feb;
           opacity: .8;
           animation: collapse-ar-button .5s;
 
-          .ar-available-button__text {
+          .ar-available-button-text {
             opacity: 0;
           }
         }
@@ -368,20 +374,19 @@ $ar-available-button-color = #0c292feb;
           opacity: 1;
           animation: expand-ar-button .5s;
 
-          .ar-available-button__text {
+          .ar-available-button-text {
             opacity: 1;
           }
         }
       }
     }
 
-    .ar-available-button__text {
-      order: 2;
-      transition: opacity .5s linear;
-      line-height: 1;
-      white-space: nowrap;
-      max-width: 100%;
+    .ar-available-button-text {
       padding-left: .6em;
+      max-width: 100%;
+      white-space: nowrap;
+      line-height: 1;
+      transition: opacity .5s linear;
       -webkit-font-smoothing: antialiased;
     }
   }
