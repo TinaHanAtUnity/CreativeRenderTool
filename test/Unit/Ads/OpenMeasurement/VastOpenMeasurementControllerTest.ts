@@ -14,7 +14,6 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
@@ -95,7 +94,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                 const parsedVast = vastParser.parseVast(vastXml);
                 const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
                 const campaign = new VastCampaign(params);
-                const request = sinon.createStubInstance(RequestManager);
                 openMeasurement1 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, thirdPartyEventManager, vastAdVerificton1.getVerificationVendor(), vastAdVerificton1);
                 openMeasurement2 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, thirdPartyEventManager, vastAdVerificton2.getVerificationVendor(), vastAdVerificton2);
                 sinon.stub(Date, 'now').returns(123);
