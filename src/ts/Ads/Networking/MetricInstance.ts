@@ -70,7 +70,12 @@ export class MetricInstance {
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
-        return this._requestManager.post(url, data, headers);
+        return this._requestManager.post(url, data, headers, {
+            retries: 2,
+            retryDelay: 0,
+            retryWithConnectionEvents: false,
+            followRedirects: false
+        });
     }
 
     private getCountryIso(country: string): string {
@@ -134,15 +139,17 @@ export class MetricInstance {
     }
 
     private sendBatchedMetricEvents(): Promise<void> {
-        return this.constructAndSendEvents(this._batchedMetricEvents, this.metricPath).then(() => {
-            this._batchedMetricEvents = [];
-        });
+        const tempBatchedMetricEvents = this._batchedMetricEvents;
+        this._batchedMetricEvents = [];
+
+        return this.constructAndSendEvents(tempBatchedMetricEvents, this.metricPath);
     }
 
     private sendBatchedTimingEvents(): Promise<void> {
-        return this.constructAndSendEvents(this._batchedTimingEvents, this.timingPath).then(() => {
-            this._batchedTimingEvents = [];
-         });
+        const tempBatchedTimingEvents = this._batchedTimingEvents;
+        this._batchedTimingEvents = [];
+
+        return this.constructAndSendEvents(tempBatchedTimingEvents, this.timingPath);
     }
 
     private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {
