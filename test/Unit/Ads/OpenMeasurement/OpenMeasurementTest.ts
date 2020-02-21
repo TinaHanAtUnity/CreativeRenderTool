@@ -136,7 +136,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         });
 
                         it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file and replace OMIDPARTNER,OMIDPARTNER,OMIDPARTNER macros', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=1');
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, {'%5BREASON%5D': '1'});
                         });
                     });
 
@@ -158,7 +158,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         });
 
                         it('should error with ERROR_RESOURCE_LOADING when resource is invalid url', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=3');
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, {'%5BREASON%5D': '3'});
                         });
                     });
                 });

@@ -23,7 +23,7 @@ import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { Campaign } from 'Ads/Models/Campaign';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -470,9 +470,9 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     }
 
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
-        const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
+        const adVerificationErrorURL = this._adVerification.getVerificationTrackingEvent();
         if (adVerificationErrorURL) {
-            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL);
+            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL, undefined, undefined, {'%5BREASON%5D': reasonCode.toString()});
         }
     }
 
