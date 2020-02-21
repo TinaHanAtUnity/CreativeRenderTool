@@ -557,6 +557,59 @@ import { Platform } from 'Core/Constants/Platform';
                 );
             });
         });
+
+        describe('retry failed', () => {
+
+            beforeEach(async () => {
+                requestManager.post.mockRejectedValueOnce(new Error('failed requests'));
+                requestManager.post.mockResolvedValueOnce(undefined);
+
+                metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, 999);
+
+                try {
+                    await metricInstance.sendBatchedEvents();
+                } catch (err) {
+                    expect(err.message).toEqual('failed requests');
+                }
+
+                metricInstance.reportTimingEvent(MediationMetric.LoadRequestNofill, 100);
+                await metricInstance.sendBatchedEvents();
+            });
+
+            it('should call post twice', () => {
+                expect(requestManager.post).toHaveBeenCalledTimes(2);
+            });
+
+            it('should fire events when events are batched', () => {
+                const expected = {
+                    metrics: [
+                        {
+                            name: 'load_request_nofill_time',
+                            value: 100,
+                            tags: [
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                'ads_sdk2_iso:us',
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }, {
+                            name: 'webview_initialization_time',
+                            value: 999,
+                            tags: [
+                                `ads_sdk2_sdv:${sdkVersion}`,
+                                'ads_sdk2_iso:us',
+                                `ads_sdk2_plt:${Platform[platform]}`
+                            ]
+                        }
+                    ]
+                };
+
+                expect(requestManager.post).toHaveBeenLastCalledWith(
+                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/timing',
+                    JSON.stringify(expected),
+                    [['Content-Type', 'application/json']]
+                );
+            });
+        });
     });
 
     describe('When test mode is enabled', () => {

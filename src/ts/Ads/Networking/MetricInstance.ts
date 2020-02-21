@@ -24,6 +24,8 @@ export class MetricInstance {
     private _countryIso: string;
     private _batchedTimingEvents: IPTSEvent[];
     private _batchedMetricEvents: IPTSEvent[];
+    private _failedTimingEvents: IPTSEvent[];
+    private _failedMetricEvents: IPTSEvent[];
     private _baseUrl: string;
 
     private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
@@ -39,6 +41,8 @@ export class MetricInstance {
         this._countryIso = this.getCountryIso(country);
         this._batchedTimingEvents = [];
         this._batchedMetricEvents = [];
+        this._failedTimingEvents = [];
+        this._failedMetricEvents = [];
         this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
     }
 
@@ -134,15 +138,23 @@ export class MetricInstance {
     }
 
     private sendBatchedMetricEvents(): Promise<void> {
-        return this.constructAndSendEvents(this._batchedMetricEvents, this.metricPath).then(() => {
-            this._batchedMetricEvents = [];
+        const tempBatchedMetricEvents = this._batchedMetricEvents.concat(this._failedMetricEvents);
+        this._batchedMetricEvents = [];
+        this._failedMetricEvents = [];
+
+        return this.constructAndSendEvents(tempBatchedMetricEvents, this.metricPath).catch((err) => {
+            this._failedMetricEvents = this._failedMetricEvents.concat(tempBatchedMetricEvents);
         });
     }
 
     private sendBatchedTimingEvents(): Promise<void> {
-        return this.constructAndSendEvents(this._batchedTimingEvents, this.timingPath).then(() => {
-            this._batchedTimingEvents = [];
-         });
+        const tempBatchedTimingEvents = this._batchedTimingEvents.concat(this._failedTimingEvents);
+        this._batchedTimingEvents = [];
+        this._failedTimingEvents = [];
+
+        return this.constructAndSendEvents(tempBatchedTimingEvents, this.timingPath).catch((err) => {
+            this._failedTimingEvents = this._failedTimingEvents.concat(tempBatchedTimingEvents);
+        });
     }
 
     private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {
