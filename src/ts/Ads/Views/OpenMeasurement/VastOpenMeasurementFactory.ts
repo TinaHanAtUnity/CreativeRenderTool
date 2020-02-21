@@ -10,7 +10,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Placement } from 'Ads/Models/Placement';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/ICore';
 
 export class VastOpenMeasurementFactory {
@@ -22,6 +21,7 @@ export class VastOpenMeasurementFactory {
     private clientInfo: ClientInfo;
     private placement: Placement;
 
+
     constructor(adVerifications: VastAdVerification[], campaign: VastCampaign, deviceInfo: DeviceInfo, platform: Platform, clientInfo: ClientInfo, placement: Placement) {
         this.adVerifications = adVerifications;
         this.campaign = campaign;
@@ -31,9 +31,9 @@ export class VastOpenMeasurementFactory {
         this.placement = placement;
     }
 
-    public createOpenMeasurementManager(core: ICoreApi, request: RequestManager): VastOpenMeasurementController {
+    public createOpenMeasurementManager(core: ICoreApi, thirdPartyEventManager: ThirdPartyEventManager): VastOpenMeasurementController {
         const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this.campaign, this.deviceInfo, this.platform);
-        const omInstances: OpenMeasurement<VastCampaign>[] = this.getOMInstances(this.adVerifications, omAdViewBuilder, core, request);
+        const omInstances: OpenMeasurement<VastCampaign>[] = this.getOMInstances(this.adVerifications, omAdViewBuilder, core, thirdPartyEventManager);
         const omManager = new VastOpenMeasurementController(this.platform, this.placement, omInstances, omAdViewBuilder, this.clientInfo, this.deviceInfo);
         omManager.addToViewHierarchy();
         omManager.injectVerifications();
@@ -68,11 +68,11 @@ export class VastOpenMeasurementFactory {
         }
     }
 
-    private getOMInstances(adVerifications: VastAdVerification[], omAdViewBuilder: OpenMeasurementAdViewBuilder, core: ICoreApi, request: RequestManager): OpenMeasurement<VastCampaign>[] {
+    private getOMInstances(adVerifications: VastAdVerification[], omAdViewBuilder: OpenMeasurementAdViewBuilder, core: ICoreApi, thirdPartyEventManager: ThirdPartyEventManager): OpenMeasurement<VastCampaign>[] {
         const omInstances: OpenMeasurement<VastCampaign>[] = [];
         adVerifications.forEach((adverification) => {
             if (CustomFeatures.isIASVendor(adverification.getVerificationVendor()) && adverification.getVerficationResources()[0].getApiFramework() === 'omid') {
-                const om = new OpenMeasurement<VastCampaign>(this.platform, core, this.clientInfo, this.campaign, this.placement, this.deviceInfo, request, adverification.getVerificationVendor(), adverification);
+                const om = new OpenMeasurement<VastCampaign>(this.platform, core, this.clientInfo, this.campaign, this.placement, this.deviceInfo, thirdPartyEventManager, adverification.getVerificationVendor(), adverification);
                 om.setOMAdViewBuilder(omAdViewBuilder);
                 omInstances.push(om);
             }
