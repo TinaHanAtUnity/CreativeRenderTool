@@ -105,8 +105,12 @@ import { Platform } from 'Core/Constants/Platform';
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
                     JSON.stringify(t.expected),
-                    [['Content-Type', 'application/json']],
-                    expect.anything()
+                    [['Content-Type', 'application/json']], {
+                        retries: 2,
+                        retryDelay: 0,
+                        retryWithConnectionEvents: false,
+                        followRedirects: false
+                    }
                 );
 
                 return promise;
@@ -243,8 +247,12 @@ import { Platform } from 'Core/Constants/Platform';
                 expect(requestManager.post).toBeCalledWith(
                     'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1' + t.path,
                     JSON.stringify(t.expected),
-                    [['Content-Type', 'application/json']],
-                    expect.anything()
+                    [['Content-Type', 'application/json']], {
+                        retries: 2,
+                        retryDelay: 0,
+                        retryWithConnectionEvents: false,
+                        followRedirects: false
+                    }
                 );
 
                 return promise;

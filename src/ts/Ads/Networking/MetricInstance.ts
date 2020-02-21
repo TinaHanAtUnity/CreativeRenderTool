@@ -75,7 +75,6 @@ export class MetricInstance {
             retryDelay: 0,
             retryWithConnectionEvents: false,
             followRedirects: false
-
         });
     }
 
