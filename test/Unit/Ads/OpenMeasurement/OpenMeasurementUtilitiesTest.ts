@@ -1,6 +1,6 @@
 import { Platform } from 'Core/Constants/Platform';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IRectangle, DoubleClickAdmobVendorTags } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { assert } from 'chai';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -134,6 +134,36 @@ import { assert } from 'chai';
                     const calculatedPercentage = om.calculateObstructionOverlapPercentage(t.videoView, t.obstruction);
                     assert.equal(calculatedPercentage, t.expectedPercentage);
                 });
+            });
+        });
+
+        describe('getting metric tags', () => {
+            it ('should set ssp for ssp value', () => {
+                const val = OpenMeasurementUtilities.getDcKeyMetricTag('doubleclickbygoogle.com-ssp');
+                assert.equal(val, 'ssp');
+            });
+            it ('should set dsp for ssp value', () => {
+                const val = OpenMeasurementUtilities.getDcKeyMetricTag('doubleclickbygoogle.com-dsp');
+                assert.equal(val, 'dsp');
+            });
+            it ('should set neut for non-affiliated value', () => {
+                const val = OpenMeasurementUtilities.getDcKeyMetricTag('doubleclickbygoogle.com');
+                assert.equal(val, 'neut');
+            });
+            it ('should set unkown if vendor string is random', () => {
+                const val = OpenMeasurementUtilities.getDcKeyMetricTag('doubleclickbygoogle.com-casdfasfasfd');
+                assert.equal(val, 'unknown');
+            });
+        });
+
+        describe('check double click start', () => {
+            it('should be false for non double click', () => {
+                const val = OpenMeasurementUtilities.isDoubleClickGoogle('doubleclickbygoogle.casdfasfasfd');
+                assert.equal(val, false);
+            });
+            it('should be true for double click starty', () => {
+                const val = OpenMeasurementUtilities.isDoubleClickGoogle('doubleclickbygoogle.com-bboyeah');
+                assert.equal(val, true);
             });
         });
     });
