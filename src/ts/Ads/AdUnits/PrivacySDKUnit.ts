@@ -243,7 +243,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         });
     }
 
-    public onPrivacyViewError(event: ErrorEvent): void {
+    public onPrivacyViewError(event: string | Event): void {
         this.closePrivacy();
     }
 
