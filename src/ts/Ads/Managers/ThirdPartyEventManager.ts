@@ -178,7 +178,7 @@ export class ThirdPartyEventManager {
 
             url = MacroUtil.replaceMacro(url, this._templateValues);
 
-            if(additionaMacros) {
+            if (additionaMacros) {
                 url = MacroUtil.replaceMacro(url, additionaMacros);
             }
 
