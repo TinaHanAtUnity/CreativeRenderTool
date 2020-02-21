@@ -37,7 +37,6 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     private _domContentLoaded = false;
     private _privacyConfig: PrivacyConfig;
     private _frameEventAdapter: PrivacyFrameEventAdapter;
-    private _errorListener: (e: ErrorEvent) => void;
 
     constructor(params: IPrivacySDKViewParameters) {
         super(params.platform, 'consent');
