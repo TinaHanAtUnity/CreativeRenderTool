@@ -39,10 +39,9 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     constructor(ar: IARApi, core: ICore, ads: IAds, supportArAds = false) {
         super(core, ads);
+        this._automatedExperimentManager = new AutomatedExperimentManager(core);
 
         if (supportArAds) {
-            this._automatedExperimentManager = new AutomatedExperimentManager(core);
-
             this._automatedExperimentManager.initialize(ArAutomatedExperimentsList).catch(() => {
                 SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
             });
