@@ -24,8 +24,6 @@ export class MetricInstance {
     private _countryIso: string;
     private _batchedTimingEvents: IPTSEvent[];
     private _batchedMetricEvents: IPTSEvent[];
-    private _failedTimingEvents: IPTSEvent[];
-    private _failedMetricEvents: IPTSEvent[];
     private _baseUrl: string;
 
     private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
@@ -41,8 +39,6 @@ export class MetricInstance {
         this._countryIso = this.getCountryIso(country);
         this._batchedTimingEvents = [];
         this._batchedMetricEvents = [];
-        this._failedTimingEvents = [];
-        this._failedMetricEvents = [];
         this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
     }
 
@@ -74,7 +70,13 @@ export class MetricInstance {
         const data: string = JSON.stringify(metricData);
         const headers: [string, string][] = [];
         headers.push(['Content-Type', 'application/json']);
-        return this._requestManager.post(url, data, headers);
+        return this._requestManager.post(url, data, headers, {
+            retries: 2,
+            retryDelay: 0,
+            retryWithConnectionEvents: false,
+            followRedirects: false
+
+        });
     }
 
     private getCountryIso(country: string): string {
@@ -138,23 +140,17 @@ export class MetricInstance {
     }
 
     private sendBatchedMetricEvents(): Promise<void> {
-        const tempBatchedMetricEvents = this._batchedMetricEvents.concat(this._failedMetricEvents);
+        const tempBatchedMetricEvents = this._batchedMetricEvents;
         this._batchedMetricEvents = [];
-        this._failedMetricEvents = [];
 
-        return this.constructAndSendEvents(tempBatchedMetricEvents, this.metricPath).catch((err) => {
-            this._failedMetricEvents = this._failedMetricEvents.concat(tempBatchedMetricEvents);
-        });
+        return this.constructAndSendEvents(tempBatchedMetricEvents, this.metricPath);
     }
 
     private sendBatchedTimingEvents(): Promise<void> {
-        const tempBatchedTimingEvents = this._batchedTimingEvents.concat(this._failedTimingEvents);
+        const tempBatchedTimingEvents = this._batchedTimingEvents;
         this._batchedTimingEvents = [];
-        this._failedTimingEvents = [];
 
-        return this.constructAndSendEvents(tempBatchedTimingEvents, this.timingPath).catch((err) => {
-            this._failedTimingEvents = this._failedTimingEvents.concat(tempBatchedTimingEvents);
-        });
+        return this.constructAndSendEvents(tempBatchedTimingEvents, this.timingPath);
     }
 
     private batchTimingEvent(metric: PTSEvent, value: number, tags: string[]): void {

@@ -40,6 +40,7 @@ import { Platform } from 'Core/Constants/Platform';
             expect(requestManager.post).toBeCalledWith(
                 'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
                 expect.anything(),
+                expect.anything(),
                 expect.anything()
             );
         });
@@ -56,6 +57,7 @@ import { Platform } from 'Core/Constants/Platform';
         it('should call the (non-china) staging endpoint', () => {
             expect(requestManager.post).toBeCalledWith(
                 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics',
+                expect.anything(),
                 expect.anything(),
                 expect.anything()
             );
