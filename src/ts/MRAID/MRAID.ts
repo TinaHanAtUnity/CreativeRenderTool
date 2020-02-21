@@ -14,10 +14,10 @@ export class MRAID extends AbstractParserModule {
             .some(placement => {
                     return (placement.getAdTypes() || [])
                         .some(adType => {
-                            return adType === 'MRAID_AR'
-                        })
+                            return adType === 'MRAID_AR';
+                        });
                 }
-            )
+            );
 
         const paramsFactory = new MRAIDAdUnitParametersFactory(ar, core, ads, supportArAds);
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
