@@ -102,11 +102,11 @@ export class ThirdPartyEventManager {
         return this.sendEvent(ThirdPartyEventMethod.POST, event, sessionId, url, body, useWebViewUserAgentForTracking, headers);
     }
 
-    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][], additionaMacros?: {[id: string]: string}): Promise<INativeResponse> {
-        return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers, additionaMacros);
+    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][], additionalMacros?: {[id: string]: string}): Promise<INativeResponse> {
+        return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers, additionalMacros);
     }
 
-    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][], additionaMacros?: {[id: string]: string}): Promise<INativeResponse> {
+    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][], additionalMacros?: {[id: string]: string}): Promise<INativeResponse> {
         headers = headers || [];
         if (!RequestManager.getHeader(headers, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
@@ -114,7 +114,7 @@ export class ThirdPartyEventManager {
             }
         }
 
-        url = this.replaceTemplateValuesAndEncodeUrl(url, additionaMacros);
+        url = this.replaceTemplateValuesAndEncodeUrl(url, additionalMacros);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
@@ -173,13 +173,13 @@ export class ThirdPartyEventManager {
         this._templateValues[key] = value;
     }
 
-    private replaceTemplateValuesAndEncodeUrl(url: string, additionaMacros?: {[id: string]: string}): string {
+    private replaceTemplateValuesAndEncodeUrl(url: string, additionalMacros?: {[id: string]: string}): string {
         if (url) {
 
             url = MacroUtil.replaceMacro(url, this._templateValues);
 
-            if (additionaMacros) {
-                url = MacroUtil.replaceMacro(url, additionaMacros);
+            if (additionalMacros) {
+                url = MacroUtil.replaceMacro(url, additionalMacros);
             }
 
             url = MacroUtil.replaceMacro(url, {'[TIMESTAMP]': (new Date()).toISOString()});
