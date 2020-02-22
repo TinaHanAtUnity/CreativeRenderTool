@@ -38,7 +38,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
-        if (adVerifications) {
+        if (adVerifications.length > 0) {
             const openMeasurementFactory = new VastOpenMeasurementFactory(adVerifications, baseParams.campaign, baseParams.deviceInfo, baseParams.platform, baseParams.clientInfo, baseParams.placement);
             vastAdUnitParameters.om = openMeasurementFactory.createOpenMeasurementManager(baseParams.core, baseParams.request);
             openMeasurementFactory.setOMVendorTracking(baseParams.thirdPartyEventManager);
