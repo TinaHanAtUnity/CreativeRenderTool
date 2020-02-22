@@ -21,7 +21,6 @@ export class VastOpenMeasurementFactory {
     private clientInfo: ClientInfo;
     private placement: Placement;
 
-
     constructor(adVerifications: VastAdVerification[], campaign: VastCampaign, deviceInfo: DeviceInfo, platform: Platform, clientInfo: ClientInfo, placement: Placement) {
         this.adVerifications = adVerifications;
         this.campaign = campaign;
