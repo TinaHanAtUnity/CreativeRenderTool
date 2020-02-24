@@ -1,3 +1,11 @@
+# Pending
+
+* Open Measurement - Fix Periscope Data [#13358](https://github.com/Applifier/unity-ads-webview/pull/13358)
+
+# Sat Feb 22 00:10:11 UTC 2020
+* Open Measurement - Create class for Setting up Open Measurement [#13273](https://github.com/Applifier/unity-ads-webview/pull/13273)
+* Fix issue with metric batching logic [#13331](https://github.com/Applifier/unity-ads-webview/pull/13331)
+
 # Thu Feb 20 22:37:07 UTC 2020
 
 * Add color variants to animated CTA button [#12786](https://github.com/Applifier/unity-ads-webview/pull/12786)
