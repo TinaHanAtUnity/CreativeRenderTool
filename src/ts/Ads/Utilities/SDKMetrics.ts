@@ -107,7 +107,9 @@ export enum OMMetric {
 
 export enum InitializationMetric {
     WebviewInitialization = 'webview_initialization_time',
-    WebviewPageLoading = 'webview_page_loading_time'
+    WebviewPageLoading = 'webview_page_loading_time',
+    WebViewCoreInit = 'webview_core_init',
+    WebViewAdsInit = 'webview_ads_init',
 }
 
 export enum MraidMetric {

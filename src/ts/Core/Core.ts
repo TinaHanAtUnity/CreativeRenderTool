@@ -48,13 +48,14 @@ import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { createMeasurementsInstances } from 'Core/Utilities/TimeMeasurements';
 
 export class Core implements ICore {
 
@@ -123,7 +124,9 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
+        const measurements = createMeasurementsInstances(InitializationMetric.WebViewAdsInit);
         return this.Api.Sdk.loadComplete().then((data) => {
+            measurements.measure('load_complete');
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
@@ -161,6 +164,7 @@ export class Core implements ICore {
 
             return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
+            measurements.measure('device_init');
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this.WakeUpManager.setListenConnectivity(true);
             this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
@@ -174,6 +178,7 @@ export class Core implements ICore {
 
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
+            measurements.measure('before_config');
             let configPromise: Promise<unknown>;
             if (TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(CreativeUrlConfiguration);
@@ -182,6 +187,7 @@ export class Core implements ICore {
             }
 
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
+                measurements.measure('after_config');
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
                 if (this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
@@ -201,6 +207,7 @@ export class Core implements ICore {
 
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
+            measurements.measure('config_parsed');
             this.Config = coreConfig;
             if (this.DeviceInfo.isChineseNetworkOperator()) {
                 SDKMetrics.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
@@ -221,6 +228,8 @@ export class Core implements ICore {
         }).then((configJson: unknown) => {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
+
+            measurements.measure('core_ready');
 
             return this.Ads.initialize().then(() => {
                 SDKMetrics.sendBatchedEvents();
