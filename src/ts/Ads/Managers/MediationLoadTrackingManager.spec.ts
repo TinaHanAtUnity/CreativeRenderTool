@@ -1,5 +1,5 @@
 import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
-import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, MediationMetric } from 'Ads/Utilities/SDKMetrics';
 import { LoadApi, LoadApiMock } from 'Core/Native/__mocks__/LoadApi';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 
@@ -61,6 +61,46 @@ describe('MediationLoadTrackingManager', () => {
 
         it('should only log two new active load requests', () => {
             expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(2);
+        });
+    });
+
+    describe('initial ad request', () => {
+        describe('before init complete', () => {
+            beforeEach(() => {
+                loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 6 });
+            });
+
+            it('iar flag should be set', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.arrayContaining(['ads_sdk2_iar:true']));
+            });
+        });
+
+        [
+            { time: 250, expected: 'ads_sdk2_iar:true'},
+            { time: 251, expected: 'ads_sdk2_iar:false'}
+        ].forEach(({time, expected}) => {
+            describe(`after init complete withing ${time}ms`, () => {
+                let windowSpy: jest.SpyInstance;
+
+                beforeEach(() => {
+                    windowSpy = jest.spyOn(performance, 'now');
+                    windowSpy.mockReturnValue(0);
+
+                    medLoadTrackingManager.setInitComplete();
+
+                    windowSpy.mockReturnValue(time);
+
+                    loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 6 });
+                });
+
+                afterEach(() => {
+                    windowSpy.mockRestore();
+                });
+
+                it('iar flag should be set correctly', () => {
+                    expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.arrayContaining([expected]));
+                });
+            });
         });
     });
 
