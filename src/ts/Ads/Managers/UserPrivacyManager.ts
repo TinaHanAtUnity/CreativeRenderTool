@@ -148,7 +148,7 @@ export class UserPrivacyManager {
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
                 platform: Platform[this._platform],
-                userLocale: this._deviceInfo.getLanguage(),
+                userLocale: this._deviceInfo.getLanguage().replace('_', '-'),
                 country: this._coreConfig.getCountry(),
                 subCountry: this._coreConfig.getSubdivision(),
                 privacyMethod: this._gamePrivacy.getMethod(),
