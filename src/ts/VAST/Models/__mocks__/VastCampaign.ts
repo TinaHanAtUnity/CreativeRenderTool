@@ -5,6 +5,10 @@ export type VastCampaignMock = Base & {
     setOMVendors: jest.Mock;
     getSeatId: jest.Mock;
     getVast: jest.Mock;
+    getVideo: jest.Mock;
+    hasStaticEndscreen: jest.Mock<boolean>;
+    hasIframeEndscreen: jest.Mock<boolean>;
+    hasHtmlEndscreen: jest.Mock<boolean>;
 };
 
 export const VastCampaign = jest.fn(() => {
@@ -12,6 +16,10 @@ export const VastCampaign = jest.fn(() => {
         setOmEnabled: jest.fn(),
         setOMVendors: jest.fn(),
         getSeatId: jest.fn(),
-        getVast: jest.fn()
+        getVast: jest.fn(),
+        getVideo: jest.fn(),
+        hasStaticEndscreen: jest.fn().mockImplementation(() => false),
+        hasIframeEndscreen: jest.fn().mockImplementation(() => false),
+        hasHtmlEndscreen: jest.fn().mockImplementation(() => false)
     };
 });
