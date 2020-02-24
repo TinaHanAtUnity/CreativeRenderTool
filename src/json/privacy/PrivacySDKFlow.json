@@ -302,35 +302,35 @@
                 "title": "customization.whatInformationWeCollectHeading",
                 "components": [
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "whatInformationWeCollectParagraph",
                     "text": "customization.whatInformationWeCollectParagraph",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "exampleInformationParagraph",
                     "text": "customization.exampleInformationParagraph",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "miniDisclosureUsing",
                     "text": "customization.miniDisclosureUsing",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "miniDisclosureCountry",
                     "text": "customization.miniDisclosureCountry",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "miniDisclosureGamePlays",
                     "text": "customization.miniDisclosureGamePlays",
                     "type": "text",
                     "isHidden": false,
@@ -344,38 +344,40 @@
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "miniDisclosureInstalls",
                     "text": "customization.miniDisclosureInstalls",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "usingInformationParagraph",
                     "text": "customization.usingInformationParagraph",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "retainingPersonalDataParagraph",
                     "text": "customization.retainingPersonalDataParagraph",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
                   },
                   {
-                    "id": "whatWeCollectParagraph",
+                    "id": "whatInformationWeCollectParagraph",
                     "text": "customization.whatInformationWeCollectParagraph",
                     "type": "text",
                     "isHidden": false,
                     "variant": "dark"
-                  }
-                ]
-              },
-              {
-                "title": "customization.whatPartnersCollectHeading",
-                "components": [
+                  },
+                  {
+                    "id": "whatPartnersCollectHeading",
+                    "text": "customization.whatPartnersCollectHeading",
+                    "type": "heading",
+                    "isHidden": false,
+                    "level": 3
+                  },
                   {
                     "id": "partnersDataUsageParagraph",
                     "text": "customization.partnersDataUsageParagraph",
@@ -403,7 +405,7 @@
                     "variant": "dark"
                   },
                   {
-                    "id": "privacyPolicyLink",
+                    "id": "dataTransferPrivacyPolicyLink",
                     "text": "customization.privacyPolicyLink",
                     "type": "link",
                     "href": "https://unity3d.com/legal/privacy-policy",
@@ -471,14 +473,14 @@
                     "isHidden": false
                   },
                   {
-                    "id": "privacyPolicyLink",
+                    "id": "bidmotionLink",
                     "text": "Bidmotion",
                     "type": "link",
                     "href": "http://www.bidmotion.com/privacy-policy",
                     "isHidden": false
                   },
                   {
-                    "id": "bidmotionLink",
+                    "id": "charBoostLink",
                     "text": "Charboost",
                     "type": "link",
                     "href": "https://answers.chartboost.com/en-us/articles/200780269",
