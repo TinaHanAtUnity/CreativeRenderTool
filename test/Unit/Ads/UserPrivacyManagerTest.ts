@@ -73,7 +73,7 @@ describe('UserPrivacyManagerTest', () => {
         privacySDK = sinon.createStubInstance(PrivacySDK);
         privacySDK.getGamePrivacy.returns(gamePrivacy);
         userPrivacy = sinon.createStubInstance(UserPrivacy);
-        (<sinon.SinonStub>userPrivacy.getPermissions).returns({
+        userPrivacy.getPermissions.returns({
            ads: false,
            gameExp: false,
            external: false
