@@ -22,7 +22,7 @@ export interface ICoreConfiguration {
     jaegerTracing: boolean;
     organizationId: string | undefined;
     developerId: number | undefined;
-    features: string[];
+    featureFlags: string[];
 }
 
 export class CoreConfiguration extends Model<ICoreConfiguration> {
@@ -40,7 +40,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         jaegerTracing: ['boolean'],
         organizationId: ['string', 'undefined'],
         developerId: ['number', 'undefined'],
-        features: ['array']
+        featureFlags: ['array']
     };
 
     constructor(data: ICoreConfiguration) {
@@ -99,8 +99,8 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         return this.get('developerId');
     }
 
-    public getFeatures(): string[] {
-        return this.get('features');
+    public getFeatureFlags(): string[] {
+        return this.get('featureFlags');
     }
 
     public getDTO(): { [key: string]: unknown } {

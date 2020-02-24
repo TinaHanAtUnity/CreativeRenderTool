@@ -91,7 +91,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
-import { Features } from 'Core/Constants/Features';
+import { FeatureFlag } from 'Core/Constants/FeatureFlag';
 
 export class Ads implements IAds {
 
@@ -179,7 +179,7 @@ export class Ads implements IAds {
 
     public initialize(): Promise<void> {
 
-        if (this._core.Config.getFeatures().includes(Features.NofillPlacementOnInitialization)) {
+        if (this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization)) {
             const placementIds = this.Config.getPlacementIds();
             placementIds.forEach((placementId) => {
                 this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
