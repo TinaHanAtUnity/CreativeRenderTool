@@ -367,6 +367,10 @@ export class UserPrivacyManager {
     }
 
     public isPrivacySDKTestActive(): boolean {
+        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 19) {
+            return false;
+        }
+
         return TestEnvironment.get('forceprivacysdk') || (PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI');
     }
 
