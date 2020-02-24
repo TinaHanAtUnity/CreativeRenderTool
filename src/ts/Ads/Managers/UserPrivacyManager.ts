@@ -367,7 +367,7 @@ export class UserPrivacyManager {
     }
 
     public isPrivacySDKTestActive(): boolean {
-        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 19) {
+        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 19) {
             return false;
         }
 
