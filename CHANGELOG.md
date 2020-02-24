@@ -1,4 +1,13 @@
-# Pending
+# Sat Feb 22 00:10:11 UTC 2020
+* Open Measurement - Create class for Setting up Open Measurement [#13273](https://github.com/Applifier/unity-ads-webview/pull/13273)
+* Fix issue with metric batching logic [#13331](https://github.com/Applifier/unity-ads-webview/pull/13331)
+
+# Thu Feb 20 22:37:07 UTC 2020
+
+* Add color variants to animated CTA button [#12786](https://github.com/Applifier/unity-ads-webview/pull/12786)
+* Open Measurement - Add Admob OM DoubleClick Tag [#13327](https://github.com/Applifier/unity-ads-webview/pull/13327)
+
+# Wed Feb 19 22:00:38 UTC 2020
 
 * Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
 * Remove reportErrorEvent Implementation [#13228](https://github.com/Applifier/unity-ads-webview/pull/13228)

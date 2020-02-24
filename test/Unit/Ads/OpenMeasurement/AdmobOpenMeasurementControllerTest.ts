@@ -48,6 +48,8 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
             request = sinon.createStubInstance(RequestManager);
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
             sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'createAdsSdkTag').returns('');
 
             return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
@@ -197,10 +199,10 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                 });
             });
 
-            it('should not send admob om impression pts metric if no verification exists', () => {
+            it('should send admob om impression pts metric', () => {
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.notCalled(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
+                    sinon.assert.called(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
                 });
             });
 
@@ -228,6 +230,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
             it('should send admob om impression pts metric for multiple om instances', () => {
 
                 const reportSpy = <sinon.SinonStub>SDKMetrics.reportMetricEvent;
+                const reportTagSpy = <sinon.SinonStub>SDKMetrics.reportMetricEventWithTags;
 
                 const verificationResource0 = {
                     resourceUrl: 'http://scoot.com',
@@ -249,10 +252,10 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                 omManager.setupOMInstance(openMeasurement1, verificationResource1);
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.callCount(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 3);
+                    sinon.assert.callCount(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 1);
+                    sinon.assert.callCount(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 1);
                     assert.equal(reportSpy.getCall(0).args[0], 'admob_om_impression');
-                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
-                    assert.equal(reportSpy.getCall(2).args[0], 'doubleclick_om_impressions');
+                    assert.equal(reportTagSpy.getCall(0).args[0], 'doubleclick_om_impressions');
                 });
             });
 

@@ -3,7 +3,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
-import { AnimatedDownloadButtonEndScreen, EndScreenAnimation } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
+import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
@@ -36,18 +36,16 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        let endscreenAnimation = EndScreenAnimation.STATIC;
+        let endScreenCombination = ButtonAnimationsExperiment.getDefaultActions();
         const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
 
         if (mabDecision) {
-            if ((<string[]>Object.values(EndScreenAnimation)).includes(mabDecision)) {
-                endscreenAnimation = <EndScreenAnimation> mabDecision;
-            } else {
-                SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            }
+            endScreenCombination = mabDecision;
+        } else {
+            SDKMetrics.reportMetricEvent(AUIMetric.DecisionNotReady);
         }
 
-        const endScreen = new AnimatedDownloadButtonEndScreen(endscreenAnimation, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,

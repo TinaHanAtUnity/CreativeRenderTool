@@ -370,6 +370,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedStarted);
         }
+
+        if (this._view.getOpenMeasurementController()) {
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMVideoStart);
+        }
     }
 
     private isDBMCreative(): boolean {

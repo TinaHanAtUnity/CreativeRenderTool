@@ -40,7 +40,9 @@ export enum AdmobMetric {
     AdmobOMSessionStartObserverCalled = 'admob_om_session_start_observer_called',
     DoubleClickOMInjections = 'doubleclick_om_injections',
     DoubleClickOMStarts = 'doubleclick_om_starts',
-    DoubleClickOMImpressions = 'doubleclick_om_impressions'
+    DoubleClickOMImpressions = 'doubleclick_om_impressions',
+    DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
+    AdmobOMVideoStart = 'admob_om_video_start'
 }
 
 export enum BannerMetric {
@@ -118,7 +120,8 @@ export enum MraidMetric {
 
 export enum AUIMetric {
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
-    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
+    DecisionNotReady = 'decision_not_ready'
 }
 
 export enum MediationMetric {
