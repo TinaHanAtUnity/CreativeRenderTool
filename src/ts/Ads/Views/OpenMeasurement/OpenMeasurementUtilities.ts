@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IViewPort, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { IViewPort, IRectangle, DoubleClickAdmobVendorTags } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class OpenMeasurementUtilities {
 
@@ -175,5 +175,21 @@ export class OpenMeasurementUtilities {
         }
 
         return topLeftY;
+    }
+
+    public static getDcKeyMetricTag(vendor: string) {
+        if (vendor === DoubleClickAdmobVendorTags.SSP) {
+            return 'ssp';
+        } else if (vendor === DoubleClickAdmobVendorTags.DSP) {
+            return 'dsp';
+        } else if (vendor === DoubleClickAdmobVendorTags.Neutral) {
+            return 'neut';
+        } else {
+            return 'unknown';
+        }
+    }
+
+    public static isDoubleClickGoogle(vendorKey: string): boolean {
+        return vendorKey.startsWith('doubleclickbygoogle.com');
     }
 }

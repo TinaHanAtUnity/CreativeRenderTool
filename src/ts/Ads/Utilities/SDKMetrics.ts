@@ -1,6 +1,6 @@
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 
-export enum ProgrammaticTrackingError {
+export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
     AdmobTestHttpError = 'admob_video_http_error',
@@ -40,7 +40,9 @@ export enum AdmobMetric {
     AdmobOMSessionStartObserverCalled = 'admob_om_session_start_observer_called',
     DoubleClickOMInjections = 'doubleclick_om_injections',
     DoubleClickOMStarts = 'doubleclick_om_starts',
-    DoubleClickOMImpressions = 'doubleclick_om_impressions'
+    DoubleClickOMImpressions = 'doubleclick_om_impressions',
+    DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
+    AdmobOMVideoStart = 'admob_om_video_start'
 }
 
 export enum BannerMetric {
@@ -104,7 +106,8 @@ export enum OMMetric {
 }
 
 export enum InitializationMetric {
-    WebviewInitialization = 'webview_initialization_time'
+    WebviewInitialization = 'webview_initialization_time',
+    WebviewPageLoading = 'webview_page_loading_time'
 }
 
 export enum MraidMetric {
@@ -117,10 +120,12 @@ export enum MraidMetric {
 
 export enum AUIMetric {
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
-    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error'
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
+    DecisionNotReady = 'decision_not_ready'
 }
 
 export enum MediationMetric {
+    LoadRequest = 'load_request',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
     LoadRequestTimeout = 'load_request_timeout',
@@ -132,9 +137,9 @@ export enum MediationMetric {
 
 export type TimingEvent = InitializationMetric | MediationMetric;
 
-export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ProgrammaticTrackingError | OMMetric | AUIMetric;
+export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
-export class ProgrammaticTrackingService {
+export class SDKMetrics {
 
     private static _metricInstance: MetricInstance;
 
@@ -156,20 +161,12 @@ export class ProgrammaticTrackingService {
         this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
-    public static reportErrorEvent(event: PTSEvent, adType: string, seatId?: number): void {
-        this._metricInstance.reportErrorEvent(event, adType, seatId);
-    }
-
     public static reportTimingEvent(event: TimingEvent, value: number): void {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
     public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
         this._metricInstance.reportTimingEventWithTags(event, value, tags);
-    }
-
-    public static batchEvent(metric: TimingEvent, value: number): void {
-        this._metricInstance.batchEvent(metric, value);
     }
 
     public static sendBatchedEvents(): void {

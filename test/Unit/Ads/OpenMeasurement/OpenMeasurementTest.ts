@@ -17,7 +17,7 @@ import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -47,7 +47,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            sinon.stub(ProgrammaticTrackingService, 'reportMetricEvent').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
             request = sinon.createStubInstance(RequestManager);
             if (verifications) {
@@ -119,11 +119,12 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                     describe('VERIFICATION_RESOURCE_REJECTED', () => {
                         const resource1 = new VastVerificationResource('http://url1.js', 'test1');
                         const verificationResources = [resource1];
-                        const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D');
+                        const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D&PARTNER=[OMIDPARTNER]&cachebusting=[CACHEBUSTING]&timestamp=[TIMESTAMP]');
                         const vastAdVerifications = [vastAdVerification];
 
                         beforeEach(() => {
                             sandbox.stub(CustomFeatures, 'isUnsupportedOMVendor').returns(true);
+                            sandbox.stub(Date.prototype, 'toISOString').returns('2020-02-06T23:45:18.458Z');
                             om = initWithVastVerifications(vastAdVerifications);
                             om.render();
                             om.addMessageListener();
@@ -134,8 +135,8 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                             om.removeMessageListener();
                         });
 
-                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1');
+                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file and replace OMIDPARTNER,OMIDPARTNER,OMIDPARTNER macros', () => {
+                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=1&PARTNER=Unity3d/1.2.10&cachebusting=-1&timestamp=2020-02-06T23:45:18.458Z');
                         });
                     });
 

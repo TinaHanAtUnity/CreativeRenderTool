@@ -1,6 +1,6 @@
 import { PerPlacementLoadManagerV3 } from 'Ads/Managers/PerPlacementLoadManagerV3';
 import { PlacementState } from 'Ads/Models/Placement';
-import { LoadMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { LoadMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 
 export class PerPlacementLoadManagerV4 extends PerPlacementLoadManagerV3 {
@@ -15,16 +15,16 @@ export class PerPlacementLoadManagerV4 extends PerPlacementLoadManagerV3 {
                 const campaign = placement.getCurrentCampaign();
 
                 if (campaign && campaign instanceof ProgrammaticCampaign) {
-                    ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadProgrammaticRefreshRequest);
+                    SDKMetrics.reportMetricEvent(LoadMetric.LoadProgrammaticRefreshRequest);
                     programmaticLoadCampaignPromises.push(this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
                         if (loadedCampaign) {
                             // Don't update state since this is just swapping a ready campaign for a ready campaign
                             placement.setCurrentCampaign(loadedCampaign.campaign);
                             placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
-                            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadProgrammaticFill);
+                            SDKMetrics.reportMetricEvent(LoadMetric.LoadProgrammaticFill);
                         } else {
                             // Use previous fill on programmatic no fill
-                            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadProgrammaticUsedPreviousFill);
+                            SDKMetrics.reportMetricEvent(LoadMetric.LoadProgrammaticUsedPreviousFill);
                         }
                     }));
                 }

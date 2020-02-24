@@ -6,7 +6,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, VastMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, VastMetric } from 'Ads/Utilities/SDKMetrics';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
@@ -47,7 +47,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super.onCompleted(url);
 
         if (!this._vastAdUnit.hasImpressionOccurred()) {
-            ProgrammaticTrackingService.reportMetricEvent(VastMetric.VastVideoImpressionFailed);
+            SDKMetrics.reportMetricEvent(VastMetric.VastVideoImpressionFailed);
         }
 
         const session = this._vastCampaign.getSession();

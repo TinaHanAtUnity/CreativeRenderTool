@@ -9,7 +9,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
@@ -21,7 +21,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     protected _adsConfig: AdsConfiguration;
     protected _coreConfig: CoreConfiguration;
     protected _campaignManager: CampaignManager;
-    protected _pts: ProgrammaticTrackingService;
+    protected _pts: SDKMetrics;
 
     constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
         super();
@@ -124,7 +124,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             });
         } else {
             this.alertPlacementReadyStatus(placement);
-            ProgrammaticTrackingService.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
+            SDKMetrics.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
 
