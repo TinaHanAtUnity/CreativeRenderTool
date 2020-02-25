@@ -2,7 +2,7 @@ import { ListenerApi } from 'Ads/Native/Listener';
 import { MediationMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { LoadApi } from 'Core/Native/LoadApi';
 
-const INITIAL_AD_REQUEST_WAIT_TIME = 250;
+const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export class MediationLoadTrackingManager {
     private _loadApi: LoadApi;
@@ -66,7 +66,7 @@ export class MediationLoadTrackingManager {
             if (this._activeLoads[placementId] === undefined) {
                 this._activeLoads[placementId] = {
                     time: this.getTime(),
-                    initialAdRequest: this._initialAdRequest || (this.getTime() - this._initCompleteTime <= INITIAL_AD_REQUEST_WAIT_TIME)
+                    initialAdRequest: this._initialAdRequest || (this.getTime() - this._initCompleteTime <= INITIAL_AD_REQUEST_WAIT_TIME_IN_MS)
                 };
                 SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequest, [
                     SDKMetrics.createAdsSdkTag('med', this._mediationName),
