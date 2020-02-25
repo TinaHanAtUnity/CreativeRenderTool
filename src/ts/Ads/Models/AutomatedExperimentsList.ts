@@ -58,7 +58,7 @@ export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
     }
 };
 
-export const ArAvailableButtonExperimentDefaultActions: IExperimentActionChoice = {
+const ArAvailableButtonExperimentDefaultActions: IExperimentActionChoice = {
     color: ArAvailableButtonExperimentDeclaration.color.BLACK,
     skip: ArAvailableButtonExperimentDeclaration.skip.NO
 };

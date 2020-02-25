@@ -2,6 +2,7 @@ import { IARApi } from 'AR/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IAds } from 'Ads/IAds';
 
 export interface IARFrameTransform {
     a: number;
@@ -168,5 +169,16 @@ export class ARUtil {
                 return ARUtil.isARSupportedAndroid(api, retry + 1);
             });
         });
+    }
+
+    public static hasArPlacement(ads: IAds) {
+        return Object.values(ads.Config.getPlacements() || {})
+            .some(placement => {
+                    return (placement.getAdTypes() || [])
+                        .some(adType => {
+                            return adType === 'MRAID_AR';
+                        });
+                }
+            );
     }
 }
