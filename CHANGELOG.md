@@ -2,6 +2,7 @@
 
 * Open Measurement - Fix Periscope Data [#13358](https://github.com/Applifier/unity-ads-webview/pull/13358)
 * Read Feature Flags from Ads Game Configuration [#13388](https://github.com/Applifier/unity-ads-webview/pull/13358)
+* Using threshold timeout for marking initial ad request [#13387](https://github.com/Applifier/unity-ads-webview/pull/13387)
 
 # Sat Feb 22 00:10:11 UTC 2020
 * Open Measurement - Create class for Setting up Open Measurement [#13273](https://github.com/Applifier/unity-ads-webview/pull/13273)
