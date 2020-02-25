@@ -179,7 +179,7 @@ export class Ads implements IAds {
 
     public initialize(): Promise<void> {
 
-        if (this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization)) {
+        if (CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization)) {
             const placementIds = this.Config.getPlacementIds();
             placementIds.forEach((placementId) => {
                 this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
