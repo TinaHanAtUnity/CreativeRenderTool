@@ -15,7 +15,7 @@ export interface IRawCoreConfiguration {
     jaegerTracing?: boolean;
     organizationId: string;
     developerId: number;
-    flags: string[];
+    flags?: string[];
 }
 
 export class CoreConfigurationParser {

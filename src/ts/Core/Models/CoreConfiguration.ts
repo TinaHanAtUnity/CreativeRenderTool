@@ -113,7 +113,8 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
             'projectId': this.getUnityProjectId(),
             'testMode': this.getTestMode(),
             'organizationId': this.getOrganizationId(),
-            'developerId': this.getDeveloperId()
+            'developerId': this.getDeveloperId(),
+            'featureFlags': this.getFeatureFlags()
         };
     }
 }
