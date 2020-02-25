@@ -55,5 +55,9 @@ describe('CoreConfigurationParserTest', () => {
             coreConfig.set('test', true);
             assert.equal(coreConfig.getTestMode(), true);
         });
+
+        it('should set feature flags to empty array when omitted', () => {
+            assert.deepEqual(coreConfig.getFeatureFlags(), []);
+        });
     });
 });
