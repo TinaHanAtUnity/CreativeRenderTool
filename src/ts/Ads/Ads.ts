@@ -276,11 +276,10 @@ export class Ads implements IAds {
         }).then(() => {
             return this.logInitializationLatency();
         }).then(() => {
-            return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-                if (this.MediationLoadTrackingManager) {
-                    this.MediationLoadTrackingManager.setInitComplete();
-                }
-            }));
+            if (this.MediationLoadTrackingManager) {
+                this.MediationLoadTrackingManager.setInitComplete();
+            }
+            return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         });
