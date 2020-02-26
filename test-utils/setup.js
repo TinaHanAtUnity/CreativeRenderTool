@@ -5,3 +5,4 @@ mocha.setup({
     reporter: HybridTestReporter,
     globals: ['nativebridge', 'webviewbridge', 'webview', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance']
 });
+performance.now = undefined;
