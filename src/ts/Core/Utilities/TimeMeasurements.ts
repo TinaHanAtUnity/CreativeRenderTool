@@ -1,12 +1,12 @@
 import { TimingEvent, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-export interface ITimeMeasurement {
-    start(event: TimingEvent): void;
+export interface ITimeMeasurements {
+    start(event: TimingEvent, tags: string[]): void;
     stop(event: TimingEvent): void;
-    measure(event: TimingEvent): void;
+    measure(tag: string): void;
 }
 
-class NullTimeMeasurement implements ITimeMeasurement {
+class NullTimeMeasurements implements ITimeMeasurements {
 
     public start(event: TimingEvent, tags: string[] = []): void {
         // noop
@@ -16,20 +16,22 @@ class NullTimeMeasurement implements ITimeMeasurement {
         // noop
     }
 
-    public measure(event: TimingEvent): void {
+    public measure(tag: string): void {
         // noop
     }
 }
 
-class TimeMeasurement implements ITimeMeasurement {
+class TimeMeasurements implements ITimeMeasurements {
     private _startTimes: { [key: string]: { start: number; event: TimingEvent; tags: string[] } };
     private _startTime: number;
     private _tags: string[];
+    private _event: TimingEvent;
 
-    constructor(tags: string[]) {
+    constructor(event: TimingEvent, tags: string[]) {
         this._startTime = performance.now();
         this._startTimes = {};
         this._tags = tags;
+        this._event = event;
     }
 
     public start(event: TimingEvent, tags: string[] = []): void {
@@ -54,20 +56,21 @@ class TimeMeasurement implements ITimeMeasurement {
         delete this._startTimes[event];
     }
 
-    public measure(event: TimingEvent, tags: string[] = []): void {
-        const duration = performance.now() - this._startTime;
-        const allTags = tags.concat(this._tags);
+    public measure(tag: string): void {
+        const time = performance.now();
+        const duration = time - this._startTime;
+        const allTags = this._tags.concat([SDKMetrics.createAdsSdkTag('stg', tag)]);
 
-        SDKMetrics.reportTimingEventWithTags(event, duration, allTags);
+        SDKMetrics.reportTimingEventWithTags(this._event, duration, allTags);
 
-        this._startTime = performance.now();
+        this._startTime = time;
     }
 }
 
-export function createMeasurementsInstances(tags: string[] = []): ITimeMeasurement {
+export function createMeasurementsInstances(event: TimingEvent, tags: string[] = []): ITimeMeasurements {
     if (performance && performance.now) {
-        return new TimeMeasurement(tags);
+        return new TimeMeasurements(event, tags);
     }
 
-    return new NullTimeMeasurement();
+    return new NullTimeMeasurements();
 }
