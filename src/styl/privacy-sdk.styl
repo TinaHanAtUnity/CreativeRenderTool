@@ -1,5 +1,19 @@
 #privacy-sdk-container {
   #privacy-iframe {
     $iframe-default();
+    padding: .25rem;
+    width: calc(100% - .5rem);
+    height: calc(100% - .5rem);
   }
 }
+
+@media (orientation: landscape) {
+  #privacy-sdk-container {
+    #privacy-iframe {
+      padding-right: 15%;
+      padding-left: 15%;
+      width: calc(100% - 30%);
+    }
+  }
+}
+
