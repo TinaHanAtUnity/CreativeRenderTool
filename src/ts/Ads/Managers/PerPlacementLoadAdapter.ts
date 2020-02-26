@@ -41,12 +41,10 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
     public initialize(): Promise<INativeResponse | void> {
         this._initialized = true;
-        return super.initialize().then((returnValue) => {
-            Object.keys(this._forceLoadPlacements).forEach((placementId) => {
-                this.sendLoadAPIEvent(placementId);
-            });
-            return returnValue;
+        Object.keys(this._forceLoadPlacements).forEach((placementId) => {
+            this._trackablePlacements[placementId] = placementId;
         });
+        return super.initialize();
     }
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
@@ -57,6 +55,13 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
     public sendPlacementStateChanges(placementId: string): void {
         const placement = this._adsConfig.getPlacement(placementId);
+        if (placement === undefined) {
+            delete this._trackablePlacements[placementId];
+            delete this._activePlacements[placementId];
+            this.sendPlacementStateChange(placementId, PlacementState.NO_FILL);
+            return;
+        }
+
         if (this._trackablePlacements[placementId]) {
             if (placement.getPlacementStateChanged()) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, placement.getPreviousState(), placement.getState());
@@ -88,6 +93,11 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     private sendLoadAPIEvent(placementId: string) {
         const placement = this._adsConfig.getPlacement(placementId);
 
+        if (placement === undefined) {
+            this.sendPlacementStateChange(placementId, PlacementState.NO_FILL);
+            return;
+        }
+
         if (placement.getState() === PlacementState.WAITING) {
             this._trackablePlacements[placementId] = placementId;
          }
@@ -108,7 +118,11 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 break;
             case PlacementState.NOT_AVAILABLE:
-                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NOT_AVAILABLE);
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
+                break;
+            case PlacementState.DISABLED:
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.NOT_AVAILABLE, PlacementState.WAITING);
+                this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 break;
             default:
         }
