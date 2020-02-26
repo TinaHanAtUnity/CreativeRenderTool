@@ -23,12 +23,12 @@
                      * @param {Object} eventData structured data to indicate type for observer to fire
                      */
                     var triggerSessionObserver = function(eventData) {
-                        sessionObservers.forEach(function(sessionObserver) {
+                        for (var i = 0; i < sessionObservers.length; i++) {
                             if (!eventData.data || Object.keys(eventData.data).length === 0) {
                                 delete eventData.data;
                             }
-                            sessionObserver(eventData);
-                        });
+                            sessionObservers[i](eventData);
+                        }
                     }
         
                     /**
@@ -63,9 +63,9 @@
                      * @param {string} key
                      */
                     var sendSessionStartForKey = function(key) {
-                        sessionObservers.forEach(function (sessionObserver) {
-                            sendSessionStart(sessionObserver, key);
-                        });
+                        for (var i = 0; i < sessionObservers.length; i++) {
+                            sendSessionStart(sessionObservers[i], key);
+                        }
                     }
 
                     var handleSessionStart = function(event) {
@@ -88,6 +88,26 @@
                      */
                     var stripEventString = function(eventType) {
                         return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
+                    }
+
+                    var handleSessionEvents = function(event) {
+                        switch(event.data.type) {
+                            case SESSION_START:
+                                handleSessionStart(event);
+                                break;
+                            case SESSION_FINISH:
+                                triggerSessionObserver(event.data);
+                                postMessageCallback(ON_EVENT_PROCESSED, {
+                                    eventType: SESSION_FINISH,
+                                    vendorKey: scriptVendor
+                                });
+                                break;
+                            case SESSION_ERROR:
+                                triggerSessionObserver(event.data);
+                                break;
+                            default:
+                                break;
+                        }
                     }
         
                     /**
@@ -114,23 +134,7 @@
                         /**
                          * SESSION EVENTS:
                          */ 
-                        switch(event.data.type) {
-                            case SESSION_START:
-                                handleSessionStart(event);
-                                break;
-                            case SESSION_FINISH:
-                                triggerSessionObserver(event.data);
-                                postMessageCallback(ON_EVENT_PROCESSED, {
-                                    eventType: SESSION_FINISH,
-                                    vendorKey: scriptVendor
-                                });
-                                break;
-                            case SESSION_ERROR:
-                                triggerSessionObserver(event.data);
-                                break;
-                            default:
-                                break;
-                        }
+                        handleSessionEvents(event);
                     });
         
                     /*
@@ -179,7 +183,7 @@
                     this.setInterval = function() {}
                     this.clearInterval = function() {}
 
-                    var fnwhitelist = ['handleSessionStart'];
+                    var fnwhitelist = ['handleSessionStart', 'handleSessionEvents'];
                     this.get = function(name) {
                         return fnwhitelist.indexOf(name) > -1 ? eval(name) : console.log('fn not gettable');
                     }
