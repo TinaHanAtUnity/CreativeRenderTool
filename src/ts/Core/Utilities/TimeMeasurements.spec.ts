@@ -14,71 +14,7 @@ describe('TimeMeasurements', () => {
     afterEach(() => {
         performanceNowSpy.mockRestore();
     });
-    
-    describe('start and stop', () => {
-        describe('normal use case', () => {
-            beforeEach(() => {
-                performanceNowSpy
-                    .mockReturnValueOnce(100)
-                    .mockReturnValueOnce(249);
 
-                timeMeasurement.start(InitializationMetric.WebviewPageLoading, []);
-                timeMeasurement.stop(InitializationMetric.WebviewPageLoading);
-            });
-
-            it('should send metric', () => {
-                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewPageLoading, 149, expect.anything());
-            });
-        });
-
-        describe('start and stop measurement send event once', () => {
-            beforeEach(() => {
-                performanceNowSpy
-                    .mockReturnValueOnce(100)
-                    .mockReturnValue(249);
-
-                timeMeasurement.start(InitializationMetric.WebviewPageLoading, []);
-                timeMeasurement.stop(InitializationMetric.WebviewPageLoading);
-                timeMeasurement.stop(InitializationMetric.WebviewPageLoading);
-            });
-
-            it('should send metric', () => {
-                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
-            });
-        });
-
-        describe('stop called for not active metric', () => {
-            beforeEach(() => {
-                performanceNowSpy
-                    .mockReturnValueOnce(100)
-                    .mockReturnValue(249);
-
-                timeMeasurement.start(InitializationMetric.WebviewPageLoading, []);
-                timeMeasurement.stop(InitializationMetric.WebviewInitialization);
-            });
-
-            it('should not send metric', () => {
-                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(0);
-            });
-        });
-
-        describe('multiple starts override value', () => {
-            beforeEach(() => {
-                performanceNowSpy
-                    .mockReturnValueOnce(50)
-                    .mockReturnValueOnce(100)
-                    .mockReturnValue(249);
-
-                timeMeasurement.start(InitializationMetric.WebviewPageLoading, []);
-                timeMeasurement.start(InitializationMetric.WebviewPageLoading, []);
-                timeMeasurement.stop(InitializationMetric.WebviewPageLoading);
-            });
-
-            it('should send metric', () => {
-                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewPageLoading, 149, expect.anything());
-            });
-        });
-    });
 
     describe('measure', () => {
         describe('normal use case', () => {
