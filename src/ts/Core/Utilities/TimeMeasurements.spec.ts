@@ -1,4 +1,4 @@
-import { ITimeMeasurements, createMeasurementsInstances } from "Core/Utilities/TimeMeasurements";
+import { ITimeMeasurements, createMeasurementsInstance } from "Core/Utilities/TimeMeasurements";
 import { InitializationMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('TimeMeasurements', () => {
@@ -8,7 +8,7 @@ describe('TimeMeasurements', () => {
     beforeEach(() => {
         performanceNowSpy = jest.spyOn(performance, 'now');
         performanceNowSpy.mockReturnValue(0)
-        timeMeasurement = createMeasurementsInstances(InitializationMetric.WebviewInitialization);
+        timeMeasurement = createMeasurementsInstance(InitializationMetric.WebviewInitialization);
     });
 
     afterEach(() => {

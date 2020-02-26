@@ -32,7 +32,7 @@ class TimeMeasurements implements ITimeMeasurements {
     }
 }
 
-export function createMeasurementsInstances(event: TimingEvent, tags: string[] = []): ITimeMeasurements {
+export function createMeasurementsInstance(event: TimingEvent, tags: string[] = []): ITimeMeasurements {
     if (performance && performance.now) {
         return new TimeMeasurements(event, tags);
     }
