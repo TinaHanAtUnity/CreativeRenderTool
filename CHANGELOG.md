@@ -1,4 +1,4 @@
-# Pending
+# Tue Feb 25 22:23:19 UTC 2020
 
 * Open Measurement - Fix Periscope Data [#13358](https://github.com/Applifier/unity-ads-webview/pull/13358)
 * Read Feature Flags from Ads Game Configuration [#13388](https://github.com/Applifier/unity-ads-webview/pull/13358)

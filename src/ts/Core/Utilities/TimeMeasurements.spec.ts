@@ -8,7 +8,7 @@ describe('TimeMeasurements', () => {
     beforeEach(() => {
         performanceNowSpy = jest.spyOn(performance, 'now');
         performanceNowSpy.mockReturnValue(0)
-        timeMeasurement = createMeasurementsInstance(InitializationMetric.WebviewInitialization);
+        timeMeasurement = createMeasurementsInstance(InitializationMetric.WebviewInitialization, ['simple:tag']);
     });
 
     afterEach(() => {
@@ -30,8 +30,8 @@ describe('TimeMeasurements', () => {
 
             it('should send metric', () => {
                 expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(2);
-                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewInitialization, 100, ['ads_sdk2_stg:step_1']);
-                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewInitialization, 200, ['ads_sdk2_stg:step_2']);
+                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewInitialization, 100, ['simple:tag', 'ads_sdk2_stg:step_1']);
+                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewInitialization, 200, ['simple:tag', 'ads_sdk2_stg:step_2']);
             });
         });
     });
