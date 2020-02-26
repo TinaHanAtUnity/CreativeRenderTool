@@ -10,12 +10,6 @@ class NullTimeMeasurements implements ITimeMeasurements {
     }
 }
 
-interface ITimeEvent {
-    start: number; 
-    event: TimingEvent; 
-    tags: string[] 
- }
-
 class TimeMeasurements implements ITimeMeasurements {
     private _startTime: number;
     private _tags: string[];
