@@ -222,7 +222,7 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.notCalled(sendReadyEventStub);
 
             const loadDict: {[key: string]: number} = {};
-            loadDict['does_not_exists'] = 1;
+            loadDict.does_not_exists = 1;
             ads.LoadApi.onLoad.trigger(loadDict);
 
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'NOT_AVAILABLE', 'WAITING');
