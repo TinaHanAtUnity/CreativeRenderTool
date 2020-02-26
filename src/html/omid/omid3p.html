@@ -4,25 +4,25 @@
             (function() {
                 var OmidVerification = function() {
 
-                    const ON_EVENT_PROCESSED = 'onEventProcessed',
+                    var ON_EVENT_PROCESSED = 'onEventProcessed',
                     SESSION_FINISH = 'sessionFinish',
                     SESSION_START = 'sessionStart',
                     SESSION_ERROR = 'sessionError',
                     SESSION_REGISTERED = 'sessionRegistered';
-                    let DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
-                    let sessionObservers = [];
-                    let sessionStartData = {};
-                    let sessionStartCalled = false;
+                    var DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
+                    var sessionObservers = [];
+                    var sessionStartData = {};
+                    var sessionStartCalled = false;
                     var scriptVendor = '';
 
-                    const registeredFunctions = {};
-                    let uuid = 0;
+                    var registeredFunctions = {};
+                    var uuid = 0;
 
                     /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
                      * @param {Object} eventData structured data to indicate type for observer to fire
                      */
-                    let triggerSessionObserver = function(eventData) {
+                    var triggerSessionObserver = function(eventData) {
                         sessionObservers.forEach(function(sessionObserver) {
                             if (!eventData.data || Object.keys(eventData.data).length === 0) {
                                 delete eventData.data;
@@ -36,7 +36,7 @@
                      * @param {string} event to send to the server
                      * @param {Object} data of the event
                      */
-                    let postMessageCallback = function(event, data) {
+                    var postMessageCallback = function(event, data) {
                         window.parent.postMessage({
                             type: 'omid',
                             event: event,
@@ -49,7 +49,7 @@
                      * @param {function} observer
                      * @param {string} vendorkey
                      */
-                    let sendSessionStart = function(observer, vendorkey) {
+                    var sendSessionStart = function(observer, vendorkey) {
                         delete sessionStartData.data.vendorkey;
                         observer(sessionStartData);
                         postMessageCallback(ON_EVENT_PROCESSED, {
@@ -62,14 +62,14 @@
                      * Calls SessionListener for specified vendorkey
                      * @param {string} key
                      */
-                    let sendSessionStartForKey = function(key) {
-                        sessionObservers.forEach((sessionObserver) => {
+                    var sendSessionStartForKey = function(key) {
+                        sessionObservers.forEach(function (sessionObserver) {
                             sendSessionStart(sessionObserver, key);
                         });
                     }
 
-                    let handleSessionStart = function(event) {
-                        let data = event.data.data;
+                    var handleSessionStart = function(event) {
+                        var data = event.data.data;
                         if (sessionObservers.length > 0) {
                             sessionStartData = event.data;
                             if (!sessionStartCalled && sessionStartData) {
@@ -86,7 +86,7 @@
                      * Strips 'omid' from string to be passed to vendor
                      * @param {string} event to send to the vendor
                      */
-                    let stripEventString = function(eventType) {
+                    var stripEventString = function(eventType) {
                         return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
                     }
         
@@ -99,7 +99,7 @@
                         */
                         if (event.data.uuid) {
                             payload = event.data.payload;
-                            const eventData = {
+                            var eventData = {
                                 adSessionId: event.data.adSessionId,
                                 timestamp: event.data.timestamp,
                                 type: stripEventString(event.data.type),
@@ -111,9 +111,9 @@
                             handler(eventData);
                         }
 
-                        /* 
-                        * SESSION EVENTS:
-                        */
+                        /**
+                         * SESSION EVENTS:
+                         */ 
                         switch(event.data.type) {
                             case SESSION_START:
                                 handleSessionStart(event);
@@ -140,7 +140,7 @@
                         return true;
                     }
 
-                   /**
+                    /**
                      * Registers session events for the given vendor key
                      * @param {function} functionToExecute sessionObserver for given vendor
                      * @param {function} vendorKey optional param to attribute given vendor key to sessionObserver
@@ -162,14 +162,14 @@
                         uuid++;
                         registeredFunctions[uuid] = listener;
 
-                        const adjustEventTypeString = (eventType) => {
-                            return `omid${eventType.charAt(0).toUpperCase()+eventType.slice(1)}`;
+                        var adjustEventTypeString = function(eventType) {
+                            return 'omid' + eventType.charAt(0).toUpperCase()+eventType.slice(1);
                         };
 
                         postMessageCallback('onEventRegistered', {
                             eventName: adjustEventTypeString(type),
                             vendorKey: scriptVendor,
-                            uuid: `${uuid}`
+                            uuid: '' + uuid
                         });
                     }
 
@@ -179,7 +179,7 @@
                     this.setInterval = function() {}
                     this.clearInterval = function() {}
 
-                    let fnwhitelist = ['handleSessionStart'];
+                    var fnwhitelist = ['handleSessionStart'];
                     this.get = function(name) {
                         return fnwhitelist.indexOf(name) > -1 ? eval(name) : console.log('fn not gettable');
                     }

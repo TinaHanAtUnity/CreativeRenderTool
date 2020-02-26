@@ -126,7 +126,7 @@
                 customReferenceIdentifier: undefined
             }
 
-            var sessionCallback = () => void 0;
+            var sessionCallback = function() {}
             var sdkVersion;
             var sessionId;
             var videoElement;
@@ -273,7 +273,7 @@
              */
             this.setVideoElement = function(videoElement) {
                 postMessage(VIDEO_ELEMENT, {
-                    videoElement: `${videoElement}`
+                    videoElement: '' + videoElement
                 });
             };
 
@@ -284,7 +284,7 @@
              */
             this.setSlotElement = function(slotElement) {
                 postMessage(SLOT_ELEMENT, {
-                    slotElement: `${slotElement}`
+                    slotElement: '' + slotElement
                 });
             };
 
@@ -327,7 +327,7 @@
                 }
 
                 sessionCallback(eventData);
-                sessionCallback = () => void 0;
+                sessionCallback = function() {}
             };
 
             this.adEvents = {};

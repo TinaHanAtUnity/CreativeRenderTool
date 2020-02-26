@@ -14,6 +14,27 @@ describe('AdmobSessionInterface', () => {
         window.postMessage = postMessageSpy;
     });
 
+    describe('reportError',() => {
+        it('should not break when sessionCallback is not set', () => {
+            window.omidSessionInterface.reportError('error', 'was an error');
+            expect(postMessageSpy).toBeCalled();
+        });
+    });
+
+    describe('set video element', () => {
+        it('should be passed a string reprensentation of an element', () => {
+            let element = document.createElement('video');
+            window.omidSessionInterface.setVideoElement(element);
+            expect(postMessageSpy).toBeCalledWith({
+                'data': {
+                    'videoElement': '[object HTMLVideoElement]',
+                },
+                'event': 'videoElement',
+                'type': 'omid'
+            }, '*');
+        });
+    });
+
     it('should inject multiple verification resources', () => {
         const theData1 = {
             resourceUrl: 'https://team-playa-shaown.scoot.mcdoot.doot',
