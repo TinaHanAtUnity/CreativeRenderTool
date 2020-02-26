@@ -55,7 +55,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
-import { createMeasurementsInstances } from 'Core/Utilities/TimeMeasurements';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 export class Core implements ICore {
 
@@ -124,7 +124,7 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstances(InitializationMetric.WebViewAdsInit);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebViewAdsInit);
         return this.Api.Sdk.loadComplete().then((data) => {
             measurements.measure('load_complete');
             this.ClientInfo = new ClientInfo(data);

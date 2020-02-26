@@ -91,7 +91,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
-import { createMeasurementsInstances } from 'Core/Utilities/TimeMeasurements';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 export class Ads implements IAds {
 
@@ -178,7 +178,7 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstances(InitializationMetric.WebViewCoreInit);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebViewCoreInit);
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
