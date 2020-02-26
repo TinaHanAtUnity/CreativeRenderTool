@@ -3,6 +3,6 @@ mocha.setup({
     checkLeaks: true,
     fullTrace: true,
     reporter: HybridTestReporter,
-    globals: ['nativebridge', 'webviewbridge', 'webview', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance']
+    globals: ['nativebridge', 'webviewbridge', 'webview', 'requestAnimationFrame', 'cancelAnimationFrame']
 });
 performance.now = undefined;
