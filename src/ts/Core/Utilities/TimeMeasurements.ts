@@ -5,7 +5,6 @@ export interface ITimeMeasurements {
 }
 
 class NullTimeMeasurements implements ITimeMeasurements {
-
     public measure(tag: string): void {
         // noop
     }
