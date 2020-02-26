@@ -34,8 +34,7 @@
           {
             "id": "ageSelectPrivacyIcon",
             "type": "icon",
-            "name": "privacy",
-            "isHidden": false
+            "name": "privacy"
           },
           {
             "id": "ageSelectTitle",
@@ -101,8 +100,7 @@
           {
             "id": "consentPrivacyIcon",
             "type": "icon",
-            "name": "privacy",
-            "isHidden": false
+            "name": "privacy"
           },
           {
             "id": "consentTitle",
