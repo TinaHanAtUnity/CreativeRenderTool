@@ -164,6 +164,72 @@ describe('PerPlacementLoadAdapterTest', () => {
             sandbox.restore();
         });
 
+        it('should report no fill on disabled placement', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                placement.setState(PlacementState.DISABLED);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            await perPlacementLoadAdapter.initialize();
+
+            assert.equal(placement.getState(), PlacementState.DISABLED, 'placement state is set to DISABLED');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
+        });
+
+        it('should report no fill on not available placement', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                placement.setState(PlacementState.NOT_AVAILABLE);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            await perPlacementLoadAdapter.initialize();
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
+        });
+
+        it('should report no fill if placement does not exists', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                return Promise.resolve();
+            });
+
+            await perPlacementLoadAdapter.initialize();
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict['does_not_exists'] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
+        });
+
         it('should update state after load', async () => {
             sandbox.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
