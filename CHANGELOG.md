@@ -1,3 +1,7 @@
+# Pending
+
+* Refactor sendErrorEvent in openMeasurement class to use thirdpartyEventManager - [#13328](https://github.com/Applifier/unity-ads-webview/pull/13328)
+
 # Tue Feb 25 22:23:19 UTC 2020
 
 * Open Measurement - Fix Periscope Data [#13358](https://github.com/Applifier/unity-ads-webview/pull/13358)
