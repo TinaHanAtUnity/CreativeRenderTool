@@ -264,8 +264,10 @@
             this.injectVerificationScriptResources = function(verificationScriptResources) {
                 verificationResources = verificationScriptResources;
                 postMessage('verificationResources', verificationScriptResources);
-                setTimeout(function() {
+
+                var startSessionTimer = setTimeout(function() {
                     startAdSession();
+                    clearTimeout(startSessionTimer);
                 }, 500);
             };
 
