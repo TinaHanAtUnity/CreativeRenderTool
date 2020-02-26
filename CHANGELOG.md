@@ -1,6 +1,7 @@
 # Pending
 
 * Refactor sendErrorEvent in openMeasurement class to use thirdpartyEventManager - [#13328](https://github.com/Applifier/unity-ads-webview/pull/13328)
+* Open Measurement - Swap to less modern JavaScript [#13390](https://github.com/Applifier/unity-ads-webview/pull/13390)
 
 # Tue Feb 25 22:23:19 UTC 2020
 
