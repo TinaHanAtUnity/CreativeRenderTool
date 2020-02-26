@@ -46,5 +46,12 @@ describe('ThirdPartyEventManagerTest', () => {
 
             expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&timestamp=2020-02-05T23:42:46.149Z&cachebusting=-1', expect.anything(), expect.anything());
         });
+
+        it('should replace the additional reason code macro correctly', () => {
+            urlTemplate = urlTemplate + '&reason=%5BREASON%5D';
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate, undefined, undefined, {'%5BREASON%5D': '1'});
+
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&reason=1', expect.anything(), expect.anything());
+        });
     });
 });
