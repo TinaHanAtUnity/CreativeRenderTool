@@ -126,7 +126,7 @@
                 customReferenceIdentifier: undefined
             }
 
-            var sessionCallback = () => void 0;
+            var sessionCallback = function() {}
             var sdkVersion;
             var sessionId;
             var videoElement;
@@ -264,6 +264,11 @@
             this.injectVerificationScriptResources = function(verificationScriptResources) {
                 verificationResources = verificationScriptResources;
                 postMessage('verificationResources', verificationScriptResources);
+
+                var startSessionTimer = setTimeout(function() {
+                    startAdSession();
+                    clearTimeout(startSessionTimer);
+                }, 500);
             };
 
             /**
@@ -273,7 +278,7 @@
              */
             this.setVideoElement = function(videoElement) {
                 postMessage(VIDEO_ELEMENT, {
-                    videoElement: `${videoElement}`
+                    videoElement: '' + videoElement
                 });
             };
 
@@ -284,7 +289,7 @@
              */
             this.setSlotElement = function(slotElement) {
                 postMessage(SLOT_ELEMENT, {
-                    slotElement: `${slotElement}`
+                    slotElement: '' + slotElement
                 });
             };
 
@@ -312,7 +317,11 @@
 
                 for (var i = 0; i < verificationResources.length; i++) {
                     var data = JSON.parse(JSON.stringify(eventData));
-                    data.verificationParameters = verificationResources[i].verificationParameters
+
+                    if (verificationResources[i] && verificationResources[i].verificationParameters) {
+                        data.verificationParameters = verificationResources[i].verificationParameters;
+                    }
+
                     sessionCallback(data);                          // needs to be called for session interface
                 }
                 postMessage(AdEventType.SESSION_START, eventData);  // needs to be called for omid3p
@@ -327,7 +336,7 @@
                 }
 
                 sessionCallback(eventData);
-                sessionCallback = () => void 0;
+                sessionCallback = function() {}
             };
 
             this.adEvents = {};
@@ -352,7 +361,6 @@
 
             this.registerAdEvents = function() {
                 adEventsRegistered = true;
-                startAdSession();
             };
 
             // We will support video events until OMID 1.3 is released. Then this will be removed.
