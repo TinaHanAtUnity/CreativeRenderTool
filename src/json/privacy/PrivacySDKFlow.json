@@ -32,6 +32,11 @@
       "components": {
         "body": [
           {
+            "id": "ageSelectPrivacyIcon",
+            "type": "icon",
+            "name": "privacy"
+          },
+          {
             "id": "ageSelectTitle",
             "text": "ageSelect.title",
             "type": "heading",
@@ -92,6 +97,11 @@
     "consent": {
       "components": {
         "body": [
+          {
+            "id": "consentPrivacyIcon",
+            "type": "icon",
+            "name": "privacy"
+          },
           {
             "id": "consentTitle",
             "text": "consent.title",
