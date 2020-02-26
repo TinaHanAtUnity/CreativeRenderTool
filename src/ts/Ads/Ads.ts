@@ -92,6 +92,7 @@ import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { FeatureFlag } from 'Core/Constants/FeatureFlag';
+import { IObserver1 } from 'Core/Utilities/IObserver';
 
 export class Ads implements IAds {
 
@@ -122,6 +123,7 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
+    private _loadObserver: IObserver1<{ [key: string]: number }>;
     private _mediationName: string;
     private _core: ICore;
 
@@ -179,15 +181,22 @@ export class Ads implements IAds {
 
     public initialize(): Promise<void> {
 
+        let promise = Promise.resolve();
+
         if (CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization)) {
             const placementIds = this.Config.getPlacementIds();
-            placementIds.forEach((placementId) => {
-                this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
-                this.Api.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
+            this._loadObserver = this.Api.LoadApi.onLoad.subscribe((loads) => {
+                Object.keys(loads).forEach((loadPlacementId) => {
+                    if (loadPlacementId in placementIds) {
+                        this.Api.Placement.setPlacementState(loadPlacementId, PlacementState.NO_FILL);
+                        this.Api.Listener.sendPlacementStateChangedEvent(loadPlacementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
+                    }
+                });
             });
+            promise = this._core.Api.Sdk.initComplete();
         }
 
-        return Promise.resolve().then(() => {
+        return promise.then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
@@ -282,6 +291,9 @@ export class Ads implements IAds {
             });
 
         }).then(() => {
+            if (this._loadObserver) {
+                this.Api.LoadApi.onLoad.unsubscribe(this._loadObserver);
+            }
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
             return this.logInitializationLatency();
