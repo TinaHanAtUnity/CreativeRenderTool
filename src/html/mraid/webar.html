@@ -387,7 +387,7 @@
 
                     // Now we can call the callbacks as we know that the camera frame is
                     // loaded in the image. This makes the synchronization to be "perfect".
-                    callRafCallbacks(performance.now());
+                    callRafCallbacks((performance && peformance.now) ? performance.now() : Date.now());
 
                     // Now we can advance a frame
                     nativeAdvanceFrame();
@@ -1117,7 +1117,7 @@
          */
 
         window.WebARonARKitSetData = function(data) {
-            WebARonARKitVRDisplay.timestamp_ = performance.now();
+            WebARonARKitVRDisplay.timestamp_ = (performance && performance.now) ? performance.now() : Date.now();
             WebARonARKitVRDisplay.pose_.position[0] = data.position[0];
             WebARonARKitVRDisplay.pose_.position[1] = data.position[1];
             WebARonARKitVRDisplay.pose_.position[2] = data.position[2];
