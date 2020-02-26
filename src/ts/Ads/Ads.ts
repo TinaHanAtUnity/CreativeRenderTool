@@ -186,10 +186,10 @@ export class Ads implements IAds {
         if (CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization)) {
             const placementIds = this.Config.getPlacementIds();
             this._loadObserver = this.Api.LoadApi.onLoad.subscribe((loads) => {
-                Object.keys(loads).forEach((loadPlacementId) => {
-                    if (loadPlacementId in placementIds) {
-                        this.Api.Placement.setPlacementState(loadPlacementId, PlacementState.NO_FILL);
-                        this.Api.Listener.sendPlacementStateChangedEvent(loadPlacementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
+                Object.keys(loads).forEach((placementId) => {
+                    if (placementIds.includes(placementId)) {
+                        this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
+                        this.Api.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
                     }
                 });
             });
