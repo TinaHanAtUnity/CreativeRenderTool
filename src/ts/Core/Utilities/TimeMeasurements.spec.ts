@@ -1,7 +1,7 @@
 import { ITimeMeasurements, createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { InitializationMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-xdescribe('TimeMeasurements', () => {
+describe('TimeMeasurements', () => {
     let performanceNowSpy: jest.SpyInstance;
     let timeMeasurement: ITimeMeasurements;
 
