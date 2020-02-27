@@ -10,15 +10,22 @@ class NullTimeMeasurements implements ITimeMeasurements {
     }
 }
 
+interface IStoredTimeMeasurement {
+    duration: number;
+    allTags: string[];
+}
+
 class TimeMeasurements implements ITimeMeasurements {
     private _startTime: number;
     private _tags: string[];
     private _event: TimingEvent;
+    private _storedTimes: IStoredTimeMeasurement[];
 
     constructor(event: TimingEvent, tags: string[]) {
         this._startTime = performance.now();
         this._tags = tags;
         this._event = event;
+        this._storedTimes = [];
     }
 
     public measure(tag: string): void {
@@ -26,7 +33,22 @@ class TimeMeasurements implements ITimeMeasurements {
         const duration = time - this._startTime;
         const allTags = this._tags.concat([SDKMetrics.createAdsSdkTag('stg', tag)]);
 
-        SDKMetrics.reportTimingEventWithTags(this._event, duration, allTags);
+        if (SDKMetrics.isMetricInstanceInitialized()) {
+            SDKMetrics.reportTimingEventWithTags(this._event, duration, allTags);
+
+            if (this._storedTimes.length > 0) {
+                this._storedTimes.forEach(storedTime => {
+                    SDKMetrics.reportTimingEventWithTags(this._event, storedTime.duration, storedTime.allTags);
+                });
+                this._storedTimes = [];
+            }
+
+        } else {
+            this._storedTimes.push({
+                duration,
+                allTags
+            });
+        }
 
         this._startTime = time;
     }
