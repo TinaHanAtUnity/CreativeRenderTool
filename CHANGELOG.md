@@ -1,3 +1,7 @@
+# Pending
+
+* Move session start to register ad events - Admob OM[#13425](https://github.com/Applifier/unity-ads-webview/pull/13425)
+
 # Thu Feb 27 01:43:09 UTC 2020
 
 * Refactor sendErrorEvent in openMeasurement class to use thirdpartyEventManager - [#13328](https://github.com/Applifier/unity-ads-webview/pull/13328)
