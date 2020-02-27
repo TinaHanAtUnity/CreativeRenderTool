@@ -283,8 +283,6 @@ export class Ads implements IAds {
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
             measurements.measure('init_complete_to_native');
-            return this.logInitializationLatency();
-        }).then(() => {
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
@@ -294,6 +292,19 @@ export class Ads implements IAds {
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         }).then(() => {
             measurements.measure('ads_ready');
+
+            if (performance && performance.now) {
+                const webviewInitTime = performance.now();
+                const tags = [
+                    SDKMetrics.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
+                    SDKMetrics.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
+                ];
+
+                if (this._mediationName) {
+                    tags.push(SDKMetrics.createAdsSdkTag('med', this._mediationName));
+                }
+                SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
+            }
         });
     }
 
@@ -331,21 +342,6 @@ export class Ads implements IAds {
             }).catch();
         }
         return Promise.resolve();
-    }
-
-    private logInitializationLatency(): void {
-        if (performance && performance.now) {
-            const webviewInitTime = performance.now();
-            const tags = [
-                SDKMetrics.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
-                SDKMetrics.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
-            ];
-
-            if (this._mediationName) {
-                tags.push(SDKMetrics.createAdsSdkTag('med', this._mediationName));
-            }
-            SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
-        }
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {

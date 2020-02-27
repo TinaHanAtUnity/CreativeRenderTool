@@ -200,7 +200,7 @@ import { Platform } from 'Core/Constants/Platform';
             expected: {
                 metrics: [
                     {
-                        name: 'webview_initialization_time',
+                        name: 'webview_init',
                         value: 18331,
                         tags: [
                             `ads_sdk2_sdv:${sdkVersion}`,
@@ -270,7 +270,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expected = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 10,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -467,7 +467,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expectedBatch1 = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 999,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -536,7 +536,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expectedBatch1 = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 999,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
