@@ -151,8 +151,13 @@ export class SDKMetrics {
         }
     }
 
+    public static isMetricInstanceInitialized(): boolean {
+        return !!this._metricInstance;
+    }
+
+    // TODO: Refactor kv pair tag generation so this doesn't need to exist
     public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return this._metricInstance.createAdsSdkTag(suffix, tagValue);
+        return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
     public static reportMetricEvent(event: PTSEvent): void {
