@@ -73,7 +73,9 @@ describe('AdmobSessionInterface', () => {
                 }]
             }, '*');
         });
+    });
 
+    describe('register ad events', () => {
         it('should call session start with correct data', () => {
 
             const DATE_TO_USE = new Date('2020');
@@ -92,8 +94,7 @@ describe('AdmobSessionInterface', () => {
             };
 
             window.omidSessionInterface.injectVerificationScriptResources([theData1, theData2]);
-
-            jest.advanceTimersByTime(500);
+            window.omidSessionInterface.registerAdEvents();
 
             expect(postMessageSpy).lastCalledWith({
                 type: 'omid',
@@ -146,7 +147,7 @@ describe('AdmobSessionInterface', () => {
             window.omidSessionInterface.registerSessionObserver(() => void 0);
 
             window.omidSessionInterface.injectVerificationScriptResources([theData1, theData2]);
-            jest.advanceTimersByTime(500);
+            window.omidSessionInterface.registerAdEvents();
 
             expect(postMessageSpy).lastCalledWith({
                 type: 'omid',
