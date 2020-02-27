@@ -2,6 +2,8 @@
 
 * Refactor sendErrorEvent in openMeasurement class to use thirdpartyEventManager - [#13328](https://github.com/Applifier/unity-ads-webview/pull/13328)
 * Open Measurement - Swap to less modern JavaScript [#13390](https://github.com/Applifier/unity-ads-webview/pull/13390)
+* Add Initialization Stages Measurements [#13392](https://github.com/Applifier/unity-ads-webview/pull/13392)
+* Add Time Measurement Utility Class [#13391](https://github.com/Applifier/unity-ads-webview/pull/13391)
 
 # Tue Feb 25 22:23:19 UTC 2020
 
