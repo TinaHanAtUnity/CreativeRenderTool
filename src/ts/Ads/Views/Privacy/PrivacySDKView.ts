@@ -93,7 +93,9 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
             return;
         }
 
-        delete this._iFrame.onerror;
+        // @ts-ignore
+        this._iFrame.onerror = undefined;
+
         this._domContentLoaded = true;
         this._handlers.forEach(handler => handler.onPrivacyReady());
     }
