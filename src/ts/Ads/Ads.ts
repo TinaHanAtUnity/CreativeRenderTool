@@ -178,7 +178,7 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstance(InitializationMetric.WebViewCoreInit);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -334,10 +334,8 @@ export class Ads implements IAds {
     }
 
     private logInitializationLatency(): void {
-        //tslint:disable-next-line
-        const initTimestamp = (<any>window).unityAdsWebviewInitTimestamp;
-        if (initTimestamp && performance && performance.now) {
-            const webviewInitTime = performance.now() - initTimestamp;
+        if (performance && performance.now) {
+            const webviewInitTime = performance.now();
             const tags = [
                 SDKMetrics.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
                 SDKMetrics.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
@@ -347,7 +345,6 @@ export class Ads implements IAds {
                 tags.push(SDKMetrics.createAdsSdkTag('med', this._mediationName));
             }
             SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
-            SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewPageLoading, initTimestamp, tags);
         }
     }
 
