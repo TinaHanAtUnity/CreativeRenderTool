@@ -295,15 +295,7 @@ export class Ads implements IAds {
 
             if (performance && performance.now) {
                 const webviewInitTime = performance.now();
-                const tags = [
-                    SDKMetrics.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
-                    SDKMetrics.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
-                ];
-
-                if (this._mediationName) {
-                    tags.push(SDKMetrics.createAdsSdkTag('med', this._mediationName));
-                }
-                SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
+                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewInitialization, webviewInitTime);
             }
         });
     }
