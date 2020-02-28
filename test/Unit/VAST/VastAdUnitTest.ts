@@ -27,7 +27,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -37,6 +37,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import {VastStaticEndScreen} from 'VAST/Views/VastStaticEndScreen';
 
 describe('VastAdUnitTest', () => {
 
@@ -268,17 +269,10 @@ describe('VastAdUnitTest', () => {
 
     describe('with companion ad', () => {
         let vastEndScreen: VastEndScreen;
-        let vastEndScreenParameters: IVastEndscreenParameters;
 
         beforeEach(() => {
             vastAdUnit.setShowing(true);
             return vastAdUnit.hide().then(() => {
-                vastEndScreenParameters = {
-                    campaign: vastAdUnitParameters.campaign,
-                    clientInfo: vastAdUnitParameters.clientInfo,
-                    country: vastAdUnitParameters.coreConfig.getCountry()
-                };
-
                 const video = new Video('', TestFixtures.getSession());
                 vastCampaign = TestFixtures.getCompanionStaticVastCampaign();
                 sinon.stub(vastCampaign, 'getVideo').returns(video);
@@ -294,7 +288,7 @@ describe('VastAdUnitTest', () => {
                     ads: ads
                 };
                 vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-                vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                 vastAdUnitParameters.campaign = vastCampaign;
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(vastAdUnitParameters);

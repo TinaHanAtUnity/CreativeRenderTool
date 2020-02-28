@@ -31,10 +31,11 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import {VastStaticEndScreen} from 'VAST/Views/VastStaticEndScreen';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastEndScreenEventHandlerTest', () => {
@@ -49,7 +50,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
         let container: AdUnitContainer;
         let request: RequestManager;
         let vastAdUnitParameters: IVastAdUnitParameters;
-        let vastEndScreenParameters: IVastEndscreenParameters;
         let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
 
         beforeEach(() => {
@@ -143,17 +143,11 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 privacySDK: privacySDK,
                 privacy
             };
-
-            vastEndScreenParameters = {
-                campaign: vastAdUnitParameters.campaign,
-                clientInfo: vastAdUnitParameters.clientInfo,
-                country: vastAdUnitParameters.coreConfig.getCountry()
-            };
         });
 
         describe('when calling onClose', () => {
             it('should hide endcard', () => {
-                const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, sinon.createStubInstance(Privacy));
+                const vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 const vastAdUnit = new VastAdUnit(vastAdUnitParameters);
                 sinon.spy(vastAdUnit, 'hide');
@@ -170,7 +164,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
             let vastAdUnit: VastAdUnit;
             let video: Video;
             let campaign: VastCampaign;
-            let vastEndScreen: VastEndScreen;
+            let vastEndScreen: VastStaticEndScreen;
             let vastEndScreenEventHandler: VastEndScreenEventHandler;
             let clickListenerStub: sinon.SinonStub;
 
@@ -182,8 +176,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 vastAdUnitParameters.video = video;
                 vastAdUnitParameters.campaign = campaign;
                 vastAdUnitParameters.placement = TestFixtures.getPlacement();
-                const privacy = sinon.createStubInstance(Privacy);
-                vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(vastAdUnitParameters);
                 vastEndScreenEventHandler = new VastEndScreenEventHandler(vastAdUnit, vastAdUnitParameters);
