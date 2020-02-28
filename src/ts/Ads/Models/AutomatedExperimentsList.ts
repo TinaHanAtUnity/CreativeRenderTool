@@ -29,15 +29,13 @@ export const ButtonExperimentDeclaration: IExperimentDeclaration = {
   }
 };
 
-export const ButtonExperimentDefaultActions: IExperimentActionChoice = {
-  color: ButtonExperimentDeclaration.color.BLUE,
-  animation: ButtonExperimentDeclaration.animation.STATIC
-};
-
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
     name: 'wbvw-endcard-v1',
     actions: ButtonExperimentDeclaration,
-    defaultActions: ButtonExperimentDefaultActions,
+    defaultActions: {
+        color: ButtonExperimentDeclaration.color.BLUE,
+        animation: ButtonExperimentDeclaration.animation.STATIC
+    },
     cacheDisabled: true
 });
 
@@ -58,15 +56,13 @@ export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
     }
 };
 
-const ArAvailableButtonExperimentDefaultActions: IExperimentActionChoice = {
-    color: ArAvailableButtonExperimentDeclaration.color.BLACK,
-    skip: ArAvailableButtonExperimentDeclaration.skip.NO
-};
-
 export const ArAvailableButtonExperiment = new AutomatedExperiment({
     name: 'wbvw-ar-v1',
     actions: ArAvailableButtonExperimentDeclaration,
-    defaultActions: ArAvailableButtonExperimentDefaultActions,
+    defaultActions: {
+        color: ArAvailableButtonExperimentDeclaration.color.BLACK,
+        skip: ArAvailableButtonExperimentDeclaration.skip.NO
+    },
     cacheDisabled: true
 });
 
