@@ -1,3 +1,7 @@
+# Pending
+
+* Update Load Adapter to handle possible timeouts [#13393](https://github.com/Applifier/unity-ads-webview/pull/13393)
+
 # Fri Feb 28 00:53:17 UTC 2020
 
 * Move session start to register ad events - Admob OM[#13425](https://github.com/Applifier/unity-ads-webview/pull/13425)
