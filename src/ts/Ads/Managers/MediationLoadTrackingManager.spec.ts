@@ -192,4 +192,22 @@ describe('MediationLoadTrackingManager', () => {
             expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(0);
         });
     });
+
+    describe('should report mediation initialization', () => {
+        let windowSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            windowSpy = jest.spyOn(performance, 'now');
+            windowSpy.mockReturnValue(0.01);
+            medLoadTrackingManager.setInitComplete();
+        });
+
+        afterEach(() => {
+            windowSpy.mockRestore();
+        });
+
+        it('should report metric event with tags', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+        });
+    });
 });

@@ -200,7 +200,7 @@ import { Platform } from 'Core/Constants/Platform';
             expected: {
                 metrics: [
                     {
-                        name: 'webview_initialization_time',
+                        name: 'webview_init',
                         value: 18331,
                         tags: [
                             `ads_sdk2_sdv:${sdkVersion}`,
@@ -223,7 +223,7 @@ import { Platform } from 'Core/Constants/Platform';
                             `ads_sdk2_sdv:${sdkVersion}`,
                             'ads_sdk2_iso:us',
                             `ads_sdk2_plt:${Platform[platform]}`,
-                            'ads_sdk2_mevt:webview_initialization_time' // Intentional to track which timing metrics are negative
+                            'ads_sdk2_mevt:webview_init' // Intentional to track which timing metrics are negative
                         ]
                     }
                 ]
@@ -270,7 +270,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expected = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 10,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -329,7 +329,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expected = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 999,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -467,7 +467,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expectedBatch1 = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 999,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
@@ -536,7 +536,7 @@ import { Platform } from 'Core/Constants/Platform';
                 const expectedBatch1 = {
                     metrics: [
                         {
-                            name: 'webview_initialization_time',
+                            name: 'webview_init',
                             value: 999,
                             tags: [
                                 `ads_sdk2_sdv:${sdkVersion}`,
