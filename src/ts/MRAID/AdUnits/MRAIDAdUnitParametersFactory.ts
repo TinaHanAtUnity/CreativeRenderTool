@@ -37,11 +37,11 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     private _webPlayerContainer: WebPlayerContainer;
     private _automatedExperimentManager: AutomatedExperimentManager;
 
-    constructor(ar: IARApi, core: ICore, ads: IAds, hasArPlacement = false) {
+    constructor(ar: IARApi, core: ICore, ads: IAds) {
         super(core, ads);
         this._automatedExperimentManager = new AutomatedExperimentManager(core);
 
-        if (hasArPlacement) {
+        if (ARUtil.hasArPlacement(ads)) {
             this._automatedExperimentManager.initialize(ArAutomatedExperimentsList).catch(() => {
                 SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
             });

@@ -6,14 +6,11 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
-import { ARUtil } from 'AR/Utilities/ARUtil';
 
 export class MRAID extends AbstractParserModule {
 
     constructor(ar: IARApi, core: ICore, ads: IAds) {
-        const hasArPlacement = ARUtil.hasArPlacement(ads);
-
-        const paramsFactory = new MRAIDAdUnitParametersFactory(ar, core, ads, hasArPlacement);
+        const paramsFactory = new MRAIDAdUnitParametersFactory(ar, core, ads);
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const factory = new MRAIDAdUnitFactory(paramsFactory);
 
