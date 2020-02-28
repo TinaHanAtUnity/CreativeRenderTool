@@ -25,6 +25,7 @@ export interface IAdsConfiguration {
     defaultPlacement: Placement;
     defaultBannerPlacement: Placement | undefined;
     hidePrivacy: boolean | undefined;
+    hasArPlacement: boolean;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -33,7 +34,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         placements: ['object'],
         defaultPlacement: ['object'],
         defaultBannerPlacement: ['string', 'undefined'],
-        hidePrivacy: ['boolean', 'undefined']
+        hidePrivacy: ['boolean', 'undefined'],
+        hasArPlacement: ['boolean']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -96,6 +98,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public getHidePrivacy(): boolean | undefined {
         return this.get('hidePrivacy');
+    }
+
+    public getHasArPlacement(): boolean {
+        return this.get('hasArPlacement');
     }
 
     public getDTO(): { [key: string]: unknown } {
