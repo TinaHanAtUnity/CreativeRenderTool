@@ -101,8 +101,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
-                    this._automatedExperimentManager.sendReward();
-
                     if (this._arAvailableButton.classList.contains('ar-available-button--collapsed')
                         && this._arUiExperiments.skip === 'false') {
                         this.expandArAvailableButton();
@@ -110,6 +108,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this.hideArAvailableButton();
                         this.showARPermissionPanel();
                         this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
+                        this._automatedExperimentManager.sendReward();
                     }
                 },
                 selector: '.ar-available-button'
