@@ -1,6 +1,7 @@
 # Pending
 
 * Move session start to register ad events - Admob OM[#13425](https://github.com/Applifier/unity-ads-webview/pull/13425)
+* Refine Initialization Metrics Implementation [#13423](https://github.com/Applifier/unity-ads-webview/pull/13423)
 
 # Thu Feb 27 01:43:09 UTC 2020
 
