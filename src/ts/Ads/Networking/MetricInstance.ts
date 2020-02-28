@@ -46,11 +46,16 @@ export class MetricInstance {
         return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
     }
 
-    private createTags(tags: string[]): string[] {
+    private createTags(tags: { [key: string]: string }): string[] {
+        const adsSdkTags: string[] = [];
+        Object.entries(tags).forEach(([key, value]) => {
+            adsSdkTags.push(this.createAdsSdkTag(key, value));
+        });
+
         return [
             this.createAdsSdkTag('sdv', this._clientInfo.getSdkVersionName()),
             this.createAdsSdkTag('iso', this._countryIso),
-            this.createAdsSdkTag('plt', Platform[this._platform])].concat(tags);
+            this.createAdsSdkTag('plt', Platform[this._platform])].concat(adsSdkTags);
     }
 
     private createData(event: PTSEvent, value: number, tags: string[]): IProgrammaticTrackingData {
@@ -102,31 +107,27 @@ export class MetricInstance {
     }
 
     public reportMetricEvent(event: PTSEvent) {
-        this.reportMetricEventWithTags(event, []);
+        this.reportMetricEventWithTags(event, {});
     }
 
-    public reportMetricEventWithTags(event: PTSEvent, tags: string[]) {
+    public reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }) {
         this.batchMetricEvent(event, 1, this.createTags(tags));
     }
 
     public reportTimingEvent(event: TimingEvent, value: number) {
         // Gate Negative Values
         if (value > 0) {
-            this.batchTimingEvent(event, value, this.createTags([]));
+            this.batchTimingEvent(event, value, this.createTags({}));
         } else {
-            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags([
-                this.createAdsSdkTag('mevt', event)
-            ]));
+            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags({ 'mevt': event }));
         }
     }
 
-    public reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]) {
+    public reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }) {
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags(tags));
         } else {
-            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags([
-                this.createAdsSdkTag('mevt', event)
-            ]));
+            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags({ 'mevt': event }));
         }
     }
 
