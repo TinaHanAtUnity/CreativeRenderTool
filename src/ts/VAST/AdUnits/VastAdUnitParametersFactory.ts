@@ -6,8 +6,18 @@ import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastOpenMeasurementFactory } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementFactory';
 import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { IAds } from 'Ads/IAds';
+import { ICore } from 'Core/ICore';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
+    private readonly _webPlayerContainer: WebPlayerContainer;
+    constructor(core: ICore, ads: IAds) {
+        super(core, ads);
+        this._webPlayerContainer = ads.InterstitialWebPlayerContainer;
+    }
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
         let showPrivacyDuringVideo = true;
 
@@ -24,7 +34,9 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             overlay: overlay
         };
 
-        if (baseParams.campaign.hasStaticEndscreen()) {
+        if (baseParams.campaign.hasHtmlEndscreen()) {
+            vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
+        } else if (baseParams.campaign.hasStaticEndscreen()) {
             vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams);
         }
 

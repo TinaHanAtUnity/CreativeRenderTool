@@ -5,6 +5,8 @@ export type AdUnitContainerMock = Base & {
     removeEventHandler: jest.Mock;
     open: jest.Mock;
     close: jest.Mock;
+    reconfigure: jest.Mock;
+    setViewFrame: jest.Mock;
 };
 
 export const AdUnitContainer = jest.fn(() => {
@@ -12,6 +14,8 @@ export const AdUnitContainer = jest.fn(() => {
         addEventHandler: jest.fn(),
         removeEventHandler: jest.fn(),
         open: jest.fn().mockImplementation(() => Promise.resolve()),
-        close: jest.fn().mockImplementation(() => Promise.resolve())
+        close: jest.fn().mockImplementation(() => Promise.resolve()),
+        reconfigure: jest.fn().mockImplementation(() => Promise.resolve()),
+        setViewFrame: jest.fn().mockImplementation(() => Promise.resolve())
     };
 });
