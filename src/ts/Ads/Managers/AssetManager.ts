@@ -92,7 +92,7 @@ export class AssetManager {
 
         const measurement = createMeasurementsInstance(CacheMetric.CacheLatency, [
             SDKMetrics.createAdsSdkTag('cmd', CacheMode[this._cacheMode]),
-            SDKMetrics.createAdsSdkTag('cmp', campaign.getContentType())
+            SDKMetrics.createAdsSdkTag('cct', campaign.getContentType())
         ]);
 
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
