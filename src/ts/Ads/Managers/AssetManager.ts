@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ErrorMetric, SDKMetrics, CachingMetric } from 'Ads/Utilities/SDKMetrics';
+import { ErrorMetric, SDKMetrics, CachingMetric, CacheMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 enum CacheType {
     REQUIRED,
@@ -89,14 +90,27 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
+        const measurement = createMeasurementsInstance(CacheMetric.CacheLatency, [
+            SDKMetrics.createAdsSdkTag('cmd', CacheMode[this._cacheMode]),
+            SDKMetrics.createAdsSdkTag('cmp', campaign.getContentType())
+        ]);
+
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
+            measurement.measure('select_assets');
             const requiredChain = this.cache(requiredAssets, campaign, CacheType.REQUIRED).then(() => {
-                return this.validateVideos(requiredAssets, campaign);
+                measurement.measure('required_assets');
+                return this.validateVideos(requiredAssets, campaign).then(() => {
+                    measurement.measure('validate_videos');
+                });
+            });
+
+            const optionalChain = this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
+                measurement.measure('optional_assets');
             });
 
             if (this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                    optionalChain.catch(() => {
                         // allow optional assets to fail caching when in CacheMode.FORCED
                     });
                     return campaign;
@@ -104,7 +118,7 @@ export class AssetManager {
             } else if (this._cacheMode === CacheMode.ADAPTIVE) {
                 if (this._fastConnectionDetected) {
                     // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
-                    requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                    requiredChain.then(() => optionalChain).catch(() => {
                         // allow optional assets to fail
                     });
                     return Promise.resolve(campaign);
@@ -125,8 +139,8 @@ export class AssetManager {
                             delete this._campaignQueue[id];
                         }
 
-                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
-                            // allow optional assets to fail caching when in CacheMode.FORCED
+                        optionalChain.catch(() => {
+                            // allow optional assets to fail
                         });
                         return campaign;
                     }).catch(error => {
@@ -145,7 +159,7 @@ export class AssetManager {
                     return promise;
                 }
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                requiredChain.then(() =>  optionalChain).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
                 });
             }

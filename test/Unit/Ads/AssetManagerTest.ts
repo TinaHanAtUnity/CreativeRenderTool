@@ -105,7 +105,7 @@ describe('AssetManagerTest', () => {
         const campaign = new TestCampaign([], [asset]);
         const spy = sinon.spy(cache, 'cache');
         return assetManager.setup(campaign).then(() => {
-            return new Promise((resolve, reject) => { setTimeout(resolve, 300); }).then(() => {
+            return new Promise((resolve, reject) => { setTimeout(resolve, 15); }).then(() => {
                 assert(spy.called, 'Cache was not called for optional asset');
                 assert(asset.isCached(), 'Asset was not cached');
             });
