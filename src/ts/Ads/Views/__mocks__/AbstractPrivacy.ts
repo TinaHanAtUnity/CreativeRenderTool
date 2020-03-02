@@ -1,5 +1,5 @@
 import { AbstractPrivacy as Base } from 'Ads/Views/AbstractPrivacy';
-import {AdUnitContainer} from 'Ads/AdUnits/Containers/__mocks__/AdUnitContainer';
+import { AdUnitContainer } from 'Ads/AdUnits/Containers/__mocks__/AdUnitContainer';
 
 export type AbstractPrivacyMock = Base & {
     addEventHandler: jest.Mock;
