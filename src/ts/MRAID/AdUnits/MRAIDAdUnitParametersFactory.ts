@@ -41,7 +41,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         super(core, ads);
         this._automatedExperimentManager = new AutomatedExperimentManager(core);
 
-        if (ARUtil.hasArPlacement(ads)) {
+        if (ads.Config.getHasArPlacement()) {
             this._automatedExperimentManager.initialize(ArAutomatedExperimentsList).catch(() => {
                 SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
             });

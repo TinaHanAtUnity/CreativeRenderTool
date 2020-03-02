@@ -170,15 +170,4 @@ export class ARUtil {
             });
         });
     }
-
-    public static hasArPlacement(ads: IAds) {
-        return Object.values(ads.Config.getPlacements() || {})
-            .some(placement => {
-                    return (placement.getAdTypes() || [])
-                        .some(adType => {
-                            return adType === 'MRAID_AR';
-                        });
-                }
-            );
-    }
 }
