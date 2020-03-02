@@ -52,6 +52,34 @@ describe('omid3p', () => {
         });
     });
 
+    describe('session finish', () => {
+        beforeEach(() => {
+            eval(omid3p);
+        });
+
+        it('should call session finish with missing data', () => {
+            const sessionEvent = {
+                adSessionId: '1',
+                timestamp: 1,
+                type: 'sessionFinish',
+                data: {}
+            };
+
+            const messageEvent = {
+                data: sessionEvent
+            };
+
+            const observer = jest.fn();
+            window.omid3p.registerSessionObserver(observer, 'beforekey');
+            window.omid3p.get('handleSessionEvents')(messageEvent);
+            expect(observer).toHaveBeenCalledWith({
+                adSessionId: '1',
+                timestamp: 1,
+                type: 'sessionFinish'
+            });
+        });
+    });
+
     describe('session start', () => {
         beforeEach(() => {
             eval(omid3p);

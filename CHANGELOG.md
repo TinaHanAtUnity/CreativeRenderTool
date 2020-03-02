@@ -1,3 +1,19 @@
+# Fri Feb 28 21:27:49 UTC 2020
+
+* Update Load Adapter to handle possible timeouts [#13393](https://github.com/Applifier/unity-ads-webview/pull/13393)
+
+# Fri Feb 28 00:53:17 UTC 2020
+
+* Move session start to register ad events - Admob OM[#13425](https://github.com/Applifier/unity-ads-webview/pull/13425)
+* Refine Initialization Metrics Implementation [#13423](https://github.com/Applifier/unity-ads-webview/pull/13423)
+
+# Thu Feb 27 01:43:09 UTC 2020
+
+* Refactor sendErrorEvent in openMeasurement class to use thirdpartyEventManager - [#13328](https://github.com/Applifier/unity-ads-webview/pull/13328)
+* Open Measurement - Swap to less modern JavaScript [#13390](https://github.com/Applifier/unity-ads-webview/pull/13390)
+* Add Initialization Stages Measurements [#13392](https://github.com/Applifier/unity-ads-webview/pull/13392)
+* Add Time Measurement Utility Class [#13391](https://github.com/Applifier/unity-ads-webview/pull/13391)
+
 # Tue Feb 25 22:23:19 UTC 2020
 
 * Open Measurement - Fix Periscope Data [#13358](https://github.com/Applifier/unity-ads-webview/pull/13358)

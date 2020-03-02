@@ -12,7 +12,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VerificationReasonCode, VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
@@ -24,6 +23,7 @@ import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { Campaign } from 'Ads/Models/Campaign';
+import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -87,7 +87,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _clientInfo: ClientInfo;
     private _campaign: T;
     private _omBridge: OMIDEventBridge;
-    private _request: RequestManager;
     private _omAdSessionId: string;
 
     private _vendorKey: string;
@@ -101,11 +100,12 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _adVerification: VastAdVerification;
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
     private _verificationResource: IVerificationScriptResource;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo,  thirdPartyEventManager: ThirdPartyEventManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -115,6 +115,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         this._core = core;
         this._clientInfo = clientInfo;
         this._campaign = campaign;
+        this._thirdPartyEventManager = thirdPartyEventManager;
 
         // TODO: Make vendor key non-optional
         if (vendorKey) {
@@ -123,7 +124,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
         this._placement = placement;
         this._deviceInfo = deviceInfo;
-        this._request = request;
 
         if (vastAdVerification) {
             this._adVerification = vastAdVerification;
@@ -473,9 +473,9 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     }
 
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
-        const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
+        const adVerificationErrorURL = this._adVerification.getVerificationTrackingEvent();
         if (adVerificationErrorURL) {
-            this._request.get(adVerificationErrorURL);
+            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL, undefined, undefined, {'%5BREASON%5D': reasonCode.toString()});
         }
     }
 

@@ -29,6 +29,11 @@ export class MediationLoadTrackingManager {
     public setInitComplete(): void {
         this._initialAdRequest = false;
         this._initCompleteTime = this.getTime();
+
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.InitializationComplete, this._initCompleteTime, [
+            SDKMetrics.createAdsSdkTag('med', this._mediationName),
+            SDKMetrics.createAdsSdkTag('wel', `${this._webviewEnabledLoad}`)
+        ]);
     }
 
     public reportPlacementCount(placementCount: number) {

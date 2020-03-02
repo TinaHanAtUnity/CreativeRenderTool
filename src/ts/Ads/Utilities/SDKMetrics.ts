@@ -106,8 +106,9 @@ export enum OMMetric {
 }
 
 export enum InitializationMetric {
-    WebviewInitialization = 'webview_initialization_time',
-    WebviewPageLoading = 'webview_page_loading_time'
+    WebviewInitialization = 'webview_init',
+    WebviewInitializationPhases = 'webview_init_phases',
+    WebviewLoad = 'webview_load'
 }
 
 export enum MraidMetric {
@@ -125,6 +126,7 @@ export enum AUIMetric {
 }
 
 export enum MediationMetric {
+    InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
@@ -149,8 +151,13 @@ export class SDKMetrics {
         }
     }
 
+    public static isMetricInstanceInitialized(): boolean {
+        return !!this._metricInstance;
+    }
+
+    // TODO: Refactor kv pair tag generation so this doesn't need to exist
     public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return this._metricInstance.createAdsSdkTag(suffix, tagValue);
+        return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
     public static reportMetricEvent(event: PTSEvent): void {
