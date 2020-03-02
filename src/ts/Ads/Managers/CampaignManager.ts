@@ -684,10 +684,8 @@ export class CampaignManager {
         return parser.parse(response, session).catch((error) => {
             if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
-                return parser.parse(response, session).then((campaign) => {
-                    measurement.measure('vpaid_parsed_vast_complete');
-                    return campaign;
-                });
+                measurement.measure('vpaid_identified_as_vast');
+                return parser.parse(response, session);
             } else {
                 throw error;
             }
