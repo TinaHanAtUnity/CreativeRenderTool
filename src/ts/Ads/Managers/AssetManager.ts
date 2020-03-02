@@ -106,21 +106,18 @@ export class AssetManager {
 
             const optionalChain = this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
                 measurement.measure('optional_assets');
+            }).catch(() => {
+                // Allow optional assets to fail
             });
 
             if (this._cacheMode === CacheMode.FORCED) {
-                return requiredChain.then(() => {
-                    optionalChain.catch(() => {
-                        // allow optional assets to fail caching when in CacheMode.FORCED
-                    });
+                return requiredChain.then(() =>  optionalChain).then(() => {
                     return campaign;
                 });
             } else if (this._cacheMode === CacheMode.ADAPTIVE) {
                 if (this._fastConnectionDetected) {
                     // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
-                    requiredChain.then(() => optionalChain).catch(() => {
-                        // allow optional assets to fail
-                    });
+                    requiredChain.then(() => optionalChain);
                     return Promise.resolve(campaign);
                 } else {
                     const id: number = this._queueId;
@@ -139,9 +136,7 @@ export class AssetManager {
                             delete this._campaignQueue[id];
                         }
 
-                        optionalChain.catch(() => {
-                            // allow optional assets to fail
-                        });
+                        optionalChain.then();
                         return campaign;
                     }).catch(error => {
                         const campaignObject = this._campaignQueue[id];
@@ -159,9 +154,7 @@ export class AssetManager {
                     return promise;
                 }
             } else {
-                requiredChain.then(() =>  optionalChain).catch(() => {
-                    // allow optional assets to fail caching when not in CacheMode.FORCED
-                });
+                requiredChain.then(() =>  optionalChain);
             }
 
             return Promise.resolve(campaign);
