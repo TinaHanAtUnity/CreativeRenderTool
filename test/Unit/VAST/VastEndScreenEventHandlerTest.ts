@@ -35,7 +35,7 @@ import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import {VastStaticEndScreen} from 'VAST/Views/VastStaticEndScreen';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastEndScreenEventHandlerTest', () => {

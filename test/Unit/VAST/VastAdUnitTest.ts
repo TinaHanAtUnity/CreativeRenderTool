@@ -37,7 +37,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import {VastStaticEndScreen} from 'VAST/Views/VastStaticEndScreen';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 describe('VastAdUnitTest', () => {
 
