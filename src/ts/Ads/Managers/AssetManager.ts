@@ -104,20 +104,23 @@ export class AssetManager {
                 });
             });
 
-            const optionalChain = this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
-                measurement.measure('optional_assets');
-            }).catch(() => {
-                // Allow optional assets to fail
-            });
-
             if (this._cacheMode === CacheMode.FORCED) {
-                return requiredChain.then(() =>  optionalChain).then(() => {
+                return requiredChain.then(() => {
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
+                        measurement.measure('optional_assets');
+                    }).catch(() => {
+                        // allow optional assets to fail caching when in CacheMode.FORCED
+                    });
                     return campaign;
                 });
             } else if (this._cacheMode === CacheMode.ADAPTIVE) {
                 if (this._fastConnectionDetected) {
                     // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
-                    requiredChain.then(() => optionalChain);
+                    requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
+                        measurement.measure('optional_assets');
+                    }).catch(() => {
+                        // allow optional assets to fail
+                    });
                     return Promise.resolve(campaign);
                 } else {
                     const id: number = this._queueId;
@@ -136,7 +139,11 @@ export class AssetManager {
                             delete this._campaignQueue[id];
                         }
 
-                        optionalChain.then();
+                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
+                            measurement.measure('optional_assets');
+                        }).catch(() => {
+                            // allow optional assets to fail caching when in CacheMode.FORCED
+                        });
                         return campaign;
                     }).catch(error => {
                         const campaignObject = this._campaignQueue[id];
@@ -154,7 +161,11 @@ export class AssetManager {
                     return promise;
                 }
             } else {
-                requiredChain.then(() =>  optionalChain);
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
+                    measurement.measure('optional_assets');
+                }).catch(() => {
+                    // allow optional assets to fail caching when not in CacheMode.FORCED
+                });
             }
 
             return Promise.resolve(campaign);
