@@ -125,6 +125,10 @@ export enum AUIMetric {
     DecisionNotReady = 'decision_not_ready'
 }
 
+export enum GeneralTimingMetric {
+    CampaignParsing = 'campaign_parsing'
+}
+
 export enum MediationMetric {
     InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
@@ -137,7 +141,7 @@ export enum MediationMetric {
     AdCaching = 'ad_caching_time'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
