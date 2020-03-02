@@ -14,8 +14,8 @@ import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
@@ -26,6 +26,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
         let core: ICoreApi;
         let backend: Backend;
         let nativeBridge: NativeBridge;
+        let thirdPartyEventManager: ThirdPartyEventManager;
 
         const initOMManager = (om: OpenMeasurement<VastCampaign>[]) => {
             placement = TestFixtures.getPlacement();
@@ -33,6 +34,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
+            thirdPartyEventManager = sandbox.createStubInstance(ThirdPartyEventManager);
 
             if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
@@ -92,9 +94,8 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
                 const parsedVast = vastParser.parseVast(vastXml);
                 const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
                 const campaign = new VastCampaign(params);
-                const request = sinon.createStubInstance(RequestManager);
-                openMeasurement1 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton1.getVerificationVendor(), vastAdVerificton1);
-                openMeasurement2 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, request, vastAdVerificton2.getVerificationVendor(), vastAdVerificton2);
+                openMeasurement1 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, thirdPartyEventManager, vastAdVerificton1.getVerificationVendor(), vastAdVerificton1);
+                openMeasurement2 = new OpenMeasurement(platform, core, clientInfo, campaign, placement, deviceInfo, thirdPartyEventManager, vastAdVerificton2.getVerificationVendor(), vastAdVerificton2);
                 sinon.stub(Date, 'now').returns(123);
                 sinon.stub(openMeasurement1, 'getOMAdSessionId').returns('456');
                 sinon.stub(openMeasurement2, 'getOMAdSessionId').returns('456');
