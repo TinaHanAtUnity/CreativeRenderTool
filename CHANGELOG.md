@@ -1,3 +1,7 @@
+# Pending
+
+* Track Campaign Caching Latency [#13479](https://github.com/Applifier/unity-ads-webview/pull/13479)
+
 # Fri Feb 28 21:27:49 UTC 2020
 
 * Update Load Adapter to handle possible timeouts [#13393](https://github.com/Applifier/unity-ads-webview/pull/13393)
