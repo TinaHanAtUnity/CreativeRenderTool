@@ -90,10 +90,10 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
-        const measurement = createMeasurementsInstance(CacheMetric.CacheLatency, [
-            SDKMetrics.createAdsSdkTag('cmd', CacheMode[this._cacheMode]),
-            SDKMetrics.createAdsSdkTag('cct', campaign.getContentType())
-        ]);
+        const measurement = createMeasurementsInstance(CacheMetric.CacheLatency, {
+            'cmd': CacheMode[this._cacheMode],
+            'cct': campaign.getContentType()
+        });
 
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
             measurement.measure('select_assets');

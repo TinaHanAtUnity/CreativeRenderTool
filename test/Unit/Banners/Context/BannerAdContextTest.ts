@@ -49,7 +49,6 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             sandbox.stub(SDKMetrics, 'reportMetricEvent');
             sandbox.stub(SDKMetrics, 'reportMetricEventWithTags');
             sandbox.stub(SDKMetrics, 'sendBatchedEvents');
-            sandbox.stub(SDKMetrics, 'createAdsSdkTag').withArgs('bls', BannerLoadState[BannerLoadState.Unloaded]).returns('ads_sdk2_bls:Unloaded');
         });
 
         afterEach(() => {
@@ -87,7 +86,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             it('should report banner load', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', { 'bls': 'Unloaded' });
             });
 
             it('should report banner ad request', () => {
@@ -131,7 +130,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             it('should report banner load', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', { 'bls': 'Unloaded' });
             });
 
             it('should call sendErrorEvent with web view error', () => {
@@ -150,7 +149,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             it('should report banner load', () => {
-                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', ['ads_sdk2_bls:Unloaded']);
+                sandbox.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 'banner_ad_load', { 'bls': 'Unloaded' });
             });
 
             it('should call sendErrorEvent with no fill', () => {
