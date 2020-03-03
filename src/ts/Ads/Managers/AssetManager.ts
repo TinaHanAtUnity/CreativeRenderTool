@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ErrorMetric, SDKMetrics, CachingMetric, CacheMetric } from 'Ads/Utilities/SDKMetrics';
+import { ErrorMetric, SDKMetrics, CachingMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -86,7 +86,7 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
-        const measurement = createMeasurementsInstance(CacheMetric.CacheLatency, {
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.CacheLatency, {
             'cmd': CacheMode[this._cacheMode],
             'cct': campaign.getContentType()
         });
