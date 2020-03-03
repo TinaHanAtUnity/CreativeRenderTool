@@ -216,6 +216,7 @@ export class Core implements ICore {
                 SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             }
 
+            // tslint:disable-next-line:no-any
             const nativeInitTime = (<number>(<any>window).initTimestamp) - this.ClientInfo.getInitTimestamp();
 
             if (nativeInitTime > 0 && nativeInitTime <= 30000) {
