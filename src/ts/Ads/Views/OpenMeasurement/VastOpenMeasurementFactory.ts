@@ -70,7 +70,7 @@ export class VastOpenMeasurementFactory {
     private getOMInstances(adVerifications: VastAdVerification[], omAdViewBuilder: OpenMeasurementAdViewBuilder, core: ICoreApi, thirdPartyEventManager: ThirdPartyEventManager): OpenMeasurement<VastCampaign>[] {
         const omInstances: OpenMeasurement<VastCampaign>[] = [];
         adVerifications.forEach((adverification) => {
-            if (CustomFeatures.isIASVendor(adverification.getVerificationVendor()) && adverification.getVerficationResources()[0].getApiFramework() === 'omid') {
+            if (adverification.getVerficationResources()[0].getApiFramework() === 'omid') {
                 const om = new OpenMeasurement<VastCampaign>(this.platform, core, this.clientInfo, this.campaign, this.placement, this.deviceInfo, thirdPartyEventManager, adverification.getVerificationVendor(), adverification);
                 om.setOMAdViewBuilder(omAdViewBuilder);
                 omInstances.push(om);
