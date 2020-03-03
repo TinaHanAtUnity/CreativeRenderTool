@@ -49,7 +49,13 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._iFrame = <HTMLIFrameElement> this._container.querySelector('#privacy-iframe');
         this._iFrameAdapterContainer = new PrivacyAdapterContainer(this);
         this._frameEventAdapter = new PrivacyFrameEventAdapter(this._coreApi, this._iFrameAdapterContainer, this._iFrame);
-        this._iFrameAdapterContainer.connect(this._frameEventAdapter);
+
+        try {
+            this._iFrameAdapterContainer.connect(this._frameEventAdapter);
+        } catch (e) {
+            this._handlers.forEach(handler => handler.onPrivacyViewError(e.message));
+            return;
+        }
 
         this._iFrame.onerror = (event) => {
             this._handlers.forEach(handler => handler.onPrivacyViewError(event));
@@ -93,8 +99,9 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
             return;
         }
 
-        // @ts-ignore
-        this._iFrame.onerror = undefined;
+        this._iFrame.onerror = () => {
+            return;
+        };
 
         this._domContentLoaded = true;
         this._handlers.forEach(handler => handler.onPrivacyReady());
