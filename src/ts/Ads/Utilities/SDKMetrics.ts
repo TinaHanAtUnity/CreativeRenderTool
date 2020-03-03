@@ -126,6 +126,7 @@ export enum AUIMetric {
 }
 
 export enum GeneralTimingMetric {
+    AuctionRequest = 'auction_request',
     CampaignParsing = 'campaign_parsing',
     CacheLatency = 'cache_latency'
 }
