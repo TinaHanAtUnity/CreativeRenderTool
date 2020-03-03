@@ -132,6 +132,7 @@ export class UserPrivacyManager {
             case AgeGateChoice.NO:
             case AgeGateChoice.MISSING:
                 agreedOverAgeLimit = false;
+                break;
             default:
                 agreedOverAgeLimit = false;
         }
