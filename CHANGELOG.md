@@ -1,3 +1,7 @@
+# Pending
+
+* Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)
+
 # Tue Mar  3 21:09:42 UTC 2020
 
 * Remove Admob Video Caching [#13510](https://github.com/Applifier/unity-ads-webview/pull/13510)
