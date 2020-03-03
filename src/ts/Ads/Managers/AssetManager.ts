@@ -75,10 +75,6 @@ export class AssetManager {
         this._optionalQueue = [];
         this._campaignQueue = {};
         this._queueId = 0;
-
-        if (cacheMode === CacheMode.ADAPTIVE) {
-            this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
-        }
     }
 
     public setCacheDiagnostics(value: boolean) {
@@ -113,53 +109,6 @@ export class AssetManager {
                     });
                     return campaign;
                 });
-            } else if (this._cacheMode === CacheMode.ADAPTIVE) {
-                if (this._fastConnectionDetected) {
-                    // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
-                    requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
-                        measurement.measure('optional_assets');
-                    }).catch(() => {
-                        // allow optional assets to fail
-                    });
-                    return Promise.resolve(campaign);
-                } else {
-                    const id: number = this._queueId;
-                    const promise = this.registerCampaign(campaign, id);
-                    this._queueId++;
-
-                    requiredChain.then(() => {
-                        const campaignObject = this._campaignQueue[id];
-
-                        if (campaignObject) {
-                            if (!campaignObject.resolved) {
-                                campaignObject.resolved = true;
-                                campaignObject.resolve(campaign);
-                            }
-
-                            delete this._campaignQueue[id];
-                        }
-
-                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
-                            measurement.measure('optional_assets');
-                        }).catch(() => {
-                            // allow optional assets to fail caching when in CacheMode.FORCED
-                        });
-                        return campaign;
-                    }).catch(error => {
-                        const campaignObject = this._campaignQueue[id];
-
-                        if (campaignObject) {
-                            if (!campaignObject.resolved) {
-                                campaignObject.resolved = true;
-                                campaignObject.reject(error);
-                            }
-
-                            delete this._campaignQueue[id];
-                        }
-                    });
-
-                    return promise;
-                }
             } else {
                 requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
                     measurement.measure('optional_assets');
@@ -346,20 +295,6 @@ export class AssetManager {
 
             throw new WebViewError('Unable to select oriented video for caching');
         });
-    }
-
-    private onFastConnectionDetected(): void {
-        this._fastConnectionDetected = true;
-
-        for (const id in this._campaignQueue) {
-            if (this._campaignQueue.hasOwnProperty(id)) {
-                const campaignObject = this._campaignQueue[id];
-                if (!campaignObject.resolved) {
-                    campaignObject.resolved = true;
-                    campaignObject.resolve(campaignObject.campaign);
-                }
-            }
-        }
     }
 
     private registerCampaign(campaign: Campaign, id: number): Promise<Campaign> {

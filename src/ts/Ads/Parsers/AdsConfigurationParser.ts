@@ -57,8 +57,6 @@ export class AdsConfigurationParser {
                 return CacheMode.ALLOWED;
             case 'disabled':
                 return CacheMode.DISABLED;
-            case 'adaptive':
-                return CacheMode.ADAPTIVE;
             default:
                 throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }
