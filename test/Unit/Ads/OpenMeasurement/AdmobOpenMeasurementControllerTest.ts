@@ -49,7 +49,6 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
             sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
             sinon.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
-            sinon.stub(SDKMetrics, 'createAdsSdkTag').returns('');
 
             return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
@@ -216,7 +215,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                     verificationParameters: 'scootage'
                 };
 
-                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scoot');
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scoot');
                 sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
 
                 omManager.setupOMInstance(openMeasurement0, verificationResource0);
@@ -243,8 +242,8 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                     verificationParameters: 'scootage1'
                 };
 
-                const openMeasurement0 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage');
-                const openMeasurement1 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage1');
+                const openMeasurement0 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage');
+                const openMeasurement1 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage1');
                 sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
                 sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
 
@@ -271,8 +270,8 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                     verificationParameters: 'scootage1'
                 };
 
-                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage');
-                const openMeasurement1 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'scootage1');
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage');
+                const openMeasurement1 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage1');
                 sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
                 sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
 

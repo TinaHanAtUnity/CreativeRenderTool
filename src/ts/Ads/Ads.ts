@@ -91,6 +91,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 export class Ads implements IAds {
 
@@ -177,12 +178,14 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
         }).then(() => {
+            measurements.measure('setup_environment');
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
@@ -196,14 +199,18 @@ export class Ads implements IAds {
 
             PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
+            measurements.measure('privacy_init');
             return this.setupLoadApiEnabled();
         }).then(() => {
+            measurements.measure('load_api_setup');
             return this.setupMediationTrackingManager();
         }).then(() => {
+            measurements.measure('mediation_tracking_init');
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing since it's normal to have undefined developer consent
             });
         }).then(() => {
+            measurements.measure('consent_update');
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
@@ -272,17 +279,24 @@ export class Ads implements IAds {
             });
 
         }).then(() => {
+            measurements.measure('managers_init');
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
-            return this.logInitializationLatency();
+            measurements.measure('init_complete_to_native');
+            if (this.MediationLoadTrackingManager) {
+                this.MediationLoadTrackingManager.setInitComplete();
+            }
+            return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
-            return Promises.voidResult(this.RefreshManager.initialize().then(() => {
-                if (this.MediationLoadTrackingManager) {
-                    this.MediationLoadTrackingManager.setInitComplete();
-                }
-            }));
-        }).then(() => {
+            measurements.measure('request_on_init');
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
+        }).then(() => {
+            measurements.measure('ads_ready');
+
+            if (performance && performance.now) {
+                const webviewInitTime = performance.now();
+                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewInitialization, webviewInitTime);
+            }
         });
     }
 
@@ -320,24 +334,6 @@ export class Ads implements IAds {
             }).catch();
         }
         return Promise.resolve();
-    }
-
-    private logInitializationLatency(): void {
-        //tslint:disable-next-line
-        const initTimestamp = (<any>window).unityAdsWebviewInitTimestamp;
-        if (initTimestamp && performance && performance.now) {
-            const webviewInitTime = performance.now() - initTimestamp;
-            const tags = [
-                SDKMetrics.createAdsSdkTag('wel', `${this._webViewEnabledLoad}`),
-                SDKMetrics.createAdsSdkTag('lae', `${this._loadApiEnabled}`)
-            ];
-
-            if (this._mediationName) {
-                tags.push(SDKMetrics.createAdsSdkTag('med', this._mediationName));
-            }
-            SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, tags);
-            SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewPageLoading, initTimestamp, tags);
-        }
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {

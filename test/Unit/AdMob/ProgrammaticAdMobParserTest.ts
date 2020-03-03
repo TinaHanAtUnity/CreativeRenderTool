@@ -16,7 +16,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ProgrammaticAdMobParser', () => {
@@ -176,37 +175,27 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
                     assert.deepEqual(campaign.getTrackingUrls(), json.trackingUrls, 'Tracking URLs are not equal');
                 };
 
-                describe('on Android', () => {
+                describe(`on ${Platform[platform]}`, () => {
                     beforeEach(() => {
-                        sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+                        sinon.stub(nativeBridge, 'getPlatform').returns(platform);
                         setFileIdSpy.resetHistory();
                         return parse(ValidAdMobCampaign);
                     });
 
                     it('should have a video cached from the AdMob ad', () => {
+                        const assets = campaign.getRequiredAssets();
+                        assert.lengthOf(assets, 0, 'Campaign should not have required assets');
+                    });
+
+                    it('should have a video cached from the AdMob ad', () => {
                         const assets = campaign.getOptionalAssets();
-                        assert.lengthOf(assets, 1, 'Video is not contained within campaign');
+                        assert.lengthOf(assets, 0, 'Campaign should not have optional assets');
                     });
 
                     it('should have valid data', validateCampaign);
 
                 });
 
-                describe('on iOS', () => {
-                    beforeEach(() => {
-                        sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-                        setFileIdSpy.resetHistory();
-                        return parse(ValidAdMobCampaign);
-                    });
-
-                    it('should have a video cached from the AdMobAd', () => {
-                        const assets = campaign.getOptionalAssets();
-                        assert.lengthOf(assets, 1, 'Video is not contained within campaign');
-                    });
-
-                    it('should have valid data', validateCampaign);
-
-                });
             });
         });
     });

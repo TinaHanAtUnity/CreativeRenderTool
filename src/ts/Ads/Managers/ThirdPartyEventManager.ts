@@ -102,11 +102,11 @@ export class ThirdPartyEventManager {
         return this.sendEvent(ThirdPartyEventMethod.POST, event, sessionId, url, body, useWebViewUserAgentForTracking, headers);
     }
 
-    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
-        return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers);
+    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][], additionalMacros?: {[id: string]: string}): Promise<INativeResponse> {
+        return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers, additionalMacros);
     }
 
-    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
+    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][], additionalMacros?: {[id: string]: string}): Promise<INativeResponse> {
         headers = headers || [];
         if (!RequestManager.getHeader(headers, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
@@ -114,7 +114,7 @@ export class ThirdPartyEventManager {
             }
         }
 
-        url = this.replaceTemplateValuesAndEncodeUrl(url);
+        url = this.replaceTemplateValuesAndEncodeUrl(url, additionalMacros);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
@@ -173,13 +173,15 @@ export class ThirdPartyEventManager {
         this._templateValues[key] = value;
     }
 
-    private replaceTemplateValuesAndEncodeUrl(url: string): string {
+    private replaceTemplateValuesAndEncodeUrl(url: string, additionalMacros?: {[id: string]: string}): string {
         if (url) {
-            for (const key in this._templateValues) {
-                if (this._templateValues.hasOwnProperty(key)) {
-                    url = url.replace(key, this._templateValues[key]);
-                }
+
+            url = MacroUtil.replaceMacro(url, this._templateValues);
+
+            if (additionalMacros) {
+                url = MacroUtil.replaceMacro(url, additionalMacros);
             }
+
             url = MacroUtil.replaceMacro(url, {'[TIMESTAMP]': (new Date()).toISOString()});
         }
 

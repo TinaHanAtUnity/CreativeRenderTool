@@ -106,8 +106,9 @@ export enum OMMetric {
 }
 
 export enum InitializationMetric {
-    WebviewInitialization = 'webview_initialization_time',
-    WebviewPageLoading = 'webview_page_loading_time'
+    WebviewInitialization = 'webview_init',
+    WebviewInitializationPhases = 'webview_init_phases',
+    WebviewLoad = 'webview_load'
 }
 
 export enum MraidMetric {
@@ -125,6 +126,7 @@ export enum AUIMetric {
 }
 
 export enum MediationMetric {
+    InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
@@ -135,7 +137,11 @@ export enum MediationMetric {
     AdCaching = 'ad_caching_time'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric;
+export enum CacheMetric {
+    CacheLatency = 'cache_latency'
+}
+
+export type TimingEvent = InitializationMetric | MediationMetric | CacheMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
@@ -149,15 +155,15 @@ export class SDKMetrics {
         }
     }
 
-    public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return this._metricInstance.createAdsSdkTag(suffix, tagValue);
+    public static isMetricInstanceInitialized(): boolean {
+        return !!this._metricInstance;
     }
 
     public static reportMetricEvent(event: PTSEvent): void {
-        this._metricInstance.reportMetricEventWithTags(event, []);
+        this._metricInstance.reportMetricEventWithTags(event, {});
     }
 
-    public static reportMetricEventWithTags(event: PTSEvent, tags: string[]): void {
+    public static reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }): void {
         this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
@@ -165,7 +171,7 @@ export class SDKMetrics {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
-    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
+    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }): void {
         this._metricInstance.reportTimingEventWithTags(event, value, tags);
     }
 
