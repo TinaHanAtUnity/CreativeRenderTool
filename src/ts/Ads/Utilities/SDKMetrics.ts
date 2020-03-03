@@ -106,6 +106,7 @@ export enum OMMetric {
 }
 
 export enum InitializationMetric {
+    NativeInitialization = 'native_init',
     WebviewInitialization = 'webview_init',
     WebviewInitializationPhases = 'webview_init_phases',
     WebviewLoad = 'webview_load'
