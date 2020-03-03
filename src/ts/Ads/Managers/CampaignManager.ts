@@ -678,9 +678,9 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.CampaignParsing, [
-            SDKMetrics.createAdsSdkTag('cct', response.getContentType())
-        ]);
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.CampaignParsing, {
+            'cct': response.getContentType()
+        });
         return parser.parse(response, session).catch((error) => {
             if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);

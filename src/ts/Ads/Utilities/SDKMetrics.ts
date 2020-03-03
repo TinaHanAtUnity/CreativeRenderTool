@@ -126,7 +126,8 @@ export enum AUIMetric {
 }
 
 export enum GeneralTimingMetric {
-    CampaignParsing = 'campaign_parsing'
+    CampaignParsing = 'campaign_parsing',
+    CacheLatency = 'cache_latency'
 }
 
 export enum MediationMetric {
@@ -159,16 +160,11 @@ export class SDKMetrics {
         return !!this._metricInstance;
     }
 
-    // TODO: Refactor kv pair tag generation so this doesn't need to exist
-    public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return `ads_sdk2_${suffix}:${tagValue}`;
-    }
-
     public static reportMetricEvent(event: PTSEvent): void {
-        this._metricInstance.reportMetricEventWithTags(event, []);
+        this._metricInstance.reportMetricEventWithTags(event, {});
     }
 
-    public static reportMetricEventWithTags(event: PTSEvent, tags: string[]): void {
+    public static reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }): void {
         this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
@@ -176,7 +172,7 @@ export class SDKMetrics {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
-    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
+    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }): void {
         this._metricInstance.reportTimingEventWithTags(event, value, tags);
     }
 

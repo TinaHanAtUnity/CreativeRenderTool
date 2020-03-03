@@ -122,11 +122,11 @@ import { Platform } from 'Core/Constants/Platform';
 
         const tests: {
             input: AdmobMetric;
-            inputTags: string[];
+            inputTags: { [key: string]: string };
             expected: IProgrammaticTrackingData;
         }[] = [{
             input: AdmobMetric.AdmobUsedCachedVideo,
-            inputTags: ['ads_sdk2_blt:3.0.0'],
+            inputTags: { 'blt': '3.0.0' },
             expected: {
                 metrics: [
                     {
@@ -143,7 +143,7 @@ import { Platform } from 'Core/Constants/Platform';
             }
         }, {
             input: AdmobMetric.AdmobUsedStreamedVideo,
-            inputTags: ['ads_sdk2_test:testValue'],
+            inputTags: { 'test': 'testValue' },
             expected: {
                 metrics: [
                     {
