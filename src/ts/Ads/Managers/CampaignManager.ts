@@ -47,13 +47,14 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, LoadMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -677,9 +678,13 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.CampaignParsing, {
+            'cct': response.getContentType()
+        });
         return parser.parse(response, session).catch((error) => {
             if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
+                measurement.measure('vpaid_identified_as_vast');
                 return parser.parse(response, session);
             } else {
                 throw error;
@@ -688,6 +693,7 @@ export class CampaignManager {
             this.reportToCreativeBlockingService(error, parser.creativeID, parser.seatID, parser.campaignID);
             throw error;
         }).then((campaign) => {
+            measurement.measure('parsing_complete');
             const parseDuration = Date.now() - parseTimestamp;
             for (const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);
