@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar  3 21:09:42 UTC 2020
 
 * Remove Admob Video Caching [#13510](https://github.com/Applifier/unity-ads-webview/pull/13510)
 * Refactor SDKMetrics to Remove createAdsSdkTag Function [#13478](https://github.com/Applifier/unity-ads-webview/pull/13478)
