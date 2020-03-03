@@ -5,6 +5,7 @@ import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export class CustomFeatures {
 
@@ -178,5 +179,9 @@ export class CustomFeatures {
     public static isIASVendor(omVendor: string | undefined) {
         return omVendor === 'IAS' ||
                omVendor === 'integralads.com-omid';
+    }
+
+    public static isWhitelistedOMVendor(omVendor: string) {
+        return this.isIASVendor(omVendor) || OpenMeasurementUtilities.isDoubleClickGoogle(omVendor);
     }
 }
