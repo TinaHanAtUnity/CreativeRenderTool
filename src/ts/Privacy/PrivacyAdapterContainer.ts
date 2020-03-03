@@ -11,7 +11,12 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
     }
 
     public connect(eventAdapter: IPrivacyFrameEventAdapter): void {
+        if (this._isConnected) {
+            throw new Error('Trying to connect even though already connected. Disconnect should be called first.');
+        }
+
         this._eventAdapter = eventAdapter;
+
         if (!this._isConnected) {
             this._eventAdapter.connect();
             this._isConnected = true;
