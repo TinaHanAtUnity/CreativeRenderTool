@@ -55,6 +55,7 @@ import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasu
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -124,8 +125,9 @@ export class CampaignManager {
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
+    private _sdkDetectionInfo: SdkDetectionInfo | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined, sdkDetectionInfo?: SdkDetectionInfo) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -144,6 +146,7 @@ export class CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
+        this._sdkDetectionInfo = sdkDetectionInfo;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -846,6 +849,10 @@ export class CampaignManager {
         const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
 
         url = Url.addParameters(url, trackingIDs);
+
+        if (this._sdkDetectionInfo != null) {
+            url = Url.addParameters(url, {isMadeWithUnity: this._sdkDetectionInfo.getUnityDetected()});
+        }
 
         if (nofillRetry && this._lastAuctionId) {
             url = Url.addParameters(url, {

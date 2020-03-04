@@ -16,20 +16,20 @@ interface IData {
 }
 
 const SdkAndroidClassMap: IData = {
-    'com.google.ads.mediation.admob.AdMobAdapter': 'AdMob',
-    'com.mopub.common.MoPub': 'MoPub',
-    'com.ironsource.mediationsdk.IronSource': 'IronSource',
-    'com.fyber.FairBid': 'Fyber',
-    'com.safedk.android.SafeDK': 'SafeDK',
+    // 'com.google.ads.mediation.admob.AdMobAdapter': 'AdMob',
+    // 'com.mopub.common.MoPub': 'MoPub',
+    // 'com.ironsource.mediationsdk.IronSource': 'IronSource',
+    // 'com.fyber.FairBid': 'Fyber',
+    // 'com.safedk.android.SafeDK': 'SafeDK',
     'com.unity3d.player.UnityPlayer': 'UnityEngine'
 };
 
 const SdkiOSClassMap: IData = {
-    'GADMobileAds': 'AdMob',
-    'MoPub': 'MoPub',
-    'IronSource': 'IronSource',
-    'FyberSDK': 'Fyber',
-    'SafeDK': 'SafeDK',
+    // 'GADMobileAds': 'AdMob',
+    // 'MoPub': 'MoPub',
+    // 'IronSource': 'IronSource',
+    // 'FyberSDK': 'Fyber',
+    // 'SafeDK': 'SafeDK',
     'UnityAppController': 'UnityEngine'
 };
 
@@ -85,6 +85,10 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
     protected handleDeviceInfoError(error: unknown) {
         this._core.Sdk.logWarning(JSON.stringify(error));
+    }
+ 
+    public getUnityDetected(): boolean {
+        return this.get('UnityEngine') == true;
     }
 
     public getDTO() {
