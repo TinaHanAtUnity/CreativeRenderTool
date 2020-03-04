@@ -1,6 +1,7 @@
 import { ListenerApi } from 'Ads/Native/Listener';
 import { MediationMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { LoadApi } from 'Core/Native/LoadApi';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
@@ -53,7 +54,8 @@ export class MediationLoadTrackingManager {
     public reportAuctionRequest(latency: number) {
         SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, {
             'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
         });
     }
 
@@ -61,7 +63,8 @@ export class MediationLoadTrackingManager {
         SDKMetrics.reportTimingEventWithTags(MediationMetric.AdCaching, latency, {
             'med': this._mediationName,
             'wel': `${this._webviewEnabledLoad}`,
-            'acs': `${adCachedSuccessfully}`
+            'acs': `${adCachedSuccessfully}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
         });
     }
 
