@@ -264,16 +264,24 @@ export class CampaignManager {
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
-            return this._request.post(requestUrl, body, [], {
-                retries: 0,
-                retryDelay: 0,
-                followRedirects: false,
-                retryWithConnectionEvents: false,
-                timeout: 10000
+
+            return Promise.resolve().then(() => {
+                return this._request.post(requestUrl, body, [], {
+                    retries: 0,
+                    retryDelay: 0,
+                    followRedirects: false,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
+                }).catch((error: unknown) => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+                    }
+                    throw error;
+                });
             }).then(response => {
                 cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
-                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
                 }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
