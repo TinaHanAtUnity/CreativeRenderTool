@@ -192,7 +192,6 @@ export class CampaignManager {
                     followRedirects: false,
                     retryWithConnectionEvents: false
                 }).catch((error: unknown) => {
-                    measurement.measure('auction_failed');
                     if (this._mediationLoadTracking && performance && performance.now) {
                         this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
                     }
