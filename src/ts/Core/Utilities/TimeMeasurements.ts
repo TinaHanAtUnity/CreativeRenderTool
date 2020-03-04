@@ -2,14 +2,14 @@ import { TimingEvent, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 export interface ITimeMeasurements {
     measure(tag: string): void;
-    addTag(tag: string, value: string): void;
+    overrideTag(tag: string, value: string): void;
 }
 
 class NullTimeMeasurements implements ITimeMeasurements {
     public measure(tag: string): void {
         // noop
     }
-    public addTag(tag: string, value: string): void {
+    public overrideTag(tag: string, value: string): void {
         // noop
     }
 }
@@ -32,7 +32,7 @@ class TimeMeasurements implements ITimeMeasurements {
         this._storedTimes = [];
     }
 
-    public addTag(tag: string, value: string): void {
+    public overrideTag(tag: string, value: string): void {
         this._tags[tag] = value;
     }
 
