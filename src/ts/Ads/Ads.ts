@@ -180,7 +180,9 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+            'wel': 'undefined'
+        });
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -303,7 +305,9 @@ export class Ads implements IAds {
 
             if (performance && performance.now) {
                 const webviewInitTime = performance.now();
-                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewInitialization, webviewInitTime);
+                SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, {
+                    'wel': `${this._webViewEnabledLoad}`
+                });
             }
         });
     }
@@ -330,13 +334,17 @@ export class Ads implements IAds {
     }
 
     private setupMediationTrackingManager(): Promise<void> {
+        // tslint:disable-next-line:no-any
+        let nativeInitTime: number | undefined = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
+        const nativeInitTimeAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
+        nativeInitTime = nativeInitTimeAcceptable ? nativeInitTime : undefined;
         if (this._loadApiEnabled) {
 
             // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation && mediation.getName() && performance && performance.now) {
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, nativeInitTime);
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();
