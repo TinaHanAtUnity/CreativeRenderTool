@@ -1,4 +1,4 @@
-# Pending
+# Wed Mar  4 00:40:16 UTC 2020
 
 * Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)
 * Add Explicity SSL Error Handling from Webplayer [#13424](https://github.com/Applifier/unity-ads-webview/pull/13424)
