@@ -322,13 +322,16 @@ export class Ads implements IAds {
     }
 
     private setupMediationTrackingManager(): Promise<void> {
-        if (this._loadApiEnabled) {
+        // tslint:disable-next-line:no-any
+        const nativeInitTime = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
+        const nativeTimestampAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
+        if (this._loadApiEnabled && nativeTimestampAcceptable) {
 
             // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation && mediation.getName() && performance && performance.now) {
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, nativeTimestampAcceptable);
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();

@@ -11,14 +11,16 @@ export class MediationLoadTrackingManager {
     private _webviewEnabledLoad: boolean;
     private _initialAdRequest: boolean = true;
     private _initCompleteTime: number;
+    private _nativeTimestamp: number;
 
     private _activeLoads: { [key: string]: { time: number; initialAdRequest: boolean } };
 
-    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean) {
+    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, nativeTimestamp: number) {
         this._loadApi = loadApi;
         this._listener = listener;
         this._mediationName = mediationName;
         this._webviewEnabledLoad = webviewEnabledLoad;
+        this._nativeTimestamp = nativeTimestamp;
 
         this._activeLoads = {};
 
@@ -118,11 +120,11 @@ export class MediationLoadTrackingManager {
     }
 
     private hasPlacementTimedOut(placementId: string, timeValue: number): boolean {
-        if (timeValue >= 30000) {
+        const timedOut = (this.getTime() - this._nativeTimestamp) >= 30000;
+        if (this._activeLoads[placementId].initialAdRequest && timedOut) {
             SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, {
                 'med': this._mediationName,
-                'wel': `${this._webviewEnabledLoad}`,
-                'iar': `${this._activeLoads[placementId].initialAdRequest}`
+                'wel': `${this._webviewEnabledLoad}`
             });
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
