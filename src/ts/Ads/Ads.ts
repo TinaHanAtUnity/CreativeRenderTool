@@ -331,7 +331,7 @@ export class Ads implements IAds {
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation && mediation.getName() && performance && performance.now) {
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, nativeTimestampAcceptable);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, nativeInitTime);
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();
