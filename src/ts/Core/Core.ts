@@ -125,7 +125,9 @@ export class Core implements ICore {
 
     public initialize(): Promise<void> {
         const loadTime = performance.now();
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+            'wel': 'undefined'
+        });
         return this.Api.Sdk.loadComplete().then((data) => {
             measurements.measure('webview_load_complete');
             this.ClientInfo = new ClientInfo(data);

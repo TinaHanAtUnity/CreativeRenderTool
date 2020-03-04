@@ -180,7 +180,9 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+            'wel': 'undefined'
+        });
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
