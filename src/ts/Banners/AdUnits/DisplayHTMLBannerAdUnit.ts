@@ -46,13 +46,15 @@ export class DisplayHTMLBannerAdUnit extends HTMLBannerAdUnit {
                 shouldOverrideUrlLoading: {
                     sendEvent: true,
                     returnValue: true
-                }
+                },
+                onReceivedSslError: { shouldCallSuper: true }
             };
         } else {
             return {
                 onCreateWindow: {
                     sendEvent: true
-                }
+                },
+                onReceivedSslError: { shouldCallSuper: true }
             };
         }
     }

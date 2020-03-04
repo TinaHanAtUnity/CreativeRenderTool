@@ -47,13 +47,14 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, LoadMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -147,6 +148,7 @@ export class CampaignManager {
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         const requestStartTime = this.getTime();
+        let measurement: ITimeMeasurements;
         this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
@@ -165,6 +167,7 @@ export class CampaignManager {
         this._requesting = true;
 
         return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
+            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -187,6 +190,7 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
+                measurement.measure('auction_response');
                 const cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
@@ -427,6 +431,7 @@ export class CampaignManager {
     }
 
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -541,6 +546,7 @@ export class CampaignManager {
         this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
+        measurement.measure('parse_response');
         for (const mediaId in campaigns) {
             if (campaigns.hasOwnProperty(mediaId)) {
                 let auctionResponse: AuctionResponse;
@@ -677,9 +683,13 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.CampaignParsing, {
+            'cct': response.getContentType()
+        });
         return parser.parse(response, session).catch((error) => {
             if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
+                measurement.measure('vpaid_identified_as_vast');
                 return parser.parse(response, session);
             } else {
                 throw error;
@@ -688,6 +698,7 @@ export class CampaignManager {
             this.reportToCreativeBlockingService(error, parser.creativeID, parser.seatID, parser.campaignID);
             throw error;
         }).then((campaign) => {
+            measurement.measure('parsing_complete');
             const parseDuration = Date.now() - parseTimestamp;
             for (const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);
@@ -829,6 +840,7 @@ export class CampaignManager {
     }
 
     private createRequestUrl(nofillRetry?: boolean, session?: Session): Promise<string> {
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         let url: string = this.getBaseUrl();
 
         const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
@@ -902,12 +914,14 @@ export class CampaignManager {
                 connectionType: connectionType,
                 networkType: networkType
             });
+            measurement.measure('url_generation');
             return url;
         });
     }
 
     // todo: refactor requestedPlacement to something more sensible
     private createRequestBody(gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         const placementRequest: { [key: string]: unknown } = {};
 
         const body: { [key: string]: unknown } = {
@@ -1042,6 +1056,7 @@ export class CampaignManager {
                     body.developerId = developerId;
                 }
 
+                measurement.measure('body_generation');
                 return body;
             });
         });

@@ -41,6 +41,10 @@ describe('AdsConfigurationParserTest', () => {
             it('should return placement by id', () => {
                 assert.equal(adsConfig.getPlacement('premium').getName(), 'Premium placement');
             });
+
+            it('should set hasArPlacement to false', () => {
+                assert.equal(adsConfig.getHasArPlacement(), false);
+            });
         });
     });
 

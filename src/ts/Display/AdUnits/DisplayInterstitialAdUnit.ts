@@ -305,7 +305,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
                 sendEvent: true,
                 returnValue: shouldOverrideUrlLoadingReturnValue,
                 callSuper: false
-            }
+            },
+            onReceivedSslError: { shouldCallSuper: true }
         };
         return this._webPlayerContainer.setEventSettings(eventSettings);
     }

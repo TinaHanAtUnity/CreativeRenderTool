@@ -21,6 +21,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
+import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
+import PrivacyWebUI from 'html/PrivacyWebUI.html';
+
 describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
     const testAdvertisingId = '128970986778678';
@@ -70,6 +73,11 @@ describe('UserPrivacyManagerTest', () => {
         privacySDK = sinon.createStubInstance(PrivacySDK);
         privacySDK.getGamePrivacy.returns(gamePrivacy);
         userPrivacy = sinon.createStubInstance(UserPrivacy);
+        userPrivacy.getPermissions.returns({
+           ads: false,
+           gameExp: false,
+           external: false
+        });
         privacySDK.getUserPrivacy.returns(userPrivacy);
 
         request = sinon.createStubInstance(RequestManager);
@@ -896,6 +904,35 @@ describe('UserPrivacyManagerTest', () => {
                         });
                     });
                 });
+            });
+        });
+    });
+
+    describe('getPrivacyConfig', () => {
+        it('Returns a non-null object', () => {
+            assert.isNotNull(privacyManager.getPrivacyConfig());
+        });
+
+        describe('Returned object has proper values', () => {
+            it('getFlow', () => {
+                assert.deepEqual(privacyManager.getPrivacyConfig().getFlow(), PrivacySDKFlow);
+            });
+
+            it('getEnv', () => {
+                assert.isNotNull(privacyManager.getPrivacyConfig().getEnv());
+            });
+
+            it('getUserSettings', () => {
+               assert.deepEqual(privacyManager.getPrivacyConfig().getUserSettings(), {
+                   ads: false,
+                   external: false,
+                   gameExp: false,
+                   agreedOverAgeLimit: false
+               });
+            });
+
+            it('getHtml', () => {
+                assert.equal(privacyManager.getPrivacyConfig().getHtml(), PrivacyWebUI);
             });
         });
     });

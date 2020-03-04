@@ -1,7 +1,20 @@
-# Pending
+# Wed Mar  4 11:58:05 UTC 2020
+
+* Initial implementation of privacy web UI for 5% of traffic from Finland [#13107](https://github.com/Applifier/unity-ads-webview/pull/13107)
+
+# Wed Mar  4 00:40:16 UTC 2020
+
+* Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)
+* Add Explicity SSL Error Handling from Webplayer [#13424](https://github.com/Applifier/unity-ads-webview/pull/13424)
+* Tracking Auction Request Stages [#13537](https://github.com/Applifier/unity-ads-webview/pull/13537)
+* Add Native Initialization Time Within Bounds [#13538](https://github.com/Applifier/unity-ads-webview/pull/13538)
+
+# Tue Mar  3 21:09:42 UTC 2020
 
 * Remove Admob Video Caching [#13510](https://github.com/Applifier/unity-ads-webview/pull/13510)
 * Refactor SDKMetrics to Remove createAdsSdkTag Function [#13478](https://github.com/Applifier/unity-ads-webview/pull/13478)
+* Remove Adaptive Cache Mode [#13509](https://github.com/Applifier/unity-ads-webview/pull/13509)
+* Track Campaign Parsing Latency [#13483](https://github.com/Applifier/unity-ads-webview/pull/13483)
 
 # Tue Mar  3 00:05:04 UTC 2020
 

@@ -1,0 +1,825 @@
+{
+  "start": "ageGateDecision",
+  "nodes": {
+    "ageGateDecision": {
+      "isSelfEvaluating": true,
+      "links": [
+        {
+          "node": "ageSelect",
+          "condition": {
+            ">": [
+              {
+                "var": "env.ageGateLimit"
+              },
+              0
+            ]
+          }
+        },
+        {
+          "node": "consent",
+          "condition": {
+            "==": [
+              {
+                "var": "env.ageGateLimit"
+              },
+              0
+            ]
+          }
+        }
+      ]
+    },
+    "ageSelect": {
+      "components": {
+        "body": [
+          {
+            "id": "ageSelectPrivacyIcon",
+            "type": "icon",
+            "name": "privacy"
+          },
+          {
+            "id": "ageSelectTitle",
+            "text": "ageSelect.title",
+            "type": "heading",
+            "isHidden": false,
+            "level": 1
+          },
+          {
+            "id": "ageSelectSubtitle",
+            "text": "ageSelect.subtitle",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          }
+        ],
+        "footer": [
+          {
+            "id": "underAgeLimit",
+            "text": "underAgeLimit",
+            "type": "button",
+            "isSubmit": true,
+            "variant": "secondary",
+            "actions": [
+              {
+                "property": "user.agreedOverAgeLimit",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "overAgeLimit",
+            "text": "overAgeLimit",
+            "type": "button",
+            "isSubmit": true,
+            "variant": "primary",
+            "actions": [
+              {
+                "property": "user.agreedOverAgeLimit",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "links": [
+        {
+          "node": "consent",
+          "condition": {
+            "==": [
+              {
+                "var": "user.agreedOverAgeLimit"
+              },
+              true
+            ]
+          }
+        }
+      ]
+    },
+    "consent": {
+      "components": {
+        "body": [
+          {
+            "id": "consentPrivacyIcon",
+            "type": "icon",
+            "name": "privacy"
+          },
+          {
+            "id": "consentTitle",
+            "text": "consent.title",
+            "type": "heading",
+            "isHidden": false,
+            "level": 1
+          },
+          {
+            "id": "consentSubtitle",
+            "text": "consent.subtitle",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          }
+        ],
+        "footer": [
+          {
+            "id": "showChoices",
+            "type": "button",
+            "text": "showChoices",
+            "variant": "secondary",
+            "isSubmit": true,
+            "actions": [
+              {
+                "property": "state.hasAcceptedTracking",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "acceptTracking",
+            "type": "button",
+            "text": "acceptTracking",
+            "variant": "primary",
+            "actions": [
+              {
+                "property": "user.gameExp",
+                "value": true
+              },
+              {
+                "property": "user.ads",
+                "value": true
+              },
+              {
+                "property": "user.external",
+                "value": true
+              },
+              {
+                "property": "state.hasAcceptedTracking",
+                "value": true
+              }
+            ],
+            "isSubmit": true
+          }
+        ]
+      },
+      "links": [
+        {
+          "node": "customization",
+          "condition": {
+            "!=": [
+              {
+                "var": "state.hasAcceptedTracking"
+              },
+              true
+            ]
+          }
+        }
+      ]
+    },
+    "customization": {
+      "components": {
+        "body": [
+          {
+            "id": "customizationTitle",
+            "text": "consent.title",
+            "type": "heading",
+            "isHidden": false,
+            "level": 2
+          },
+          {
+            "id": "allowGameExperienceDataCollection",
+            "type": "switch",
+            "text": "allowGameExperienceDataCollection",
+            "isChecked": {
+              "==": [
+                {
+                  "var": "user.gameExp"
+                },
+                true
+              ]
+            },
+            "actions": [
+              {
+                "property": "user.gameExp",
+                "value": {
+                  "!": [
+                    {
+                      "var": [
+                        "user.gameExp"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "allowGameAdsDataCollection",
+            "type": "switch",
+            "text": "allowGameAdsDataCollection",
+            "isChecked": {
+              "==": [
+                {
+                  "var": "user.ads"
+                },
+                true
+              ]
+            },
+            "actions": [
+              {
+                "property": "user.ads",
+                "value": {
+                  "!": [
+                    {
+                      "var": [
+                        "user.ads"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "property": "user.external",
+                "value": {
+                  "if": [
+                    {
+                      "!": [
+                        {
+                          "var": [
+                            "user.ads"
+                          ]
+                        }
+                      ]
+                    },
+                    false,
+                    {
+                      "var": [
+                        "user.external"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "allowThirdPartyDataCollection",
+            "type": "switch",
+            "text": "allowThirdPartyDataCollection",
+            "isChecked": {
+              "==": [
+                {
+                  "var": "user.external"
+                },
+                true
+              ]
+            },
+            "isDisabled": {
+              "==": [
+                {
+                  "var": [
+                    "user.ads",
+                    false
+                  ]
+                },
+                false
+              ]
+            },
+            "actions": [
+              {
+                "property": "user.external",
+                "value": {
+                  "!": [
+                    {
+                      "var": [
+                        "user.external"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "customizationSubtitle",
+            "text": "consent.subtitle",
+            "type": "text",
+            "isHidden": false,
+            "variant": "dark"
+          },
+          {
+            "id": "customizationPrivacyTextAccordion",
+            "type": "accordion",
+            "isHidden": false,
+            "items": [
+              {
+                "title": "customization.whatInformationWeCollectHeading",
+                "components": [
+                  {
+                    "id": "whatInformationWeCollectParagraph",
+                    "text": "customization.whatInformationWeCollectParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "exampleInformationParagraph",
+                    "text": "customization.exampleInformationParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "miniDisclosureUsing",
+                    "text": "customization.miniDisclosureUsing",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "miniDisclosureCountry",
+                    "text": "customization.miniDisclosureCountry",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "miniDisclosureGamePlays",
+                    "text": "customization.miniDisclosureGamePlays",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "whatWeCollectParagraph",
+                    "text": "customization.miniDisclosureAdsSeen",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "miniDisclosureInstalls",
+                    "text": "customization.miniDisclosureInstalls",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "usingInformationParagraph",
+                    "text": "customization.usingInformationParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "retainingPersonalDataParagraph",
+                    "text": "customization.retainingPersonalDataParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "whatInformationWeCollectParagraph",
+                    "text": "customization.whatInformationWeCollectParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "whatPartnersCollectHeading",
+                    "text": "customization.whatPartnersCollectHeading",
+                    "type": "heading",
+                    "isHidden": false,
+                    "level": 3
+                  },
+                  {
+                    "id": "partnersDataUsageParagraph",
+                    "text": "customization.partnersDataUsageParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "partnersDataCollectionParagraph",
+                    "text": "customization.partnersDataCollectionParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  }
+                ]
+              },
+              {
+                "title": "customization.dataTransferHeading",
+                "components": [
+                  {
+                    "id": "dataTransferParagraph",
+                    "text": "customization.dataTransferParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "dataTransferPrivacyPolicyLink",
+                    "text": "customization.privacyPolicyLink",
+                    "type": "link",
+                    "href": "https://unity3d.com/legal/privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "partnersDataCollectionParagraph",
+                    "text": "customization.partnersDataCollectionParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  }
+                ]
+              },
+              {
+                "title": "customization.thirdPartyListHeading",
+                "components": [
+                  {
+                    "id": "aarkiLink",
+                    "text": "Aarki",
+                    "type": "link",
+                    "href": "http://corp.aarki.com/privacy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "adNetLink",
+                    "text": "Ad.Net",
+                    "type": "link",
+                    "href": "http://www.ad.net/privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "adColonyLink",
+                    "text": "AdColony",
+                    "type": "link",
+                    "href": "https://www.adcolony.com/gdpr/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "adMaximLink",
+                    "text": "AdMaxim",
+                    "type": "link",
+                    "href": "http://www.admaxim.com/admaxim-privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "adobeink",
+                    "text": "Adobe",
+                    "type": "link",
+                    "href": "https://www.adobe.com/privacy/policy.html",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "appreciateLink",
+                    "text": "Appreciate",
+                    "type": "link",
+                    "href": "https://appreciate.mobi/page.html#/end-user-privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "beeswaxLink",
+                    "text": "Beeswax",
+                    "type": "link",
+                    "href": "http://beeswax.com/privacy.html",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "bidmotionLink",
+                    "text": "Bidmotion",
+                    "type": "link",
+                    "href": "http://www.bidmotion.com/privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "charBoostLink",
+                    "text": "Charboost",
+                    "type": "link",
+                    "href": "https://answers.chartboost.com/en-us/articles/200780269",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "crossInstallLink",
+                    "text": "CrossInstall",
+                    "type": "link",
+                    "href": "http://www.crossinstall.com/privacy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "engageBdrLink",
+                    "text": "EngageBDR",
+                    "type": "link",
+                    "href": "http://engagebdr.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "googleLink",
+                    "text": "Google",
+                    "type": "link",
+                    "href": "https://policies.google.com/technologies/partner-sites",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "gothamAdsLink",
+                    "text": "GothamAds",
+                    "type": "link",
+                    "href": "https://gothamads.com/privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "jamppLink",
+                    "text": "Jampp",
+                    "type": "link",
+                    "href": "https://jampp.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "kayzenLink",
+                    "text": "Kayzen (fka Applift)",
+                    "type": "link",
+                    "href": "https://www.applift.com/privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "lifestreetLink",
+                    "text": "Lifestreet",
+                    "type": "link",
+                    "href": "http://lifestreet.com/privacy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "liftoffLink",
+                    "text": "Liftoff",
+                    "type": "link",
+                    "href": "https://liftoff.io/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "loopMeLink",
+                    "text": "LoopMe",
+                    "type": "link",
+                    "href": "https://loopme.com/privacy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "manageComLink",
+                    "text": "Manage.com",
+                    "type": "link",
+                    "href": "https://www.manage.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "molocoLink",
+                    "text": "Moloco",
+                    "type": "link",
+                    "href": "http://www.molocoads.com/private-policy.html",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "personaLyLink",
+                    "text": "Persona.ly",
+                    "type": "link",
+                    "href": "http://persona.ly/privacy_dsp",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "pubnativeLink",
+                    "text": "Pubnative",
+                    "type": "link",
+                    "href": "https://pubnative.net/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "vervLink",
+                    "text": "Verv",
+                    "type": "link",
+                    "href": "https://www.verve.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "remergeLink",
+                    "text": "Remerge",
+                    "type": "link",
+                    "href": "https://remerge.io/privacy-policy.html",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "telariaLink",
+                    "text": "Telaria",
+                    "type": "link",
+                    "href": "https://telaria.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "yeahMobiLink",
+                    "text": "YeahMobi",
+                    "type": "link",
+                    "href": "https://www.yeahmobi.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "smadexLink",
+                    "text": "Smadex",
+                    "type": "link",
+                    "href": "https://smadex.com/index.html@p=3888.html",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "bideaseLink",
+                    "text": "Bidease",
+                    "type": "link",
+                    "href": "https://www.bidease.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "gdmservicesLink",
+                    "text": "GDM Services",
+                    "type": "link",
+                    "href": "https://gdm.services/privacy-policy",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "cubepileLink",
+                    "text": "CubePile",
+                    "type": "link",
+                    "href": "https://cubepile.com/privacy-policy/",
+                    "isHidden": false
+                  },
+                  {
+                    "id": "adikteevLink",
+                    "text": "Adikteev",
+                    "type": "link",
+                    "href": "https://www.adikteev.com/privacy-policy-eng/",
+                    "isHidden": false
+                  }
+                ]
+              },
+              {
+                "title": "customization.changingPrivacyChoiceHeading",
+                "components": [
+                  {
+                    "id": "changingPrivacyChoiceParagraph",
+                    "text": "customization.changingPrivacyChoiceParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  }
+                ]
+              },
+              {
+                "title": "customization.privacyPolicyHeading",
+                "components": [
+                  {
+                    "id": "privacyPolicyParagraph",
+                    "text": "customization.privacyPolicyParagraph",
+                    "type": "text",
+                    "isHidden": false,
+                    "variant": "dark"
+                  },
+                  {
+                    "id": "ourPrivacyPolicyLink",
+                    "text": "customization.privacyPolicyLink",
+                    "type": "link",
+                    "href": "https://unity3d.com/legal/privacy-policy",
+                    "isHidden": false
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "footer": [
+          {
+            "id": "disagree",
+            "type": "button",
+            "text": "disagree",
+            "isSubmit": true,
+            "variant": "secondary",
+            "isHidden": {
+              "or": [
+                {
+                  "==": [
+                    {
+                      "var": "user.gameExp"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": "user.ads"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": "user.external"
+                    },
+                    true
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "allowAll",
+            "type": "button",
+            "text": "allowAll",
+            "actions": [
+              {
+                "property": "user.gameExp",
+                "value": true
+              },
+              {
+                "property": "user.ads",
+                "value": true
+              },
+              {
+                "property": "user.external",
+                "value": true
+              }
+            ],
+            "isSubmit": true,
+            "submitDelay": 1000,
+            "variant": "primary",
+            "isHidden": {
+              "or": [
+                {
+                  "==": [
+                    {
+                      "var": "user.gameExp"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": "user.ads"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": "user.external"
+                    },
+                    true
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "saveChoices",
+            "type": "button",
+            "text": "saveChoices",
+            "isSubmit": true,
+            "variant": "primary",
+            "isHidden": {
+              "and": [
+                {
+                  "==": [
+                    {
+                      "var": [
+                        "user.gameExp",
+                        false
+                      ]
+                    },
+                    false
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": [
+                        "user.ads",
+                        false
+                      ]
+                    },
+                    false
+                  ]
+                },
+                {
+                  "==": [
+                    {
+                      "var": [
+                        "user.external",
+                        false
+                      ]
+                    },
+                    false
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "links": [],
+      "allowGoBack": true
+    }
+  }
+}
