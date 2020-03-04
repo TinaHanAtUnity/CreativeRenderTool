@@ -151,7 +151,6 @@ export class Core implements ICore {
             }
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
-            this.SdkDetectionInfo = new SdkDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
 
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
@@ -235,6 +234,7 @@ export class Core implements ICore {
             return configJson;
         }).then((configJson: unknown) => {
             this.Purchasing = new Purchasing(this);
+            this.SdkDetectionInfo = new SdkDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
             this.SdkDetectionInfo.detectSdks();
             this.Ads = new Ads(configJson, this, this.SdkDetectionInfo);
 
