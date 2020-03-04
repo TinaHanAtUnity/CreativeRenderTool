@@ -8,7 +8,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -87,10 +87,12 @@ import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 export class Ads implements IAds {
@@ -202,6 +204,7 @@ export class Ads implements IAds {
             measurements.measure('privacy_init');
             return this.setupLoadApiEnabled();
         }).then(() => {
+            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
             measurements.measure('load_api_setup');
             return this.setupMediationTrackingManager();
         }).then(() => {
@@ -286,6 +289,11 @@ export class Ads implements IAds {
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
+
+            if (this.PrivacyManager.isPrivacySDKTestActive()) {
+                CachedUserSummary.fetch(this.PrivacyManager);
+            }
+
             return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             measurements.measure('request_on_init');
@@ -358,17 +366,37 @@ export class Ads implements IAds {
 
         this._showingPrivacy = true;
 
-        const privacyView = new PrivacyUnit({
-            abGroup: this._core.Config.getAbGroup(),
-            platform: this._core.NativeBridge.getPlatform(),
-            privacyManager: this.PrivacyManager,
-            adUnitContainer: this.Container,
-            adsConfig: this.Config,
-            core: this._core.Api,
-            deviceInfo: this._core.DeviceInfo,
-            privacySDK: this.PrivacySDK
-        });
-        return privacyView.show(options);
+        let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
+        if (this.PrivacyManager.isPrivacySDKTestActive()) {
+            const privacyAdUnitParams = {
+                requestManager: this._core.RequestManager,
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK
+            };
+
+            privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
+        } else {
+            const consentAdUnitParams = {
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK
+            };
+
+            privacyAdUnit = new PrivacyUnit(consentAdUnitParams);
+        }
+
+        return privacyAdUnit.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
