@@ -1,5 +1,6 @@
 # Wed Mar  4 22:45:20 UTC 2020
 
+* Fix Metric bugs [#13614](https://github.com/Applifier/unity-ads-webview/pull/13614)
 * Report Mediation Timeouts Better And Add Tags [#13564](https://github.com/Applifier/unity-ads-webview/pull/13564)
 
 # Wed Mar  4 20:23:16 UTC 2020
