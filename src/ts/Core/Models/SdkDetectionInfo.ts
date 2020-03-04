@@ -86,9 +86,9 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
     protected handleDeviceInfoError(error: unknown) {
         this._core.Sdk.logWarning(JSON.stringify(error));
     }
- 
+
     public getUnityDetected(): boolean {
-        return this.get('UnityEngine') == true;
+        return this.get('UnityEngine') === true;
     }
 
     public getDTO() {

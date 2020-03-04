@@ -135,7 +135,7 @@ export class Ads implements IAds {
     public Analytics: Analytics;
     public Store: IStore;
 
-    constructor(config: unknown, core: ICore, sdkDetectionInfo:SdkDetectionInfo) {
+    constructor(config: unknown, core: ICore, sdkDetectionInfo: SdkDetectionInfo) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
