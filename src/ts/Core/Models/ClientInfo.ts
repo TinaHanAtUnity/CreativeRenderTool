@@ -15,7 +15,6 @@ interface IClientInfo {
     webviewVersion: string | null;
     initTimestamp: number;
     reinitialized: boolean;
-    monetizationInUse: boolean;
     usePerPlacementLoad: boolean;
 }
 
@@ -36,7 +35,6 @@ export class ClientInfo extends Model<IClientInfo> {
             webviewVersion: ['string', 'null'],
             initTimestamp: ['number'],
             reinitialized: ['boolean'],
-            monetizationInUse: ['boolean'],
             usePerPlacementLoad: ['boolean']
         });
 
@@ -54,7 +52,6 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('initTimestamp', data[11]);
         this.set('reinitialized', data[12]);
         this.set('usePerPlacementLoad', !!data[13]);
-        this.set('monetizationInUse', false);
     }
 
     public getGameId(): string {
@@ -113,14 +110,6 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('reinitialized');
     }
 
-    public isMonetizationInUse(): boolean {
-        return this.get('monetizationInUse');
-    }
-
-    public setMonetizationInUse(using: boolean) {
-        this.set('monetizationInUse', using);
-    }
-
     public getDTO() {
         return {
             'gameId': this.getGameId(),
@@ -136,7 +125,6 @@ export class ClientInfo extends Model<IClientInfo> {
             'webviewVersion': this.getWebviewVersion(),
             'initTimestamp': this.getInitTimestamp(),
             'reinitialized': this.isReinitialized(),
-            'monetizationInUse': this.isMonetizationInUse(),
             'usePerPlacementLoad': this.getUsePerPlacementLoad()
         };
     }

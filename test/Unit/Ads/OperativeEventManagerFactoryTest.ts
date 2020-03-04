@@ -130,28 +130,5 @@ describe('OperativeEventManagerFactoryTest', () => {
 
             assert.isTrue(manager instanceof MRAIDOperativeEventManager, 'Manager not instance of MRAIDOperativeEventManager');
         });
-
-        it('with all other campaign types', () => {
-            const campaign = TestFixtures.getPromoCampaign();
-            const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                platform,
-                core,
-                ads,
-                request: request,
-                metaDataManager: metaDataManager,
-                sessionManager: sessionManager,
-                clientInfo: clientInfo,
-                deviceInfo: deviceInfo,
-                coreConfig: coreConfig,
-                adsConfig: adsConfig,
-                storageBridge: storageBridge,
-                campaign: campaign,
-                playerMetadataServerId: 'test-gamerSid',
-                privacySDK: privacySDK,
-                userPrivacyManager: userPrivacyManager
-            });
-
-            assert.isTrue(manager instanceof OperativeEventManager, 'Manager not instance of OperativeEventManager');
-        });
     });
 });

@@ -33,8 +33,6 @@ import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScree
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { IStoreApi } from 'Store/IStore';

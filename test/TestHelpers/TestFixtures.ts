@@ -60,7 +60,6 @@ import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/Programmat
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 
-import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
@@ -69,21 +68,12 @@ import OnCometVideoPlcCampaignStandaloneAndroid from 'json/OnCometVideoPlcCampai
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import OnProgrammaticVPAIDPlcCampaign from 'json/OnProgrammaticVPAIDPlcCampaign.json';
 import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
-import { IMonetizationApi } from 'Monetization/IMonetization';
-import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
-import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
 import OnCometVideoPlcCampaignWithSquareEndScreenAsset from 'json/OnCometVideoPlcCampaignWithSquareEndScreenAsset.json';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
-import { IPromoApi } from 'Promo/IPromo';
-import { IProductInfo, ProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
-import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingApi } from 'Promo/Native/Purchasing';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 
 import * as sinon from 'sinon';
 import { FakeAndroidDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
@@ -166,16 +156,10 @@ import { LoadApi } from 'Core/Native/LoadApi';
 import { IAdMobCampaign, AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
 import { IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
-import { LimitedTimeOffer, ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
-import { SilentAnalyticsManager } from 'Analytics/SilentAnalyticsManager';
 import { Analytics } from 'Analytics/Analytics';
 import { Store } from 'Store/Store';
-import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
-import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
-import { PromoSize } from 'Promo/Models/PromoSize';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -543,60 +527,6 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean, limitedTimeOffer?: ILimitedTimeOffer): IPromoCampaign {
-        const session = this.getSession();
-        const costProductInfoList: ProductInfo[] = [];
-        const payoutProductInfoList: ProductInfo[] = [];
-        const costProductInfo: IProductInfo = {
-            productId: 'fakeProductID',
-            type: ProductInfoType.PREMIUM,
-            quantity: 1
-        };
-        costProductInfoList.push(new ProductInfo(costProductInfo));
-        const payoutProductInfo: IProductInfo = {
-            productId: 'fakeProductID2',
-            type: ProductInfoType.VIRTUAL,
-            quantity: 1
-        };
-        payoutProductInfoList.push(new ProductInfo(payoutProductInfo));
-        const premiumProduct: IProductInfo = {
-            productId: 'fakeProductID2',
-            type: ProductInfoType.PREMIUM,
-            quantity: 1
-        };
-        const buttonAsset: IPromoAsset = {
-            image: new Image('https://storage.googleapis.com/promo-asset-prd/test-mode-IAP-button.png', session),
-            font: undefined,
-            coordinates: undefined,
-            size: new PromoSize({width: '20', height: '20'})
-        };
-        const backgroundAsset: IPromoAsset = {
-            image: new Image('https://storage.googleapis.com/promo-asset-prd/test-mode-IAP-phone-portrait.png', session),
-            font: undefined,
-            coordinates: undefined,
-            size: new PromoSize({width: '20', height: '20'})
-        };
-        const orientationAsset: IPromoOrientationAsset = {
-            buttonAsset: new PromoAsset(buttonAsset),
-            backgroundAsset: new PromoAsset(backgroundAsset)
-        };
-        return {
-            ... this.getCampaignBaseParams(session, json.promo.id, json.meta, adType),
-            trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
-            limitedTimeOffer: limitedTimeOffer ? new LimitedTimeOffer(limitedTimeOffer) : undefined,
-            costs: costProductInfoList,
-            payouts: payoutProductInfoList,
-            premiumProduct: new ProductInfo(premiumProduct),
-            portraitAssets: new PromoOrientationAsset(orientationAsset),
-            landscapeAssets: new PromoOrientationAsset(orientationAsset)
-        };
-    }
-
-    public static getPromoCampaign(adType?: string, rewardedPromo?: boolean, timeLimitedOffer?: ILimitedTimeOffer): PromoCampaign {
-        const json = DummyPromoCampaign;
-        return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo, timeLimitedOffer));
-    }
-
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
         const json = OnCometVideoPlcCampaignFollowsRedirects;
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
@@ -801,15 +731,15 @@ export class TestFixtures {
         return new VideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
     }
 
-    public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
+    public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
         return new PerformanceOverlayEventHandler(
             adUnit,
-            TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, store, ar, purchasing),
+            TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, store, ar),
             TestFixtures.getStoreHandler(platform, core, ads, store, campaign, adUnit, thirdPartyEventManager, nativeBridge)
         );
     }
 
-    public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): IXPromoAdUnitParameters {
+    public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi): IXPromoAdUnitParameters {
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const campaign = TestFixtures.getXPromoCampaign();
@@ -842,7 +772,7 @@ export class TestFixtures {
         };
     }
 
-    public static getPerformanceAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): IPerformanceAdUnitParameters {
+    public static getPerformanceAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi): IPerformanceAdUnitParameters {
         const campaign = TestFixtures.getCampaign();
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
@@ -906,12 +836,12 @@ export class TestFixtures {
         };
     }
 
-    public static getXPromoAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): XPromoAdUnit {
-        return new XPromoAdUnit(TestFixtures.getXPromoAdUnitParameters(platform, core, ads, store, ar, purchasing));
+    public static getXPromoAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi): XPromoAdUnit {
+        return new XPromoAdUnit(TestFixtures.getXPromoAdUnitParameters(platform, core, ads, store, ar));
     }
 
-    public static getPerformanceAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): PerformanceAdUnit {
-        return new PerformanceAdUnit(TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, store, ar, purchasing));
+    public static getPerformanceAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi): PerformanceAdUnit {
+        return new PerformanceAdUnit(TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, store, ar));
     }
 
     public static getStoreHandlerDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IStoreHandlerDownloadParameters {
@@ -1152,25 +1082,6 @@ export class TestFixtures {
         return {
             BannerApi: new BannerApi(nativeBridge),
             BannerListenerApi: new BannerListenerApi(nativeBridge)
-        };
-    }
-
-    public static getMonetizationApi(nativeBridge: NativeBridge): IMonetizationApi {
-        return {
-            Listener: new MonetizationListenerApi(nativeBridge),
-            PlacementContents: new PlacementContentsApi(nativeBridge)
-        };
-    }
-
-    public static getPromoApi(nativeBridge: NativeBridge): IPromoApi {
-        return {
-            Purchasing: new PurchasingApi(nativeBridge)
-        };
-    }
-
-    public static getPurchasingApi(nativeBridge: NativeBridge): IPurchasingApi {
-        return {
-            CustomPurchasing: new CustomPurchasingApi(nativeBridge)
         };
     }
 

@@ -51,12 +51,10 @@ import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
-import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
 import { MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
-import { Promo } from 'Promo/Promo';
 import { VAST } from 'VAST/VAST';
 import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -71,7 +69,6 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
@@ -126,7 +123,6 @@ export class Ads implements IAds {
     private _core: ICore;
 
     public BannerModule: BannerModule;
-    public Monetization: Monetization;
     public AR: AR;
     public Analytics: Analytics;
     public Store: IStore;
@@ -219,16 +215,7 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const promo = new Promo(this._core, this, this._core.Purchasing);
-            const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
-            for (const contentType in promoContentTypeHandlerMap) {
-                if (promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
-                    this.ContentTypeHandlerManager.addHandler(contentType, promoContentTypeHandlerMap[contentType]);
-                }
-            }
-
             this.BannerModule = new BannerModule(this._core, this);
-            this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
@@ -269,14 +256,6 @@ export class Ads implements IAds {
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
-
-            promo.initialize();
-
-            this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
-                if (enabled) {
-                    this.Monetization.initialize();
-                }
-            });
 
         }).then(() => {
             measurements.measure('managers_init');
@@ -413,12 +392,6 @@ export class Ads implements IAds {
 
         SdkStats.sendShowEvent(placementId);
 
-        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
-            this.showError(false, placementId, 'No creatives found for promo campaign');
-            SDKMetrics.reportMetricEvent(ErrorMetric.PromoWithoutCreatives);
-            return;
-        }
-
         if (campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
             this.RefreshManager.refresh();
@@ -483,9 +456,6 @@ export class Ads implements IAds {
             AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
             this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options);
             this.RefreshManager.setCurrentAdUnit(this._currentAdUnit, placement);
-            if (this.Monetization.isInitialized()) {
-                this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
-            }
             this._currentAdUnit.onClose.subscribe(() =>  {
                 this.onAdUnitClose();
                 SDKMetrics.sendBatchedEvents();

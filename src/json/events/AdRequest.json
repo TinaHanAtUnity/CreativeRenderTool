@@ -350,12 +350,6 @@
       "body": true
     },
     {
-      "parameter": "isPromoCatalogAvailable",
-      "required": "all",
-      "queryString": false,
-      "body": true
-    },
-    {
       "parameter": "isLoadEnabled",
       "required": "all",
       "queryString": false,

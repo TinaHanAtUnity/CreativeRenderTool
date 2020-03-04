@@ -112,11 +112,9 @@ describe('PerPlacementLoadManagerWithCometRefreshTest', () => {
         [
             { campaign: TestFixtures.getCampaign(), shouldCall: true },
             { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false },
-            { campaign: TestFixtures.getPromoCampaign(), shouldCall: false },
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false },
             { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: false },
-            { campaign: TestFixtures.getPromoCampaign(), shouldCall: false },
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: false },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: false }
         ].forEach(({ campaign, shouldCall }) => {

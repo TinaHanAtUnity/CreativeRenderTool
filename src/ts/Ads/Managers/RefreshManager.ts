@@ -2,7 +2,6 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { INativeResponse } from 'Core/Managers/RequestManager';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 
 export abstract class RefreshManager {
     public static NoFillDelayInSeconds = 3600;
@@ -17,5 +16,4 @@ export abstract class RefreshManager {
     public abstract setPlacementState(placementId: string, placementState: PlacementState): void;
     public abstract sendPlacementStateChanges(placementId: string): void;
     public abstract setPlacementStates(placementState: PlacementState, placementIds: string[]): void;
-    public abstract subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void;
 }

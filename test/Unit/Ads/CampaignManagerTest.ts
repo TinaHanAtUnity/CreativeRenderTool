@@ -99,7 +99,6 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1361,63 +1360,6 @@ describe('CampaignManager', () => {
 
             }).catch(() => {
                 assert.fail();
-            });
-        });
-    });
-
-    describe('on request', () => {
-        let requestMock: sinon.SinonMock;
-        let campaignManager: CampaignManager;
-
-        beforeEach(() => {
-            requestMock = sinon.mock(request);
-            requestMock.expects('post').returns(Promise.resolve({
-                response: OnProgrammaticVastPlcCampaignJson
-            }));
-            const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(core), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
-            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
-        });
-
-        const tests: {
-            name: string;
-            isCatalogAvailable: boolean;
-            configurationIncludesPromoPlacement: boolean;
-            refreshCallCount: number;
-        }[] = [{
-            name: 'should trigger promo refresh catalog if catalog is not available and configuration includes promo placement',
-            isCatalogAvailable: false,
-            configurationIncludesPromoPlacement: true,
-            refreshCallCount: 1
-        },
-        {
-            name: 'should not trigger promo refresh catalog if catalog is not available and configuration does not include promo placement',
-            isCatalogAvailable: true,
-            configurationIncludesPromoPlacement: false,
-            refreshCallCount: 0
-        },
-        {
-            name: 'should not trigger promo refresh catalog if catalog is available and configuration include promo placement',
-            isCatalogAvailable: true,
-            configurationIncludesPromoPlacement: true,
-            refreshCallCount: 0
-        },
-        {
-            name: 'should not trigger promo refresh catalog if catalog is not available and configuration does not includes promo placement',
-            isCatalogAvailable: false,
-            configurationIncludesPromoPlacement: false,
-            refreshCallCount: 0
-        }];
-
-        tests.forEach(t => {
-            it(t.name, () => {
-                sinon.stub(PurchasingUtilities, 'isCatalogAvailable').returns(t.isCatalogAvailable);
-                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(t.configurationIncludesPromoPlacement);
-                sinon.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                return campaignManager.request().then(() => {
-                    requestMock.verify();
-                    sinon.assert.callCount(<sinon.SinonStub>PurchasingUtilities.refreshCatalog, t.refreshCallCount);
-                });
             });
         });
     });

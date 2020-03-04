@@ -33,7 +33,6 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { IPurchasing } from 'Purchasing/IPurchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
@@ -83,5 +82,4 @@ export interface ICore extends IApiModule {
     DeviceInfo: DeviceInfo;
     Config: CoreConfiguration;
     Ads: IAds;
-    Purchasing: IPurchasing;
 }

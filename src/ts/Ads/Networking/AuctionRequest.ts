@@ -21,7 +21,6 @@ import { Url } from 'Core/Utilities/Url';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
@@ -92,7 +91,6 @@ interface IAuctionRequestBody {
     volume: number;
     requestSignal: string;
     ext: { [key: string]: unknown };
-    isPromoCatalogAvailable: boolean;
     cachedCampaigns: string[] | undefined;
     versionCode: number | undefined;
     mediationName: string | undefined;
@@ -454,7 +452,6 @@ export class AuctionRequest {
                     volume: volume,
                     requestSignal: requestSignal,
                     ext: optionalSignal,
-                    isPromoCatalogAvailable: PurchasingUtilities.isCatalogAvailable(),
                     cachedCampaigns: (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) ? fullyCachedCampaignIds : undefined,
                     versionCode: versionCode,
                     mediationName: mediation ? mediation.getName() : undefined,

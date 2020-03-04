@@ -3,7 +3,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -89,10 +88,6 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
-        // todo: implement method or remove from parent class
-    }
-
-    public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
         // todo: implement method or remove from parent class
     }
 

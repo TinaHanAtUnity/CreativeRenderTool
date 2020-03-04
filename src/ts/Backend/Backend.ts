@@ -4,16 +4,12 @@ import { AppSheet } from 'Backend/Api/AppSheet';
 import { Broadcast } from 'Backend/Api/Broadcast';
 import { Cache } from 'Backend/Api/Cache';
 import { Connectivity } from 'Backend/Api/Connectivity';
-import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
 import { DeviceInfo } from 'Backend/Api/DeviceInfo';
 import { Intent } from 'Backend/Api/Intent';
 import { Lifecycle } from 'Backend/Api/Lifecycle';
 import { Listener } from 'Backend/Api/Listener';
-import { MonetizationListener } from 'Backend/Api/MonetizationListener';
 import { Notification } from 'Backend/Api/Notification';
 import { Placement } from 'Backend/Api/Placement';
-import { PlacementContents } from 'Backend/Api/PlacementContents';
-import { Purchasing } from 'Backend/Api/Purchasing';
 import { Request } from 'Backend/Api/Request';
 import { Resolve } from 'Backend/Api/Resolve';
 import { Sdk } from 'Backend/Api/Sdk';
@@ -58,7 +54,6 @@ interface IBackendApi {
     Listener: Listener;
     Notification: Notification;
     Placement: Placement;
-    Purchasing: Purchasing;
     Preferences: AndroidPreferences | IosPreferences;
     Products: Products;
     Request: Request;
@@ -88,19 +83,15 @@ export class Backend implements IWebViewBridge {
             Broadcast: new Broadcast(this),
             Cache: new Cache(this),
             Connectivity: new Connectivity(this),
-            CustomPurchasing: new CustomPurchasing(this),
             DeviceInfo: new DeviceInfo(this),
             ClassDetection: new ClassDetection(this),
             Intent: new Intent(this),
             Lifecycle: new Lifecycle(this),
             Listener: new Listener(this),
-            MonetizationListener: new MonetizationListener(this),
             Notification: new Notification(this),
             Placement: new Placement(this),
-            PlacementContents: new PlacementContents(this),
             Preferences: platform === Platform.IOS ? new IosPreferences(this) : new AndroidPreferences(this),
             Products: new Products(this),
-            Purchasing: new Purchasing(this),
             Request: new Request(this),
             Resolve: new Resolve(this),
             Sdk: new Sdk(this),
