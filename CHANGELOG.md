@@ -3,6 +3,7 @@
 * Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)
 * Add Explicity SSL Error Handling from Webplayer [#13424](https://github.com/Applifier/unity-ads-webview/pull/13424)
 * Tracking Auction Request Stages [#13537](https://github.com/Applifier/unity-ads-webview/pull/13537)
+* Add Native Initialization Time Within Bounds [#13538](https://github.com/Applifier/unity-ads-webview/pull/13538)
 
 # Tue Mar  3 21:09:42 UTC 2020
 
