@@ -13,7 +13,7 @@ interface IExtendedWindow extends Window {
     initTimestamp: number;
 }
 
-(<IExtendedWindow>window).timestamp = Date.now();
+(<IExtendedWindow>window).initTimestamp = Date.now();
 
 let platform: string | null = null;
 if (typeof location !== 'undefined') {
