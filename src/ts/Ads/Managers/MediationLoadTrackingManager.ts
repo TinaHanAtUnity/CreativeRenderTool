@@ -12,16 +12,16 @@ export class MediationLoadTrackingManager {
     private _webviewEnabledLoad: boolean;
     private _initialAdRequest: boolean = true;
     private _initCompleteTime: number;
-    private _nativeTimestamp: number | undefined;
+    private _nativeInitTime: number | undefined;
 
     private _activeLoads: { [key: string]: { time: number; initialAdRequest: boolean; nativeTimeoutSent: boolean } };
 
-    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, nativeTimestamp: number | undefined) {
+    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, nativeInitTime: number | undefined) {
         this._loadApi = loadApi;
         this._listener = listener;
         this._mediationName = mediationName;
         this._webviewEnabledLoad = webviewEnabledLoad;
-        this._nativeTimestamp = nativeTimestamp;
+        this._nativeInitTime = nativeInitTime;
 
         this._activeLoads = {};
 
@@ -87,7 +87,7 @@ export class MediationLoadTrackingManager {
                     'iar': `${this._activeLoads[placementId].initialAdRequest}`
                 });
 
-                if (this._nativeTimestamp && this._activeLoads[placementId].initialAdRequest) {
+                if (this._nativeInitTime && this._activeLoads[placementId].initialAdRequest) {
                     SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestNativeMeasured, {
                         'med': this._mediationName,
                         'wel': `${this._webviewEnabledLoad}`
@@ -150,7 +150,7 @@ export class MediationLoadTrackingManager {
     }
 
     private tryToSendNativeTimeout(placementId: string) {
-        if (this._nativeTimestamp === undefined) {
+        if (this._nativeInitTime === undefined) {
             return;
         }
 
@@ -162,7 +162,7 @@ export class MediationLoadTrackingManager {
             return;
         }
 
-        if (this.getTime() - this._nativeTimestamp >= 30000) {
+        if (this.getTime() - this._nativeInitTime >= 30000) {
             SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeoutNativeMeasured, {
                 'med': this._mediationName,
                 'wel': `${this._webviewEnabledLoad}`
