@@ -124,7 +124,10 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const loadTime = performance.now();
+        let loadTime: number;
+        if (performance && performance.now) {
+            loadTime = performance.now();
+        }
         const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
             'wel': 'undefined'
         });
@@ -224,7 +227,10 @@ export class Core implements ICore {
             if (nativeInitTime > 0 && nativeInitTime <= 30000) {
                 SDKMetrics.reportTimingEvent(InitializationMetric.NativeInitialization, nativeInitTime);
             }
-            SDKMetrics.reportTimingEvent(InitializationMetric.WebviewLoad, loadTime);
+
+            if (loadTime) {
+                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewLoad, loadTime);
+            }
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());

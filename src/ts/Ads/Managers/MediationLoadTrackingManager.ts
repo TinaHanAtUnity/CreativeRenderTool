@@ -162,7 +162,7 @@ export class MediationLoadTrackingManager {
             return;
         }
 
-        if (this.getTime() - this._nativeInitTime >= 30000) {
+        if (this.getTime() + this._nativeInitTime >= 30000) {
             SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeoutNativeMeasured, {
                 'med': this._mediationName,
                 'wel': `${this._webviewEnabledLoad}`
