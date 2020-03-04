@@ -49,7 +49,8 @@ export class MediationLoadTrackingManager {
     public reportMediaCount(mediaCount: number) {
         SDKMetrics.reportTimingEventWithTags(MediationMetric.MediaCount, mediaCount, {
             'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
         });
     }
 
@@ -124,10 +125,11 @@ export class MediationLoadTrackingManager {
 
     private hasPlacementTimedOut(placementId: string, timeValue: number): boolean {
         const timedOut = (this.getTime() - this._nativeTimestamp) >= 30000;
-        if (this._activeLoads[placementId].initialAdRequest && timedOut) {
+        if (timedOut) {
             SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, {
                 'med': this._mediationName,
-                'wel': `${this._webviewEnabledLoad}`
+                'wel': `${this._webviewEnabledLoad}`,
+                'iar': `${this._activeLoads[placementId].initialAdRequest}`
             });
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
