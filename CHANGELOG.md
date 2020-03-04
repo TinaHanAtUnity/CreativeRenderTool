@@ -1,3 +1,7 @@
+# Staged
+
+* Initial implementation of privacy web UI for 5% of traffic from Finland [#13107](https://github.com/Applifier/unity-ads-webview/pull/13107)
+
 # Wed Mar  4 00:40:16 UTC 2020
 
 * Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)
