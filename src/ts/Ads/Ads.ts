@@ -204,6 +204,7 @@ export class Ads implements IAds {
             measurements.measure('privacy_init');
             return this.setupLoadApiEnabled();
         }).then(() => {
+            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
             measurements.measure('load_api_setup');
             return this.setupMediationTrackingManager();
         }).then(() => {

@@ -167,7 +167,10 @@ export class CampaignManager {
         this._requesting = true;
 
         return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
-            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
+            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+            });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
