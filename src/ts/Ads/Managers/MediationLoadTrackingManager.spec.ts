@@ -11,7 +11,7 @@ describe('MediationLoadTrackingManager', () => {
     beforeEach(() => {
         loadApi = LoadApi();
         listenerApi = ListenerApi();
-        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, 0);
+        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, undefined);
     });
 
     describe('when request load for a placement one time', () => {

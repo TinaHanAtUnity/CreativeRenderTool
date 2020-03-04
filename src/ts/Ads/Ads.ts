@@ -305,7 +305,9 @@ export class Ads implements IAds {
 
             if (performance && performance.now) {
                 const webviewInitTime = performance.now();
-                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewInitialization, webviewInitTime);
+                SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, {
+                    'wel': `${this._webViewEnabledLoad}`
+                });
             }
         });
     }
@@ -333,9 +335,10 @@ export class Ads implements IAds {
 
     private setupMediationTrackingManager(): Promise<void> {
         // tslint:disable-next-line:no-any
-        const nativeInitTime = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
-        const nativeTimestampAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
-        if (this._loadApiEnabled && nativeTimestampAcceptable) {
+        let nativeInitTime: number | undefined = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
+        const nativeInitTimeAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
+        nativeInitTime = nativeInitTimeAcceptable ? nativeInitTime : undefined;
+        if (this._loadApiEnabled) {
 
             // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
