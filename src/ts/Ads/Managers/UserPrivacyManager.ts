@@ -401,7 +401,7 @@ export class UserPrivacyManager {
 
     public applyDeveloperAgeGate() {
         if (this._privacy.isAgeGateEnabled() && this.isDeveloperAgeGateActive() && !this._privacy.isOptOutRecorded() && (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST || this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT)) {
-            if(this.getDeveloperAgeGateChoice()) {
+            if (this.getDeveloperAgeGateChoice()) {
                 this.setUsersAgeGateChoice(AgeGateChoice.YES, AgeGateSource.DEVELOPER);
             } else {
                 this.setUsersAgeGateChoice(AgeGateChoice.NO, AgeGateSource.DEVELOPER);
