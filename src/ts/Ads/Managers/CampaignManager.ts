@@ -850,8 +850,8 @@ export class CampaignManager {
 
         url = Url.addParameters(url, trackingIDs);
 
-        if (this._sdkDetectionInfo != null) {
-            url = Url.addParameters(url, {isMadeWithUnity: this._sdkDetectionInfo.getUnityDetected()});
+        if (this._sdkDetectionInfo != null && this._sdkDetectionInfo.hasDetectionFinished()) {
+            url = Url.addParameters(url, {isMadeWithUnity: this._sdkDetectionInfo.isMadeWithUnity()});
         }
 
         if (nofillRetry && this._lastAuctionId) {

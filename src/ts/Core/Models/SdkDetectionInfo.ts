@@ -3,11 +3,11 @@ import {ICoreApi} from 'Core/ICore';
 import {ISchema, Model} from 'Core/Models/Model';
 
 export interface ISdkDetectionInfo {
-    AdMob: boolean | undefined;
-    MoPub: boolean | undefined;
-    IronSource: boolean | undefined;
-    Fyber: boolean | undefined;
-    SafeDK: boolean | undefined;
+    // AdMob: boolean | undefined;
+    // MoPub: boolean | undefined;
+    // IronSource: boolean | undefined;
+    // Fyber: boolean | undefined;
+    // SafeDK: boolean | undefined;
     UnityEngine: boolean | undefined;
 }
 
@@ -36,22 +36,24 @@ const SdkiOSClassMap: IData = {
 export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
     public static Schema: ISchema<ISdkDetectionInfo> = {
-        AdMob: ['boolean', 'undefined'],
-        MoPub: ['boolean', 'undefined'],
-        IronSource: ['boolean', 'undefined'],
-        Fyber: ['boolean', 'undefined'],
-        SafeDK: ['boolean', 'undefined'],
+        // AdMob: ['boolean', 'undefined'],
+        // MoPub: ['boolean', 'undefined'],
+        // IronSource: ['boolean', 'undefined'],
+        // Fyber: ['boolean', 'undefined'],
+        // SafeDK: ['boolean', 'undefined'],
         UnityEngine: ['boolean', 'undefined']
     };
 
     protected _platform: Platform;
     protected _core: ICoreApi;
+    private _detected: boolean;
 
     constructor(platform: Platform, core: ICoreApi) {
         super('SdkDetectionInfo', SdkDetectionInfo.Schema);
 
         this._platform = platform;
         this._core = core;
+        this._detected = false;
     }
 
     public detectSdks(): Promise<unknown[]> {
@@ -75,7 +77,10 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
                     }
                     this.set(name, r.found);
                 });
-            }).catch(err => this.handleDeviceInfoError(err)));
+
+            }).catch(err => this.handleDeviceInfoError(err)).then(() => {
+                this._detected = true;
+            }));
         return Promise.all(promises);
     }
 
@@ -87,17 +92,21 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
         this._core.Sdk.logWarning(JSON.stringify(error));
     }
 
-    public getUnityDetected(): boolean {
+    public hasDetectionFinished(): boolean {
+        return this._detected;
+    }
+
+    public isMadeWithUnity(): boolean {
         return this.get('UnityEngine') === true;
     }
 
     public getDTO() {
         return {
-            'AdMob': this.get('AdMob'),
-            'MoPub': this.get('MoPub'),
-            'IronSource': this.get('IronSource'),
-            'Fyber': this.get('Fyber'),
-            'SafeDK': this.get('SafeDK'),
+            // 'AdMob': this.get('AdMob'),
+            // 'MoPub': this.get('MoPub'),
+            // 'IronSource': this.get('IronSource'),
+            // 'Fyber': this.get('Fyber'),
+            // 'SafeDK': this.get('SafeDK'),
             'UnityEngine': this.get('UnityEngine')
         };
     }
