@@ -313,17 +313,17 @@ export class Ads implements IAds {
             if (performance && performance.now && CustomFeatures.sampleAtGivenPercent(5)) {
                 const startTime = performance.now();
                 this._core.RequestManager.get('https://auction.unityads.unity3d.com/check')
-                    .then(() => { 
+                    .then(() => {
                         SDKMetrics.reportTimingEventWithTags(BaseLineMetrics.Auction, performance.now() - startTime, {
                             'wel': `${this._webViewEnabledLoad}`,
                             'res': 'true'
-                        }); 
+                        });
                     })
                     .catch(() => {
                         SDKMetrics.reportTimingEventWithTags(BaseLineMetrics.Auction, performance.now() - startTime, {
                             'wel': `${this._webViewEnabledLoad}`,
                             'res': 'false'
-                        });;
+                        });
                     });
             }
         });
