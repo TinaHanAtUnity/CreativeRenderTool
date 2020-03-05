@@ -127,7 +127,7 @@ export class Ads implements IAds {
     private _webViewEnabledLoad: boolean = false;
     private _mediationName: string;
     private _core: ICore;
-    private _sdkDetectionInfo: SdkDetectionInfo;
+    private _sdkDetectionInfo: SdkDetectionInfo | undefined;
 
     public BannerModule: BannerModule;
     public Monetization: Monetization;
@@ -135,7 +135,7 @@ export class Ads implements IAds {
     public Analytics: Analytics;
     public Store: IStore;
 
-    constructor(config: unknown, core: ICore, sdkDetectionInfo: SdkDetectionInfo) {
+    constructor(config: unknown, core: ICore, sdkDetectionInfo?: SdkDetectionInfo | undefined) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;

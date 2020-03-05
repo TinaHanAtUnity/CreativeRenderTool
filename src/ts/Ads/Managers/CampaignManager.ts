@@ -127,7 +127,7 @@ export class CampaignManager {
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
     private _sdkDetectionInfo: SdkDetectionInfo | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined, sdkDetectionInfo?: SdkDetectionInfo) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined, sdkDetectionInfo?: SdkDetectionInfo | undefined) {
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
