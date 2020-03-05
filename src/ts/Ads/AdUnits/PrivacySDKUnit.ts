@@ -1,7 +1,10 @@
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 import { Orientation, IAdUnit, AdUnitContainer, AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ICoreApi } from 'Core/ICore';
-import { UserPrivacyManager, AgeGateChoice, GDPREventAction, GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
+import {
+    UserPrivacyManager, AgeGateChoice, GDPREventAction, GDPREventSource,
+    AgeGateSource
+} from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyMethod, IPrivacyPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -155,7 +158,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
 
     // IConsentViewHandler
     public ageGateDisagree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
+        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO, AgeGateSource.USER);
 
         const permissions: IPrivacyPermissions = {
             gameExp: false,
@@ -167,7 +170,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     }
 
     public ageGateAgree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
+        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES, AgeGateSource.USER);
     }
 
     public openPrivacyUrl(url: string): void {
