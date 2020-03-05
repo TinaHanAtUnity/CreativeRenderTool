@@ -135,9 +135,11 @@ export enum GeneralTimingMetric {
 export enum MediationMetric {
     InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
+    LoadRequestNativeMeasured = 'load_request_native_measured',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
     LoadRequestTimeout = 'load_request_timeout',
+    LoadRequestTimeoutNativeMeasured = 'load_request_timeout_native_measured',
     PlacementCount = 'placement_count',
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',

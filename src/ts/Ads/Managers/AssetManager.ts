@@ -17,6 +17,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 enum CacheType {
     REQUIRED,
@@ -88,7 +89,8 @@ export class AssetManager {
 
         const measurement = createMeasurementsInstance(GeneralTimingMetric.CacheLatency, {
             'cmd': CacheMode[this._cacheMode],
-            'cct': campaign.getContentType()
+            'cct': campaign.getContentType(),
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
         });
 
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
