@@ -46,6 +46,7 @@ export enum GDPREventAction {
     DEVELOPER_CONSENT = 'developer_consent',
     DEVELOPER_OPTOUT = 'developer_optout',
     AGE_GATE_DISAGREE = 'agegate_disagree',
+    DEVELOPER_AGE_GATE_OPTOUT = 'developer_agegate_optout',
     CONSENT_AGREE_ALL = 'consent_agreed_all',
     CONSENT_DISAGREE = 'consent_disagree',
     CONSENT_SAVE_CHOICES = 'consent_save_choices',
@@ -398,6 +399,23 @@ export class UserPrivacyManager {
         return this._developerAgeGateChoice;
     }
 
+    public applyDeveloperAgeGate() {
+        if (this._privacy.isAgeGateEnabled() && this.isDeveloperAgeGateActive() && !this._privacy.isOptOutRecorded() && (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST || this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT)) {
+            if(this.getDeveloperAgeGateChoice()) {
+                this.setUsersAgeGateChoice(AgeGateChoice.YES, AgeGateSource.DEVELOPER);
+            } else {
+                this.setUsersAgeGateChoice(AgeGateChoice.NO, AgeGateSource.DEVELOPER);
+
+                const permissions: IPrivacyPermissions = {
+                    gameExp: false,
+                    ads: false,
+                    external: false
+                };
+                this.updateUserPrivacy(permissions, GDPREventSource.DEVELOPER, GDPREventAction.DEVELOPER_AGE_GATE_OPTOUT);
+            }
+        }
+    }
+
     public isPrivacySDKTestActive(): boolean {
         if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 19) {
             return false;
@@ -546,7 +564,7 @@ export class UserPrivacyManager {
     }
 
     private isAgeGateShowRequired(): boolean {
-        if (this._privacy.isAgeGateEnabled()) {
+        if (this._privacy.isAgeGateEnabled() && !this.isDeveloperAgeGateActive()) {
             if (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this._privacy.isGDPREnabled() && !this._privacy.isOptOutRecorded()) {
                 return true;
             }
