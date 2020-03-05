@@ -146,7 +146,11 @@ export enum MediationMetric {
     AdCaching = 'ad_caching_time'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
+export enum BaseLineMetrics {
+    Auction = 'baseline_auction'
+}
+
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | BaseLineMetrics;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
