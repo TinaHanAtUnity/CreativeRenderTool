@@ -58,15 +58,34 @@ export class AndroidAdUnitApi extends NativeApi {
     public readonly onFocusGained = new Observable1<number>();
     public readonly onFocusLost = new Observable1<number>();
 
+    private _isClosing: boolean = false;
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit', ApiPackage.ADS, EventCategory.ADUNIT);
     }
 
     public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent]);
+        let timeout = 0;
+        if (this._isClosing) {
+            timeout = 5000;
+        }
+        const bridge = this._nativeBridge;
+        const className = this._fullApiClassName;
+        return new Promise(function(resolve, reject){
+            setTimeout(function(){
+                bridge.invoke<void>(className, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent])
+                .then(() => {
+                    resolve();
+                },
+                (reason) => {
+                    reject(reason);
+                });
+            }, timeout)
+        });
     }
 
     public close(): Promise<void> {
+        this._isClosing = true;
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'close');
     }
 
@@ -146,6 +165,7 @@ export class AndroidAdUnitApi extends NativeApi {
 
             case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
                 this.onDestroy.trigger(<boolean>parameters[0], <number>parameters[1]);
+                this._isClosing = false;
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_PAUSE]:
