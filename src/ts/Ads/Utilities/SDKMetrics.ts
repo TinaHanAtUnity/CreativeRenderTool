@@ -129,7 +129,8 @@ export enum AUIMetric {
 export enum GeneralTimingMetric {
     AuctionRequest = 'auction_request',
     CampaignParsing = 'campaign_parsing',
-    CacheLatency = 'cache_latency'
+    CacheLatency = 'cache_latency',
+    AuctionHealth = 'auction_health'
 }
 
 export enum MediationMetric {
@@ -146,11 +147,7 @@ export enum MediationMetric {
     AdCaching = 'ad_caching_time'
 }
 
-export enum BaseLineMetrics {
-    Auction = 'baseline_auction'
-}
-
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | BaseLineMetrics;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
