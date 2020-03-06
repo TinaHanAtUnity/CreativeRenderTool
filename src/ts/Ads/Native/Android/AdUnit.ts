@@ -71,8 +71,9 @@ export class AndroidAdUnitApi extends NativeApi {
         }
         const bridge = this._nativeBridge;
         const className = this._fullApiClassName;
-        return new Promise(function(resolve, reject){
-            setTimeout(function(){
+
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
                 bridge.invoke<void>(className, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent])
                 .then(() => {
                     resolve();
@@ -80,7 +81,7 @@ export class AndroidAdUnitApi extends NativeApi {
                 (reason) => {
                     reject(reason);
                 });
-            }, timeout)
+            }, timeout);
         });
     }
 
