@@ -5,8 +5,9 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
-enum ExperimentType {
-    CacheModeAllowed = 'cma'
+export enum MediationExperimentType {
+    CacheModeAllowed = 'cma',
+    None = 'none'
 }
 
 export class MediationLoadTrackingManager {
@@ -17,26 +18,22 @@ export class MediationLoadTrackingManager {
     private _initialAdRequest: boolean = true;
     private _initCompleteTime: number;
     private _nativeInitTime: number | undefined;
-    private _experimentType: ExperimentType;
+    private _experimentType: MediationExperimentType;
 
     private _activeLoads: { [key: string]: { time: number; initialAdRequest: boolean; nativeTimeoutSent: boolean } };
 
-    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, nativeInitTime: number | undefined) {
+    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, experimentType: MediationExperimentType, nativeInitTime: number | undefined) {
         this._loadApi = loadApi;
         this._listener = listener;
         this._mediationName = mediationName;
         this._webviewEnabledLoad = webviewEnabledLoad;
         this._nativeInitTime = nativeInitTime;
-        this._experimentType = this.getExperimentType();
+        this._experimentType = experimentType;
 
         this._activeLoads = {};
 
         this._loadApi.onLoad.subscribe((placements) => this.onLoad(placements));
         this._listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, nextState) => this.onPlacementStateChangedEventSent(placementId, nextState));
-    }
-
-    private getExperimentType(): ExperimentType {
-        return ExperimentType.CacheModeAllowed;
     }
 
     public setInitComplete(): void {

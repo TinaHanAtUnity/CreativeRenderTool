@@ -91,7 +91,7 @@ import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
@@ -219,10 +219,6 @@ export class Ads implements IAds {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            if (this.MediationLoadTrackingManager && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
-                this.Config.set('cacheMode', CacheMode.ALLOWED);
-            }
-
             this.AssetManager = new AssetManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.CacheManager, this.Config.getCacheMode(), this._core.DeviceInfo, this._core.CacheBookkeeping);
             if (this.SessionManager.getGameSessionId() % 10000 === 0) {
                 this.AssetManager.setCacheDiagnostics(true);
@@ -343,12 +339,17 @@ export class Ads implements IAds {
         const nativeInitTimeAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
         nativeInitTime = nativeInitTimeAcceptable ? nativeInitTime : undefined;
         if (this._loadApiEnabled) {
-
-            // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation && mediation.getName() && performance && performance.now) {
+
+                    let experimentType = MediationExperimentType.None;
+                    if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                        this.Config.set('cacheMode', CacheMode.ALLOWED);
+                        experimentType = MediationExperimentType.CacheModeAllowed;
+                    }
+
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, nativeInitTime);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, experimentType, nativeInitTime);
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();
