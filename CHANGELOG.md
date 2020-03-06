@@ -1,3 +1,7 @@
+# Thu Mar  5 21:57:57 UTC 2020
+
+* Bugfix adding height and width to fix banner display issue [#13616](https://github.com/Applifier/unity-ads-webview/pull/13616)
+
 # Wed Mar  4 22:45:20 UTC 2020
 
 * Fix Metric bugs [#13614](https://github.com/Applifier/unity-ads-webview/pull/13614)
