@@ -94,7 +94,6 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
-import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 export class Ads implements IAds {
 
@@ -127,7 +126,6 @@ export class Ads implements IAds {
     private _webViewEnabledLoad: boolean = false;
     private _mediationName: string;
     private _core: ICore;
-    private _sdkDetectionInfo: SdkDetectionInfo | undefined;
 
     public BannerModule: BannerModule;
     public Monetization: Monetization;
@@ -135,11 +133,10 @@ export class Ads implements IAds {
     public Analytics: Analytics;
     public Store: IStore;
 
-    constructor(config: unknown, core: ICore, sdkDetectionInfo?: SdkDetectionInfo | undefined) {
+    constructor(config: unknown, core: ICore) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
-        this._sdkDetectionInfo = sdkDetectionInfo;
 
         this.Analytics = new Analytics(core, this.PrivacySDK);
         this.Store = new Store(core, this.Analytics.AnalyticsManager);
@@ -274,7 +271,7 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager, this._sdkDetectionInfo);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 

@@ -100,7 +100,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1281,15 +1280,13 @@ describe('CampaignManager', () => {
     describe('loadCampaign', () => {
         let assetManager: AssetManager;
         let campaignManager: CampaignManager;
-        let sdkDetectionInfo: SdkDetectionInfo;
         let mockRequest: sinon.SinonMock;
         const ConfigurationAuctionPlcJson = ConfigurationAuctionPlc;
 
         beforeEach(() => {
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
-            sdkDetectionInfo = new SdkDetectionInfo(platform, core.Api);
-            campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, undefined, sdkDetectionInfo);
+            campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
             mockRequest = sinon.mock(request);
             sinon.stub(Diagnostics, 'trigger').callsFake(() => {
                 return Promise.resolve(<INativeResponse>{});
@@ -1366,38 +1363,6 @@ describe('CampaignManager', () => {
                 assert.fail();
             });
         });
-        /* tslint:disable:no-string-literal */
-        it('createRequestUrl response should have isMadeWithUnity flag when Detection is complete and createUrl is requested', () => {
-            return sdkDetectionInfo.detectSdks().then(() => {
-                return campaignManager['createRequestUrl'](false).then((url) => {
-                    assert.isTrue(url.includes('isMadeWithUnity=false'));
-                });
-            }).catch(() => {
-                assert.fail();
-            });
-        });
-
-        it('createRequestUrl response should NOT have isMadeWithUnity flag when Detection is not run and createUrl is requested', () => {
-            return campaignManager['createRequestUrl'](false).then((url) => {
-                assert.isFalse(url.includes('isMadeWithUnity=false'));
-                assert.isFalse(url.includes('isMadeWithUnity=true'));
-                assert.isFalse(url.includes('isMadeWithUnity'));
-            }).catch(() => {
-                assert.fail();
-            });
-        });
-
-        it('createRequestUrl response should NOT have isMadeWithUnity flag when Detection is run but has not finished and createUrl is requested', () => {
-            sdkDetectionInfo.detectSdks();
-            return campaignManager['createRequestUrl'](false).then((url) => {
-                assert.isFalse(url.includes('isMadeWithUnity=false'));
-                assert.isFalse(url.includes('isMadeWithUnity=true'));
-                assert.isFalse(url.includes('isMadeWithUnity'));
-            }).catch(() => {
-                assert.fail();
-            });
-        });
-        /* tslint:enable:no-string-literal */
     });
 
     describe('on request', () => {

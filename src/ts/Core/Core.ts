@@ -156,6 +156,7 @@ export class Core implements ICore {
             }
             this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
+            this.SdkDetectionInfo = new SdkDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
 
             HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setPlatform(this.NativeBridge.getPlatform());
@@ -167,11 +168,12 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
+            return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             measurements.measure('device_info_collection');
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this.WakeUpManager.setListenConnectivity(true);
+            this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
             if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.FocusManager.setListenAppForeground(true);
                 this.FocusManager.setListenAppBackground(true);
@@ -242,9 +244,7 @@ export class Core implements ICore {
             return configJson;
         }).then((configJson: unknown) => {
             this.Purchasing = new Purchasing(this);
-            this.SdkDetectionInfo = new SdkDetectionInfo(this.NativeBridge.getPlatform(), this.Api);
-            this.SdkDetectionInfo.detectSdks();
-            this.Ads = new Ads(configJson, this, this.SdkDetectionInfo);
+            this.Ads = new Ads(configJson, this);
 
             measurements.measure('core_ready');
 

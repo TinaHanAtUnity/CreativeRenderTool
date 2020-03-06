@@ -46,14 +46,12 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
     protected _platform: Platform;
     protected _core: ICoreApi;
-    private _detected: boolean;
 
     constructor(platform: Platform, core: ICoreApi) {
         super('SdkDetectionInfo', SdkDetectionInfo.Schema);
 
         this._platform = platform;
         this._core = core;
-        this._detected = false;
     }
 
     public detectSdks(): Promise<unknown[]> {
@@ -77,10 +75,7 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
                     }
                     this.set(name, r.found);
                 });
-
-            }).catch(err => this.handleDeviceInfoError(err)).then(() => {
-                this._detected = true;
-            }));
+            }).catch(err => this.handleDeviceInfoError(err)));
         return Promise.all(promises);
     }
 
@@ -90,10 +85,6 @@ export class SdkDetectionInfo extends Model<ISdkDetectionInfo> {
 
     protected handleDeviceInfoError(error: unknown) {
         this._core.Sdk.logWarning(JSON.stringify(error));
-    }
-
-    public hasDetectionFinished(): boolean {
-        return this._detected;
     }
 
     public isMadeWithUnity(): boolean {

@@ -37,6 +37,7 @@ import { IPurchasing } from 'Purchasing/IPurchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -84,4 +85,5 @@ export interface ICore extends IApiModule {
     Config: CoreConfiguration;
     Ads: IAds;
     Purchasing: IPurchasing;
+    SdkDetectionInfo: SdkDetectionInfo;
 }
