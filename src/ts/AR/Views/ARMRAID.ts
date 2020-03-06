@@ -233,6 +233,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         super.hide();
         this._mraidAdapterContainer.disconnect();
+        this._automatedExperimentManager.endExperiment();
     }
 
     private showLoadingScreen() {
