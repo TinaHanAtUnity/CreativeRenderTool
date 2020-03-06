@@ -2,6 +2,7 @@
 
 * Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)
 * Add endExperiment for AR MAB [#13626](https://github.com/Applifier/unity-ads-webview/pull/13626)
+* Use correct namespace for Localization when showing AR ads [#13625](https://github.com/Applifier/unity-ads-webview/pull/13625)
 
 # Thu Mar  5 21:57:57 UTC 2020
 
