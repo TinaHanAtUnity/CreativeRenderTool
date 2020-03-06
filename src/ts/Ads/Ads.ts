@@ -314,16 +314,9 @@ export class Ads implements IAds {
                 const startTime = performance.now();
                 this._core.RequestManager.get('https://auction.unityads.unity3d.com/check')
                     .then(() => {
-                        SDKMetrics.reportTimingEventWithTags(GeneralTimingMetric.AuctionHealth, performance.now() - startTime, {
-                            'wel': `${this._webViewEnabledLoad}`,
-                            'res': 'true'
-                        });
-                    })
-                    .catch(() => {
-                        SDKMetrics.reportTimingEventWithTags(GeneralTimingMetric.AuctionHealth, performance.now() - startTime, {
-                            'wel': `${this._webViewEnabledLoad}`,
-                            'res': 'false'
-                        });
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthGood, performance.now() - startTime);
+                    }).catch(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthBad, performance.now() - startTime);
                     });
             }
         });
