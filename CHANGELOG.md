@@ -1,4 +1,4 @@
-# Pending
+# Fri Mar  6 22:32:55 UTC 2020
 
 * Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)
 * Add endExperiment for AR MAB [#13626](https://github.com/Applifier/unity-ads-webview/pull/13626)
