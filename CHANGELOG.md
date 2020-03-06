@@ -1,3 +1,7 @@
+# Pending
+
+* Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)
+
 # Thu Mar  5 21:57:57 UTC 2020
 
 * Bugfix adding height and width to fix banner display issue [#13616](https://github.com/Applifier/unity-ads-webview/pull/13616)
