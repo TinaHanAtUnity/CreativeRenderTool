@@ -55,6 +55,7 @@ import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasu
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -124,6 +125,7 @@ export class CampaignManager {
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
+    private _sdkDetectionInfo: SdkDetectionInfo;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         this._platform = platform;
@@ -144,6 +146,7 @@ export class CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
+        this._sdkDetectionInfo = core.SdkDetectionInfo;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -952,6 +955,10 @@ export class CampaignManager {
             legalFramework: this._privacy.getLegalFramework(),
             agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
         };
+
+        if (this._sdkDetectionInfo != null) {
+            body.isMadeWithUnity = this._sdkDetectionInfo.isMadeWithUnity();
+        }
 
         if (this.getPreviousPlacementId()) {
             body.previousPlacementId = this.getPreviousPlacementId();
