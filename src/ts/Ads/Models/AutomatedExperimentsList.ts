@@ -29,16 +29,41 @@ export const ButtonExperimentDeclaration: IExperimentDeclaration = {
   }
 };
 
-export const ButtonExperimentDefaultActions: IExperimentActionChoice = {
-  color: ButtonExperimentDeclaration.color.BLUE,
-  animation: ButtonExperimentDeclaration.animation.STATIC
-};
-
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
     name: 'wbvw-endcard-v1',
     actions: ButtonExperimentDeclaration,
-    defaultActions: ButtonExperimentDefaultActions,
+    defaultActions: {
+        color: ButtonExperimentDeclaration.color.BLUE,
+        animation: ButtonExperimentDeclaration.animation.STATIC
+    },
     cacheDisabled: true
 });
 
 export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
+
+// AR Ads
+
+export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
+    skip: {
+        YES: 'true',
+        NO: 'false'
+    },
+    color: {
+        BLUE: '00002feb',
+        GREEN: '003700eb',
+        RED: '2f0000eb',
+        BLACK: '0c292feb'
+    }
+};
+
+export const ArAvailableButtonExperiment = new AutomatedExperiment({
+    name: 'wbvw-ar-v1',
+    actions: ArAvailableButtonExperimentDeclaration,
+    defaultActions: {
+        color: ArAvailableButtonExperimentDeclaration.color.BLACK,
+        skip: ArAvailableButtonExperimentDeclaration.skip.NO
+    },
+    cacheDisabled: true
+});
+
+export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ArAvailableButtonExperiment];

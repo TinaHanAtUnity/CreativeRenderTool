@@ -11,7 +11,7 @@ describe('MediationLoadTrackingManager', () => {
     beforeEach(() => {
         loadApi = LoadApi();
         listenerApi = ListenerApi();
-        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false);
+        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, undefined);
     });
 
     describe('when request load for a placement one time', () => {
@@ -71,13 +71,13 @@ describe('MediationLoadTrackingManager', () => {
             });
 
             it('iar flag should be set', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.arrayContaining(['ads_sdk2_iar:true']));
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({'iar': 'true'}));
             });
         });
 
         [
-            { time: 250, expected: 'ads_sdk2_iar:true'},
-            { time: 251, expected: 'ads_sdk2_iar:false'}
+            { time: 250, expected: { 'iar': 'true' }},
+            { time: 251, expected: { 'iar': 'false' }}
         ].forEach(({time, expected}) => {
             describe(`after init complete withing ${time}ms`, () => {
                 let windowSpy: jest.SpyInstance;
@@ -98,7 +98,7 @@ describe('MediationLoadTrackingManager', () => {
                 });
 
                 it('iar flag should be set correctly', () => {
-                    expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.arrayContaining([expected]));
+                    expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining(expected));
                 });
             });
         });

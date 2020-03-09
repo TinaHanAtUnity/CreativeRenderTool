@@ -111,9 +111,9 @@ export class BannerAdContext {
     }
 
     public load(): Promise<void> {
-        SDKMetrics.reportMetricEventWithTags(BannerMetric.BannerAdLoad, [
-            SDKMetrics.createAdsSdkTag('bls', BannerLoadState[this._loadState]) // banner load state
-        ]);
+        SDKMetrics.reportMetricEventWithTags(BannerMetric.BannerAdLoad, {
+            'bls': BannerLoadState[this._loadState]
+        });
         switch (this._loadState) {
             case BannerLoadState.Unloaded:
             case BannerLoadState.Loaded:

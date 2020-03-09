@@ -80,10 +80,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._thirdPartyEventManager, resource.vendorKey);
             this.setupOMInstance(om, resource);
             if (CustomFeatures.isDoubleClickGoogle(resource.vendorKey)) {
-                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickInstanceCreated,
-                [
-                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(resource.vendorKey))
-                ]);
+                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickInstanceCreated, {
+                    'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(resource.vendorKey)
+                });
             }
             omVendors.push(resource.vendorKey);
         });
@@ -175,10 +174,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             this._omInstances.forEach((om) => {
                 const verificationresource = om.getVerificationResource();
                 if (CustomFeatures.isDoubleClickGoogle(verificationresource.vendorKey)) {
-                    SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
-                    [
-                        SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
-                    ]);
+                    SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions, {
+                        'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey)
+                    });
                 }
             });
             super.impression(impressionObject);
@@ -193,10 +191,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             this._omInstances.forEach((om) => {
                 const verificationresource = om.getVerificationResource();
                 if (CustomFeatures.isDoubleClickGoogle((verificationresource.vendorKey))) {
-                    SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
-                    [
-                        SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
-                    ]);
+                    SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions, {
+                        'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey)
+                    });
                 }
             });
             super.impression(impressionObject);
@@ -218,10 +215,9 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             om.sessionStart(event);
 
             if (CustomFeatures.isDoubleClickGoogle(verificationresource.vendorKey)) {
-                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMStarts,
-                [
-                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
-                ]);
+                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMStarts, {
+                    'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey)
+                });
             }
         });
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);

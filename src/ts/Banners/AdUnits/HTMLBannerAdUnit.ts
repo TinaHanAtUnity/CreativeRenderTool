@@ -137,13 +137,15 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
             eventSettings = {
                 onPageFinished: {
                     sendEvent: true
-                }
+                },
+                onReceivedSslError: { shouldCallSuper: true }
             };
         } else {
             eventSettings = {
                 onPageFinished: {
                     sendEvent: true
-                }
+                },
+                onReceivedSslError: { shouldCallSuper: true }
             };
         }
         return this.setEventSettings(eventSettings);

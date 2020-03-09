@@ -4,8 +4,7 @@ import { ISchema, Model } from 'Core/Models/Model';
 export enum CacheMode {
     FORCED,
     ALLOWED,
-    DISABLED,
-    ADAPTIVE
+    DISABLED
 }
 
 export interface ICoreConfiguration {
