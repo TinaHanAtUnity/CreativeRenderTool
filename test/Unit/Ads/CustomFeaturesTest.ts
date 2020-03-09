@@ -208,4 +208,15 @@ describe('CustomFeatures', () => {
             });
         });
     });
+
+    describe('check double click start', () => {
+        it('should be false for non double click', () => {
+            const val = CustomFeatures.isDoubleClickGoogle('doubleclickbygoogle.casdfasfasfd');
+            assert.equal(val, false);
+        });
+        it('should be true for double click starty', () => {
+            const val = CustomFeatures.isDoubleClickGoogle('doubleclickbygoogle.com-bboyeah');
+            assert.equal(val, true);
+        });
+    });
 });
