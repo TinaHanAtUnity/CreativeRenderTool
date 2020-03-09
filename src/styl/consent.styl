@@ -1,5 +1,19 @@
 @import "components.styl";
 
+$unity-ads-logo-container() {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  margin: .25 * $default-size 0 0 0;
+  width: 100%;
+  height: $default-size;
+
+  .unityads-logo {
+    $unityads-logo-default($default-size);
+    opacity: .6;
+  }
+}
+
 #consent {
   position: absolute;
   top: 0;
@@ -157,7 +171,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 0 3.25 * $default-size .75 * $default-size 3.25 * $default-size;
+    padding: 0 3.25 * $default-size .5 * $default-size 3.25 * $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -182,9 +196,8 @@
     }
   }
 
-  .unityads-logo {
-    $unityads-logo-default($default-size);
-    margin-top: .75 * $default-size;
+  .logo-container {
+    $unity-ads-logo-container();
   }
 }
 
@@ -404,7 +417,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: $default-size 3.25 * $default-size .75 * $default-size 3.25 * $default-size;
+    padding: $default-size 3.25 * $default-size .5 * $default-size 3.25 * $default-size;
     border-bottom-right-radius: .5 * $default-size;
     border-bottom-left-radius: .5 * $default-size;
     background: $white;
@@ -447,10 +460,10 @@
     cursor: pointer;
   }
 
-  .unityads-logo {
-    $unityads-logo-default($default-size);
-    margin-top: .75 * $default-size;
+  .logo-container {
+    $unity-ads-logo-container();
   }
+
 }
 
 &.portrait {
@@ -485,7 +498,7 @@
 body {
   &.landscape #consent-homepage {
     .homepage-button-container {
-      padding: $default-size 5 * $default-size .75 * $default-size 5 * $default-size;
+      padding: $default-size 5 * $default-size .5 * $default-size 5 * $default-size;
     }
   }
 }

@@ -1,3 +1,11 @@
+# Fri Mar  6 22:32:55 UTC 2020
+
+* Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)
+* Add endExperiment for AR MAB [#13626](https://github.com/Applifier/unity-ads-webview/pull/13626)
+* Use correct namespace for Localization when showing AR ads [#13625](https://github.com/Applifier/unity-ads-webview/pull/13625)
+* Add some space to top and bottom of the logo container for consent [#13618](https://github.com/Applifier/unity-ads-webview/pull/13618)
+* Collect baseline metrics for auction connection [#13623](https://github.com/Applifier/unity-ads-webview/pull/13623)
+
 # Thu Mar  5 21:57:57 UTC 2020
 
 * Bugfix adding height and width to fix banner display issue [#13616](https://github.com/Applifier/unity-ads-webview/pull/13616)

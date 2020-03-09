@@ -67,7 +67,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
-        this._localization = new Localization(language, 'loadingscreen');
+        this._localization = new Localization(language, 'mraid');
         this._arUiExperiments = arUiExperiments;
         this._automatedExperimentManager = automatedExperimentManager;
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
@@ -233,6 +233,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         super.hide();
         this._mraidAdapterContainer.disconnect();
+        this._automatedExperimentManager.endExperiment();
     }
 
     private showLoadingScreen() {

@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
+import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, SDKMetrics, InitializationMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -308,6 +308,16 @@ export class Ads implements IAds {
                 SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, {
                     'wel': `${this._webViewEnabledLoad}`
                 });
+            }
+
+            if (performance && performance.now && CustomFeatures.sampleAtGivenPercent(5)) {
+                const startTime = performance.now();
+                this._core.RequestManager.get('https://auction.unityads.unity3d.com/check')
+                    .then(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthGood, performance.now() - startTime);
+                    }).catch(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthBad, performance.now() - startTime);
+                    });
             }
         });
     }
