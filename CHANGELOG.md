@@ -1,4 +1,4 @@
-# Pending
+# Mon Mar  9 20:49:40 UTC 2020
 
 * Run Open Measurement For Double Click [#13511](https://github.com/Applifier/unity-ads-webview/pull/13511)
 * Add Mediation CacheMode Allowed on Group 5 and 6 [#13624](https://github.com/Applifier/unity-ads-webview/pull/13624)
