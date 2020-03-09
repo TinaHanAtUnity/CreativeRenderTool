@@ -15,6 +15,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
@@ -78,7 +79,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         verificationResources.forEach((resource) => {
             const om = new OpenMeasurement<AdMobCampaign>(this._platform, this._core, this._clientInfo, this._campaign, this._placement, this._deviceInfo, this._thirdPartyEventManager, resource.vendorKey);
             this.setupOMInstance(om, resource);
-            if (OpenMeasurementUtilities.isDoubleClickGoogle(resource.vendorKey)) {
+            if (CustomFeatures.isDoubleClickGoogle(resource.vendorKey)) {
                 SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickInstanceCreated,
                 [
                     SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(resource.vendorKey))
@@ -173,7 +174,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
             this._omInstances.forEach((om) => {
                 const verificationresource = om.getVerificationResource();
-                if (OpenMeasurementUtilities.isDoubleClickGoogle(verificationresource.vendorKey)) {
+                if (CustomFeatures.isDoubleClickGoogle(verificationresource.vendorKey)) {
                     SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
                     [
                         SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
@@ -191,7 +192,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
             this._omInstances.forEach((om) => {
                 const verificationresource = om.getVerificationResource();
-                if (OpenMeasurementUtilities.isDoubleClickGoogle((verificationresource.vendorKey))) {
+                if (CustomFeatures.isDoubleClickGoogle((verificationresource.vendorKey))) {
                     SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions,
                     [
                         SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))
@@ -216,7 +217,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             event.data.vendorkey = verificationresource.vendorKey;
             om.sessionStart(event);
 
-            if (OpenMeasurementUtilities.isDoubleClickGoogle(verificationresource.vendorKey)) {
+            if (CustomFeatures.isDoubleClickGoogle(verificationresource.vendorKey)) {
                 SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMStarts,
                 [
                     SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey))

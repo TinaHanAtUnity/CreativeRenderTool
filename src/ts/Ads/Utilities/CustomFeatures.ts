@@ -181,7 +181,11 @@ export class CustomFeatures {
                omVendor === 'integralads.com-omid';
     }
 
+    public static isDoubleClickGoogle(vendorKey: string): boolean {
+        return vendorKey.startsWith('doubleclickbygoogle.com');
+    }
+
     public static isWhitelistedOMVendor(omVendor: string) {
-        return this.isIASVendor(omVendor) || OpenMeasurementUtilities.isDoubleClickGoogle(omVendor);
+        return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
     }
 }
