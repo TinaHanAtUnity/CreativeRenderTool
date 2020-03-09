@@ -32,12 +32,13 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -440,7 +441,6 @@ describe('VastVideoEventHandler tests', () => {
 
     describe('with companion ad', () => {
         let vastAdUnit: VastAdUnit;
-        let vastEndScreenParameters: IVastEndscreenParameters;
 
         beforeEach(() => {
             const overlayContainer = overlay.container();
@@ -448,12 +448,7 @@ describe('VastVideoEventHandler tests', () => {
                 overlayContainer.parentElement.removeChild(overlayContainer);
             }
             sandbox.restore();
-            vastEndScreenParameters = {
-                campaign: vastAdUnitParameters.campaign,
-                clientInfo: vastAdUnitParameters.clientInfo,
-                country: vastAdUnitParameters.coreConfig.getCountry()
-            };
-            vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+            vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);
