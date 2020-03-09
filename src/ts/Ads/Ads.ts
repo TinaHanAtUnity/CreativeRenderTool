@@ -94,6 +94,7 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { XHRequest } from 'Core/Utilities/XHRequest';
 
 export class Ads implements IAds {
 
@@ -317,6 +318,16 @@ export class Ads implements IAds {
                         SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthGood, performance.now() - startTime);
                     }).catch(() => {
                         SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthBad, performance.now() - startTime);
+                    });
+            }
+
+            if (performance && performance.now && XHRequest.isAvailable() && CustomFeatures.sampleAtGivenPercent(5)) {
+                const startTime = performance.now();
+                XHRequest.get('https://auction.unityads.unity3d.com/check')
+                    .then(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthGoodXHR, performance.now() - startTime);
+                    }).catch(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthBadXHR, performance.now() - startTime);
                     });
             }
         });
