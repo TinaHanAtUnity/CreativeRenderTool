@@ -3,6 +3,7 @@
 * Run Open Measurement For Double Click [#13511](https://github.com/Applifier/unity-ads-webview/pull/13511)
 * Add Mediation CacheMode Allowed on Group 5 and 6 [#13624](https://github.com/Applifier/unity-ads-webview/pull/13624)
 * Extend XHRequest class with post and isAvailable methods [#13653](https://github.com/Applifier/unity-ads-webview/pull/13653)
+* Use XHR to measure baseline for Http Request for auction connection [#13654](https://github.com/Applifier/unity-ads-webview/pull/13654)
 
 # Fri Mar  6 22:32:55 UTC 2020
 
