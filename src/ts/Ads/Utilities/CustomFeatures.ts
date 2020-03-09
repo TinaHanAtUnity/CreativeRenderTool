@@ -1,11 +1,9 @@
-import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
-import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export class CustomFeatures {
 
