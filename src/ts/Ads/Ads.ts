@@ -84,7 +84,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -390,6 +390,8 @@ export class Ads implements IAds {
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (this._nofillImmediately) {
                         experimentType = MediationExperimentType.NofillImmediately;
+                    } else if (AuctionXHR.isValid(this._core.Config.getAbGroup()) && XHRequest.isAvailable()) {
+                        experimentType = MediationExperimentType.AuctionXHR;
                     }
 
                     this._mediationName = mediation.getName()!;
