@@ -8,7 +8,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -32,7 +32,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
+import { ChinaMetric, ErrorMetric, MiscellaneousMetric, LoadMetric, SDKMetrics, InitializationMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -84,10 +84,12 @@ import { Promises } from 'Core/Utilities/Promises';
 import { LoadExperiment, LoadRefreshV4 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 
 export class Ads implements IAds {
@@ -174,7 +176,9 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+            'wel': 'undefined'
+        });
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -198,6 +202,7 @@ export class Ads implements IAds {
             measurements.measure('privacy_init');
             return this.setupLoadApiEnabled();
         }).then(() => {
+            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
             measurements.measure('load_api_setup');
             return this.setupMediationTrackingManager();
         }).then(() => {
@@ -265,6 +270,11 @@ export class Ads implements IAds {
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
+
+            if (this.PrivacyManager.isPrivacySDKTestActive()) {
+                CachedUserSummary.fetch(this.PrivacyManager);
+            }
+
             return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             measurements.measure('request_on_init');
@@ -274,7 +284,19 @@ export class Ads implements IAds {
 
             if (performance && performance.now) {
                 const webviewInitTime = performance.now();
-                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewInitialization, webviewInitTime);
+                SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, {
+                    'wel': `${this._webViewEnabledLoad}`
+                });
+            }
+
+            if (performance && performance.now && CustomFeatures.sampleAtGivenPercent(5)) {
+                const startTime = performance.now();
+                this._core.RequestManager.get('https://auction.unityads.unity3d.com/check')
+                    .then(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthGood, performance.now() - startTime);
+                    }).catch(() => {
+                        SDKMetrics.reportTimingEvent(GeneralTimingMetric.AuctionHealthBad, performance.now() - startTime);
+                    });
             }
         });
     }
@@ -301,13 +323,17 @@ export class Ads implements IAds {
     }
 
     private setupMediationTrackingManager(): Promise<void> {
+        // tslint:disable-next-line:no-any
+        let nativeInitTime: number | undefined = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
+        const nativeInitTimeAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
+        nativeInitTime = nativeInitTimeAcceptable ? nativeInitTime : undefined;
         if (this._loadApiEnabled) {
 
             // Potentially use SDK Detection
             return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
                 if (mediation && mediation.getName() && performance && performance.now) {
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, nativeInitTime);
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();
@@ -334,17 +360,37 @@ export class Ads implements IAds {
 
         this._showingPrivacy = true;
 
-        const privacyView = new PrivacyUnit({
-            abGroup: this._core.Config.getAbGroup(),
-            platform: this._core.NativeBridge.getPlatform(),
-            privacyManager: this.PrivacyManager,
-            adUnitContainer: this.Container,
-            adsConfig: this.Config,
-            core: this._core.Api,
-            deviceInfo: this._core.DeviceInfo,
-            privacySDK: this.PrivacySDK
-        });
-        return privacyView.show(options);
+        let privacyAdUnit: PrivacySDKUnit | PrivacyUnit;
+        if (this.PrivacyManager.isPrivacySDKTestActive()) {
+            const privacyAdUnitParams = {
+                requestManager: this._core.RequestManager,
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK
+            };
+
+            privacyAdUnit = new PrivacySDKUnit(privacyAdUnitParams);
+        } else {
+            const consentAdUnitParams = {
+                abGroup: this._core.Config.getAbGroup(),
+                platform: this._core.NativeBridge.getPlatform(),
+                privacyManager: this.PrivacyManager,
+                adUnitContainer: this.Container,
+                adsConfig: this.Config,
+                core: this._core.Api,
+                deviceInfo: this._core.DeviceInfo,
+                privacySDK: this.PrivacySDK
+            };
+
+            privacyAdUnit = new PrivacyUnit(consentAdUnitParams);
+        }
+
+        return privacyAdUnit.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {

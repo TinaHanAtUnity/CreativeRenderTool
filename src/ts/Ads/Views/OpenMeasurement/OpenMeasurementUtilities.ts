@@ -188,8 +188,4 @@ export class OpenMeasurementUtilities {
             return 'unknown';
         }
     }
-
-    public static isDoubleClickGoogle(vendorKey: string): boolean {
-        return vendorKey.startsWith('doubleclickbygoogle.com');
-    }
 }

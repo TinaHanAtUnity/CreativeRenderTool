@@ -1,3 +1,32 @@
+# Pending
+
+* Run Open Measurement For Double Click [#13511](https://github.com/Applifier/unity-ads-webview/pull/13511)
+
+# Fri Mar  6 22:32:55 UTC 2020
+
+* Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)
+* Add endExperiment for AR MAB [#13626](https://github.com/Applifier/unity-ads-webview/pull/13626)
+* Use correct namespace for Localization when showing AR ads [#13625](https://github.com/Applifier/unity-ads-webview/pull/13625)
+* Add some space to top and bottom of the logo container for consent [#13618](https://github.com/Applifier/unity-ads-webview/pull/13618)
+* Collect baseline metrics for auction connection [#13623](https://github.com/Applifier/unity-ads-webview/pull/13623)
+
+# Thu Mar  5 21:57:57 UTC 2020
+
+* Bugfix adding height and width to fix banner display issue [#13616](https://github.com/Applifier/unity-ads-webview/pull/13616)
+
+# Wed Mar  4 22:45:20 UTC 2020
+
+* Fix Metric bugs [#13614](https://github.com/Applifier/unity-ads-webview/pull/13614)
+* Report Mediation Timeouts Better And Add Tags [#13564](https://github.com/Applifier/unity-ads-webview/pull/13564)
+
+# Wed Mar  4 20:23:16 UTC 2020
+
+* Add IAR to Some Metrics [#13591](https://github.com/Applifier/unity-ads-webview/pull/13591)
+
+# Wed Mar  4 11:58:05 UTC 2020
+
+* Initial implementation of privacy web UI for 5% of traffic from Finland [#13107](https://github.com/Applifier/unity-ads-webview/pull/13107)
+
 # Wed Mar  4 00:40:16 UTC 2020
 
 * Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)

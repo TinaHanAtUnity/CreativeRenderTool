@@ -34,6 +34,7 @@ import { SensorInfoApi } from 'Core/Native/__mocks__/SensorInfo';
 import { StorageApi } from 'Core/Native/__mocks__/StorageApi';
 import { StorageBridge } from 'Core/Utilities/__mocks__/StorageBridge';
 import { NativeErrorApi } from 'Core/__mocks__/NativeErrorApi';
+import { SdkDetectionInfo } from 'Core/Models/__mocks__/SdkDetectionInfo';
 
 import { ICore } from 'Core/ICore';
 
@@ -81,5 +82,6 @@ export const Core = jest.fn(() => {
         DeviceInfo: new DeviceInfo(),
         Config: new CoreConfiguration(),
         Ads: new Ads(),
+        SdkDetectionInfo: new SdkDetectionInfo()
     };
 });

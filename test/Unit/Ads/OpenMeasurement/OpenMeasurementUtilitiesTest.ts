@@ -155,16 +155,5 @@ import { assert } from 'chai';
                 assert.equal(val, 'unknown');
             });
         });
-
-        describe('check double click start', () => {
-            it('should be false for non double click', () => {
-                const val = OpenMeasurementUtilities.isDoubleClickGoogle('doubleclickbygoogle.casdfasfasfd');
-                assert.equal(val, false);
-            });
-            it('should be true for double click starty', () => {
-                const val = OpenMeasurementUtilities.isDoubleClickGoogle('doubleclickbygoogle.com-bboyeah');
-                assert.equal(val, true);
-            });
-        });
     });
 });

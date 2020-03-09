@@ -52,6 +52,7 @@ import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasu
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -121,6 +122,7 @@ export class CampaignManager {
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
+    private _sdkDetectionInfo: SdkDetectionInfo;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         this._platform = platform;
@@ -141,6 +143,7 @@ export class CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
+        this._sdkDetectionInfo = core.SdkDetectionInfo;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -164,7 +167,10 @@ export class CampaignManager {
         this._requesting = true;
 
         return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
-            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
+            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+            });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -185,12 +191,17 @@ export class CampaignManager {
                     retryDelay: 10000,
                     followRedirects: false,
                     retryWithConnectionEvents: false
+                }).catch((error: unknown) => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+                    }
+                    throw error;
                 });
             }).then(response => {
                 measurement.measure('auction_response');
                 const cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
-                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
                 }
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
@@ -250,16 +261,24 @@ export class CampaignManager {
             const body = JSON.stringify(requestBody);
             this._deviceFreeSpace = deviceFreeSpace;
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
-            return this._request.post(requestUrl, body, [], {
-                retries: 0,
-                retryDelay: 0,
-                followRedirects: false,
-                retryWithConnectionEvents: false,
-                timeout: 10000
+
+            return Promise.resolve().then(() => {
+                return this._request.post(requestUrl, body, [], {
+                    retries: 0,
+                    retryDelay: 0,
+                    followRedirects: false,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
+                }).catch((error: unknown) => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+                    }
+                    throw error;
+                });
             }).then(response => {
                 cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
-                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime);
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
                 }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
@@ -898,6 +917,10 @@ export class CampaignManager {
             legalFramework: this._privacy.getLegalFramework(),
             agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
         };
+
+        if (this._sdkDetectionInfo != null) {
+            body.isMadeWithUnity = this._sdkDetectionInfo.isMadeWithUnity();
+        }
 
         if (this.getPreviousPlacementId()) {
             body.previousPlacementId = this.getPreviousPlacementId();
