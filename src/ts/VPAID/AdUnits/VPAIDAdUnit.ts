@@ -226,7 +226,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             shouldOverrideUrlLoading: {
                 sendEvent: true,
                 returnValue: true
-            }
+            },
+            onReceivedSslError: { shouldCallSuper: true }
         };
         promises.push(this._webPlayerContainer.setEventSettings(eventSettings));
         return Promise.all(promises);
@@ -244,7 +245,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             },
             shouldOverrideUrlLoading: {
                 sendEvent: true, returnValue: true
-            }
+            },
+            onReceivedSslError: { shouldCallSuper: true }
         };
         return Promise.all([
             this._webPlayerContainer.setSettings(settings, {}),

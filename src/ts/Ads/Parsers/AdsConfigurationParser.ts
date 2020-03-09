@@ -14,6 +14,7 @@ export class AdsConfigurationParser {
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
         let defaultBannerPlacement: Placement | undefined;
+        let hasArPlacement: boolean = false;
 
         if (configPlacements) {
             configPlacements.forEach(rawPlacement => {
@@ -25,6 +26,11 @@ export class AdsConfigurationParser {
                     } else {
                         defaultPlacement = placement;
                     }
+                }
+
+                const adTypes = placement.getAdTypes();
+                if (adTypes && adTypes.includes('MRAID_AR')) {
+                    hasArPlacement = true;
                 }
             });
         } else {
@@ -43,7 +49,8 @@ export class AdsConfigurationParser {
             placements: placements,
             defaultPlacement: defaultPlacement,
             defaultBannerPlacement: defaultBannerPlacement,
-            hidePrivacy: configJson.hidePrivacy
+            hidePrivacy: configJson.hidePrivacy,
+            hasArPlacement: hasArPlacement
         };
 
         return new AdsConfiguration(configurationParams);
@@ -57,8 +64,6 @@ export class AdsConfigurationParser {
                 return CacheMode.ALLOWED;
             case 'disabled':
                 return CacheMode.DISABLED;
-            case 'adaptive':
-                return CacheMode.ADAPTIVE;
             default:
                 throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }

@@ -26,7 +26,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
         it('should return false when detected class is not present', () => {
             return sdkDetectionInfo.detectSdks().then(() => {
                 const result = sdkDetectionInfo.getSdkDetectionJSON();
-                assert(result === '{"AdMob":false,"MoPub":false,"IronSource":false,"Fyber":false,"SafeDK":false,"UnityEngine":false}');
+                assert(result === '{"UnityEngine":false}');
             });
         });
 
@@ -34,7 +34,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
             backend.Api.ClassDetection.setClassesArePresent(true);
             return sdkDetectionInfo.detectSdks().then(() => {
                 const result = sdkDetectionInfo.getSdkDetectionJSON();
-                assert(result === '{"AdMob":true,"MoPub":true,"IronSource":true,"Fyber":true,"SafeDK":true,"UnityEngine":true}');
+                assert(result === '{"UnityEngine":true}');
             });
         });
     });

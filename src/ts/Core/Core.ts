@@ -124,8 +124,13 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
-        const loadTime = performance.now();
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        let loadTime: number;
+        if (performance && performance.now) {
+            loadTime = performance.now();
+        }
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+            'wel': 'undefined'
+        });
         return this.Api.Sdk.loadComplete().then((data) => {
             measurements.measure('webview_load_complete');
             this.ClientInfo = new ClientInfo(data);
@@ -215,7 +220,17 @@ export class Core implements ICore {
             } else {
                 SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
             }
-            SDKMetrics.reportTimingEvent(InitializationMetric.WebviewLoad, loadTime);
+
+            // tslint:disable-next-line:no-any
+            const nativeInitTime = (<number>(<any>window).initTimestamp) - this.ClientInfo.getInitTimestamp();
+
+            if (nativeInitTime > 0 && nativeInitTime <= 30000) {
+                SDKMetrics.reportTimingEvent(InitializationMetric.NativeInitialization, nativeInitTime);
+            }
+
+            if (loadTime) {
+                SDKMetrics.reportTimingEvent(InitializationMetric.WebviewLoad, loadTime);
+            }
 
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());

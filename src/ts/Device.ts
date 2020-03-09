@@ -10,7 +10,10 @@ import 'styl/main.styl';
 interface IExtendedWindow extends Window {
     nativebridge: NativeBridge;
     webview: WebView;
+    initTimestamp: number;
 }
+
+(<IExtendedWindow>window).initTimestamp = Date.now();
 
 let platform: string | null = null;
 if (typeof location !== 'undefined') {

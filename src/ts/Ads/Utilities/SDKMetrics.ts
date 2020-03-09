@@ -106,6 +106,7 @@ export enum OMMetric {
 }
 
 export enum InitializationMetric {
+    NativeInitialization = 'native_init',
     WebviewInitialization = 'webview_init',
     WebviewInitializationPhases = 'webview_init_phases',
     WebviewLoad = 'webview_load'
@@ -125,19 +126,31 @@ export enum AUIMetric {
     DecisionNotReady = 'decision_not_ready'
 }
 
+export enum GeneralTimingMetric {
+    AuctionRequest = 'auction_request',
+    CampaignParsing = 'campaign_parsing',
+    CacheLatency = 'cache_latency',
+    AuctionHealthGood = 'auction_health_good',
+    AuctionHealthBad = 'auction_health_bad',
+    AuctionHealthGoodXHR = 'auction_health_good_xhr',
+    AuctionHealthBadXHR = 'auction_health_bad_xhr'
+}
+
 export enum MediationMetric {
     InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
+    LoadRequestNativeMeasured = 'load_request_native_measured',
     LoadRequestFill = 'load_request_fill_time',
     LoadRequestNofill = 'load_request_nofill_time',
     LoadRequestTimeout = 'load_request_timeout',
+    LoadRequestTimeoutNativeMeasured = 'load_request_timeout_native_measured',
     PlacementCount = 'placement_count',
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
     AdCaching = 'ad_caching_time'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
@@ -155,16 +168,11 @@ export class SDKMetrics {
         return !!this._metricInstance;
     }
 
-    // TODO: Refactor kv pair tag generation so this doesn't need to exist
-    public static createAdsSdkTag(suffix: string, tagValue: string): string {
-        return `ads_sdk2_${suffix}:${tagValue}`;
-    }
-
     public static reportMetricEvent(event: PTSEvent): void {
-        this._metricInstance.reportMetricEventWithTags(event, []);
+        this._metricInstance.reportMetricEventWithTags(event, {});
     }
 
-    public static reportMetricEventWithTags(event: PTSEvent, tags: string[]): void {
+    public static reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }): void {
         this._metricInstance.reportMetricEventWithTags(event, tags);
     }
 
@@ -172,7 +180,7 @@ export class SDKMetrics {
         this._metricInstance.reportTimingEvent(event, value);
     }
 
-    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: string[]): void {
+    public static reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }): void {
         this._metricInstance.reportTimingEventWithTags(event, value, tags);
     }
 
