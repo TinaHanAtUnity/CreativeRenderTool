@@ -439,11 +439,10 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
                 SDKMetrics.reportMetricEvent(OMMetric.IASVerificatonInjected);
             }
 
-            if (OpenMeasurementUtilities.isDoubleClickGoogle(vendorKey) && this._campaign instanceof AdMobCampaign) {
-                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMInjections,
-                [
-                    SDKMetrics.createAdsSdkTag('dckey', OpenMeasurementUtilities.getDcKeyMetricTag(vendorKey))
-                ]);
+            if (CustomFeatures.isDoubleClickGoogle(vendorKey) && this._campaign instanceof AdMobCampaign) {
+                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMInjections, {
+                    'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(vendorKey)
+                });
             }
 
             return Promise.resolve();

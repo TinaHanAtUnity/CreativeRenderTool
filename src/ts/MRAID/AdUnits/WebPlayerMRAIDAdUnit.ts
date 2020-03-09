@@ -136,7 +136,8 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
         }, {}));
         const eventSettings = {
             onPageStarted: { 'sendEvent': true },
-            shouldOverrideUrlLoading: { 'sendEvent': true, 'returnValue': true }
+            shouldOverrideUrlLoading: { 'sendEvent': true, 'returnValue': true },
+            onReceivedSslError: { shouldCallSuper: true }
         };
         promises.push(this._webPlayerContainer.setEventSettings(eventSettings));
         return Promise.all(promises);
@@ -150,7 +151,8 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
         };
         const events = {
             onPageStarted: { 'sendEvent': true },
-            shouldOverrideUrlLoading: { 'sendEvent': true, 'returnValue': true }
+            shouldOverrideUrlLoading: { 'sendEvent': true, 'returnValue': true },
+            onReceivedSslError: { shouldCallSuper: true }
         };
         return Promise.all([
             this._webPlayerContainer.setSettings(settings, {}),

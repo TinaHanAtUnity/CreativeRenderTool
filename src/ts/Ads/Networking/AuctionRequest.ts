@@ -479,6 +479,7 @@ export class AuctionRequest {
                     omidJSVersion: OM_JS_VERSION,
                     legalFramework: this._privacySDK.getLegalFramework(),
                     agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
+                    //Todo: Add IsMadeWithUnity flag from SDKDetectionInfo
                 };
             });
         });

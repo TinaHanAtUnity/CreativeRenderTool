@@ -224,44 +224,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             return Promise.reject(new Error('Not a valid HTML document => ' + markup));
         }
         this.removeScriptTags(dom);
-        this.injectVideoURL(dom);
         return this.injectScripts(dom).then(() => {
             return dom.documentElement.outerHTML;
         });
-    }
-
-    private injectVideoURL(dom: Document) {
-        const video = this._campaign.getVideo();
-        if (video) {
-            const scriptEl = dom.querySelector('body script');
-            const mediaFileURL = this.encodeURLForHTML(video.getMediaFileURL());
-            let cachedFileURL = video.getVideo().getCachedUrl();
-            if (scriptEl && scriptEl.textContent) {
-                if (cachedFileURL) {
-                    cachedFileURL = this.encodeURLForHTML(cachedFileURL);
-                    const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
-                    scriptEl.textContent = replacedSrc;
-
-                    if (scriptEl.textContent.includes(cachedFileURL)) {
-                        // report using cached video
-                        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo);
-                    } else {
-                        // report using streaming video
-                        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
-                    }
-                } else {
-                    // report using streaming video
-                    SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
-                }
-            }
-        } else {
-            // report using streaming video
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
-        }
-    }
-
-    private encodeURLForHTML(str: string): string {
-        return str.replace(/[&=]/g, (c) => '\\x' + c.charCodeAt(0).toString(16));
     }
 
     private removeScriptTags(dom: Document) {
