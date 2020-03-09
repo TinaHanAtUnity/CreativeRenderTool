@@ -6,6 +6,7 @@ import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/SquareEndScreenA
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import {Color} from 'Core/Utilities/Color';
 
 export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     private _animation: string;
@@ -17,7 +18,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             combination = ButtonAnimationsExperiment.getDefaultActions();
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
         }
-        this._bgColor = '#' + combination.color;
+        this._bgColor = Color.hexToCssRgba(combination.color);
         this._animation = combination.animation;
         this._templateData = {
             ...this._templateData,
