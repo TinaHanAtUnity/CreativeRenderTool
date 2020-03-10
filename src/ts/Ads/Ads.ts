@@ -197,16 +197,16 @@ export class Ads implements IAds {
             const timeoutPointInMs = 250;
             const placementIds = this.Config.getPlacementIds();
             this._loadObserver = this.Api.LoadApi.onLoad.subscribe((loads) => {
-                // Sends nofill until 250ms threshold has been hit, then unregisters the listener
-                if (this._mediationInitCompleteStartTime && (performance.now() - this._mediationInitCompleteStartTime < timeoutPointInMs)) {
+                // Sends nofills until 250ms threshold has been hit, then unregisters the listener
+                if (this._mediationInitCompleteStartTime && (performance.now() - this._mediationInitCompleteStartTime > timeoutPointInMs)) {
+                    this.Api.LoadApi.onLoad.unsubscribe(this._loadObserver);
+                } else {
                     Object.keys(loads).forEach((placementId) => {
                         if (placementIds.includes(placementId)) {
                             this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
                             this.Api.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
                         }
                     });
-                } else {
-                    this.Api.LoadApi.onLoad.unsubscribe(this._loadObserver);
                 }
             });
             promise = this._core.Api.Sdk.initComplete();
