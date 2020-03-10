@@ -633,7 +633,7 @@ describe('UserPrivacyManagerTest', () => {
 
         it('with proper fields', () => {
             const expectedKafkaObject = {
-                v: 2,
+                v: 3,
                 advertisingId: testAdvertisingId,
                 abGroup: abGroup,
                 layout: layout,
