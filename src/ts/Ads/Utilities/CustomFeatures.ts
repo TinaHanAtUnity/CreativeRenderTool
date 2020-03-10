@@ -7,9 +7,9 @@ import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
 
-    // TODO: Update with whitelisted gameID
     public static isNofillImmediatelyGame(gameId: string): boolean {
-        return gameId === '';
+        return gameId === '1781853' ||
+               gameId === '1781854';
     }
 
     public static isNoGzipGame(gameId: string): boolean {
