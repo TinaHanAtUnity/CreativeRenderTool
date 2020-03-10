@@ -1,5 +1,4 @@
 export class Color {
-
     public static hexToCssRgba(hex: string): string {
         const rgba = this.hexToRgba(hex);
         return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${parseFloat((rgba.a / 255).toFixed(3))})`;
@@ -15,5 +14,4 @@ export class Color {
             a: hex.length >= 8 ? parseInt(hex.slice(6, 8), 16) : 255
         };
     }
-
 }
