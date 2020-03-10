@@ -1,39 +1,40 @@
-import { ListenerApi } from 'Ads/Native/Listener';
-import { LoadApi } from 'Core/Native/LoadApi';
-import { Observable1 } from 'Core/Utilities/Observable';
-import { IObserver1 } from 'Core/Utilities/IObserver';
 import { PlacementState } from 'Ads/Models/Placement';
+import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
-import { IAdsApi } from 'Ads/IAds';
+import { LoadApi } from 'Core/Native/LoadApi';
+import { IObserver1 } from 'Core/Utilities/IObserver';
 
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
-export enum MediationExperimentType {
-    NofillImmediately = 'nfi',
-    CacheModeAllowed = 'cma',
-    None = 'none'
-}
-
 export class NofillImmediatelyManager {
-    private _placementApi: PlacementApi;
+    private _loadApi: LoadApi;
     private _listenerApi: ListenerApi;
+    private _placementApi: PlacementApi;
+
     private _loadObserver: IObserver1<{ [key: string]: number }>;
-    private _onLoad: Observable1<{ [key: string]: number }>;
     private _placementIds: string[];
     private _mediationInitCompleteStartTime: number;
 
-    constructor(adsApi: IAdsApi, placementIds: string[]) {
-        this._onLoad = adsApi.LoadApi.onLoad;
-        this._placementApi = adsApi.Placement;
-        this._listenerApi = adsApi.Listener;
+    constructor(loadApi: LoadApi, listenerApi: ListenerApi, placementApi: PlacementApi, placementIds: string[]) {
+        this._loadApi = loadApi;
+        this._listenerApi = listenerApi;
+        this._placementApi = placementApi;
         this._placementIds = placementIds;
+
+        this.subscribeToLoads();
     }
 
-    public subscribeToLoads() {
-        this._loadObserver = this._onLoad.subscribe((loads) => {
+    public setInitComplete(): void {
+        if (!this._mediationInitCompleteStartTime) {
+            this._mediationInitCompleteStartTime = performance.now();
+        }
+    }
+
+    private subscribeToLoads() {
+        this._loadObserver = this._loadApi.onLoad.subscribe((loads) => {
             // Sends nofills until 250ms threshold has been hit, then unregisters the listener
             if (this._mediationInitCompleteStartTime && (performance.now() - this._mediationInitCompleteStartTime > INITIAL_AD_REQUEST_WAIT_TIME_IN_MS)) {
-                this._onLoad.unsubscribe(this._loadObserver);
+                this._loadApi.onLoad.unsubscribe(this._loadObserver);
             } else {
                 Object.keys(loads).forEach((placementId) => {
                     if (this._placementIds.includes(placementId)) {
@@ -43,11 +44,5 @@ export class NofillImmediatelyManager {
                 });
             }
         });
-    }
-
-    public setInitComplete(): void {
-        if (!this._mediationInitCompleteStartTime) {
-            this._mediationInitCompleteStartTime = performance.now();
-        }
     }
 }

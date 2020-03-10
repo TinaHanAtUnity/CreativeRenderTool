@@ -196,8 +196,7 @@ export class Ads implements IAds {
 
         this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization) && !!(performance && performance.now);
         if (this._nofillImmediately) {
-            this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api, this.Config.getPlacementIds());
-            this.NofillImmediatelyManager.subscribeToLoads();
+            this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
             promise = this._core.Api.Sdk.initComplete();
         }
 
@@ -310,7 +309,7 @@ export class Ads implements IAds {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
 
-            if(this.NofillImmediatelyManager) {
+            if (this.NofillImmediatelyManager) {
                 this.NofillImmediatelyManager.setInitComplete();
             }
 
