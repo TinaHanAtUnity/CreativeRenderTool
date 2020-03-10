@@ -6,7 +6,7 @@ import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/SquareEndScreenA
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
-import {Color} from 'Core/Utilities/Color';
+import { Color } from 'Core/Utilities/Color';
 
 export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     private _animation: string;
