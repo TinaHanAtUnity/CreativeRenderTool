@@ -5,7 +5,7 @@ import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi, IAds } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
@@ -110,7 +110,7 @@ describe('CampaignRefreshManager', () => {
     let vastParser: VastParserStrict;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -233,7 +233,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
             adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
             privacySDK = TestFixtures.getPrivacySDK(core);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
+            campaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -637,7 +637,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
             adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
             privacySDK = TestFixtures.getPrivacySDK(core);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
+            campaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
