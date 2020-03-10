@@ -97,6 +97,7 @@ import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Manag
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
+import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 
 export class Ads implements IAds {
 
@@ -119,6 +120,7 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
+    public NofillImmediatelyManager: NofillImmediatelyManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -194,21 +196,8 @@ export class Ads implements IAds {
 
         this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization) && !!(performance && performance.now);
         if (this._nofillImmediately) {
-            const timeoutPointInMs = 250;
-            const placementIds = this.Config.getPlacementIds();
-            this._loadObserver = this.Api.LoadApi.onLoad.subscribe((loads) => {
-                // Sends nofills until 250ms threshold has been hit, then unregisters the listener
-                if (this._mediationInitCompleteStartTime && (performance.now() - this._mediationInitCompleteStartTime > timeoutPointInMs)) {
-                    this.Api.LoadApi.onLoad.unsubscribe(this._loadObserver);
-                } else {
-                    Object.keys(loads).forEach((placementId) => {
-                        if (placementIds.includes(placementId)) {
-                            this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
-                            this.Api.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[PlacementState.NOT_AVAILABLE], PlacementState[PlacementState.NO_FILL]);
-                        }
-                    });
-                }
-            });
+            this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api, this.Config.getPlacementIds());
+            this.NofillImmediatelyManager.subscribeToLoads();
             promise = this._core.Api.Sdk.initComplete();
         }
 
@@ -319,7 +308,10 @@ export class Ads implements IAds {
             measurements.measure('init_complete_to_native');
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
-                this._mediationInitCompleteStartTime = performance.now();
+            }
+
+            if(this.NofillImmediatelyManager) {
+                this.NofillImmediatelyManager.setInitComplete();
             }
 
             if (this.PrivacyManager.isPrivacySDKTestActive()) {
