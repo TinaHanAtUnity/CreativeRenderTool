@@ -2,7 +2,7 @@ export class Color {
 
     public static hexToCssRgba(hex: string): string {
         const rgba = this.hexToRgba(hex);
-        return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+        return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${parseFloat((rgba.a / 255).toFixed(3))})`;
     }
 
     public static hexToRgba(hex: string): {r: number; g: number; b: number; a: number} {
