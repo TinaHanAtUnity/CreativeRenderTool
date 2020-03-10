@@ -99,7 +99,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
             this._unityPrivacyView.show();
 
-            if (this._privacySDK.isAgeGateEnabled()) {
+            if (this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
             } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
                 PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);

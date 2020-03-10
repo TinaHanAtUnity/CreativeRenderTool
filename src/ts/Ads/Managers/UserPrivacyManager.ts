@@ -195,7 +195,7 @@ export class UserPrivacyManager {
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
 
-        if (source === GDPREventSource.DEVELOPER) {
+        if (source === GDPREventSource.DEVELOPER && action !== GDPREventAction.DEVELOPER_AGE_GATE_OPTOUT) {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
             userPrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
@@ -332,13 +332,15 @@ export class UserPrivacyManager {
     }
 
     public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice, ageGateSource: AgeGateSource) {
-        if (ageGateChoice === AgeGateChoice.YES) {
-            PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
-            if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+        if (ageGateSource === AgeGateSource.USER) {
+            if (ageGateChoice === AgeGateChoice.YES) {
+                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
+                if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                    PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+                }
+            } else if (ageGateChoice === AgeGateChoice.NO) {
+                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
             }
-        } else if (ageGateChoice === AgeGateChoice.NO) {
-            PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
         }
 
         this._ageGateChoice = ageGateChoice;
