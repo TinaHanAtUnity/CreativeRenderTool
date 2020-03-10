@@ -128,6 +128,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
     private _nofillImmediately: boolean = false;
+    private _mediationInitCompleteStartTime: number;
     private _loadObserver: IObserver1<{ [key: string]: number }>;
     private _mediationName: string;
     private _core: ICore;
@@ -193,12 +194,11 @@ export class Ads implements IAds {
 
         this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization) && !!(performance && performance.now);
         if (this._nofillImmediately) {
-            const startTime = performance.now();
             const timeoutPointInMs = 250;
             const placementIds = this.Config.getPlacementIds();
             this._loadObserver = this.Api.LoadApi.onLoad.subscribe((loads) => {
                 // Sends nofill until 250ms threshold has been hit, then unregisters the listener
-                if (performance.now() - startTime < timeoutPointInMs) {
+                if (this._mediationInitCompleteStartTime && (performance.now() - this._mediationInitCompleteStartTime < timeoutPointInMs)) {
                     Object.keys(loads).forEach((placementId) => {
                         if (placementIds.includes(placementId)) {
                             this.Api.Placement.setPlacementState(placementId, PlacementState.NO_FILL);
@@ -319,6 +319,7 @@ export class Ads implements IAds {
             measurements.measure('init_complete_to_native');
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
+                this._mediationInitCompleteStartTime = performance.now();
             }
 
             if (this.PrivacyManager.isPrivacySDKTestActive()) {
