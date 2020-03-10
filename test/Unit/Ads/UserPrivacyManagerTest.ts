@@ -724,7 +724,7 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.abGroup, expectedAbGroup);
                     assert.equal(eventData.layout, '');
                     assert.equal(eventData.firstRequest, true);
-                    assert.equal(eventData.v, 2);
+                    assert.equal(eventData.v, 3);
                     assert.equal(eventData.agreedVersion, gamePrivacy.getVersion());
                 });
             });
