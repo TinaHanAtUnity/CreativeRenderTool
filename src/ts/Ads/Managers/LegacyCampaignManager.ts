@@ -19,7 +19,6 @@ import { ICoreApi, ICore } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -32,7 +31,6 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Observable1, Observable2, Observable3, Observable4 } from 'Core/Utilities/Observable';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
@@ -56,53 +54,14 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
     trackingUrls: ICampaignTrackingUrls;
 }
 
-export class CampaignManager {
-
-    public static setCampaignId(campaignId: string) {
-        CampaignManager.CampaignId = campaignId;
-    }
-
-    public static setSessionId(sessionId: string) {
-        CampaignManager.SessionId = sessionId;
-    }
-
-    public static setCountry(country: string) {
-        CampaignManager.Country = country;
-    }
-
-    public static setCampaignResponse(campaignResponse: string) {
-        CampaignManager.CampaignResponse = campaignResponse;
-    }
-
-    public static setBaseUrl(baseUrl: string): void {
-        CampaignManager.BaseUrl = baseUrl + '/v4/games';
-        CampaignManager.AuctionV5BaseUrl = baseUrl + '/v5/games';
-    }
-
-    protected static CampaignResponse: string | undefined;
-
-    protected static AbGroup: ABGroup | undefined;
-
-    private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
-    private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
-    private static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
-
-    private static CampaignId: string | undefined;
-    private static SessionId: string | undefined;
-    private static Country: string | undefined;
-
-    public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
-    public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable4<unknown, string[], string, Session | undefined>();
-    public readonly onConnectivityError = new Observable1<string[]>();
-    public readonly onAdPlanReceived = new Observable3<number, number, number>();
-
+export class LegacyCampaignManager extends CampaignManager {
     protected _platform: Platform;
     protected _core: ICoreApi;
     protected _requesting: boolean;
@@ -128,6 +87,8 @@ export class CampaignManager {
     private _sdkDetectionInfo: SdkDetectionInfo;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
+        super();
+
         this._platform = platform;
         this._core = core.Api;
         this._coreConfig = coreConfig;
@@ -169,38 +130,26 @@ export class CampaignManager {
 
         this._requesting = true;
 
-        return Promise.all([this.createRequestUrl(nofillRetry), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all<string[], number | undefined, number>([
+            this.getFullyCachedCampaigns(),
+            this.getVersionCode(),
+            this._deviceInfo.getFreeSpace()
+        ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
+            this._deviceFreeSpace = freeSpace;
+            return Promise.all<string, unknown>([
+                CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, this._sdkDetectionInfo)
+            ]);
+        }).then(([requestUrl, requestBody]) => {
             measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
                 'wel': 'false',
                 'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
             });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
-            const body = JSON.stringify(requestBody);
 
             SdkStats.setAdRequestTimestamp();
             const requestTimestamp: number = Date.now();
-            return Promise.resolve().then((): Promise<INativeResponse> => {
-                if (CampaignManager.CampaignResponse) {
-                    return Promise.resolve({
-                        url: requestUrl,
-                        response: CampaignManager.CampaignResponse,
-                        responseCode: 200,
-                        headers: []
-                    });
-                }
-                const headers: [string, string][] = [];
-                return this._request.post(requestUrl, body, headers, {
-                    retries: 2,
-                    retryDelay: 10000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: false
-                }).catch((error: unknown) => {
-                    if (this._mediationLoadTracking && performance && performance.now) {
-                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
-                    }
-                    throw error;
-                });
-            }).then(response => {
+            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody).then(response => {
                 measurement.measure('auction_response');
                 const cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
@@ -262,10 +211,19 @@ export class CampaignManager {
         const requestPrivacy = RequestPrivacyFactory.create(this._privacy, this._deviceInfo.getLimitAdTracking());
         const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
-        return Promise.all([this.createRequestUrl(false), this.createRequestBody(countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy, undefined, placement), this._deviceInfo.getFreeSpace()]).then(([requestUrl, requestBody, deviceFreeSpace]) => {
+        return Promise.all<string[], number | undefined, number>([
+            this.getFullyCachedCampaigns(),
+            this.getVersionCode(),
+            this._deviceInfo.getFreeSpace()
+        ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
+            this._deviceFreeSpace = freeSpace;
+            return Promise.all<string, unknown>([
+                CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._sdkDetectionInfo, placement)
+            ]);
+        }).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
             const body = JSON.stringify(requestBody);
-            this._deviceFreeSpace = deviceFreeSpace;
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
 
             return Promise.resolve().then(() => {
@@ -286,7 +244,7 @@ export class CampaignManager {
                 if (this._mediationLoadTracking && performance && performance.now) {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
                 }
-                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
+                return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, this._deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
                     SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledFill);
