@@ -1,5 +1,5 @@
 --language_out ECMASCRIPT5_STRICT
---formatting PRETTY_PRINT
+--formatting SINGLE_QUOTES
 --assume_function_wrapper
 --inject_libraries
 --rewrite_polyfills
