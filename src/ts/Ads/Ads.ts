@@ -18,7 +18,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
-import { Placement, PlacementState } from 'Ads/Models/Placement';
+import { Placement } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
@@ -91,13 +91,12 @@ import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { FeatureFlag } from 'Core/Constants/FeatureFlag';
-import { IObserver1 } from 'Core/Utilities/IObserver';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
+import { FeatureFlag } from 'Core/Constants/FeatureFlag';
 
 export class Ads implements IAds {
 
@@ -130,8 +129,6 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
     private _nofillImmediately: boolean = false;
-    private _mediationInitCompleteStartTime: number;
-    private _loadObserver: IObserver1<{ [key: string]: number }>;
     private _mediationName: string;
     private _core: ICore;
 
