@@ -1,3 +1,11 @@
+# Mon Mar  9 20:49:40 UTC 2020
+
+* Run Open Measurement For Double Click [#13511](https://github.com/Applifier/unity-ads-webview/pull/13511)
+* Add Mediation CacheMode Allowed on Group 5 and 6 [#13624](https://github.com/Applifier/unity-ads-webview/pull/13624)
+* Extend XHRequest class with post and isAvailable methods [#13653](https://github.com/Applifier/unity-ads-webview/pull/13653)
+* Use XHR to measure baseline for Http Request for auction connection [#13654](https://github.com/Applifier/unity-ads-webview/pull/13654)
+* Refactor VastEndScreen into VastStaticEndscreen [#13477](https://github.com/Applifier/unity-ads-webview/pull/13477)
+
 # Fri Mar  6 22:32:55 UTC 2020
 
 * Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)

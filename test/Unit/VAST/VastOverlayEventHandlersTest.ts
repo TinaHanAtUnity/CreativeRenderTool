@@ -31,7 +31,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
@@ -39,6 +38,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -213,12 +213,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             it('should show endcard', () => {
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
-                    const vastEndScreenParameters: IVastEndscreenParameters = {
-                        campaign: vastAdUnitParameters.campaign,
-                        clientInfo: vastAdUnitParameters.clientInfo,
-                        country: vastAdUnitParameters.coreConfig.getCountry()
-                    };
-                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    const vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                     sinon.spy(vastEndScreen, 'show');
                     vastAdUnitParameters.endScreen = vastEndScreen;
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -233,12 +228,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             it('should not show endcard if the impression has not occurred', () => {
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
-                    const vastEndScreenParameters: IVastEndscreenParameters = {
-                        campaign: vastAdUnitParameters.campaign,
-                        clientInfo: vastAdUnitParameters.clientInfo,
-                        country: vastAdUnitParameters.coreConfig.getCountry()
-                    };
-                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    const vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                     sinon.spy(vastEndScreen, 'show');
                     vastAdUnitParameters.endScreen = vastEndScreen;
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);

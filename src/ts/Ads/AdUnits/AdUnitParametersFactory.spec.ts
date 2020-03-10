@@ -1,5 +1,4 @@
 import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCampaign';
-import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager.ts';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo.ts';
@@ -22,6 +21,11 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 jest.mock('Ads/Views/Privacy.ts');
 jest.mock('AdMob/Views/AdMobView.ts');
 jest.mock('Ads/Views/VastVideoOverlay');
+jest.mock('html/OMID.html', () => {
+    return {
+        'default': 'HTMLRenderTest'
+    };
+});
 
 describe('AdUnitParametersFactoryTest', () => {
     let placement: PlacementMock;
@@ -87,6 +91,7 @@ describe('AdUnitParametersFactoryTest', () => {
 
                 const vast: VastMock = new Vast();
                 const vastAdVerificton1: VastAdVerificationMock = new VastAdVerification();
+                vastAdVerificton1.getVerificationVendor.mockReturnValue('notIAS');
                 const verificationResource = new VastVerificationResource('https://scootmcdoot.com', 'omid');
                 vastAdVerificton1.getVerficationResources.mockReturnValue([verificationResource]);
 

@@ -55,6 +55,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 describe('Vast VideoEventHandlersTest', () => {
 
@@ -146,12 +147,6 @@ describe('Vast VideoEventHandlersTest', () => {
         };
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
-        endScreen = new VastEndScreen(platform, {
-            campaign: vastCampaign,
-            clientInfo: clientInfo,
-            country: undefined
-        }, privacy);
-
         vastAdUnitParameters = {
             platform,
             core,
@@ -177,6 +172,8 @@ describe('Vast VideoEventHandlersTest', () => {
             privacyManager: privacyManager,
             privacySDK: privacySDK
         };
+
+        endScreen = new VastStaticEndScreen(vastAdUnitParameters);
 
         vastAdUnit = new VastAdUnit(vastAdUnitParameters);
 

@@ -1,4 +1,3 @@
-import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
@@ -178,5 +177,13 @@ export class CustomFeatures {
     public static isIASVendor(omVendor: string | undefined) {
         return omVendor === 'IAS' ||
                omVendor === 'integralads.com-omid';
+    }
+
+    public static isDoubleClickGoogle(vendorKey: string): boolean {
+        return vendorKey.startsWith('doubleclickbygoogle.com');
+    }
+
+    public static isWhitelistedOMVendor(omVendor: string) {
+        return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
     }
 }

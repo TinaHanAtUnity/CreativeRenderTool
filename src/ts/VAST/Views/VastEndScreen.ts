@@ -1,13 +1,5 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Core/Constants/Platform';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Template } from 'Core/Utilities/Template';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { View } from 'Core/Views/View';
-import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
-import VastIframeEndScreenTemplate from 'html/VastIframeEndScreen.html';
-import VastHTMLEndScreenTemplate from 'html/VastHTMLEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export interface IVastEndScreenHandler {
@@ -17,80 +9,20 @@ export interface IVastEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-export interface IVastEndscreenParameters {
-    campaign: VastCampaign;
-    clientInfo: ClientInfo;
-    country: string | undefined;
-    hidePrivacy?: boolean;
-}
+export class VastEndScreen extends View<IVastEndScreenHandler> {
 
-export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandlerView {
+    protected _isSwipeToCloseEnabled: boolean = false;
+    protected _campaign: VastCampaign;
+    protected _country: string | undefined;
+    protected _hidePrivacy: boolean = false;
+    protected _callButtonEnabled: boolean = true;
 
-    private _isSwipeToCloseEnabled: boolean = false;
-    private _privacy: AbstractPrivacy;
-    private _callButtonEnabled: boolean = true;
-    private _campaign: VastCampaign;
-    private _country: string | undefined;
-    private _hidePrivacy: boolean = false;
-
-    constructor(platform: Platform, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
-        super(platform, 'vast-end-screen');
+    constructor(parameters: IAdUnitParameters<VastCampaign>) {
+        super(parameters.platform, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
-        this._country = parameters.country;
-        this._privacy = privacy;
-        this._hidePrivacy = parameters.hidePrivacy || false;
-
-        if (this._campaign.hasHtmlEndscreen()) {
-            this._template = new Template(VastHTMLEndScreenTemplate);
-            this._templateData = {
-                'endScreenHtmlContent': (this._campaign.getVast().getHtmlCompanionResourceContent() ? this._campaign.getVast().getHtmlCompanionResourceContent() : undefined)
-            };
-        } else if (this._campaign.hasIframeEndscreen()) {
-            this._template = new Template(VastIframeEndScreenTemplate);
-            this._templateData = {
-                'endScreenurl': (this._campaign.getVast().getIframeCompanionResourceUrl() ? this._campaign.getVast().getIframeCompanionResourceUrl() : undefined)
-            };
-        } else if (this._campaign.hasStaticEndscreen()) {
-            this._template = new Template(VastStaticEndScreenTemplate);
-            const landscape = this._campaign.getStaticLandscape();
-            const portrait = this._campaign.getStaticPortrait();
-
-            this._templateData = {
-                'endScreenLandscape': (landscape ? landscape.getUrl() : (portrait ? portrait.getUrl() : undefined)),
-                'endScreenPortrait': (portrait ? portrait.getUrl() : (landscape ? landscape.getUrl() : undefined))
-            };
-        } else {
-            this._template = new Template(VastStaticEndScreenTemplate);
-        }
-
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onClickEvent(event),
-                selector: '.game-background'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            }
-        ];
-
-        if (CustomFeatures.isTimehopApp(parameters.clientInfo.getGameId())) {
-            this._isSwipeToCloseEnabled = true;
-
-            this._bindings.push({
-                event: 'swipe',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.campaign-container, .game-background'
-            });
-        }
+        this._country = parameters.coreConfig.getCountry();
+        this._hidePrivacy = parameters.adsConfig.getHidePrivacy() || false;
     }
 
     public render(): void {
@@ -124,24 +56,9 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     public remove(): void {
-        if (this._privacy) {
-            this._privacy.hide();
-            const privacyContainer = this._privacy.container();
-            if (privacyContainer && privacyContainer.parentElement) {
-                privacyContainer.parentElement.removeChild(privacyContainer);
-            }
-            delete this._privacy;
-        }
-
         const container = this.container();
         if (container && container.parentElement) {
             container.parentElement.removeChild(this.container());
-        }
-    }
-
-    public onPrivacyClose(): void {
-        if (this._privacy) {
-            this._privacy.hide();
         }
     }
 
@@ -151,21 +68,4 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         }
     }
 
-    private onCloseEvent(event: Event): void {
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onVastEndScreenClose());
-    }
-
-    private onClickEvent(event: Event): void {
-        if (!this._callButtonEnabled) {
-            return;
-        }
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onVastEndScreenClick());
-    }
-
-    private onPrivacyEvent(event: Event): void {
-        event.preventDefault();
-        this._privacy.show();
-    }
 }
