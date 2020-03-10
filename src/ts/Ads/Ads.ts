@@ -127,6 +127,7 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
+    private _nofillImmediately: boolean = false;
     private _loadObserver: IObserver1<{ [key: string]: number }>;
     private _mediationName: string;
     private _core: ICore;
@@ -190,7 +191,8 @@ export class Ads implements IAds {
 
         let promise = Promise.resolve();
 
-        if (CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization) && performance && performance.now) {
+        this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization) && !!(performance && performance.now);
+        if (this._nofillImmediately) {
             const startTime = performance.now();
             const timeoutPointInMs = 250;
             const placementIds = this.Config.getPlacementIds();
@@ -393,6 +395,8 @@ export class Ads implements IAds {
                     if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
+                    } else if (this._nofillImmediately) {
+                        experimentType = MediationExperimentType.NofillImmediately;
                     }
 
                     this._mediationName = mediation.getName()!;
