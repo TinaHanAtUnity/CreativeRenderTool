@@ -337,7 +337,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
              * admob-session-interface - calls session start for admob
              * vast video event handler - calls session start for vast
              */
-            if (CustomFeatures.isIASVendor(vendorKey) || this._campaign instanceof AdMobCampaign) {
+            if (CustomFeatures.isWhitelistedOMVendor(vendorKey) || this._campaign instanceof AdMobCampaign) {
                 if (this._sessionStartEventData) {
                     this.sessionStart(this._sessionStartEventData);
                 }
