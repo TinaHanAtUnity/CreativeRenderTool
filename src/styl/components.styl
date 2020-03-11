@@ -389,57 +389,6 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
   }
 }
 
-$radio-group-container-blue($scale-size = $default-scale-size, $context-font-size = 1rem) {
-  $radio-group-default-size = $scale-size * $default-size;
-
-  padding: $radio-group-default-size * .5;
-  font-size: $context-font-size;
-
-  [type="radio"]:checked,
-  [type="radio"]:not(:checked) {
-    position: absolute;
-    visibility: hidden;
-  }
-
-  /* label text*/
-  [type="radio"]:checked + label,
-  [type="radio"]:not(:checked) + label {
-    position: relative;
-    padding-left: $radio-group-default-size * 1.5;
-    cursor: pointer;
-    line-height: $context-font-size * 1.5;
-    display: inline-block;
-  }
-
-  [type="radio"]:checked + label:before,
-  [type="radio"]:not(:checked) + label:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: $radio-group-default-size * .75;
-    height: @width;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-
-  [type="radio"]:checked + label:before {
-    background-image: url('./../img/radio_on_blue.png');
-  }
-
-  [type="radio"]:not(:checked) + label:before {
-    background-image: url('./../img/radio_off.png');
-  }
-
-  [type="radio"]:checked + label {
-    font-weight: 500;
-  }
-
-}
-
-
-
 $switch-group-container() {
   .switch-container {
     position: relative;
