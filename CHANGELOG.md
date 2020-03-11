@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Extract base class for Campaign Manager [#13684](https://github.com/Applifier/unity-ads-webview/pull/13684)
+
 # Wed Mar 11 20:05:18 UTC 2020
 
 * Add getCurrentExperiment to MediationLoadTrackingManager [#13687](https://github.com/Applifier/unity-ads-webview/pull/13687)
