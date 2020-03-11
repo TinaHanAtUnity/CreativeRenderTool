@@ -1,4 +1,4 @@
-# Pending
+# Wed Mar 11 20:05:18 UTC 2020
 
 * Add getCurrentExperiment to MediationLoadTrackingManager [#13687](https://github.com/Applifier/unity-ads-webview/pull/13687)
 * Open Measurement - Fix omid doubleclick - Admob Integration [#13713](https://github.com/Applifier/unity-ads-webview/pull/13713)
