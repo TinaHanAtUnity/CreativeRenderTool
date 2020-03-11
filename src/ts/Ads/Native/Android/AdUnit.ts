@@ -65,23 +65,25 @@ export class AndroidAdUnitApi extends NativeApi {
     }
 
     public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {
-        let timeout = 0;
+        // Workaround for situations where an ad is opened before the previous ad has finished closing resulting in a black screen (ABT-1125).
+        let delay: number = 0;
         if (this._isClosing) {
-            timeout = 5000;
+            delay = 500;
         }
-        const bridge = this._nativeBridge;
-        const className = this._fullApiClassName;
-
         return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                bridge.invoke<void>(className, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent])
+            const intervalId: number = window.setInterval(() => {
+                if (this._isClosing) {
+                    return;
+                }
+                window.clearInterval(intervalId);
+                this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent])
                 .then(() => {
                     resolve();
                 },
                 (reason) => {
                     reject(reason);
                 });
-            }, timeout);
+            }, delay);
         });
     }
 
