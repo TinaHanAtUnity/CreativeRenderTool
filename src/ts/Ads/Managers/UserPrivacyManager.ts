@@ -149,7 +149,7 @@ export class UserPrivacyManager {
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
                 platform: Platform[this._platform],
-                userLocale: this._deviceInfo.getLanguage() ? this._deviceInfo.getLanguage().replace('_', '-') : undefined,
+                userLocale: this._deviceInfo.getLanguage() ? this.resolveLanguageForPrivacyConfig(this._deviceInfo.getLanguage()) : undefined,
                 country: this._coreConfig.getCountry(),
                 subCountry: this._coreConfig.getSubdivision(),
                 privacyMethod: this._gamePrivacy.getMethod(),
@@ -166,6 +166,16 @@ export class UserPrivacyManager {
                 }
             },
             PrivacyWebUI);
+    }
+
+    private resolveLanguageForPrivacyConfig(deviceLanguage: string): string {
+        if (deviceLanguage.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
+            return 'zh-Hans';
+        } else if (deviceLanguage.match('zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$')) {
+            return 'zh-Hant';
+        } else {
+            return deviceLanguage.replace('_', '-');
+        }
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
