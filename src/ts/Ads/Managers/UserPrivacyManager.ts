@@ -154,6 +154,7 @@ export class UserPrivacyManager {
                 subCountry: this._coreConfig.getSubdivision(),
                 privacyMethod: this._gamePrivacy.getMethod(),
                 ageGateLimit: this._privacy.getAgeGateLimit(),
+                ageGateLimitMinusOne: this._privacy.getAgeGateLimit() - 1,
                 legalFramework: this._privacy.getLegalFramework(),
                 isCoppa: this._coreConfig.isCoppaCompliant(),
                 apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
