@@ -185,8 +185,9 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
+        this.setupLoadApiEnabled();
         const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-            'wel': 'undefined'
+            'wel': `${this._webViewEnabledLoad}`
         });
 
         let promise = Promise.resolve();
@@ -194,7 +195,9 @@ export class Ads implements IAds {
         this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && this._core.Config.getFeatureFlags().includes(FeatureFlag.NofillPlacementOnInitialization) && !!(performance && performance.now);
         if (this._nofillImmediately) {
             this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
-            promise = this._core.Api.Sdk.initComplete();
+            promise = this.setupMediationTrackingManager().then(() => {
+                this._core.Api.Sdk.initComplete();
+            });
         }
 
         return promise.then(() => {
@@ -218,11 +221,9 @@ export class Ads implements IAds {
             PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
             measurements.measure('privacy_init');
-            return this.setupLoadApiEnabled();
-        }).then(() => {
-            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
-            measurements.measure('load_api_setup');
-            return this.setupMediationTrackingManager();
+            if (!this.MediationLoadTrackingManager) { // Temporary gate for Nofill testing
+                return this.setupMediationTrackingManager();
+            }
         }).then(() => {
             measurements.measure('mediation_tracking_init');
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
