@@ -1,3 +1,7 @@
+# Pending
+
+* Add getCurrentExperiment to MediationLoadTrackingManager [#13687](https://github.com/Applifier/unity-ads-webview/pull/13687)
+
 # Mon Mar  9 20:49:40 UTC 2020
 
 * Run Open Measurement For Double Click [#13511](https://github.com/Applifier/unity-ads-webview/pull/13511)
