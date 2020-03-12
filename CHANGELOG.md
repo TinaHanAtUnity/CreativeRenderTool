@@ -4,6 +4,7 @@
 * Reduce WebView size by changing formatting option in Google Closure Compiler [#13683](https://github.com/Applifier/unity-ads-webview/pull/13683)
 * Remove Green Radio Buttons [#13657](https://github.com/Applifier/unity-ads-webview/pull/13657)
 * Convert hex colors to css rgba in MAB [#13656](https://github.com/Applifier/unity-ads-webview/pull/13656)
+* Add Mediation Auction Request Failed Events Back [#13740](https://github.com/Applifier/unity-ads-webview/pull/13740)
 
 # Thu Mar 12 16:43:34 UTC 2020
 
