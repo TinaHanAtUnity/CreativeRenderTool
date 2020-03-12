@@ -1,3 +1,8 @@
+# Pending
+
+* Reduce WebView size by changing formatting option in Google Closure Compiler [#13683](https://github.com/Applifier/unity-ads-webview/pull/13683)
+* Remove Green Radio Buttons [#13657](https://github.com/Applifier/unity-ads-webview/pull/13657)
+
 # Thu Mar 12 16:43:34 UTC 2020
 
 * [Load V5] Extract base class for Campaign Manager [#13684](https://github.com/Applifier/unity-ads-webview/pull/13684)
