@@ -152,14 +152,14 @@ export class LegacyCampaignManager extends CampaignManager {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
             if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
-                return XHRequest.post(requestUrl, <string>requestBody).then((resp: string) => {
+                return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
                     return {
                         url: requestUrl,
                         response: resp,
                         responseCode: 200,
                         headers: []
                     };
-                })
+                });
             } else {
                 return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
             }
