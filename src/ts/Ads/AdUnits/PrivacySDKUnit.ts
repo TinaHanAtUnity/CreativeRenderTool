@@ -153,23 +153,6 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         });
     }
 
-    // IConsentViewHandler
-    public ageGateDisagree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
-
-        const permissions: IPrivacyPermissions = {
-            gameExp: false,
-            ads: false,
-            external: false
-        };
-
-        this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, GDPREventAction.AGE_GATE_DISAGREE, ConsentPage.AGE_GATE);
-    }
-
-    public ageGateAgree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
-    }
-
     public openPrivacyUrl(url: string): void {
         if (this._platform === Platform.IOS) {
             this._core.iOS!.UrlScheme.open(url);
@@ -206,16 +189,34 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        this.setConsent({
-                ads: userSettings.user.ads,
-                external: userSettings.user.external,
-                gameExp: userSettings.user.gameExp
-            },
-            action,
-            GDPREventSource.USER);
+        const permissions: IPrivacyPermissions = {
+            ads: userSettings.user.ads,
+            external: userSettings.user.external,
+            gameExp: userSettings.user.gameExp
+        };
+
+        if (this._privacySDK.isAgeGateEnabled()) {
+            let ageGateChoice = AgeGateChoice.MISSING;
+
+            if (userSettings.user.agreedOverAgeLimit !== undefined) {
+                ageGateChoice = AgeGateChoice.YES;
+
+                if (userSettings.user.agreedOverAgeLimit === false) {
+                    ageGateChoice = AgeGateChoice.NO;
+                    action = GDPREventAction.AGE_GATE_DISAGREE;
+                }
+            }
+
+            this._privacyManager.setUsersAgeGateChoice(ageGateChoice);
+
+            if (ageGateChoice === AgeGateChoice.NO || (userSettings.env.privacyMethod && userSettings.env.privacyMethod === PrivacyMethod.UNITY_CONSENT)) {
+                this.setConsent(permissions, action, GDPREventSource.USER);
+            }
+        } else {
+            this.setConsent(permissions, action, GDPREventSource.USER);
+        }
 
         this._unityPrivacyView.completeCallback();
-
         this.closePrivacy();
     }
 
