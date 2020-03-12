@@ -275,7 +275,7 @@ export class Core implements ICore {
                     'v': 1,
                     mwu: this.SdkDetectionInfo.isMadeWithUnity()
                 };
-        
+
                 HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson).then();
                 UserCountData.setHasSentIsMadeWithUnity(this.Api);
             }
