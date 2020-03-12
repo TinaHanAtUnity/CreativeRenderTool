@@ -70,9 +70,16 @@ export class AndroidAdUnitApi extends NativeApi {
         if (this._isClosing) {
             delay = 500;
         }
+        let attempt: number = 0;
+        const maxAttempts: number = 10;
         return new Promise((resolve, reject) => {
             const intervalId: number = window.setInterval(() => {
+                if (attempt > maxAttempts) {
+                    reject('Previous ad unit did not close in time');
+                    return;
+                }
                 if (this._isClosing) {
+                    attempt++;
                     return;
                 }
                 window.clearInterval(intervalId);
