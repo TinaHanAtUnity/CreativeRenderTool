@@ -1,3 +1,7 @@
+# Pending
+
+* Cleanup promise chain in LegacyCampaignManager.request method [#13769](https://github.com/Applifier/unity-ads-webview/pull/13769)
+
 # Thu Mar 12 19:05:50 UTC 2020
 
 * Add NoFill in Mediation Test From Whitelist [#13332](https://github.com/Applifier/unity-ads-webview/pull/13332)
