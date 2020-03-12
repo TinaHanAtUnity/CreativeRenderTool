@@ -51,10 +51,11 @@ import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { XHRequest } from 'Core/Utilities/XHRequest';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -150,7 +151,18 @@ export class LegacyCampaignManager extends CampaignManager {
             });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
-            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
+            if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
+                return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
+                    return {
+                        url: requestUrl,
+                        response: resp,
+                        responseCode: 200,
+                        headers: []
+                    };
+                });
+            } else {
+                return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
+            }
         }).catch((error: unknown) => {
             if (this._mediationLoadTracking && performance && performance.now) {
                 this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
