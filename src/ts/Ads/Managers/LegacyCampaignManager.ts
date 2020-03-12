@@ -149,7 +149,12 @@ export class LegacyCampaignManager extends CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
             const requestTimestamp: number = Date.now();
-            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody).then(response => {
+            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody).catch((error: unknown) => {
+                if (this._mediationLoadTracking && performance && performance.now) {
+                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+                }
+                throw error;
+            }).then(response => {
                 measurement.measure('auction_response');
                 const cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
