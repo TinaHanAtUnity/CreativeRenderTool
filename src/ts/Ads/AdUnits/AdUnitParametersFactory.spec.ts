@@ -50,8 +50,8 @@ describe('AdUnitParametersFactoryTest', () => {
                 adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
 
                 expect(thirdPartyEventManagerFactory.create).toHaveBeenCalledWith({
-                    [ThirdPartyEventMacro.ZONE]: undefined,
-                    [ThirdPartyEventMacro.SDK_VERSION]: '',
+                    [ThirdPartyEventMacro.ZONE]: 'video',
+                    [ThirdPartyEventMacro.SDK_VERSION]: '3420',
                     [ThirdPartyEventMacro.GAMER_SID]: '123',
                     [ThirdPartyEventMacro.OM_ENABLED]: 'false',
                     [ThirdPartyEventMacro.OM_VENDORS]: '',
