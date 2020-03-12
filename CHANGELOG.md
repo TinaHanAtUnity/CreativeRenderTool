@@ -1,6 +1,8 @@
 # Pending
 
+* Test using XHR for Auction Request on 1% for Android Devices [#13655](https://github.com/Applifier/unity-ads-webview/pull/13655)
 * Cleanup promise chain in LegacyCampaignManager.request method [#13769](https://github.com/Applifier/unity-ads-webview/pull/13769)
+* Fix Mediation Tracker Metrics for Nofill Immediately Test [#13767](https://github.com/Applifier/unity-ads-webview/pull/13767)
 
 # Thu Mar 12 19:05:50 UTC 2020
 
