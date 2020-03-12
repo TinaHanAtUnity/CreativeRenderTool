@@ -2,7 +2,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -35,13 +35,14 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 
 describe('PerPlacementLoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -89,7 +90,7 @@ describe('PerPlacementLoadManagerTest', () => {
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
+        campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
         loadManager = new PerPlacementLoadManager(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager);
     });
 

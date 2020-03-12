@@ -184,11 +184,11 @@ export class CustomFeatures {
                omVendor === 'integralads.com-omid';
     }
 
-    public static isDoubleClickGoogle(vendorKey: string): boolean {
-        return vendorKey.startsWith('doubleclickbygoogle.com');
+    public static isDoubleClickGoogle(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
     }
 
-    public static isWhitelistedOMVendor(omVendor: string) {
+    public static isWhitelistedOMVendor(omVendor: string | undefined) {
         return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
     }
 }
