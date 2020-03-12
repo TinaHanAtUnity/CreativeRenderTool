@@ -95,6 +95,7 @@ import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Manag
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
+import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 
 export class Ads implements IAds {
@@ -118,6 +119,7 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
+    public NofillImmediatelyManager: NofillImmediatelyManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -126,6 +128,7 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
+    private _nofillImmediately: boolean = false;
     private _mediationName: string;
     private _core: ICore;
 
@@ -182,10 +185,22 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
+        this.setupLoadApiEnabled();
         const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-            'wel': 'undefined'
+            'wel': `${this._webViewEnabledLoad}`
         });
-        return Promise.resolve().then(() => {
+
+        let promise = Promise.resolve();
+
+        this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
+        if (this._nofillImmediately) {
+            this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
+            promise = this.setupMediationTrackingManager().then(() => {
+                this._core.Api.Sdk.initComplete();
+            });
+        }
+
+        return promise.then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
@@ -206,10 +221,6 @@ export class Ads implements IAds {
             PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
             measurements.measure('privacy_init');
-            return this.setupLoadApiEnabled();
-        }).then(() => {
-            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
-            measurements.measure('load_api_setup');
             return this.setupMediationTrackingManager();
         }).then(() => {
             measurements.measure('mediation_tracking_init');
@@ -294,6 +305,10 @@ export class Ads implements IAds {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
 
+            if (this.NofillImmediatelyManager) {
+                this.NofillImmediatelyManager.setInitComplete();
+            }
+
             if (this.PrivacyManager.isPrivacySDKTestActive()) {
                 CachedUserSummary.fetch(this.PrivacyManager);
             }
@@ -356,6 +371,11 @@ export class Ads implements IAds {
     }
 
     private setupMediationTrackingManager(): Promise<void> {
+
+        if (this.MediationLoadTrackingManager) {
+            return Promise.resolve();
+        }
+
         // tslint:disable-next-line:no-any
         let nativeInitTime: number | undefined = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
         const nativeInitTimeAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
@@ -368,6 +388,8 @@ export class Ads implements IAds {
                     if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
+                    } else if (this._nofillImmediately) {
+                        experimentType = MediationExperimentType.NofillImmediately;
                     }
 
                     this._mediationName = mediation.getName()!;
