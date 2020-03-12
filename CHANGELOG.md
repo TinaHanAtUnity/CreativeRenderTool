@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar 12 19:05:50 UTC 2020
 
 * Add NoFill in Mediation Test From Whitelist [#13332](https://github.com/Applifier/unity-ads-webview/pull/13332)
 * Reduce WebView size by changing formatting option in Google Closure Compiler [#13683](https://github.com/Applifier/unity-ads-webview/pull/13683)
