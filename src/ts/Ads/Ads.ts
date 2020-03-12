@@ -221,9 +221,7 @@ export class Ads implements IAds {
             PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
             measurements.measure('privacy_init');
-            if (!this.MediationLoadTrackingManager) { // Temporary gate for Nofill testing
-                return this.setupMediationTrackingManager();
-            }
+            return this.setupMediationTrackingManager();
         }).then(() => {
             measurements.measure('mediation_tracking_init');
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
@@ -373,6 +371,11 @@ export class Ads implements IAds {
     }
 
     private setupMediationTrackingManager(): Promise<void> {
+
+        if (this.MediationLoadTrackingManager) {
+            return Promise.resolve();
+        }
+
         // tslint:disable-next-line:no-any
         let nativeInitTime: number | undefined = (<number>(<any>window).initTimestamp) - this._core.ClientInfo.getInitTimestamp();
         const nativeInitTimeAcceptable = (nativeInitTime > 0 && nativeInitTime <= 30000);
