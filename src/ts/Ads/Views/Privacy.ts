@@ -227,9 +227,9 @@ export class Privacy extends AbstractPrivacy {
         const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
         const closeButton = <HTMLDivElement> this._container.querySelector('.close-button');
         const classList = this._container.classList;
-        const reportButtonText = 'Report Ad ⚑';
-        const privacyButtonText = 'Privacy info 👁';
-        const buildButtonText = 'Build info ⚙';
+        const reportButtonText = 'Report Ad';
+        const privacyButtonText = 'Privacy info';
+        const buildButtonText = 'Build info';
         const confirmText = this._localization.translate('privacy-dialog-button-confirm');
         const closeText = this._localization.translate('privacy-dialog-button-close');
 
