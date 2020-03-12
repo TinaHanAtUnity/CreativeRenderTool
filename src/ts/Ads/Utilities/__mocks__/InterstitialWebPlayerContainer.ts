@@ -1,5 +1,5 @@
 import { InterstitialWebPlayerContainer as Base} from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
-import {Observable, ObservableMock} from 'Core/Utilities/__mocks__/Observable';
+import { Observable, ObservableMock } from 'Core/Utilities/__mocks__/Observable';
 
 export type InterstitialWebPlayerContainerMock = Base & {
     setUrl: jest.Mock;
