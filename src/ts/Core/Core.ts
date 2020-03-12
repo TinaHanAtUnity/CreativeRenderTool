@@ -40,7 +40,7 @@ import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -56,6 +56,7 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { UserCountData } from 'Ads/Utilities/UserCountData';
 
 export class Core implements ICore {
 
@@ -250,6 +251,7 @@ export class Core implements ICore {
 
             return this.Ads.initialize().then(() => {
                 SDKMetrics.sendBatchedEvents();
+                this.sendIsMadeWithUnity();
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
@@ -263,6 +265,20 @@ export class Core implements ICore {
             this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
             this.Api.Sdk.logError(`Initialization error: ${error.message}`);
             Diagnostics.trigger('initialization_error', error);
+        });
+    }
+
+    private sendIsMadeWithUnity(): void {
+        UserCountData.hasSentIsMadeWithUnity(this.Api).then(hasSentIsMadeWithUnity => {
+            if (!hasSentIsMadeWithUnity) {
+                const isMadeWithUnityJson: unknown = {
+                    'v': 1,
+                    mwu: this.SdkDetectionInfo.isMadeWithUnity()
+                };
+        
+                HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson).then();
+                UserCountData.setHasSentIsMadeWithUnity(this.Api);
+            }
         });
     }
 
