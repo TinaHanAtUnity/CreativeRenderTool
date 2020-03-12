@@ -36,6 +36,10 @@ export class MediationLoadTrackingManager {
         this._listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, nextState) => this.onPlacementStateChangedEventSent(placementId, nextState));
     }
 
+    public getCurrentExperiment(): MediationExperimentType {
+        return this._experimentType;
+    }
+
     public setInitComplete(): void {
         this._initialAdRequest = false;
         this._initCompleteTime = this.getTime();
