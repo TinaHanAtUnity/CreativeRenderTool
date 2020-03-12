@@ -194,9 +194,9 @@ export class Ads implements IAds {
 
         this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
         if (this._nofillImmediately) {
-            this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
             promise = this.setupMediationTrackingManager().then(() => {
-                this._core.Api.Sdk.initComplete();
+                this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
+                return this._core.Api.Sdk.initComplete();
             });
         }
 
