@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar 12 16:43:34 UTC 2020
 
 * [Load V5] Extract base class for Campaign Manager [#13684](https://github.com/Applifier/unity-ads-webview/pull/13684)
 * [Load V5] Remove Unused Methods in LegacyCampaignManager [#13714](https://github.com/Applifier/unity-ads-webview/pull/13714)
