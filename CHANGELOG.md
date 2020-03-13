@@ -1,4 +1,4 @@
-# Pending
+# Fri Mar 13 00:51:31 UTC 2020
 
 * Test using XHR for Auction Request on 1% for Android Devices [#13655](https://github.com/Applifier/unity-ads-webview/pull/13655)
 * Cleanup promise chain in LegacyCampaignManager.request method [#13769](https://github.com/Applifier/unity-ads-webview/pull/13769)
