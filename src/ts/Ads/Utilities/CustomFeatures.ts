@@ -191,6 +191,8 @@ export class CustomFeatures {
     }
 
     public static isWhitelistedOMVendor(omVendor: string | undefined) {
-        return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
+        return this.isIASVendor(omVendor) ||
+               this.isDoubleClickGoogle(omVendor) ||
+               omVendor === 'doubleverify.com-omid';
     }
 }
