@@ -47,17 +47,4 @@ export class UserCountData {
             return 0;
         });
     }
-
-    public static hasSentIsMadeWithUnity(core: ICoreApi): Promise<boolean | void> {
-        return core.Storage.get<boolean>(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity').then((hasSentIsMadeWithUnity) => {
-            return hasSentIsMadeWithUnity;
-        }).catch(() => {
-            return false;
-        });
-    }
-
-    public static setHasSentIsMadeWithUnity(core: ICoreApi): void {
-        core.Storage.set<boolean>(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity', true);
-        core.Storage.write(StorageType.PRIVATE);
-    }
 }

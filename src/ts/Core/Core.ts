@@ -57,6 +57,7 @@ import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
+import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
 export class Core implements ICore {
 
@@ -251,7 +252,7 @@ export class Core implements ICore {
 
             return this.Ads.initialize().then(() => {
                 SDKMetrics.sendBatchedEvents();
-                this.sendIsMadeWithUnity();
+                IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
@@ -265,20 +266,6 @@ export class Core implements ICore {
             this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
             this.Api.Sdk.logError(`Initialization error: ${error.message}`);
             Diagnostics.trigger('initialization_error', error);
-        });
-    }
-
-    private sendIsMadeWithUnity(): void {
-        UserCountData.hasSentIsMadeWithUnity(this.Api).then(hasSentIsMadeWithUnity => {
-            if (!hasSentIsMadeWithUnity) {
-                const isMadeWithUnityJson: unknown = {
-                    'v': 1,
-                    mwu: this.SdkDetectionInfo.isMadeWithUnity()
-                };
-
-                HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson).then();
-                UserCountData.setHasSentIsMadeWithUnity(this.Api);
-            }
         });
     }
 
