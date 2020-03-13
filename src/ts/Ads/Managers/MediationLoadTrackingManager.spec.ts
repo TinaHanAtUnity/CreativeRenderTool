@@ -1,7 +1,7 @@
 import { ListenerApi, ListenerMock } from 'Ads/Native/__mocks__/Listener';
 import { SDKMetrics, MediationMetric } from 'Ads/Utilities/SDKMetrics';
 import { LoadApi, LoadApiMock } from 'Core/Native/__mocks__/LoadApi';
-import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 
 describe('MediationLoadTrackingManager', () => {
     let medLoadTrackingManager: MediationLoadTrackingManager;
@@ -11,7 +11,13 @@ describe('MediationLoadTrackingManager', () => {
     beforeEach(() => {
         loadApi = LoadApi();
         listenerApi = ListenerApi();
-        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, undefined);
+        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, MediationExperimentType.None, undefined);
+    });
+
+    describe('current experiment', () => {
+        it('should return correct experiment', () => {
+            expect(medLoadTrackingManager.getCurrentExperiment()).toEqual(MediationExperimentType.None);
+        });
     });
 
     describe('when request load for a placement one time', () => {
@@ -72,6 +78,10 @@ describe('MediationLoadTrackingManager', () => {
 
             it('iar flag should be set', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({'iar': 'true'}));
+            });
+
+            it('exp flag should be set correctly', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({'exp': 'none'}));
             });
         });
 

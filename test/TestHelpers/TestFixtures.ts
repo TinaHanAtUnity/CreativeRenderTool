@@ -134,7 +134,7 @@ import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
@@ -972,7 +972,7 @@ export class TestFixtures {
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager, privacySDK);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping);
-        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
+        ads.CampaignManager = new LegacyCampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         ads.Analytics = new Analytics(core, ads.PrivacySDK!);
         ads.Store = new Store(core, ads.Analytics.AnalyticsManager);

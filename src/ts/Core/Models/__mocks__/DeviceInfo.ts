@@ -35,6 +35,8 @@ export const DeviceInfo = jest.fn(() => {
         getAnonymousDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
         getStaticDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
         getAnonymousStaticDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
-        isChineseNetworkOperator: jest.fn().mockImplementation(() => false)
+        isChineseNetworkOperator: jest.fn().mockImplementation(() => false),
+        getLimitAdTracking: jest.fn().mockReturnValue(false),
+        getStores: jest.fn().mockReturnValue('')
     };
 });

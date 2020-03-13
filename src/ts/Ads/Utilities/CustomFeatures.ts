@@ -7,6 +7,13 @@ import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
 
+    public static isNofillImmediatelyGame(gameId: string): boolean {
+        return gameId === '1781853' ||
+               gameId === '1781854' ||
+               gameId === '3152568' ||
+               gameId === '3152569';
+    }
+
     public static isNoGzipGame(gameId: string): boolean {
         return gameId === '1475968' ||
                gameId === '1708468' ||
@@ -179,11 +186,11 @@ export class CustomFeatures {
                omVendor === 'integralads.com-omid';
     }
 
-    public static isDoubleClickGoogle(vendorKey: string): boolean {
-        return vendorKey.startsWith('doubleclickbygoogle.com');
+    public static isDoubleClickGoogle(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
     }
 
-    public static isWhitelistedOMVendor(omVendor: string) {
+    public static isWhitelistedOMVendor(omVendor: string | undefined) {
         return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
     }
 }
