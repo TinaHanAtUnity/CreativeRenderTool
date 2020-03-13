@@ -253,7 +253,6 @@ export class Core implements ICore {
             } else {
                 listener = new AdsListenerApi(this.NativeBridge);
             }
-
             this.Ads = new Ads(configJson, this, listener);
 
             measurements.measure('core_ready');
