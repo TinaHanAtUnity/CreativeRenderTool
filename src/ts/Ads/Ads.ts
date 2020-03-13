@@ -25,6 +25,7 @@ import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
@@ -138,7 +139,7 @@ export class Ads implements IAds {
     public Analytics: Analytics;
     public Store: IStore;
 
-    constructor(config: unknown, core: ICore) {
+    constructor(config: unknown, core: ICore, listener: ListenerApi) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
@@ -149,7 +150,7 @@ export class Ads implements IAds {
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
             AdsProperties: new AdsPropertiesApi(core.NativeBridge),
-            Listener: new ListenerApi(core.NativeBridge),
+            Listener: listener,
             Placement: new PlacementApi(core.NativeBridge),
             VideoPlayer: new VideoPlayerApi(core.NativeBridge),
             WebPlayer: new WebPlayerApi(core.NativeBridge),
@@ -537,6 +538,10 @@ export class Ads implements IAds {
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
 
         this._showing = true;
+
+        if (this.Api.Listener instanceof PausableListenerApi) {
+            this.Api.Listener.pauseEvents();
+        }
 
         if (this.Config.getCacheMode() !== CacheMode.DISABLED) {
             this.AssetManager.stopCaching();

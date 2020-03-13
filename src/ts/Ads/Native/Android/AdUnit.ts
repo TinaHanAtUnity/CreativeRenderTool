@@ -58,45 +58,15 @@ export class AndroidAdUnitApi extends NativeApi {
     public readonly onFocusGained = new Observable1<number>();
     public readonly onFocusLost = new Observable1<number>();
 
-    private _isClosing: boolean = false;
-
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AdUnit', ApiPackage.ADS, EventCategory.ADUNIT);
     }
 
     public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {
-        // Workaround for situations where an ad is opened before the previous ad has finished closing resulting in a black screen (ABT-1125).
-        let delay: number = 0;
-        if (this._isClosing) {
-            delay = 500;
-        }
-        let attempt: number = 0;
-        const maxAttempts: number = 10;
-        return new Promise((resolve, reject) => {
-            const intervalId: number = window.setInterval(() => {
-                if (attempt > maxAttempts) {
-                    window.clearInterval(intervalId);
-                    reject('Previous ad unit did not close in time');
-                    return;
-                }
-                if (this._isClosing) {
-                    attempt++;
-                    return;
-                }
-                window.clearInterval(intervalId);
-                this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent])
-                .then(() => {
-                    resolve();
-                },
-                (reason) => {
-                    reject(reason);
-                });
-            }, delay);
-        });
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent]);
     }
 
     public close(): Promise<void> {
-        this._isClosing = true;
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'close');
     }
 
@@ -176,7 +146,6 @@ export class AndroidAdUnitApi extends NativeApi {
 
             case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
                 this.onDestroy.trigger(<boolean>parameters[0], <number>parameters[1]);
-                this._isClosing = false;
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_PAUSE]:

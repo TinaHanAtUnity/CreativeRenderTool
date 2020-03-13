@@ -193,4 +193,12 @@ export class CustomFeatures {
     public static isWhitelistedOMVendor(omVendor: string | undefined) {
         return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
     }
+
+    // Enables experimental PausableListenerApi, which allows pausing and resuming events.
+    // This is needed as a fix for https://jira.unity3d.com/browse/ABT-1125.
+    public static pauseEventsSupported(gameId: string): boolean {
+        return gameId === '14850' ||
+               gameId === '14851' ||
+               gameId === '80222'; // Pocketgems, Episode
+    }
 }
