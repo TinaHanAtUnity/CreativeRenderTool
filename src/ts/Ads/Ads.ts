@@ -390,8 +390,12 @@ export class Ads implements IAds {
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (this._nofillImmediately) {
                         experimentType = MediationExperimentType.NofillImmediately;
-                    } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && XHRequest.isAvailable() && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
-                        experimentType = MediationExperimentType.AuctionXHR;
+                    } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
+                        if (XHRequest.isAvailable()) {
+                            experimentType = MediationExperimentType.AuctionXHR;
+                        } else {
+                            SDKMetrics.reportMetricEvent(MiscellaneousMetric.XHRNotAvailable);
+                        }
                     }
 
                     this._mediationName = mediation.getName()!;
