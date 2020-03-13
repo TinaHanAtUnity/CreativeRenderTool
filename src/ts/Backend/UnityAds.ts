@@ -52,7 +52,7 @@ export class UnityAds {
         if (UnityAds._initialized) {
             const placements: {[key: string]: number} = {};
             placements[placement] = 1;
-            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], [placements]);
+            UnityAds.getBackend().sendEvent(EventCategory[EventCategory.LOAD_API], LoadEvent[LoadEvent.LOAD_PLACEMENTS], placements);
         } else {
             const placements: {[key: string]: number} = {};
             placements[placement] = 1;
