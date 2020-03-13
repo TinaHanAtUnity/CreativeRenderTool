@@ -24,8 +24,9 @@ export class IsMadeWithUnity {
                     mwu: sdkDetectionInfo.isMadeWithUnity()
                 };
 
-                HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson);
-                this.setHasSentIsMadeWithUnity(storage);
+                HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson).then(()=> {
+                    this.setHasSentIsMadeWithUnity(storage);
+                });
             }
         });
     }
