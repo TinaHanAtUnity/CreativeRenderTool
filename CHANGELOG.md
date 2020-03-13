@@ -2,6 +2,7 @@
 
 * AB Test for Auction XHR request on Android only [#13799](https://github.com/Applifier/unity-ads-webview/pull/13799)
 * Open Measurement - Send event at video start for googledoubleclick [#13797](https://github.com/Applifier/unity-ads-webview/pull/13797)
+* Open Measurement - Add double verify script to Whitelist [#13798](https://github.com/Applifier/unity-ads-webview/pull/13798)
 
 # Fri Mar 13 00:51:31 UTC 2020
 
