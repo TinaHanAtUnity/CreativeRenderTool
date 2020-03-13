@@ -55,6 +55,8 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { ListenerApi as AdsListenerApi} from 'Ads/Native/Listener';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 
 export class Core implements ICore {
 
@@ -220,7 +222,15 @@ export class Core implements ICore {
             return configJson;
         }).then((configJson: unknown) => {
             this.Purchasing = new Purchasing(this);
-            this.Ads = new Ads(configJson, this);
+
+            let listener: AdsListenerApi;
+            if (CustomFeatures.pauseEventsSupported(this.ClientInfo.getGameId())) {
+                listener = new PausableListenerApi(this.NativeBridge);
+            } else {
+                listener = new AdsListenerApi(this.NativeBridge);
+            }
+
+            this.Ads = new Ads(configJson, this, listener);
 
             return this.Ads.initialize().then(() => {
                 SDKMetrics.sendBatchedEvents();
