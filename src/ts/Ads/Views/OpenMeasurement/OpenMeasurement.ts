@@ -363,7 +363,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
                 this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight));
 
-                if (CustomFeatures.isIASVendor(vendorKey)) {
+                if (CustomFeatures.isWhitelistedOMVendor(vendorKey)) {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
                 }
 
