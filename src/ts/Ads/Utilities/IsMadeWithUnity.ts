@@ -12,8 +12,9 @@ export class IsMadeWithUnity {
     }
 
     public static setHasSentIsMadeWithUnity(storage: StorageApi): void {
-        storage.set<boolean>(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity', true);
-        storage.write(StorageType.PRIVATE);
+        storage.set<boolean>(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity', true).then(() => {
+            storage.write(StorageType.PRIVATE);
+        });
     }
 
     public static sendIsMadeWithUnity(storage: StorageApi, sdkDetectionInfo: SdkDetectionInfo): Promise<void> {
@@ -24,7 +25,7 @@ export class IsMadeWithUnity {
                     mwu: sdkDetectionInfo.isMadeWithUnity()
                 };
 
-                HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson).then(()=> {
+                HttpKafka.sendEvent('ads.events.mwu.v1.json', KafkaCommonObjectType.ANONYMOUS, isMadeWithUnityJson).then(() => {
                     this.setHasSentIsMadeWithUnity(storage);
                 });
             }

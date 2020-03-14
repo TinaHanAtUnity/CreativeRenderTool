@@ -27,7 +27,7 @@ import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
         });
 
         it('should send the event when Storage API key is not present', () => {
-            sinon.stub(HttpKafka, 'sendEvent').returns(TestFixtures.getOkNativeResponse());
+            sinon.stub(HttpKafka, 'sendEvent').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             sinon.stub(core.Api.Storage, 'get').withArgs(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity').returns(Promise.resolve(false));
             sinon.stub(core.Api.Storage, 'set').withArgs(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity').returns(Promise.resolve());
             const kafkaSpy = <sinon.SinonStub>HttpKafka.sendEvent;
@@ -39,7 +39,7 @@ import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
         });
 
         it('should NOT send the event when the key is present', () => {
-            sinon.stub(HttpKafka, 'sendEvent').returns(TestFixtures.getOkNativeResponse());
+            sinon.stub(HttpKafka, 'sendEvent').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             sinon.stub(core.Api.Storage, 'get').withArgs(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity').returns(Promise.resolve(true));
             const kafkaSpy = <sinon.SinonStub>HttpKafka.sendEvent;
             return IsMadeWithUnity.sendIsMadeWithUnity(core.Api.Storage, core.SdkDetectionInfo).then(() => {
