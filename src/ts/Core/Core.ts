@@ -40,7 +40,7 @@ import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -56,7 +56,6 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
-import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
 export class Core implements ICore {
