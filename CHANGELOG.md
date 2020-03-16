@@ -1,3 +1,7 @@
+# Pending
+
+* Add isMadeWithUnity To New MWU Kafka Topic [#13768](https://github.com/Applifier/unity-ads-webview/pull/13768)
+
 # Fri Mar 13 20:32:57 UTC 2020
 
 * AB Test for Auction XHR request on Android only [#13799](https://github.com/Applifier/unity-ads-webview/pull/13799)
