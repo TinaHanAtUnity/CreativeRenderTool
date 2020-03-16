@@ -3,7 +3,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { KafkaCommonObjectType, HttpKafka } from 'Core/Utilities/HttpKafka';
 
 export class IsMadeWithUnity {
-    public static hasSentIsMadeWithUnity(storage: StorageApi): Promise<boolean> {
+    private static hasSentIsMadeWithUnity(storage: StorageApi): Promise<boolean> {
         return storage.get<boolean>(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity').then((hasSentIsMadeWithUnity) => {
             return hasSentIsMadeWithUnity;
         }).catch(() => {
@@ -11,7 +11,7 @@ export class IsMadeWithUnity {
         });
     }
 
-    public static setHasSentIsMadeWithUnity(storage: StorageApi): void {
+    private static setHasSentIsMadeWithUnity(storage: StorageApi): void {
         storage.set<boolean>(StorageType.PRIVATE, 'user.hasSentIsMadeWithUnity', true).then(() => {
             storage.write(StorageType.PRIVATE);
         });

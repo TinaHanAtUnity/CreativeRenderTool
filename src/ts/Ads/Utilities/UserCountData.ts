@@ -47,4 +47,5 @@ export class UserCountData {
             return 0;
         });
     }
+
 }
