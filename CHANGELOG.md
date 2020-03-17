@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar 17 20:26:08 UTC 2020
 
 * Add isMadeWithUnity To New MWU Kafka Topic [#13768](https://github.com/Applifier/unity-ads-webview/pull/13768)
 * [Load V5] Move construction of CampaignManager to own method [#13685](https://github.com/Applifier/unity-ads-webview/pull/13685)
