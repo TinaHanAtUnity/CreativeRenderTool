@@ -1,5 +1,30 @@
 # Pending
 
+* Add isMadeWithUnity To New MWU Kafka Topic [#13768](https://github.com/Applifier/unity-ads-webview/pull/13768)
+
+# Fri Mar 13 20:32:57 UTC 2020
+
+* AB Test for Auction XHR request on Android only [#13799](https://github.com/Applifier/unity-ads-webview/pull/13799)
+* Open Measurement - Send event at video start for googledoubleclick [#13797](https://github.com/Applifier/unity-ads-webview/pull/13797)
+* Open Measurement - Add double verify script to Whitelist [#13798](https://github.com/Applifier/unity-ads-webview/pull/13798)
+
+# Fri Mar 13 00:51:31 UTC 2020
+
+* Test using XHR for Auction Request on 1% for Android Devices [#13655](https://github.com/Applifier/unity-ads-webview/pull/13655)
+* Cleanup promise chain in LegacyCampaignManager.request method [#13769](https://github.com/Applifier/unity-ads-webview/pull/13769)
+* Fix Mediation Tracker Metrics for Nofill Immediately Test [#13767](https://github.com/Applifier/unity-ads-webview/pull/13767)
+* [LOAD V5] Mock classes for Load V5 [#13686](https://github.com/Applifier/unity-ads-webview/pull/13686)
+
+# Thu Mar 12 19:05:50 UTC 2020
+
+* Add NoFill in Mediation Test From Whitelist [#13332](https://github.com/Applifier/unity-ads-webview/pull/13332)
+* Reduce WebView size by changing formatting option in Google Closure Compiler [#13683](https://github.com/Applifier/unity-ads-webview/pull/13683)
+* Remove Green Radio Buttons [#13657](https://github.com/Applifier/unity-ads-webview/pull/13657)
+* Convert hex colors to css rgba in MAB [#13656](https://github.com/Applifier/unity-ads-webview/pull/13656)
+* Add Mediation Auction Request Failed Events Back [#13740](https://github.com/Applifier/unity-ads-webview/pull/13740)
+
+# Thu Mar 12 16:43:34 UTC 2020
+
 * [Load V5] Extract base class for Campaign Manager [#13684](https://github.com/Applifier/unity-ads-webview/pull/13684)
 * [Load V5] Remove Unused Methods in LegacyCampaignManager [#13714](https://github.com/Applifier/unity-ads-webview/pull/13714)
 

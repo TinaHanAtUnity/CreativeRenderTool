@@ -51,10 +51,11 @@ import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
+import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { XHRequest } from 'Core/Utilities/XHRequest';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -130,6 +131,9 @@ export class LegacyCampaignManager extends CampaignManager {
 
         this._requesting = true;
 
+        SdkStats.setAdRequestTimestamp();
+        const requestTimestamp: number = Date.now();
+
         return Promise.all<string[], number | undefined, number>([
             this.getFullyCachedCampaigns(),
             this.getVersionCode(),
@@ -147,52 +151,64 @@ export class LegacyCampaignManager extends CampaignManager {
             });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
-            SdkStats.setAdRequestTimestamp();
-            const requestTimestamp: number = Date.now();
-            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody).then(response => {
-                measurement.measure('auction_response');
-                const cachingTime = this.getTime();
-                if (this._mediationLoadTracking && performance && performance.now) {
-                    this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
-                }
-                if (response) {
-                    this.setSDKSignalValues(requestTimestamp);
+            if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
+                return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
+                    return {
+                        url: requestUrl,
+                        response: resp,
+                        responseCode: 200,
+                        headers: []
+                    };
+                });
+            } else {
+                return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
+            }
+        }).catch((error: unknown) => {
+            if (this._mediationLoadTracking && performance && performance.now) {
+                this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+            }
+            throw error;
+        }).then(response => {
+            measurement.measure('auction_response');
+            const cachingTime = this.getTime();
+            if (this._mediationLoadTracking && performance && performance.now) {
+                this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
+            }
+            if (response) {
+                this.setSDKSignalValues(requestTimestamp);
 
-                    if (this._auctionProtocol === AuctionProtocol.V5) {
-                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
-                            if (this._mediationLoadTracking && performance && performance.now) {
-                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
-                            }
-                        }).catch((e) => {
-                            if (this._mediationLoadTracking && performance && performance.now) {
-                                this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
-                            }
-                            this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
-                        });
-                    } else {
-                        return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
-                            this.handleGeneralError(e, 'parse_campaigns_error');
-                        });
-                    }
+                if (this._auctionProtocol === AuctionProtocol.V5) {
+                    return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
+                        if (this._mediationLoadTracking && performance && performance.now) {
+                            this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                        }
+                    }).catch((e) => {
+                        if (this._mediationLoadTracking && performance && performance.now) {
+                            this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                        }
+                        this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
+                    });
+                } else {
+                    return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
+                        this.handleGeneralError(e, 'parse_campaigns_error');
+                    });
                 }
-                throw new WebViewError('Empty campaign response', 'CampaignRequestError');
-            }).then(() => {
-                if (!PurchasingUtilities.isCatalogAvailable() && PurchasingUtilities.configurationIncludesPromoPlacement()) {
-                    PurchasingUtilities.refreshCatalog();
+            }
+            throw new WebViewError('Empty campaign response', 'CampaignRequestError');
+        }).then(() => {
+            if (!PurchasingUtilities.isCatalogAvailable() && PurchasingUtilities.configurationIncludesPromoPlacement()) {
+                PurchasingUtilities.refreshCatalog();
+            }
+            this._requesting = false;
+        }).catch((error) => {
+            this._requesting = false;
+            if (error instanceof RequestError) {
+                if (!error.nativeResponse) {
+                    this.onConnectivityError.trigger(this._adsConfig.getPlacementIds());
+                    return Promise.resolve();
                 }
-                this._requesting = false;
-            }).catch((error) => {
-                this._requesting = false;
-                if (error instanceof RequestError) {
-                    if (!error.nativeResponse) {
-                        this.onConnectivityError.trigger(this._adsConfig.getPlacementIds());
-                        return Promise.resolve();
-                    }
-                }
-                return this.handleGeneralError(error, 'auction_request_failed');
-            });
-        }).then((resp) => {
-            return resp;
+            }
+            return this.handleGeneralError(error, 'auction_request_failed');
         });
     }
 

@@ -6,7 +6,9 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export enum MediationExperimentType {
+    NofillImmediately = 'nfi',
     CacheModeAllowed = 'cma',
+    AuctionXHR = 'xhr',
     None = 'none'
 }
 

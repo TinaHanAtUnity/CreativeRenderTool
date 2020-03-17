@@ -600,5 +600,12 @@
     "description": "Privacy method, only sent if it is developer_consent or legitimate_interest",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "isMadeWithUnity",
+    "type": "boolean",
+    "description": "isMadeWithUnity flag",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
