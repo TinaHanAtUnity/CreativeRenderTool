@@ -327,22 +327,7 @@ export class OperativeEventManager {
             retryDelay: 10000,
             followRedirects: false,
             retryWithConnectionEvents: false
-        }).catch((error) => {
-            if (CustomFeatures.sampleAtGivenPercent(10)) {
-                const diagnosticData = {
-                    request: error.nativeRequest,
-                    event: event,
-                    sessionId: sessionId,
-                    url: url,
-                    response: error,
-                    data: data,
-                    campaignId: this._campaign.getId(),
-                    creativeId: this._campaign.getCreativeId(),
-                    seatId: this._campaign.getSeatId(),
-                    auctionProtocol: RequestManager.getAuctionProtocol()
-                };
-                Diagnostics.trigger('operative_event_manager_failed_post', diagnosticData);
-            }
+        }).catch(() => {
             new FailedOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,
                data: data

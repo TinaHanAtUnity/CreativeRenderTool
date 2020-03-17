@@ -139,28 +139,6 @@ export class ThirdPartyEventManager {
                 request = this._request.get(url, headers, options);
         }
         return request.catch(error => {
-            const urlParts = Url.parse(url);
-            const auctionProtocol = RequestManager.getAuctionProtocol();
-            const diagnosticData = {
-                request: error.nativeRequest,
-                event: event,
-                sessionId: sessionId,
-                url: url,
-                response: error,
-                host: urlParts.host,
-                protocol: urlParts.protocol,
-                auctionProtocol: auctionProtocol
-            };
-            if (error instanceof RequestError) {
-                error = new DiagnosticError(new Error(error.message), diagnosticData);
-            }
-            // Auction V5 start dip investigation
-            if (CustomFeatures.sampleAtGivenPercent(10)) {
-                if (event === TrackingEvent.START || event === TrackingEvent.IMPRESSION) {
-                    Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
-                }
-            }
-
             return Analytics.trigger('third_party_event_failed', error);
         });
     }

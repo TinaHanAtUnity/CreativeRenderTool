@@ -177,22 +177,26 @@ export class LegacyCampaignManager extends CampaignManager {
             if (response) {
                 this.setSDKSignalValues(requestTimestamp);
 
-                if (this._auctionProtocol === AuctionProtocol.V5) {
-                    return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
-                        if (this._mediationLoadTracking && performance && performance.now) {
-                            this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
-                        }
-                    }).catch((e) => {
-                        if (this._mediationLoadTracking && performance && performance.now) {
-                            this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
-                        }
-                        this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
-                    });
-                } else {
-                    return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
-                        this.handleGeneralError(e, 'parse_campaigns_error');
-                    });
+                let parseResponse: Promise<void | void[]>;
+                switch (this._auctionProtocol) {
+                    case AuctionProtocol.V5:
+                        parseResponse = this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
+                        break;
+                    case AuctionProtocol.V4:
+                    default:
+                        parseResponse = this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
                 }
+
+                return parseResponse.then(() => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                    }
+                }).catch((e) => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                    }
+                    this.handleGeneralError(e, 'parse_auction_campaigns_error');
+                });
             }
             throw new WebViewError('Empty campaign response', 'CampaignRequestError');
         }).then(() => {
@@ -811,25 +815,24 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private getBaseUrl(): string {
         if (this._coreConfig.getTestMode()) {
-            return [
-                CampaignManager.TestModeUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
+            return this.constructBaseUrl(CampaignManager.TestModeUrl);
         }
-        if (this._auctionProtocol === AuctionProtocol.V5) {
-            return [
-                CampaignManager.AuctionV5BaseUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
-        } else {
-            return [
-                CampaignManager.BaseUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
+
+        switch (this._auctionProtocol) {
+            case AuctionProtocol.V5:
+                return this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl);
+            case AuctionProtocol.V4:
+            default:
+                return this.constructBaseUrl(CampaignManager.BaseUrl);
         }
+    }
+
+    private constructBaseUrl(baseUri: string): string {
+        return [
+            baseUri,
+            this._clientInfo.getGameId(),
+            'requests'
+        ].join('/');
     }
 
     private getVersionCode(): Promise<number | undefined> {
