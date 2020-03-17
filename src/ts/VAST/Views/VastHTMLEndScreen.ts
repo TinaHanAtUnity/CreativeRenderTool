@@ -62,10 +62,14 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     }
 
     public show(): void {
-        super.show();
-        this.setUpWebPlayers().then(() => {
-            this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData ? this._htmlContentTemplateData : {}), 'text/html', 'UTF-8');
-        });
+        if (this._htmlContentTemplateData) {
+            super.show();
+            this.setUpWebPlayers().then(() => {
+                this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8');
+            });
+        } else {
+            this.onCloseEvent(new Event('click'));
+        }
     }
 
     public remove(): void {
