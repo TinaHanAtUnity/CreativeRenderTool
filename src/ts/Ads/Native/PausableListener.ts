@@ -73,9 +73,8 @@ export class PausableListenerApi extends ListenerApi {
         return super.sendErrorEvent(error, message);
     }
 
-    public pauseEvents(): Promise<void> {
+    public pauseEvents(): void {
         this._paused = true;
-        return Promise.resolve();
     }
 
     public resumeEvents(): Promise<void> {
