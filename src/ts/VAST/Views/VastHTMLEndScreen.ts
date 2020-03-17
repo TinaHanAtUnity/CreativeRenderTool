@@ -19,7 +19,7 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     private _privacy: AbstractPrivacy;
     private _webPlayerContainer: WebPlayerContainer;
     private _htmlContentTemplate: Template;
-    private readonly _htmlContentTemplateData: { [key: string]: TemplateDataType | ITemplateData } = {};
+    private readonly _htmlContentTemplateData: ITemplateData  = {};
     private _adUnitContainer: AdUnitContainer;
     private _deviceInfo: DeviceInfo;
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
@@ -98,9 +98,8 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
                 this.shouldOverrideUrlLoading(url, method);
             });
         }
-        const platform = this._platform;
         let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
-        if (platform === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             webPlayerSettings = {
                 setJavaScriptCanOpenWindowsAutomatically: [true]
             };
