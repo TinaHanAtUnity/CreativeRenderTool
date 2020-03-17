@@ -117,6 +117,9 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
         }
         return this._adUnitContainer.reconfigure(ViewConfiguration.WEB_PLAYER)
             .then(() => {
+                this._adUnitContainer.reorient(false, this._adUnitContainer.getLockedOrientation());
+            })
+            .then(() => {
                 this._webPlayerContainer.setSettings(webPlayerSettings, {}).then(() => {
                     const promises = [
                         this._deviceInfo.getScreenWidth(),
