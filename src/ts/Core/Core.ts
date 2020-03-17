@@ -56,8 +56,6 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
-import { ListenerApi as AdsListenerApi} from 'Ads/Native/Listener';
-import { PausableListenerApi } from 'Ads/Native/PausableListener';
 
 export class Core implements ICore {
 
@@ -246,14 +244,7 @@ export class Core implements ICore {
             return configJson;
         }).then((configJson: unknown) => {
             this.Purchasing = new Purchasing(this);
-
-            let listener: AdsListenerApi;
-            if (CustomFeatures.pauseEventsSupported(this.ClientInfo.getGameId())) {
-                listener = new PausableListenerApi(this.NativeBridge);
-            } else {
-                listener = new AdsListenerApi(this.NativeBridge);
-            }
-            this.Ads = new Ads(configJson, this, listener);
+            this.Ads = new Ads(configJson, this);
 
             measurements.measure('core_ready');
 

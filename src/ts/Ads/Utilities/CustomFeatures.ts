@@ -197,8 +197,8 @@ export class CustomFeatures {
     // Enables experimental PausableListenerApi, which allows pausing and resuming events.
     // This is needed as a fix for https://jira.unity3d.com/browse/ABT-1125.
     public static pauseEventsSupported(gameId: string): boolean {
-        return gameId === '14850' ||
-               gameId === '14851' ||
+        return gameId === '1543460' || // richardh, iOS test app
+               gameId === '1543461' || // richardh, Google Play Store test app
                gameId === '80222'; // Pocketgems, Episode
     }
 }

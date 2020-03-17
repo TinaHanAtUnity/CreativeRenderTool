@@ -139,7 +139,7 @@ export class Ads implements IAds {
     public Analytics: Analytics;
     public Store: IStore;
 
-    constructor(config: unknown, core: ICore, listener: ListenerApi) {
+    constructor(config: unknown, core: ICore) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config);
         this._core = core;
@@ -150,7 +150,7 @@ export class Ads implements IAds {
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
             AdsProperties: new AdsPropertiesApi(core.NativeBridge),
-            Listener: listener,
+            Listener: CustomFeatures.pauseEventsSupported(core.ClientInfo.getGameId()) ? new PausableListenerApi(core.NativeBridge) : new ListenerApi(core.NativeBridge),
             Placement: new PlacementApi(core.NativeBridge),
             VideoPlayer: new VideoPlayerApi(core.NativeBridge),
             WebPlayer: new WebPlayerApi(core.NativeBridge),
