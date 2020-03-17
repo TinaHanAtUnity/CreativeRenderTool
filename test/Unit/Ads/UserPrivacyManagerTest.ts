@@ -633,7 +633,7 @@ describe('UserPrivacyManagerTest', () => {
 
         it('with proper fields', () => {
             const expectedKafkaObject = {
-                v: 3,
+                v: 2,
                 advertisingId: testAdvertisingId,
                 abGroup: abGroup,
                 layout: layout,
@@ -651,8 +651,7 @@ describe('UserPrivacyManagerTest', () => {
                 bundleId: testBundleId,
                 permissions: permissions,
                 legalFramework: 'none',
-                agreedOverAgeLimit: 'missing',
-                ageGateSource: 'missing'
+                agreedOverAgeLimit: 'missing'
             };
 
             return privacyManager.updateUserPrivacy(permissions, source, action, layout).then(() => {
@@ -724,7 +723,7 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.abGroup, expectedAbGroup);
                     assert.equal(eventData.layout, '');
                     assert.equal(eventData.firstRequest, true);
-                    assert.equal(eventData.v, 3);
+                    assert.equal(eventData.v, 2);
                     assert.equal(eventData.agreedVersion, gamePrivacy.getVersion());
                 });
             });

@@ -247,7 +247,7 @@ export class UserPrivacyManager {
 
     private sendPrivacyEvent(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
-            'v': 3,
+            'v': 2,
             advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
             abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
@@ -265,8 +265,7 @@ export class UserPrivacyManager {
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
-            agreedOverAgeLimit: this._ageGateChoice,
-            ageGateSource: this._ageGateSource
+            agreedOverAgeLimit: this._ageGateChoice
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
