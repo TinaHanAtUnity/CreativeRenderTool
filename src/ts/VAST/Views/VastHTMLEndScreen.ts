@@ -26,6 +26,8 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     private _onCreateWebview: IObserver1<string>;
     private _core: ICoreApi;
     private _controlBarHeight: number;
+    private _screenWidth: number;
+    private _screenHeight: number;
 
     constructor(parameters: IAdUnitParameters<VastCampaign>, webPlayerContainer: WebPlayerContainer) {
         super(parameters);
@@ -79,16 +81,10 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     }
 
     public onPrivacyClose(): void {
-        const promises = [
-            this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ];
-        Promise.all(promises).then(([screenWidth, screenHeight]) => {
-            this._adUnitContainer.setViewFrame('webview', 0, screenHeight - this._controlBarHeight, screenWidth, this._controlBarHeight).then(() => {
-                if (this._privacy) {
-                    this._privacy.hide();
-                }
-            });
+        this._adUnitContainer.setViewFrame('webview', 0, this._screenHeight - this._controlBarHeight, this._screenWidth, this._controlBarHeight).then(() => {
+            if (this._privacy) {
+                this._privacy.hide();
+            }
         });
     }
 
@@ -126,8 +122,10 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
                         this._deviceInfo.getScreenHeight()
                     ];
                     Promise.all(promises).then(([screenWidth, screenHeight]) => {
+                        this._screenHeight = screenHeight;
+                        this._screenWidth = screenWidth;
                         this._adUnitContainer.setViewFrame('webplayer', 0, 0, screenWidth, screenHeight).then(() => {
-                            this._adUnitContainer.setViewFrame('webview', 0, screenHeight - 100, screenWidth, 100).then(() => {
+                            this._adUnitContainer.setViewFrame('webview', 0, screenHeight - this._controlBarHeight, screenWidth, this._controlBarHeight).then(() => {
                                 return this.setWebplayerEventSettings();
                             });
                         });
@@ -168,14 +166,8 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        const promises = [
-            this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ];
-        Promise.all(promises).then(([screenWidth, screenHeight]) => {
-            this._adUnitContainer.setViewFrame('webview', 0, 0, screenWidth, screenHeight).then(() => {
-                this._privacy.show();
-            });
+        this._adUnitContainer.setViewFrame('webview', 0, 0, this._screenWidth, this._screenHeight).then(() => {
+            this._privacy.show();
         });
     }
 }
