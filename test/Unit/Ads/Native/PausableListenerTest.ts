@@ -8,14 +8,18 @@ import { NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { assert } from 'chai';
 
 class WebviewBridgeMock implements IWebViewBridge {
-    public handleInvocation(invocations: string): void {}
-    public handleCallback(id: string, status: string, parameters?: string): void {}
+    public handleInvocation(invocations: string): void {
+        // NOP
+    }
+    public handleCallback(id: string, status: string, parameters?: string): void {
+        // NOP
+    }
 }
 
 class InvokeElement {
     public className: string;
     public methodName: string;
-    
+
     constructor(className: string, methodName: string) {
         this.className = className;
         this.methodName = methodName;
@@ -25,18 +29,34 @@ class InvokeElement {
 class NativeBridgeMock extends NativeBridge {
     public _invokeList: InvokeElement[] = [];
     constructor() { super(new WebviewBridgeMock(), Platform.ANDROID, false); }
-    public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void): number { return 0; }
+    public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void): number {
+        return 0;
+    }
     public invoke<T>(className: string, methodName: string, parameters?: unknown[]): Promise<T> {
         this._invokeList.push(new InvokeElement(className, methodName));
-        return new Promise<T>(() => {});
+        return new Promise<T>(() => {
+            // NOP
+        });
     }
-    public handleCallback(results: unknown[][]): void {}
-    public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {}
-    public handleEvent(parameters: unknown[]): void {}
-    public handleInvocation(parameters: unknown[]): void {}
-    public getPlatform(): Platform { return Platform.ANDROID; }
-    public setAutoBatchEnabled(enabled: boolean) {}
-};
+    public handleCallback(results: unknown[][]): void {
+        // NOP
+    }
+    public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {
+        // NOP
+    }
+    public handleEvent(parameters: unknown[]): void {
+        // NOP
+    }
+    public handleInvocation(parameters: unknown[]): void {
+        // NOP
+    }
+    public getPlatform(): Platform {
+        return Platform.ANDROID;
+    }
+    public setAutoBatchEnabled(enabled: boolean) {
+        // NOP
+    }
+}
 
 describe('PausableListenerTest', () => {
     const expectedEvents: InvokeElement[] = [
@@ -45,7 +65,7 @@ describe('PausableListenerTest', () => {
         new InvokeElement('com.unity3d.services.ads.api.Listener', 'sendFinishEvent'),
         new InvokeElement('com.unity3d.services.ads.api.Listener', 'sendClickEvent'),
         new InvokeElement('com.unity3d.services.ads.api.Listener', 'sendPlacementStateChangedEvent'),
-        new InvokeElement('com.unity3d.services.ads.api.Listener', 'sendErrorEvent'),
+        new InvokeElement('com.unity3d.services.ads.api.Listener', 'sendErrorEvent')
     ];
 
     let nativeBridge: NativeBridgeMock;
@@ -66,10 +86,10 @@ describe('PausableListenerTest', () => {
             listener.sendErrorEvent('test', 'error details');
 
             assert(nativeBridge._invokeList.length === expectedEvents.length, 'all queued events should be sent');
-            for (let i = 0; i < expectedEvents.length; i++) {
-                let got: InvokeElement | undefined = nativeBridge._invokeList.shift();
+            for (const expected of expectedEvents) {
+                const got: InvokeElement | undefined = nativeBridge._invokeList.shift();
                 if (got !== undefined) {
-                    assert(got.methodName === expectedEvents[i].methodName, 'queued events should be sent in the order recieved');
+                    assert(got.methodName === expected.methodName, 'queued events should be sent in the order recieved');
                 }
             }
         });
@@ -85,12 +105,12 @@ describe('PausableListenerTest', () => {
             listener.sendClickEvent('video');
             listener.sendPlacementStateChangedEvent('video', 'WAITING', 'READY');
             listener.sendErrorEvent('test', 'error details');
-            
+
             assert(nativeBridge._invokeList.length === 0, 'no events should be sent');
         });
     });
 
-    describe('when unpaused', () => {        
+    describe('when unpaused', () => {
         it('should send queued events', () => {
             listener.pauseEvents();
 
@@ -100,13 +120,13 @@ describe('PausableListenerTest', () => {
             listener.sendClickEvent('video');
             listener.sendPlacementStateChangedEvent('video', 'WAITING', 'READY');
             listener.sendErrorEvent('test', 'error details');
-    
+
             listener.resumeEvents();
             assert(nativeBridge._invokeList.length === expectedEvents.length, 'all queued events should be sent');
-            for (let i = 0; i < expectedEvents.length; i++) {
-                let got: InvokeElement | undefined = nativeBridge._invokeList.shift();
+            for (const expected of expectedEvents) {
+                const got: InvokeElement | undefined = nativeBridge._invokeList.shift();
                 if (got !== undefined) {
-                    assert(got.methodName === expectedEvents[i].methodName, 'queued events should be sent in the order recieved');
+                    assert(got.methodName === expected.methodName, 'queued events should be sent in the order recieved');
                 }
             }
         });
@@ -117,18 +137,18 @@ describe('PausableListenerTest', () => {
             listener.sendReadyEvent('video');
             listener.sendStartEvent('video');
             listener.sendFinishEvent('video', FinishState.COMPLETED);
-            
+
             listener.resumeEvents();
 
             listener.sendClickEvent('video');
             listener.sendPlacementStateChangedEvent('video', 'WAITING', 'READY');
             listener.sendErrorEvent('test', 'error details');
-    
+
             assert(nativeBridge._invokeList.length === expectedEvents.length, 'all queued events should be sent');
-            for (let i = 0; i < expectedEvents.length; i++) {
-                let got: InvokeElement | undefined = nativeBridge._invokeList.shift();
+            for (const expected of expectedEvents) {
+                const got: InvokeElement | undefined = nativeBridge._invokeList.shift();
                 if (got !== undefined) {
-                    assert(got.methodName === expectedEvents[i].methodName, 'queued events should be sent in the order recieved');
+                    assert(got.methodName === expected.methodName, 'queued events should be sent in the order recieved');
                 }
             }
         });
