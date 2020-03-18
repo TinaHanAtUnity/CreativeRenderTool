@@ -412,6 +412,8 @@ export class Ads implements IAds {
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
+        this.PrivacyManager.applyDeveloperAgeGate();
+
         if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
         }
