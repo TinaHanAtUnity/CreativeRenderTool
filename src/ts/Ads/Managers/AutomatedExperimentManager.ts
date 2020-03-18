@@ -141,7 +141,7 @@ export class AutomatedExperimentManager {
         }
     }
 
-    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): IExperimentActionChoice | undefined {
+    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): IExperimentActionChoice {
 
         if (this.isCampaignTargetForExperiment(campaign)) {
 
@@ -516,7 +516,7 @@ export class AutomatedExperimentManager {
                         SDKMetrics.reportMetricEvent(AUIMetric.FailedToFetchAutomatedExperiements);
                     });
             }).catch(() => {
-                SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
+                SDKMetrics.reportMetricEvent(AUIMetric.CampaignInitializationError);
             });
     }
 
@@ -525,7 +525,8 @@ export class AutomatedExperimentManager {
         if (this._campaign.Id === campaign.getId()) {
 
             if (this._campaign.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
-                return Promise.reject('campaign_optimization_response_ignored');
+                SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseIgnored);
+                return Promise.resolve();
             }
 
             experiments.forEach(experiment => {

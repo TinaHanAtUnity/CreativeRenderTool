@@ -33,14 +33,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        let endScreenCombination = ButtonAnimationsExperiment.getDefaultActions();
-        const mabDecision = this._automatedExperimentManager.activateExperiment(baseParams.campaign, ButtonAnimationsExperiment);
-
-        if (mabDecision) {
-            endScreenCombination = mabDecision;
-        } else {
-            SDKMetrics.reportMetricEvent(AUIMetric.DecisionNotReady);
-        }
+        const endScreenCombination = this._automatedExperimentManager.activateExperiment(baseParams.campaign, ButtonAnimationsExperiment);
 
         const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 

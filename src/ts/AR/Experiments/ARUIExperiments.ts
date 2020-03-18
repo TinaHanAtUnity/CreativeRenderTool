@@ -9,14 +9,7 @@ export interface IArUiExperiments {
 }
 
 export function arAvailableButtonDecision(automatedExperimentManager: AutomatedExperimentManager, campaign: Campaign): IArUiExperiments {
-    let arAvailableButtonCombination = ArAvailableButtonExperiment.getDefaultActions();
-    const mabDecision = automatedExperimentManager.activateExperiment(campaign, ArAvailableButtonExperiment);
-
-    if (mabDecision) {
-        arAvailableButtonCombination = mabDecision;
-    } else {
-        SDKMetrics.reportMetricEvent(AUIMetric.DecisionNotReady);
-    }
+    const arAvailableButtonCombination = automatedExperimentManager.activateExperiment(campaign, ArAvailableButtonExperiment);
 
     return {
         color: arAvailableButtonCombination.color,

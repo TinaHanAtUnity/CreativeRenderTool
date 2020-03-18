@@ -123,13 +123,12 @@ export enum MraidMetric {
 
 export enum AUIMetric {
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
-    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
-    DecisionNotReady = 'decision_not_ready',
+    CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
     UnknownExperimentName = 'unknown_experiement_name',
-    FailedToPublishOutcome = 'failed_to_publish_outcome',
-    CampaignNotTargettedForExperimenting = 'campaign_not_targetted_for_experimenting'
+    FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
+    OptimizationResponseIgnored = 'campaign_optimization_response_ignored'
 }
 
 export enum GeneralTimingMetric {
