@@ -67,7 +67,7 @@ describe('AutomatedExperimentManagerTests', () => {
     let ads: IAds;
     let platform: Platform;
     let campaign: Campaign;
-    let aem: AutomatedExperimentManager
+    let aem: AutomatedExperimentManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -178,7 +178,7 @@ describe('AutomatedExperimentManagerTests', () => {
                 responseCode: 200,
                 response: ''
             });
-            
+
         return aem.onNewCampaign(campaign)
         .then(() => aem.startCampaign(campaign))
         .then(() => {
@@ -203,7 +203,8 @@ describe('AutomatedExperimentManagerTests', () => {
                     response: responseText
                 });
 
-            aem.registerExperiments([FooExperiment])
+            aem.registerExperiments([FooExperiment]);
+
             return aem.onNewCampaign(campaign)
                 .then(() => aem.startCampaign(campaign))
                 .then(() => {
@@ -213,7 +214,6 @@ describe('AutomatedExperimentManagerTests', () => {
             });
         });
     });
-
 
     it(`send proper request, receive garbage, use default action`, () => {
         const postUrl = baseUrl + createEndPoint;
@@ -230,12 +230,12 @@ describe('AutomatedExperimentManagerTests', () => {
             .withArgs(AUIMetric.FailedToParseExperimentResponse)
             .returns(true);
 
-        aem.registerExperiments([FooExperiment])
+        aem.registerExperiments([FooExperiment]);
         return aem.onNewCampaign(campaign)
         .then(() => aem.startCampaign(campaign))
         .then(() => {
             assert.isTrue(postStub.called);
-            assert.isTrue(metricStub.calledOnce)
+            assert.isTrue(metricStub.calledOnce);
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
             assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
@@ -245,7 +245,7 @@ describe('AutomatedExperimentManagerTests', () => {
     it('initialize with request failure, use default action', () => {
         const postUrl = baseUrl + createEndPoint;
         const responseText = JSON.stringify({});
-            
+
         const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
             .withArgs(AUIMetric.FailedToFetchAutomatedExperiements)
             .returns(true);
@@ -257,12 +257,12 @@ describe('AutomatedExperimentManagerTests', () => {
                 response: responseText
             });
 
-        aem.registerExperiments([FooExperiment])
+        aem.registerExperiments([FooExperiment]);
         return aem.onNewCampaign(campaign)
         .then(() => aem.startCampaign(campaign))
         .then(() => {
             assert.isTrue(postStub.called);
-            assert.isTrue(metricStub.calledOnce)
+            assert.isTrue(metricStub.calledOnce);
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
             assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
@@ -291,7 +291,7 @@ describe('AutomatedExperimentManagerTests', () => {
                 response: rewardResponseText
             });
 
-            aem.registerExperiments([FooExperiment])
+            aem.registerExperiments([FooExperiment]);
             return aem.onNewCampaign(campaign)
             .then(() => aem.startCampaign(campaign))
             .then(() => {
@@ -334,7 +334,7 @@ describe('AutomatedExperimentManagerTests', () => {
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
         sandbox.stub(MabDisabledABTest, 'isValid').returns(true);
- 
+
         const mockRequest = sinon.mock(requestManager);
         mockRequest.expects('post').returns(Promise.resolve({
             response: JSON.stringify(CometVideoPlcCampaign)
