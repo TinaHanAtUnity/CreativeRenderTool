@@ -1,9 +1,14 @@
+# Pending
+
+* Open Measurement - Move Loaded Event Prior to Start [#13880](https://github.com/Applifier/unity-ads-webview/pull/13880)
+* Dealy opening ad if previous ad is still closing [#13627](https://github.com/Applifier/unity-ads-webview/pull/13627)
+
+
 # Tue Mar 17 20:26:08 UTC 2020
 
 * Add isMadeWithUnity To New MWU Kafka Topic [#13768](https://github.com/Applifier/unity-ads-webview/pull/13768)
 * [Load V5] Move construction of CampaignManager to own method [#13685](https://github.com/Applifier/unity-ads-webview/pull/13685)
 * [LOAD V5] Improvements for Browser Test App [#13796](https://github.com/Applifier/unity-ads-webview/pull/13796)
-* Open Measurement - Move Loaded Event Prior to Start [#13880](https://github.com/Applifier/unity-ads-webview/pull/13880)
 
 # Fri Mar 13 20:32:57 UTC 2020
 
