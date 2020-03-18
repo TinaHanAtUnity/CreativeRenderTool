@@ -7,6 +7,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastOpenMeasurementController extends OpenMeasurementController {
     private _clientInfo: ClientInfo;
@@ -55,8 +56,17 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             if (verification.getVerificationParameters()) {
                 event.data.verificationParameters = verification.getVerificationParameters();
             }
-            event.data.vendorkey = verification.getVerificationVendor();
+
+            const vendorKey = verification.getVerificationVendor();
+
+            event.data.vendorkey = vendorKey;
+
+            if (CustomFeatures.isIASVendor(vendorKey)) {
+                contextData.adSessionType = AdSessionType.NATIVE;  // TODO: Adjust. IAS expects native to run properly
+            }
+
             event.data.context = contextData;
+
             om.sessionStart(event);
         });
 
