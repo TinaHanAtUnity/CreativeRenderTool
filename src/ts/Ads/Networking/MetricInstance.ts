@@ -31,6 +31,12 @@ export class MetricInstance {
     private metricPath = 'v1/metrics';
     private timingPath = 'v1/timing';
 
+    private static _overrideBaseUrl: string | undefined;
+
+    public static setBaseUrl(url: string | undefined) {
+        MetricInstance._overrideBaseUrl = url;
+    }
+
     constructor(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
         this._platform = platform;
         this._requestManager = requestManager;
@@ -39,7 +45,12 @@ export class MetricInstance {
         this._countryIso = this.getCountryIso(country);
         this._batchedTimingEvents = [];
         this._batchedMetricEvents = [];
-        this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+
+        if (MetricInstance._overrideBaseUrl !== undefined) {
+            this._baseUrl = MetricInstance._overrideBaseUrl;
+        } else {
+            this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+        }
     }
 
     protected getProductionUrl(): string {
