@@ -9,7 +9,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { SDKMetrics, VastMetric } from 'Ads/Utilities/SDKMetrics';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
-import { VideoPlayerState } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { VideoPlayerState, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -121,6 +121,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.resume();
             this._om.setDeviceVolume(this._vastAdUnit.getVolume());
+            this._om.loaded({
+                isSkippable: this._placement.allowSkip(),
+                skipOffset: this._placement.allowSkipInSeconds(),
+                isAutoplay: true,                   // Always autoplay for video
+                position: VideoPosition.STANDALONE  // Always standalone video
+            });
             this._om.start(this._vastCampaign.getVideo().getDuration());
             this._om.playerStateChanged(VideoPlayerState.FULLSCREEN);
         }

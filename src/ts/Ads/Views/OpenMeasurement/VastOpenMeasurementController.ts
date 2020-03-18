@@ -67,7 +67,7 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
+            adSessionType: AdSessionType.HTML,
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
