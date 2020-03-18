@@ -63,7 +63,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
                 sinon.stub(TestEnvironment, 'get').returns(true);
                 sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.setAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(coreConfig);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
@@ -73,7 +73,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
                 sinon.stub(TestEnvironment, 'get').returns(false);
                 sinon.stub(coreConfig, 'getTestMode').returns(true);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.setAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(coreConfig);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
@@ -83,7 +83,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
                 sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V4');
                 sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.setAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(coreConfig);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
@@ -93,7 +93,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
                 sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V5');
                 sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.setAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(coreConfig);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V5);
@@ -103,7 +103,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
                 sinon.stub(TestEnvironment, 'get').returns(false);
                 sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.setAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(coreConfig);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V5);
