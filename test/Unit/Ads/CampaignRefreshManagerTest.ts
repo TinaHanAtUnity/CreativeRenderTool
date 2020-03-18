@@ -194,7 +194,7 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        const performance = new Performance(ar, coreModule, adsModule);
+        const performance = new Performance(ar, coreModule, undefined, adsModule);
         const contentTypeHandlerMap = performance.getContentTypeHandlerMap();
         for (const contentType in contentTypeHandlerMap) {
             if (contentTypeHandlerMap.hasOwnProperty(contentType)) {

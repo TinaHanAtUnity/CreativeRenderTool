@@ -109,7 +109,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this.hideArAvailableButton();
                         this.showARPermissionPanel();
                         this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
-                        this._automatedExperimentManager.sendReward();
+                        this._automatedExperimentManager.rewardExperiments(campaign);
                     }
                 },
                 selector: '.ar-available-button'
@@ -233,7 +233,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         super.hide();
         this._mraidAdapterContainer.disconnect();
-        this._automatedExperimentManager.endExperiment();
+        this._automatedExperimentManager.endCampaign(this._campaign);
     }
 
     private showLoadingScreen() {

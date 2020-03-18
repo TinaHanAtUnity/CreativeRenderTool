@@ -34,7 +34,7 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
     actions: ButtonExperimentDeclaration,
     defaultActions: {
         color: ButtonExperimentDeclaration.color.BLUE,
-        animation: ButtonExperimentDeclaration.animation.STATIC
+        animation: ButtonExperimentDeclaration.animation.BOUNCING
     },
     cacheDisabled: true
 });

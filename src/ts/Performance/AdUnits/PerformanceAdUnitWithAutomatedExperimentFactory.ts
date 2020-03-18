@@ -1,20 +1,20 @@
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Platform } from 'Core/Constants/Platform';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
-import { IOnCampaignListener, implementsIOnCampaignListener } from 'Ads/Managers/CampaignManager';
-import { Campaign, ICampaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { Platform } from 'Core/Constants/Platform';
-import { Observable3 } from 'Core/Utilities/Observable';
-import { IOSPerformanceAdUnitWithAutomatedExperiment } from 'Performance/AdUnits/IOSPerformanceAdUnitWithAutomatedExperiment';
-import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import {
     IPerformanceAdUnitWithAutomatedExperimentParameters,
     PerformanceAdUnitWithAutomatedExperiment
 } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperiment';
+import { IOSPerformanceAdUnitWithAutomatedExperiment } from 'Performance/AdUnits/IOSPerformanceAdUnitWithAutomatedExperiment';
 import { MabDecisionPerformanceEndScreenEventHandler } from 'Performance/EventHandlers/MabDecisionPerformanceEndScreenEventHandler';
-import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
-export class PerformanceAdUnitWithAutomatedExperimentFactory extends PerformanceAdUnitFactory implements IOnCampaignListener {
+export class PerformanceAdUnitWithAutomatedExperimentFactory extends PerformanceAdUnitFactory {
 
     public createAdUnit(parameters: IPerformanceAdUnitWithAutomatedExperimentParameters): PerformanceAdUnit {
         const useIOSPerformanceAdUnit = parameters.platform === Platform.IOS;
@@ -42,12 +42,6 @@ export class PerformanceAdUnitWithAutomatedExperimentFactory extends Performance
         this.initializeHandlers(parameters, performanceAdUnit, performanceOverlayEventHandler, endScreenEventHandler);
 
         return performanceAdUnit;
-    }
-
-    public listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
-        if (implementsIOnCampaignListener(this.getParametersFactory())) {
-            (<IOnCampaignListener><unknown> this.getParametersFactory()).listenOnCampaigns(onCampaign);
-        }
     }
 
 }
