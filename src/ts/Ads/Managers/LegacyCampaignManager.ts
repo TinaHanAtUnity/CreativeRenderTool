@@ -45,7 +45,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { SDKMetrics, LoadMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, LoadMetric, GeneralTimingMetric, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -164,9 +164,22 @@ export class LegacyCampaignManager extends CampaignManager {
                 return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
             }
         }).catch((error: unknown) => {
-            if (this._mediationLoadTracking && performance && performance.now) {
-                this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+            let reason: string = 'unknown';
+            if (error instanceof RequestError) {
+                if (error.nativeResponse) {
+                    reason = error.nativeResponse.responseCode.toString();
+                } else {
+                    reason = 'request';
+                }
             }
+            if (this._mediationLoadTracking && performance && performance.now) {
+                this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false, reason);
+            }
+            SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestFailed, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+                'rsn': reason
+            });
             throw error;
         }).then(response => {
             measurement.measure('auction_response');
@@ -250,9 +263,22 @@ export class LegacyCampaignManager extends CampaignManager {
                     retryWithConnectionEvents: false,
                     timeout: 10000
                 }).catch((error: unknown) => {
-                    if (this._mediationLoadTracking && performance && performance.now) {
-                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+                    let reason: string = 'unknown';
+                    if (error instanceof RequestError) {
+                        if (error.nativeResponse) {
+                            reason = error.nativeResponse.responseCode.toString();
+                        } else {
+                            reason = 'request';
+                        }
                     }
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false, reason);
+                    }
+                    SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestFailed, {
+                        'wel': 'false',
+                        'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+                        'rsn': reason
+                    });
                     throw error;
                 });
             }).then(response => {
