@@ -14,15 +14,6 @@ describe('PausableListenerTest', () => {
         'sendErrorEvent'
     ];
 
-    const triggerEventsForListener = () => {
-        listener.sendReadyEvent('video');
-        listener.sendStartEvent('video');
-        listener.sendFinishEvent('video', FinishState.COMPLETED);
-        listener.sendClickEvent('video');
-        listener.sendPlacementStateChangedEvent('video', 'WAITING', 'READY');
-        listener.sendErrorEvent('test', 'error details');
-    };
-
     let nativeBridge: NativeBridgeMock;
     let listener: PausableListenerApi;
 
@@ -50,8 +41,12 @@ describe('PausableListenerTest', () => {
 
         beforeEach(() => {
             listener.pauseEvents();
-            triggerEventsForListener();
-        });
+            listener.sendReadyEvent('video');
+            listener.sendStartEvent('video');
+            listener.sendFinishEvent('video', FinishState.COMPLETED);
+            listener.sendClickEvent('video');
+            listener.sendPlacementStateChangedEvent('video', 'WAITING', 'READY');
+            listener.sendErrorEvent('test', 'error details');        });
 
         it('should not send events', () => {
             expect(nativeBridge.invoke.mock.calls.length).toBe(0);
