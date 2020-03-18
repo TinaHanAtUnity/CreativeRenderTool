@@ -67,8 +67,6 @@ describe('PausableListenerTest', () => {
             });
 
             it('should send the events in the order received', () => {
-                listener.resumeEvents();
-
                 for (const methodName of expectedMethodNames) {
                     const call = nativeBridge.invoke.mock.calls.shift();
                     expect(methodName).toBe(call[methodNameCallIndex]);
