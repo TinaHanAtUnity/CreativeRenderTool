@@ -218,7 +218,6 @@ export class AutomatedExperimentManager {
                     if (this._campaign.Experiments[experimentName].Active) {
                         this._campaign.Experiments[experimentName].Outcome = 1;
                     }
-                    
                 }
             }
 
