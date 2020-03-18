@@ -172,19 +172,22 @@ export class AutomatedExperimentManager {
                 return Promise.reject('Experiment session not started.');
             }
 
-            return this.publishCampaignOutcomes(campaign, this._campaign, AutomatedExperimentStage.ENDED);
+            return this.publishCampaignOutcomes(campaign, AutomatedExperimentStage.ENDED);
         }
 
         return Promise.resolve();
     }
 
-    private publishCampaignOutcomes(campaign: Campaign, optmzCampaign: OptimizedCampaign, nextStage: AutomatedExperimentStage): Promise<void> {
+    private publishCampaignOutcomes(campaign: Campaign, nextStage: AutomatedExperimentStage): Promise<void> {
 
-        optmzCampaign.Stage = nextStage;
+        this._campaign.Stage = nextStage;
+
         const promises: Promise<INativeResponse>[] = [];
-        for (const experimentName in optmzCampaign.Experiments) {
-            if (optmzCampaign.Experiments.hasOwnProperty(experimentName)) {
-                const optmzdExperiment = optmzCampaign.Experiments[experimentName];
+        for (const experimentName in this._campaign.Experiments) {
+
+            if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+
+                const optmzdExperiment = this._campaign.Experiments[experimentName];
                 if (optmzdExperiment.Active) {
                     optmzdExperiment.Active = false;
                     promises.push(this.postExperimentOutcome(campaign, optmzdExperiment, AutomatedExperimentManager._rewardEndPoint));
@@ -193,13 +196,16 @@ export class AutomatedExperimentManager {
         }
 
         return Promise.all(promises)
-            .finally()
-            .then((ignore) => {
-                this._campaign = new OptimizedCampaign();
-            });
+            .catch((e) => {
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToPublishOutcome);
+                return Promise.reject(e);
+            })
+            .finally(() => { this._campaign = new OptimizedCampaign(); })
+            .then((res) => { return Promise.resolve(); });
     }
 
     public rewardExperiments(campaign: Campaign) {
+
         if (this.isCampaignTargetForExperiment(campaign)) {
 
             if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
@@ -208,14 +214,15 @@ export class AutomatedExperimentManager {
 
             for (const experimentName in this._campaign.Experiments) {
                 if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+
                     if (this._campaign.Experiments[experimentName].Active) {
                         this._campaign.Experiments[experimentName].Outcome = 1;
                     }
+                    
                 }
             }
 
-            this.publishCampaignOutcomes(campaign, this._campaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
-
+            this.publishCampaignOutcomes(campaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
         }
     }
 
