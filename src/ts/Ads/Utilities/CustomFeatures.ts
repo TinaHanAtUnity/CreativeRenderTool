@@ -199,7 +199,6 @@ export class CustomFeatures {
     public static pauseEventsSupported(gameId: string): boolean {
         return gameId === '1543460' || // richardh, test app (Apple App Store)
                gameId === '1543461' || // richardh, test app (Google Play Store)
-               gameId === '63855' || // Pocketgems, Episode (Apple App Store)
                gameId === '80222';   // Pocketgems, Episode (Google Play Store)
     }
 }
