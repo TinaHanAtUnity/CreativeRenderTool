@@ -38,17 +38,27 @@ $game-icon-default($scale-size, $radius-size = .75, $with-styles = true) {
   $set-image($scale-size * $default-size, $scale-size * $default-size, $scale-size * $default-size * $radius-size);
 }
 
-$unityads-logo-default($scale-size, $with-styles = true) {
-  $set-image(100%, $scale-size * $default-size, 0, "../img/unityads.png", contain);
+$unityads-logo-default($scale-size) {
   bottom: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
 
   if($with-styles) {
     position: absolute;
     z-index: 5;
     max-height: $scale-size * $default-size * 1;
-    font-size: $scale-size * $default-size * .7;
-    opacity: .6;
+    color: $unityads-logo-color;
+    font-size: $default-font-size;
+    opacity: .3;
+  }
+
+  &:after {
+    content: "\e00b";
+    font-family: "unityicons" !important; // @stylint ignore;
   }
 }
 
@@ -368,7 +378,7 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         margin-bottom: $pop-up-size * .5;
         margin-left: $pop-up-size * .5;
         width: 22%;
-        color: darken($end-screen-info-gray, 40%);
+        color: $blue;
       }
     }
 
@@ -378,57 +388,6 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
     }
   }
 }
-
-$radio-group-container-blue($scale-size = $default-scale-size, $context-font-size = 1rem) {
-  $radio-group-default-size = $scale-size * $default-size;
-
-  padding: $radio-group-default-size * .5;
-  font-size: $context-font-size;
-
-  [type="radio"]:checked,
-  [type="radio"]:not(:checked) {
-    position: absolute;
-    visibility: hidden;
-  }
-
-  /* label text*/
-  [type="radio"]:checked + label,
-  [type="radio"]:not(:checked) + label {
-    position: relative;
-    padding-left: $radio-group-default-size * 1.5;
-    cursor: pointer;
-    line-height: $context-font-size * 1.5;
-    display: inline-block;
-  }
-
-  [type="radio"]:checked + label:before,
-  [type="radio"]:not(:checked) + label:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: $radio-group-default-size * .75;
-    height: @width;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-
-  [type="radio"]:checked + label:before {
-    background-image: url('./../img/radio_on_blue.png');
-  }
-
-  [type="radio"]:not(:checked) + label:before {
-    background-image: url('./../img/radio_off.png');
-  }
-
-  [type="radio"]:checked + label {
-    font-weight: 500;
-  }
-
-}
-
-
 
 $switch-group-container() {
   .switch-container {

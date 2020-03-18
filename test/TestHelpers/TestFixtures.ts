@@ -126,7 +126,7 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
@@ -144,7 +144,7 @@ import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
@@ -154,9 +154,6 @@ import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParam
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { AndroidDownloadApi } from 'China/Native/Android/Download';
-import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
-import { IChinaApi } from 'China/IChina';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -646,9 +643,9 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
-    public static getPerformanceMRAIDCampaign(customParams: Partial<ICampaign> = {}): PerformanceMRAIDCampaign {
-        const json = OnProgrammaticMraidUrlPlcCampaign;
-        return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
+    public static getPerformanceMRAIDCampaign(session?: Session): PerformanceMRAIDCampaign {
+        const json = OnCometMraidPlcCampaign;
+        return new PerformanceMRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getCompanionStaticVastCampaign(): VastCampaign {
@@ -841,7 +838,6 @@ export class TestFixtures {
             video: new Video('', TestFixtures.getSession()),
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
@@ -875,7 +871,6 @@ export class TestFixtures {
             video: new Video('', TestFixtures.getSession()),
             privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
             privacySDK: sinon.createStubInstance(PrivacySDK)
         };
     }
@@ -902,7 +897,6 @@ export class TestFixtures {
             adsConfig: ads.Config,
             request: core.RequestManager,
             privacyManager: ads.PrivacyManager,
-            programmaticTrackingService: core.ProgrammaticTrackingService,
             gameSessionId: ads.SessionManager.getGameSessionId(),
             options: {},
             privacy: privacy,
@@ -1024,7 +1018,6 @@ export class TestFixtures {
             core.DeviceInfo = new IosDeviceInfo(api);
             core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
         }
-        core.ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
 
         return <ICore>core;
@@ -1048,8 +1041,8 @@ export class TestFixtures {
         };
         ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager, privacySDK);
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
-        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, core.ProgrammaticTrackingService);
-        ads.CampaignManager = new CampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping);
+        ads.CampaignManager = new LegacyCampaignManager(platform, core, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, privacySDK, ads.PrivacyManager);
         ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         ads.Analytics = new Analytics(core, ads.PrivacySDK!);
         ads.Store = new Store(core, ads.Analytics.AnalyticsManager);
@@ -1072,7 +1065,7 @@ export class TestFixtures {
         const banners: Partial<IBannerModule> = {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config, api),
-            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ProgrammaticTrackingService, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK, ads.PrivacyManager),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, ads.PrivacySDK, ads.PrivacyManager),
             AdUnitFactory: new BannerAdUnitFactory()
         };
         banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBannerModule>banners, ads, core);
@@ -1191,15 +1184,6 @@ export class TestFixtures {
             iOS: platform === Platform.IOS ? {
                 AR: new IosARApi(nativeBridge)
             } : undefined
-        };
-    }
-
-    public static getChinaApi(nativeBridge: NativeBridge): IChinaApi {
-        return {
-            Android: {
-                Download: new AndroidDownloadApi(nativeBridge),
-                InstallListener: new AndroidInstallListenerApi(nativeBridge)
-            }
         };
     }
 

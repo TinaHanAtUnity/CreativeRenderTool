@@ -2,6 +2,7 @@ import { DeviceInfo as Base } from 'Core/Models/DeviceInfo';
 
 export type DeviceInfoMock = Base & {
     getOsVersion: jest.Mock;
+    isChineseNetworkOperator: jest.Mock<boolean>;
 };
 
 export const DeviceInfo = jest.fn(() => {
@@ -33,6 +34,9 @@ export const DeviceInfo = jest.fn(() => {
         getDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
         getAnonymousDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
         getStaticDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
-        getAnonymousStaticDTO: jest.fn().mockImplementation(() => Promise.resolve({}))
+        getAnonymousStaticDTO: jest.fn().mockImplementation(() => Promise.resolve({})),
+        isChineseNetworkOperator: jest.fn().mockImplementation(() => false),
+        getLimitAdTracking: jest.fn().mockReturnValue(false),
+        getStores: jest.fn().mockReturnValue('')
     };
 });

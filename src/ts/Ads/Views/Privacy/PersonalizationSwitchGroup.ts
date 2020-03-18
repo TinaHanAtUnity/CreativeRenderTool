@@ -4,7 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { IPrivacyPermissions } from 'Privacy/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { Localization } from 'Core/Utilities/Localization';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 export interface IPersonalizationSwitchGroupHandler {
     onSwitchGroupSelectionChange(): void;
@@ -23,7 +23,7 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
 
         this._userPrivacyManager = userPrivacyManager;
 
-        this._template = new Template(SwitchGroupTemplate, new Localization(language, 'consent'));
+        this._template = new Template(SwitchGroupTemplate, new PrivacyLocalization(language, 'consent', userPrivacyManager.getLegalFramework()));
 
         this._bindings = [
             {

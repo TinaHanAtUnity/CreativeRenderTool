@@ -168,4 +168,55 @@ describe('CustomFeatures', () => {
             });
         });
     });
+
+    describe('isFanateeExtermaxGameForLoad', () => {
+        const tests: {
+            gameId: string;
+            expected: boolean;
+        }[] = [{
+            gameId: '56659',
+            expected: true
+        }, {
+            gameId: '1225669',
+            expected: true
+        }, {
+            gameId: '20721',
+            expected: true
+        }, {
+            gameId: '89611',
+            expected: true
+        }, {
+            gameId: '1781085',
+            expected: true
+        }, {
+            gameId: '12256',
+            expected: false
+        }, {
+            gameId: 'scott',
+            expected: false
+        }];
+
+        tests.forEach(t => {
+            it('should match the expected value', () => {
+                const value = CustomFeatures.isFanateeExtermaxGameForLoad(t.gameId);
+                assert.equal(value, t.expected);
+            });
+
+            it('should not exist in the load whitelist', () => {
+                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
+                assert.equal(value, false);
+            });
+        });
+    });
+
+    describe('check double click start', () => {
+        it('should be false for non double click', () => {
+            const val = CustomFeatures.isDoubleClickGoogle('doubleclickbygoogle.casdfasfasfd');
+            assert.equal(val, false);
+        });
+        it('should be true for double click starty', () => {
+            const val = CustomFeatures.isDoubleClickGoogle('doubleclickbygoogle.com-bboyeah');
+            assert.equal(val, true);
+        });
+    });
 });

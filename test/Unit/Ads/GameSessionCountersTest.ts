@@ -7,7 +7,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 describe('GameSessionCountersTest', () => {
 
     const videoCampaign = TestFixtures.getCampaign();
-    const cometPlayableCampaign = TestFixtures.getExtendedMRAIDCampaign();
+    const cometPlayableCampaign = TestFixtures.getPerformanceMRAIDCampaign();
     let clock: sinon.SinonFakeTimers;
 
     beforeEach(() => {
@@ -28,6 +28,7 @@ describe('GameSessionCountersTest', () => {
         let countersObj = GameSessionCounters.getCurrentCounters();
         assert.deepEqual(countersObjStart, countersObj, 'Counters should be identical when there are no changes between queries');
         let latestCampaignStartTimestamp: string;
+        let latestTargetStartTimestamp: string;
 
         assert.equal(countersObj.starts, 1);
         assert.equal(countersObj.adRequests, 1);
@@ -41,6 +42,11 @@ describe('GameSessionCountersTest', () => {
         assert.equal(Object.keys(countersObj.latestCampaignsStarts).length, 1, 'latestsCampaign start was not recorded correctly');
         assert.isNotEmpty(countersObj.latestCampaignsStarts[videoCampaign.getId()], 'latestsCampaign has empty timestamp');
         assert.equal(latestCampaignStartTimestamp, '2018-07-23T12:00:00.000Z', 'Timestamp of latestCampaignsStart is incorrect');
+
+        latestTargetStartTimestamp = countersObj.latestTargetStarts[videoCampaign.getGameId()];
+        assert.equal(Object.keys(countersObj.latestTargetStarts).length, 1, 'latestTargetStarts start was not recorded correctly');
+        assert.isNotEmpty(countersObj.latestTargetStarts[videoCampaign.getGameId()], 'latestTargetStarts has empty timestamp');
+        assert.equal(latestTargetStartTimestamp, '2018-07-23T12:00:00.000Z', 'Timestamp of latestTargetStarts is incorrect');
 
         clock.setSystemTime(Date.parse('2018-07-23T12:15:00.000Z'));
         GameSessionCounters.addAdRequest();
@@ -60,24 +66,37 @@ describe('GameSessionCountersTest', () => {
         assert.isNotEmpty(countersObj.latestCampaignsStarts[videoCampaign.getId()], 'latestsCampaign has empty timestamp');
         assert.equal(latestCampaignStartTimestamp, '2018-07-23T12:15:00.000Z', 'Timestamp of latestCampaignsStart is incorrect');
 
+        latestTargetStartTimestamp = countersObj.latestTargetStarts[videoCampaign.getGameId()];
+        assert.equal(Object.keys(countersObj.latestTargetStarts).length, 1, 'latestTargetStarts start was not recorded correctly, same target game should have one entry');
+        assert.isNotEmpty(countersObj.latestTargetStarts[videoCampaign.getGameId()], 'latestTargetStarts has empty timestamp');
+        assert.equal(latestTargetStartTimestamp, '2018-07-23T12:15:00.000Z', 'Timestamp of latestTargetStarts is incorrect');
+
         clock.setSystemTime(Date.parse('2018-07-24T10:00:00.000Z'));
         GameSessionCounters.addStart(cometPlayableCampaign);
+        GameSessionCounters.addView(cometPlayableCampaign);
         countersObj = GameSessionCounters.getCurrentCounters();
         assert.equal(Object.keys(countersObj.startsPerCampaign).length, 2);
         assert.equal(countersObj.starts, 3);
         assert.equal(countersObj.adRequests, 2);
-        assert.equal(countersObj.views, 1);
+        assert.equal(countersObj.views, 2);
         assert.equal(countersObj.startsPerCampaign[videoCampaign.getId()], 2);
         assert.equal(countersObj.startsPerTarget[videoCampaign.getGameId()], 2);
         assert.equal(countersObj.viewsPerCampaign[videoCampaign.getId()], 1);
         assert.equal(countersObj.viewsPerTarget[videoCampaign.getGameId()], 1);
         assert.equal(countersObj.startsPerCampaign[cometPlayableCampaign.getId()], 1);
-        assert.equal(countersObj.viewsPerCampaign[cometPlayableCampaign.getId()], undefined);
+        assert.equal(countersObj.viewsPerCampaign[cometPlayableCampaign.getId()], 1);
+        assert.equal(countersObj.startsPerTarget[cometPlayableCampaign.getTargetGameId()!], 1);
+        assert.equal(countersObj.viewsPerTarget[cometPlayableCampaign.getTargetGameId()!], 1);
 
         latestCampaignStartTimestamp = countersObj.latestCampaignsStarts[cometPlayableCampaign.getId()];
         assert.equal(Object.keys(countersObj.latestCampaignsStarts).length, 2, 'latestsCampaign, new campaign start was not recorded correctly');
         assert.isNotEmpty(countersObj.latestCampaignsStarts[cometPlayableCampaign.getId()], 'latestsCampaign has empty timestamp');
         assert.equal(latestCampaignStartTimestamp, '2018-07-24T10:00:00.000Z', 'Timestamp of latestCampaignsStart is incorrect');
+
+        latestTargetStartTimestamp = countersObj.latestTargetStarts[cometPlayableCampaign.getTargetGameId()!];
+        assert.equal(Object.keys(countersObj.latestTargetStarts).length, 2, 'latestTargetStarts, new target game campaign start was not recorded correctly');
+        assert.isNotEmpty(countersObj.latestTargetStarts[cometPlayableCampaign.getTargetGameId()!], 'latestTargetStarts has empty timestamp');
+        assert.equal(latestTargetStartTimestamp, '2018-07-24T10:00:00.000Z', 'Timestamp of latestTargetStarts is incorrect');
 
         assert.equal(countersObjStart.starts, 1, 'the queried counters should have changed');
         assert.equal(countersObjStart.adRequests, 1, 'the queried counters should have changed');
@@ -100,5 +119,6 @@ describe('GameSessionCountersTest', () => {
         assert.equal(Object.keys(countersObj.viewsPerCampaign).length, 0);
         assert.equal(Object.keys(countersObj.viewsPerTarget).length, 0);
         assert.equal(Object.keys(countersObj.latestCampaignsStarts).length, 0, 'latestsCampaignsStarts was not initialized to 0 properly');
+        assert.equal(Object.keys(countersObj.latestTargetStarts).length, 0, 'latestTargetStarts was not initialized to 0 properly');
     });
 });

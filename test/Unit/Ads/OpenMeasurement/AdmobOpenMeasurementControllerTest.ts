@@ -15,7 +15,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { assert } from 'chai';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -29,7 +30,6 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
         let deviceInfo: DeviceInfo;
         let request: RequestManager;
         let thirdPartyEventManager: ThirdPartyEventManager;
-        let programmaticTrackingService: ProgrammaticTrackingService;
 
         const initAdMobOMManager = () => {
             placement = TestFixtures.getPlacement();
@@ -47,9 +47,10 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
             }
             request = sinon.createStubInstance(RequestManager);
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
+            sinon.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
 
-            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager, programmaticTrackingService);
+            return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
 
         describe('DOM Hierarchy', () => {
@@ -84,8 +85,8 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     omManager.injectVerificationResources([verificationResource, verificationResource1]);
                     sinon.assert.calledTwice(<sinon.SinonStub>omManager.setupOMInstance);
                     sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.setTemplateValue, '%25OM_VENDORS%25', 'scoot|scoot1');
-                    sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
-                    sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_injected');
+                    sinon.assert.calledOnce(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
+                    sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'admob_om_injected');
                 });
             });
 
@@ -105,7 +106,7 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
             beforeEach(() => {
                 omManager = initAdMobOMManager();
                 sandbox.stub(omManager.getAdmobBridge(), 'sendSessionFinish');
-                sandbox.stub(omManager, 'setupOMInstance');
+                sandbox.stub(omManager, 'mountOMInstance');
             });
 
             afterEach(() => {
@@ -118,14 +119,14 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
             });
 
             it('sessionFinish should report to pts', () => {
-                (<sinon.SinonStub>programmaticTrackingService.reportMetricEvent).reset();
+                (<sinon.SinonStub>SDKMetrics.reportMetricEvent).reset();
                 omManager.sessionFinish();
-                sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
-                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_finish');
+                sinon.assert.calledOnce(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
+                sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'admob_om_session_finish');
             });
 
             it('sessionStart should report to pts', () => {
-                (<sinon.SinonStub>programmaticTrackingService.reportMetricEvent).reset();
+                (<sinon.SinonStub>SDKMetrics.reportMetricEvent).reset();
 
                 const sessionEvent: ISessionEvent = {
                     adSessionId: '',
@@ -135,30 +136,21 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 };
 
                 omManager.sessionStart(sessionEvent);
-                sinon.assert.calledOnce(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
-                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, 'admob_om_session_start');
+                sinon.assert.calledOnce(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
+                sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'admob_om_session_start');
             });
         });
 
         describe('impression event handling', () => {
             let omManager: AdmobOpenMeasurementController;
+            let omAdViewBuilder: OpenMeasurementAdViewBuilder;
 
             beforeEach(() => {
                 omManager = initAdMobOMManager();
+
                 sinon.stub(deviceInfo, 'getScreenWidth').returns(1080);
                 sinon.stub(deviceInfo, 'getScreenHeight').returns(1920);
-                sandbox.stub(OpenMeasurementController.prototype, 'impression');
-            });
 
-            afterEach(() => {
-                sandbox.restore();
-            });
-
-            it('should build adview and om impression object', () => {
-                const impressionDataAndroid = {'mediaType': 'video', 'viewport': {'width': 540, 'height': 960},
-                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
-                const impressionDataIOS = {'mediaType': 'video', 'viewport': {'width': 1080, 'height': 1920},
-                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
                 const testAdView: IAdView = {
                     percentageInView: 100,
                     geometry: {
@@ -177,10 +169,24 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     measuringElement: false,
                     reasons: []
                 };
-
-                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+                omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
 
                 sandbox.stub(omAdViewBuilder, 'buildAdmobImpressionView').returns(testAdView);
+                sandbox.stub(omManager, 'mountOMInstance');
+
+                sandbox.stub(OpenMeasurementController.prototype, 'impression');
+                sandbox.stub(omManager, 'geometryChange');
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should build adview and om impression object', () => {
+                const impressionDataAndroid = {'mediaType': 'video', 'viewport': {'width': 540, 'height': 960},
+                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
+                const impressionDataIOS = {'mediaType': 'video', 'viewport': {'width': 1080, 'height': 1920},
+                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
                     sinon.assert.called(<sinon.SinonStub>OpenMeasurementController.prototype.impression);
@@ -192,43 +198,68 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                 });
             });
 
-            it('should not send admob om impression pts metric if no verification exists', () => {
-
-                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+            it('should send admob om impression pts metric', () => {
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.notCalled(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
+                    sinon.assert.called(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
                 });
             });
 
             it('should send admob om impression pts metric if one verification exists', () => {
 
-                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
-                sandbox.stub(omManager, 'setupOMInstance');
-                const reportSpy = <sinon.SinonStub>programmaticTrackingService.reportMetricEvent;
+                const reportSpy = <sinon.SinonStub>SDKMetrics.reportMetricEvent;
 
-                const verificationResource = {
+                const verificationResource0 = {
                     resourceUrl: 'http://scoot.com',
                     vendorKey: 'scoot',
                     verificationParameters: 'scootage'
                 };
 
-                omManager.injectVerificationResources([verificationResource]);
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scoot');
+                sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
+
+                omManager.setupOMInstance(openMeasurement0, verificationResource0);
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.calledTwice(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
-                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
-                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
+                    sinon.assert.callCount(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 1);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_impression');
                 });
             });
 
             it('should send admob om impression pts metric for multiple om instances', () => {
 
-                const omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
-                sandbox.stub(omManager, 'setupOMInstance');
-                const reportSpy = <sinon.SinonStub>programmaticTrackingService.reportMetricEvent;
+                const reportSpy = <sinon.SinonStub>SDKMetrics.reportMetricEvent;
+                const reportTagSpy = <sinon.SinonStub>SDKMetrics.reportMetricEventWithTags;
 
-                const verificationResource = {
+                const verificationResource0 = {
+                    resourceUrl: 'http://scoot.com',
+                    vendorKey: 'scoot',
+                    verificationParameters: 'scootage'
+                };
+                const verificationResource1 = {
+                    resourceUrl: 'http://scoot1.com',
+                    vendorKey: 'doubleclickbygoogle.com.booyah',
+                    verificationParameters: 'scootage1'
+                };
+
+                const openMeasurement0 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage');
+                const openMeasurement1 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage1');
+                sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
+                sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
+
+                omManager.setupOMInstance(openMeasurement0, verificationResource0);
+                omManager.setupOMInstance(openMeasurement1, verificationResource1);
+
+                return omManager.admobImpression(omAdViewBuilder).then(() => {
+                    sinon.assert.callCount(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 1);
+                    sinon.assert.callCount(<sinon.SinonStub>SDKMetrics.reportMetricEventWithTags, 1);
+                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_impression');
+                    assert.equal(reportTagSpy.getCall(0).args[0], 'doubleclick_om_impressions');
+                });
+            });
+
+            it('should call geometry change with impression adview and viewport', () => {
+                const verificationResource0 = {
                     resourceUrl: 'http://scoot.com',
                     vendorKey: 'scoot',
                     verificationParameters: 'scootage'
@@ -238,13 +269,24 @@ import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/Programm
                     vendorKey: 'scoot1',
                     verificationParameters: 'scootage1'
                 };
-                omManager.injectVerificationResources([verificationResource, verificationResource1]);
+
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage');
+                const openMeasurement1 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage1');
+                sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
+                sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
+
+                omManager.setupOMInstance(openMeasurement0, verificationResource0);
+                omManager.setupOMInstance(openMeasurement1, verificationResource1);
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
-                    sinon.assert.calledThrice(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent);
-                    assert.equal(reportSpy.getCall(0).args[0], 'admob_om_injected');
-                    assert.equal(reportSpy.getCall(1).args[0], 'admob_om_impression');
-                    assert.equal(reportSpy.getCall(2).args[0], 'admob_om_impression');
+                    sinon.assert.called(<sinon.SinonStub>omManager.geometryChange);
+                    if (platform === Platform.ANDROID) {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({'width': 540, 'height': 960}));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}));
+                    } else {
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({'width': 1080, 'height': 1920}));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}));
+                    }
                 });
             });
         });

@@ -10,18 +10,21 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import OMID3p from 'html/omid/omid3p.html';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { Campaign } from 'Ads/Models/Campaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OpenMeasurementTest`, () => {
         const sandbox = sinon.createSandbox();
-        let om: OpenMeasurement;
+        let om: OpenMeasurement<Campaign>;
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -29,8 +32,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
         let campaign: VastCampaign;
         let placement: Placement;
         let deviceInfo: DeviceInfo;
-        let request: RequestManager;
         let clock: sinon.SinonFakeTimers;
+        let thirdPartyEventManager: ThirdPartyEventManager;
 
         const initWithVastVerifications = (verifications?: VastAdVerification[]) => {
             backend = TestFixtures.getBackend(platform);
@@ -39,19 +42,19 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
             clientInformation = TestFixtures.getClientInfo(platform);
             campaign = TestFixtures.getAdVerificationsVastCampaign();
             placement = TestFixtures.getPlacement();
+            thirdPartyEventManager = sandbox.createStubInstance(ThirdPartyEventManager);
             if (platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            const pts = sinon.createStubInstance(ProgrammaticTrackingService);
+            sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
-            request = sinon.createStubInstance(RequestManager);
             if (verifications) {
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verifications[0]);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'test', verifications[0]);
             } else {
                 const verification = campaign.getVast().getAdVerifications()[0];
-                return new OpenMeasurement(platform, core, clientInformation, campaign, placement, deviceInfo, request, 'test', pts, verification);
+                return new OpenMeasurement<VastCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'test', verification);
             }
         };
 
@@ -68,7 +71,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key'));
+                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
@@ -113,13 +116,15 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 });
 
                 describe('on failure', () => {
-                    describe('VERIFICATION_NOT_SUPPORTED', () => {
-                        const resource1 = new VastVerificationResource('http://url1.html', 'test1');
+                    describe('VERIFICATION_RESOURCE_REJECTED', () => {
+                        const resource1 = new VastVerificationResource('http://url1.js', 'test1');
                         const verificationResources = [resource1];
                         const vastAdVerification = new VastAdVerification('vendorkey1', verificationResources, '', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D');
                         const vastAdVerifications = [vastAdVerification];
 
                         beforeEach(() => {
+                            sandbox.stub(CustomFeatures, 'isUnsupportedOMVendor').returns(true);
+                            sandbox.stub(Date.prototype, 'toISOString').returns('2020-02-06T23:45:18.458Z');
                             om = initWithVastVerifications(vastAdVerifications);
                             om.render();
                             om.addMessageListener();
@@ -130,8 +135,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                             om.removeMessageListener();
                         });
 
-                        it('should error with VERIFICATION_NOT_SUPPORTED when resource is not a js file', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=2');
+                        it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file and replace OMIDPARTNER,OMIDPARTNER,OMIDPARTNER macros', () => {
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, {'%5BREASON%5D': '1'});
                         });
                     });
 
@@ -153,7 +158,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                         });
 
                         it('should error with ERROR_RESOURCE_LOADING when resource is invalid url', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'https://ade.googlesyndication.com/errorcode=3');
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, {'%5BREASON%5D': '3'});
                         });
                     });
                 });
@@ -178,19 +183,6 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                         sinon.assert.calledWith(<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent, sessionEvent);
                         assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(sessionEvent));
                         assert.equal((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0].data.vendorkey, sessionEvent.data.vendorkey);
-                    });
-
-                    it('should construct vast event data when no data is passed', () => {
-                        const constructedEventIOS = {'adSessionId': '10', 'timestamp': 1, 'type': 'sessionStart', 'data': {'context': {'apiVersion': 'Unity3d/1.2.10', 'environment': 'app', 'accessMode': 'limited', 'adSessionType': 'native', 'omidNativeInfo': {'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'omidJsInfo': {'omidImplementer': 'Unity3d', 'serviceVersion': '2.0.0-alpha2', 'sessionClientVersion': 'Unity3d/1.2.10', 'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'app': {'libraryVersion': '1.2.10', 'appId': 'com.unity3d.ads.example'}, 'deviceInfo': {'deviceType': 'TestModel', 'os': 'ios', 'osVersion': '1.0'}, 'supports': ['vlid', 'clid']}, 'vendorkey': 'test'}};
-                        const constructedEventAndroid = {'adSessionId': '10', 'timestamp': 1, 'type': 'sessionStart', 'data': {'context': {'apiVersion': 'Unity3d/1.2.10', 'environment': 'app', 'accessMode': 'limited', 'adSessionType': 'native', 'omidNativeInfo': {'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'omidJsInfo': {'omidImplementer': 'Unity3d', 'serviceVersion': '2.0.0-alpha2', 'sessionClientVersion': 'Unity3d/1.2.10', 'partnerName': 'Unity3d', 'partnerVersion': '2.0.0-alpha2'}, 'app': {'libraryVersion': '1.2.10', 'appId': 'com.unity3d.ads.example'}, 'deviceInfo': {'deviceType': 'TestModel', 'os': 'android', 'osVersion': '1.0'}, 'supports': ['vlid', 'clid']}, 'vendorkey': 'test'}};
-
-                        om.sessionStart(undefined);
-                        sinon.assert.called(<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent);
-                        if (platform === Platform.IOS) {
-                            assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(constructedEventIOS));
-                        } else {
-                            assert.deepEqual(JSON.stringify((<sinon.SinonStub>om.getOmidBridge().triggerSessionEvent).getCall(0).args[0]), JSON.stringify(constructedEventAndroid));
-                        }
                     });
                 });
 
@@ -218,13 +210,17 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                             });
                         });
 
-                        it('should call session begin ad events for IAS', () => {
-                            return om.onEventProcessed('sessionStart', 'IAS').then(() => {
-                                clock.tick(1000);
-                                clock.restore();
-                                sinon.assert.called(<sinon.SinonSpy>om.impression);
-                                sinon.assert.called(<sinon.SinonSpy>om.loaded);
-                                sinon.assert.calledWith(<sinon.SinonSpy>om.geometryChange);
+                        const customGeometryVendors = ['IAS', 'integralads.com-omid'];
+
+                        customGeometryVendors.forEach((vendor) => {
+                            it('should call session begin ad events for IAS', () => {
+                                return om.onEventProcessed('sessionStart', vendor).then(() => {
+                                    clock.tick(1000);
+                                    clock.restore();
+                                    sinon.assert.called(<sinon.SinonSpy>om.impression);
+                                    sinon.assert.called(<sinon.SinonSpy>om.loaded);
+                                    sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
+                                });
                             });
                         });
                     });

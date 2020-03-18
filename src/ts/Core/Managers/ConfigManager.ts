@@ -16,6 +16,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
 import { UnityInfo } from 'Core/Models/UnityInfo';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class ConfigManager {
 
@@ -60,21 +61,26 @@ export class ConfigManager {
             return Promise.resolve(this._rawConfig);
         } else {
             return Promise.all([
+                this._deviceInfo.getConnectionType(),
+                this._deviceInfo.getScreenHeight(),
+                this._deviceInfo.getScreenWidth(),
                 this._metaDataManager.fetch(FrameworkMetaData),
                 this._metaDataManager.fetch(AdapterMetaData),
                 this.fetchGamerToken()
-            ]).then(([framework, adapter, storedGamerToken]) => {
+            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken]) => {
                 let gamerToken: string | undefined;
 
+                // TODO: Fix or remove following code
                 if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
                     // only use stored gamerToken for iOS when ad tracking is limited
                     gamerToken = storedGamerToken;
                 } else if (storedGamerToken) {
                     // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
                     this.deleteGamerToken();
+                    SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
                 }
 
-                const url: string = this.createConfigUrl(framework, adapter, gamerToken);
+                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -108,7 +114,7 @@ export class ConfigManager {
         }
     }
 
-    private createConfigUrl(framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -129,8 +135,10 @@ export class ConfigManager {
             osVersion: this._deviceInfo.getOsVersion(),
             deviceModel: this._deviceInfo.getModel(),
             language: this._deviceInfo.getLanguage(),
+            connectionType: connectionType,
+            screenHeight: screenHeight,
+            screenWidth: screenWidth,
             test: this._clientInfo.getTestMode(),
-            gamerToken: gamerToken,
             analyticsUserId: this._unityInfo.getAnalyticsUserId(),
             analyticsSessionId: this._unityInfo.getAnalyticsSessionId(),
             forceAbGroup: abGroup
@@ -138,11 +146,13 @@ export class ConfigManager {
 
         if (this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: (<AndroidDeviceInfo> this._deviceInfo).getManufacturer()
+                deviceMake: (<AndroidDeviceInfo> this._deviceInfo).getManufacturer(),
+                screenDensity: (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity(),
+                screenSize: (<AndroidDeviceInfo> this._deviceInfo).getScreenLayout()
             });
         }
 
-        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo);
         url = Url.addParameters(url, trackingIDs);
 
         if (framework) {

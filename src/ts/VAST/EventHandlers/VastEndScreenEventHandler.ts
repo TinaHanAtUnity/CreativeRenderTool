@@ -10,7 +10,7 @@ import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, ErrorMetric } from 'Ads/Utilities/SDKMetrics';
 import { IAdsApi } from 'Ads/IAds';
 import { Placement } from 'Ads/Models/Placement';
 
@@ -23,7 +23,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _core: ICoreApi;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
-    private _pts: ProgrammaticTrackingService;
     private _ads: IAdsApi;
     private _placement: Placement;
 
@@ -36,7 +35,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
-        this._pts = parameters.programmaticTrackingService;
         this._ads = parameters.ads;
         this._placement = parameters.placement;
     }
@@ -47,7 +45,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._ads.Listener.sendClickEvent(this._placement.getId());
 
         if (!this._vastAdUnit.hasImpressionOccurred()) {
-            this._pts.reportErrorEvent(ProgrammaticTrackingError.VastClickWithoutImpressionError, this._vastAdUnit.description());
+            SDKMetrics.reportMetricEvent(ErrorMetric.VastClickWithoutImpressionError);
         }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();

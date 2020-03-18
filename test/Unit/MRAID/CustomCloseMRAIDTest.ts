@@ -1,6 +1,6 @@
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Placement } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -22,7 +22,6 @@ describe('CustomCloseMRAID', () => {
     let core: ICoreApi;
     let configuration: CoreConfiguration;
     let privacy: Privacy;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let placement: Placement;
     let privacyManager: UserPrivacyManager;
     let mraidCampaign: MRAIDCampaign;
@@ -39,7 +38,7 @@ describe('CustomCloseMRAID', () => {
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         mraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
         privacy = new Privacy(platform, mraidCampaign, privacyManager, false, false, 'en');
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         placement = TestFixtures.getPlacement();
         clock = sinon.useFakeTimers();
     });
@@ -48,7 +47,7 @@ describe('CustomCloseMRAID', () => {
 
         beforeEach(() => {
             placement.set('allowSkip', true);
-            mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, mraidCampaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+            mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, mraidCampaign, privacy, false, configuration.getAbGroup());
             mraid.render();
             mraid.show();
             container = mraid.container();
@@ -99,7 +98,7 @@ describe('CustomCloseMRAID', () => {
 
         beforeEach(() => {
             placement.set('allowSkip', false);
-            mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, mraidCampaign, privacy, false, configuration.getAbGroup(), programmaticTrackingService);
+            mraid = new CustomCloseMRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, mraidCampaign, privacy, false, configuration.getAbGroup());
             mraid.render();
             mraid.show();
             container = mraid.container();

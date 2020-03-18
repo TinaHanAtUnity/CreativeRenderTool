@@ -46,14 +46,6 @@ export class VastAdVerification extends Model<IVastAdVerification> {
         return this.get('verificationParameters');
     }
 
-    public getFormattedVerificationTrackingEvent(reasonCode: VerificationReasonCode): string | null {
-        let trackingEvent = this.getVerificationTrackingEvent();
-        if (trackingEvent) {
-            trackingEvent = trackingEvent.replace('%5BREASON%5D', reasonCode.toString());
-        }
-        return trackingEvent;
-    }
-
     public setVerificationTrackingEvent(trackingUrl: string) {
         this.set('verificationTrackingEvent', trackingUrl);
     }

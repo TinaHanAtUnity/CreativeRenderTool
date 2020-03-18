@@ -36,8 +36,8 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -85,5 +85,5 @@ export interface ICore extends IApiModule {
     Config: CoreConfiguration;
     Ads: IAds;
     Purchasing: IPurchasing;
-    ProgrammaticTrackingService: ProgrammaticTrackingService;
+    SdkDetectionInfo: SdkDetectionInfo;
 }

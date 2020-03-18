@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ProgrammaticTrackingError, ProgrammaticTrackingService, CachingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ErrorMetric, SDKMetrics, CachingMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -16,6 +16,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 enum CacheType {
     REQUIRED,
@@ -49,7 +51,6 @@ export class AssetManager {
     private _cache: CacheManager;
     private _cacheMode: CacheMode;
     private _cacheBookkeeping: CacheBookkeepingManager;
-    private _pts: ProgrammaticTrackingService;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
@@ -61,13 +62,12 @@ export class AssetManager {
 
     private _sendCacheDiagnostics = false;
 
-    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager, pts: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager) {
         this._platform = platform;
         this._core = core;
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._cacheBookkeeping = cacheBookkeeping;
-        this._pts = pts;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
         this._caching = false;
@@ -76,10 +76,6 @@ export class AssetManager {
         this._optionalQueue = [];
         this._campaignQueue = {};
         this._queueId = 0;
-
-        if (cacheMode === CacheMode.ADAPTIVE) {
-            this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
-        }
     }
 
     public setCacheDiagnostics(value: boolean) {
@@ -91,63 +87,34 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
+        const measurement = createMeasurementsInstance(GeneralTimingMetric.CacheLatency, {
+            'cmd': CacheMode[this._cacheMode],
+            'cct': campaign.getContentType(),
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        });
+
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
+            measurement.measure('select_assets');
             const requiredChain = this.cache(requiredAssets, campaign, CacheType.REQUIRED).then(() => {
-                return this.validateVideos(requiredAssets, campaign);
+                measurement.measure('required_assets');
+                return this.validateVideos(requiredAssets, campaign).then(() => {
+                    measurement.measure('validate_videos');
+                });
             });
 
             if (this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
+                        measurement.measure('optional_assets');
+                    }).catch(() => {
                         // allow optional assets to fail caching when in CacheMode.FORCED
                     });
                     return campaign;
                 });
-            } else if (this._cacheMode === CacheMode.ADAPTIVE) {
-                if (this._fastConnectionDetected) {
-                    // if fast connection has been detected, set campaign ready immediately and start caching (like CacheMode.ALLOWED)
-                    requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
-                        // allow optional assets to fail
-                    });
-                    return Promise.resolve(campaign);
-                } else {
-                    const id: number = this._queueId;
-                    const promise = this.registerCampaign(campaign, id);
-                    this._queueId++;
-
-                    requiredChain.then(() => {
-                        const campaignObject = this._campaignQueue[id];
-
-                        if (campaignObject) {
-                            if (!campaignObject.resolved) {
-                                campaignObject.resolved = true;
-                                campaignObject.resolve(campaign);
-                            }
-
-                            delete this._campaignQueue[id];
-                        }
-
-                        this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
-                            // allow optional assets to fail caching when in CacheMode.FORCED
-                        });
-                        return campaign;
-                    }).catch(error => {
-                        const campaignObject = this._campaignQueue[id];
-
-                        if (campaignObject) {
-                            if (!campaignObject.resolved) {
-                                campaignObject.resolved = true;
-                                campaignObject.reject(error);
-                            }
-
-                            delete this._campaignQueue[id];
-                        }
-                    });
-
-                    return promise;
-                }
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
+                    measurement.measure('optional_assets');
+                }).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
                 });
             }
@@ -197,7 +164,7 @@ export class AssetManager {
             // disable caching if there is less than 20 megabytes free space in cache directory
             if (freeSpace < 20480) {
                 this._cacheMode = CacheMode.DISABLED;
-                this._pts.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
+                SDKMetrics.reportMetricEvent(CachingMetric.CachingModeForcedToDisabled);
             }
 
             return;
@@ -332,20 +299,6 @@ export class AssetManager {
         });
     }
 
-    private onFastConnectionDetected(): void {
-        this._fastConnectionDetected = true;
-
-        for (const id in this._campaignQueue) {
-            if (this._campaignQueue.hasOwnProperty(id)) {
-                const campaignObject = this._campaignQueue[id];
-                if (!campaignObject.resolved) {
-                    campaignObject.resolved = true;
-                    campaignObject.resolve(campaignObject.campaign);
-                }
-            }
-        }
-    }
-
     private registerCampaign(campaign: Campaign, id: number): Promise<Campaign> {
         return new Promise<Campaign>((resolve, reject) => {
             const queueObject: ICampaignQueueObject = {
@@ -378,14 +331,8 @@ export class AssetManager {
             headers: headers
         }, campaign.getSession());
         const seatId = campaign.getSeatId();
-        if (seatId !== undefined) {
-            let adType: string = '';
-            const maybeAdType: string | undefined = campaign.getAdType();
-            if (maybeAdType !== undefined) {
-                adType = maybeAdType;
-            }
-            this._pts.reportErrorEvent(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
-        }
+
+        SDKMetrics.reportMetricEvent(ErrorMetric.TooLargeFile);
 
         CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {
             fileSize: Math.floor(totalSize / (1024 * 1024))

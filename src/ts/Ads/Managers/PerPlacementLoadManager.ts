@@ -9,7 +9,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
@@ -21,9 +21,9 @@ export class PerPlacementLoadManager extends RefreshManager {
     protected _adsConfig: AdsConfiguration;
     protected _coreConfig: CoreConfiguration;
     protected _campaignManager: CampaignManager;
-    protected _pts: ProgrammaticTrackingService;
+    protected _pts: SDKMetrics;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
         super();
 
         this._ads = ads;
@@ -32,7 +32,6 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
-        this._pts = programmaticTrackingService;
 
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
@@ -125,7 +124,7 @@ export class PerPlacementLoadManager extends RefreshManager {
             });
         } else {
             this.alertPlacementReadyStatus(placement);
-            this._pts.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
+            SDKMetrics.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
         }
     }
 

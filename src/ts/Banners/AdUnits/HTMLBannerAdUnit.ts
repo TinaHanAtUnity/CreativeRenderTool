@@ -8,7 +8,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
-import { ProgrammaticTrackingService, BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { IBannerNativeApi } from 'Banners/IBannerModule';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
@@ -18,7 +18,6 @@ export interface IBannerAdUnitParameters {
     campaign: BannerCampaign;
     thirdPartyEventManager: ThirdPartyEventManager;
     webPlayerContainer: WebPlayerContainer;
-    programmaticTrackingService: ProgrammaticTrackingService;
     bannerNativeApi: IBannerNativeApi;
     placementId: string;
     bannerAdViewId: string;
@@ -30,7 +29,6 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     protected _platform: Platform;
     protected _core: ICoreApi;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
     protected _webPlayerContainer: WebPlayerContainer;
     private _bannerNativeApi: IBannerNativeApi;
     private _placementId: string;
@@ -46,7 +44,6 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         this._campaign = parameters.campaign;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._webPlayerContainer = parameters.webPlayerContainer;
-        this._programmaticTrackingService = parameters.programmaticTrackingService;
         this._bannerNativeApi = parameters.bannerNativeApi;
         this._placementId = parameters.placementId;
         this._bannerAdViewId = parameters.bannerAdViewId;
@@ -78,7 +75,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         GameSessionCounters.addStart(this._campaign);
         GameSessionCounters.addView(this._campaign);
         if (!this._impressionEventsSent) {
-            this._programmaticTrackingService.reportMetricEvent(BannerMetric.BannerAdImpression);
+            SDKMetrics.reportMetricEvent(BannerMetric.BannerAdImpression);
             this.sendTrackingEvent(TrackingEvent.IMPRESSION);
             this._impressionEventsSent = true;
         }
@@ -140,13 +137,15 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
             eventSettings = {
                 onPageFinished: {
                     sendEvent: true
-                }
+                },
+                onReceivedSslError: { shouldCallSuper: true }
             };
         } else {
             eventSettings = {
                 onPageFinished: {
                     sendEvent: true
-                }
+                },
+                onReceivedSslError: { shouldCallSuper: true }
             };
         }
         return this.setEventSettings(eventSettings);

@@ -12,15 +12,18 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VerificationReasonCode, VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { AccessMode, IVerificationScriptResource, IImpressionValues, OMID3pEvents, IVastProperties, IViewPort, IAdView, ISessionEvent, SessionEvents, MediaType, VideoPosition, VideoEventAdaptorType, ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { ProgrammaticTrackingService, OMMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, OMMetric, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import { Campaign } from 'Ads/Models/Campaign';
+import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVerificationVendorMap {
     [vendorKey: string]: string;
@@ -78,33 +81,31 @@ export const OM_JS_VERSION = '1.2.10';
 export const OMID_P = `${PARTNER_NAME}/${OM_JS_VERSION}`;
 export const SDK_APIS = '7';
 
-export class OpenMeasurement extends View<AdMobCampaign> {
+export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _omIframe: HTMLIFrameElement;
     private _core: ICoreApi;
     private _clientInfo: ClientInfo;
-    private _campaign: AdMobCampaign | VastCampaign;
+    private _campaign: T;
     private _omBridge: OMIDEventBridge;
-    private _request: RequestManager;
     private _omAdSessionId: string;
 
-    private _verificationVendorMap: IVerificationVendorMap;
     private _vendorKey: string;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
 
-    private _sessionStartCalled = false;
     private _sessionFinishCalled = false;
     private _sessionStartEventData: ISessionEvent;
     private _sessionStartProcessedByOmidScript = false;
     private _sessionFinishProcessedByOmidScript = false;
     private _adVerification: VastAdVerification;
-    private _pts: ProgrammaticTrackingService | undefined;
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
+    private _verificationResource: IVerificationScriptResource;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign | VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vendorKey: string | undefined, pts?: ProgrammaticTrackingService, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo,  thirdPartyEventManager: ThirdPartyEventManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -112,9 +113,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omAdSessionId = JaegerUtilities.uuidv4();
         this._bindings = [];
         this._core = core;
-        this._verificationVendorMap = {};
         this._clientInfo = clientInfo;
         this._campaign = campaign;
+        this._thirdPartyEventManager = thirdPartyEventManager;
 
         // TODO: Make vendor key non-optional
         if (vendorKey) {
@@ -123,8 +124,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         this._placement = placement;
         this._deviceInfo = deviceInfo;
-        this._request = request;
-        this._pts = pts;
 
         if (vastAdVerification) {
             this._adVerification = vastAdVerification;
@@ -132,7 +131,11 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         this._omBridge = new OMIDEventBridge(core, {
             onEventProcessed: (eventType, vendor) => this.onEventProcessed(eventType, vendor)
-        }, this._omIframe, this, this._campaign, this._pts);
+        }, this._omIframe, this, this._campaign);
+    }
+
+    public getVastVerification(): VastAdVerification {
+        return this._adVerification;
     }
 
     // only needed to build impression adview for VAST campaigns
@@ -198,7 +201,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         super.render();
 
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = OMID3p.replace('{{ DEFAULT_KEY_ }}', DEFAULT_VENDOR_KEY);
+        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY });
 
         this._omIframe.id += this._omAdSessionId;
         this._omIframe.style.position = 'absolute';
@@ -240,72 +243,19 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
     }
 
+    public getVerificationResource(): IVerificationScriptResource {
+        return this._verificationResource;
+    }
+
     /*
     * SessionStart:
     * First event that MUST be fired for a session to begin
     * Has the necessary data to fill in the context and verificationParameters of the event data
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
-    public sessionStart(sessionEvent?: ISessionEvent) {
-        if (!sessionEvent) {
-            // Non-Admob code path
-            const event: ISessionEvent = {
-                adSessionId: this.getOMAdSessionId(),
-                timestamp: Date.now(),
-                type: 'sessionStart',
-                data: {}
-            };
-            this._sessionStartCalled = true;
-
-            if (this._verificationVendorMap[this._vendorKey]) {
-                event.data.verificationParameters = this._verificationVendorMap[this._vendorKey];
-            }
-            const contextData: IContext = this.buildSessionContext();
-            event.data.context = contextData;
-            event.data.vendorkey = this._vendorKey;
-            this._omBridge.triggerSessionEvent(event);
-        } else {
-            // TODO: Refactor. Admob Code Path
-            this._sessionStartEventData = sessionEvent;
-            this._sessionStartEventData.data.vendorkey = this._vendorKey;
-            this._omBridge.triggerSessionEvent(this._sessionStartEventData);
-        }
-    }
-
-    private buildSessionContext(): IContext {
-        const contextData: IContext = {
-            apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
-            environment: 'app',                                   // OMID JS Verification Client API
-            accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
-            omidNativeInfo: {
-                partnerName: PARTNER_NAME,
-                partnerVersion: this._clientInfo.getSdkVersionName()
-            },
-            omidJsInfo: {
-                omidImplementer: PARTNER_NAME,
-                serviceVersion: this._clientInfo.getSdkVersionName(),
-                sessionClientVersion: OMID_P,
-                partnerName: PARTNER_NAME,
-                partnerVersion: this._clientInfo.getSdkVersionName()
-            },
-            app: {
-                libraryVersion: OM_JS_VERSION,
-                appId: this._clientInfo.getApplicationName()
-            },
-            deviceInfo: {
-                deviceType: this._deviceInfo.getModel(),
-                os: Platform[this._platform].toLowerCase(),
-                osVersion: this._deviceInfo.getOsVersion()
-            },
-            supports: ['vlid', 'clid']
-        };
-
-        if (contextData.accessMode === AccessMode.FULL) {
-            contextData.videoElement = document.querySelector('video');
-        }
-
-        return contextData;
+    public sessionStart(sessionEvent: ISessionEvent) {
+        this._sessionStartEventData = sessionEvent;
+        this._omBridge.triggerSessionEvent(sessionEvent);
     }
 
    /**
@@ -344,8 +294,12 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (eventType === SessionEvents.SESSION_START) {
             this._sessionStartProcessedByOmidScript = true;
 
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+            if (CustomFeatures.isIASVendor(vendorKey)) {
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
+            }
+
+            if (this._campaign instanceof AdMobCampaign) {
+                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStartObserverCalled);
             }
 
             if (this._campaign instanceof VastCampaign) {
@@ -355,8 +309,8 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
         if (eventType === SessionEvents.SESSION_FINISH) {
             this._sessionFinishProcessedByOmidScript = true;
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
+            if (CustomFeatures.isIASVendor(vendorKey)) {
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificationSessionFinished);
             }
             // IAB recommended -> Set a 1 second timeout to allow the Complete and AdSessionFinishEvent calls
             // to reach server before removing the Verification Client from the DOM
@@ -364,6 +318,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         if (eventType === 'loadError') {
+            SDKMetrics.reportMetricEvent(OMMetric.OMInjectionFailure);
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
         }
 
@@ -382,8 +337,10 @@ export class OpenMeasurement extends View<AdMobCampaign> {
              * admob-session-interface - calls session start for admob
              * vast video event handler - calls session start for vast
              */
-            if (vendorKey === 'IAS' || this._campaign instanceof AdMobCampaign) {
-                this.sessionStart(this._sessionStartEventData);
+            if (CustomFeatures.isWhitelistedOMVendor(vendorKey) || this._campaign instanceof AdMobCampaign) {
+                if (this._sessionStartEventData) {
+                    this.sessionStart(this._sessionStartEventData);
+                }
             }
         }
 
@@ -406,7 +363,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
 
                 this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight));
 
-                if (vendorKey === 'IAS') {
+                if (CustomFeatures.isWhitelistedOMVendor(vendorKey)) {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
                 }
 
@@ -472,17 +429,27 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         return this.checkVendorResourceURL(resourceUrl).then(() => {
             this.injectAsString(resourceUrl, vendorKey);
             this.populateVendorKey(vendorKey);
-            this._verificationVendorMap[vendorKey] = verificationParameters;
+            this._verificationResource = {
+                resourceUrl: resourceUrl,
+                vendorKey: vendorKey,
+                verificationParameters: verificationParameters
+            };
 
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificatonInjected);
+            if (CustomFeatures.isIASVendor(vendorKey)) {
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificatonInjected);
+            }
+
+            if (CustomFeatures.isDoubleClickGoogle(vendorKey) && this._campaign instanceof AdMobCampaign) {
+                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMInjections, {
+                    'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(vendorKey)
+                });
             }
 
             return Promise.resolve();
         }).catch((e) => {
             this._core.Sdk.logDebug(`Could not load open measurement verification script: ${e}`);
-            if (vendorKey === 'IAS' && this._pts) {
-                this._pts.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
+            if (CustomFeatures.isIASVendor(vendorKey)) {
+                SDKMetrics.reportMetricEvent(OMMetric.IASVerificatonInjectionFailed);
             }
         });
     }
@@ -496,9 +463,6 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         if (CustomFeatures.isUnsupportedOMVendor(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.VERIFICATION_RESOURCE_REJECTED);
             return Promise.reject('verification resource rejected');
-        } else if (!resourceUrl.includes('.js')) {
-            this.sendErrorEvent(VerificationReasonCode.VERIFICATION_NOT_SUPPORTED);
-            return Promise.reject('verification resource not supported');
         } else if (!Url.isValid(resourceUrl)) {
             this.sendErrorEvent(VerificationReasonCode.ERROR_RESOURCE_LOADING);
             return Promise.reject('verification resource is malformed');
@@ -508,9 +472,9 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     }
 
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
-        const adVerificationErrorURL = this._adVerification.getFormattedVerificationTrackingEvent(reasonCode);
+        const adVerificationErrorURL = this._adVerification.getVerificationTrackingEvent();
         if (adVerificationErrorURL) {
-            this._request.get(adVerificationErrorURL);
+            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL, undefined, undefined, {'%5BREASON%5D': reasonCode.toString()});
         }
     }
 

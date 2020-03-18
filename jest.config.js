@@ -1,6 +1,10 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
+  roots: [
+    '<rootDir>/src',
+    '<rootDir>/tools'
+  ],
   moduleDirectories: [
     'node_modules',
     'src/ts',
@@ -12,7 +16,10 @@ module.exports = {
   },
   globals: {
     'ts-jest': {
-      tsConfig: 'tsconfig.webpack.json'
+      tsConfig: 'tsconfig.webpack.json',
+      diagnostics: false,
     }
-  }
+  },
+  setupFiles: ['<rootDir>/test-utils/jest.setup.js'],
+  clearMocks: true,
 };

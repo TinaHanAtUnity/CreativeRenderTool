@@ -23,6 +23,7 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import VastWrappedIAS from 'xml/WrappedVastIAS.xml';
 import ProgrammaticVastCampaignIASMid from 'json/campaigns/vast/ProgrammaticVastCampaignIASMid.json';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('ProgrammaticVastParser', () => {
     const placementId = 'TestPlacement';
@@ -51,6 +52,7 @@ describe('ProgrammaticVastParser', () => {
 
         parser = new ProgrammaticVastParser(core);
         ProgrammaticVastParser.setVastParserMaxDepth(8);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
     });
 
     describe('parsing a campaign', () => {

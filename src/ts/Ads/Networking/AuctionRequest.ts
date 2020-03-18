@@ -19,7 +19,6 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -64,7 +63,6 @@ export interface IAuctionRequestParams {
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
     sessionManager: SessionManager;
-    programmaticTrackingService: ProgrammaticTrackingService;
     privacySDK: PrivacySDK;
     userPrivacyManager: UserPrivacyManager;
 }
@@ -170,7 +168,6 @@ export class AuctionRequest {
     protected _core: ICoreApi;
     protected _response: INativeResponse;
     protected _deviceInfo: DeviceInfo;
-    protected _pts: ProgrammaticTrackingService;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
@@ -209,7 +206,6 @@ export class AuctionRequest {
         this._metaDataManager = params.metaDataManager;
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
-        this._pts = params.programmaticTrackingService;
         this._privacy = RequestPrivacyFactory.create(params.privacySDK, this._deviceInfo.getLimitAdTracking());
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
@@ -315,7 +311,7 @@ export class AuctionRequest {
             return Promise.resolve(this._url);
         }
         let url = this.getBaseURL();
-        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
+        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo));
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),
@@ -483,6 +479,7 @@ export class AuctionRequest {
                     omidJSVersion: OM_JS_VERSION,
                     legalFramework: this._privacySDK.getLegalFramework(),
                     agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
+                    //Todo: Add IsMadeWithUnity flag from SDKDetectionInfo
                 };
             });
         });

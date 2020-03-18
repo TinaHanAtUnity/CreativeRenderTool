@@ -5,6 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Localization } from 'Core/Utilities/Localization';
+import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
 export interface IPrivacyRowItemContainerHandler {
     onPrivacy(url: string): void;
@@ -28,7 +29,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         super(platform, 'privacy-row-item-container', false);
 
         this._userPrivacyManager = userPrivacyManager;
-        this._localization = new Localization(language, 'consent');
+        this._localization = new PrivacyLocalization(language, 'consent', userPrivacyManager.getLegalFramework());
         this._template = new Template(PrivacyRowItemContainerTemplate, this._localization);
 
         this._templateData = {

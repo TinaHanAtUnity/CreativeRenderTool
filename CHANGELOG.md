@@ -1,7 +1,294 @@
-# Pending
+# Fri Mar 13 20:32:57 UTC 2020
+
+* AB Test for Auction XHR request on Android only [#13799](https://github.com/Applifier/unity-ads-webview/pull/13799)
+* Open Measurement - Send event at video start for googledoubleclick [#13797](https://github.com/Applifier/unity-ads-webview/pull/13797)
+* Open Measurement - Add double verify script to Whitelist [#13798](https://github.com/Applifier/unity-ads-webview/pull/13798)
+
+# Fri Mar 13 00:51:31 UTC 2020
+
+* Test using XHR for Auction Request on 1% for Android Devices [#13655](https://github.com/Applifier/unity-ads-webview/pull/13655)
+* Cleanup promise chain in LegacyCampaignManager.request method [#13769](https://github.com/Applifier/unity-ads-webview/pull/13769)
+* Fix Mediation Tracker Metrics for Nofill Immediately Test [#13767](https://github.com/Applifier/unity-ads-webview/pull/13767)
+* [LOAD V5] Mock classes for Load V5 [#13686](https://github.com/Applifier/unity-ads-webview/pull/13686)
+
+# Thu Mar 12 19:05:50 UTC 2020
+
+* Add NoFill in Mediation Test From Whitelist [#13332](https://github.com/Applifier/unity-ads-webview/pull/13332)
+* Reduce WebView size by changing formatting option in Google Closure Compiler [#13683](https://github.com/Applifier/unity-ads-webview/pull/13683)
+* Remove Green Radio Buttons [#13657](https://github.com/Applifier/unity-ads-webview/pull/13657)
+* Convert hex colors to css rgba in MAB [#13656](https://github.com/Applifier/unity-ads-webview/pull/13656)
+* Add Mediation Auction Request Failed Events Back [#13740](https://github.com/Applifier/unity-ads-webview/pull/13740)
+
+# Thu Mar 12 16:43:34 UTC 2020
+
+* [Load V5] Extract base class for Campaign Manager [#13684](https://github.com/Applifier/unity-ads-webview/pull/13684)
+* [Load V5] Remove Unused Methods in LegacyCampaignManager [#13714](https://github.com/Applifier/unity-ads-webview/pull/13714)
+
+# Wed Mar 11 20:05:18 UTC 2020
+
+* Add getCurrentExperiment to MediationLoadTrackingManager [#13687](https://github.com/Applifier/unity-ads-webview/pull/13687)
+* Open Measurement - Fix omid doubleclick - Admob Integration [#13713](https://github.com/Applifier/unity-ads-webview/pull/13713)
+
+# Mon Mar  9 20:49:40 UTC 2020
+
+* Run Open Measurement For Double Click [#13511](https://github.com/Applifier/unity-ads-webview/pull/13511)
+* Add Mediation CacheMode Allowed on Group 5 and 6 [#13624](https://github.com/Applifier/unity-ads-webview/pull/13624)
+* Extend XHRequest class with post and isAvailable methods [#13653](https://github.com/Applifier/unity-ads-webview/pull/13653)
+* Use XHR to measure baseline for Http Request for auction connection [#13654](https://github.com/Applifier/unity-ads-webview/pull/13654)
+* Refactor VastEndScreen into VastStaticEndscreen [#13477](https://github.com/Applifier/unity-ads-webview/pull/13477)
+
+# Fri Mar  6 22:32:55 UTC 2020
+
+* Add isMadeWithUnity query string to auction request [#13617](https://github.com/Applifier/unity-ads-webview/pull/13617)
+* Add endExperiment for AR MAB [#13626](https://github.com/Applifier/unity-ads-webview/pull/13626)
+* Use correct namespace for Localization when showing AR ads [#13625](https://github.com/Applifier/unity-ads-webview/pull/13625)
+* Add some space to top and bottom of the logo container for consent [#13618](https://github.com/Applifier/unity-ads-webview/pull/13618)
+* Collect baseline metrics for auction connection [#13623](https://github.com/Applifier/unity-ads-webview/pull/13623)
+
+# Thu Mar  5 21:57:57 UTC 2020
+
+* Bugfix adding height and width to fix banner display issue [#13616](https://github.com/Applifier/unity-ads-webview/pull/13616)
+
+# Wed Mar  4 22:45:20 UTC 2020
+
+* Fix Metric bugs [#13614](https://github.com/Applifier/unity-ads-webview/pull/13614)
+* Report Mediation Timeouts Better And Add Tags [#13564](https://github.com/Applifier/unity-ads-webview/pull/13564)
+
+# Wed Mar  4 20:23:16 UTC 2020
+
+* Add IAR to Some Metrics [#13591](https://github.com/Applifier/unity-ads-webview/pull/13591)
+
+# Wed Mar  4 11:58:05 UTC 2020
+
+* Initial implementation of privacy web UI for 5% of traffic from Finland [#13107](https://github.com/Applifier/unity-ads-webview/pull/13107)
+
+# Wed Mar  4 00:40:16 UTC 2020
+
+* Add Multi Armed Bandit for AR Ads [#13329](https://github.com/Applifier/unity-ads-webview/pull/13329)
+* Add Explicity SSL Error Handling from Webplayer [#13424](https://github.com/Applifier/unity-ads-webview/pull/13424)
+* Tracking Auction Request Stages [#13537](https://github.com/Applifier/unity-ads-webview/pull/13537)
+* Add Native Initialization Time Within Bounds [#13538](https://github.com/Applifier/unity-ads-webview/pull/13538)
+
+# Tue Mar  3 21:09:42 UTC 2020
+
+* Remove Admob Video Caching [#13510](https://github.com/Applifier/unity-ads-webview/pull/13510)
+* Refactor SDKMetrics to Remove createAdsSdkTag Function [#13478](https://github.com/Applifier/unity-ads-webview/pull/13478)
+* Remove Adaptive Cache Mode [#13509](https://github.com/Applifier/unity-ads-webview/pull/13509)
+* Track Campaign Parsing Latency [#13483](https://github.com/Applifier/unity-ads-webview/pull/13483)
+
+# Tue Mar  3 00:05:04 UTC 2020
+
+* Track Campaign Caching Latency [#13479](https://github.com/Applifier/unity-ads-webview/pull/13479)
+
+# Fri Feb 28 21:27:49 UTC 2020
+
+* Update Load Adapter to handle possible timeouts [#13393](https://github.com/Applifier/unity-ads-webview/pull/13393)
+
+# Fri Feb 28 00:53:17 UTC 2020
+
+* Move session start to register ad events - Admob OM[#13425](https://github.com/Applifier/unity-ads-webview/pull/13425)
+* Refine Initialization Metrics Implementation [#13423](https://github.com/Applifier/unity-ads-webview/pull/13423)
+
+# Thu Feb 27 01:43:09 UTC 2020
+
+* Refactor sendErrorEvent in openMeasurement class to use thirdpartyEventManager - [#13328](https://github.com/Applifier/unity-ads-webview/pull/13328)
+* Open Measurement - Swap to less modern JavaScript [#13390](https://github.com/Applifier/unity-ads-webview/pull/13390)
+* Add Initialization Stages Measurements [#13392](https://github.com/Applifier/unity-ads-webview/pull/13392)
+* Add Time Measurement Utility Class [#13391](https://github.com/Applifier/unity-ads-webview/pull/13391)
+
+# Tue Feb 25 22:23:19 UTC 2020
+
+* Open Measurement - Fix Periscope Data [#13358](https://github.com/Applifier/unity-ads-webview/pull/13358)
+* Read Feature Flags from Ads Game Configuration [#13388](https://github.com/Applifier/unity-ads-webview/pull/13358)
+* Using threshold timeout for marking initial ad request [#13387](https://github.com/Applifier/unity-ads-webview/pull/13387)
+
+# Sat Feb 22 00:10:11 UTC 2020
+* Open Measurement - Create class for Setting up Open Measurement [#13273](https://github.com/Applifier/unity-ads-webview/pull/13273)
+* Fix issue with metric batching logic [#13331](https://github.com/Applifier/unity-ads-webview/pull/13331)
+
+# Thu Feb 20 22:37:07 UTC 2020
+
+* Add color variants to animated CTA button [#12786](https://github.com/Applifier/unity-ads-webview/pull/12786)
+* Open Measurement - Add Admob OM DoubleClick Tag [#13327](https://github.com/Applifier/unity-ads-webview/pull/13327)
+
+# Wed Feb 19 22:00:38 UTC 2020
+
+* Rename ProgrammaticTrackingService to SDKMetrics [#13274](https://github.com/Applifier/unity-ads-webview/pull/13274)
+* Remove reportErrorEvent Implementation [#13228](https://github.com/Applifier/unity-ads-webview/pull/13228)
+* Remove AdmobAdapterManager AB Test [#13233](https://github.com/Applifier/unity-ads-webview/pull/13233)
+* Add Vast 4.1 URL Macro Support [#13166](https://github.com/Applifier/unity-ads-webview/pull/13166)
+
+# Wed Feb 19 00:20:54 UTC 2020
+
+* Adds the following changes to applicable branches other than 3.2.0:
+* Batch Metric and Timing Events [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
+* Align metric and timing tags [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
+* Add ABGroup for Diagnostics trigger method [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
+* Add Load Request, Page Load Metrics, Add Tests, Refine Metric Behavior [#13269](https://github.com/Applifier/unity-ads-webview/pull/13269)
+* Add Metrics around Auction, Placements, and Caching [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
+* Adjust tagging on Mediation metrics on [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
+* Remove Initialization Stages and Add Webview Init Timestamp on Webview Version [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
+* Fix Mediation Tracking Bug and Add Test [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
+* Add Mediation Load Tracking to Webview Version [#13230](https://github.com/Applifier/unity-ads-webview/pull/13230)
+
+# Tue Feb 18 20:24:04 UTC 2020
+
+* Batch Metric and Timing Events on 3.2.0 [#13272](https://github.com/Applifier/unity-ads-webview/pull/13272)
+
+# Fri Feb 14 19:19:55 UTC 2020
+
+* Align metric and timing tags on 3.2.0 [#13270](https://github.com/Applifier/unity-ads-webview/pull/13270)
+* Add ABGroup for Diagnostics trigger method on 3.2.0 [#13234](https://github.com/Applifier/unity-ads-webview/pull/13234)
+
+# Fri Feb 14 18:18:50 UTC 2020
+
+* Add Load Request, Page Load Metrics, Add Tests, Refine Metric Behavior on 3.2.0[#13269](https://github.com/Applifier/unity-ads-webview/pull/13269)
+
+# Thu Feb 13 23:12:45 UTC 2020
+
+* Add Metrics around Auction, Placements, and Caching on 3.2.0 [#13266](https://github.com/Applifier/unity-ads-webview/pull/13266)
+* Revert "Hack: Test Native Initialization Speed through Webview" on 3.2.0 [#13268](https://github.com/Applifier/unity-ads-webview/pull/13268)
+
+# Thu Feb 13 21:38:43 UTC 2020
+
+* Hack: Test Native Initialization Speed through Webview on 3.2.0 [#13238](https://github.com/Applifier/unity-ads-webview/pull/13238)
+
+# Thu Feb 13 18:53:39 UTC 2020
+
+* Adjust tagging on Mediation metrics on 3.2.0 [#13237](https://github.com/Applifier/unity-ads-webview/pull/13237)
+
+# Thu Feb 13 00:39:30 UTC 2020
+
+* Remove Initialization Stages and Add Webview Init Timestamp on Webview Version 3.2.0 [#13235](https://github.com/Applifier/unity-ads-webview/pull/13235)
+
+# Wed Feb 12 21:54:20 UTC 2020
+
+* Fix Mediation Tracking Bug and Add Test to 3.2.0 [#13232](https://github.com/Applifier/unity-ads-webview/pull/13232)
+
+# Wed Feb 12 20:50:59 UTC 2020
+
+* Add Mediation Load Tracking to Webview Version 3.2.0 [#13230](https://github.com/Applifier/unity-ads-webview/pull/13230)
+
+# Tue Feb 11 23:23:12 UTC 2020
+
+* Add willExpireAt Support for Comet Campaigns [#13201](https://github.com/Applifier/unity-ads-webview/pull/13201)
+* Add Webview to Native Version Mapping Support [#13015](https://github.com/Applifier/unity-ads-webview/pull/13015)
+* Open Measurement - (Temporary) Don't use stored campaign OMEnabled Value for brand tracking [#13165](https://github.com/Applifier/unity-ads-webview/pull/13165)
+
+# Mon Feb 10 22:37:45 UTC 2020
+
+* Remove China Module [#13167](https://github.com/Applifier/unity-ads-webview/pull/13167)
+* Cleaning up Jest output [#13171](https://github.com/Applifier/unity-ads-webview/pull/13171)
+* Fix GamerToken Storage on IOS and Remove GamerToken from Config Request [#13168](https://github.com/Applifier/unity-ads-webview/pull/13168)
+* Open Measurement - Add injection failure metric and postback [#13109](https://github.com/Applifier/unity-ads-webview/pull/13109)
+* Add latest target game start timestamp to game session counters [#13170](https://github.com/Applifier/unity-ads-webview/pull/13170)
+* Add more game ids in whitelist to prevents the Android 10 gzip crash [#13173](https://github.com/Applifier/unity-ads-webview/pull/13173)
+* Open Measurement - Whitelist `integralads` as IAS [#13163](https://github.com/Applifier/unity-ads-webview/pull/13163)
+
+# Wed Feb  5 20:48:25 UTC 2020
+
+* Revert Ad Unit Tracker Metrics [#13047](https://github.com/Applifier/unity-ads-webview/pull/13047)
+* Update GameSessionCounters for Comet MRAID Playables [#13136](https://github.com/Applifier/unity-ads-webview/pull/13136)
+* Update UnityAds logo to SVG [#12817](https://github.com/Applifier/unity-ads-webview/pull/12817)
+* Fix AR.getSupportedVideoFormats Native Method [#13050](https://github.com/Applifier/unity-ads-webview/pull/13050)
+* Remove async/await in Production Code to Reduce Bundle Size [#13162](https://github.com/Applifier/unity-ads-webview/pull/13162)
+* Track Stored GamerToken Deletion on iOS [#13164](https://github.com/Applifier/unity-ads-webview/pull/13164)
+
+# Sat Feb  1 01:32:06 UTC 2020
+
+* Open Measurement: Add volume change event for admob ads [#13048](https://github.com/Applifier/unity-ads-webview/pull/13048)
+* Add GameID 3427556 to Load Whitelist [#13108](https://github.com/Applifier/unity-ads-webview/pull/13108)
+* Open Measurement - Add Temporary Metrics for DoubleClick Admob [#13110](https://github.com/Applifier/unity-ads-webview/pull/13110)
+
+# Thu Jan 30 21:26:04 UTC 2020
+
+* Open Measurement - Log When Admob Session Start Observer is Called [#13081](https://github.com/Applifier/unity-ads-webview/pull/13081/files)
+* Fix New Parameters in Ads Configuration Request [#13079](https://github.com/Applifier/unity-ads-webview/pull/13079)
+
+# Wed Jan 29 00:59:44 UTC 2020
+
+* Adds Unknown Enum on CacheError [#13052](https://github.com/Applifier/unity-ads-webview/pull/13052)
+* Point Native 3.4.2 to 3.4.0 Webview [#13051](https://github.com/Applifier/unity-ads-webview/pull/13051)
+* Open Measurement - Refactor sessionStart [#12780](https://github.com/Applifier/unity-ads-webview/pull/12780)
+* Open Measurement - Remove Vendor Key Map Checks for Session Start Event [#13049](https://github.com/Applifier/unity-ads-webview/pull/13049)
+
+# Mon Jan 27 23:30:22 UTC 2020
+
+* Refactor PTS to Static Utility [#12906](https://github.com/Applifier/unity-ads-webview/pull/12906)
+* Refactor PTS to Instance-Based Implementation [#13044](https://github.com/Applifier/unity-ads-webview/pull/13044)
+* Add URL Parameters to Game Configuration Requests [#13016](https://github.com/Applifier/unity-ads-webview/pull/13016)
+* Remove Jest Haste Map and TS Jest Diagnostic Errors [#13045](https://github.com/Applifier/unity-ads-webview/pull/13045)
+* Add Basic Github Actions CI Support [#12724](https://github.com/Applifier/unity-ads-webview/pull/12724)
+* Fix AR Creatives Timestamp [#12784](https://github.com/Applifier/unity-ads-webview/pull/12784)
+
+# Fri Jan 24 21:20:44 UTC 2020
+
+* Add spec.ts Support in tsconfig [#12988](https://github.com/Applifier/unity-ads-webview/pull/12988)
+* Add isNoGzipGame GameID [#12987](https://github.com/Applifier/unity-ads-webview/pull/12987)
+* Add MacroUtil class to do string replacement [#12191](https://github.com/Applifier/unity-ads-webview/pull/12191)
+* Add MobilityWareGames to isCloseIconSkipEnabled [#13017](https://github.com/Applifier/unity-ads-webview/pull/13017)
+* Duplicate missed impression event to PTS [#13018](https://github.com/Applifier/unity-ads-webview/pull/13018)
+
+# Wed Jan 22 21:11:27 UTC 2020
+
+* Improve Missed Impression Metrics V3 [#12959](https://github.com/Applifier/unity-ads-webview/pull/12959)
+* Increase the cn diagnostic endpoint traffic to 100% [#12961](https://github.com/Applifier/unity-ads-webview/pull/12961)
+* Run with Accept-Encoding header for CSR2 game id [#12905](https://github.com/Applifier/unity-ads-webview/pull/12905)
+* Begin Reverse Zynga ABTest on MAB Endcard Animation on Group 7 [#12933](https://github.com/Applifier/unity-ads-webview/pull/12933)
+
+# Tue Jan 21 23:01:23 UTC 2020
+
+* Open Measurement Refactor - Fix Generic Use [#12725](https://github.com/Applifier/unity-ads-webview/pull/12725)
+* Improve metrics for AR ads [#12787](https://github.com/Applifier/unity-ads-webview/pull/12787)
+* Increase sample percentage for cn diagnostic endpoint switching [#12932](https://github.com/Applifier/unity-ads-webview/pull/12932)
+
+# Fri Jan 17 23:44:30 UTC 2020
+
+* Open Measurement - Remove JS string check for OM Verification Scripts [#12815](https://github.com/Applifier/unity-ads-webview/pull/12815)
+* VAST - Pass Ad Verifications to Subsequent Nested Tags [#12819](https://github.com/Applifier/unity-ads-webview/pull/12819)
+* Fix Ad Unit Tracker Metrics [#12904](https://github.com/Applifier/unity-ads-webview/pull/12904)
+
+# Fri Jan 17 10:02:07 UTC 2020
+
+* Permission external should be allowed outside GDPR area if the legal framework is legitimate interest [#12852](https://github.com/Applifier/unity-ads-webview/pull/12852)
+
+# Fri Jan 17 00:04:49 UTC 2020
+
+* Add Metrics to Investigate Missed Impressions in Mediation [#12824](https://github.com/Applifier/unity-ads-webview/pull/12824)
+* Fix Animated Endcard Button on Orientation Change [#12782](https://github.com/Applifier/unity-ads-webview/pull/12782)
+
+# Thu Jan 16 18:55:31 UTC 2020
+
+* Change the SDK diagnostic endpoint for China [#12820](https://github.com/Applifier/unity-ads-webview/pull/12820)
+
+# Mon Jan 13 19:17:49 UTC 2020
+
+* Open Measurement - Fix verification params on Admob OM SessionStart [#12779](https://github.com/Applifier/unity-ads-webview/pull/12779)
+* Add WebPlayer api jest tests [#12445](https://github.com/Applifier/unity-ads-webview/pull/12445)
+
+# Thu Dec 19 13:41:58 UTC 2019
+
+* Force Load on All Traffic for Specific Etermax/Fanatee Games [#12728](https://github.com/Applifier/unity-ads-webview/pull/12728)
+
+# Thu Dec 19 00:49:02 UTC 2019
+
+* Add Hide AR Button Feature [#12105](https://github.com/Applifier/unity-ads-webview/pull/12105)
+* Add Cheetah GameIDs for Load Testing and Fix Load V4 Experiment [#12482](https://github.com/Applifier/unity-ads-webview/pull/12482)
+* Add 3 more Etermax gameIDs into load experiment whitelists [#12726](https://github.com/Applifier/unity-ads-webview/pull/12726)
+
+# Wed Dec 18 13:36:33 UTC 2019
+
+* Spanish translation for CCPA [#12668](https://github.com/Applifier/unity-ads-webview/pull/12668)
+
+# Wed Dec 18 02:07:58 UTC 2019
 
 * Add AB groups to Animated Button experiment [#12454](https://github.com/Applifier/unity-ads-webview/pull/12454)
 * Send out AUI reward on click instead of on hide [#12526](https://github.com/Applifier/unity-ads-webview/pull/12526)
+* Create Jest Mocks for Banners [#12583](https://github.com/Applifier/unity-ads-webview/pull/12583)
+* Send banner impression on reload of banner ad context [#12584](https://github.com/Applifier/unity-ads-webview/pull/12584)
+* Open Measurement - Add Geometry Change call to Admob Impression [#12669](https://github.com/Applifier/unity-ads-webview/pull/12669)
+* Add Admob Nofill ABTest and Whitelist [#12670](https://github.com/Applifier/unity-ads-webview/pull/12670)
+* Release Load Adapter for everyone [#12673](https://github.com/Applifier/unity-ads-webview/pull/12673)
 
 # Tue Dec 17 15:22:32 UTC 2019
 

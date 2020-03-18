@@ -2,14 +2,14 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
@@ -38,7 +38,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -55,7 +55,6 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let campaignParserManager: ContentTypeHandlerManager;
     let privacySDK: PrivacySDK;
     let userPrivacyManager: UserPrivacyManager;
@@ -70,7 +69,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
         privacySDK = TestFixtures.getPrivacySDK(core.Api);
 
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
 
@@ -85,10 +84,10 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
         sessionManager = new SessionManager(core.Api, request, storageBridge);
         cacheBookkeeping = new CacheBookkeepingManager(core.Api);
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
-        loadManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+        campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
+        loadManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager);
     });
 
     describe('setCurrentAdUnit', () => {

@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -13,22 +13,22 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { SdkApi } from 'Core/Native/Sdk';
+import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { IOnCampaignListener } from 'Ads/Managers/CampaignManager';
 import { Observable3 } from 'Core/Utilities/Observable';
+import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
 
 interface IAutomatedExperimentResponse {
-    experiments: { [key: string]: string };
+    experiments: { [key: string]: IExperimentActionChoice };
     metadata: { [key: string]: string };
 }
 
 interface IParsedExperiment {
     name: string;
-    action: string;
+    actions: IExperimentActionChoice;
     metadata: string;
 }
 
@@ -37,13 +37,13 @@ export type ContextualFeature = string | number | boolean | null | undefined | B
 class OptimizedAutomatedExperiment {
     constructor(experiment: AutomatedExperiment) {
         this._experiment = experiment;
-        this.Action = experiment.getDefaultAction();
+        this.Actions = experiment.getDefaultActions();
         this.Active = false;
         this.Outcome = 0;
     }
 
     private _experiment: AutomatedExperiment;
-    public Action: string;
+    public Actions: IExperimentActionChoice;
     public Active: boolean;
     public Outcome: number;
     public MetaData: string;
@@ -64,116 +64,118 @@ class OptimizedCampaign {
     constructor() {
         this.Stage = AutomatedExperimentStage.AWAITING_OPTIMIZATION;
         this.Experiments = {};
+        this.Id = '';
     }
 
+    public Id: string;
     public Stage: AutomatedExperimentStage;
     public Experiments: { [experimentId: string]: OptimizedAutomatedExperiment };
 }
 
-export class CachableAutomatedExperimentData {
-    constructor(action: string, metadata: string) {
-        this.Action = action;
-        this.Metadata = metadata;
-    }
-
-    public Action: string;
-    public Metadata: string;
-}
-
-export class AutomatedExperimentManager implements IOnCampaignListener {
+export class AutomatedExperimentManager {
     private readonly _requestManager: RequestManager;
     private readonly _deviceInfo: DeviceInfo;
-    private readonly _sdkApi: SdkApi;
     private readonly _privacySdk: PrivacySDK;
     private readonly _clientInfo: ClientInfo;
     private readonly _coreConfig: CoreConfiguration;
     private readonly _nativeBridge: NativeBridge;
+    private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
-    private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
-
+    private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
     private static readonly _createEndPoint = 'experiment';
     private static readonly _rewardEndPoint = 'reward';
 
     private _abGroup: number;
     private _gameSessionID: number;
     private _declaredExperiments: AutomatedExperiment[];
-    private _campaigns: { [CampaignId: string]: OptimizedCampaign };
+    private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
+    private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
 
     constructor(core: ICore) {
-        this._campaigns = {};
-
+        this._declaredExperiments = [];
         this._requestManager = core.RequestManager;
         this._deviceInfo = core.DeviceInfo;
         this._abGroup = core.Config.getAbGroup();
         this._gameSessionID = core.Ads.SessionManager.getGameSessionId();
-        this._sdkApi = core.Api.Sdk;
         this._privacySdk = core.Ads.PrivacySDK;
         this._clientInfo = core.ClientInfo;
         this._coreConfig = core.Config;
         this._nativeBridge = core.NativeBridge;
+        this._onCampaignListener = (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => this.onNewCampaign(campaign);
+        this._staticFeaturesPromise = this.collectStaticContextualFeatures();
+    }
+
+    public static createIfAvailable(core: ICore): AutomatedExperimentManager | undefined {
+        if (MabDisabledABTest.isValid(core.Config.getAbGroup())) {
+            return undefined;
+        }
+
+        return new AutomatedExperimentManager(core);
     }
 
     public listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
-        onCampaign.subscribe((placementId, campaign, trackingUrls) => AutomatedExperimentManager.onNewCampaign(this, campaign));
+        this._campaignSource = onCampaign;
+        onCampaign.subscribe(this._onCampaignListener);
     }
 
-    public initialize(experiments: AutomatedExperiment[]): Promise<void> {
-        this._declaredExperiments = experiments;
-        this._staticFeaturesPromise = this.collectStaticContextualFeatures();
+    public registerExperiments(experiments: AutomatedExperiment[]) {
+        this._declaredExperiments = this._declaredExperiments.concat(experiments);
+    }
 
-        return Promise.resolve();
+    public isCampaignTargetForExperiment(campaign: Campaign) {
+        return this._campaign !== undefined && this._campaign.Id === campaign.getId();
     }
 
     public startCampaign(campaign: Campaign) {
-        if (this._campaigns.hasOwnProperty(campaign.getId())) {
-            const optmzdCampaign = this._campaigns[campaign.getId()];
+        if (this.isCampaignTargetForExperiment(campaign)) {
 
-            for (const experimentName in optmzdCampaign.Experiments.keys) {
-                if (optmzdCampaign.Experiments.hasOwnProperty(experimentName)) {
-                    optmzdCampaign.Experiments[experimentName].Active = false;
-                    optmzdCampaign.Experiments[experimentName].Outcome = 0;
+            for (const experimentName in this._campaign.Experiments.keys) {
+                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+                    this._campaign.Experiments[experimentName].Active = false;
+                    this._campaign.Experiments[experimentName].Outcome = 0;
                 }
             }
 
-            optmzdCampaign.Stage = AutomatedExperimentStage.RUNNING;
-        } else {
-            this._sdkApi.logError('init_experiments_with_unkown_campaign:' + campaign.getId());
+            this._campaign.Stage = AutomatedExperimentStage.RUNNING;
         }
     }
 
-    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): string|undefined {
+    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): IExperimentActionChoice | undefined {
 
-        if (this._campaigns.hasOwnProperty(campaign.getId())) {
-            const optmzdCampaign = this._campaigns[campaign.getId()];
+        if (this.isCampaignTargetForExperiment(campaign)) {
 
-            for (const experimentName in optmzdCampaign.Experiments) {
-                if (optmzdCampaign.Experiments.hasOwnProperty(experimentName)) {
-                    optmzdCampaign.Experiments[experiment.getName()].Active = true;
-                    return optmzdCampaign.Experiments[experiment.getName()].Action;
+            for (const experimentName in this._campaign.Experiments) {
+                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+                    this._campaign.Experiments[experiment.getName()].Active = true;
+                    return this._campaign.Experiments[experiment.getName()].Actions;
                 }
             }
-        } else {
-            this._sdkApi.logError('start_experiments_with_unkown_campaign:' + campaign.getId());
+
+            SDKMetrics.reportMetricEvent(AUIMetric.UnknownExperimentName);
         }
-        return undefined;
+
+        return experiment.getDefaultActions();
     }
 
     public endCampaign(campaign: Campaign): Promise<void> {
-        if (this._campaigns.hasOwnProperty(campaign.getId())) {
 
-            const optmzdCampaign = this._campaigns[campaign.getId()];
-            if (optmzdCampaign.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
-                optmzdCampaign.Stage = AutomatedExperimentStage.ENDED;
+        if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+
+                this._campaign.Stage = AutomatedExperimentStage.ENDED;
+
                 return Promise.resolve();
-            } else if (optmzdCampaign.Stage !== AutomatedExperimentStage.RUNNING) {
+
+            } else if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
                 return Promise.reject('Experiment session not started.');
             }
 
-            return this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.ENDED);
+            return this.publishCampaignOutcomes(campaign, this._campaign, AutomatedExperimentStage.ENDED);
         }
 
-        return Promise.reject('Attempted to end experiments of unknown campaign');
+        return Promise.resolve();
     }
 
     private publishCampaignOutcomes(campaign: Campaign, optmzCampaign: OptimizedCampaign, nextStage: AutomatedExperimentStage): Promise<void> {
@@ -191,33 +193,29 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         }
 
         return Promise.all(promises)
-        .finally()
-        .then((ignore) => {
-            if (this._campaigns.hasOwnProperty(campaign.getId())) {
-                delete this._campaigns[campaign.getId()];
-            }
-        });
+            .finally()
+            .then((ignore) => {
+                this._campaign = new OptimizedCampaign();
+            });
     }
 
     public rewardExperiments(campaign: Campaign) {
-        if (this._campaigns.hasOwnProperty(campaign.getId())) {
-            const optmzdCampaign = this._campaigns[campaign.getId()];
-            if (optmzdCampaign.Stage !== AutomatedExperimentStage.RUNNING) {
+        if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
                 return;
             }
 
-            for (const experimentName in optmzdCampaign.Experiments) {
-                if (optmzdCampaign.Experiments.hasOwnProperty(experimentName)) {
-                    if (optmzdCampaign.Experiments[experimentName].Active) {
-                        optmzdCampaign.Experiments[experimentName].Outcome = 1;
+            for (const experimentName in this._campaign.Experiments) {
+                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+                    if (this._campaign.Experiments[experimentName].Active) {
+                        this._campaign.Experiments[experimentName].Outcome = 1;
                     }
                 }
             }
 
-            this.publishCampaignOutcomes(campaign, optmzdCampaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
+            this.publishCampaignOutcomes(campaign, this._campaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
 
-        } else {
-            this._sdkApi.logError('reward_experiments_with_unkown_campaign:' + campaign.getId());
         }
     }
 
@@ -229,7 +227,7 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
                 game_session_id: this._gameSessionID
             },
             experiment: optmzExperiment.getExperiment().getName(),
-            action: optmzExperiment.Action,
+            actions: optmzExperiment.Actions,
             reward: optmzExperiment.Outcome,
             metadata: optmzExperiment.MetaData
         };
@@ -237,26 +235,6 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
         const body = JSON.stringify(outcome);
         return this._requestManager.post(url, body);
-    }
-
-    private loadCampaignExperiments(campaign: Campaign, experiments: IParsedExperiment[]): Promise<void> {
-        if (this._campaigns.hasOwnProperty(campaign.getId())) {
-            const optmzdCampaign = this._campaigns[campaign.getId()];
-
-            if (optmzdCampaign.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
-                return Promise.reject('campaign_optimization_response_ignored');
-            }
-            experiments.forEach(experiment => {
-                const optmzdExperiment = optmzdCampaign.Experiments[experiment.name];
-                if (optmzdExperiment) {
-                    optmzdExperiment.Action = experiment.action;
-                    optmzdExperiment.MetaData = experiment.metadata;
-                }
-            });
-            return Promise.resolve();
-        } else {
-            return Promise.reject('unknown_campaign_cant_load_experiments');
-        }
     }
 
     private parseExperimentsResponse(response: INativeResponse): IParsedExperiment[] {
@@ -267,11 +245,11 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
 
                 return Object.keys(json.experiments).map(experiment => ({
                     name: experiment,
-                    action: json.experiments[experiment],
+                    actions: json.experiments[experiment],
                     metadata: (json.metadata === null || json.metadata === undefined ? '' : json.metadata[experiment])
                 }));
             } catch (e) {
-                Diagnostics.trigger('failed_to_parse_automated_experiments', e);
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToParseExperimentResponse);
                 return [];
             }
         } else {
@@ -279,10 +257,10 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         }
     }
 
-    private async collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
+    private collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }> {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
-            { l: 'bundleId', c: 'bundle_id'},
+            { l: 'bundleId', c: 'bundle_id' },
             { l: 'gameId', c: 'game_id' },
 
             //PRIVACY & OPT-OUTS
@@ -298,16 +276,16 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
             { l: 'timeZone', c: 'time_zone' },
 
             //DEVICE -- STATIC
-            { l: 'platform',  c: undefined },
+            { l: 'platform', c: undefined },
             { l: 'osVersion', c: 'os_version' },
             { l: 'deviceModel', c: 'device_model' },
             { l: 'deviceMake', c: 'device_make' },
             { l: 'screenDensity', c: 'screen_density' },
-            { l: 'simulator',  c: undefined },
+            { l: 'simulator', c: undefined },
             { l: 'stores', c: undefined },
 
             //DEVICE -- BEHAVIOUR
-            { l: 'rooted',  c: undefined },
+            { l: 'rooted', c: undefined },
             { l: 'max_volume', c: undefined },
             { l: 'totalMemory', c: 'total_memory' },
             { l: 'total_internal_space', c: undefined },
@@ -319,37 +297,37 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
             this._clientInfo.getDTO(),
             this._coreConfig.getDTO()
         ]))
-        .then((res) => {
-            const rawData: { [key: string]: ContextualFeature } = {
-               ...res[0],
-               ...res[1],
-               ...res[2],
-               'gdpr_enabled': this._privacySdk.isGDPREnabled(),
-               'opt_out_Recorded': this._privacySdk.isOptOutRecorded(),
-               'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
-               'platform': Platform[this._nativeBridge.getPlatform()],
-               'stores':  this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
-               'simulator': this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
-               'total_internal_space': this._deviceInfo.getTotalSpace(),
-               'max_volume': this._deviceInfo.get('maxVolume')
-            };
+            .then((res) => {
+                const rawData: { [key: string]: ContextualFeature } = {
+                    ...res[0],
+                    ...res[1],
+                    ...res[2],
+                    'gdpr_enabled': this._privacySdk.isGDPREnabled(),
+                    'opt_out_Recorded': this._privacySdk.isOptOutRecorded(),
+                    'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
+                    'platform': Platform[this._nativeBridge.getPlatform()],
+                    'stores': this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
+                    'simulator': this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
+                    'total_internal_space': this._deviceInfo.getTotalSpace(),
+                    'max_volume': this._deviceInfo.get('maxVolume')
+                };
 
-            const features: { [key: string]: ContextualFeature } = {};
-            filter.forEach(item => {
-               if (rawData[item.l] !== undefined) {
-                   const name = (item.c !== undefined) ? item.c : item.l;
-                   features[ name ] = rawData[item.l] ;
-               }
+                const features: { [key: string]: ContextualFeature } = {};
+                filter.forEach(item => {
+                    if (rawData[item.l] !== undefined) {
+                        const name = (item.c !== undefined) ? item.c : item.l;
+                        features[name] = rawData[item.l];
+                    }
+                });
+
+                return features;
+            }).catch(err => {
+                Diagnostics.trigger('failed_to_collect_static_features', err);
+                return {};
             });
-
-            return features;
-        }).catch(err => {
-            Diagnostics.trigger('failed_to_collect_static_features', err);
-            return {};
-        });
     }
 
-    private async collectDeviceContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
+    private async collectDeviceContextualFeatures(): Promise<{ [key: string]: ContextualFeature }> {
         const filter = [
             { l: 'connectionType', c: 'connection_type' },
             { l: 'headset', c: undefined },
@@ -376,55 +354,55 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
             new Date(Date.now()),
             this._deviceInfo.getFreeSpace()
         ]))
-        .then((res) => {
-            const rawData: { [key: string]: ContextualFeature } = {
-               ...res[0],
-               'video_orientation': Orientation[  res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
-               'local_day_time': res[3].getHours() + res[3].getMinutes() / 60,
-               'device_free_space': res[4]
-            };
+            .then((res) => {
+                const rawData: { [key: string]: ContextualFeature } = {
+                    ...res[0],
+                    'video_orientation': Orientation[res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
+                    'local_day_time': res[3].getHours() + res[3].getMinutes() / 60,
+                    'device_free_space': res[4]
+                };
 
-            // do some enum conversions
-            if (rawData.hasOwnProperty('batteryStatus')) {
-                rawData.batteryStatus = BatteryStatus[<BatteryStatus>rawData.batteryStatus];
-            }
-            if (rawData.hasOwnProperty('ringerMode')) {
-                rawData.ringerMode = RingerMode[<RingerMode>rawData.ringerMode];
-            }
+                // do some enum conversions
+                if (rawData.hasOwnProperty('batteryStatus')) {
+                    rawData.batteryStatus = BatteryStatus[<BatteryStatus>rawData.batteryStatus];
+                }
+                if (rawData.hasOwnProperty('ringerMode')) {
+                    rawData.ringerMode = RingerMode[<RingerMode>rawData.ringerMode];
+                }
 
-            const features: { [key: string]: ContextualFeature } = {};
-            filter.forEach(item => {
-               if (rawData[item.l] !== undefined) {
-                   const name = (item.c !== undefined) ? item.c : item.l;
-                   features[ name ] = rawData[item.l] ;
-               }
+                const features: { [key: string]: ContextualFeature } = {};
+                filter.forEach(item => {
+                    if (rawData[item.l] !== undefined) {
+                        const name = (item.c !== undefined) ? item.c : item.l;
+                        features[name] = rawData[item.l];
+                    }
+                });
+
+                return features;
+            }).catch(err => {
+                Diagnostics.trigger('failed_to_collect_device_features', err);
+                return {};
             });
-
-            return features;
-        }).catch(err => {
-            Diagnostics.trigger('failed_to_collect_device_features', err);
-            return {};
-        });
     }
 
-    private async collectAdUnitFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }>  {
+    private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
-        features.rating =  campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
-        features.rating_count =  campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
+        features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
+        features.rating_count = campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
         features.gsc_ad_requests = gameSessionCounters.adRequests;
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;
         features.is_video_cached = CampaignAssetInfo.isCached(campaign);
 
         // Extract game session counters: Campaign centric
-        let  ids: string[] = [];
-        let  starts: number[] = [];
-        let  views: number[] = [];
-        let  startsTS: string[] = [];
+        let ids: string[] = [];
+        let starts: number[] = [];
+        let views: number[] = [];
+        let startsTS: string[] = [];
         for (const campaignID in gameSessionCounters.startsPerCampaign) {
             if (gameSessionCounters.startsPerCampaign.hasOwnProperty(campaignID)) {
                 ids = ids.concat(campaignID);
@@ -461,37 +439,53 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
         return features;
     }
 
-    private createRequestBody(campaign: Campaign, experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}): string {
+    private createRequestBody(campaign: Campaign, experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature }): string {
         return JSON.stringify({
             user_info: {
                 ab_group: this._abGroup,
                 game_session_id: this._gameSessionID,
                 auction_id: campaign.getSession().getId()
             },
-            experiments: experiments.map(e => { return {name: e.getName(), actions: e.getActions()}; }),
+            experiments: experiments.map(e => {
+                return {
+                    name: e.getName(),
+                    actions: this.getExperimentSpace(e.getActions())
+                };
+            }),
             contextual_features: contextualFeatures
         });
     }
 
+    private getExperimentSpace(experimentComponentsDictionary: IExperimentDeclaration): IExperimentActionsPossibleValues {
+        const experimentSpace: { [actionName: string]: string[] } = {};
+        for (const [actionName, variants] of Object.entries(experimentComponentsDictionary)) {
+            experimentSpace[actionName] = Object.values(variants);
+        }
+
+        return experimentSpace;
+    }
+
     // Only public so that testing can access it. :/
-    public static onNewCampaign(_this: AutomatedExperimentManager, campaign: Campaign): Promise<void> {
-        if (_this._declaredExperiments.length === 0) {
+    public onNewCampaign(campaign: Campaign): Promise<void> {
+
+        if (this._declaredExperiments.length === 0) {
             return Promise.resolve();
         }
 
-        if (_this._campaigns.hasOwnProperty(campaign.getId())) {
-            return Promise.resolve();
+        // This is to limit to 1 optmization call per Game Session.
+        if (this._campaignSource !== undefined) {
+            this._campaignSource.unsubscribe(this._onCampaignListener);
         }
 
-        const optmzdCampaign = new OptimizedCampaign();
-        _this._campaigns[campaign.getId()] = optmzdCampaign;
+        this._campaign = new OptimizedCampaign();
+        this._campaign.Id = campaign.getId();
 
-        _this._declaredExperiments.forEach(experiment => {
-            optmzdCampaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
+        this._declaredExperiments.forEach(experiment => {
+            this._campaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
         });
 
         // Fire and forget... No one resolves it/blocks on it explicitely
-        return Promise.all([_this._staticFeaturesPromise, _this.collectDeviceContextualFeatures(), _this.collectAdUnitFeatures(campaign)])
+        return Promise.all([this._staticFeaturesPromise, this.collectDeviceContextualFeatures(), this.collectAdSpecificFeatures(campaign)])
             .then((featureMaps) => {
                 const features: { [key: string]: ContextualFeature } = {};
                 for (const i in featureMaps) {
@@ -504,17 +498,42 @@ export class AutomatedExperimentManager implements IOnCampaignListener {
                     }
                 }
                 return features;
-        }).then((features) => {
-            const body = _this.createRequestBody(campaign, _this._declaredExperiments, features);
-            const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
+            }).then((features) => {
+                const body = this.createRequestBody(campaign, this._declaredExperiments, features);
+                const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
 
-            return _this._requestManager.post(url, body)
-                .then((response) => _this.parseExperimentsResponse(response))
-                .then((parsedExperiments) => _this.loadCampaignExperiments(campaign, parsedExperiments))
-                .then(() => Promise.resolve())
-                .catch((err) => {
-                    Diagnostics.trigger('failed_to_fetch_automated_experiments', err);
-                });
-        });
+                return this._requestManager.post(url, body)
+                    .then((response) => this.parseExperimentsResponse(response))
+                    .then((parsedExperiments) => this.loadCampaignExperiments(campaign, parsedExperiments))
+                    .then(() => Promise.resolve())
+                    .catch((err) => {
+                        SDKMetrics.reportMetricEvent(AUIMetric.FailedToFetchAutomatedExperiements);
+                    });
+            }).catch(() => {
+                SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
+            });
+    }
+
+    private loadCampaignExperiments(campaign: Campaign, experiments: IParsedExperiment[]): Promise<void> {
+
+        if (this._campaign.Id === campaign.getId()) {
+
+            if (this._campaign.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+                return Promise.reject('campaign_optimization_response_ignored');
+            }
+
+            experiments.forEach(experiment => {
+                const optmzdExperiment = this._campaign.Experiments[experiment.name];
+                if (optmzdExperiment) {
+                    optmzdExperiment.Actions = experiment.actions;
+                    optmzdExperiment.MetaData = experiment.metadata;
+                }
+            });
+
+            return Promise.resolve();
+
+        } else {
+            return Promise.reject('unknown_campaign_cant_load_experiments');
+        }
     }
 }

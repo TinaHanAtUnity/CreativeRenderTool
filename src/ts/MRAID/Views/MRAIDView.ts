@@ -502,7 +502,15 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this.onArReadyToShowEvent(msg).catch((reason) => this._core.Sdk.logError('AR ready to show message error: ' + reason.toString()));
     }
 
+    public onBridgeArButtonHide(msg: MessageEvent) {
+        this.onArButtonHideEvent(msg).catch((reason) => this._core.Sdk.logError('AR button hide message error: ' + reason.toString()));
+    }
+
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
+        return Promise.resolve();
+    }
+
+    protected onArButtonHideEvent(msg: MessageEvent): Promise<void> {
         return Promise.resolve();
     }
 

@@ -9,10 +9,8 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { AutomatedExperimentManager, ContextualFeature } from 'Ads/Managers/AutomatedExperimentManager';
 import { AuctionProtocol, INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheManager } from 'Core/Managers/CacheManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
@@ -20,7 +18,7 @@ import { PerformanceAdUnitFactory} from 'Performance/AdUnits/PerformanceAdUnitFa
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { CampaignManager, implementsIOnCampaignListener } from 'Ads/Managers/CampaignManager';
+import { LegacyMABCampaignManager } from 'Ads/Managers/LegacyMABCampaignManager';
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
@@ -29,19 +27,36 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import CometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import { Performance } from 'Performance/Performance';
-import { China } from 'China/China';
-import { MabDecisionButtonTest } from 'Core/Models/ABGroup';
+import { MabDisabledABTest } from 'Core/Models/ABGroup';
+
+import 'mocha';
 import * as sinon from 'sinon';
+import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
+
+const FooExperimentDeclaration = {
+    action1: {
+        choiceA: 'action1ChoiceA',
+        choiceB: 'action1ChoiceB'
+    },
+    action2: {
+        choiceA: 'action2ChoiceA',
+        choiceB: 'action2ChoiceB'
+    }
+};
+
+const FooExperimentDefaultActions = {
+    action1: FooExperimentDeclaration.action1.choiceB,
+    action2: FooExperimentDeclaration.action2.choiceA
+};
 
 const FooExperiment = new AutomatedExperiment({
     name: 'FooExperiment',
-    actions: ['FooAction1', 'FooAction2'],
-    defaultAction: 'FooAction2'
+    actions: FooExperimentDeclaration,
+    defaultActions: FooExperimentDefaultActions
 });
 
 describe('AutomatedExperimentManagerTests', () => {
-    const baseUrl = 'https://auiopt.unityads.unity3d.com/v1/';
+    const baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
     const createEndPoint = 'experiment';
     const rewardEndPoint = 'reward';
 
@@ -50,9 +65,9 @@ describe('AutomatedExperimentManagerTests', () => {
     let nativeBridge: NativeBridge;
     let core: ICore;
     let ads: IAds;
-    let diagnosticTrigger: sinon.SinonStub;
     let platform: Platform;
     let campaign: Campaign;
+    let aem: AutomatedExperimentManager
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -62,7 +77,8 @@ describe('AutomatedExperimentManagerTests', () => {
         core = TestFixtures.getCoreModule(nativeBridge);
         ads = TestFixtures.getAdsModule(core);
         core.Ads = ads;
-        diagnosticTrigger = sandbox.stub(Diagnostics, 'trigger');
+
+        aem = new AutomatedExperimentManager(core);
     });
 
     afterEach(() => {
@@ -157,19 +173,26 @@ describe('AutomatedExperimentManagerTests', () => {
         const postUrl = baseUrl + createEndPoint;
 
         const postStub = sandbox.stub(core.RequestManager, 'post')
+            .withArgs(postUrl)
             .resolves(<INativeResponse>{
                 responseCode: 200,
                 response: ''
             });
-
-        const aem = new AutomatedExperimentManager(core);
-        return aem.initialize([]).then(() => {
+            
+        return aem.onNewCampaign(campaign)
+        .then(() => aem.startCampaign(campaign))
+        .then(() => {
             assert.isFalse(postStub.called);
         });
     });
 
-    ['FooAction1', 'FooAction2'].forEach((action) => {
-        it(`initialize with request ok, use received action ${action}`, () => {
+    [
+        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
+        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB},
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA},
+        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+    ].forEach((action) => {
+        it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
             const postUrl = baseUrl + createEndPoint;
             const responseText = JSON.stringify({experiments: {FooExperiment: action}});
 
@@ -180,53 +203,52 @@ describe('AutomatedExperimentManagerTests', () => {
                     response: responseText
                 });
 
-            const aem = new AutomatedExperimentManager(core);
-            return aem.initialize([FooExperiment])
-                .then(() => AutomatedExperimentManager.onNewCampaign(aem, campaign))
+            aem.registerExperiments([FooExperiment])
+            return aem.onNewCampaign(campaign)
                 .then(() => aem.startCampaign(campaign))
                 .then(() => {
                     assert.isTrue(postStub.called);
                     assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
-                    assert.equal(aem.activateExperiment(campaign, FooExperiment), action, 'Wrong variant...');
+                    assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(action), 'Wrong variant...');
             });
         });
     });
 
-    ['FooAction1', 'FooAction2'].forEach((action) => {
-        it(`initialize with request ok, use received action ${action}, failed to parse`, () => {
-            const postUrl = baseUrl + createEndPoint;
-            const responseText = 'not json';
 
-            const postStub = sandbox.stub(core.RequestManager, 'post')
-                .withArgs(postUrl)
-                .resolves(<INativeResponse>{
-                    responseCode: 200,
-                    response: responseText
-                });
+    it(`send proper request, receive garbage, use default action`, () => {
+        const postUrl = baseUrl + createEndPoint;
+        const responseText = 'not json';
 
-            const aem = new AutomatedExperimentManager(core);
-            return aem.initialize([FooExperiment])
-            .then(() => AutomatedExperimentManager.onNewCampaign(aem, campaign))
-            .then(() => aem.startCampaign(campaign))
-            .then(() => {
-                assert.isTrue(postStub.called);
-
-                assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
-
-                assert.equal(aem.activateExperiment(campaign, FooExperiment), 'FooAction2', 'Wrong variant...');
-
-                assert.equal(diagnosticTrigger.callCount, 1, 'missing an error...');
-
-                assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_parse_automated_experiments');
-                // The error message is browser dependant, thus different between safari(iOS) and chrome(Android)
-                assert.oneOf(diagnosticTrigger.firstCall.args[1].message, ['JSON Parse error: Unexpected identifier "not"', 'Unexpected token o in JSON at position 1']);
+        const postStub = sandbox.stub(core.RequestManager, 'post')
+            .withArgs(postUrl)
+            .resolves(<INativeResponse>{
+                responseCode: 200,
+                response: responseText
             });
+
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .withArgs(AUIMetric.FailedToParseExperimentResponse)
+            .returns(true);
+
+        aem.registerExperiments([FooExperiment])
+        return aem.onNewCampaign(campaign)
+        .then(() => aem.startCampaign(campaign))
+        .then(() => {
+            assert.isTrue(postStub.called);
+            assert.isTrue(metricStub.calledOnce)
+            assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
+
+            assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
         });
     });
 
     it('initialize with request failure, use default action', () => {
         const postUrl = baseUrl + createEndPoint;
         const responseText = JSON.stringify({});
+            
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .withArgs(AUIMetric.FailedToFetchAutomatedExperiements)
+            .returns(true);
 
         const postStub = sandbox.stub(core.RequestManager, 'post')
             .withArgs(postUrl)
@@ -235,21 +257,15 @@ describe('AutomatedExperimentManagerTests', () => {
                 response: responseText
             });
 
-        const aem = new AutomatedExperimentManager(core);
-        return aem.initialize([FooExperiment])
-        .then(() => AutomatedExperimentManager.onNewCampaign(aem, campaign))
+        aem.registerExperiments([FooExperiment])
+        return aem.onNewCampaign(campaign)
         .then(() => aem.startCampaign(campaign))
         .then(() => {
             assert.isTrue(postStub.called);
-
+            assert.isTrue(metricStub.calledOnce)
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-            assert.equal(aem.activateExperiment(campaign, FooExperiment), 'FooAction2', 'Wrong variant...');
-
-            assert.equal(diagnosticTrigger.callCount, 1, 'missing an error...');
-
-            assert.equal(diagnosticTrigger.firstCall.args[0], 'failed_to_fetch_automated_experiments');
-            assert.equal(diagnosticTrigger.firstCall.args[1].message, 'Failed to fetch response from aui service');
+            assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
         });
     });
 
@@ -257,7 +273,7 @@ describe('AutomatedExperimentManagerTests', () => {
         it(`experiment, rewarded(${rewarded})`, () => {
             const postStub = sandbox.stub(core.RequestManager, 'post');
 
-            const responseText = JSON.stringify({experiments: {FooExperiment: 'FooAction1'}});
+            const responseText = JSON.stringify({experiments: {FooExperiment: FooExperimentDefaultActions}});
 
             postStub.onCall(0).resolves(<INativeResponse>{
                 responseCode: 200,
@@ -266,7 +282,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = baseUrl + rewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: {ab_group: 99, auction_id: '12345'}, experiment: 'FooExperiment', action: 'FooAction1', reward: rewarded, metadata: ''
+                user_info: {ab_group: 99, auction_id: '12345'}, experiment: 'FooExperiment', actions: FooExperimentDefaultActions, reward: rewarded, metadata: ''
             });
             const rewardResponseText = JSON.stringify({success: true});
 
@@ -275,13 +291,12 @@ describe('AutomatedExperimentManagerTests', () => {
                 response: rewardResponseText
             });
 
-            const aem = new AutomatedExperimentManager(core);
-            return aem.initialize([FooExperiment])
-            .then(() => AutomatedExperimentManager.onNewCampaign(aem, campaign))
+            aem.registerExperiments([FooExperiment])
+            return aem.onNewCampaign(campaign)
             .then(() => aem.startCampaign(campaign))
             .then(() => {
                 const variant = aem.activateExperiment(campaign, FooExperiment);
-                assert.equal(variant, 'FooAction1', 'Wrong variant name');
+                assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
 
                 if (rewarded) {
                     aem.rewardExperiments(campaign);
@@ -296,17 +311,9 @@ describe('AutomatedExperimentManagerTests', () => {
         });
     });
 
-    it('EndExperiment should fail if called before beginExperiment', (done) => {
-        const aem = new AutomatedExperimentManager(core);
-        aem.initialize([]).then(() => {
-            aem.endCampaign(campaign).catch(() => { done(); });
-        });
-    });
-
     it('AutomatedExperimentManager notified of performance campaigns', () => {
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
-        const china = new China(core);
         const arApi = TestFixtures.getARApi(nativeBridge);
         const cacheBookkeeping = core.CacheBookkeeping;
         const wakeUpManager = core.WakeUpManager;
@@ -321,30 +328,24 @@ describe('AutomatedExperimentManagerTests', () => {
         const privacySDK = TestFixtures.getPrivacySDK(core.Api);
         const requestManager = core.RequestManager;
         const sessionManager = new SessionManager(core.Api, requestManager, storageBridge);
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, requestManager, privacySDK);
         const adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        sandbox.stub(MabDecisionButtonTest, 'isValid').returns(true);
-        const performance: Performance =  new Performance(arApi, core, ads, china);
-
+        sandbox.stub(MabDisabledABTest, 'isValid').returns(true);
+ 
         const mockRequest = sinon.mock(requestManager);
         mockRequest.expects('post').returns(Promise.resolve({
             response: JSON.stringify(CometVideoPlcCampaign)
         }));
 
-        const onNewCampaignStub = sandbox.stub(AutomatedExperimentManager, 'onNewCampaign')
+        const onNewCampaignStub = sandbox.stub(aem, 'onNewCampaign')
             .resolves();
 
-        const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, requestManager, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, requestManager, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
-        const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
-
-        if (implementsIOnCampaignListener(performance)) {
-            performance.listenOnCampaigns(campaignManager.onCampaign);
-        }
+        const campaignManager = new LegacyMABCampaignManager(aem, platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
 
         let triggeredError: any;
         campaignManager.onError.subscribe(error => {

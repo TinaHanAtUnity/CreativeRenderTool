@@ -4,16 +4,14 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore, ICoreApi } from 'Core/ICore';
 import 'mocha';
-import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -88,7 +86,7 @@ describe('PerPlacementLoadAdapterTest', () => {
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -105,7 +103,6 @@ describe('PerPlacementLoadAdapterTest', () => {
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
     let privacyManager: UserPrivacyManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let privacySDK: PrivacySDK;
     let perPlacementLoadAdapter: PerPlacementLoadAdapter;
     let adMobSignalFactory: AdMobSignalFactory;
@@ -129,10 +126,9 @@ describe('PerPlacementLoadAdapterTest', () => {
         sessionManager = new SessionManager(core, request, storageBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
         adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
@@ -141,7 +137,7 @@ describe('PerPlacementLoadAdapterTest', () => {
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
 
         privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
-        campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
+        campaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
     });
 
     describe('should handle onLoad', () => {
@@ -166,6 +162,72 @@ describe('PerPlacementLoadAdapterTest', () => {
 
         afterEach(() => {
             sandbox.restore();
+        });
+
+        it('should report no fill on disabled placement', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                placement.setState(PlacementState.DISABLED);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            await perPlacementLoadAdapter.initialize();
+
+            assert.equal(placement.getState(), PlacementState.DISABLED, 'placement state is set to DISABLED');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
+        });
+
+        it('should report no fill on not available placement', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                placement.setState(PlacementState.NOT_AVAILABLE);
+                return Promise.resolve();
+            });
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            await perPlacementLoadAdapter.initialize();
+
+            assert.equal(placement.getState(), PlacementState.NOT_AVAILABLE, 'placement state is set to NOT_AVAILABLE');
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict[placementID] = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
+        });
+
+        it('should report no fill if placement does not exists', async () => {
+            sandbox.stub(campaignManager, 'request').callsFake(() => {
+                return Promise.resolve();
+            });
+
+            await perPlacementLoadAdapter.initialize();
+
+            sinon.assert.notCalled(sendPlacementStateChangedEventStub);
+            sinon.assert.notCalled(sendReadyEventStub);
+
+            const loadDict: {[key: string]: number} = {};
+            loadDict.does_not_exists = 1;
+            ads.LoadApi.onLoad.trigger(loadDict);
+
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'NOT_AVAILABLE', 'WAITING');
+            sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'WAITING', 'NO_FILL');
+            sinon.assert.notCalled(sendReadyEventStub);
         });
 
         it('should update state after load', async () => {
@@ -421,7 +483,6 @@ describe('PerPlacementLoadAdapterTest', () => {
                     request: request,
                     options: {},
                     privacyManager: privacyManager,
-                    programmaticTrackingService: programmaticTrackingService,
                     privacy: privacy,
                     privacySDK: privacySDK
                 };

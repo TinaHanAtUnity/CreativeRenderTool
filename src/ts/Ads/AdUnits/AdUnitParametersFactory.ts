@@ -18,7 +18,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IPrivacyEventHandlerParameters, PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
@@ -31,6 +30,7 @@ import { PrivacySettings } from 'Ads/Views/Privacy/PrivacySettings';
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -59,7 +59,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _coreConfig: CoreConfiguration;
     private _sessionManager: SessionManager;
     private _privacyManager: UserPrivacyManager;
-    protected _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
     private _privacySDK: PrivacySDK;
 
@@ -85,7 +84,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._coreConfig = core.Config;
         this._sessionManager = ads.SessionManager;
         this._privacyManager = ads.PrivacyManager;
-        this._programmaticTrackingService = core.ProgrammaticTrackingService;
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._storageBridge = core.StorageBridge;
         this._osVersion = core.DeviceInfo.getOsVersion();
@@ -120,7 +118,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
                 [ThirdPartyEventMacro.GAMER_SID]: this._playerMetadataServerId || '',
                 [ThirdPartyEventMacro.OM_ENABLED]: 'false',
-                [ThirdPartyEventMacro.OM_VENDORS]: ''
+                [ThirdPartyEventMacro.OM_VENDORS]: '',
+                [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P,
+                [ThirdPartyEventMacro.CACHEBUSTING]: '-1'
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,
@@ -129,7 +129,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             adsConfig: this._adsConfig,
             request: this._requestManager,
             privacyManager: this._privacyManager,
-            programmaticTrackingService: this._programmaticTrackingService,
             gameSessionId: this._sessionManager.getGameSessionId(),
             options: this._options,
             privacy: this.createPrivacy(),

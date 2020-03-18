@@ -107,18 +107,6 @@
                 partnerVersion: undefined,
             }
 
-            var Context = {
-                apiVersion: getOMIDAPIVersion(),
-                environment: undefined,
-                accessMode: undefined,
-                adSessionType: undefined,
-                supports: undefined,
-                omidNativeInfo: undefined,
-                omidJsInfo: undefined,
-                app: undefined,
-                customReferenceIdentifier: undefined
-            }
-
             var App = {
                 omidImplementer: getOmidImplementer(),
                 libraryVersion: '1.2.10',                 // First version of unity's implementation of OMID for Web
@@ -126,7 +114,19 @@
                 adId: undefined,                          // The iOS or Android advertising identifier - set by unity?
             }
 
-            var sessionCallback = () => void 0;
+            var Context = {
+                apiVersion: getOMIDAPIVersion(),
+                environment: Environment.APP,
+                accessMode: AccessMode.LIMITED,
+                adSessionType: AdSessionType.HTML,
+                supports: [SupportedFeatures.VIDEO, SupportedFeatures.CONTAINER],
+                omidNativeInfo: undefined,
+                omidJsInfo: undefined,
+                app: App,
+                customReferenceIdentifier: undefined
+            }
+
+            var sessionCallback = function() {}
             var sdkVersion;
             var sessionId;
             var videoElement;
@@ -228,19 +228,11 @@
                 omidJSInfo.partnerName = partnerName;
                 omidJSInfo.partnerVersion = partnerVersion;
                 omidJSInfo.serviceVersion = '1.2.10';
+                Context.omidJsInfo = omidJSInfo;
+                Context.omidNativeInfo = omidNativeInfo;
             };
 
             this.registerSessionObserver = function(sessionEventsCallback) {
-                Context.apiVersion = getOMIDAPIVersion();
-                Context.environment = Environment.APP;
-                Context.accessMode = AccessMode.LIMITED;
-                Context.adSessionType = AdSessionType.HTML;
-                Context.supports = [SupportedFeatures.VIDEO, SupportedFeatures.CONTAINER];
-                Context.omidNativeInfo = omidNativeInfo;
-                Context.omidJsInfo = omidJSInfo;
-                Context.app = App;
-                Context.customReferenceIdentifier = undefined;
-
                 if (sessionEventsCallback) {
                     sessionCallback = sessionEventsCallback;
                 }
@@ -281,7 +273,7 @@
              */
             this.setVideoElement = function(videoElement) {
                 postMessage(VIDEO_ELEMENT, {
-                    videoElement: `${videoElement}`
+                    videoElement: '' + videoElement
                 });
             };
 
@@ -292,7 +284,7 @@
              */
             this.setSlotElement = function(slotElement) {
                 postMessage(SLOT_ELEMENT, {
-                    slotElement: `${slotElement}`
+                    slotElement: '' + slotElement
                 });
             };
 
@@ -309,8 +301,7 @@
 
             var startAdSession = function() {
                 var sessionStartEventData = {
-                    context: Context,
-                    verificationParameters: verificationResources[0].verificationParameters
+                    context: Context
                 }
                 var eventData = {
                     adSessionId: getSessionId(),
@@ -319,7 +310,15 @@
                     data: sessionStartEventData
                 }
 
-                sessionCallback(eventData);                         // needs to be called for session interface
+                for (var i = 0; i < verificationResources.length; i++) {
+                    var data = JSON.parse(JSON.stringify(eventData));
+
+                    if (verificationResources[i] && verificationResources[i].verificationParameters) {
+                        data.verificationParameters = verificationResources[i].verificationParameters;
+                    }
+
+                    sessionCallback(data);                          // needs to be called for session interface
+                }
                 postMessage(AdEventType.SESSION_START, eventData);  // needs to be called for omid3p
             };
 
@@ -332,7 +331,7 @@
                 }
 
                 sessionCallback(eventData);
-                sessionCallback = () => void 0;
+                sessionCallback = function() {}
             };
 
             this.adEvents = {};

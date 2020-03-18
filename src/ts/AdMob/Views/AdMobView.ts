@@ -9,7 +9,7 @@ import {
 } from 'AdMob/Views/AFMABridge';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { ProgrammaticTrackingService, AdmobMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -28,6 +28,7 @@ import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobO
 import { ObstructionReasons, IRectangle } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { Localization } from 'Core/Utilities/Localization';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -44,8 +45,11 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
-const OMIDImplementerMacro = '{{ OMID_IMPLEMENTOR }}';
-const OMIDApiVersionMacro = '{{ OMID_API_VERSION }}';
+
+const omidMacroMap = {
+    '{{ OMID_IMPLEMENTOR }}': PARTNER_NAME,
+    '{{ OMID_API_VERSION }}': OM_JS_VERSION
+};
 
 export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandlerView {
 
@@ -61,17 +65,16 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _privacy: AbstractPrivacy;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
-    private _programmaticTrackingService: ProgrammaticTrackingService;
     private _admobOMController: AdmobOpenMeasurementController | undefined;
     private _deviceInfo: DeviceInfo;
+    private _volume: number = 1;
 
-    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService, om: AdmobOpenMeasurementController | undefined) {
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, deviceInfo: DeviceInfo, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, om: AdmobOpenMeasurementController | undefined) {
         super(platform, 'admob');
 
         this._campaign = campaign;
         this._template = new Template(AdMobContainer, new Localization(deviceInfo.getLanguage(), 'privacy'));
         this._adMobSignalFactory = adMobSignalFactory;
-        this._programmaticTrackingService = programmaticTrackingService;
 
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
@@ -92,7 +95,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo),
-            onAFMAUserSeeked: () => this.onUserSeeked()
+            onAFMAUserSeeked: () => this.onUserSeeked(),
+            onVolumeChange: (volume) => { this._volume = volume; }
         });
         this._mraidBridge = new MRAIDBridge(core, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -133,6 +137,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._deviceInfo.checkIsMuted();
 
         this.choosePrivacyShown();
+    }
+
+    public getVideoPlayerVolume(): number {
+        return this._volume;
     }
 
     public hide() {
@@ -203,7 +211,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             iframe.srcdoc = markup;
 
             if (this._admobOMController) {
-                iframe.srcdoc += OMIDSessionClient.replace(OMIDImplementerMacro, PARTNER_NAME).replace(OMIDApiVersionMacro, OM_JS_VERSION);
+                iframe.srcdoc += MacroUtil.replaceMacro(OMIDSessionClient, omidMacroMap);
                 this._admobOMController.getAdmobBridge().setAdmobIframe(iframe);
             }
         });
@@ -216,44 +224,9 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             return Promise.reject(new Error('Not a valid HTML document => ' + markup));
         }
         this.removeScriptTags(dom);
-        this.injectVideoURL(dom);
         return this.injectScripts(dom).then(() => {
             return dom.documentElement.outerHTML;
         });
-    }
-
-    private injectVideoURL(dom: Document) {
-        const video = this._campaign.getVideo();
-        if (video) {
-            const scriptEl = dom.querySelector('body script');
-            const mediaFileURL = this.encodeURLForHTML(video.getMediaFileURL());
-            let cachedFileURL = video.getVideo().getCachedUrl();
-            if (scriptEl && scriptEl.textContent) {
-                if (cachedFileURL) {
-                    cachedFileURL = this.encodeURLForHTML(cachedFileURL);
-                    const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
-                    scriptEl.textContent = replacedSrc;
-
-                    if (scriptEl.textContent.includes(cachedFileURL)) {
-                        // report using cached video
-                        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedCachedVideo);
-                    } else {
-                        // report using streaming video
-                        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
-                    }
-                } else {
-                    // report using streaming video
-                    this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
-                }
-            }
-        } else {
-            // report using streaming video
-            this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
-        }
-    }
-
-    private encodeURLForHTML(str: string): string {
-        return str.replace(/[&=]/g, (c) => '\\x' + c.charCodeAt(0).toString(16));
     }
 
     private removeScriptTags(dom: Document) {
@@ -322,7 +295,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onUserSeeked() {
-        this._programmaticTrackingService.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked).catch();
+        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUserVideoSeeked);
     }
 
     private onGDPRPopupEvent(event: Event) {

@@ -9,7 +9,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { MOAT } from 'Ads/Views/MOAT';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -32,12 +32,13 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -68,7 +69,6 @@ describe('VastVideoEventHandler tests', () => {
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let privacyManager: UserPrivacyManager;
     let privacy: Privacy;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let openMeasurement: VastOpenMeasurementController | undefined;
 
     before(() => {
@@ -122,7 +122,7 @@ describe('VastVideoEventHandler tests', () => {
             ads: ads
         };
         overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
@@ -155,7 +155,7 @@ describe('VastVideoEventHandler tests', () => {
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const omInstance = sinon.createStubInstance(OpenMeasurement);
         const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
-        const omController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+        const omController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
         sandbox.stub(omController, 'sessionStart');
         sandbox.stub(omController, 'resume');
         sandbox.stub(omController, 'completed');
@@ -188,7 +188,6 @@ describe('VastVideoEventHandler tests', () => {
             overlay: overlay,
             video: campaign.getVideo(),
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService,
             privacy,
             om: omController,
             privacySDK: privacySDK
@@ -216,8 +215,7 @@ describe('VastVideoEventHandler tests', () => {
             placement: placement,
             video: campaign.getVideo(),
             adUnitStyle: undefined,
-            clientInfo: clientInfo,
-            programmaticTrackingService: programmaticTrackingService
+            clientInfo: clientInfo
         };
 
         vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
@@ -443,7 +441,6 @@ describe('VastVideoEventHandler tests', () => {
 
     describe('with companion ad', () => {
         let vastAdUnit: VastAdUnit;
-        let vastEndScreenParameters: IVastEndscreenParameters;
 
         beforeEach(() => {
             const overlayContainer = overlay.container();
@@ -451,12 +448,7 @@ describe('VastVideoEventHandler tests', () => {
                 overlayContainer.parentElement.removeChild(overlayContainer);
             }
             sandbox.restore();
-            vastEndScreenParameters = {
-                campaign: vastAdUnitParameters.campaign,
-                clientInfo: vastAdUnitParameters.clientInfo,
-                country: vastAdUnitParameters.coreConfig.getCountry()
-            };
-            vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+            vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);

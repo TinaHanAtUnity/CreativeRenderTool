@@ -91,12 +91,7 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
     }
 
     public getOptionalAssets(): Asset[] {
-        const assets = [];
-        const video = this.get('video');
-        if (video) {
-            assets.push(video.getVideo());
-        }
-        return assets;
+        return [];
     }
 
     public isConnectionNeeded(): boolean {

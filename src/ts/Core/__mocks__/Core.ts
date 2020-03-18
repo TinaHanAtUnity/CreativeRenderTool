@@ -1,4 +1,3 @@
-import { ProgrammaticTrackingService } from 'Ads/Utilities/__mocks__/ProgrammaticTrackingService';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { CacheBookkeepingManager } from 'Core/Managers/__mocks__/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/__mocks__/CacheManager';
@@ -36,6 +35,7 @@ import { StorageApi } from 'Core/Native/__mocks__/StorageApi';
 import { StorageBridge } from 'Core/Utilities/__mocks__/StorageBridge';
 import { NativeErrorApi } from 'Core/__mocks__/NativeErrorApi';
 import { Purchasing } from 'Purchasing/__mocks__/Purchasing';
+import { SdkDetectionInfo } from 'Core/Models/__mocks__/SdkDetectionInfo';
 
 import { ICore } from 'Core/ICore';
 
@@ -84,6 +84,6 @@ export const Core = jest.fn(() => {
         Config: new CoreConfiguration(),
         Ads: new Ads(),
         Purchasing: new Purchasing(),
-        ProgrammaticTrackingService: new ProgrammaticTrackingService(),
+        SdkDetectionInfo: new SdkDetectionInfo()
     };
 });

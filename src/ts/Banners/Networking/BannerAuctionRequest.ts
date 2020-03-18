@@ -1,6 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
-import { BannerMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { BannerMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { AuctionRequest, IAuctionRequestParams, IAuctionResponse, IPlacementRequestDTO } from 'Ads/Networking/AuctionRequest';
 
 export interface IBannerAuctionRequestParams extends IAuctionRequestParams {
@@ -28,7 +28,7 @@ export class BannerAuctionRequest extends AuctionRequest {
 
     public request(): Promise<IAuctionResponse> {
         if (this._deviceInfo.getLimitAdTracking()) {
-            this._pts.reportMetricEvent(BannerMetric.BannerAdRequestWithLimitedAdTracking);
+            SDKMetrics.reportMetricEvent(BannerMetric.BannerAdRequestWithLimitedAdTracking);
         }
         return super.request();
     }

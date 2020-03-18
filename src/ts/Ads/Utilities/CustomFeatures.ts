@@ -1,11 +1,27 @@
-import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
+import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
+
+    public static isNofillImmediatelyGame(gameId: string): boolean {
+        return gameId === '1781853' ||
+               gameId === '1781854' ||
+               gameId === '3152568' ||
+               gameId === '3152569';
+    }
+
+    public static isNoGzipGame(gameId: string): boolean {
+        return gameId === '1475968' ||
+               gameId === '1708468' ||
+               gameId === '3391175' ||
+               gameId === '37214' ||
+               gameId === '37215';
+    }
+
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
     }
@@ -57,13 +73,9 @@ export class CustomFeatures {
         // this should be cleaned once there is proper backend support for these features
         return this.existsInList(CheetahGamesJson, gameId)
             || this.existsInList(BitmangoGamesJson, gameId)
-            || this.existsInList(Game7GamesJson, gameId);
+            || this.existsInList(Game7GamesJson, gameId)
+            || this.existsInList(MobilityWareGamesJson, gameId);
 
-    }
-
-    public static isChinaSDK(platform: Platform, versionName: string): boolean {
-        return platform === Platform.ANDROID
-            && versionName.endsWith('china');
     }
 
     public static isTimerExpirationExperiment(gameId: string): boolean {
@@ -123,6 +135,19 @@ export class CustomFeatures {
         }
     }
 
+    public static isCheetahTestGameForLoad(gameId: string): boolean {
+        return (gameId === '3058518' || gameId === '3058519');
+
+    }
+
+    public static isFanateeExtermaxGameForLoad(gameId: string): boolean {
+        const fanateeGames = ['56659', '1225669'];
+        const etermaxGames = ['20721', '20723', '89611', '1781085', '1781084'];
+
+        return this.existsInList(fanateeGames, gameId) ||
+               this.existsInList(etermaxGames, gameId);
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;
@@ -154,5 +179,20 @@ export class CustomFeatures {
                creativeId === 'lions_hooke_p1'   ||
                creativeId === 'gg_bounzy'        ||
                creativeId === 'social_dc';
+    }
+
+    public static isIASVendor(omVendor: string | undefined) {
+        return omVendor === 'IAS' ||
+               omVendor === 'integralads.com-omid';
+    }
+
+    public static isDoubleClickGoogle(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
+    }
+
+    public static isWhitelistedOMVendor(omVendor: string | undefined) {
+        return this.isIASVendor(omVendor) ||
+               this.isDoubleClickGoogle(omVendor) ||
+               omVendor === 'doubleverify.com-omid';
     }
 }

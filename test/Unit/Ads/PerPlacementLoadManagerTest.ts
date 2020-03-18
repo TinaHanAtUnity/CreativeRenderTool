@@ -2,7 +2,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager, ILoadedCampaign } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -10,7 +10,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { ProgrammaticTrackingService, LoadMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -35,13 +35,14 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 
 describe('PerPlacementLoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -58,7 +59,6 @@ describe('PerPlacementLoadManagerTest', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let campaignParserManager: ContentTypeHandlerManager;
     let privacySDK: PrivacySDK;
     let userPrivacyManager: UserPrivacyManager;
@@ -73,7 +73,7 @@ describe('PerPlacementLoadManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core.Api);
         privacySDK = TestFixtures.getPrivacySDK(core.Api);
 
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
 
@@ -88,10 +88,10 @@ describe('PerPlacementLoadManagerTest', () => {
         sessionManager = new SessionManager(core.Api, request, storageBridge);
         cacheBookkeeping = new CacheBookkeepingManager(core.Api);
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService);
+        assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
-        loadManager = new PerPlacementLoadManager(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, programmaticTrackingService);
+        campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
+        loadManager = new PerPlacementLoadManager(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager);
     });
 
     describe('getCampaign and initialize', () => {
@@ -197,7 +197,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.notCalled(sendReadyEventStub);
-                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
+                sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
             });
 
             it('should not attempt to load a campaign that\'s ready and not expired', () => {
@@ -214,7 +214,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.calledWith(sendReadyEventStub, placementId);
-                sinon.assert.calledWith(<sinon.SinonStub>programmaticTrackingService.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
+                sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
             });
 
             it('should attempt to load a campaign that\'s ready and expired', () => {

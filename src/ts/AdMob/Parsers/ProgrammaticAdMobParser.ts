@@ -12,7 +12,7 @@ import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SDKMetrics, ErrorMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
@@ -29,7 +29,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     private _core: ICoreApi;
     private _requestManager: RequestManager;
     private _abGroup: ABGroup;
-    private _pts: ProgrammaticTrackingService;
     private _mediaFileUrl: string;
 
     constructor(core: ICore) {
@@ -37,7 +36,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         this._core = core.Api;
         this._requestManager = core.RequestManager;
         this._abGroup = core.Config.getAbGroup();
-        this._pts = core.ProgrammaticTrackingService;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -189,7 +187,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private reportHttpFailure(e: RequestError, session: Session): void {
-        this._pts.reportErrorEvent(ProgrammaticTrackingError.AdmobTestHttpError, 'AdMob', this.seatID);
+        SDKMetrics.reportMetricEvent(ErrorMetric.AdmobTestHttpError);
         const failureTimestamp = Math.floor(Date.now() / 1000);
         const urlTimestamp = Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP);
 

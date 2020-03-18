@@ -84,10 +84,16 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         promises.push(this._core.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getCPUCount().then(cpuCount => this.set('cpuCount', cpuCount)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._core.DeviceInfo.getNetworkOperator().then(networkOperator => this.set('networkOperator', networkOperator)).catch(err => this.handleDeviceInfoError(err)));
         return Promise.all(promises);
     }
 
     public abstract getStores(): string;
+
+    public isChineseNetworkOperator(): boolean | undefined {
+        const networkOperator = this.get('networkOperator');
+        return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
+    }
 
     public getAdvertisingIdentifier(): string | undefined | null {
         return this.get('advertisingIdentifier');

@@ -131,3 +131,61 @@ export interface IVerificationScriptResource {
     vendorKey: string;
     verificationParameters: string | null;
 }
+
+export interface IContext {
+    apiVersion: string;
+    environment: string;
+    accessMode: AccessMode;
+    videoElement?: HTMLVideoElement | null; // Only required for AccessMode.FULL video
+    slotElement?: HTMLElement;              // Only required for AccessMode.FULL display
+    adSessionType: AdSessionType;
+    adServingId?: string;                   // VAST optional field - <AdServingId>
+    transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
+    podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
+    adCount?: number;                       // VAST optional field - number of <InLine> elements
+    omidNativeInfo?: {
+        partnerName: string;
+        partnerVersion: string;
+    };
+    omidJsInfo: IOmidJsInfo;
+    app?: IApp;
+    deviceInfo: IDeviceInfo;
+    supports: string[];
+    customReferenceData?: string;
+}
+
+export interface IOmidJsInfo {
+    omidImplementer: string;
+    serviceVersion: string;
+    sessionClientVersion: string;
+    partnerName: string;
+    partnerVersion: string;
+}
+
+export interface IApp {
+    libraryVersion: string;
+    appId: string;
+}
+
+export interface IDeviceInfo {
+    deviceType: string;
+    os: string;
+    osVersion: string;
+}
+
+export enum AdSessionType {
+    NATIVE = 'native',
+    HTML = 'html'
+}
+
+export const PARTNER_NAME = 'Unity3d';
+export const DEFAULT_VENDOR_KEY = 'default_key';
+export const OM_JS_VERSION = '1.2.10';
+export const OMID_P = `${PARTNER_NAME}/${OM_JS_VERSION}`;
+export const SDK_APIS = '7';
+
+export enum DoubleClickAdmobVendorTags {
+    SSP = 'doubleclickbygoogle.com-ssp',
+    DSP = 'doubleclickbygoogle.com-dsp',
+    Neutral = 'doubleclickbygoogle.com'
+}

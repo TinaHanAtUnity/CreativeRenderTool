@@ -7,7 +7,6 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -32,7 +31,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
@@ -40,6 +38,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -66,7 +65,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
         let moat: MOAT;
         let sandbox: sinon.SinonSandbox;
         let privacy: Privacy;
-        let programmaticTrackingService: ProgrammaticTrackingService;
         let om: VastOpenMeasurementController | undefined;
 
         before(() => {
@@ -110,8 +108,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             };
             overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-
             const wakeUpManager = new WakeUpManager(core);
             request = new RequestManager(platform, core, wakeUpManager);
 
@@ -144,7 +140,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
 
             const omInstance = sinon.createStubInstance(OpenMeasurement);
             const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
-            const omController = new VastOpenMeasurementController(placement, [omInstance], omViewBuilder);
+            const omController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
             sandbox.stub(omController, 'skipped');
             sandbox.stub(omController, 'setDeviceVolume');
             sandbox.stub(omController, 'geometryChange');
@@ -173,7 +169,6 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
                 overlay: overlay,
                 video: campaign.getVideo(),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
                 privacy,
                 om: omController,
                 privacySDK: privacySDK
@@ -218,12 +213,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             it('should show endcard', () => {
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
-                    const vastEndScreenParameters: IVastEndscreenParameters = {
-                        campaign: vastAdUnitParameters.campaign,
-                        clientInfo: vastAdUnitParameters.clientInfo,
-                        country: vastAdUnitParameters.coreConfig.getCountry()
-                    };
-                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    const vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                     sinon.spy(vastEndScreen, 'show');
                     vastAdUnitParameters.endScreen = vastEndScreen;
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -238,12 +228,7 @@ import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurem
             it('should not show endcard if the impression has not occurred', () => {
                 vastAdUnit.setShowing(true);
                 return vastAdUnit.hide().then(() => {
-                    const vastEndScreenParameters: IVastEndscreenParameters = {
-                        campaign: vastAdUnitParameters.campaign,
-                        clientInfo: vastAdUnitParameters.clientInfo,
-                        country: vastAdUnitParameters.coreConfig.getCountry()
-                    };
-                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                    const vastEndScreen = new VastStaticEndScreen(vastAdUnitParameters);
                     sinon.spy(vastEndScreen, 'show');
                     vastAdUnitParameters.endScreen = vastEndScreen;
                     vastAdUnit = new VastAdUnit(vastAdUnitParameters);

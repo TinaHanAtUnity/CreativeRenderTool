@@ -161,6 +161,12 @@
                     });
                 });
 
+                videoEl.addEventListener('volumechange', function() {
+                    self.postMessage('volumeChanged', {
+                        volume: videoEl.volume
+                    })
+                })
+
                 videoEl.addEventListener('canplay', function() {
                     self.postMessage('tracking', {
                         event: 'loaded'

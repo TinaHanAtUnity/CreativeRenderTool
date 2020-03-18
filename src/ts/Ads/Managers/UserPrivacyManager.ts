@@ -15,8 +15,16 @@ import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { PrivacyConfig } from 'Privacy/PrivacyConfig';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { PrivacySDKTest } from 'Core/Models/ABGroup';
+import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
-interface IUserSummary extends ITemplateData {
+import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
+import PrivacyWebUI from 'html/PrivacyWebUI.html';
+
+export interface IUserSummary extends ITemplateData {
     deviceModel: string;
     country: string;
     gamePlaysThisWeek: number;
@@ -113,6 +121,51 @@ export class UserPrivacyManager {
         this._forcedConsentUnit = forcedConsentUnit || false;
         this._privacyFormatMetadataSeenInSession = false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
+    }
+
+    public getPrivacyConfig(): PrivacyConfig {
+        let agreedOverAgeLimit = false;
+        switch (this.getAgeGateChoice()) {
+            case AgeGateChoice.YES:
+                agreedOverAgeLimit = true;
+                break;
+            case AgeGateChoice.NO:
+            case AgeGateChoice.MISSING:
+                agreedOverAgeLimit = false;
+                break;
+            default:
+                agreedOverAgeLimit = false;
+        }
+
+        const userSummary = CachedUserSummary.get();
+
+        return new PrivacyConfig(PrivacySDKFlow,
+            {
+                ads: this._userPrivacy.getPermissions().ads,
+                external: this._userPrivacy.getPermissions().external,
+                gameExp: this._userPrivacy.getPermissions().gameExp,
+                agreedOverAgeLimit: agreedOverAgeLimit
+            },
+            {
+                buildOsVersion: this._deviceInfo.getOsVersion(),
+                platform: Platform[this._platform],
+                userLocale: this._deviceInfo.getLanguage() ? this._deviceInfo.getLanguage().replace('_', '-') : undefined,
+                country: this._coreConfig.getCountry(),
+                subCountry: this._coreConfig.getSubdivision(),
+                privacyMethod: this._gamePrivacy.getMethod(),
+                ageGateLimit: this._privacy.getAgeGateLimit(),
+                legalFramework: this._privacy.getLegalFramework(),
+                isCoppa: this._coreConfig.isCoppaCompliant(),
+                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
+                userSummary: {
+                    deviceModel: userSummary ? userSummary.deviceModel : '-',
+                    country: userSummary ? userSummary.country : '-',
+                    gamePlaysThisWeek: userSummary ? userSummary.gamePlaysThisWeek.toString() : '-',
+                    adsSeenInGameThisWeek: userSummary ? userSummary.adsSeenInGameThisWeek.toString() : '-',
+                    installsFromAds: userSummary ? userSummary.installsFromAds.toString() : '-'
+                }
+            },
+            PrivacyWebUI);
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
@@ -312,6 +365,14 @@ export class UserPrivacyManager {
 
     public isDataRequestEnabled(): boolean {
         return this._privacy.getLegalFramework() === LegalFramework.CCPA;
+    }
+
+    public isPrivacySDKTestActive(): boolean {
+        if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 19) {
+            return false;
+        }
+
+        return TestEnvironment.get('forceprivacysdk') || (PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI');
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {

@@ -65,10 +65,13 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 
 // Active AB Tests
-export const MabDecisionButtonTest = new ZyngaFilteredABTest(7, 8, 10, 11, 12, 15, 17);
+export const MediationCacheModeAllowedTest = new ABTest(5, 6);
+export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
-export const LoadAdapterV1 = new ABTest(5, 6);
+export const PrivacySDKTest = new ABTest(16);
+export const DiagnosticsRampDown = new ABTest(15);
+export const AuctionXHR = new ABTest(18);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
