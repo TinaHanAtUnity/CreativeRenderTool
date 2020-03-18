@@ -66,9 +66,11 @@ export abstract class OpenMeasurementController implements IOMController {
      * to play the media. Corresponds to the VAST  loaded  event.
      */
     public loaded(vastProperties: IVastProperties) {
-        this._omInstances.forEach((om) => {
-            om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, {vastProperties});
-        });
+        if (this.getState() === OMState.STOPPED) {
+            this._omInstances.forEach((om) => {
+                om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, {vastProperties});
+            });
+        }
     }
 
     /**
