@@ -77,21 +77,10 @@ export class PausableListenerApi extends ListenerApi {
         this._paused = true;
     }
 
-    public resumeEvents(): Promise<void> {
-        let errors: string = '';
+    public resumeEvents(): void {
         this._eventQueue.forEach((f) => {
-            f().catch(reason => {
-                if (errors.length !== 0) {
-                    errors += ', ';
-                }
-                errors += reason;
-            });
+            f();
         });
         this._paused = false;
-        if (errors.length === 0) {
-            return Promise.resolve();
-        } else {
-            return Promise.reject(errors);
-        }
     }
 }

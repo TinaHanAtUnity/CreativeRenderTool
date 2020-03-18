@@ -12,7 +12,7 @@ export const NativeBridge = jest.fn(() => {
         handleCallback: jest.fn(),
         handleEvent: jest.fn(),
         handleInvocation: jest.fn(),
-        invoke: jest.fn().mockReturnValue(Promise.resolve()),
+        invoke: jest.fn(),
         addEventHandler: jest.fn(),
         registerCallback: jest.fn(),
         getPlatform: jest.fn(),
