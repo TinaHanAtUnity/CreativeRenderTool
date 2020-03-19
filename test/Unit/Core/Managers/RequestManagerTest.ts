@@ -3,16 +3,15 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
-
-import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
+import { AuctionProtocol, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { Url } from 'Core/Utilities/Url';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+
 import 'mocha';
 import * as sinon from 'sinon';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Url } from 'Core/Utilities/Url';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(Platform[platform] + ' - RequestManagerTest', () => {
@@ -21,7 +20,6 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
         let core: ICoreApi;
         let request: RequestManager;
         let wakeUpManager: WakeUpManager;
-        let coreConfig: CoreConfiguration;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -29,7 +27,6 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
             core = TestFixtures.getCoreApi(nativeBridge);
             wakeUpManager = new WakeUpManager(core);
             request = new RequestManager(platform, core, wakeUpManager, platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : undefined);
-            coreConfig = TestFixtures.getCoreConfiguration();
         });
 
         describe(('Status code tests'), () => {
@@ -61,9 +58,8 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
         describe(('Auction protocol tests'), () => {
             it(('should set V4 for creative testing'), () => {
                 sinon.stub(TestEnvironment, 'get').returns(true);
-                sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(false);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
@@ -71,9 +67,8 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
             it(('should set V4 in Test mode'), () => {
                 sinon.stub(TestEnvironment, 'get').returns(false);
-                sinon.stub(coreConfig, 'getTestMode').returns(true);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(true);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
@@ -81,9 +76,8 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
             it(('should set V4 when using forceAuctionProtocol'), () => {
                 sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V4');
-                sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(false);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
@@ -91,9 +85,8 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
             it(('should set V5 when using forceAuctionProtocol'), () => {
                 sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V5');
-                sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(false);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V5);
@@ -101,9 +94,8 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
             it(('should set V5 otherwise'), () => {
                 sinon.stub(TestEnvironment, 'get').returns(false);
-                sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(false);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V5);

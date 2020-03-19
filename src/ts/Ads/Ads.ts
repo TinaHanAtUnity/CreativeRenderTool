@@ -283,7 +283,7 @@ export class Ads implements IAds {
                 }
             });
 
-            RequestManager.configureAuctionProtocol(this._core.Config);
+            RequestManager.configureAuctionProtocol(this._core.Config.getTestMode());
 
             this.configureCampaignManager();
             this.configureRefreshManager();
