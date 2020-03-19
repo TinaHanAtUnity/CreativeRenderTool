@@ -3,7 +3,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode } from 'Ads/Models/AuctionResponse';
+import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode, IRawAuctionV6Response } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -179,6 +179,8 @@ export class LegacyCampaignManager extends CampaignManager {
 
                 let parseResponse: Promise<void | void[]>;
                 switch (this._auctionProtocol) {
+                    case AuctionProtocol.V6:
+                        parseResponse = this.parseAuctionV6Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
                     case AuctionProtocol.V5:
                         parseResponse = this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
                         break;
@@ -238,6 +240,7 @@ export class LegacyCampaignManager extends CampaignManager {
         ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
+                // TODO: Force this to always be Auction V5
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._sdkDetectionInfo, placement)
             ]);
@@ -427,6 +430,17 @@ export class LegacyCampaignManager extends CampaignManager {
         }
     }
 
+    // TODO: Update with implementation
+    private parseAuctionV6Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
+        let json;
+        try {
+            json = JsonParser.parse<IRawAuctionV6Response>(response.response);
+        } catch (e) {
+            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+        }
+        return Promise.resolve();
+    }
+
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
         const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         let json;
@@ -573,6 +587,7 @@ export class LegacyCampaignManager extends CampaignManager {
     private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, deviceFreeSpace: number, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<ILoadedCampaign | undefined> {
         let json;
         try {
+            // TODO: Transition Load to use Auction V6
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
         } catch (e) {
             Diagnostics.trigger('load_campaign_failed_to_parse', {});
@@ -819,6 +834,8 @@ export class LegacyCampaignManager extends CampaignManager {
         }
 
         switch (this._auctionProtocol) {
+            case AuctionProtocol.V6:
+                return this.constructBaseUrl(CampaignManager.AuctionV6BaseUrl);
             case AuctionProtocol.V5:
                 return this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl);
             case AuctionProtocol.V4:

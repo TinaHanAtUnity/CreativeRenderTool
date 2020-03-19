@@ -23,7 +23,8 @@ const enum RequestMethod {
 
 export enum AuctionProtocol {
     V4 = 4,
-    V5 = 5
+    V5 = 5,
+    V6 = 6
 }
 
 interface IRequestOptions {
@@ -113,7 +114,10 @@ export class RequestManager {
     public static configureAuctionProtocol(coreConfig: CoreConfiguration) {
         if (!RequestManager._auctionProtocol) {
             const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
-            if (forceProtocol === 'V5') {
+            if (forceProtocol === 'V6') {
+                RequestManager._auctionProtocol = AuctionProtocol.V6;
+                return;
+            } else if (forceProtocol === 'V5') {
                 RequestManager._auctionProtocol = AuctionProtocol.V5;
                 return;
             } else if (forceProtocol === 'V4') {
@@ -131,6 +135,7 @@ export class RequestManager {
                 return;
             }
 
+            // TODO: Update to default to V6 upon full transition
             RequestManager._auctionProtocol = AuctionProtocol.V5;
         }
     }

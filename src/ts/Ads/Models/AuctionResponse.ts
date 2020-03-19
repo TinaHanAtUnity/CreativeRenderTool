@@ -25,6 +25,21 @@ export interface IRawAuctionV5Response {
     statusCode?: number;
 }
 
+interface IPlacementTrackingV6 {
+    urlIndices: number[];
+    params: { [key: string]: string };
+    events?: { [key: string]: number[] };
+}
+
+export interface IRawAuctionV6Response {
+    auctionId?: string;
+    correlationId: string;
+    statusCode?: number;
+    placements: { [key: string]: { mediaId: string; tracking: IPlacementTrackingV6 } };
+    media: { [key: string]: IAuctionResponse };
+    trackingTemplates: { [key: string]: string[] };
+}
+
 export interface IAuctionResponse {
     placements: AuctionPlacement[];
     contentType: string;
