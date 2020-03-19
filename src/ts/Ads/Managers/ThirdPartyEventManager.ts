@@ -74,7 +74,7 @@ export class ThirdPartyEventManager {
         const sessionId = campaign.getSession().getId();
         const events = [];
 
-        if (event === TrackingEvent.IMPRESSION) {
+        if (event === TrackingEvent.IMPRESSION && CustomFeatures.sampleAtGivenPercent(50)) {
             SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
         }
 
