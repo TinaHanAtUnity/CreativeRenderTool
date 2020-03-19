@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar 19 20:30:38 UTC 2020
 
 * Open Measurement - Move Loaded Event Prior to Start [#13880](https://github.com/Applifier/unity-ads-webview/pull/13880)
 * Add PausableListenerAPI for ABT-1125 [#13627](https://github.com/Applifier/unity-ads-webview/pull/13627)
