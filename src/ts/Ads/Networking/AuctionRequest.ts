@@ -513,9 +513,8 @@ export class AuctionRequest {
         }
 
         switch (RequestManager.getAuctionProtocol()) {
+            // TODO: Update banners to use Auction V6
             case AuctionProtocol.V6:
-                this._baseURL = AuctionRequest.AuctionV6BaseUrl;
-                break;
             case AuctionProtocol.V5:
                 this._baseURL = AuctionRequest.AuctionV5BaseUrl;
                 break;

@@ -5,9 +5,6 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 const enum RequestStatus {

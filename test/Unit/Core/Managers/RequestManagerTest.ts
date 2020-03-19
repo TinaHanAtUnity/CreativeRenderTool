@@ -94,9 +94,8 @@ import * as sinon from 'sinon';
 
             it(('should set V6 when using forceAuctionProtocol'), () => {
                 sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V6');
-                sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(coreConfig);
+                RequestManager.configureAuctionProtocol(false);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V6);
