@@ -7,6 +7,13 @@ import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 
 export class CustomFeatures {
 
+    public static isNofillImmediatelyGame(gameId: string): boolean {
+        return gameId === '1781853' ||
+               gameId === '1781854' ||
+               gameId === '3152568' ||
+               gameId === '3152569';
+    }
+
     public static isNoGzipGame(gameId: string): boolean {
         return gameId === '1475968' ||
                gameId === '1708468' ||
@@ -179,11 +186,21 @@ export class CustomFeatures {
                omVendor === 'integralads.com-omid';
     }
 
-    public static isDoubleClickGoogle(vendorKey: string): boolean {
-        return vendorKey.startsWith('doubleclickbygoogle.com');
+    public static isDoubleClickGoogle(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
     }
 
-    public static isWhitelistedOMVendor(omVendor: string) {
-        return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
+    public static isWhitelistedOMVendor(omVendor: string | undefined) {
+        return this.isIASVendor(omVendor) ||
+               this.isDoubleClickGoogle(omVendor) ||
+               omVendor === 'doubleverify.com-omid';
+    }
+
+    // Enables experimental PausableListenerApi, which allows pausing and resuming events.
+    // This is needed as a fix for https://jira.unity3d.com/browse/ABT-1125.
+    public static pauseEventsSupported(gameId: string): boolean {
+        return gameId === '1543460' || // richardh, test app (Apple App Store)
+               gameId === '1543461' || // richardh, test app (Google Play Store)
+               gameId === '80222';   // Pocketgems, Episode (Google Play Store)
     }
 }

@@ -20,6 +20,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { IArUiExperiments } from 'AR/Experiments/ARUIExperiments';
+import { Color } from 'Core/Utilities/Color';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -180,8 +181,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         // MAB - AR Available Button Color
-        const arAvailableButtonColor = this._arUiExperiments.color;
-        this._arAvailableButton.style.backgroundColor = `#${arAvailableButtonColor}`;
+        this._arAvailableButton.style.backgroundColor = Color.hexToCssRgba(this._arUiExperiments.color);
     }
 
     public setViewableState(viewable: boolean): void {

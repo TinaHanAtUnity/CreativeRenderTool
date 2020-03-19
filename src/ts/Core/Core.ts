@@ -56,6 +56,7 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
 export class Core implements ICore {
 
@@ -250,6 +251,7 @@ export class Core implements ICore {
 
             return this.Ads.initialize().then(() => {
                 SDKMetrics.sendBatchedEvents();
+                IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {

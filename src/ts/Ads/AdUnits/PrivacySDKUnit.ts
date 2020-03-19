@@ -1,7 +1,10 @@
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 import { Orientation, IAdUnit, AdUnitContainer, AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ICoreApi } from 'Core/ICore';
-import { UserPrivacyManager, AgeGateChoice, GDPREventAction, GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
+import {
+    UserPrivacyManager, AgeGateChoice, GDPREventAction, GDPREventSource,
+    AgeGateSource
+} from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyMethod, IPrivacyPermissions, UserPrivacy } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -52,7 +55,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._core = parameters.core;
         this._privacySDK = parameters.privacySDK;
 
-        this._landingPage = this._privacySDK.isAgeGateEnabled() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
+        this._landingPage = this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
 
         this._useTransparency = true;
         if (this._platform === Platform.IOS && IosUtils.isAdUnitTransparencyBroken(parameters.deviceInfo.getOsVersion())) {
@@ -207,7 +210,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 }
             }
 
-            this._privacyManager.setUsersAgeGateChoice(ageGateChoice);
+            this._privacyManager.setUsersAgeGateChoice(ageGateChoice, AgeGateSource.USER);
 
             if (ageGateChoice === AgeGateChoice.NO || (userSettings.env.privacyMethod && userSettings.env.privacyMethod === PrivacyMethod.UNITY_CONSENT)) {
                 this.setConsent(permissions, action, GDPREventSource.USER);

@@ -6,7 +6,9 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export enum MediationExperimentType {
+    NofillImmediately = 'nfi',
     CacheModeAllowed = 'cma',
+    AuctionXHR = 'xhr',
     None = 'none'
 }
 
@@ -34,6 +36,10 @@ export class MediationLoadTrackingManager {
 
         this._loadApi.onLoad.subscribe((placements) => this.onLoad(placements));
         this._listener.onPlacementStateChangedEventSent.subscribe((placementId, oldState, nextState) => this.onPlacementStateChangedEventSent(placementId, nextState));
+    }
+
+    public getCurrentExperiment(): MediationExperimentType {
+        return this._experimentType;
     }
 
     public setInitComplete(): void {

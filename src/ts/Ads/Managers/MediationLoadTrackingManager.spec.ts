@@ -14,6 +14,12 @@ describe('MediationLoadTrackingManager', () => {
         medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, MediationExperimentType.None, undefined);
     });
 
+    describe('current experiment', () => {
+        it('should return correct experiment', () => {
+            expect(medLoadTrackingManager.getCurrentExperiment()).toEqual(MediationExperimentType.None);
+        });
+    });
+
     describe('when request load for a placement one time', () => {
         beforeEach(() => {
             loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1 });
