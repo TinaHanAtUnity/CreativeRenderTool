@@ -141,8 +141,8 @@ export class LegacyCampaignManager extends CampaignManager {
         ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
-                // TODO: Force load to be on V5
-                CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
+                // TODO: Utilize this.getBaseUrl() after V6 is supported for load
+                CampaignManager.createRequestUrl(this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, this._sdkDetectionInfo)
             ]);
         }).then(([requestUrl, requestBody]) => {
