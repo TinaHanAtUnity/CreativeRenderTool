@@ -366,13 +366,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
                 if (CustomFeatures.isWhitelistedOMVendor(vendorKey)) {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
                 }
-
-                this.loaded({
-                    isSkippable: this._placement.allowSkip(),
-                    skipOffset: this._placement.allowSkipInSeconds(),
-                    isAutoplay: true,                   // Always autoplay for video
-                    position: VideoPosition.STANDALONE  // Always standalone video
-                });
             });
     }
 

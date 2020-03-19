@@ -4,7 +4,10 @@ import {
     IAdUnit,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AgeGateChoice, GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import {
+    AgeGateChoice, AgeGateSource, GDPREventAction, GDPREventSource,
+    UserPrivacyManager
+} from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { Privacy, ConsentPage, IPrivacyViewParameters } from 'Ads/Views/Privacy/Privacy';
 import { IPrivacyViewHandler } from 'Ads/Views/Privacy/IPrivacyViewHandler';
@@ -52,7 +55,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
         this._core = parameters.core;
         this._privacySDK = parameters.privacySDK;
 
-        this._landingPage = this._privacySDK.isAgeGateEnabled() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
+        this._landingPage = this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
 
         let viewParams: IPrivacyViewParameters = {
             platform: parameters.platform,
@@ -96,7 +99,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
             this._unityPrivacyView.show();
 
-            if (this._privacySDK.isAgeGateEnabled()) {
+            if (this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive()) {
                 PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_SHOW);
             } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
                 PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
@@ -177,7 +180,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onAgeGateDisagree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO);
+        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.NO, AgeGateSource.USER);
 
         const permissions: IPrivacyPermissions = {
             gameExp: false,
@@ -188,7 +191,7 @@ export class PrivacyUnit implements IPrivacyViewHandler, IAdUnit {
     }
 
     public onAgeGateAgree(): void {
-        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES);
+        this._privacyManager.setUsersAgeGateChoice(AgeGateChoice.YES, AgeGateSource.USER);
 
         if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
             // todo: handle the flow inside view class

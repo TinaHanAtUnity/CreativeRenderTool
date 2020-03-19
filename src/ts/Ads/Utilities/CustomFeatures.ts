@@ -195,4 +195,12 @@ export class CustomFeatures {
                this.isDoubleClickGoogle(omVendor) ||
                omVendor === 'doubleverify.com-omid';
     }
+
+    // Enables experimental PausableListenerApi, which allows pausing and resuming events.
+    // This is needed as a fix for https://jira.unity3d.com/browse/ABT-1125.
+    public static pauseEventsSupported(gameId: string): boolean {
+        return gameId === '1543460' || // richardh, test app (Apple App Store)
+               gameId === '1543461' || // richardh, test app (Google Play Store)
+               gameId === '80222';   // Pocketgems, Episode (Google Play Store)
+    }
 }

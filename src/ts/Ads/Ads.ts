@@ -25,6 +25,7 @@ import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
@@ -149,7 +150,7 @@ export class Ads implements IAds {
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
             AdsProperties: new AdsPropertiesApi(core.NativeBridge),
-            Listener: new ListenerApi(core.NativeBridge),
+            Listener: CustomFeatures.pauseEventsSupported(core.ClientInfo.getGameId()) ? new PausableListenerApi(core.NativeBridge) : new ListenerApi(core.NativeBridge),
             Placement: new PlacementApi(core.NativeBridge),
             VideoPlayer: new VideoPlayerApi(core.NativeBridge),
             WebPlayer: new WebPlayerApi(core.NativeBridge),
@@ -412,6 +413,8 @@ export class Ads implements IAds {
     }
 
     private showPrivacyIfNeeded(options: unknown): Promise<void> {
+        this.PrivacyManager.applyDeveloperAgeGate();
+
         if (!this.PrivacyManager.isPrivacyShowRequired()) {
             return Promise.resolve();
         }
@@ -545,6 +548,10 @@ export class Ads implements IAds {
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
 
         this._showing = true;
+
+        if (this.Api.Listener instanceof PausableListenerApi) {
+            this.Api.Listener.pauseEvents();
+        }
 
         if (this.Config.getCacheMode() !== CacheMode.DISABLED) {
             this.AssetManager.stopCaching();
