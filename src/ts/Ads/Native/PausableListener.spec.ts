@@ -69,4 +69,22 @@ describe('PausableListenerTest', () => {
             });
         });
     });
+
+    describe('when resumeEvents is called', () => {
+
+        const sendEventAfterResumeEvents = () => {
+            listener.pauseEvents();
+            listener.sendReadyEvent('video');
+            listener.resumeEvents();
+        }
+
+        beforeEach(() => {
+            sendEventAfterResumeEvents();
+        });
+
+        it('should clear events', () => {
+            listener.resumeEvents();
+            expect(nativeBridge.invoke.mock.calls.length).toBe(1);
+        });
+    });
 });
