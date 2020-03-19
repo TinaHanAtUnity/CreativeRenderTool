@@ -187,7 +187,7 @@ export class UserPrivacyManager {
                     adsSeenInGameThisWeek: userSummary ? userSummary.adsSeenInGameThisWeek.toString() : '-',
                     installsFromAds: userSummary ? userSummary.installsFromAds.toString() : '-'
                 },
-                developerAgeGate: this._ageGateSource === AgeGateSource.DEVELOPER
+                developerAgeGate: this.isDeveloperAgeGateActive()
             },
             PrivacyWebUI);
     }
