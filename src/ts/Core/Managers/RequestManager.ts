@@ -110,7 +110,7 @@ export class RequestManager {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform, clientInfo: ClientInfo) {
+    public static configureAuctionProtocol(testMode: boolean) {
         if (!RequestManager._auctionProtocol) {
             const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
             if (forceProtocol === 'V5') {
@@ -126,7 +126,7 @@ export class RequestManager {
                 return;
             }
 
-            if (coreConfig.getTestMode()) {
+            if (testMode) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
