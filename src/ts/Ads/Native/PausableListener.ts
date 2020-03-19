@@ -81,6 +81,7 @@ export class PausableListenerApi extends ListenerApi {
         this._eventQueue.forEach((f) => {
             f();
         });
+        this._eventQueue = [];
         this._paused = false;
     }
 }
