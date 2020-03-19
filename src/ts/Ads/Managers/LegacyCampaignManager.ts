@@ -78,7 +78,6 @@ export class LegacyCampaignManager extends CampaignManager {
     private _metaDataManager: MetaDataManager;
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
-    private _previousPlacementId: string | undefined;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
@@ -135,8 +134,8 @@ export class LegacyCampaignManager extends CampaignManager {
         const requestTimestamp: number = Date.now();
 
         return Promise.all<string[], number | undefined, number>([
-            this.getFullyCachedCampaigns(),
-            this.getVersionCode(),
+            CampaignManager.getFullyCachedCampaigns(this._core),
+            CampaignManager.getVersionCode(this._platform, this._core, this._clientInfo),
             this._deviceInfo.getFreeSpace()
         ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
             this._deviceFreeSpace = freeSpace;
@@ -228,8 +227,8 @@ export class LegacyCampaignManager extends CampaignManager {
         const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
         return Promise.all<string[], number | undefined, number>([
-            this.getFullyCachedCampaigns(),
-            this.getVersionCode(),
+            CampaignManager.getFullyCachedCampaigns(this._core),
+            CampaignManager.getVersionCode(this._platform, this._core, this._clientInfo),
             this._deviceInfo.getFreeSpace()
         ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
             this._deviceFreeSpace = freeSpace;
@@ -280,22 +279,6 @@ export class LegacyCampaignManager extends CampaignManager {
                 SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
-        });
-    }
-
-    public setPreviousPlacementId(id: string | undefined) {
-        this._previousPlacementId = id;
-    }
-
-    public getPreviousPlacementId(): string | undefined {
-        return this._previousPlacementId;
-    }
-
-    public getFullyCachedCampaigns(): Promise<string[]> {
-        return this._core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            return campaignKeys;
-        }).catch(() => {
-            return [];
         });
     }
 
@@ -829,22 +812,6 @@ export class LegacyCampaignManager extends CampaignManager {
                 this._clientInfo.getGameId(),
                 'requests'
             ].join('/');
-        }
-    }
-
-    private getVersionCode(): Promise<number | undefined> {
-        if (this._platform === Platform.ANDROID) {
-            return this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
-                if (packageInfo.versionCode) {
-                    return packageInfo.versionCode;
-                } else {
-                    return undefined;
-                }
-            }).catch(() => {
-                return undefined;
-            });
-        } else {
-            return Promise.resolve(undefined);
         }
     }
 

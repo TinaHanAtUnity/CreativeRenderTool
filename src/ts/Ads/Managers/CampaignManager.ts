@@ -29,6 +29,8 @@ import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasu
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { ICoreApi } from 'Core/ICore';
+import { StorageType } from 'Core/Native/Storage';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -70,6 +72,8 @@ export abstract class CampaignManager {
     protected static SessionId: string | undefined;
     protected static Country: string | undefined;
 
+    private _previousPlacementId: string | undefined;
+
     public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<unknown, string[], string, Session | undefined>();
@@ -78,9 +82,14 @@ export abstract class CampaignManager {
 
     public abstract request(nofillRetry?: boolean): Promise<INativeResponse | void>;
     public abstract loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined>;
-    public abstract setPreviousPlacementId(id: string | undefined): void;
-    public abstract getPreviousPlacementId(): string | undefined;
-    public abstract getFullyCachedCampaigns(): Promise<string[]>;
+
+    public setPreviousPlacementId(id: string | undefined) {
+        this._previousPlacementId = id;
+    }
+
+    public getPreviousPlacementId(): string | undefined {
+        return this._previousPlacementId;
+    }
 
     public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown): Promise<INativeResponse> {
         const body = JSON.stringify(requestBody);
@@ -324,6 +333,30 @@ export abstract class CampaignManager {
                 measurement.measure('body_generation');
                 return body;
             });
+        });
+    }
+
+    public static getVersionCode(platform: Platform, core: ICoreApi, clientInfo: ClientInfo): Promise<number | undefined> {
+        if (platform === Platform.ANDROID) {
+            return core.DeviceInfo.Android!.getPackageInfo(clientInfo.getApplicationName()).then(packageInfo => {
+                if (packageInfo.versionCode) {
+                    return packageInfo.versionCode;
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
+    }
+
+    public static getFullyCachedCampaigns(core: ICoreApi): Promise<string[]> {
+        return core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
         });
     }
 }
