@@ -70,7 +70,7 @@ export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
 export const PrivacySDKTest = new ABTest(16);
 export const DiagnosticsRampDown = new ABTest(15);
-export const AuctionXHR = new ABTest(18);
+export const AuctionXHR = new DisabledABTest();
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
