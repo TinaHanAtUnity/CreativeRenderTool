@@ -1,5 +1,4 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
@@ -10,8 +9,12 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { Placement } from 'Ads/Models/Placement';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
+import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { Placement } from 'Ads/Models/Placement';
+import { PrivacyMethod } from 'Privacy/Privacy';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private _adUnitParametersFactory: IAbstractAdUnitParametersFactory<T, Params>;
