@@ -72,14 +72,10 @@ describe('PausableListenerTest', () => {
 
     describe('when resumeEvents is called', () => {
 
-        const sendEventAfterResumeEvents = () => {
+        beforeEach(() => {
             listener.pauseEvents();
             listener.sendReadyEvent('video');
             listener.resumeEvents();
-        }
-
-        beforeEach(() => {
-            sendEventAfterResumeEvents();
         });
 
         it('should clear events', () => {
