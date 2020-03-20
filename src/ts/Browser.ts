@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 CampaignManager.setBaseUrl('https://auction.staging.unityads.unity3d.com');
                 AuctionRequest.setBaseUrl('https://auction.staging.unityads.unity3d.com');
                 ConfigManager.setTestBaseUrl('https://ads-game-configuration.staging.unityads.unity3d.com');
-                MetricInstance.setBaseUrl('https://sdk-diagnostics.stg.mz.internal.unity3d.com/');
+                MetricInstance.setBaseUrl('https://sdk-diagnostics.stg.mz.internal.unity3d.com');
                 HttpKafka.setTestBaseUrl('https://httpkafka.staging.unityads.unity3d.com/v1/events');
             }
 

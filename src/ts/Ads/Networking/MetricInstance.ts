@@ -26,10 +26,10 @@ export class MetricInstance {
     private _batchedMetricEvents: IPTSEvent[];
     private _baseUrl: string;
 
-    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
+    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com';
 
-    private metricPath = 'v1/metrics';
-    private timingPath = 'v1/timing';
+    private metricPath = '/v1/metrics';
+    private timingPath = '/v1/timing';
 
     private static _overrideBaseUrl: string | undefined;
 
@@ -54,7 +54,7 @@ export class MetricInstance {
     }
 
     protected getProductionUrl(): string {
-        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com';
     }
 
     private createTags(tags: { [key: string]: string }): string[] {
