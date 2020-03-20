@@ -157,6 +157,7 @@ describe('LegacyCampaignManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         sinon.stub(SDKMetrics, 'reportMetricEvent');
         sinon.stub(SDKMetrics, 'reportTimingEvent');
+        sinon.stub(SDKMetrics, 'reportMetricEventWithTags');
         contentTypeHandlerManager = new ContentTypeHandlerManager();
         adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);

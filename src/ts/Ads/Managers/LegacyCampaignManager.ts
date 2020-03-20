@@ -119,6 +119,15 @@ export class LegacyCampaignManager extends CampaignManager {
             return Promise.resolve();
         }
 
+        SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestCreated, {
+            'wel': 'false',
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        });
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportAuctionRequestStarted();
+        }
+
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
@@ -181,6 +190,10 @@ export class LegacyCampaignManager extends CampaignManager {
             });
             throw error;
         }).then(response => {
+            SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestOk, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+            });
             measurement.measure('auction_response');
             const cachingTime = this.getTime();
             if (this._mediationLoadTracking && performance && performance.now) {
@@ -229,6 +242,15 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+        SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestCreated, {
+            'wel': 'true',
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        });
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportAuctionRequestStarted();
+        }
+
         const requestStartTime = this.getTime();
         let cachingTime: number;
         this._isLoadEnabled = true;
@@ -278,13 +300,17 @@ export class LegacyCampaignManager extends CampaignManager {
                         this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false, reason);
                     }
                     SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestFailed, {
-                        'wel': 'false',
+                        'wel': 'true',
                         'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
                         'rsn': reason
                     });
                     throw error;
                 });
             }).then(response => {
+                SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestOk, {
+                    'wel': 'true',
+                    'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+                });
                 cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);

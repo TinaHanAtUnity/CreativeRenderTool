@@ -78,7 +78,9 @@ export enum MiscellaneousMetric {
     CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
     IOSDeleteStoredGamerToken = 'ios_delete_stored_gamer_token',
     XHRNotAvailable = 'xhr_not_available',
-    AuctionRequestFailed = 'auction_request_failed'
+    AuctionRequestFailed = 'auction_request_failed',
+    AuctionRequestOk = 'auction_request_ok',
+    AuctionRequestCreated = 'auction_request_created'
 }
 
 export enum LoadMetric {
@@ -150,7 +152,8 @@ export enum MediationMetric {
     PlacementCount = 'placement_count',
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
-    AdCaching = 'ad_caching_time'
+    AdCaching = 'ad_caching_time',
+    AuctionRequestStarted = 'auction_request_start'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
