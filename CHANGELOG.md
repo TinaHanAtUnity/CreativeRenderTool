@@ -2,6 +2,7 @@
 
 * Use RequestError instead of Error in XHRequest [#13921](https://github.com/Applifier/unity-ads-webview/pull/13921)
 * Disable XHR Request ABTest [#13919](https://github.com/Applifier/unity-ads-webview/pull/13919)
+* Browser tester: checkbox to use staging [#13882](https://github.com/Applifier/unity-ads-webview/pull/13882)
 
 # Fri Mar 20 16:55:42 UTC 2020
 
