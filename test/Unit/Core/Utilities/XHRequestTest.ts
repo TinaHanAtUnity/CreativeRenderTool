@@ -55,6 +55,29 @@ describe('XHRequestTest', () => {
             })
         );
 
+        it('should fail from bad response with correct headers and response', async () => {
+            server.respondWith('GET', 'https://api.unity3d.com/test', [500, {'test-header': 'test-value'}, 'Status code 500']);
+
+            try {
+                await XHRequest.get('https://api.unity3d.com/test');
+            } catch (err) {
+                assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
+                assert.isTrue(err instanceof RequestError, 'Did not fail from the file not being found');
+
+                if (err instanceof RequestError) {
+                    assert.deepEqual(err.nativeRequest, {});
+                    assert.isDefined(err.nativeResponse);
+                    assert.equal(err.nativeResponse!.url, 'https://api.unity3d.com/test');
+                    assert.equal(err.nativeResponse!.response, 'Status code 500');
+                    assert.equal(err.nativeResponse!.responseCode, 500);
+                    assert.deepEqual(err.nativeResponse!.headers, [['test-header', 'test-value']]);
+                }
+
+                return;
+            }
+            assert.fail('Promise was not rejected');
+        });
+
         // Test skipped since is not faking XMLHttpRequest properly.
         xit('should give an OK response from the file', () => {
             server.respondWith('GET', 'file:///path/to/file.txt', [0, {}, 'File content']);
