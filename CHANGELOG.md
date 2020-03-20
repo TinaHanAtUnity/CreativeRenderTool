@@ -3,6 +3,7 @@
 * Conclude Mediation CacheMode Allowed Experiment [#13892](https://github.com/Applifier/unity-ads-webview/pull/13892)
 * [Load V5] Move common methods to Campaign Manager [#13885](https://github.com/Applifier/unity-ads-webview/pull/13885)
 * Add Error Reason Tag to Failed Auction Requests [#13883](https://github.com/Applifier/unity-ads-webview/pull/13883)
+* Duplicate Impression Event in SDKMetrics when sent to PTS [#13918](https://github.com/Applifier/unity-ads-webview/pull/13918)
 
 # Thu Mar 19 20:30:38 UTC 2020
 
