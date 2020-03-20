@@ -10,14 +10,15 @@ import { IARApi } from 'AR/AR';
 import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
 import { PerformanceAdUnitWithAutomatedExperimentFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentFactory';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { MabDisabledABTest } from 'Core/Models/ABGroup';
 
 export class Performance extends AbstractParserModule {
-    constructor(ar: IARApi, core: ICore, aem: AutomatedExperimentManager | undefined,  ads: IAds) {
+    constructor(ar: IARApi, core: ICore, aem: AutomatedExperimentManager,  ads: IAds) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const parser = new CometCampaignParser(core);
 
         let performanceFactory: PerformanceAdUnitFactory;
-        if (aem !== undefined) {
+        if (!MabDisabledABTest.isValid(core.Config.getAbGroup())) {
             performanceFactory = new PerformanceAdUnitWithAutomatedExperimentFactory(
                 new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, aem));
         } else {
@@ -30,7 +31,7 @@ export class Performance extends AbstractParserModule {
         };
         contentTypeHandlerMap[CometCampaignParser.ContentTypeMRAID] = {
             parser,
-            factory: new MRAIDAdUnitFactory(new MRAIDAdUnitParametersFactory(ar, core, ads))
+            factory: new MRAIDAdUnitFactory(new MRAIDAdUnitParametersFactory(ar, core, ads, aem))
         };
         super(contentTypeHandlerMap);
     }

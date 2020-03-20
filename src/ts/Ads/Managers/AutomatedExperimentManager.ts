@@ -14,12 +14,13 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { Observable3 } from 'Core/Utilities/Observable';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
+import { MabDisabledABTest } from 'Core/Models/ABGroup';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: IExperimentActionChoice };
@@ -73,12 +74,12 @@ class OptimizedCampaign {
 }
 
 export class AutomatedExperimentManager {
-    private readonly _requestManager: RequestManager;
-    private readonly _deviceInfo: DeviceInfo;
-    private readonly _privacySdk: PrivacySDK;
-    private readonly _clientInfo: ClientInfo;
-    private readonly _coreConfig: CoreConfiguration;
-    private readonly _nativeBridge: NativeBridge;
+    private _requestManager: RequestManager;
+    private _deviceInfo: DeviceInfo;
+    private _privacySdk: PrivacySDK;
+    private _clientInfo: ClientInfo;
+    private _coreConfig: CoreConfiguration;
+    private _nativeBridge: NativeBridge;
     private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
@@ -92,29 +93,25 @@ export class AutomatedExperimentManager {
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
 
-    constructor(core: ICore) {
+    public static isAutomationAvailable(adsConfig: AdsConfiguration, config: CoreConfiguration) {
+        return !MabDisabledABTest.isValid(config.getAbGroup()) || adsConfig.getHasArPlacement();
+    }
+
+    constructor() {
         this._declaredExperiments = [];
+    }
+
+    public initialize(core: ICore, campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
         this._requestManager = core.RequestManager;
         this._deviceInfo = core.DeviceInfo;
-        this._abGroup = core.Config.getAbGroup();
-        this._gameSessionID = core.Ads.SessionManager.getGameSessionId();
         this._privacySdk = core.Ads.PrivacySDK;
         this._clientInfo = core.ClientInfo;
         this._coreConfig = core.Config;
         this._nativeBridge = core.NativeBridge;
+        this._abGroup = core.Config.getAbGroup();
+        this._gameSessionID = core.Ads.SessionManager.getGameSessionId();
+        this._campaignSource = campaignSource;
         this._onCampaignListener = (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => this.onNewCampaign(campaign);
-    }
-
-    public static createIfEnabled(core: ICore): AutomatedExperimentManager | undefined {
-        if (MabDisabledABTest.isValid(core.Config.getAbGroup())) {
-            return undefined;
-        }
-
-        return new AutomatedExperimentManager(core);
-    }
-
-    public initialize(campaignMgr: CampaignManager): void {
-        this._campaignSource = campaignMgr.onCampaign;
         this._campaignSource.subscribe(this._onCampaignListener);
         this._staticFeaturesPromise = this.collectStaticContextualFeatures();
     }
@@ -129,6 +126,11 @@ export class AutomatedExperimentManager {
 
     public startCampaign(campaign: Campaign) {
         if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Stage === AutomatedExperimentStage.RUNNING) {
+                SDKMetrics.reportMetricEvent(AUIMetric.CampaignAlreadyActive);
+                return;
+            }
 
             for (const experimentName in this._campaign.Experiments.keys) {
                 if (this._campaign.Experiments.hasOwnProperty(experimentName)) {

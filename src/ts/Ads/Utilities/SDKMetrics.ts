@@ -122,6 +122,7 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
+    CampaignAlreadyActive = 'campaign_already_active',
     CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
     FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',

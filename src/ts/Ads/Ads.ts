@@ -132,7 +132,7 @@ export class Ads implements IAds {
     private _nofillImmediately: boolean = false;
     private _mediationName: string;
     private _core: ICore;
-    private _automatedExperimentManager: AutomatedExperimentManager | undefined;
+    private _automatedExperimentManager: AutomatedExperimentManager;
 
     public BannerModule: BannerModule;
     public Monetization: Monetization;
@@ -184,7 +184,7 @@ export class Ads implements IAds {
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
-        this._automatedExperimentManager = AutomatedExperimentManager.createIfEnabled(this._core);
+        this._automatedExperimentManager = new AutomatedExperimentManager();
     }
 
     public initialize(): Promise<void> {
@@ -269,7 +269,7 @@ export class Ads implements IAds {
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
                 new Display(this._core, this),
-                new MRAID(this.AR.Api, this._core, this),
+                new MRAID(this.AR.Api, this._core, this._automatedExperimentManager, this),
                 new Performance(this.AR.Api, this._core, this._automatedExperimentManager, this),
                 new VAST(this._core, this),
                 new VPAID(this._core, this),
@@ -288,6 +288,7 @@ export class Ads implements IAds {
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
             this.configureCampaignManager();
+            this.configureAutomatedExperimentManager();
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
@@ -354,9 +355,11 @@ export class Ads implements IAds {
 
     private configureCampaignManager() {
         this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
+    }
 
-        if (this._automatedExperimentManager !== undefined) {
-            this._automatedExperimentManager.initialize(this.CampaignManager);
+    private configureAutomatedExperimentManager() {
+        if (AutomatedExperimentManager.isAutomationAvailable(this.Config, this._core.Config)) {
+            this._automatedExperimentManager.initialize(this._core, this.CampaignManager.onCampaign);
         }
     }
 
@@ -426,7 +429,7 @@ export class Ads implements IAds {
         }
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
-            Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
+            Diagnostics.trigger('consent_show', { adsConfig: JSON.stringify(this.Config.getDTO()) });
         }
 
         if (this._core.Config.isCoppaCompliant()) {
@@ -590,7 +593,7 @@ export class Ads implements IAds {
             if (this.Monetization.isInitialized()) {
                 this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
             }
-            this._currentAdUnit.onClose.subscribe(() =>  {
+            this._currentAdUnit.onClose.subscribe(() => {
                 this.onAdUnitClose();
                 SDKMetrics.sendBatchedEvents();
             });

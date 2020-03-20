@@ -9,7 +9,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { AutomatedExperimentManager, ContextualFeature } from 'Ads/Managers/AutomatedExperimentManager';
 import { AuctionProtocol, INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
@@ -32,6 +32,8 @@ import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import 'mocha';
 import * as sinon from 'sinon';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
+import { CampaignManager } from 'Ads/Managers/__mocks__/CampaignManager';
+import { Observable3 } from 'Core/Utilities/Observable';
 
 const FooExperimentDeclaration = {
     action1: {
@@ -68,6 +70,7 @@ describe('AutomatedExperimentManagerTests', () => {
     let platform: Platform;
     let campaign: Campaign;
     let aem: AutomatedExperimentManager;
+    let campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -77,8 +80,9 @@ describe('AutomatedExperimentManagerTests', () => {
         core = TestFixtures.getCoreModule(nativeBridge);
         ads = TestFixtures.getAdsModule(core);
         core.Ads = ads;
+        campaignSource = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
 
-        aem = new AutomatedExperimentManager(core);
+        aem = new AutomatedExperimentManager();
     });
 
     afterEach(() => {
@@ -203,6 +207,7 @@ describe('AutomatedExperimentManagerTests', () => {
                     response: responseText
                 });
 
+            aem.initialize(core, campaignSource);
             aem.registerExperiments([FooExperiment]);
 
             return aem.onNewCampaign(campaign)
@@ -230,6 +235,7 @@ describe('AutomatedExperimentManagerTests', () => {
             .withArgs(AUIMetric.FailedToParseExperimentResponse)
             .returns(true);
 
+        aem.initialize(core, campaignSource);
         aem.registerExperiments([FooExperiment]);
         return aem.onNewCampaign(campaign)
         .then(() => aem.startCampaign(campaign))
@@ -257,6 +263,7 @@ describe('AutomatedExperimentManagerTests', () => {
                 response: responseText
             });
 
+        aem.initialize(core, campaignSource);
         aem.registerExperiments([FooExperiment]);
         return aem.onNewCampaign(campaign)
         .then(() => aem.startCampaign(campaign))
@@ -291,6 +298,7 @@ describe('AutomatedExperimentManagerTests', () => {
                 response: rewardResponseText
             });
 
+            aem.initialize(core, campaignSource);
             aem.registerExperiments([FooExperiment]);
             return aem.onNewCampaign(campaign)
             .then(() => aem.startCampaign(campaign))
@@ -346,7 +354,7 @@ describe('AutomatedExperimentManagerTests', () => {
         contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
         const campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
 
-        aem.initialize(campaignManager);
+        aem.initialize(core, campaignManager.onCampaign);
 
         let triggeredError: any;
         campaignManager.onError.subscribe(error => {
@@ -362,5 +370,18 @@ describe('AutomatedExperimentManagerTests', () => {
         .then(() => {
             assert(onNewCampaignStub.calledOnce);
         });
+    });
+
+    it(`Experiment defaults cleanly if initialize is not called`, () => {
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .withArgs(AUIMetric.FailedToFetchAutomatedExperiements)
+            .returns(true);
+
+        aem.registerExperiments([FooExperiment]);
+        aem.startCampaign(campaign);
+        const variant = aem.activateExperiment(campaign, FooExperiment);
+        assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
+        assert.isTrue(metricStub.notCalled);
+        return aem.endCampaign(campaign);
     });
 });
