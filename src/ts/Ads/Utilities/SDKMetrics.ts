@@ -72,11 +72,13 @@ export enum VastMetric {
 }
 
 export enum MiscellaneousMetric {
+    ImpressionDuplicate = 'impression_duplicate',
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
     CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
     IOSDeleteStoredGamerToken = 'ios_delete_stored_gamer_token',
-    XHRNotAvailable = 'xhr_not_available'
+    XHRNotAvailable = 'xhr_not_available',
+    AuctionRequestFailed = 'auction_request_failed'
 }
 
 export enum LoadMetric {
