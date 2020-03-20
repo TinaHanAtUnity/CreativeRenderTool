@@ -69,6 +69,16 @@ export class MediationLoadTrackingManager {
         });
     }
 
+    public reportAuctionRequestStarted() {
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AuctionRequestStarted, {
+            'med': this._mediationName,
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+            'exp': this._experimentType
+        });
+        SDKMetrics.sendBatchedEvents();
+    }
+
     public reportAuctionRequest(latency: number, requestSuccessful: boolean, reason?: string) {
         let tags: { [key: string]: string } = {
             'med': this._mediationName,
@@ -86,6 +96,7 @@ export class MediationLoadTrackingManager {
         }
 
         SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, tags);
+        SDKMetrics.sendBatchedEvents();
     }
 
     public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {
