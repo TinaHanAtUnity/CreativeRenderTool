@@ -69,14 +69,23 @@ export class MediationLoadTrackingManager {
         });
     }
 
-    public reportAuctionRequest(latency: number, requestSuccessful: boolean) {
-        SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, {
+    public reportAuctionRequest(latency: number, requestSuccessful: boolean, reason?: string) {
+        let tags: { [key: string]: string } = {
             'med': this._mediationName,
             'wel': `${this._webviewEnabledLoad}`,
             'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
             'res': `${requestSuccessful}`,
             'exp': this._experimentType
-        });
+        };
+
+        if (reason) {
+            tags = {
+                ...tags,
+                'rsn': reason
+            };
+        }
+
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, tags);
     }
 
     public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {
