@@ -27,6 +27,7 @@ import { MRAIDView, IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('WebPlayerMraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -141,6 +142,8 @@ describe('WebPlayerMraidAdUnit', () => {
                 'impression': ['http://booyahimpression.com']
             }
         );
+
+        sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
         sendWithGetStub = sandbox.stub(thirdPartyEventMnager, 'sendWithGet').returns(Promise.resolve());
 
