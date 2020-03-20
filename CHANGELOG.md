@@ -1,4 +1,4 @@
-# Pending
+# Fri Mar 20 16:55:42 UTC 2020
 
 * Conclude Mediation CacheMode Allowed Experiment [#13892](https://github.com/Applifier/unity-ads-webview/pull/13892)
 * [Load V5] Move common methods to Campaign Manager [#13885](https://github.com/Applifier/unity-ads-webview/pull/13885)
