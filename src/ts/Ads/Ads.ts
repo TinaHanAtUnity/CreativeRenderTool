@@ -133,6 +133,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
     private _nofillImmediately: boolean = false;
+    private _forceLoadV5: boolean = false;
     private _mediationName: string;
     private _core: ICore;
 
@@ -766,6 +767,10 @@ export class Ads implements IAds {
         if (TestEnvironment.get('debugJsConsole')) {
             MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
         }
+
+        if (TestEnvironment.get('forceLoadV5')) {
+            this._forceLoadV5 = true;
+        }
     }
 
     private logChinaMetrics() {
@@ -823,6 +828,6 @@ export class Ads implements IAds {
         const loadV5Test = LoadV5.isValid(this._core.Config.getAbGroup());
         const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
 
-        return loadV5Test && loadV5Game;
+        return (loadV5Test && loadV5Game) || this._forceLoadV5;
     }
 }
