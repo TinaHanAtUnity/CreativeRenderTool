@@ -4,7 +4,7 @@
 * Disable XHR Request ABTest [#13919](https://github.com/Applifier/unity-ads-webview/pull/13919)
 * Browser tester: checkbox to use staging [#13882](https://github.com/Applifier/unity-ads-webview/pull/13882)
 * Open Measurement - Move stopped check strictly to vast [#13949](https://github.com/Applifier/unity-ads-webview/pull/13949)
-
+* Improving our metrics for auction request [#13948](https://github.com/Applifier/unity-ads-webview/pull/13948)
 
 # Fri Mar 20 16:55:42 UTC 2020
 
