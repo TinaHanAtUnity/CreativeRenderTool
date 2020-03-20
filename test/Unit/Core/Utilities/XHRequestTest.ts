@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import 'mocha';
 import * as sinon from 'sinon';
+import { RequestError } from 'Core/Errors/RequestError';
 
 describe('XHRequestTest', () => {
 
@@ -46,8 +47,8 @@ describe('XHRequestTest', () => {
                     await XHRequest.get('https://api.unity3d.com/test');
                 } catch (err) {
                     assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
-                    assert.isTrue(err instanceof Error, 'Did not fail from the file not being found');
-                    assert.equal(err.toString(), `Error: Request failed with status code ${params[0]}`);
+                    assert.isTrue(err instanceof RequestError, 'Did not fail from the file not being found');
+                    assert.equal(err.message, `Request failed with status code ${params[0]}`);
                     return;
                 }
                 assert.fail('Promise was not rejected');
@@ -71,8 +72,8 @@ describe('XHRequestTest', () => {
                 await XHRequest.get('file:///path/to/file.txt');
             } catch (err) {
                 assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
-                assert.isTrue(err instanceof Error, 'Did not fail from the error');
-                assert.equal(err.toString(), 'Error: Request failed with status code 300');
+                assert.isTrue(err instanceof RequestError, 'Did not fail from the error');
+                assert.equal(err.message, 'Request failed with status code 300');
                 return;
             }
 
@@ -90,8 +91,8 @@ describe('XHRequestTest', () => {
             try {
                 await promise;
             } catch (err) {
-                assert.isTrue(err instanceof Error, 'Did not fail from the error');
-                assert.equal(err.toString(), 'Error: Error ocurred while executing request: status - 0');
+                assert.isTrue(err instanceof RequestError, 'Did not fail from the error');
+                assert.equal(err.message, 'Error ocurred while executing request: status - 0');
                 return;
             }
 
@@ -110,8 +111,8 @@ describe('XHRequestTest', () => {
             try {
                 await promise;
             } catch (err) {
-                assert.isTrue(err instanceof Error, 'Did not fail from the error');
-                assert.equal(err.toString(), 'Error: Request was aborted');
+                assert.isTrue(err instanceof RequestError, 'Did not fail from the error');
+                assert.equal(err.message, 'Request was aborted');
                 return;
             }
 
@@ -128,8 +129,8 @@ describe('XHRequestTest', () => {
             try {
                 await promise;
             } catch (err) {
-                assert.isTrue(err instanceof Error, 'Did not fail from the error');
-                assert.equal(err.toString(), 'Error: Request timed out');
+                assert.isTrue(err instanceof RequestError, 'Did not fail from the error');
+                assert.equal(err.message, 'Request timed out');
                 return;
             }
 
