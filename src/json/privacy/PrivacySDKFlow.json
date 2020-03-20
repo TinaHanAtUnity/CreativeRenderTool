@@ -5,6 +5,17 @@
       "isSelfEvaluating": true,
       "links": [
         {
+          "node": "consent",
+          "condition": {
+            "==": [
+              {
+                "var": "env.developerAgeGate"
+              },
+              true
+            ]
+          }
+        },
+        {
           "node": "ageSelect",
           "condition": {
             ">": [
