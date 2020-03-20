@@ -58,6 +58,7 @@ export abstract class CampaignManager {
     public static setBaseUrl(baseUrl: string): void {
         CampaignManager.BaseUrl = baseUrl + '/v4/games';
         CampaignManager.AuctionV5BaseUrl = baseUrl + '/v5/games';
+        CampaignManager.TestModeUrl = baseUrl + '/v4/test/games';
     }
 
     protected static CampaignResponse: string | undefined;

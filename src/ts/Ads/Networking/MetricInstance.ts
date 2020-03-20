@@ -26,10 +26,16 @@ export class MetricInstance {
     private _batchedMetricEvents: IPTSEvent[];
     private _baseUrl: string;
 
-    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
+    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com';
 
-    private metricPath = 'v1/metrics';
-    private timingPath = 'v1/timing';
+    private metricPath = '/v1/metrics';
+    private timingPath = '/v1/timing';
+
+    private static _overrideBaseUrl: string | undefined;
+
+    public static setBaseUrl(url: string | undefined) {
+        MetricInstance._overrideBaseUrl = url;
+    }
 
     constructor(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
         this._platform = platform;
@@ -39,11 +45,16 @@ export class MetricInstance {
         this._countryIso = this.getCountryIso(country);
         this._batchedTimingEvents = [];
         this._batchedMetricEvents = [];
-        this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+
+        if (MetricInstance._overrideBaseUrl !== undefined) {
+            this._baseUrl = MetricInstance._overrideBaseUrl;
+        } else {
+            this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+        }
     }
 
     protected getProductionUrl(): string {
-        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com';
     }
 
     private createTags(tags: { [key: string]: string }): string[] {

@@ -596,4 +596,26 @@ import { Platform } from 'Core/Constants/Platform';
             );
         });
     });
+
+    describe('whet base url overridden', () => {
+        beforeEach(() => {
+            MetricInstance.setBaseUrl('https://localhost');
+            metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            metricInstance.sendBatchedEvents();
+        });
+
+        afterEach(() => {
+            MetricInstance.setBaseUrl(undefined);
+        });
+
+        it('should call the provided endpoint', () => {
+            expect(requestManager.post).toBeCalledWith(
+                'https://localhost/v1/metrics',
+                expect.anything(),
+                expect.anything(),
+                expect.anything()
+            );
+        });
+    });
 }));
