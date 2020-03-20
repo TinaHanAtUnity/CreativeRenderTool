@@ -18,7 +18,7 @@ import { PerformanceAdUnitFactory} from 'Performance/AdUnits/PerformanceAdUnitFa
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { LegacyMABCampaignManager } from 'Ads/Managers/LegacyMABCampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
@@ -314,7 +314,6 @@ describe('AutomatedExperimentManagerTests', () => {
     it('AutomatedExperimentManager notified of performance campaigns', () => {
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
-        const arApi = TestFixtures.getARApi(nativeBridge);
         const cacheBookkeeping = core.CacheBookkeeping;
         const wakeUpManager = core.WakeUpManager;
         const deviceInfo = core.DeviceInfo;
@@ -345,7 +344,9 @@ describe('AutomatedExperimentManagerTests', () => {
 
         const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, requestManager, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
-        const campaignManager = new LegacyMABCampaignManager(aem, platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
+        const campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
+
+        aem.initialize(campaignManager);
 
         let triggeredError: any;
         campaignManager.onError.subscribe(error => {

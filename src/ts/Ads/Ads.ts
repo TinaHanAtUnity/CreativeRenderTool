@@ -97,7 +97,6 @@ import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
-import { LegacyMABCampaignManager } from 'Ads/Managers/LegacyMABCampaignManager';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 export class Ads implements IAds {
@@ -133,6 +132,7 @@ export class Ads implements IAds {
     private _nofillImmediately: boolean = false;
     private _mediationName: string;
     private _core: ICore;
+    private _automatedExperimentManager: AutomatedExperimentManager | undefined;
 
     public BannerModule: BannerModule;
     public Monetization: Monetization;
@@ -184,6 +184,7 @@ export class Ads implements IAds {
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
+        this._automatedExperimentManager = AutomatedExperimentManager.createIfEnabled(this._core);
     }
 
     public initialize(): Promise<void> {
@@ -265,13 +266,11 @@ export class Ads implements IAds {
 
             this.logChinaMetrics();
 
-            const aem = AutomatedExperimentManager.createIfAvailable(this._core);
-
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
                 new Display(this._core, this),
                 new MRAID(this.AR.Api, this._core, this),
-                new Performance(this.AR.Api, this._core, aem, this),
+                new Performance(this.AR.Api, this._core, this._automatedExperimentManager, this),
                 new VAST(this._core, this),
                 new VPAID(this._core, this),
                 new XPromo(this._core, this)
@@ -288,7 +287,7 @@ export class Ads implements IAds {
 
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
-            this.configureCampaignManager(aem);
+            this.configureCampaignManager();
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
@@ -353,11 +352,11 @@ export class Ads implements IAds {
         });
     }
 
-    private configureCampaignManager(aem: AutomatedExperimentManager | undefined) {
-        if (aem !== undefined) {
-            this.CampaignManager = new LegacyMABCampaignManager(aem, this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
-        } else {
-            this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
+    private configureCampaignManager() {
+        this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
+
+        if (this._automatedExperimentManager !== undefined) {
+            this._automatedExperimentManager.initialize(this.CampaignManager);
         }
     }
 

@@ -1,6 +1,7 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
@@ -14,7 +15,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MabDisabledABTest } from 'Core/Models/ABGroup';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -103,10 +103,9 @@ export class AutomatedExperimentManager {
         this._coreConfig = core.Config;
         this._nativeBridge = core.NativeBridge;
         this._onCampaignListener = (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => this.onNewCampaign(campaign);
-        this._staticFeaturesPromise = this.collectStaticContextualFeatures();
     }
 
-    public static createIfAvailable(core: ICore): AutomatedExperimentManager | undefined {
+    public static createIfEnabled(core: ICore): AutomatedExperimentManager | undefined {
         if (MabDisabledABTest.isValid(core.Config.getAbGroup())) {
             return undefined;
         }
@@ -114,9 +113,10 @@ export class AutomatedExperimentManager {
         return new AutomatedExperimentManager(core);
     }
 
-    public listenOnCampaigns(onCampaign: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
-        this._campaignSource = onCampaign;
-        onCampaign.subscribe(this._onCampaignListener);
+    public initialize(campaignMgr: CampaignManager): void {
+        this._campaignSource = campaignMgr.onCampaign;
+        this._campaignSource.subscribe(this._onCampaignListener);
+        this._staticFeaturesPromise = this.collectStaticContextualFeatures();
     }
 
     public registerExperiments(experiments: AutomatedExperiment[]) {
@@ -298,11 +298,11 @@ export class AutomatedExperimentManager {
             { l: 'totalSpaceExternal', c: 'total_external_space' }
         ];
 
-        return this._deviceInfo.fetch().then(() => Promise.all([
+        return Promise.all([
             this._deviceInfo.getDTO(),
             this._clientInfo.getDTO(),
             this._coreConfig.getDTO()
-        ]))
+        ])
             .then((res) => {
                 const rawData: { [key: string]: ContextualFeature } = {
                     ...res[0],
@@ -328,7 +328,7 @@ export class AutomatedExperimentManager {
 
                 return features;
             }).catch(err => {
-                Diagnostics.trigger('failed_to_collect_static_features', err);
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToCollectStaticFeatures);
                 return {};
             });
     }
@@ -353,13 +353,13 @@ export class AutomatedExperimentManager {
             { l: 'screenHeight', c: 'screen_height' }
         ];
 
-        return this._deviceInfo.fetch().then(() => Promise.all([
+        return Promise.all([
             this._deviceInfo.getDTO(),
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
             new Date(Date.now()),
             this._deviceInfo.getFreeSpace()
-        ]))
+        ])
             .then((res) => {
                 const rawData: { [key: string]: ContextualFeature } = {
                     ...res[0],
@@ -386,7 +386,7 @@ export class AutomatedExperimentManager {
 
                 return features;
             }).catch(err => {
-                Diagnostics.trigger('failed_to_collect_device_features', err);
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToCollectDeviceFeatures);
                 return {};
             });
     }
