@@ -1,8 +1,8 @@
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { Placement } from 'Ads/Models/Placement';
-import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
+import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { AccessMode,  ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P, IVastProperties } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -38,6 +38,17 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
         this._omInstances.forEach((om) => {
             om.injectAdVerifications();
         });
+    }
+
+    /**
+     * Video-only event. The player has loaded and buffered the creative’s
+     * media and assets either fully or to the extent that it is ready
+     * to play the media. Corresponds to the VAST  loaded  event.
+     */
+    public loaded(vastProperties: IVastProperties) {
+        if (this.getState() === OMState.STOPPED) {
+            super.loaded(vastProperties);
+        }
     }
 
     public sessionStart() {
