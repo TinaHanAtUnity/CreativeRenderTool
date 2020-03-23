@@ -216,10 +216,12 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             measurements.measure('config_parsed');
             this.Config = coreConfig;
-            if (this.DeviceInfo.isChineseNetworkOperator()) {
-                SDKMetrics.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
-            } else {
-                SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
+            if (CustomFeatures.sampleAtGivenPercent(25)) {
+                if (this.DeviceInfo.isChineseNetworkOperator()) {
+                    SDKMetrics.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
+                } else {
+                    SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
+                }
             }
 
             // tslint:disable-next-line:no-any
