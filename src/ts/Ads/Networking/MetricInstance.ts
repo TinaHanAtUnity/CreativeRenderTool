@@ -1,4 +1,3 @@
-import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ErrorMetric, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
@@ -223,6 +222,12 @@ export class MetricInstance implements IMetricInstance {
             return Promises.voidResult(this.postToDatadog(data, path));
         }
         return Promise.resolve();
+    }
+}
+
+export class ChinaMetricInstance extends MetricInstance {
+    protected getProductionUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity.cn';
     }
 }
 
