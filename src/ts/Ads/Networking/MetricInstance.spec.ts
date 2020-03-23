@@ -47,7 +47,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
         it('should create a ChinaMetricInstance', () => {
             CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => true);
-            deviceInfo.isChineseNetworkOperator.mockReturnValue(false);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(true);
             const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
             expect(localInstance).toBeInstanceOf(ChinaMetricInstance);
         });
