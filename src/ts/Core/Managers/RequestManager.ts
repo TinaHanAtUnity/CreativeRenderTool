@@ -111,23 +111,22 @@ export class RequestManager {
     public static configureAuctionProtocol(testMode: boolean) {
         if (!RequestManager._auctionProtocol) {
             const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
-            if (forceProtocol === 'V6') {
-                RequestManager._auctionProtocol = AuctionProtocol.V6;
-                return;
-            } else if (forceProtocol === 'V5') {
-                RequestManager._auctionProtocol = AuctionProtocol.V5;
-                return;
-            } else if (forceProtocol === 'V4') {
-                RequestManager._auctionProtocol = AuctionProtocol.V4;
-                return;
+            switch (forceProtocol) {
+                case 'V6':
+                    RequestManager._auctionProtocol = AuctionProtocol.V6;
+                    return;
+                case 'V5':
+                    RequestManager._auctionProtocol = AuctionProtocol.V5;
+                    return;
+                case 'V4':
+                    RequestManager._auctionProtocol = AuctionProtocol.V4;
+                    return;
+                default:
             }
 
-            if (TestEnvironment.get('creativeUrl')) {
-                RequestManager._auctionProtocol = AuctionProtocol.V4;
-                return;
-            }
-
-            if (testMode) {
+            // TestMode is currently unsupported for other protocols
+            // creativeUrl testing is set up to use V4 Protocol
+            if (testMode || TestEnvironment.get('creativeUrl')) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
