@@ -48,18 +48,6 @@ export class NullMetricInstance implements IMetricInstance {
     }
 }
 
-export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
-    if (CustomFeatures.sampleAtGivenPercent(25)) {
-        if (deviceInfo.isChineseNetworkOperator()) {
-            return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-        } else {
-            return new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-        }
-    } else {
-        return new NullMetricInstance();
-    }
-}
-
 export class MetricInstance implements IMetricInstance {
 
     private _platform: Platform;
@@ -235,5 +223,17 @@ export class MetricInstance implements IMetricInstance {
             return Promises.voidResult(this.postToDatadog(data, path));
         }
         return Promise.resolve();
+    }
+}
+
+export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
+    if (CustomFeatures.sampleAtGivenPercent(25)) {
+        if (deviceInfo.isChineseNetworkOperator()) {
+            return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        } else {
+            return new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        }
+    } else {
+        return new NullMetricInstance();
     }
 }
