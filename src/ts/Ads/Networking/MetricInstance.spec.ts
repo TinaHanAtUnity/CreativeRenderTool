@@ -1,9 +1,11 @@
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
-import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
+import { IProgrammaticTrackingData, MetricInstance, createMetricInstance, NullMetricInstance } from 'Ads/Networking/MetricInstance';
 import { AdmobMetric, TimingEvent, InitializationMetric, MediationMetric, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ChinaMetricInstance } from './ChinaMetricInstance';
 
 [
     Platform.IOS,
@@ -27,6 +29,29 @@ import { Platform } from 'Core/Constants/Platform';
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
         metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+    });
+
+    describe('createMetricInstance', () => {
+        it('should create a NullMetricInstance', () => {
+            CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => false);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(false);
+            const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            expect(localInstance).toBeInstanceOf(NullMetricInstance);
+        });
+
+        it('should create a MetricInstance', () => {
+            CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => true);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(false);
+            const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            expect(localInstance).toBeInstanceOf(MetricInstance);
+        });
+
+        it('should create a ChinaMetricInstance', () => {
+            CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => true);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(false);
+            const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            expect(localInstance).toBeInstanceOf(ChinaMetricInstance);
+        });
     });
 
     describe('createAdsSdkTag', () => {

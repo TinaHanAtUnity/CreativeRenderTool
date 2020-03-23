@@ -1,3 +1,5 @@
+import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ErrorMetric, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -43,6 +45,18 @@ export class NullMetricInstance implements IMetricInstance {
 
     public sendBatchedEvents(): Promise<void[]> {
         return Promise.resolve([]);
+    }
+}
+
+export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
+    if (CustomFeatures.sampleAtGivenPercent(25)) {
+        if (deviceInfo.isChineseNetworkOperator()) {
+            return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        } else {
+            return new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        }
+    } else {
+        return new NullMetricInstance();
     }
 }
 
