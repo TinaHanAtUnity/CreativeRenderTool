@@ -1,11 +1,10 @@
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
-import { IProgrammaticTrackingData, MetricInstance, createMetricInstance, NullMetricInstance } from 'Ads/Networking/MetricInstance';
+import { IProgrammaticTrackingData, MetricInstance, createMetricInstance, NullMetricInstance, ChinaMetricInstance } from 'Ads/Networking/MetricInstance';
 import { AdmobMetric, TimingEvent, InitializationMetric, MediationMetric, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { ChinaMetricInstance } from './ChinaMetricInstance';
 
 [
     Platform.IOS,
