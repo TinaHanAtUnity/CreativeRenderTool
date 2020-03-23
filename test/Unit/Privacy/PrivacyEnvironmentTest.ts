@@ -7,7 +7,7 @@ import { ICoreApi } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Backend } from 'Backend/Backend';
-import { PrivacyEnvironment } from 'Privacy/PrivacyEnvironment'
+import { PrivacyEnvironment } from 'Privacy/PrivacyEnvironment';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEnvironmentTest', () => {
@@ -50,6 +50,5 @@ import { PrivacyEnvironment } from 'Privacy/PrivacyEnvironment'
                 assert.isFalse(PrivacyEnvironment.isSet('undefinedTestValue'), 'isSet should return false for undefined value');
             });
         });
-
     });
 });
