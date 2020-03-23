@@ -23,6 +23,6 @@ export class PrivacyEnvironment {
     }
 
     public static isSet(key: string): boolean {
-        return PrivacyEnvironment._privacyEnvironment.hasOwnProperty(key)
+        return PrivacyEnvironment._privacyEnvironment.hasOwnProperty(key);
     }
 }
