@@ -8,5 +8,5 @@ export interface IUserPrivacySettings {
     external: boolean;
     gameExp: boolean;
     agreedOverAgeLimit: boolean;
-    agreementMethod?: string;
+    agreementMethod: string;
 }
