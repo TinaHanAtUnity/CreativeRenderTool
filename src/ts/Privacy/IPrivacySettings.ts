@@ -6,6 +6,7 @@ export interface IPrivacySettings {
 
 export interface IUserPrivacySettings {
     ads: boolean;
+    agreementMethod: string;
     external: boolean;
     gameExp: boolean;
     agreedOverAgeLimit: boolean;
