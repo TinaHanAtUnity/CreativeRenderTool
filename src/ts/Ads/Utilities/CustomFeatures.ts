@@ -48,7 +48,47 @@ export class CustomFeatures {
                 creativeId === '151338976' ||
                 creativeId === '151337994' ||
                 creativeId === '152919353' ||
-                creativeId === '153119177';
+                creativeId === '153119177' ||
+                creativeId === '16_215968892' || //Apple PMP creative
+                creativeId === '16_220979354' || //Apple PMP creative
+                creativeId === '16_203260709' || //Apple PMP creative
+                creativeId === '16_223349858' || //Apple PMP creative
+                creativeId === '16_220980857' || //Apple PMP creative
+                creativeId === '16_203291188' || //Apple PMP creative
+                creativeId === '16_203288594' || //Apple PMP creative
+                creativeId === '16_217248861' || //Apple PMP creative
+                creativeId === '16_220977264' || //Apple PMP creative
+                creativeId === '16_217250598' || //Apple PMP creative
+                creativeId === '16_200397780' || //Apple PMP creative
+                creativeId === '16_200563587' || //Apple PMP creative
+                creativeId === '16_200562587' || //Apple PMP creative
+                creativeId === '16_219202714' || //Apple PMP creative
+                creativeId === '16_217239365' || //Apple PMP creative
+                creativeId === '16_220977577' || //Apple PMP creative
+                creativeId === '16_200562390' || //Apple PMP creative
+                creativeId === '16_200561491' || //Apple PMP creative
+                creativeId === '16_223806491' || //Apple PMP creative
+                creativeId === '16_219208805' || //Apple PMP creative
+                creativeId === '16_217249360' || //Apple PMP creative
+                creativeId === '16_217248733' || //Apple PMP creative
+                creativeId === '16_226244139' || //Apple PMP creative
+                creativeId === '16_226221945' || //Apple PMP creative
+                creativeId === '16_223349336' || //Apple PMP creative
+                creativeId === '16_226136780' || //Apple PMP creative
+                creativeId === '16_226249715' || //Apple PMP creative
+                creativeId === '16_217251023' || //Apple PMP creative
+                creativeId === '16_226628388' || //Apple PMP creative
+                creativeId === '16_225901232' || //Apple PMP creative
+                creativeId === '16_226604812' || //Apple PMP creative
+                creativeId === '16_220589497' || //Apple PMP creative
+                creativeId === '16_223538689' || //Apple PMP creative
+                creativeId === '16_225901233' || //Apple PMP creative
+                creativeId === '16_225900934' || //Apple PMP creative
+                creativeId === '16_225904217' || //Apple PMP creative
+                creativeId === '16_223536291' || //Apple PMP creative
+                creativeId === '16_223524147' || //Apple PMP creative
+                creativeId === '16_223536390' || //Apple PMP creative
+                creativeId === '16_215924381';   //Apple PMP creative
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
