@@ -1,5 +1,6 @@
 import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { LegalFramework } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacyEnvironment } from './PrivacyEnvironment';
 
 export class PrivacySDK {
     private _gamePrivacy: GamePrivacy;
@@ -56,6 +57,7 @@ export class PrivacySDK {
     }
 
     public getLegalFramework(): LegalFramework {
-        return this._legalFramework;
+        return PrivacyEnvironment.isSet('legalFramework') ?
+            PrivacyEnvironment.get<LegalFramework>('legalFramework') : this._legalFramework;
     }
 }
