@@ -15,7 +15,38 @@ export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
 }
 
-export class MetricInstance {
+export interface IMetricInstance {
+    reportMetricEvent(event: PTSEvent): void;
+    reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }): void;
+    reportTimingEvent(event: TimingEvent, value: number): void;
+    reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }): void;
+    sendBatchedEvents(): Promise<void[]>;
+}
+
+export class NullMetricInstance implements IMetricInstance {
+
+    public reportMetricEvent(event: PTSEvent) {
+        // noop
+    }
+
+    public reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }) {
+        // noop
+    }
+
+    public reportTimingEvent(event: TimingEvent, value: number) {
+        // noop
+    }
+
+    public reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }) {
+        // noop
+    }
+
+    public sendBatchedEvents(): Promise<void[]> {
+        return Promise.resolve([]);
+    }
+}
+
+export class MetricInstance implements IMetricInstance {
 
     private _platform: Platform;
     private _requestManager: RequestManager;

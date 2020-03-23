@@ -54,7 +54,7 @@ import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
-import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { MetricInstance, NullMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
@@ -222,6 +222,8 @@ export class Core implements ICore {
                 } else {
                     SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
                 }
+            } else {
+                SDKMetrics.initialize(new NullMetricInstance());
             }
 
             // tslint:disable-next-line:no-any

@@ -1,4 +1,4 @@
-import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { IMetricInstance } from 'Ads/Networking/MetricInstance';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -162,9 +162,9 @@ export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric 
 
 export class SDKMetrics {
 
-    private static _metricInstance: MetricInstance;
+    private static _metricInstance: IMetricInstance;
 
-    public static initialize(metricInstance: MetricInstance): void {
+    public static initialize(metricInstance: IMetricInstance): void {
         if (!this._metricInstance) {
             this._metricInstance = metricInstance;
         }
