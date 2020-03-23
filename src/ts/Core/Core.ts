@@ -309,6 +309,8 @@ export class Core implements ICore {
     private setupPrivacyEnvironment(): Promise<void> {
         return PrivacyEnvironment.setup(new MetaData(this.Api)).then(() => {
             return Promise.resolve();
+        }).catch(() => {
+            this.Api.Sdk.logDebug('Error setting metadata env for privacy');
         });
     }
 }
