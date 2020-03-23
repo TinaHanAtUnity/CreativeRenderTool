@@ -24,6 +24,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
 import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 class TestListener implements IUnityAdsListener {
 
@@ -150,6 +151,7 @@ describe('AndroidAUIEssentialsTest', () => {
         AbstractAdUnit.setAutoCloseDelay(10000);
         AbstractAdUnit.setAutoClose(true);
 
+        AdsConfiguration.setTestHasArPlacement(true);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
