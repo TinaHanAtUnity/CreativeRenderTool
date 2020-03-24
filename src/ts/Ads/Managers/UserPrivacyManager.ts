@@ -167,7 +167,7 @@ export class UserPrivacyManager {
                 external: this._userPrivacy.getPermissions().external,
                 gameExp: this._userPrivacy.getPermissions().gameExp,
                 agreedOverAgeLimit: agreedOverAgeLimit,
-                agreementMethod: ''
+                agreementMethod: '' // TODO: get the value from userPrivacy
             },
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
