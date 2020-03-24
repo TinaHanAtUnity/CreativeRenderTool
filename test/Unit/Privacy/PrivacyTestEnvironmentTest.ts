@@ -24,7 +24,7 @@ import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
             sinon.stub(metaData, 'getKeys').returns(Promise.resolve(['testValue']));
             sinon.stub(metaData, 'get')
-                .withArgs('privacyenv.testValue').returns(Promise.resolve([true, 1234]));
+                .withArgs('privacytest.testValue').returns(Promise.resolve([true, 1234]));
         });
 
         it('should get defined value', () => {
