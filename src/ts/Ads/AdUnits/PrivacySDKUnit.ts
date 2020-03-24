@@ -171,20 +171,20 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
 
         let action: GDPREventAction;
-        switch (userSettings.lastInteraction.id) {
-            case 'acceptTracking':
+        switch (userSettings.user.agreementMethod) {
+            case 'all':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
 
-            case 'allowAll':
+            case 'allSeen':
                 action = GDPREventAction.CONSENT_AGREE; // this is correct, naming is just different in privacy UI
                 break;
 
-            case 'disagree':
+            case 'noneSeen':
                 action = GDPREventAction.CONSENT_DISAGREE;
                 break;
 
-            case 'saveChoices':
+            case 'userSelected':
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
                 break;
 
