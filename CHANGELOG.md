@@ -1,3 +1,8 @@
+# Pending
+
+* [Auction V6] Add Skeleton Implementation [#13884](https://github.com/Applifier/unity-ads-webview/pull/13884)
+* Add NullMetricInstance and Sample SDKMetrics at 25% [#13956](https://github.com/Applifier/unity-ads-webview/pull/13956)
+
 # Sat Mar 21 00:29:50 UTC 2020
 
 * Use RequestError instead of Error in XHRequest [#13921](https://github.com/Applifier/unity-ads-webview/pull/13921)
