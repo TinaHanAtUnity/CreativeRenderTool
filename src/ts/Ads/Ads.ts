@@ -209,7 +209,7 @@ export class Ads implements IAds {
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
         }).then(() => {
-            return this.setupPrivacyEnvironment();
+            return this.setupPrivacyTestEnvironment();
         }).then(() => {
             measurements.measure('setup_environment');
             return this.Analytics.initialize();
@@ -749,7 +749,7 @@ export class Ads implements IAds {
         }
     }
 
-    private setupPrivacyEnvironment(): Promise<void> {
+    private setupPrivacyTestEnvironment(): Promise<void> {
         return PrivacyTestEnvironment.setup(new MetaData(this._core.Api)).then(() => {
             return Promise.resolve();
         }).catch(() => {
