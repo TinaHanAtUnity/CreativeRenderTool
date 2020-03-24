@@ -347,15 +347,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private sendPTSCanPlay() {
         // TODO: Add Tagging to remove the below logic
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobVideoCanPlay);
-        if (this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMRewardedCanPlay);
-        } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedCanPlay);
-        } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedCanPlay);
-        } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedCanPlay);
-        }
     }
 
     private sendPTSStart() {
@@ -365,10 +356,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMRewardedStarted);
         } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedStarted);
-        } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedStarted);
-        } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedStarted);
         }
 
         if (this._view.getOpenMeasurementController()) {

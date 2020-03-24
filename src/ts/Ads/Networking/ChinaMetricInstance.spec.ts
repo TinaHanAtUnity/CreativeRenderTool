@@ -32,7 +32,6 @@ import { Platform } from 'Core/Constants/Platform';
 
     describe('reportMetricEvent with Chinese network operator', () => {
         beforeEach(() => {
-            metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
             metricInstance.sendBatchedEvents();
         });
 

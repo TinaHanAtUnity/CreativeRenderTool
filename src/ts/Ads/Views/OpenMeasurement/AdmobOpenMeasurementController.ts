@@ -13,7 +13,7 @@ import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, Inter
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-import { SDKMetrics, AdmobMetric, OMMetric, OMTimingMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, AdmobMetric, OMTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -90,7 +90,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
         this._campaign.setOMVendors(omVendors);
         this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
     public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
@@ -237,7 +236,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 });
             }
         });
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
     /**
@@ -245,7 +243,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
      */
     public sessionFinish() {
         super.sessionFinish();
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
         this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }
