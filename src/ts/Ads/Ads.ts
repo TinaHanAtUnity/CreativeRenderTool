@@ -390,7 +390,7 @@ export class Ads implements IAds {
                 if (mediation && mediation.getName() && performance && performance.now) {
 
                     let experimentType = MediationExperimentType.None;
-                    if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                    if (CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && !MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (this._nofillImmediately) {
