@@ -23,6 +23,7 @@ import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -108,8 +109,6 @@ export class UserPrivacyManager {
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
     private static AgeGateSourceStorageKey = 'privacy.agegatesource';
 
-    public _forcedConsentUnit: boolean;
-
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
@@ -127,7 +126,7 @@ export class UserPrivacyManager {
     private _developerAgeGateChoice: boolean;
     private _privacyFormatMetadataSeenInSession: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -138,7 +137,6 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._forcedConsentUnit = forcedConsentUnit || false;
         this._developerAgeGateActive = false;
         this._developerAgeGateChoice = false;
         this._privacyFormatMetadataSeenInSession = false;
@@ -375,8 +373,8 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
-        if (this._forcedConsentUnit) {
-            return true;
+        if (PrivacyTestEnvironment.isSet('forcePrivacyShow')) {
+            return PrivacyTestEnvironment.get<boolean>('forcePrivacyShow');
         }
 
         if (this.isAgeGateShowRequired()) {
