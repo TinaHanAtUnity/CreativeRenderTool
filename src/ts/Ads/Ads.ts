@@ -98,6 +98,7 @@ import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 
 export class Ads implements IAds {
 
@@ -390,7 +391,7 @@ export class Ads implements IAds {
                 if (mediation && mediation.getName() && performance && performance.now) {
 
                     let experimentType = MediationExperimentType.None;
-                    if (CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && !MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                    if (CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (this._nofillImmediately) {
@@ -623,6 +624,10 @@ export class Ads implements IAds {
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled && this._webViewEnabledLoad) {
                     SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledShow);
+                }
+
+                if (this.MediationLoadTrackingManager && this.MediationLoadTrackingManager.getCurrentExperiment() === 'cma') {
+                    this.MediationLoadTrackingManager.reportAdShown(CampaignAssetInfo.isCached(campaign));
                 }
             });
         });

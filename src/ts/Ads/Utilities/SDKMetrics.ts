@@ -142,6 +142,7 @@ export enum GeneralTimingMetric {
 }
 
 export enum MediationMetric {
+    AdShow = 'ad_show',
     InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
     LoadRequestNativeMeasured = 'load_request_native_measured',
