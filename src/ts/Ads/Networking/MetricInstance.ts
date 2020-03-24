@@ -232,7 +232,7 @@ export class ChinaMetricInstance extends MetricInstance {
 }
 
 export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
-    if (CustomFeatures.sampleAtGivenPercent(25)) {
+    if (CustomFeatures.sampleAtGivenPercent(100)) {
         if (deviceInfo.isChineseNetworkOperator()) {
             return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
         } else {
