@@ -45,6 +45,12 @@ export enum AdmobMetric {
     AdmobOMVideoStart = 'admob_om_video_start'
 }
 
+export enum OMTimingMetric {
+    AdmobOMLoaded = 'admob_om_loaded_event',
+    AdmobOMStart = 'admob_om_start_event',
+    AdmobOMImpression = 'admob_om_impression_event'
+}
+
 export enum BannerMetric {
     BannerAdLoad = 'banner_ad_load',
     BannerAdUnitLoaded = 'banner_ad_unit_loaded',
@@ -156,7 +162,7 @@ export enum MediationMetric {
     AuctionRequestStarted = 'auction_request_start'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | OMTimingMetric;
 
 export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric;
 
