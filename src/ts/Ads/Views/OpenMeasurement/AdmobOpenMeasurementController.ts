@@ -200,6 +200,12 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
     }
 
+    public start(duration: number) {
+        setTimeout(() => {
+            super.start(duration);
+        }, 10);
+    }
+
     public getOMInstances(): OpenMeasurement<Campaign>[] {
         return this._omInstances;
     }
