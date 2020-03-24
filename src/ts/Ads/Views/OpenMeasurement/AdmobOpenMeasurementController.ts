@@ -209,11 +209,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
     public start(duration: number) {
         SDKMetrics.reportTimingEvent(OMTimingMetric.AdmobOMStart, performance.now() - this.startTime);
-
-        // Introduce a small timeout to ensure the start event gets called after load
-        setTimeout(() => {
-            super.start(duration);
-        }, 100);
+        super.start(duration);
     }
 
     public getOMInstances(): OpenMeasurement<Campaign>[] {

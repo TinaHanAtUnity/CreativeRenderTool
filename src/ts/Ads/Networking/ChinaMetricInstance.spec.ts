@@ -30,21 +30,6 @@ import { Platform } from 'Core/Constants/Platform';
         metricInstance = new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
     });
 
-    describe('reportMetricEvent with Chinese network operator', () => {
-        beforeEach(() => {
-            metricInstance.sendBatchedEvents();
-        });
-
-        it('should fire with china endpoint', () => {
-            expect(requestManager.post).toBeCalledWith(
-                'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
-                expect.anything(),
-                expect.anything(),
-                expect.anything()
-            );
-        });
-    });
-
     describe('When test mode is enabled', () => {
         beforeEach(() => {
             clientInfo.getTestMode.mockReturnValue(true);
