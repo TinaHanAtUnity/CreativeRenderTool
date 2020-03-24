@@ -320,6 +320,9 @@ describe('AutomatedExperimentManagerTests', () => {
     });
 
     it('AutomatedExperimentManager notified of performance campaigns', () => {
+        sandbox.stub(SDKMetrics, 'reportMetricEventWithTags')
+            .returns(true);
+
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
         const cacheBookkeeping = core.CacheBookkeeping;
@@ -382,6 +385,7 @@ describe('AutomatedExperimentManagerTests', () => {
         const variant = aem.activateExperiment(campaign, FooExperiment);
         assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
         assert.isTrue(metricStub.notCalled);
+
         return aem.endCampaign(campaign);
     });
 });
