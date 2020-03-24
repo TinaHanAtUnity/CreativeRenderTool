@@ -66,10 +66,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _playerMetadataServerId: string;
     private _options: unknown;
 
-    public static setForcedGDPRBanner(value: boolean) {
-        AbstractAdUnitParametersFactory._forceGDPRBanner = value;
-    }
-
     constructor(core: ICore, ads: IAds) {
         this._platform = core.NativeBridge.getPlatform();
         this._core = core.Api;
@@ -183,8 +179,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     }
 
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
-        if (AbstractAdUnitParametersFactory._forceGDPRBanner) {
-            return true;
+        if (PrivacyTestEnvironment.isSet('showGDPRBanner')) {
+            return PrivacyTestEnvironment.get<boolean>('showGDPRBanner');
         }
 
         if (parameters.coreConfig.isCoppaCompliant()) {

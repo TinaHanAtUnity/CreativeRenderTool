@@ -373,8 +373,8 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
-        if (PrivacyTestEnvironment.isSet('forcePrivacyShow')) {
-            return PrivacyTestEnvironment.get<boolean>('forcePrivacyShow');
+        if (PrivacyTestEnvironment.isSet('showPrivacy')) {
+            return PrivacyTestEnvironment.get<boolean>('showPrivacy');
         }
 
         if (this.isAgeGateShowRequired()) {
