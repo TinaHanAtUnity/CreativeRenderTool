@@ -1,6 +1,6 @@
 import { MetaData } from 'Core/Utilities/MetaData';
 
-export class PrivacyEnvironment {
+export class PrivacyTestEnvironment {
     private static _privacyEnvironment: { [key: string]: unknown } = {};
 
     public static setup(metaData: MetaData): Promise<void[]> {
@@ -19,10 +19,10 @@ export class PrivacyEnvironment {
     }
 
     public static get<T>(key: string): T {
-        return <T>PrivacyEnvironment._privacyEnvironment[key];
+        return <T>PrivacyTestEnvironment._privacyEnvironment[key];
     }
 
     public static isSet(key: string): boolean {
-        return PrivacyEnvironment._privacyEnvironment.hasOwnProperty(key);
+        return PrivacyTestEnvironment._privacyEnvironment.hasOwnProperty(key);
     }
 }
