@@ -98,6 +98,8 @@ import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
+import { PrivacyEnvironment } from 'Privacy/PrivacyEnvironment';
+import { MetaData } from 'Core/Utilities/MetaData';
 
 export class Ads implements IAds {
 
@@ -206,6 +208,8 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
+        }).then(() => {
+            return this.setupPrivacyEnvironment();
         }).then(() => {
             measurements.measure('setup_environment');
             return this.Analytics.initialize();
@@ -743,6 +747,14 @@ export class Ads implements IAds {
         if (TestEnvironment.get('debugJsConsole')) {
             MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
         }
+    }
+
+    private setupPrivacyEnvironment(): Promise<void> {
+        return PrivacyEnvironment.setup(new MetaData(this._core.Api)).then(() => {
+            return Promise.resolve();
+        }).catch(() => {
+            this._core.Api.Sdk.logDebug('Error setting metadata env for privacy');
+        });
     }
 
     private logChinaMetrics() {

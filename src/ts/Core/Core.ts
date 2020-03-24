@@ -57,7 +57,6 @@ import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
-import { PrivacyEnvironment } from 'Privacy/PrivacyEnvironment';
 
 export class Core implements ICore {
 
@@ -170,7 +169,7 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment(), this.setupPrivacyEnvironment()]);
+            return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             measurements.measure('device_info_collection');
             HttpKafka.setDeviceInfo(this.DeviceInfo);
@@ -303,14 +302,6 @@ export class Core implements ICore {
                     }
                 }
             }
-        });
-    }
-
-    private setupPrivacyEnvironment(): Promise<void> {
-        return PrivacyEnvironment.setup(new MetaData(this.Api)).then(() => {
-            return Promise.resolve();
-        }).catch(() => {
-            this.Api.Sdk.logDebug('Error setting metadata env for privacy');
         });
     }
 }
