@@ -222,7 +222,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public sessionStart(sessionEvent: ISessionEvent) {
-        const startTime = performance.now();
+        this.startTime = performance.now();
         this._omInstances.forEach((om) => {
             // Need a deep assignment to avoid duplication for events
             const event = JSON.parse(JSON.stringify(sessionEvent));
