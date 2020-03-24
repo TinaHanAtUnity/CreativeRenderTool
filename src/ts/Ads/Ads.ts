@@ -208,9 +208,7 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
-        }).then(() => {
-            return this.setupPrivacyTestEnvironment();
-        }).then(() => {
+        }).then(() => this.setupPrivacyTestEnvironment()).then(() => {
             measurements.measure('setup_environment');
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -750,9 +748,7 @@ export class Ads implements IAds {
     }
 
     private setupPrivacyTestEnvironment(): Promise<void> {
-        return PrivacyTestEnvironment.setup(new MetaData(this._core.Api)).then(() => {
-            return Promise.resolve();
-        }).catch(() => {
+        return PrivacyTestEnvironment.setup(new MetaData(this._core.Api)).catch(() => {
             this._core.Api.Sdk.logDebug('Error setting metadata env for privacy');
         });
     }
