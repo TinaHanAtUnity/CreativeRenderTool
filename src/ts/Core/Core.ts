@@ -53,8 +53,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
-import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
-import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { createMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
@@ -216,11 +215,7 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             measurements.measure('config_parsed');
             this.Config = coreConfig;
-            if (this.DeviceInfo.isChineseNetworkOperator()) {
-                SDKMetrics.initialize(new ChinaMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
-            } else {
-                SDKMetrics.initialize(new MetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
-            }
+            SDKMetrics.initialize(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
 
             // tslint:disable-next-line:no-any
             const nativeInitTime = (<number>(<any>window).initTimestamp) - this.ClientInfo.getInitTimestamp();

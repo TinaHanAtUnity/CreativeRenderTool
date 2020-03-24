@@ -1,3 +1,4 @@
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ErrorMetric, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -15,7 +16,38 @@ export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
 }
 
-export class MetricInstance {
+export interface IMetricInstance {
+    reportMetricEvent(event: PTSEvent): void;
+    reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }): void;
+    reportTimingEvent(event: TimingEvent, value: number): void;
+    reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }): void;
+    sendBatchedEvents(): Promise<void[]>;
+}
+
+export class NullMetricInstance implements IMetricInstance {
+
+    public reportMetricEvent(event: PTSEvent) {
+        // noop
+    }
+
+    public reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }) {
+        // noop
+    }
+
+    public reportTimingEvent(event: TimingEvent, value: number) {
+        // noop
+    }
+
+    public reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }) {
+        // noop
+    }
+
+    public sendBatchedEvents(): Promise<void[]> {
+        return Promise.resolve([]);
+    }
+}
+
+export class MetricInstance implements IMetricInstance {
 
     private _platform: Platform;
     private _requestManager: RequestManager;
@@ -190,5 +222,23 @@ export class MetricInstance {
             return Promises.voidResult(this.postToDatadog(data, path));
         }
         return Promise.resolve();
+    }
+}
+
+export class ChinaMetricInstance extends MetricInstance {
+    protected getProductionUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity.cn';
+    }
+}
+
+export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
+    if (CustomFeatures.sampleAtGivenPercent(25)) {
+        if (deviceInfo.isChineseNetworkOperator()) {
+            return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        } else {
+            return new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        }
+    } else {
+        return new NullMetricInstance();
     }
 }
