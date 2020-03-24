@@ -159,6 +159,7 @@ export class AuctionRequest {
     private static AbGroup: number | undefined;
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    private static AuctionV6BaseUrl: string = 'https://auction.unityads.unity3d.com/v6/games';
     private static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -512,6 +513,8 @@ export class AuctionRequest {
         }
 
         switch (RequestManager.getAuctionProtocol()) {
+            // TODO: Update banners to use Auction V6
+            case AuctionProtocol.V6:
             case AuctionProtocol.V5:
                 this._baseURL = AuctionRequest.AuctionV5BaseUrl;
                 break;

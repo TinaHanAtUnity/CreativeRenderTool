@@ -67,6 +67,7 @@ export abstract class CampaignManager {
 
     protected static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     protected static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    protected static AuctionV6BaseUrl: string = 'https://auction.unityads.unity3d.com/v6/games';
     protected static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
 
     protected static CampaignId: string | undefined;
