@@ -27,6 +27,16 @@ class ABTest {
     }
 }
 
+class ReverseABTest extends ABTest {
+    constructor(...groups: AllowedGroups[]) {
+        super(...groups);
+    }
+
+    public isValid(group: ABGroup): boolean {
+        return !super.isValid(group);
+    }
+}
+
 class DisabledABTest extends ABTest {
     constructor(...groups: AllowedGroups[]) {
         super(...groups);
@@ -63,6 +73,7 @@ class ZyngaFilteredABTest extends FilteredABTest {
 export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
+export const FakeReverseABTest = new ReverseABTest(16, 17);
 
 // Active AB Tests
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
