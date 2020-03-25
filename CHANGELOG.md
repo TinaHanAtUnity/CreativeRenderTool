@@ -3,6 +3,7 @@
 * [Auction V6] Add Skeleton Implementation [#13884](https://github.com/Applifier/unity-ads-webview/pull/13884)
 * Add NullMetricInstance and Sample SDKMetrics at 25% [#13956](https://github.com/Applifier/unity-ads-webview/pull/13956)
 * Sample Metrics at 100% Temporarily [#13985](https://github.com/Applifier/unity-ads-webview/pull/13985)
+* Add Reverse AB Test Functionality [#13988](https://github.com/Applifier/unity-ads-webview/pull/13988)
 
 # Sat Mar 21 00:29:50 UTC 2020
 
