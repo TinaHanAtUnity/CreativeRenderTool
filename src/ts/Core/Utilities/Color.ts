@@ -21,10 +21,10 @@ export class Color {
 
     public static lerp(c1: Color, c2: Color, t: number): Color {
         return new Color(
-            c1.r + (c2.r - c1.r) * t,
-            c1.g + (c2.g - c1.g) * t,
-            c1.b + (c2.b - c1.b) * t,
-            c1.a + (c2.a - c1.a) * t);
+            Math.round(c1.r + (c2.r - c1.r) * t),
+            Math.round(c1.g + (c2.g - c1.g) * t),
+            Math.round(c1.b + (c2.b - c1.b) * t),
+            Math.round(c1.a + (c2.a - c1.a) * t));
     }
 
     public static hexToCssRgba(hex: string): string {
