@@ -1,4 +1,4 @@
-import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { IMetricInstance } from 'Ads/Networking/MetricInstance';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -72,11 +72,15 @@ export enum VastMetric {
 }
 
 export enum MiscellaneousMetric {
+    ImpressionDuplicate = 'impression_duplicate',
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
     CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
     IOSDeleteStoredGamerToken = 'ios_delete_stored_gamer_token',
-    XHRNotAvailable = 'xhr_not_available'
+    XHRNotAvailable = 'xhr_not_available',
+    AuctionRequestFailed = 'auction_request_failed',
+    AuctionRequestOk = 'auction_request_ok',
+    AuctionRequestCreated = 'auction_request_created'
 }
 
 export enum LoadMetric {
@@ -145,6 +149,7 @@ export enum GeneralTimingMetric {
 }
 
 export enum MediationMetric {
+    AdShow = 'ad_show',
     InitializationComplete = 'mediation_init_complete',
     LoadRequest = 'load_request',
     LoadRequestNativeMeasured = 'load_request_native_measured',
@@ -155,7 +160,8 @@ export enum MediationMetric {
     PlacementCount = 'placement_count',
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
-    AdCaching = 'ad_caching_time'
+    AdCaching = 'ad_caching_time',
+    AuctionRequestStarted = 'auction_request_start'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
@@ -164,9 +170,9 @@ export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric 
 
 export class SDKMetrics {
 
-    private static _metricInstance: MetricInstance;
+    private static _metricInstance: IMetricInstance;
 
-    public static initialize(metricInstance: MetricInstance): void {
+    public static initialize(metricInstance: IMetricInstance): void {
         if (!this._metricInstance) {
             this._metricInstance = metricInstance;
         }

@@ -25,6 +25,7 @@ import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
@@ -84,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, AuctionXHR } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -98,6 +99,7 @@ import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 
 export class Ads implements IAds {
 
@@ -151,7 +153,7 @@ export class Ads implements IAds {
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
             AdsProperties: new AdsPropertiesApi(core.NativeBridge),
-            Listener: new ListenerApi(core.NativeBridge),
+            Listener: CustomFeatures.pauseEventsSupported(core.ClientInfo.getGameId()) ? new PausableListenerApi(core.NativeBridge) : new ListenerApi(core.NativeBridge),
             Placement: new PlacementApi(core.NativeBridge),
             VideoPlayer: new VideoPlayerApi(core.NativeBridge),
             WebPlayer: new WebPlayerApi(core.NativeBridge),
@@ -285,7 +287,7 @@ export class Ads implements IAds {
                 }
             });
 
-            RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
+            RequestManager.configureAuctionProtocol(this._core.Config.getTestMode());
 
             this.configureCampaignManager();
             this.configureAutomatedExperimentManager();
@@ -399,10 +401,7 @@ export class Ads implements IAds {
                 if (mediation && mediation.getName() && performance && performance.now) {
 
                     let experimentType = MediationExperimentType.None;
-                    if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
-                        this.Config.set('cacheMode', CacheMode.ALLOWED);
-                        experimentType = MediationExperimentType.CacheModeAllowed;
-                    } else if (this._nofillImmediately) {
+                    if (this._nofillImmediately) {
                         experimentType = MediationExperimentType.NofillImmediately;
                     } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
                         if (XHRequest.isAvailable()) {
@@ -558,6 +557,10 @@ export class Ads implements IAds {
 
         this._showing = true;
 
+        if (this.Api.Listener instanceof PausableListenerApi) {
+            this.Api.Listener.pauseEvents();
+        }
+
         if (this.Config.getCacheMode() !== CacheMode.DISABLED) {
             this.AssetManager.stopCaching();
         }
@@ -628,6 +631,10 @@ export class Ads implements IAds {
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled && this._webViewEnabledLoad) {
                     SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledShow);
+                }
+
+                if (this.MediationLoadTrackingManager) {
+                    this.MediationLoadTrackingManager.reportAdShown(CampaignAssetInfo.isCached(campaign));
                 }
             });
         });

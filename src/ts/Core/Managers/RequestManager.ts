@@ -5,9 +5,6 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 const enum RequestStatus {
@@ -23,7 +20,8 @@ const enum RequestMethod {
 
 export enum AuctionProtocol {
     V4 = 4,
-    V5 = 5
+    V5 = 5,
+    V6 = 6
 }
 
 interface IRequestOptions {
@@ -110,27 +108,30 @@ export class RequestManager {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform, clientInfo: ClientInfo) {
+    public static configureAuctionProtocol(testMode: boolean) {
         if (!RequestManager._auctionProtocol) {
             const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
-            if (forceProtocol === 'V5') {
-                RequestManager._auctionProtocol = AuctionProtocol.V5;
-                return;
-            } else if (forceProtocol === 'V4') {
+            switch (forceProtocol) {
+                case 'V6':
+                    RequestManager._auctionProtocol = AuctionProtocol.V6;
+                    return;
+                case 'V5':
+                    RequestManager._auctionProtocol = AuctionProtocol.V5;
+                    return;
+                case 'V4':
+                    RequestManager._auctionProtocol = AuctionProtocol.V4;
+                    return;
+                default:
+            }
+
+            // TestMode is currently unsupported for other protocols
+            // creativeUrl testing is set up to use V4 Protocol
+            if (testMode || TestEnvironment.get('creativeUrl')) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
 
-            if (TestEnvironment.get('creativeUrl')) {
-                RequestManager._auctionProtocol = AuctionProtocol.V4;
-                return;
-            }
-
-            if (coreConfig.getTestMode()) {
-                RequestManager._auctionProtocol = AuctionProtocol.V4;
-                return;
-            }
-
+            // TODO: Update to default to V6 upon full transition
             RequestManager._auctionProtocol = AuctionProtocol.V5;
         }
     }

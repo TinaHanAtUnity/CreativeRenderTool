@@ -3,7 +3,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode } from 'Ads/Models/AuctionResponse';
+import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode, IRawAuctionV6Response } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -45,7 +45,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { SDKMetrics, LoadMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, LoadMetric, GeneralTimingMetric, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -78,7 +78,6 @@ export class LegacyCampaignManager extends CampaignManager {
     private _metaDataManager: MetaDataManager;
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
-    private _previousPlacementId: string | undefined;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
     private _auctionProtocol: AuctionProtocol;
@@ -120,6 +119,15 @@ export class LegacyCampaignManager extends CampaignManager {
             return Promise.resolve();
         }
 
+        SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestCreated, {
+            'wel': 'false',
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        });
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportAuctionRequestStarted();
+        }
+
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
@@ -135,8 +143,8 @@ export class LegacyCampaignManager extends CampaignManager {
         const requestTimestamp: number = Date.now();
 
         return Promise.all<string[], number | undefined, number>([
-            this.getFullyCachedCampaigns(),
-            this.getVersionCode(),
+            CampaignManager.getFullyCachedCampaigns(this._core),
+            CampaignManager.getVersionCode(this._platform, this._core, this._clientInfo),
             this._deviceInfo.getFreeSpace()
         ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
             this._deviceFreeSpace = freeSpace;
@@ -164,11 +172,28 @@ export class LegacyCampaignManager extends CampaignManager {
                 return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
             }
         }).catch((error: unknown) => {
-            if (this._mediationLoadTracking && performance && performance.now) {
-                this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+            let reason: string = 'unknown';
+            if (error instanceof RequestError) {
+                if (error.nativeResponse) {
+                    reason = error.nativeResponse.responseCode.toString();
+                } else {
+                    reason = 'request';
+                }
             }
+            if (this._mediationLoadTracking && performance && performance.now) {
+                this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false, reason);
+            }
+            SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestFailed, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+                'rsn': reason
+            });
             throw error;
         }).then(response => {
+            SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestOk, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+            });
             measurement.measure('auction_response');
             const cachingTime = this.getTime();
             if (this._mediationLoadTracking && performance && performance.now) {
@@ -177,22 +202,28 @@ export class LegacyCampaignManager extends CampaignManager {
             if (response) {
                 this.setSDKSignalValues(requestTimestamp);
 
-                if (this._auctionProtocol === AuctionProtocol.V5) {
-                    return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).then(() => {
-                        if (this._mediationLoadTracking && performance && performance.now) {
-                            this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
-                        }
-                    }).catch((e) => {
-                        if (this._mediationLoadTracking && performance && performance.now) {
-                            this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
-                        }
-                        this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
-                    });
-                } else {
-                    return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy).catch((e) => {
-                        this.handleGeneralError(e, 'parse_campaigns_error');
-                    });
+                let parseResponse: Promise<void | void[]>;
+                switch (this._auctionProtocol) {
+                    case AuctionProtocol.V6:
+                        parseResponse = this.parseAuctionV6Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
+                    case AuctionProtocol.V5:
+                        parseResponse = this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
+                        break;
+                    case AuctionProtocol.V4:
+                    default:
+                        parseResponse = this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
                 }
+
+                return parseResponse.then(() => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, true);
+                    }
+                }).catch((e) => {
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportingAdCaching(this.getTime() - cachingTime, false);
+                    }
+                    this.handleGeneralError(e, 'parse_auction_campaigns_error');
+                });
             }
             throw new WebViewError('Empty campaign response', 'CampaignRequestError');
         }).then(() => {
@@ -213,6 +244,15 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+        SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestCreated, {
+            'wel': 'true',
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        });
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportAuctionRequestStarted();
+        }
+
         const requestStartTime = this.getTime();
         let cachingTime: number;
         this._isLoadEnabled = true;
@@ -228,13 +268,14 @@ export class LegacyCampaignManager extends CampaignManager {
         const legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
 
         return Promise.all<string[], number | undefined, number>([
-            this.getFullyCachedCampaigns(),
-            this.getVersionCode(),
+            CampaignManager.getFullyCachedCampaigns(this._core),
+            CampaignManager.getVersionCode(this._platform, this._core, this._clientInfo),
             this._deviceInfo.getFreeSpace()
         ]).then(([fullyCachedCampaignIds, versionCode, freeSpace]) => {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
-                CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
+                // TODO: Utilize this.getBaseUrl() after V6 is supported for load
+                CampaignManager.createRequestUrl(this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._sdkDetectionInfo, placement)
             ]);
         }).then(([requestUrl, requestBody]) => {
@@ -250,12 +291,29 @@ export class LegacyCampaignManager extends CampaignManager {
                     retryWithConnectionEvents: false,
                     timeout: 10000
                 }).catch((error: unknown) => {
-                    if (this._mediationLoadTracking && performance && performance.now) {
-                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false);
+                    let reason: string = 'unknown';
+                    if (error instanceof RequestError) {
+                        if (error.nativeResponse) {
+                            reason = error.nativeResponse.responseCode.toString();
+                        } else {
+                            reason = 'request';
+                        }
                     }
+                    if (this._mediationLoadTracking && performance && performance.now) {
+                        this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, false, reason);
+                    }
+                    SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestFailed, {
+                        'wel': 'true',
+                        'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+                        'rsn': reason
+                    });
                     throw error;
                 });
             }).then(response => {
+                SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestOk, {
+                    'wel': 'true',
+                    'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+                });
                 cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
@@ -280,22 +338,6 @@ export class LegacyCampaignManager extends CampaignManager {
                 SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledNoFill);
                 return undefined;
             });
-        });
-    }
-
-    public setPreviousPlacementId(id: string | undefined) {
-        this._previousPlacementId = id;
-    }
-
-    public getPreviousPlacementId(): string | undefined {
-        return this._previousPlacementId;
-    }
-
-    public getFullyCachedCampaigns(): Promise<string[]> {
-        return this._core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            return campaignKeys;
-        }).catch(() => {
-            return [];
         });
     }
 
@@ -421,6 +463,17 @@ export class LegacyCampaignManager extends CampaignManager {
         } else {
             throw new Error('No placements found');
         }
+    }
+
+    // TODO: Update with implementation
+    private parseAuctionV6Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
+        let json;
+        try {
+            json = JsonParser.parse<IRawAuctionV6Response>(response.response);
+        } catch (e) {
+            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+        }
+        return Promise.resolve();
     }
 
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
@@ -569,6 +622,7 @@ export class LegacyCampaignManager extends CampaignManager {
     private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, deviceFreeSpace: number, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<ILoadedCampaign | undefined> {
         let json;
         try {
+            // TODO: Transition Load to use Auction V6
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
         } catch (e) {
             Diagnostics.trigger('load_campaign_failed_to_parse', {});
@@ -811,41 +865,26 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private getBaseUrl(): string {
         if (this._coreConfig.getTestMode()) {
-            return [
-                CampaignManager.TestModeUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
+            return this.constructBaseUrl(CampaignManager.TestModeUrl);
         }
-        if (this._auctionProtocol === AuctionProtocol.V5) {
-            return [
-                CampaignManager.AuctionV5BaseUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
-        } else {
-            return [
-                CampaignManager.BaseUrl,
-                this._clientInfo.getGameId(),
-                'requests'
-            ].join('/');
+
+        switch (this._auctionProtocol) {
+            case AuctionProtocol.V6:
+                return this.constructBaseUrl(CampaignManager.AuctionV6BaseUrl);
+            case AuctionProtocol.V5:
+                return this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl);
+            case AuctionProtocol.V4:
+            default:
+                return this.constructBaseUrl(CampaignManager.BaseUrl);
         }
     }
 
-    private getVersionCode(): Promise<number | undefined> {
-        if (this._platform === Platform.ANDROID) {
-            return this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
-                if (packageInfo.versionCode) {
-                    return packageInfo.versionCode;
-                } else {
-                    return undefined;
-                }
-            }).catch(() => {
-                return undefined;
-            });
-        } else {
-            return Promise.resolve(undefined);
-        }
+    private constructBaseUrl(baseUri: string): string {
+        return [
+            baseUri,
+            this._clientInfo.getGameId(),
+            'requests'
+        ].join('/');
     }
 
     private setSDKSignalValues(requestTimestamp: number): void {

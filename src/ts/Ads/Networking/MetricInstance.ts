@@ -1,3 +1,4 @@
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ErrorMetric, PTSEvent, TimingEvent } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
@@ -15,7 +16,38 @@ export interface IProgrammaticTrackingData {
     metrics: IPTSEvent[];
 }
 
-export class MetricInstance {
+export interface IMetricInstance {
+    reportMetricEvent(event: PTSEvent): void;
+    reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }): void;
+    reportTimingEvent(event: TimingEvent, value: number): void;
+    reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }): void;
+    sendBatchedEvents(): Promise<void[]>;
+}
+
+export class NullMetricInstance implements IMetricInstance {
+
+    public reportMetricEvent(event: PTSEvent) {
+        // noop
+    }
+
+    public reportMetricEventWithTags(event: PTSEvent, tags: { [key: string]: string }) {
+        // noop
+    }
+
+    public reportTimingEvent(event: TimingEvent, value: number) {
+        // noop
+    }
+
+    public reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }) {
+        // noop
+    }
+
+    public sendBatchedEvents(): Promise<void[]> {
+        return Promise.resolve([]);
+    }
+}
+
+export class MetricInstance implements IMetricInstance {
 
     private _platform: Platform;
     private _requestManager: RequestManager;
@@ -26,10 +58,16 @@ export class MetricInstance {
     private _batchedMetricEvents: IPTSEvent[];
     private _baseUrl: string;
 
-    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/';
+    private _stagingBaseUrl = 'https://sdk-diagnostics.stg.mz.internal.unity3d.com';
 
-    private metricPath = 'v1/metrics';
-    private timingPath = 'v1/timing';
+    private metricPath = '/v1/metrics';
+    private timingPath = '/v1/timing';
+
+    private static _overrideBaseUrl: string | undefined;
+
+    public static setBaseUrl(url: string | undefined) {
+        MetricInstance._overrideBaseUrl = url;
+    }
 
     constructor(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string) {
         this._platform = platform;
@@ -39,11 +77,16 @@ export class MetricInstance {
         this._countryIso = this.getCountryIso(country);
         this._batchedTimingEvents = [];
         this._batchedMetricEvents = [];
-        this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+
+        if (MetricInstance._overrideBaseUrl !== undefined) {
+            this._baseUrl = MetricInstance._overrideBaseUrl;
+        } else {
+            this._baseUrl = this._clientInfo.getTestMode() ? this._stagingBaseUrl : this.getProductionUrl();
+        }
     }
 
     protected getProductionUrl(): string {
-        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com/';
+        return 'https://sdk-diagnostics.prd.mz.internal.unity3d.com';
     }
 
     private createTags(tags: { [key: string]: string }): string[] {
@@ -179,5 +222,23 @@ export class MetricInstance {
             return Promises.voidResult(this.postToDatadog(data, path));
         }
         return Promise.resolve();
+    }
+}
+
+export class ChinaMetricInstance extends MetricInstance {
+    protected getProductionUrl(): string {
+        return 'https://sdk-diagnostics.prd.mz.internal.unity.cn';
+    }
+}
+
+export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
+    if (CustomFeatures.sampleAtGivenPercent(100)) {
+        if (deviceInfo.isChineseNetworkOperator()) {
+            return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        } else {
+            return new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+        }
+    } else {
+        return new NullMetricInstance();
     }
 }

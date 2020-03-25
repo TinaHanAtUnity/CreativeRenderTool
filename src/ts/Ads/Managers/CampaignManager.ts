@@ -29,6 +29,8 @@ import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasu
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { ICoreApi } from 'Core/ICore';
+import { StorageType } from 'Core/Native/Storage';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -56,6 +58,7 @@ export abstract class CampaignManager {
     public static setBaseUrl(baseUrl: string): void {
         CampaignManager.BaseUrl = baseUrl + '/v4/games';
         CampaignManager.AuctionV5BaseUrl = baseUrl + '/v5/games';
+        CampaignManager.TestModeUrl = baseUrl + '/v4/test/games';
     }
 
     protected static CampaignResponse: string | undefined;
@@ -64,11 +67,14 @@ export abstract class CampaignManager {
 
     protected static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     protected static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    protected static AuctionV6BaseUrl: string = 'https://auction.unityads.unity3d.com/v6/games';
     protected static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
 
     protected static CampaignId: string | undefined;
     protected static SessionId: string | undefined;
     protected static Country: string | undefined;
+
+    private _previousPlacementId: string | undefined;
 
     public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
     public readonly onNoFill = new Observable1<string>();
@@ -78,9 +84,14 @@ export abstract class CampaignManager {
 
     public abstract request(nofillRetry?: boolean): Promise<INativeResponse | void>;
     public abstract loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined>;
-    public abstract setPreviousPlacementId(id: string | undefined): void;
-    public abstract getPreviousPlacementId(): string | undefined;
-    public abstract getFullyCachedCampaigns(): Promise<string[]>;
+
+    public setPreviousPlacementId(id: string | undefined) {
+        this._previousPlacementId = id;
+    }
+
+    public getPreviousPlacementId(): string | undefined {
+        return this._previousPlacementId;
+    }
 
     public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown): Promise<INativeResponse> {
         const body = JSON.stringify(requestBody);
@@ -324,6 +335,30 @@ export abstract class CampaignManager {
                 measurement.measure('body_generation');
                 return body;
             });
+        });
+    }
+
+    public static getVersionCode(platform: Platform, core: ICoreApi, clientInfo: ClientInfo): Promise<number | undefined> {
+        if (platform === Platform.ANDROID) {
+            return core.DeviceInfo.Android!.getPackageInfo(clientInfo.getApplicationName()).then(packageInfo => {
+                if (packageInfo.versionCode) {
+                    return packageInfo.versionCode;
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
+    }
+
+    public static getFullyCachedCampaigns(core: ICoreApi): Promise<string[]> {
+        return core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
         });
     }
 }

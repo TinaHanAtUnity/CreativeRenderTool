@@ -162,6 +162,7 @@ describe('VastVideoEventHandler tests', () => {
         sandbox.stub(omController, 'pause');
         sandbox.stub(omController, 'setDeviceVolume');
         sandbox.stub(omController, 'start');
+        sandbox.stub(omController, 'loaded');
         sandbox.stub(omController, 'sessionFinish');
         sandbox.stub(omController, 'volumeChange');
         sandbox.stub(omController, 'playerStateChanged');
@@ -348,6 +349,7 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onPlay('https://test.com');
             sinon.assert.called(<sinon.SinonStub>openMeasurement!.resume);
             sinon.assert.called(<sinon.SinonStub>openMeasurement!.start);
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.loaded);
             sinon.assert.called(<sinon.SinonStub>openMeasurement!.playerStateChanged);
         });
     });

@@ -168,6 +168,7 @@ describe('CampaignRefreshManager', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
         sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
