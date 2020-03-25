@@ -24,6 +24,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
 import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 class TestListener implements IUnityAdsListener {
 
@@ -125,13 +126,15 @@ describe('AndroidAUIEssentialsTest', () => {
             .withArgs('campaignId').returns('')
             .withArgs('country').returns('')
             .withArgs('creativePack').returns(config.creativePack);
+
+        targetSandbox.stub(PrivacyTestEnvironment, 'get')
+            .withArgs('showGDPRBanner').returns(config.forceGDPRBanner)
     };
 
     const initialize = async () => {
         fakeARSupport(sandbox);
         // We must reset these parameters manually because the webview does not get completely reset between runs.
         // The way metadata is read during initialization prevents false value from updating it to the respective systems.
-        AbstractAdUnitParametersFactory.setForcedGDPRBanner(false);
         MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(false);
         MRAIDAdUnitParametersFactory.setForcedARMRAID(false);
         MRAIDView.setDebugJsConsole(false);
