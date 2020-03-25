@@ -433,7 +433,11 @@ export class UserPrivacyManager {
             return false;
         }
 
-        return PrivacyTestEnvironment.get<boolean>('forceprivacysdk') || (PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI');
+        if (PrivacyTestEnvironment.isSet('usePrivacySDK')) {
+            return PrivacyTestEnvironment.get('usePrivacySDK') 
+        }
+
+        return PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI';
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
