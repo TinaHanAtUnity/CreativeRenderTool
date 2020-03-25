@@ -119,9 +119,14 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
                     isAutoplay: false,
                     position: VideoPosition.STANDALONE
                 });
-                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
-                expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
-                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+
+                if (platform === Platform.ANDROID) {
+                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
+                    expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
+                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+                } else {
+                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
+                }
             });
 
             it('start event first metric should not fire if loaded has fired', () => {
@@ -133,9 +138,13 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
                 });
                 omManager.start(10);
 
-                expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
-                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
-                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+                if (platform === Platform.ANDROID) {
+                    expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
+                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
+                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+                } else {
+                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
+                }
             });
         });
 

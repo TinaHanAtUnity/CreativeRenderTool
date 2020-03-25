@@ -152,7 +152,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public loaded(vastProperties: IVastProperties) {
-        if (!this._omMetricFirstCheck) {
+        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMLoadedFirst);
             this._omMetricFirstCheck = true;
         }
@@ -160,7 +160,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public start(duration: number) {
-        if (!this._omMetricFirstCheck) {
+        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMStartFirst);
             this._omMetricFirstCheck = true;
         }
