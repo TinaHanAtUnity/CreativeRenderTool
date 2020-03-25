@@ -79,6 +79,17 @@ export class MediationLoadTrackingManager {
         SDKMetrics.sendBatchedEvents();
     }
 
+    public reportAdShown(adPlayedFromStream: boolean) {
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AdShow, {
+            'med': this._mediationName,
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+            'exp': this._experimentType,
+            'str': `${adPlayedFromStream}`
+        });
+        SDKMetrics.sendBatchedEvents();
+    }
+
     public reportAuctionRequest(latency: number, requestSuccessful: boolean, reason?: string) {
         let tags: { [key: string]: string } = {
             'med': this._mediationName,

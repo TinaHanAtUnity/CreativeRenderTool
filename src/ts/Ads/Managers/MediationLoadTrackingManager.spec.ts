@@ -242,4 +242,17 @@ describe('MediationLoadTrackingManager', () => {
             expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 0, expect.not.objectContaining({ 'rsn': '500' }));
         });
     });
+
+    [false, true].forEach(flag => {
+        describe(`should create the str with the ${flag} flag`, () => {
+            beforeEach(() => {
+                medLoadTrackingManager.reportAdShown(flag);
+            });
+
+            it('should report metric event with tags', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${flag}` }));
+            });
+        });
+    });
 });
