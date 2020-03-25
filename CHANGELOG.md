@@ -1,4 +1,4 @@
-# Pending
+# Wed Mar 25 21:40:32 UTC 2020
 
 * [Auction V6] Add Skeleton Implementation [#13884](https://github.com/Applifier/unity-ads-webview/pull/13884)
 * Add NullMetricInstance and Sample SDKMetrics at 25% [#13956](https://github.com/Applifier/unity-ads-webview/pull/13956)
