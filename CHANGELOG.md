@@ -1,3 +1,5 @@
+# Pending
+* Add whitelist for Apple PMP creative [#13954](https://github.com/Applifier/unity-ads-webview/pull/13954)
 # Wed Mar 25 21:40:32 UTC 2020
 
 * [Auction V6] Add Skeleton Implementation [#13884](https://github.com/Applifier/unity-ads-webview/pull/13884)
