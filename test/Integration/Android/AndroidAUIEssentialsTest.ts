@@ -63,6 +63,7 @@ interface ITestMetadataConfig {
     forcePlayable: boolean;
     forceAR: boolean;
     forceGDPRBanner: boolean;
+    forceGDPRBannerSet: boolean;
     debugJSConsole: boolean;
     creativePack?: string;
 }
@@ -129,6 +130,8 @@ describe('AndroidAUIEssentialsTest', () => {
 
         targetSandbox.stub(PrivacyTestEnvironment, 'get')
             .withArgs('showGDPRBanner').returns(config.forceGDPRBanner);
+        targetSandbox.stub(PrivacyTestEnvironment, 'isSet')
+            .withArgs('showGDPRBanner').returns(config.forceGDPRBannerSet)
     };
 
     const initialize = async () => {
@@ -234,6 +237,7 @@ describe('AndroidAUIEssentialsTest', () => {
                 forcePlayable: false,
                 forceAR: true,
                 forceGDPRBanner: true,
+                forceGDPRBannerSet: true,
                 debugJSConsole: true
             });
             await showAdAndGatherSources(); // initialize().then(showAdAndGatherSources);
@@ -281,6 +285,7 @@ describe('AndroidAUIEssentialsTest', () => {
                 forcePlayable: true,
                 forceAR: false,
                 forceGDPRBanner: false,
+                forceGDPRBannerSet: true,
                 debugJSConsole: false
             });
             await showAdAndGatherSources();
@@ -330,6 +335,7 @@ describe('AndroidAUIEssentialsTest', () => {
                 forcePlayable: false,
                 forceAR: false,
                 forceGDPRBanner: false,
+                forceGDPRBannerSet: true,
                 debugJSConsole: false,
                 creativePack: testCreativePack
             });
