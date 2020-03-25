@@ -51,7 +51,7 @@ describe('Color Test', () => {
             const c1 = values[i].c1;
             const c2 = values[i].c1;
             const t = values[i].t;
-            assert.equal(Color.lerp(new Color(c1.r, c1.g, c1.b, c1.a), new Color(c2.r, c2.g, c2.b, c2.a), t), mixed[i], 'Colors were lerped incorrectly');
+            assert.deepEqual(Color.lerp(new Color(c1.r, c1.g, c1.b, c1.a), new Color(c2.r, c2.g, c2.b, c2.a), t), mixed[i], 'Colors were lerped incorrectly');
         }
     });
 });
