@@ -5,6 +5,7 @@
 * Sample Metrics at 100% Temporarily [#13985](https://github.com/Applifier/unity-ads-webview/pull/13985)
 * Add Reverse AB Test Functionality [#13988](https://github.com/Applifier/unity-ads-webview/pull/13988)
 * Add reportAdShown to Mediation Load Tracking [#13989](https://github.com/Applifier/unity-ads-webview/pull/13989)
+* Update Node version to 12 for Travis [#13993](https://github.com/Applifier/unity-ads-webview/pull/13993)
 
 # Sat Mar 21 00:29:50 UTC 2020
 
