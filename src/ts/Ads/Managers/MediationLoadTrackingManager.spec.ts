@@ -243,18 +243,16 @@ describe('MediationLoadTrackingManager', () => {
         });
     });
 
-    describe('should ad shown with the correct flag', () => {
+    [false, true].forEach(flag => {
+        describe(`should create the str with the ${flag} flag`, () => {
+            beforeEach(() => {
+                medLoadTrackingManager.reportAdShown(flag);
+            });
 
-        it('should report metric event with false tag', () => {
-            medLoadTrackingManager.reportAdShown(false);
-            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
-            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': 'false' }));
-        });
-
-        it('should report metric event with true tag', () => {
-            medLoadTrackingManager.reportAdShown(true);
-            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
-            expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': 'true' }));
+            it('should report metric event with tags', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${flag}` }));
+            });
         });
     });
 });
