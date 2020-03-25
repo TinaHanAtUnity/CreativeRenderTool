@@ -137,7 +137,10 @@ $link-color = #2196F3;
 
   .radio-group-container {
     $radio-group-container($default-scale-size, $privacy-settings-font-size);
-    line-height: 1.25 * $default-size;
+
+    .radio-item-container {
+      padding: .25 * $default-size 0;
+    }
   }
 
   .text-small {
