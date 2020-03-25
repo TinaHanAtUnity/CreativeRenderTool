@@ -143,7 +143,9 @@ describe('AutomatedExperimentManagerTests', () => {
         gsc_campaign_last_start_ts: ['sdfsfs'],
         gsc_target_games: ['2'],
         gsc_target_game_starts: [0],
-        gsc_target_game_views: [0]
+        gsc_target_game_views: [0],
+        day_of_week: 0,
+        is_weekend: true
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
