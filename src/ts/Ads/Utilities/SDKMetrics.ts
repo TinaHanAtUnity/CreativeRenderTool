@@ -128,7 +128,11 @@ export enum MraidMetric {
 export enum AUIMetric {
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
-    DecisionNotReady = 'decision_not_ready'
+    DecisionNotReady = 'decision_not_ready',
+    InvalidEndscreenColorTintSwitches = 'invalid_endscreen_color_tint_switches',
+    InvalidEndscreenColorTintTheme = 'invalid_endscreen_color_tint_theme',
+    EndscreenColorTintError = 'endscreen_color_tint_error',
+    EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed'
 }
 
 export enum GeneralTimingMetric {
