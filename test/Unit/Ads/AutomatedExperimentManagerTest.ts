@@ -32,7 +32,6 @@ import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import 'mocha';
 import * as sinon from 'sinon';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
-import { CampaignManager } from 'Ads/Managers/__mocks__/CampaignManager';
 import { Observable3 } from 'Core/Utilities/Observable';
 
 const FooExperimentDeclaration = {

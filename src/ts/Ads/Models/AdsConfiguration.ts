@@ -38,15 +38,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         hasArPlacement: ['boolean']
     };
 
-    private static defaultHasArPlacement: boolean = false;
-
-    public static setTestHasArPlacement(value: boolean) {
-        AdsConfiguration.defaultHasArPlacement = value;
-    }
-
     constructor(data: IAdsConfiguration) {
         super('Configuration', AdsConfiguration.Schema, data);
-        this.set('hasArPlacement', AdsConfiguration.defaultHasArPlacement);
     }
 
     public getCacheMode(): CacheMode {

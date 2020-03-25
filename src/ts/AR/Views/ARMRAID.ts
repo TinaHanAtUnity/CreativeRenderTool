@@ -204,11 +204,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this.showLoadingScreen();
 
-        ARUtil.isARSupported(this._ar).then(arSupported => {
-            if (arSupported) {
-                this._automatedExperimentManager.startCampaign(this._campaign);
-            }
-        });
+        this._automatedExperimentManager.startCampaign(this._campaign);
     }
 
     public hide() {
@@ -240,11 +236,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.hide();
         this._mraidAdapterContainer.disconnect();
 
-        ARUtil.isARSupported(this._ar).then(arSupported => {
-            if (arSupported) {
-                this._automatedExperimentManager.endCampaign(this._campaign);
-            }
-        });
+        this._automatedExperimentManager.endCampaign(this._campaign);
     }
 
     private showLoadingScreen() {
