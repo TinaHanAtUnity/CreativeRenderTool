@@ -31,7 +31,9 @@ export enum AdmobMetric {
     DoubleClickOMStarts = 'doubleclick_om_starts',
     DoubleClickOMImpressions = 'doubleclick_om_impressions',
     DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
-    AdmobOMVideoStart = 'admob_om_video_start'
+    AdmobOMVideoStart = 'admob_om_video_start', 
+    AdmobOMStartFirst = 'admob_om_start_first',
+    AdmobOMLoadedFirst = 'admob_om_load_first'
 }
 
 export enum BannerMetric {

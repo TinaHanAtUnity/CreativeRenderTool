@@ -9,8 +9,9 @@ import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { Core } from 'Core/__mocks__/Core';
 
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { ISessionEvent, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { Platform } from 'Core/Constants/Platform';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -102,5 +103,41 @@ import { Platform } from 'Core/Constants/Platform';
                 expect(openMeasurement1.sessionStart).toHaveBeenCalledWith(event1);
             });
         });
+
+        describe('start and loaded race condition', () => {
+            let omManager: AdmobOpenMeasurementController;
+
+            beforeEach(() => {
+                omManager = initAdMobOMManager();
+            });
+
+            it('loaded event first metric should not fire if start has fired', () => {
+                omManager.start(10);
+                omManager.loaded({
+                    isSkippable: false,
+                    skipOffset: 1,
+                    isAutoplay: false,
+                    position: VideoPosition.STANDALONE
+                });
+                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
+                expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
+                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+            });
+
+            it('start event first metric should not fire if loaded has fired', () => {
+                omManager.loaded({
+                    isSkippable: false,
+                    skipOffset: 1,
+                    isAutoplay: false,
+                    position: VideoPosition.STANDALONE
+                });
+                omManager.start(10);
+
+                expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
+                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
+                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+            });
+        });
+
     });
 });
