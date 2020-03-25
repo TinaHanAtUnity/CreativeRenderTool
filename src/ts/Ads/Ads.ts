@@ -626,7 +626,7 @@ export class Ads implements IAds {
                     SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledShow);
                 }
 
-                if (this.MediationLoadTrackingManager && this.MediationLoadTrackingManager.getCurrentExperiment() === 'cma') {
+                if (this.MediationLoadTrackingManager && this.MediationLoadTrackingManager.getCurrentExperiment() === 'cma2') {
                     this.MediationLoadTrackingManager.reportAdShown(CampaignAssetInfo.isCached(campaign));
                 }
             });
