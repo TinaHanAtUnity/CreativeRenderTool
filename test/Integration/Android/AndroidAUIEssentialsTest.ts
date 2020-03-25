@@ -128,7 +128,7 @@ describe('AndroidAUIEssentialsTest', () => {
             .withArgs('creativePack').returns(config.creativePack);
 
         targetSandbox.stub(PrivacyTestEnvironment, 'get')
-            .withArgs('showGDPRBanner').returns(config.forceGDPRBanner)
+            .withArgs('showGDPRBanner').returns(config.forceGDPRBanner);
     };
 
     const initialize = async () => {
