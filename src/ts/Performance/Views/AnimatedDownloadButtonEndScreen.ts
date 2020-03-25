@@ -12,7 +12,9 @@ import { IColorTheme } from 'Performance/Utilities/Swatch';
 
 export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     private _animation: string;
-    private _bgColor: string;
+    private _downloadButtonColor: string;
+    private _darkMode: boolean;
+    private _tintColor: boolean;
 
     constructor(combination: IExperimentActionChoice, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
@@ -20,7 +22,20 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             combination = ButtonAnimationsExperiment.getDefaultActions();
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
         }
-        this._bgColor = Color.hexToCssRgba(combination.color);
+
+        switch (combination.scheme) {
+            case ButtonExperimentDeclaration.scheme.LIGHT:
+                this._downloadButtonColor = Color.hexToCssRgba(combination.color);
+                break;
+            case ButtonExperimentDeclaration.scheme.DARK:
+                this._darkMode = true;
+                break;
+            case ButtonExperimentDeclaration.scheme.COLORMATCHING:
+                this._tintColor = true;
+                break;
+            default:
+        }
+
         this._animation = combination.animation;
         this._templateData = {
             ...this._templateData,
@@ -34,9 +49,17 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             this._container.classList.add(`${this._animation}-download-button-end-screen-square`);
         }
-        const ctaButton = <HTMLElement> this._container.querySelector('.download-container');
-        if (ctaButton !== null) {
-            ctaButton.style.backgroundColor = this._bgColor;
+        if (this._downloadButtonColor) {
+            const ctaButton = <HTMLElement> this._container.querySelector('.download-container');
+            if (ctaButton !== null) {
+                ctaButton.style.backgroundColor = this._downloadButtonColor;
+            }
+        }
+        if (this._darkMode) {
+            this.applyDarkMode();
+        }
+        if (this._tintColor) {
+            this.renderColorTheme();
         }
     }
 
