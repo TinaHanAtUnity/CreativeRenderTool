@@ -7,6 +7,7 @@ const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export enum MediationExperimentType {
     NofillImmediately = 'nfi',
+    CacheModeAllowed = 'cma2',
     AuctionXHR = 'xhr',
     None = 'none'
 }
@@ -75,6 +76,17 @@ export class MediationLoadTrackingManager {
             'wel': `${this._webviewEnabledLoad}`,
             'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
             'exp': this._experimentType
+        });
+        SDKMetrics.sendBatchedEvents();
+    }
+
+    public reportAdShown(adPlayedFromStream: boolean) {
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AdShow, {
+            'med': this._mediationName,
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+            'exp': this._experimentType,
+            'str': `${adPlayedFromStream}`
         });
         SDKMetrics.sendBatchedEvents();
     }

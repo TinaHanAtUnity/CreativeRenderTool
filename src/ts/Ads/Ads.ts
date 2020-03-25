@@ -98,6 +98,7 @@ import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 
 export class Ads implements IAds {
 
@@ -620,6 +621,10 @@ export class Ads implements IAds {
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled && this._webViewEnabledLoad) {
                     SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledShow);
+                }
+
+                if (this.MediationLoadTrackingManager) {
+                    this.MediationLoadTrackingManager.reportAdShown(CampaignAssetInfo.isCached(campaign));
                 }
             });
         });
