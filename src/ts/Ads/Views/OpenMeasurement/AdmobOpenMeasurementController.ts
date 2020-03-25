@@ -1,4 +1,4 @@
-import { OpenMeasurement, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AdMobSessionInterfaceEventBridge } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
@@ -88,7 +88,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
         this._campaign.setOMVendors(omVendors);
         this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
     public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
@@ -205,7 +204,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public sessionStart(sessionEvent: ISessionEvent) {
-
         this._omInstances.forEach((om) => {
             // Need a deep assignment to avoid duplication for events
             const event = JSON.parse(JSON.stringify(sessionEvent));
@@ -220,7 +218,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 });
             }
         });
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
     /**
@@ -228,7 +225,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
      */
     public sessionFinish() {
         super.sessionFinish();
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
         this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }
