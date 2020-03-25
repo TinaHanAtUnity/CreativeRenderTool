@@ -111,40 +111,56 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
                 omManager = initAdMobOMManager();
             });
 
-            it('loaded event first metric should not fire if start has fired', () => {
-                omManager.start(10);
-                omManager.loaded({
-                    isSkippable: false,
-                    skipOffset: 1,
-                    isAutoplay: false,
-                    position: VideoPosition.STANDALONE
+            describe('start called first', () => {
+                beforeEach(() => {
+                    omManager.start(10);
+                    omManager.loaded({
+                        isSkippable: false,
+                        skipOffset: 1,
+                        isAutoplay: false,
+                        position: VideoPosition.STANDALONE
+                    });
                 });
 
-                if (platform === Platform.ANDROID) {
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
-                    expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
-                } else {
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
-                }
+                it('should only fire start called first metric on Android', () => {
+                    if (platform === Platform.ANDROID) {
+                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
+                        expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
+                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+                    }
+                });
+
+                it('should not fire any metric events on IOS', () => {
+                    if (platform === Platform.IOS) {
+                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
+                    }
+                });
             });
 
-            it('start event first metric should not fire if loaded has fired', () => {
-                omManager.loaded({
-                    isSkippable: false,
-                    skipOffset: 1,
-                    isAutoplay: false,
-                    position: VideoPosition.STANDALONE
+            describe('load called first', () => {
+                beforeEach(() => {
+                    omManager.loaded({
+                        isSkippable: false,
+                        skipOffset: 1,
+                        isAutoplay: false,
+                        position: VideoPosition.STANDALONE
+                    });
+                    omManager.start(10);
                 });
-                omManager.start(10);
 
-                if (platform === Platform.ANDROID) {
-                    expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
-                } else {
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
-                }
+                it('should only fire load called first metric', () => {
+                    if (platform === Platform.ANDROID) {
+                        expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
+                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
+                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
+                    }
+                });
+
+                it('should not fire any metric events on IOS', () => {
+                    if (platform === Platform.IOS) {
+                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
+                    }
+                });
             });
         });
 
