@@ -1,4 +1,4 @@
-import { OpenMeasurement, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AdMobSessionInterfaceEventBridge } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
@@ -13,7 +13,7 @@ import { IRectangle, IImpressionValues, IVastProperties, VideoPlayerState, Inter
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-import { SDKMetrics, AdmobMetric, OMTimingMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
@@ -34,8 +34,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-
-    private startTime: number;
 
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder, thirdPartyEventManager: ThirdPartyEventManager) {
         super(placement, omAdViewBuilder);
@@ -152,7 +150,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {
-        SDKMetrics.reportTimingEvent(OMTimingMetric.AdmobOMImpression, performance.now() - this.startTime);
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const impressionObject: IImpressionValues = {
@@ -202,22 +199,11 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
     }
 
-    public loaded(vastProperties: IVastProperties) {
-        SDKMetrics.reportTimingEvent(OMTimingMetric.AdmobOMLoaded, performance.now() - this.startTime);
-        super.loaded(vastProperties);
-    }
-
-    public start(duration: number) {
-        SDKMetrics.reportTimingEvent(OMTimingMetric.AdmobOMStart, performance.now() - this.startTime);
-        super.start(duration);
-    }
-
     public getOMInstances(): OpenMeasurement<Campaign>[] {
         return this._omInstances;
     }
 
     public sessionStart(sessionEvent: ISessionEvent) {
-        this.startTime = performance.now();
         this._omInstances.forEach((om) => {
             // Need a deep assignment to avoid duplication for events
             const event = JSON.parse(JSON.stringify(sessionEvent));
