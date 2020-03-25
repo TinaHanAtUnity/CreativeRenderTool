@@ -384,6 +384,30 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "preload",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "load",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "preloadPlacements",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "preloadData",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }
