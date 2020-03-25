@@ -49,7 +49,6 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
             const adViewBuilder = sandbox.createStubInstance(AdmobOpenMeasurementController);
             sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
             sinon.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
-            sinon.stub(SDKMetrics, 'reportTimingEvent').returns(Promise.resolve());
 
             return new AdmobOpenMeasurementController(platform, core, clientInformation, campaign, placement, deviceInfo, request, adViewBuilder, thirdPartyEventManager);
         };
