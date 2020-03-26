@@ -434,7 +434,7 @@ export class UserPrivacyManager {
         }
 
         if (PrivacyTestEnvironment.isSet('usePrivacySDK')) {
-            return PrivacyTestEnvironment.get('usePrivacySDK') 
+            return PrivacyTestEnvironment.get<boolean>('usePrivacySDK');
         }
 
         return PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI';
