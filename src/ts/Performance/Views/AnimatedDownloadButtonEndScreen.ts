@@ -39,8 +39,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     }
 
     private applyDarkMode() {
-        this._container.classList.add('dark-mode');
-        this._privacy.container().classList.add('dark-mode');
+        document.body.classList.add('dark-mode');
     }
 
     public show(): void {

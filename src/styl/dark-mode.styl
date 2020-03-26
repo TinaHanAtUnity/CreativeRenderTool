@@ -1,87 +1,90 @@
 @import "dark-vars.styl";
 
-#end-screen.dark-mode {
-  .icon-gdpr {
-    color: $privacy-text-color;
-  }
+.dark-mode {
+  #end-screen {
+    .icon-gdpr {
+      color: $privacy-text-color;
+    }
 
-  .end-screen-info-background {
-    background-color: $end-screen-background-color;
-  }
+    .end-screen-info-background {
+      background-color: $end-screen-background-color;
+    }
 
-  .unityads-logo {
-    color: $unityads-logo-color;
+    .unityads-logo {
+      color: $unityads-logo-color;
 
-  }
+    }
 
-  .game-rating {
-    color: $end-screen-info-gray;
-  }
+    .game-rating {
+      color: $end-screen-info-gray;
+    }
 
-  .name-container {
-    color: $end-screen-game-name-color;
-  }
-}
-
-#privacy.dark-mode {
-  color: $privacy-text-color;
-
-  .pop-up {
-    background-color: $end-screen-background-color;
-    .fade-out-gradient-separator {
-      background: linear-gradient(to top, $end-screen-background-color 0, $end-screen-background-color 50%, rgba(5, 5, 5, 0) 100%);
+    .name-container {
+      color: $end-screen-game-name-color;
     }
   }
 
-  .pop-up-footer {
-    .middle-link,
-    .left-side-link {
+  #privacy {
+    color: $privacy-text-color;
+
+    .pop-up {
+      background-color: $end-screen-background-color;
+      .fade-out-gradient-separator {
+        background: linear-gradient(to top, $end-screen-background-color 0, $end-screen-background-color 50%, rgba(5, 5, 5, 0) 100%);
+      }
+    }
+
+    .pop-up-footer {
+      .middle-link,
+      .left-side-link {
+        color: $blue;
+      }
+
+      .close-button {
+        background-color: $blue;
+      }
+    }
+
+    a {
       color: $blue;
     }
+  }
 
-    .close-button {
-      background-color: $blue;
+  #privacy-settings {
+    color: $privacy-text-color;
+
+    #privacy-row-item-container {
+      .description {
+        color: $consent-text-font-color;
+      }
     }
-  }
 
-  a {
-    color: $blue;
-  }
-}
-
-#privacy-settings.dark-mode {
-  color: $privacy-text-color;
-
-  #privacy-row-item-container {
-    .description {
+    .back-button {
       color: $consent-text-font-color;
     }
-  }
 
-  .back-button {
-    color: $consent-text-font-color;
-  }
-
-  .settings-button {
-    background: $darker-gray;
-  }
-
-  .button-row-container {
-    .row-button {
+    .settings-button {
       background: $darker-gray;
     }
-  }
 
-  .view-container {
-    background-color: $end-screen-background-color;
-  }
+    .button-row-container {
+      .row-button {
+        background: $darker-gray;
+      }
+    }
 
-  .privacy-logo {
-    color: $privacy-text-color;
-  }
+    .view-container {
+      background-color: $end-screen-background-color;
+    }
 
-  .page-link,
-  a {
-    color: $blue;
+    .privacy-logo {
+      color: $privacy-text-color;
+    }
+
+    .page-link,
+    a {
+      color: $blue;
+    }
   }
 }
+
