@@ -33,10 +33,14 @@ export interface IRawAuctionV5Response {
     encryptedPreloadData?: { [key: string]: string };
 }
 
-interface IPlacementTrackingV6 {
+interface IEventTrackingV6 {
     urlIndices: number[];
+    params?: { [key: string]: string };
+}
+
+export interface IPlacementTrackingV6 {
     params: { [key: string]: string };
-    events?: { [key: string]: number[] };
+    events: { [key: string]: IEventTrackingV6 };
 }
 
 export interface IRawAuctionV6Response {
@@ -45,11 +49,12 @@ export interface IRawAuctionV6Response {
     statusCode?: number;
     placements: { [key: string]: { mediaId: string; tracking: IPlacementTrackingV6 } };
     media: { [key: string]: IAuctionResponse };
-    trackingTemplates: { [key: string]: string[] };
+    trackingTemplates: string[];
 }
 
 export interface IAuctionResponse {
     placements: AuctionPlacement[];
+    auctionId: string;
     contentType: string;
     content: string;
     cacheTTL: number | undefined;
@@ -77,9 +82,10 @@ export interface IAuctionResponse {
 
 export class AuctionResponse extends Model<IAuctionResponse> {
 
-    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number) {
+    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number, auctionId?: string) {
         super('AuctionResponse', {
             placements: ['array'],
+            auctionId: ['string'],
             contentType: ['string'],
             content: ['string'],
             cacheTTL: ['integer', 'undefined'],
@@ -106,6 +112,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         });
 
         this.set('placements', placements);
+        this.set('auctionId', auctionId || ''); // TODO: Make this non-optional
         this.set('contentType', data.contentType);
         this.set('content', data.content);
         this.set('cacheTTL', data.cacheTTL);
@@ -133,6 +140,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getPlacements(): AuctionPlacement[] {
         return this.get('placements');
+    }
+
+    public getAuctionId(): string {
+        return this.get('auctionId');
     }
 
     public getContentType(): string {
