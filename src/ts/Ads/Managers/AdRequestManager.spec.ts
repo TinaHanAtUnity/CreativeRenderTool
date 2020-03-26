@@ -21,7 +21,6 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { SdkDetectionInfoMock, SdkDetectionInfo } from 'Core/Models/__mocks__/SdkDetectionInfo';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
@@ -62,7 +61,6 @@ class SatisfiesMatcher {
         let contentTypeHandlerManager: ContentTypeHandlerManagerMock;
         let privacySDK: PrivacySDKMock;
         let userPrivacyManager: UserPrivacyManagerMock;
-        let sdkDetectionInfo: SdkDetectionInfoMock;
 
         beforeEach(() => {
             GameSessionCounters.init();
@@ -81,8 +79,7 @@ class SatisfiesMatcher {
             contentTypeHandlerManager = ContentTypeHandlerManager();
             privacySDK = PrivacySDK();
             userPrivacyManager = UserPrivacyManager();
-            sdkDetectionInfo = SdkDetectionInfo();
-            adRequestManager = new AdRequestManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, sdkDetectionInfo);
+            adRequestManager = new AdRequestManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
         });
 
         describe('initial state', () => {
@@ -181,7 +178,7 @@ class SatisfiesMatcher {
                     response: JSON.stringify(LoadV5PreloadResponse),
                     responseCode: 200,
                     headers: []
-                })
+                });
 
                 await promise;
             });
@@ -368,7 +365,7 @@ class SatisfiesMatcher {
                     });
 
                 adsConfig.getPlacement.mockReturnValue(Placement());
-                
+
                 await adRequestManager.requestPreload();
                 loadedCampaign = await adRequestManager.requestLoad('video');
             });
@@ -399,7 +396,7 @@ class SatisfiesMatcher {
                 });
 
                 adsConfig.getPlacement.mockReturnValue(Placement());
-                
+
                 await adRequestManager.requestPreload();
 
                 loadedCampaign = await adRequestManager.requestLoad('video');

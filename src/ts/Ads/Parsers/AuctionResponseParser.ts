@@ -1,16 +1,21 @@
-import { MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { AuctionResponse, AuctionStatusCode, IPlacementTrackingV6, IRawAuctionV6Response } from 'Ads/Models/AuctionResponse';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { AuctionV6, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Observable3 } from 'Core/Utilities/Observable';
-import { SDKMetrics, AuctionV6 } from 'Ads/Utilities/SDKMetrics';
 
+export interface IParsedAuctionResponse {
+    auctionId: string;
+    refreshDelay: number;
+    auctionStatusCode: AuctionStatusCode;
+    auctionResponses: AuctionResponse[];
+    unfilledPlacementIds: string[];
+}
 export class AuctionResponseParser {
 
-    public static parse(response: string, adsConfig: AdsConfiguration, handleNoFill: (placementId: string) => void, onAdPlanReceived: Observable3<number, number, number>, mediationLoadTracking: MediationLoadTrackingManager | undefined): AuctionResponse[] {
+    public static parse(response: string, placements: { [id: string]: Placement }): IParsedAuctionResponse {
         let json: IRawAuctionV6Response;
         try {
             json = JsonParser.parse<IRawAuctionV6Response>(response);
@@ -18,9 +23,11 @@ export class AuctionResponseParser {
             throw new Error('Failed to parse IRawAuctionV6Response ' + e.message);
         }
 
+        let auctionId: string;
         if (!json.auctionId) {
             throw new Error('No auction ID found');
         }
+        auctionId = json.auctionId;
 
         if (!json.placements) {
             throw new Error('No placements found');
@@ -35,7 +42,9 @@ export class AuctionResponseParser {
         const campaigns: { [mediaId: string]: AuctionPlacement[] } = {};
         let refreshDelay: number = 0;
 
-        const placements = adsConfig.getPlacements();
+        const auctionResponses: AuctionResponse[] = [];
+        const unfilledPlacementIds: string[] = [];
+
         Object.keys(placements).forEach((placementId) => {
             const placement = placements[placementId];
             if (!placement.isBannerPlacement()) {
@@ -90,13 +99,11 @@ export class AuctionResponseParser {
 
                     campaigns[mediaId].push(auctionPlacement);
                 } else {
-                    handleNoFill(placementId);
+                    unfilledPlacementIds.push(placementId);
                     refreshDelay = 3600; // Moved const from RefreshManager
                 }
             }
         });
-
-        const auctionResponses: AuctionResponse[] = [];
 
         Object.keys(campaigns).forEach((mediaId) => {
             // TODO: Followup if this behavior is wanted - Should be controlled server-side
@@ -107,21 +114,19 @@ export class AuctionResponseParser {
             }
 
             try {
-                auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode, json.auctionId));
+                auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode));
             } catch (e) {
                 throw new Error('Failure creating Auction Response' + e.message);
             }
         });
 
-        const campaignCount = auctionResponses.length;
-
-        if (mediationLoadTracking) {
-            mediationLoadTracking.reportMediaCount(campaignCount);
-        }
-
-        onAdPlanReceived.trigger(refreshDelay, auctionResponses.length, auctionStatusCode);
-
-        return auctionResponses;
+        return {
+            auctionId,
+            refreshDelay,
+            auctionStatusCode,
+            auctionResponses,
+            unfilledPlacementIds
+        };
     }
 
 }
