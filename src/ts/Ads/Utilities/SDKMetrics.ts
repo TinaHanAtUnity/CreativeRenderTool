@@ -10,8 +10,7 @@ export enum ErrorMetric {
     PromoWithoutCreatives = 'promo_without_creatives',
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
-    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    TimingValueNegative = 'timing_value_negative'
+    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show'
 }
 
 export enum AdmobMetric {
