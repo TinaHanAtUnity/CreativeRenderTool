@@ -9,6 +9,7 @@
 * Sample SDKMetrics at 50% [#14031](https://github.com/Applifier/unity-ads-webview/pull/14031)
 * Remove SDKDetectionInfo From Request Body [#14027](https://github.com/Applifier/unity-ads-webview/pull/14027)
 * Add CacheMode Allowed Reverse ABTest for Whitelisted Games [#13992](https://github.com/Applifier/unity-ads-webview/pull/13992)
+* Remove Sending "Negative Value" Metrics to SDKMetrics [#14037](https://github.com/Applifier/unity-ads-webview/pull/14037)
 
 # Wed Mar 25 21:40:32 UTC 2020
 
