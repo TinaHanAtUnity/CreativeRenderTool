@@ -76,9 +76,7 @@ describe('UserPrivacyManagerTest', () => {
         userPrivacy.getPermissions.returns({
            ads: false,
            gameExp: false,
-           external: false,
-           agreedOverAgeLimit: false,
-           agreementMethod: ''
+           external: false
         });
         privacySDK.getUserPrivacy.returns(userPrivacy);
 
@@ -928,8 +926,7 @@ describe('UserPrivacyManagerTest', () => {
                    ads: false,
                    external: false,
                    gameExp: false,
-                   agreedOverAgeLimit: false,
-                   agreementMethod: ''
+                   agreedOverAgeLimit: false
                });
             });
 

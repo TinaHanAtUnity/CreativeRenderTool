@@ -5,7 +5,7 @@ import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 describe('PrivacyConfigTest', () => {
     let privacyConfig: PrivacyConfig;
     const flow = { testFlowValue: 'testFlowValue'};
-    const userSettings = { ads: false, external: false, gameExp: false, agreedOverAgeLimit: false, agreementMethod: '' };
+    const userSettings = { ads: false, external: false, gameExp: false, agreedOverAgeLimit: false};
     const env = { testEnvValue: 'testEnvValue'};
     const html = '<html></html>';
 
