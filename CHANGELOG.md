@@ -1,10 +1,18 @@
 # Pending
 
+* [Load V5] Ad Request Manager [#13881](https://github.com/Applifier/unity-ads-webview/pull/13881)
+* Add whitelist for Apple PMP creative [#13954](https://github.com/Applifier/unity-ads-webview/pull/13954)
+* Open Measurement - Clean up non-necessary metrics [#13982](https://github.com/Applifier/unity-ads-webview/pull/13982)
+* Improve Color Utility [#13996](https://github.com/Applifier/unity-ads-webview/pull/13996)
+
+# Wed Mar 25 21:40:32 UTC 2020
+
 * [Auction V6] Add Skeleton Implementation [#13884](https://github.com/Applifier/unity-ads-webview/pull/13884)
 * Add NullMetricInstance and Sample SDKMetrics at 25% [#13956](https://github.com/Applifier/unity-ads-webview/pull/13956)
 * Sample Metrics at 100% Temporarily [#13985](https://github.com/Applifier/unity-ads-webview/pull/13985)
 * Add Reverse AB Test Functionality [#13988](https://github.com/Applifier/unity-ads-webview/pull/13988)
 * Add reportAdShown to Mediation Load Tracking [#13989](https://github.com/Applifier/unity-ads-webview/pull/13989)
+* Update Node version to 12 for Travis [#13993](https://github.com/Applifier/unity-ads-webview/pull/13993)
 
 # Sat Mar 21 00:29:50 UTC 2020
 
