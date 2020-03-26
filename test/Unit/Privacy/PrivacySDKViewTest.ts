@@ -20,7 +20,8 @@ describe('PrivacySDKViewTest', () => {
             ads: false,
             external: false,
             gameExp: false,
-            agreedOverAgeLimit: false
+            agreedOverAgeLimit: false,
+            agreementMethod: ''
         },
         {
             buildOsVersion: '10.0.3',

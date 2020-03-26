@@ -9,6 +9,7 @@ export interface IUserPrivacySettings {
     external: boolean;
     gameExp: boolean;
     agreedOverAgeLimit: boolean;
+    agreementMethod: string;
 }
 
 export interface IUserLastInteraction {
