@@ -1,14 +1,5 @@
 @import "components.styl";
 
-// todo: move inside main element?
-$privacy-settings-font-size = .75 * $default-size;
-$privacy-settings-font-weight = 300;
-$privacy-settings-h2-font-size = .8 * $default-size;
-$privacy-settings-h2-font-weight = 600;
-$background-color = #121317;
-$header-background-color = #0b0b0b;
-$link-color = #2196F3;
-
 #privacy {
   position: absolute;
   top: 0;
@@ -51,7 +42,7 @@ $link-color = #2196F3;
     width: 100%;
     border-top-left-radius: .5 * $default-size;
     border-top-right-radius: .5 * $default-size;
-    background: $background-color;
+    background: $privacy-settings-background-color;
 
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
@@ -63,7 +54,7 @@ $link-color = #2196F3;
   }
 
   a, .page-link {
-    color: $link-color;
+    color: $privacy-settings-link-color;
     text-decoration: none;
     font-weight: 600;
     cursor: pointer;
@@ -73,7 +64,7 @@ $link-color = #2196F3;
     position: sticky;
     top: 0;
     z-index: 9999;
-    background: $header-background-color;
+    background: $privacy-settings-header-background-color;
     text-align: left;
 
     .close-button {
