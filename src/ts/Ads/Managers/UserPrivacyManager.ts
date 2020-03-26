@@ -127,6 +127,8 @@ export class UserPrivacyManager {
     private _developerAgeGateChoice: boolean;
     private _privacyFormatMetadataSeenInSession: boolean;
 
+    private _privacySDKMetricsUrl = 'https://sdk-metrics.privacy.unity3d.com/api/v1/metrics';
+
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
         this._platform = platform;
         this._core = core;
@@ -143,6 +145,10 @@ export class UserPrivacyManager {
         this._developerAgeGateChoice = false;
         this._privacyFormatMetadataSeenInSession = false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
+
+        if (TestEnvironment.get('privacySDKMetricsUrl')) {
+            this._privacySDKMetricsUrl = TestEnvironment.get('privacySDKMetricsUrl');
+        }
     }
 
     public getPrivacyConfig(): PrivacyConfig {
@@ -398,6 +404,10 @@ export class UserPrivacyManager {
 
     public getDeveloperAgeGateChoice(): boolean {
         return this._developerAgeGateChoice;
+    }
+
+    public getPrivacyMetricsUrl(): string {
+        return this._privacySDKMetricsUrl;
     }
 
     public applyDeveloperAgeGate() {

@@ -130,7 +130,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._frameEventAdapter.postMessage('openUrlCallback', url);
     }
 
-    public onPrivacyMetric(data: { [key: string]: unknown }): void {
+    public onPrivacyMetric(data: string): void {
         this._handlers.forEach(handler => handler.onPrivacyMetric(data));
     }
 
