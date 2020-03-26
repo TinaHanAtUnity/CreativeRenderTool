@@ -5,6 +5,7 @@
 * Open Measurement - Clean up non-necessary metrics [#13982](https://github.com/Applifier/unity-ads-webview/pull/13982)
 * Improve Color Utility [#13996](https://github.com/Applifier/unity-ads-webview/pull/13996)
 * Open Measurement - Add Metrics for Admob OM Start and Loaded [#13998](https://github.com/Applifier/unity-ads-webview/pull/13998)
+* Sample SDKMetrics at 50% [#14031](https://github.com/Applifier/unity-ads-webview/pull/14031)
 
 # Wed Mar 25 21:40:32 UTC 2020
 
