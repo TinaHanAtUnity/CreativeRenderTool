@@ -6,6 +6,8 @@ import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 
 export interface IParsedAuctionResponse {
+    auctionId: string;
+    refreshDelay: number;
     auctionResponses: AuctionResponse[];
     unfilledPlacementIds: string[];
 }
@@ -19,9 +21,11 @@ export class AuctionResponseParser {
             throw new Error('Failed to parse IRawAuctionV6Response ' + e.message);
         }
 
+        let auctionId: string;
         if (!json.auctionId) {
             throw new Error('No auction ID found');
         }
+        auctionId = json.auctionId;
 
         if (!json.placements) {
             throw new Error('No placements found');
@@ -110,13 +114,15 @@ export class AuctionResponseParser {
             }
 
             try {
-                auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode, json.auctionId, refreshDelay));
+                auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode));
             } catch (e) {
                 throw new Error('Failure creating Auction Response' + e.message);
             }
         });
 
         return {
+            auctionId,
+            refreshDelay,
             auctionResponses,
             unfilledPlacementIds
         };
