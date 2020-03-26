@@ -28,6 +28,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
                 this._downloadButtonColor = Color.hexToCssRgba(combination.color);
                 break;
             case ButtonExperimentDeclaration.scheme.DARK:
+                // This is "pastel blue", to be cohesive with dark mode
                 this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
                 this._darkMode = true;
                 break;
