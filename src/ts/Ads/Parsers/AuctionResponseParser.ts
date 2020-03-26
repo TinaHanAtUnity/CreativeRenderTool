@@ -6,6 +6,7 @@ import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Observable3 } from 'Core/Utilities/Observable';
+import { SDKMetrics, AuctionV6 } from 'Ads/Utilities/SDKMetrics';
 
 export class AuctionResponseParser {
 
@@ -46,13 +47,13 @@ export class AuctionResponseParser {
                     if (placementResponse.mediaId) {
                         mediaId = json.placements[placementId].mediaId;
                     } else {
-                        // Alert issue with media
+                        SDKMetrics.reportMetricEvent(AuctionV6.MediaIdMissing);
                     }
 
                     if (placementResponse.tracking) {
                         tracking = json.placements[placementId].tracking;
                     } else {
-                        // Alert issue with tracking
+                        SDKMetrics.reportMetricEvent(AuctionV6.TrackingMissing);
                     }
                 }
 
@@ -76,7 +77,7 @@ export class AuctionResponseParser {
                                 tempTrackingUrls.push(MacroUtil.replaceMacro(urlToTemplate, params));
                                 trackingUrls[eventKey] = tempTrackingUrls;
                             } else {
-                                // Alert to out of bounds array
+                                SDKMetrics.reportMetricEvent(AuctionV6.TrackingIndicesOutOfBounds);
                             }
                         });
                     }));
@@ -92,8 +93,6 @@ export class AuctionResponseParser {
                     handleNoFill(placementId);
                     refreshDelay = 3600; // Moved const from RefreshManager
                 }
-            } else {
-                // Alert to banner placement being requested
             }
         });
 

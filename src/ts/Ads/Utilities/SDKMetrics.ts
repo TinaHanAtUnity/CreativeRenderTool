@@ -171,9 +171,15 @@ export enum LoadV5 {
     LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data'
 }
 
+export enum AuctionV6 {
+    MediaIdMissing = 'media_id_missing',
+    TrackingMissing = 'tracking_missing',
+    TrackingIndicesOutOfBounds = 'tracking_indices_out_of_bounds'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
 
 export class SDKMetrics {
 
