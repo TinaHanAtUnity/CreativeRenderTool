@@ -56,11 +56,13 @@ describe('AuctionResponseParser', () => {
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements().length).toEqual(3);
             });
 
-            it('should contain the correct placementId', () => {
+            it('should contain the correct placementIds', () => {
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[0].getPlacementId()).toEqual('premium');
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[1].getPlacementId()).toEqual('video');
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[2].getPlacementId()).toEqual('rewardedVideoZone');
             });
 
-            it('should contain the correct trackingUrls', () => {
+            it('should contain the correct trackingUrls for premium', () => {
                 const expectedTrackingUrls = {
                     start: [
                         'https://tracking.stg.mz.internal.unity3d.com/operative/placement=premiumAuction?eventType=start',
@@ -71,6 +73,24 @@ describe('AuctionResponseParser', () => {
                     ]
                 };
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[0].getTrackingUrls()).toStrictEqual(expectedTrackingUrls);
+            });
+
+            it('should contain the correct trackingUrls for video', () => {
+                const expectedTrackingUrls = {
+                    impression: [
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/placement=video?eventType={{eventType}}'
+                    ]
+                };
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[1].getTrackingUrls()).toStrictEqual(expectedTrackingUrls);
+            });
+
+            it('should contain the correct trackingUrls for rewardedVideoZone', () => {
+                const expectedTrackingUrls = {
+                    unsupportedEvent: [
+                        'https://ads.brand.postback.unity3d.com/impression/placement=rewardedVideoZone?data=rewardedVideoZoneDataBlob?secret=fifthQuartile'
+                    ]
+                };
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[2].getTrackingUrls()).toStrictEqual(expectedTrackingUrls);
             });
         });
     });

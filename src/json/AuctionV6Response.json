@@ -52,10 +52,7 @@
                     "impression": {
                         "urlIndices": [
                             0
-                        ],
-                        "params": {
-                            "{{eventType}}": "start"
-                        }
+                        ]
                     }
                 }
             }
@@ -68,12 +65,12 @@
                     "{{placement}}": "rewardedVideoZone"
                 },
                 "events": {
-                    "start": {
+                    "unsupportedEvent": {
                         "urlIndices": [
-                            0
+                            1
                         ],
                         "params": {
-                            "{{eventType}}": "impression"
+                            "{{secretParam}}": "fifthQuartile"
                         }
                     }
                 }
