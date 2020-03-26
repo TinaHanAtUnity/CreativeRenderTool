@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar 26 23:11:54 UTC 2020
 
 * [Auction V6] Add Mocks [#14032](https://github.com/Applifier/unity-ads-webview/pull/14032)
 * [Load V5] Ad Request Manager [#13881](https://github.com/Applifier/unity-ads-webview/pull/13881)
