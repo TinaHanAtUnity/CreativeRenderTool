@@ -157,6 +157,7 @@ export class AuctionRequest {
     private static AbGroup: number | undefined;
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    private static AuctionV6BaseUrl: string = 'https://auction.unityads.unity3d.com/v6/games';
     private static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
@@ -207,11 +208,7 @@ export class AuctionRequest {
         this._privacy = RequestPrivacyFactory.create(params.privacySDK, this._deviceInfo.getLimitAdTracking());
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
-        if (this._coreConfig.getTestMode()) {
-            this._baseURL = AuctionRequest.TestModeUrl;
-        } else {
-            this._baseURL = RequestManager.getAuctionProtocol() === AuctionProtocol.V5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
-        }
+        this.assignBaseUrl();
     }
 
     public request(): Promise<IAuctionResponse> {
@@ -476,7 +473,6 @@ export class AuctionRequest {
                     omidJSVersion: OM_JS_VERSION,
                     legalFramework: this._privacySDK.getLegalFramework(),
                     agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
-                    //Todo: Add IsMadeWithUnity flag from SDKDetectionInfo
                 };
             });
         });
@@ -503,6 +499,24 @@ export class AuctionRequest {
             });
         } else {
             return Promise.resolve(undefined);
+        }
+    }
+
+    private assignBaseUrl(): void {
+        if (this._coreConfig.getTestMode()) {
+            this._baseURL = AuctionRequest.TestModeUrl;
+            return;
+        }
+
+        switch (RequestManager.getAuctionProtocol()) {
+            // TODO: Update banners to use Auction V6
+            case AuctionProtocol.V6:
+            case AuctionProtocol.V5:
+                this._baseURL = AuctionRequest.AuctionV5BaseUrl;
+                break;
+            case AuctionProtocol.V4:
+            default:
+                this._baseURL = AuctionRequest.BaseUrl;
         }
     }
 

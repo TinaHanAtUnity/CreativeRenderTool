@@ -16,6 +16,12 @@ export interface IRawAuctionResponse {
     statusCode?: number;
 }
 
+export interface IPlacementPreloadData {
+    campaignAvailable: boolean;
+    ttlInSeconds: number;
+    dataIndex: string;
+}
+
 export interface IRawAuctionV5Response {
     auctionId?: string;
     correlationId: string;
@@ -23,6 +29,23 @@ export interface IRawAuctionV5Response {
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls | undefined };
     statusCode?: number;
+    preloadData?: { [key: string]: IPlacementPreloadData };
+    encryptedPreloadData?: { [key: string]: string };
+}
+
+interface IPlacementTrackingV6 {
+    urlIndices: number[];
+    params: { [key: string]: string };
+    events?: { [key: string]: number[] };
+}
+
+export interface IRawAuctionV6Response {
+    auctionId?: string;
+    correlationId: string;
+    statusCode?: number;
+    placements: { [key: string]: { mediaId: string; tracking: IPlacementTrackingV6 } };
+    media: { [key: string]: IAuctionResponse };
+    trackingTemplates: { [key: string]: string[] };
 }
 
 export interface IAuctionResponse {

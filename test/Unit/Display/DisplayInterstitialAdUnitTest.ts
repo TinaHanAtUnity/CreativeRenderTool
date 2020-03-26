@@ -36,6 +36,7 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('DisplayInterstitialAdUnitTest', () => {
@@ -118,6 +119,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
                 (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
                 asStub(webPlayerContainer.setSettings).resolves();
                 asStub(webPlayerContainer.clearSettings).resolves();
+                sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
                 view = new DisplayInterstitial(platform, core, <AndroidDeviceInfo>deviceInfo, placement, campaign, privacy, false);
                 view.render();

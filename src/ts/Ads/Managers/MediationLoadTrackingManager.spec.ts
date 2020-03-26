@@ -220,4 +220,39 @@ describe('MediationLoadTrackingManager', () => {
             expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
         });
     });
+
+    describe('should report reason when it is set', () => {
+        beforeEach(() => {
+            medLoadTrackingManager.reportAuctionRequest(0, true, '500');
+        });
+
+        it('should report metric event with tags', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 0, expect.objectContaining({ 'rsn': '500' }));
+        });
+    });
+
+    describe('should not report reason', () => {
+        beforeEach(() => {
+            medLoadTrackingManager.reportAuctionRequest(0, false);
+        });
+
+        it('should report metric event with tags', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 0, expect.not.objectContaining({ 'rsn': '500' }));
+        });
+    });
+
+    [false, true].forEach(flag => {
+        describe(`should create the str with the ${flag} flag`, () => {
+            beforeEach(() => {
+                medLoadTrackingManager.reportAdShown(flag);
+            });
+
+            it('should report metric event with tags', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${flag}` }));
+            });
+        });
+    });
 });

@@ -161,6 +161,7 @@ import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Analytics } from 'Analytics/Analytics';
 import { Store } from 'Store/Store';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
+import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -939,7 +940,8 @@ export class TestFixtures {
             MetaDataManager: new MetaDataManager(api),
             StorageBridge: new StorageBridge(api),
             ClientInfo: this.getClientInfo(platform),
-            Config: this.getCoreConfiguration()
+            Config: this.getCoreConfiguration(),
+            SdkDetectionInfo: new SdkDetectionInfo(platform, api)
         };
         if (platform === Platform.ANDROID) {
             core.DeviceInfo = new AndroidDeviceInfo(api);
