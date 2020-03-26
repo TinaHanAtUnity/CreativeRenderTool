@@ -47,7 +47,7 @@ import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Manag
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { XHRequest } from 'Core/Utilities/XHRequest';
-import { AuctionResponseParser } from 'Ads/Parsers/AuctionResponseParser';
+import { AuctionResponseParser, IParsedAuctionResponse } from 'Ads/Parsers/AuctionResponseParser';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -459,17 +459,24 @@ export class LegacyCampaignManager extends CampaignManager {
     private parseAuctionV6Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
         const promises: Promise<void>[] = [];
 
-        const handleNoFill = (placementId: string) => {
+        const parsedResponse: IParsedAuctionResponse = AuctionResponseParser.parse(response.response, this._adsConfig.getPlacements());
+
+        this.onAdPlanReceived.trigger(parsedResponse.refreshDelay, parsedResponse.auctionResponses.length, AuctionStatusCode.NORMAL);
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportMediaCount(parsedResponse.auctionResponses.length);
+        }
+
+        parsedResponse.unfilledPlacementIds.forEach(placementId => {
             promises.push(this.handleNoFill(placementId));
-        };
+        });
 
-        const auctionResponses = AuctionResponseParser.parse(response.response, this._adsConfig, handleNoFill, this.onAdPlanReceived, this._mediationLoadTracking);
-
+        const auctionResponses: AuctionResponse[] = parsedResponse.auctionResponses;
         if (auctionResponses.length === 0) {
             return Promise.all(promises);
         }
 
-        const auctionId = auctionResponses[0].getAuctionId();
+        const auctionId = parsedResponse.auctionId;
         this._lastAuctionId = auctionId;
         const session: Session = this._sessionManager.create(auctionId);
         session.setAdPlan(response.response);
