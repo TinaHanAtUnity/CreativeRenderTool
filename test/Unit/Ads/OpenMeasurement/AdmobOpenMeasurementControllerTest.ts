@@ -15,7 +15,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { assert } from 'chai';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -85,8 +85,6 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                     omManager.injectVerificationResources([verificationResource, verificationResource1]);
                     sinon.assert.calledTwice(<sinon.SinonStub>omManager.setupOMInstance);
                     sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.setTemplateValue, '%25OM_VENDORS%25', 'scoot|scoot1');
-                    sinon.assert.calledOnce(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
-                    sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'admob_om_injected');
                 });
             });
 
@@ -116,28 +114,6 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
             it('sessionFinish should should pass to admob session interface bridge', () => {
                 omManager.sessionFinish();
                 sinon.assert.calledOnce(<sinon.SinonStub>omManager.getAdmobBridge().sendSessionFinish);
-            });
-
-            it('sessionFinish should report to pts', () => {
-                (<sinon.SinonStub>SDKMetrics.reportMetricEvent).reset();
-                omManager.sessionFinish();
-                sinon.assert.calledOnce(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
-                sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'admob_om_session_finish');
-            });
-
-            it('sessionStart should report to pts', () => {
-                (<sinon.SinonStub>SDKMetrics.reportMetricEvent).reset();
-
-                const sessionEvent: ISessionEvent = {
-                    adSessionId: '',
-                    timestamp: 1,
-                    type: '',
-                    data: {}
-                };
-
-                omManager.sessionStart(sessionEvent);
-                sinon.assert.calledOnce(<sinon.SinonStub>SDKMetrics.reportMetricEvent);
-                sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, 'admob_om_session_start');
             });
         });
 
