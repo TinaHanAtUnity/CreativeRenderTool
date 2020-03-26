@@ -25,7 +25,6 @@ import { Session } from 'Ads/Models/Session';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
-import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { RequestError } from 'Core/Errors/RequestError';
 
 export interface IParsedPlacementPreloadData {
@@ -71,7 +70,6 @@ export class AdRequestManager extends CampaignManager {
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
     protected _privacy: PrivacySDK;
-    protected _sdkDetectionInfo: SdkDetectionInfo;
     private _contentTypeHandlerManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -84,7 +82,7 @@ export class AdRequestManager extends CampaignManager {
     private _userPrivacyManager: UserPrivacyManager;
     private _currentSession: Session | null;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, sdkDetectionInfo: SdkDetectionInfo) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
         super();
 
         this._platform = platform;
@@ -100,7 +98,6 @@ export class AdRequestManager extends CampaignManager {
         this._adMobSignalFactory = adMobSignalFactory;
         this._cacheBookkeeping = cacheBookkeeping;
         this._contentTypeHandlerManager = contentTypeHandlerManager;
-        this._sdkDetectionInfo = sdkDetectionInfo;
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._ongoingReloadRequest = null;
@@ -239,7 +236,7 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._sdkDetectionInfo, this._adsConfig.getPlacement(placementId))
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId))
             ]);
         }).then(([requestUrl, requestBody]) => CampaignManager.onlyRequest(this._request, requestUrl, this.makeLoadBody(<ILoadV5BodyExtra>requestBody, placementId))).then((response) => {
             // if load request has been canceled by reload request, we start it again
@@ -297,7 +294,7 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._sdkDetectionInfo)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
             ]);
         }).then(([requestUrl, requestBody]) => CampaignManager.onlyRequest(this._request, requestUrl, this.makeReloadBody(<ILoadV5BodyExtra>requestBody, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId))))).then((response) => {
             SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
