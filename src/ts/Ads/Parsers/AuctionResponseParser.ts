@@ -8,6 +8,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 export interface IParsedAuctionResponse {
     auctionId: string;
     refreshDelay: number;
+    auctionStatusCode: AuctionStatusCode;
     auctionResponses: AuctionResponse[];
     unfilledPlacementIds: string[];
 }
@@ -123,6 +124,7 @@ export class AuctionResponseParser {
         return {
             auctionId,
             refreshDelay,
+            auctionStatusCode,
             auctionResponses,
             unfilledPlacementIds
         };

@@ -1,3 +1,4 @@
+import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement.ts';
 import { AuctionResponseParser, IParsedAuctionResponse } from 'Ads/Parsers/AuctionResponseParser';
 
@@ -45,6 +46,10 @@ describe('AuctionResponseParser', () => {
 
             it('should contain the correct refreshDelay', () => {
                 expect(parsedAuctionResponse.refreshDelay).toEqual(3600);
+            });
+
+            it('should contain the correct refreshDelay', () => {
+                expect(parsedAuctionResponse.auctionStatusCode).toEqual(AuctionStatusCode.NORMAL);
             });
 
             it('should contain the correct amount of AuctionPlacements', () => {
