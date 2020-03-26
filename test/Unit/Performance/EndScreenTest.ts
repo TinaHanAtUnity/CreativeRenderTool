@@ -17,6 +17,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { ButtonExperimentDeclaration } from 'Ads/Models/AutomatedExperimentsList';
+import {SDKMetrics} from 'Ads/Utilities/SDKMetrics';
 
 describe('EndScreenTest', () => {
     let platform: Platform;
@@ -25,8 +26,10 @@ describe('EndScreenTest', () => {
     let core: ICoreApi;
     let configuration: CoreConfiguration;
     let privacy: Privacy;
+    let sandbox: sinon.SinonSandbox;
 
     beforeEach(() => {
+        sandbox = sinon.createSandbox();
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -35,6 +38,12 @@ describe('EndScreenTest', () => {
             'Download For Free': 'Lataa ilmaiseksi'
         });
         configuration = TestFixtures.getCoreConfiguration();
+        sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
+        sandbox.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
+    });
+
+    afterEach(() => {
+        sandbox.restore();
     });
 
     const createEndScreen = (language: string): PerformanceEndScreen => {
@@ -55,7 +64,7 @@ describe('EndScreenTest', () => {
         return new PerformanceEndScreen(params, campaign);
     };
 
-    const createAnimatedDownloadButtonEndScreen = (language: string, buttonColor: string): AnimatedDownloadButtonEndScreen => {
+    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string, buttonColor: string): AnimatedDownloadButtonEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -72,6 +81,7 @@ describe('EndScreenTest', () => {
         };
         // Non-default experiment description
         const experimentDescription = {
+            scheme: scheme,
             color: buttonColor,
             animation: ButtonExperimentDeclaration.animation.BOUNCING
         };
@@ -98,7 +108,7 @@ describe('EndScreenTest', () => {
         };
 
         validateTranslation(createEndScreen('fi'));
-        validateTranslation(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.color.RED));
+        validateTranslation(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, ButtonExperimentDeclaration.color.RED));
     });
 
     it('should render correct experiment attributes', () => {
@@ -134,7 +144,10 @@ describe('EndScreenTest', () => {
         };
 
         Object.values(ButtonExperimentDeclaration.color).forEach((c: string) => {
-            validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', c), c);
+            validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), c);
         });
+
+        //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
+        validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.DARK, ButtonExperimentDeclaration.color.RED), '2ba3ff');
     });
 });
