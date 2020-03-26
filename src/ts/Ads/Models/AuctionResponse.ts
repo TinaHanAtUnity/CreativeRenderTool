@@ -55,6 +55,7 @@ export interface IRawAuctionV6Response {
 export interface IAuctionResponse {
     placements: AuctionPlacement[];
     auctionId: string;
+    refreshDelay: number;
     contentType: string;
     content: string;
     cacheTTL: number | undefined;
@@ -82,10 +83,11 @@ export interface IAuctionResponse {
 
 export class AuctionResponse extends Model<IAuctionResponse> {
 
-    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number, auctionId?: string) {
+    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number, auctionId?: string, refreshDelay?: number) {
         super('AuctionResponse', {
             placements: ['array'],
             auctionId: ['string'],
+            refreshDelay: ['number'],
             contentType: ['string'],
             content: ['string'],
             cacheTTL: ['integer', 'undefined'],
@@ -113,6 +115,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
         this.set('placements', placements);
         this.set('auctionId', auctionId || ''); // TODO: Make this non-optional
+        this.set('refreshDelay', refreshDelay || 0); // TODO: Make this non-optional
         this.set('contentType', data.contentType);
         this.set('content', data.content);
         this.set('cacheTTL', data.cacheTTL);
@@ -144,6 +147,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getAuctionId(): string {
         return this.get('auctionId');
+    }
+
+    public getRefreshDelay(): number {
+        return this.get('refreshDelay');
     }
 
     public getContentType(): string {

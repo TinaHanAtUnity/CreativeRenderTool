@@ -96,6 +96,8 @@
 | legalFramework | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | nofillRetry | boolean | Retrying after no fill | SDK | all |
 | agreedOverAgeLimit | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| privacyType | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+
 
 
 ### Configuration request
@@ -250,6 +252,9 @@
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+
+
 
 ### Click event
 | key | required | queryString | body | type | description | provider | platforms |
@@ -301,3 +306,5 @@
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+
