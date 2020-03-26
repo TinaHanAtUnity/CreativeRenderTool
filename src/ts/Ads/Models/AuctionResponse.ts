@@ -16,6 +16,12 @@ export interface IRawAuctionResponse {
     statusCode?: number;
 }
 
+export interface IPlacementPreloadData {
+    campaignAvailable: boolean;
+    ttlInSeconds: number;
+    dataIndex: string;
+}
+
 export interface IRawAuctionV5Response {
     auctionId?: string;
     correlationId: string;
@@ -23,6 +29,8 @@ export interface IRawAuctionV5Response {
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls | undefined };
     statusCode?: number;
+    preloadData?: { [key: string]: IPlacementPreloadData };
+    encryptedPreloadData?: { [key: string]: string };
 }
 
 interface IPlacementTrackingV6 {

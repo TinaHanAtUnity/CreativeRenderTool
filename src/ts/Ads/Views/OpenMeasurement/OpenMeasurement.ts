@@ -21,13 +21,8 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { Campaign } from 'Ads/Models/Campaign';
-import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-
-interface IVerificationVendorMap {
-    [vendorKey: string]: string;
-}
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 enum AdSessionType {
     NATIVE = 'native',
@@ -296,10 +291,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
             if (CustomFeatures.isIASVendor(vendorKey)) {
                 SDKMetrics.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
-            }
-
-            if (this._campaign instanceof AdMobCampaign) {
-                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStartObserverCalled);
             }
 
             if (this._campaign instanceof VastCampaign) {
