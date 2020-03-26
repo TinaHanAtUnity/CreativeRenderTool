@@ -124,8 +124,6 @@ export class Ads implements IAds {
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
     public NofillImmediatelyManager: NofillImmediatelyManager;
 
-    private static _forcedConsentUnit: boolean = false;
-
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
     private _showingPrivacy: boolean = false;
@@ -213,7 +211,7 @@ export class Ads implements IAds {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             PrivacyMetrics.setGameSessionId(gameSessionId);
@@ -693,20 +691,10 @@ export class Ads implements IAds {
             MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
         }
 
-        if (TestEnvironment.get('forcedGDPRBanner')) {
-            AbstractAdUnitParametersFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
-        }
-
         let forcedARMRAID = false;
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
-        }
-
-        let forcedConsentUnit = false;
-        if (TestEnvironment.get('forcedConsent')) {
-            forcedConsentUnit = TestEnvironment.get('forcedConsent');
-            Ads._forcedConsentUnit = forcedConsentUnit;
         }
 
         if (TestEnvironment.get('creativeUrl')) {
