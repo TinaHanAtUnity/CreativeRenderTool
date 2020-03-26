@@ -97,7 +97,6 @@
 | nofillRetry | boolean | Retrying after no fill | SDK | all |
 | agreedOverAgeLimit | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 | privacyType | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
-| isMadeWithUnity | boolean | isMadeWithUnity flag | SDK | all |
 
 
 
