@@ -40,7 +40,11 @@ describe('AuctionResponseParser', () => {
             });
 
             it('should have the correct auction id', () => {
-                expect(parsedAuctionResponse.auctionResponses[0].getAuctionId()).toEqual('auction-v6-fake-auction-id');
+                expect(parsedAuctionResponse.auctionId).toEqual('auction-v6-fake-auction-id');
+            });
+
+            it('should contain the correct refreshDelay', () => {
+                expect(parsedAuctionResponse.refreshDelay).toEqual(3600);
             });
 
             it('should contain the correct amount of AuctionPlacements', () => {
@@ -49,10 +53,6 @@ describe('AuctionResponseParser', () => {
 
             it('should contain the correct placementId', () => {
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[0].getPlacementId()).toEqual('premium');
-            });
-
-            it('should contain the correct refreshDelay', () => {
-                expect(parsedAuctionResponse.auctionResponses[0].getRefreshDelay()).toEqual(3600);
             });
 
             it('should contain the correct trackingUrls', () => {
