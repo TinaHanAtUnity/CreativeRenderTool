@@ -14,6 +14,7 @@ import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { Core } from 'Core/__mocks__/Core';
 import { PrivacySDK, PrivacySDKMock } from 'Privacy/__mocks__/PrivacySDK';
 
+import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
@@ -71,6 +72,7 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
             let noFillPlacements: string[];
             let triggeredRefreshDelay: number;
             let triggeredCampaignCount: number;
+            let triggeredAuctionStatusCode: AuctionStatusCode
 
             beforeEach(() => {
                 filledPlacements = {};
@@ -90,9 +92,10 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
                     throw error;
                 });
 
-                campaignManager.onAdPlanReceived.subscribe((refreshDelay: number, campaignCount: number) => {
+                campaignManager.onAdPlanReceived.subscribe((refreshDelay: number, campaignCount: number, auctionStatusCode: number) => {
                     triggeredRefreshDelay = refreshDelay;
                     triggeredCampaignCount = campaignCount;
+                    triggeredAuctionStatusCode = auctionStatusCode;
                 });
 
                 requestManager.post.mockResolvedValueOnce({
@@ -125,6 +128,7 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
             it('should trigger onAdPlanReceived', () => {
                 expect(triggeredRefreshDelay).toEqual(3600);
                 expect(triggeredCampaignCount).toEqual(1);
+                expect(triggeredAuctionStatusCode).toEqual(AuctionStatusCode.NORMAL);
             });
 
             it('should nofill the correct placements', () => {

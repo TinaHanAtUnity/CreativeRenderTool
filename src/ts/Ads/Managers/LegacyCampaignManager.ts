@@ -461,7 +461,7 @@ export class LegacyCampaignManager extends CampaignManager {
 
         const parsedResponse: IParsedAuctionResponse = AuctionResponseParser.parse(response.response, this._adsConfig.getPlacements());
 
-        this.onAdPlanReceived.trigger(parsedResponse.refreshDelay, parsedResponse.auctionResponses.length, AuctionStatusCode.NORMAL);
+        this.onAdPlanReceived.trigger(parsedResponse.refreshDelay, parsedResponse.auctionResponses.length, parsedResponse.auctionStatusCode);
 
         if (this._mediationLoadTracking) {
             this._mediationLoadTracking.reportMediaCount(parsedResponse.auctionResponses.length);
