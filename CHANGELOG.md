@@ -1,5 +1,6 @@
 # Pending
 
+* [Auction V6] Add Mocks [#14032](https://github.com/Applifier/unity-ads-webview/pull/14032)
 * [Load V5] Ad Request Manager [#13881](https://github.com/Applifier/unity-ads-webview/pull/13881)
 * Add whitelist for Apple PMP creative [#13954](https://github.com/Applifier/unity-ads-webview/pull/13954)
 * Open Measurement - Clean up non-necessary metrics [#13982](https://github.com/Applifier/unity-ads-webview/pull/13982)
