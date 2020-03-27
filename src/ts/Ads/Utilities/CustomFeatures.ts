@@ -1,9 +1,11 @@
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
+import NestedIframePlayableCreativeJson from 'json/custom_features/NestedIframePlayableCreatives.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
+import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
 
@@ -35,20 +37,11 @@ export class CustomFeatures {
     }
 
     public static isNestedIframePlayable(creativeId: string | undefined) {
-        return  creativeId === '109455881' ||
-                creativeId === '109455877' ||
-                creativeId === '109091853' ||
-                creativeId === '109091754' ||
-                creativeId === '114617576' || // Hellfest
-                creativeId === '114617336' || // Hellfest
-                creativeId === '145941071' || // Miller Lite Fallback
-                creativeId === '145940860' || // Miller Lite Fallback
-                creativeId === '147367465' || // Carnival Creative
-                creativeId === '151099348' ||
-                creativeId === '151338976' ||
-                creativeId === '151337994' ||
-                creativeId === '152919353' ||
-                creativeId === '153119177';
+        return creativeId !== undefined && this.existsInList(NestedIframePlayableCreativeJson, creativeId);
+    }
+
+    public static isCacheModeAllowedTestGame(gameId: string): boolean {
+        return this.existsInList(CacheModeAllowedExperimentGames, gameId);
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {

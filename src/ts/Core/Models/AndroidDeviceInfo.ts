@@ -311,13 +311,19 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
             return Promise.all([
                 this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
-                this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
+                this.getRingerMode().catch(err => this.handleDeviceInfoError(err)),
+                this.isUSBConnected().catch(err => this.handleDeviceInfoError(err)),
+                this.getNetworkMetered().catch(err => this.handleDeviceInfoError(err))
             ]).then(([
                 freeSpaceExternal,
-                ringerMode
+                ringerMode,
+                usbConnected,
+                networkMetered
             ]) => {
                 dto.freeSpaceExternal = freeSpaceExternal;
                 dto.ringerMode = ringerMode;
+                dto.usbConnected = usbConnected;
+                dto.networkMetered = networkMetered;
 
                 return dto;
             });

@@ -158,19 +158,14 @@ export class MetricInstance implements IMetricInstance {
     }
 
     public reportTimingEvent(event: TimingEvent, value: number) {
-        // Gate Negative Values
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags({}));
-        } else {
-            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags({ 'mevt': event }));
         }
     }
 
     public reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }) {
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags(tags));
-        } else {
-            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags({ 'mevt': event }));
         }
     }
 
@@ -232,7 +227,7 @@ export class ChinaMetricInstance extends MetricInstance {
 }
 
 export function createMetricInstance(platform: Platform, requestManager: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, country: string): IMetricInstance {
-    if (CustomFeatures.sampleAtGivenPercent(100)) {
+    if (CustomFeatures.sampleAtGivenPercent(50)) {
         if (deviceInfo.isChineseNetworkOperator()) {
             return new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
         } else {
