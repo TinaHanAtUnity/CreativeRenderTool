@@ -19,10 +19,13 @@ export class Swatch {
     public color: Color;
 
     public population: number;
+    public selected: boolean;
 
     constructor(color: number[], population: number) {
         this.color = new Color(color[0], color[1], color[2]);
+
         this.population = population;
+        this.selected = false;
     }
 
     public getColorTheme(): IColorTheme {
