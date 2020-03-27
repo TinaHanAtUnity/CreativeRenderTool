@@ -75,7 +75,7 @@ describe('PrivacySDKViewTest', () => {
                     document.body.removeChild(privacyView.container());
                     done();
                 },
-                onPrivacyCompleted: (userSettings: IPrivacySettings): void => {
+                onPrivacyCompleted: (privacySettings: IPrivacySettings): void => {
                     // TODO: Empty
                 },
                 onPrivacyOpenUrl: (url: string): void => {

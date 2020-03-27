@@ -114,8 +114,8 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         });
     }
 
-    public onPrivacyCompleted(userSettings: IPrivacySettings): void {
-        this._handlers.forEach(handler => handler.onPrivacyCompleted(userSettings));
+    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
+        this._handlers.forEach(handler => handler.onPrivacyCompleted(privacySettings));
     }
 
     public completeCallback(): void {

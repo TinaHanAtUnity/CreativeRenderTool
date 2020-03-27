@@ -15,7 +15,7 @@ export interface IPrivacyFrameEventAdapter {
 }
 
 export interface IPrivacyFrameHandler {
-    onPrivacyCompleted(userSettings: IPrivacySettings): void;
+    onPrivacyCompleted(privacySettings: IPrivacySettings): void;
     onPrivacyReady(): void;
     onPrivacyOpenUrl(url: string): void;
     onPrivacyMetric(data: string): void;
@@ -69,8 +69,8 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         }
     }
 
-    private onPrivacyCompleted(userSettings: IPrivacySettings): void {
-        this._handler.onPrivacyCompleted(userSettings);
+    private onPrivacyCompleted(privacySettings: IPrivacySettings): void {
+        this._handler.onPrivacyCompleted(privacySettings);
     }
 
     private onPrivacyReady(): void {
