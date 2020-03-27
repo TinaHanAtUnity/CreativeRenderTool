@@ -128,7 +128,7 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -320,7 +320,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -344,7 +344,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -815,7 +815,7 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -935,7 +935,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
