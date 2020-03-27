@@ -184,11 +184,11 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         }
     }
 
-    public onPrivacyCompleted(userSettings: IPrivacySettings): void {
-        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
+    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
+        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(privacySettings));
 
         let action: GDPREventAction;
-        switch (userSettings.user.agreementMethod) {
+        switch (privacySettings.user.agreementMethod) {
             case 'all':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
@@ -210,9 +210,9 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         }
 
         this.setConsent({
-                ads: userSettings.user.ads,
-                external: userSettings.user.external,
-                gameExp: userSettings.user.gameExp
+                ads: privacySettings.user.ads,
+                external: privacySettings.user.external,
+                gameExp: privacySettings.user.gameExp
             },
             action,
             GDPREventSource.USER);
