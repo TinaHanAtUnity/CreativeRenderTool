@@ -86,6 +86,7 @@ export const AuctionXHR = new DisabledABTest();
 export const AuctionV6Test = new DisabledABTest();
 
 // Disabled AB Tests
+export const LoadV5 = new DisabledABTest();
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();

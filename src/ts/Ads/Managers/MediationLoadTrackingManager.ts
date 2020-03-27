@@ -9,6 +9,7 @@ export enum MediationExperimentType {
     NofillImmediately = 'nfi',
     CacheModeAllowed = 'cma2',
     AuctionXHR = 'xhr',
+    LoadV5 = 'lv5',
     None = 'none'
 }
 
