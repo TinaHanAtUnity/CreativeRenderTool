@@ -4,6 +4,7 @@
 * [Load V5] Do not retry request if it fails [#14038](https://github.com/Applifier/unity-ads-webview/pull/14038)
 * [Load V5] Mocks for PerPlacementLoadManagerV5 tests [#14039](https://github.com/Applifier/unity-ads-webview/pull/14039)
 * Open Measurement - Add Timeout on Admob start metric [#14040](https://github.com/Applifier/unity-ads-webview/pull/14040)
+* Update AndroidDeviceInfo DTO [#14001](https://github.com/Applifier/unity-ads-webview/pull/14001)
 
 # Thu Mar 26 23:11:54 UTC 2020
 
