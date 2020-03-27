@@ -101,6 +101,14 @@ import * as sinon from 'sinon';
                 assert.equal(returnedProtocol, AuctionProtocol.V6);
             });
 
+            it(('should set V6 when the auctionV6test is true'), () => {
+                RequestManager.setTestAuctionProtocol(undefined);
+                RequestManager.configureAuctionProtocol(false, true);
+                const returnedProtocol = RequestManager.getAuctionProtocol();
+
+                assert.equal(returnedProtocol, AuctionProtocol.V6);
+            });
+
             it(('should set V5 otherwise'), () => {
                 sinon.stub(TestEnvironment, 'get').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
