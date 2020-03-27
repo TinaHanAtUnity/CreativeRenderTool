@@ -111,7 +111,7 @@ import * as sinon from 'sinon';
 
             it(('should set V5 when the auctionV6test is false'), () => {
                 RequestManager.setTestAuctionProtocol(undefined);
-                RequestManager.configureAuctionProtocol(false, true);
+                RequestManager.configureAuctionProtocol(false, false);
                 const returnedProtocol = RequestManager.getAuctionProtocol();
 
                 assert.equal(returnedProtocol, AuctionProtocol.V5);
