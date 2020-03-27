@@ -1,5 +1,6 @@
 # Pending
 
+* [Auction V6] Add Disabled ABTest [#14070](https://github.com/Applifier/unity-ads-webview/pull/14070)
 * [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
 * [Auction V6] Use Auction Parser in LegacyCampaignManager [#14034](https://github.com/Applifier/unity-ads-webview/pull/14034)
 * [Auction V6] Add Metric Tracking For Failure Cases [#14035](https://github.com/Applifier/unity-ads-webview/pull/14035)
