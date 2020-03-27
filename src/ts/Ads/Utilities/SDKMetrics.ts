@@ -167,7 +167,10 @@ export enum LoadV5 {
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
     ReloadRequestStarted = 'v5_reload_request_started',
     ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
-    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data'
+    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data',
+    RefreshManagerPreloadDataExpired = 'v5_refresh_manager_preload_data_expired',
+    RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
+    RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
