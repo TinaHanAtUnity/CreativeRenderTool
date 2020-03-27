@@ -187,26 +187,26 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        this.setupLoadApiEnabled();
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-            'wel': `${this._webViewEnabledLoad}`
-        });
-
-        let promise = Promise.resolve();
-
-        this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
-        if (this._nofillImmediately) {
-            promise = this.setupMediationTrackingManager().then(() => {
-                this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
-                return this._core.Api.Sdk.initComplete();
-            });
-        }
-
-        return promise.then(() => {
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
+        }).then(() => {
+            this.setupLoadApiEnabled();
+            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
+
+            let promise = Promise.resolve();
+
+            this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
+            if (this._nofillImmediately) {
+                promise = this.setupMediationTrackingManager().then(() => {
+                    this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
+                    return this._core.Api.Sdk.initComplete();
+                });
+            }
+            return promise;
         }).then(() => {
             measurements.measure('setup_environment');
             return this.Analytics.initialize();
