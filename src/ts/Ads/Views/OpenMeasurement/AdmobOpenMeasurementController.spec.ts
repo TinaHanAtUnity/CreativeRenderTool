@@ -108,12 +108,14 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
             let omManager: AdmobOpenMeasurementController;
 
             beforeEach(() => {
+                jest.useFakeTimers();
                 omManager = initAdMobOMManager();
             });
 
             describe('start called first', () => {
                 beforeEach(() => {
                     omManager.start(10);
+                    jest.runAllTimers();
                     omManager.loaded({
                         isSkippable: false,
                         skipOffset: 1,
