@@ -3,6 +3,7 @@ import { AuctionResponse, AuctionStatusCode, IPlacementTrackingV6, IRawAuctionV6
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { AuctionV6, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 
 export interface IParsedAuctionResponse {
@@ -40,7 +41,7 @@ export class AuctionResponseParser {
                     tempTrackingUrls.push(MacroUtil.replaceMacro(urlToTemplate, params));
                     trackingUrls[eventKey] = tempTrackingUrls;
                 } else {
-                    // Alert to out of bounds array
+                    SDKMetrics.reportMetricEvent(AuctionV6.TrackingIndicesOutOfBounds);
                 }
             });
         }));
@@ -64,13 +65,13 @@ export class AuctionResponseParser {
                     if (placementResponse.mediaId) {
                         mediaId = responseJson.placements[placementId].mediaId;
                     } else {
-                        // Alert issue with media
+                        SDKMetrics.reportMetricEvent(AuctionV6.MediaIdMissing);
                     }
 
                     if (placementResponse.tracking) {
                         tracking = responseJson.placements[placementId].tracking;
                     } else {
-                        // Alert issue with tracking
+                        SDKMetrics.reportMetricEvent(AuctionV6.TrackingMissing);
                     }
                 }
 
@@ -90,7 +91,7 @@ export class AuctionResponseParser {
                     refreshDelay = 3600; // Moved const from RefreshManager
                 }
             } else {
-                // Alert to banner placement being requested
+                SDKMetrics.reportMetricEvent(AuctionV6.BannerPlacementNotRemoved);
             }
         });
 
@@ -115,16 +116,19 @@ export class AuctionResponseParser {
         try {
             json = JsonParser.parse<IRawAuctionV6Response>(response);
         } catch (e) {
+            SDKMetrics.reportMetricEvent(AuctionV6.FailedToParse);
             throw new Error('Failed to parse IRawAuctionV6Response ' + e.message);
         }
 
         let auctionId: string;
         if (!json.auctionId) {
+            SDKMetrics.reportMetricEvent(AuctionV6.AuctionIdMissing);
             throw new Error('No auction ID found');
         }
         auctionId = json.auctionId;
 
         if (!json.placements) {
+            SDKMetrics.reportMetricEvent(AuctionV6.PlacementsMissing);
             throw new Error('No placements found');
         }
 
@@ -142,6 +146,7 @@ export class AuctionResponseParser {
             try {
                 auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode));
             } catch (e) {
+                SDKMetrics.reportMetricEvent(AuctionV6.FailedCreatingAuctionResponse);
                 throw new Error('Failure creating Auction Response' + e.message);
             }
         });
