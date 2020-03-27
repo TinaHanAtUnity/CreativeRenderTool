@@ -5,6 +5,7 @@ import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
+import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
 
@@ -37,6 +38,10 @@ export class CustomFeatures {
 
     public static isNestedIframePlayable(creativeId: string | undefined) {
         return creativeId !== undefined && this.existsInList(NestedIframePlayableCreativeJson, creativeId);
+    }
+
+    public static isCacheModeAllowedTestGame(gameId: string): boolean {
+        return this.existsInList(CacheModeAllowedExperimentGames, gameId);
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
