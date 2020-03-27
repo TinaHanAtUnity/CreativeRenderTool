@@ -593,5 +593,33 @@
     "description": "Privacy method, only sent if it is developer_consent or legitimate_interest",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "preload",
+    "type": "boolean",
+    "description": "Preload Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "load",
+    "type": "boolean",
+    "description": "Load Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadPlacements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadData",
+    "type": "object",
+    "description": "Preload Data for all placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

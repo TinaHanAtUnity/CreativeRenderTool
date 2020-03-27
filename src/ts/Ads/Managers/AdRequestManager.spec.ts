@@ -128,7 +128,7 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -320,7 +320,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -344,7 +344,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -815,7 +815,7 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -935,7 +935,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 2,
+                    retries: 0,
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
@@ -1013,6 +1013,78 @@ class SatisfiesMatcher {
 
             it('should have correct campaign', () => {
                 expect(loadedCampaign!.campaign.getId()).toEqual('load_v5_2');
+            });
+
+            it('should have session from reload', () => {
+                expect(loadedCampaign!.campaign.getSession()).toBeDefined();
+                expect(loadedCampaign!.campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca7');
+                expect(loadedCampaign!.campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca7');
+            });
+        });
+
+        describe('load request ongoing and reload triggered for the same placement', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                let requestMadePromiseResolve: () => void = () => { expect(false).toBe(true); };
+                const requestMadePromise = new Promise((resolve) => { requestMadePromiseResolve = resolve; });
+
+                let requestPromiseResolve: (response: INativeResponse) => void = () => { expect(false).toBe(true); };
+                const requestPromise = new Promise((resolve) => { requestPromiseResolve = resolve; });
+
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockImplementationOnce(
+                    () => { requestMadePromiseResolve(); return requestPromise; }
+                ).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5ReloadResponse),
+                    responseCode: 200,
+                    headers: []
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_2),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacements.mockReturnValue({
+                    video: Placement('video'),
+                    rewardedVideo: Placement('rewardedVideo')
+                });
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                const load = adRequestManager.requestLoad('video');
+
+                await requestMadePromise;
+
+                const reload = adRequestManager.requestReload(['rewardedVideo', 'video']);
+
+                await reload;
+
+                requestPromiseResolve({
+                    url: '',
+                    response: '{}',
+                    responseCode: 200,
+                    headers: []
+                });
+
+                loadedCampaign = await load;
+            });
+
+            it('should have a fill', () => {
+                expect(loadedCampaign).toBeDefined();
+            });
+
+            it('should have correct campaign', () => {
+                expect(loadedCampaign!.campaign.getId()).toEqual('reload_v5');
             });
 
             it('should have session from reload', () => {

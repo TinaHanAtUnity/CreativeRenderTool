@@ -91,7 +91,7 @@ export abstract class CampaignManager {
         return this._previousPlacementId;
     }
 
-    public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown): Promise<INativeResponse> {
+    public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown, retries: number = 2): Promise<INativeResponse> {
         const body = JSON.stringify(requestBody);
 
         return Promise.resolve().then((): Promise<INativeResponse> => {
@@ -105,7 +105,7 @@ export abstract class CampaignManager {
             }
             const headers: [string, string][] = [];
             return request.post(requestUrl, body, headers, {
-                retries: 2,
+                retries: retries,
                 retryDelay: 10000,
                 followRedirects: false,
                 retryWithConnectionEvents: false
