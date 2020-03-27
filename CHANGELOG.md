@@ -4,6 +4,7 @@
 * [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
 * [Auction V6] Use Auction Parser in LegacyCampaignManager [#14034](https://github.com/Applifier/unity-ads-webview/pull/14034)
 * [Auction V6] Add Metric Tracking For Failure Cases [#14035](https://github.com/Applifier/unity-ads-webview/pull/14035)
+* [Load V5] Add Disabled ABTest for Selected Games [#13890](https://github.com/Applifier/unity-ads-webview/pull/13890)
 * [Load V5] Add Support for PerPlacementLoadManagerV5 [#13889](https://github.com/Applifier/unity-ads-webview/pull/13889)
 * [Load V5] Use reload campaign if ongoing load was canceled [#14068](https://github.com/Applifier/unity-ads-webview/pull/14068)
 * [Load V5] Set Retry to 0 for Requests [#14038](https://github.com/Applifier/unity-ads-webview/pull/14038)
