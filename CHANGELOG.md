@@ -2,6 +2,7 @@
 
 * [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
 * [Auction V6] Use Auction Parser in LegacyCampaignManager [#14034](https://github.com/Applifier/unity-ads-webview/pull/14034)
+* [Load V5] Add Support for PerPlacementLoadManagerV5 [#13889](https://github.com/Applifier/unity-ads-webview/pull/13889)
 * [Load V5] Set Retry to 0 for Requests [#14038](https://github.com/Applifier/unity-ads-webview/pull/14038)
 * [Load V5] Mocks for PerPlacementLoadManagerV5 tests [#14039](https://github.com/Applifier/unity-ads-webview/pull/14039)
 * [Load V5] Increment Ad Ordinal [#14036](https://github.com/Applifier/unity-ads-webview/pull/14036)
