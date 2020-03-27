@@ -1,4 +1,4 @@
-# Pending
+# Fri Mar 27 23:32:15 UTC 2020
 
 * [Auction V6] Add Disabled ABTest [#14070](https://github.com/Applifier/unity-ads-webview/pull/14070)
 * [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
