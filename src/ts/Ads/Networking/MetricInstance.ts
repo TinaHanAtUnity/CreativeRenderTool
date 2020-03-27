@@ -158,19 +158,14 @@ export class MetricInstance implements IMetricInstance {
     }
 
     public reportTimingEvent(event: TimingEvent, value: number) {
-        // Gate Negative Values
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags({}));
-        } else {
-            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags({ 'mevt': event }));
         }
     }
 
     public reportTimingEventWithTags(event: TimingEvent, value: number, tags: { [key: string]: string }) {
         if (value > 0) {
             this.batchTimingEvent(event, value, this.createTags(tags));
-        } else {
-            this.batchMetricEvent(ErrorMetric.TimingValueNegative, 1, this.createTags({ 'mevt': event }));
         }
     }
 

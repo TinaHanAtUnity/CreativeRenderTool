@@ -10,8 +10,7 @@ export enum ErrorMetric {
     PromoWithoutCreatives = 'promo_without_creatives',
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
-    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    TimingValueNegative = 'timing_value_negative'
+    MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show'
 }
 
 export enum AdmobMetric {
@@ -174,7 +173,8 @@ export enum LoadV5 {
 export enum AuctionV6 {
     MediaIdMissing = 'media_id_missing',
     TrackingMissing = 'tracking_missing',
-    TrackingIndicesOutOfBounds = 'tracking_indices_out_of_bounds'
+    TrackingIndicesOutOfBounds = 'tracking_indices_out_of_bounds',
+    BannerPlacementNotRemoved = 'banner_placement_not_removed'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
