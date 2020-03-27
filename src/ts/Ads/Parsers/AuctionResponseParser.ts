@@ -12,7 +12,103 @@ export interface IParsedAuctionResponse {
     auctionResponses: AuctionResponse[];
     unfilledPlacementIds: string[];
 }
+
+interface IPlacementMedia {
+    refreshDelay: number;
+    unfilledPlacementIds: string[];
+    campaigns: { [mediaId: string]: AuctionPlacement[] };
+}
+
 export class AuctionResponseParser {
+
+    private static constructTrackingUrls(trackingTemplates: string[], tracking: IPlacementTrackingV6): ICampaignTrackingUrls {
+        const trackingUrls: ICampaignTrackingUrls = {};
+
+        const globalParams = tracking.params;
+        const events = tracking.events;
+
+        Object.keys(events).forEach(((eventKey) => {
+            const eventTracking = events[eventKey];
+            const params = {
+                ...(eventTracking.params || {}),
+                ...globalParams
+            };
+            eventTracking.urlIndices.forEach((index) => {
+                if (index >= 0 && index < trackingTemplates.length) {
+                    const tempTrackingUrls: string[] = trackingUrls[eventKey] || [];
+                    const urlToTemplate = trackingTemplates[index];
+                    tempTrackingUrls.push(MacroUtil.replaceMacro(urlToTemplate, params));
+                    trackingUrls[eventKey] = tempTrackingUrls;
+                } else {
+                    // Alert to out of bounds array
+                }
+            });
+        }));
+
+        return trackingUrls;
+    }
+
+    private static populatePlacementMedia(responseJson: IRawAuctionV6Response, placements: { [id: string]: Placement }): IPlacementMedia {
+        let refreshDelay: number = 0;
+        const unfilledPlacementIds: string[] = [];
+        const campaigns: { [mediaId: string]: AuctionPlacement[] } = {};
+
+        Object.keys(placements).forEach((placementId) => {
+            const placement = placements[placementId];
+            if (!placement.isBannerPlacement()) {
+                let mediaId: string | undefined;
+                let tracking: IPlacementTrackingV6 | undefined;
+
+                const placementResponse = responseJson.placements[placementId];
+                if (placementResponse) {
+                    if (placementResponse.mediaId) {
+                        mediaId = responseJson.placements[placementId].mediaId;
+                    } else {
+                        // Alert issue with media
+                    }
+
+                    if (placementResponse.tracking) {
+                        tracking = responseJson.placements[placementId].tracking;
+                    } else {
+                        // Alert issue with tracking
+                    }
+                }
+
+                if (mediaId && tracking) {
+
+                    const trackingUrls = this.constructTrackingUrls(responseJson.trackingTemplates, tracking);
+
+                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
+
+                    if (campaigns[mediaId] === undefined) {
+                        campaigns[mediaId] = [];
+                    }
+
+                    campaigns[mediaId].push(auctionPlacement);
+                } else {
+                    unfilledPlacementIds.push(placementId);
+                    refreshDelay = 3600; // Moved const from RefreshManager
+                }
+            } else {
+                // Alert to banner placement being requested
+            }
+        });
+
+        // TODO: Potentially remove - decide if behavior is wanted in the future
+        Object.keys(campaigns).forEach((mediaId) => {
+            const contentType = responseJson.media[mediaId].contentType;
+            const cacheTTL = responseJson.media[mediaId].cacheTTL ? responseJson.media[mediaId].cacheTTL : 3600;
+            if (contentType && contentType !== 'comet/campaign' && typeof cacheTTL !== 'undefined' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                refreshDelay = cacheTTL;
+            }
+        });
+
+        return {
+            refreshDelay,
+            unfilledPlacementIds,
+            campaigns
+        };
+    }
 
     public static parse(response: string, placements: { [id: string]: Placement }): IParsedAuctionResponse {
         let json: IRawAuctionV6Response;
@@ -38,82 +134,11 @@ export class AuctionResponseParser {
             auctionStatusCode = json.statusCode;
         }
 
-        const campaigns: { [mediaId: string]: AuctionPlacement[] } = {};
-        let refreshDelay: number = 0;
+        const { campaigns, unfilledPlacementIds, refreshDelay } = this.populatePlacementMedia(json, placements);
 
         const auctionResponses: AuctionResponse[] = [];
-        const unfilledPlacementIds: string[] = [];
-
-        Object.keys(placements).forEach((placementId) => {
-            const placement = placements[placementId];
-            if (!placement.isBannerPlacement()) {
-                let mediaId: string | undefined;
-                let tracking: IPlacementTrackingV6 | undefined;
-
-                const placementResponse = json.placements[placementId];
-                if (placementResponse) {
-                    if (placementResponse.mediaId) {
-                        mediaId = json.placements[placementId].mediaId;
-                    } else {
-                        // Alert issue with media
-                    }
-
-                    if (placementResponse.tracking) {
-                        tracking = json.placements[placementId].tracking;
-                    } else {
-                        // Alert issue with tracking
-                    }
-                }
-
-                if (mediaId && tracking) {
-                    const trackingTemplates: string[] = json.trackingTemplates;
-                    const trackingUrls: ICampaignTrackingUrls = {};
-
-                    const globalParams = tracking.params;
-                    const events = tracking.events;
-
-                    Object.keys(events).forEach(((eventKey) => {
-                        const eventTracking = events[eventKey];
-                        const params = {
-                            ...(eventTracking.params || {}),
-                            ...globalParams
-                        };
-                        eventTracking.urlIndices.forEach((index) => {
-                            if (index >= 0 && index < trackingTemplates.length) {
-                                const tempTrackingUrls: string[] = trackingUrls[eventKey] || [];
-                                const urlToTemplate = trackingTemplates[index];
-                                tempTrackingUrls.push(MacroUtil.replaceMacro(urlToTemplate, params));
-                                trackingUrls[eventKey] = tempTrackingUrls;
-                            } else {
-                                // Alert to out of bounds array
-                            }
-                        });
-                    }));
-
-                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
-
-                    if (campaigns[mediaId] === undefined) {
-                        campaigns[mediaId] = [];
-                    }
-
-                    campaigns[mediaId].push(auctionPlacement);
-                } else {
-                    unfilledPlacementIds.push(placementId);
-                    refreshDelay = 3600; // Moved const from RefreshManager
-                }
-            } else {
-                // Alert to banner placement being requested
-            }
-        });
 
         Object.keys(campaigns).forEach((mediaId) => {
-            // TODO: Followup if this behavior is wanted - Should be controlled server-side
-            const contentType = json.media[mediaId].contentType;
-            const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-            if (contentType && contentType !== 'comet/campaign' && typeof cacheTTL !== 'undefined' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
-                refreshDelay = cacheTTL;
-            }
-
             try {
                 auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode));
             } catch (e) {
