@@ -10,6 +10,7 @@
 * [Load V5] Mocks for PerPlacementLoadManagerV5 tests [#14039](https://github.com/Applifier/unity-ads-webview/pull/14039)
 * [Load V5] Increment Ad Ordinal [#14036](https://github.com/Applifier/unity-ads-webview/pull/14036)
 * [Load V5] Parameters Test for Load V5 [#13990](https://github.com/Applifier/unity-ads-webview/pull/13990)
+* [Load V5] Configure test environment as fast as possible [#14069](https://github.com/Applifier/unity-ads-webview/pull/14069)
 * Open Measurement - Add Timeout on Admob start metric [#14040](https://github.com/Applifier/unity-ads-webview/pull/14040)
 * Update AndroidDeviceInfo DTO [#14001](https://github.com/Applifier/unity-ads-webview/pull/14001)
 
