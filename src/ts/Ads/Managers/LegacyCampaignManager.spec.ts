@@ -72,7 +72,7 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
             let noFillPlacements: string[];
             let triggeredRefreshDelay: number;
             let triggeredCampaignCount: number;
-            let triggeredAuctionStatusCode: AuctionStatusCode
+            let triggeredAuctionStatusCode: AuctionStatusCode;
 
             beforeEach(() => {
                 filledPlacements = {};
