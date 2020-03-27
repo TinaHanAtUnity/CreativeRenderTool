@@ -79,7 +79,7 @@ export class AuctionResponseParser {
                             ...globalParams
                         };
                         eventTracking.urlIndices.forEach((index) => {
-                            if (index >= 0 && trackingTemplates.length >= index + 1) {
+                            if (index >= 0 && index < trackingTemplates.length) {
                                 const tempTrackingUrls: string[] = trackingUrls[eventKey] || [];
                                 const urlToTemplate = trackingTemplates[index];
                                 tempTrackingUrls.push(MacroUtil.replaceMacro(urlToTemplate, params));

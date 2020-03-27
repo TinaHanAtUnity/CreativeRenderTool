@@ -17,7 +17,7 @@
             "tracking": {
                 "params": {
                     "{{data}}": "premiumDataBlob",
-                    "{{placement}}": "premiumAuction"                    
+                    "{{placement}}": "premiumAuction"
                 },
                 "events": {
                     "start": {
@@ -71,6 +71,36 @@
                         ],
                         "params": {
                             "{{secretParam}}": "fifthQuartile"
+                        }
+                    }
+                }
+            }
+        },
+        "outOfBoundsStartPlacement": {
+            "mediaId": "5be40c5f602f4510ec583881",
+            "tracking": {
+                "params": {
+                    "{{data}}": "outOfBoundsData",
+                    "{{placement}}": "oobPlacement"
+                },
+                "events": {
+                    "start": {
+                        "urlIndices": [
+                            -1,
+                            1,
+                            2
+                        ],
+                        "params": {
+                            "{{eventType}}": "start",
+                            "{{secretParam}}": "scott"
+                        }
+                    },
+                    "complete": {
+                        "urlIndices": [
+                            0
+                        ],
+                        "params": {
+                            "{{eventType}}": "complete"
                         }
                     }
                 }
