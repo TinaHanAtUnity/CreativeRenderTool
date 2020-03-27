@@ -1,6 +1,7 @@
 # Pending
 
 * [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
+* Open Measurement - Add Timeout on Admob start metric [#14040](https://github.com/Applifier/unity-ads-webview/pull/14040)
 
 # Thu Mar 26 23:11:54 UTC 2020
 
