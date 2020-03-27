@@ -83,6 +83,7 @@ export const LoadRefreshV4 = new ABTest(14);
 export const PrivacySDKTest = new ABTest(16);
 export const DiagnosticsRampDown = new ABTest(15);
 export const AuctionXHR = new DisabledABTest();
+export const AuctionV6Test = new DisabledABTest();
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
