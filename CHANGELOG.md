@@ -1,3 +1,7 @@
+# Pending
+
+* [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
+
 # Thu Mar 26 23:11:54 UTC 2020
 
 * [Auction V6] Add Mocks [#14032](https://github.com/Applifier/unity-ads-webview/pull/14032)
