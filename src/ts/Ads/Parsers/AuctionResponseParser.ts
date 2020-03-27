@@ -116,16 +116,19 @@ export class AuctionResponseParser {
         try {
             json = JsonParser.parse<IRawAuctionV6Response>(response);
         } catch (e) {
+            SDKMetrics.reportMetricEvent(AuctionV6.FailedToParse);
             throw new Error('Failed to parse IRawAuctionV6Response ' + e.message);
         }
 
         let auctionId: string;
         if (!json.auctionId) {
+            SDKMetrics.reportMetricEvent(AuctionV6.AuctionIdMissing);
             throw new Error('No auction ID found');
         }
         auctionId = json.auctionId;
 
         if (!json.placements) {
+            SDKMetrics.reportMetricEvent(AuctionV6.PlacementsMissing);
             throw new Error('No placements found');
         }
 
@@ -143,6 +146,7 @@ export class AuctionResponseParser {
             try {
                 auctionResponses.push(new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode));
             } catch (e) {
+                SDKMetrics.reportMetricEvent(AuctionV6.FailedCreatingAuctionResponse);
                 throw new Error('Failure creating Auction Response' + e.message);
             }
         });
