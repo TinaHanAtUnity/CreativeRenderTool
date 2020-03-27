@@ -48,7 +48,7 @@ export class AuctionResponseParser {
         return trackingUrls;
     }
 
-    private static populatePlacementMedia(responseJson: IRawAuctionV6Response, placements: { [id: string]: Placement }): IPlacementMedia {
+    private static determinePlacementFill(responseJson: IRawAuctionV6Response, placements: { [id: string]: Placement }): IPlacementMedia {
         let refreshDelay: number = 0;
         const unfilledPlacementIds: string[] = [];
         const campaigns: { [mediaId: string]: AuctionPlacement[] } = {};
@@ -134,7 +134,7 @@ export class AuctionResponseParser {
             auctionStatusCode = json.statusCode;
         }
 
-        const { campaigns, unfilledPlacementIds, refreshDelay } = this.populatePlacementMedia(json, placements);
+        const { campaigns, unfilledPlacementIds, refreshDelay } = this.determinePlacementFill(json, placements);
 
         const auctionResponses: AuctionResponse[] = [];
 
