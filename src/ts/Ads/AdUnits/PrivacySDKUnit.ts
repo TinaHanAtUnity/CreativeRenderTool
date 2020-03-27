@@ -44,6 +44,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     private _showing: boolean;
     private _privacyManager: UserPrivacyManager;
     private _unityPrivacyView: PrivacySDKView;
+    private _privacyMetricsUrl: string;
     private readonly _platform: Platform;
     private readonly _landingPage: ConsentPage;
 
@@ -54,6 +55,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
         this._privacySDK = parameters.privacySDK;
+        this._privacyMetricsUrl = this._privacyManager.getPrivacyMetricsUrl();
 
         this._landingPage = this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
 
@@ -237,7 +239,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     }
 
     public onPrivacyMetric(data: string): void {
-        this._requestManager.post(this._privacyManager.getPrivacyMetricsUrl(), data)
+        this._requestManager.post(this._privacyMetricsUrl, data)
           .catch(error => {
               this._core.Sdk.logError(`PRIVACY: sending metrics failed: ${error.message}`);
           });
