@@ -60,6 +60,7 @@ export class AdRequestManager extends CampaignManager {
     private _ongoingPreloadRequestResolve: () => void;
     private _ongoingReloadRequest: Promise<void> | null;
     private _ongoingLoadRequests: { [key: string]: boolean };
+    private _reloadResults: { [key: string]: ILoadedCampaign };
     private _preloadFailed: boolean;
     private _activePreload: boolean;
 
@@ -103,6 +104,7 @@ export class AdRequestManager extends CampaignManager {
         this._userPrivacyManager = userPrivacyManager;
         this._ongoingReloadRequest = null;
         this._ongoingLoadRequests = {};
+        this._reloadResults = {};
         this._preloadData = null;
         this._preloadFailed = false;
         this._ongoingPreloadRequest = new Promise((resolve) => { this._ongoingPreloadRequestResolve = resolve; });
@@ -244,8 +246,11 @@ export class AdRequestManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId))
             ]);
         }).then(([requestUrl, requestBody]) => CampaignManager.onlyRequest(this._request, requestUrl, this.makeLoadBody(<ILoadV5BodyExtra>requestBody, placementId), 0)).then((response) => {
-            // if load request has been canceled by reload request, we start it again
+            // if load request has been canceled by reload request, we start it again or we use result from reload request
             if (this._ongoingLoadRequests[placementId] === undefined) {
+                if (this._reloadResults[placementId] !== undefined) {
+                    return Promise.resolve(this._reloadResults[placementId]);
+                }
                 SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
                 return this.requestLoad(placementId);
             }
@@ -277,6 +282,7 @@ export class AdRequestManager extends CampaignManager {
         this._ongoingReloadRequest = new Promise((resolve) => { promiseResolve = resolve; });
 
         this._ongoingLoadRequests = {}; // cancel all ongoing load requests
+        this._reloadResults = {};
         this._preloadFailed = false;
         this._preloadData = null;
         this._currentSession = null;
@@ -514,10 +520,12 @@ export class AdRequestManager extends CampaignManager {
             }))
         ).then((loadedCampaigns) => {
             loadedCampaigns.forEach((loadedCampaign, index) => {
+                const placementId = placementsToLoad[index].getId();
                 if (loadedCampaign !== undefined) {
-                    this.onCampaign.trigger(placementsToLoad[index].getId(), loadedCampaign.campaign, loadedCampaign.trackingUrls);
+                    this._reloadResults[placementId] = loadedCampaign;
+                    this.onCampaign.trigger(placementId, loadedCampaign.campaign, loadedCampaign.trackingUrls);
                 } else {
-                    this.onNoFill.trigger(placementsToLoad[index].getId());
+                    this.onNoFill.trigger(placementId);
                 }
             });
         });
