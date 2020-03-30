@@ -96,6 +96,12 @@
 | legalFramework | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | nofillRetry | boolean | Retrying after no fill | SDK | all |
 | agreedOverAgeLimit | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| privacyType | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+| preload | boolean | Preload Flag for Load V5 | SDK | all |
+| load | boolean | Load Flag for Load V5 | SDK | all |
+| preloadPlacements | object | All placements received in configuration | SDK | all |
+| preloadData | object | Preload Data for all placements received in configuration | SDK | all |
+
 
 
 ### Configuration request
@@ -197,6 +203,10 @@
 | omidJSVersion | all | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| preload | no | False | True | boolean | Preload Flag for Load V5 | SDK | all |
+| load | no | False | True | boolean | Load Flag for Load V5 | SDK | all |
+| preloadPlacements | no | False | True | object | All placements received in configuration | SDK | all |
+| preloadData | no | False | True | object | Preload Data for all placements received in configuration | SDK | all |
 
 
 
@@ -250,6 +260,9 @@
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+
+
 
 ### Click event
 | key | required | queryString | body | type | description | provider | platforms |
@@ -301,3 +314,5 @@
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
+| privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+

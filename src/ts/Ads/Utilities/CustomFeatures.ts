@@ -5,6 +5,7 @@ import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
+import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
 
@@ -37,6 +38,10 @@ export class CustomFeatures {
 
     public static isNestedIframePlayable(creativeId: string | undefined) {
         return creativeId !== undefined && this.existsInList(NestedIframePlayableCreativeJson, creativeId);
+    }
+
+    public static isCacheModeAllowedTestGame(gameId: string): boolean {
+        return this.existsInList(CacheModeAllowedExperimentGames, gameId);
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
@@ -134,6 +139,12 @@ export class CustomFeatures {
 
         return this.existsInList(fanateeGames, gameId) ||
                this.existsInList(etermaxGames, gameId);
+    }
+
+    public static isLoadV5Game(gameId: string): boolean {
+        const gameIds = ['1783252', '1781853', '1781854'];
+
+        return this.existsInList(gameIds, gameId);
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

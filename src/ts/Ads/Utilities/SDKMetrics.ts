@@ -11,7 +11,7 @@ export enum ErrorMetric {
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    TimingValueNegative = 'timing_value_negative'
+    PlacementInvalidationPending = 'placement_invalidation_pending'
 }
 
 export enum AdmobMetric {
@@ -31,7 +31,9 @@ export enum AdmobMetric {
     DoubleClickOMStarts = 'doubleclick_om_starts',
     DoubleClickOMImpressions = 'doubleclick_om_impressions',
     DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
-    AdmobOMVideoStart = 'admob_om_video_start'
+    AdmobOMVideoStart = 'admob_om_video_start',
+    AdmobOMStartFirst = 'admob_om_start_first',
+    AdmobOMLoadedFirst = 'admob_om_load_first'
 }
 
 export enum BannerMetric {
@@ -115,13 +117,22 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
+    CampaignAlreadyActive = 'campaign_already_active',
+    CampaignInitializationError = 'automated_experiment_manager_initialization_error',
+    FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
+    FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',
+    FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
+    FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
+    FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
     DecisionNotReady = 'decision_not_ready',
     InvalidEndscreenColorTintSwitches = 'invalid_endscreen_color_tint_switches',
     InvalidEndscreenColorTintTheme = 'invalid_endscreen_color_tint_theme',
     EndscreenColorTintError = 'endscreen_color_tint_error',
-    EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed'
+    EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
+    OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
+    UnknownExperimentName = 'unknown_experiement_name'
 }
 
 export enum GeneralTimingMetric {
@@ -170,12 +181,26 @@ export enum LoadV5 {
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
     ReloadRequestStarted = 'v5_reload_request_started',
     ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
-    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data'
+    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data',
+    RefreshManagerPreloadDataExpired = 'v5_refresh_manager_preload_data_expired',
+    RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
+    RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate'
+}
+
+export enum AuctionV6 {
+    FailedToParse = 'v6_failed_to_parse',
+    AuctionIdMissing = 'v6_auction_id_missing',
+    PlacementsMissing = 'v6_placements_missing',
+    MediaIdMissing = 'v6_media_id_missing',
+    TrackingMissing = 'v6_tracking_missing',
+    TrackingIndicesOutOfBounds = 'v6_tracking_indices_out_of_bounds',
+    BannerPlacementNotRemoved = 'v6_banner_placement_not_removed',
+    FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
 
 export class SDKMetrics {
 

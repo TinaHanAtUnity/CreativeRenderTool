@@ -23,6 +23,8 @@ import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
+import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -222,7 +224,7 @@ export class VastParserStrict {
     }
 
     private setIASURLHack(wrapperURL: string, bundleId?: string) {
-        let url = wrapperURL.replace('vast.adsafeprotected.com', 'vastpixel3.adsafeprotected.com');
+        let url = MacroUtil.replaceMacro(wrapperURL, {'vast.adsafeprotected.com': 'vastpixel3.adsafeprotected.com', '%5BOMIDPARTNER%5D': OMID_P});
         const stringSplice = (str1: string, start: number, delCount: number, newSubStr: string) => str1.slice(0, start) + newSubStr + str1.slice(start + Math.abs(delCount));
 
         if (bundleId && /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(url) && url.includes('?')) {

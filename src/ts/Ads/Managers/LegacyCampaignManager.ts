@@ -1,61 +1,53 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { CampaignError } from 'Ads/Errors/CampaignError';
+import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
+import { MediationExperimentType, MediationLoadTrackingManager } from 'Ads/Managers/MediationLoadTrackingManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, AuctionStatusCode, IRawAuctionV6Response } from 'Ads/Models/AuctionResponse';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
+import { AuctionResponse, AuctionStatusCode, IRawAuctionResponse, IRawAuctionV5Response } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { Session } from 'Ads/Models/Session';
+import { AuctionResponseParser, IParsedAuctionResponse } from 'Ads/Parsers/AuctionResponseParser';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { GeneralTimingMetric, LoadMetric, MiscellaneousMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { ICoreApi, ICore } from 'Core/ICore';
+import { ICore, ICoreApi } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { AuctionProtocol, INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { CacheError } from 'Core/Native/Cache';
-import { StorageType } from 'Core/Native/Storage';
+import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Url } from 'Core/Utilities/Url';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
+import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
+import { XHRequest } from 'Core/Utilities/XHRequest';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
-import { CampaignError } from 'Ads/Errors/CampaignError';
-import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
-import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
-import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
-import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { SDKMetrics, LoadMetric, GeneralTimingMetric, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
-import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
-import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
-import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
-import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
-import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { XHRequest } from 'Core/Utilities/XHRequest';
+import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -84,7 +76,6 @@ export class LegacyCampaignManager extends CampaignManager {
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
-    private _sdkDetectionInfo: SdkDetectionInfo;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         super();
@@ -107,7 +98,6 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
-        this._sdkDetectionInfo = core.SdkDetectionInfo;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -150,7 +140,7 @@ export class LegacyCampaignManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, this._sdkDetectionInfo)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry)
             ]);
         }).then(([requestUrl, requestBody]) => {
             measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
@@ -206,6 +196,7 @@ export class LegacyCampaignManager extends CampaignManager {
                 switch (this._auctionProtocol) {
                     case AuctionProtocol.V6:
                         parseResponse = this.parseAuctionV6Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
+                        break;
                     case AuctionProtocol.V5:
                         parseResponse = this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
                         break;
@@ -276,7 +267,7 @@ export class LegacyCampaignManager extends CampaignManager {
             return Promise.all<string, unknown>([
                 // TODO: Utilize this.getBaseUrl() after V6 is supported for load
                 CampaignManager.createRequestUrl(this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._sdkDetectionInfo, placement)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, placement)
             ]);
         }).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
@@ -465,15 +456,51 @@ export class LegacyCampaignManager extends CampaignManager {
         }
     }
 
-    // TODO: Update with implementation
-    private parseAuctionV6Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
-        let json;
-        try {
-            json = JsonParser.parse<IRawAuctionV6Response>(response.response);
-        } catch (e) {
-            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+    private parseAuctionV6Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
+        const promises: Promise<void>[] = [];
+
+        const parsedResponse: IParsedAuctionResponse = AuctionResponseParser.parse(response.response, this._adsConfig.getPlacements());
+
+        this.onAdPlanReceived.trigger(parsedResponse.refreshDelay, parsedResponse.auctionResponses.length, parsedResponse.auctionStatusCode);
+
+        if (this._mediationLoadTracking) {
+            this._mediationLoadTracking.reportMediaCount(parsedResponse.auctionResponses.length);
         }
-        return Promise.resolve();
+
+        parsedResponse.unfilledPlacementIds.forEach(placementId => {
+            promises.push(this.handleNoFill(placementId));
+        });
+
+        const auctionResponses: AuctionResponse[] = parsedResponse.auctionResponses;
+        if (auctionResponses.length === 0) {
+            return Promise.all(promises);
+        }
+
+        const auctionId = parsedResponse.auctionId;
+        this._lastAuctionId = auctionId;
+        const session: Session = this._sessionManager.create(auctionId);
+        session.setAdPlan(response.response);
+        session.setGameSessionCounters(gameSessionCounters);
+        session.setPrivacy(requestPrivacy);
+        session.setLegacyPrivacy(legacyRequestPrivacy);
+        session.setDeviceFreeSpace(this._deviceFreeSpace);
+
+        auctionResponses.forEach(auctionResponse => {
+            promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
+                if (error === CacheStatus.STOPPED) {
+                    return Promise.resolve();
+                } else if (error === CacheStatus.FAILED) {
+                    return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), auctionResponse.getPlacements(), 'campaign_caching_failed', session);
+                } else if (error === CacheError[CacheError.FILE_NOT_FOUND]) {
+                    // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
+                    return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), auctionResponse.getPlacements(), 'campaign_caching_get_file_path_failed', session);
+                }
+
+                return this.handleParseCampaignError(auctionResponse.getContentType(), error, auctionResponse.getPlacements(), session);
+            }));
+        });
+
+        return Promise.all(promises);
     }
 
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
@@ -864,7 +891,14 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private getBaseUrl(): string {
-        if (this._coreConfig.getTestMode()) {
+
+        const testMode = this._coreConfig.getTestMode();
+
+        if (this._auctionProtocol === AuctionProtocol.V6 && testMode) {
+            return this.constructBaseUrl(CampaignManager.AuctionV6TestBaseUrl);
+        }
+
+        if (testMode) {
             return this.constructBaseUrl(CampaignManager.TestModeUrl);
         }
 

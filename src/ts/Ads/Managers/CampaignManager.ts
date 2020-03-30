@@ -28,7 +28,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
-import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ICoreApi } from 'Core/ICore';
 import { StorageType } from 'Core/Native/Storage';
 
@@ -69,6 +68,7 @@ export abstract class CampaignManager {
     protected static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
     protected static AuctionV6BaseUrl: string = 'https://auction.unityads.unity3d.com/v6/games';
     protected static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
+    protected static AuctionV6TestBaseUrl: string = 'https://auction.unityads.unity3d.com/v6/test/games';
 
     protected static CampaignId: string | undefined;
     protected static SessionId: string | undefined;
@@ -93,7 +93,7 @@ export abstract class CampaignManager {
         return this._previousPlacementId;
     }
 
-    public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown): Promise<INativeResponse> {
+    public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown, retries: number = 2): Promise<INativeResponse> {
         const body = JSON.stringify(requestBody);
 
         return Promise.resolve().then((): Promise<INativeResponse> => {
@@ -107,7 +107,7 @@ export abstract class CampaignManager {
             }
             const headers: [string, string][] = [];
             return request.post(requestUrl, body, headers, {
-                retries: 2,
+                retries: retries,
                 retryDelay: 10000,
                 followRedirects: false,
                 retryWithConnectionEvents: false
@@ -196,7 +196,7 @@ export abstract class CampaignManager {
     }
 
     // todo: refactor requestedPlacement to something more sensible
-    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, sdkDetectionInfo?: SdkDetectionInfo, requestedPlacement?: Placement): Promise<unknown> {
+    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
         const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         const placementRequest: { [key: string]: unknown } = {};
 
@@ -212,10 +212,6 @@ export abstract class CampaignManager {
             legalFramework: privacy.getLegalFramework(),
             agreedOverAgeLimit: userPrivacyManager.getAgeGateChoice()
         };
-
-        if (sdkDetectionInfo != null) {
-            body.isMadeWithUnity = sdkDetectionInfo.isMadeWithUnity();
-        }
 
         if (previousPlacementId) {
             body.previousPlacementId = previousPlacementId;

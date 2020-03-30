@@ -13,13 +13,10 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
     private _automatedExperimentManager: AutomatedExperimentManager;
 
-    constructor(core: ICore) {
+    constructor(core: ICore, aem: AutomatedExperimentManager) {
         super(core, core.Ads);
-        this._automatedExperimentManager = new AutomatedExperimentManager(core);
-        this._automatedExperimentManager.initialize(AutomatedExperimentsList).catch(() => {
-            SDKMetrics.reportMetricEvent(AUIMetric.AutomatedExperimentManagerInitializationError);
-        });
-        this._automatedExperimentManager.beginExperiment();
+        this._automatedExperimentManager = aem;
+        this._automatedExperimentManager.registerExperiments(AutomatedExperimentsList);
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -36,14 +33,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        let endScreenCombination = ButtonAnimationsExperiment.getDefaultActions();
-        const mabDecision = this._automatedExperimentManager.getExperimentAction(ButtonAnimationsExperiment);
-
-        if (mabDecision) {
-            endScreenCombination = mabDecision;
-        } else {
-            SDKMetrics.reportMetricEvent(AUIMetric.DecisionNotReady);
-        }
+        const endScreenCombination = this._automatedExperimentManager.activateExperiment(baseParams.campaign, ButtonAnimationsExperiment);
 
         const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
