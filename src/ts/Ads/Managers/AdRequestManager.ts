@@ -331,18 +331,7 @@ export class AdRequestManager extends CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
-        // If by some reason at the time of load request we don't have preload data
-        // we would trigger preload requests and load requests after.
-        // It would make sense to use reload request here, however it would require some refactoring,
-        // which will be done later.
-        if (this.hasPreloadFailed()) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadCampaignWithPreloadData);
-            return this.requestPreload().then(() => {
-                return this.requestLoad(placement.getId());
-            });
-        } else {
-            return this.requestLoad(placement.getId());
-        }
+        return this.requestLoad(placement.getId());
     }
 
     public isPreloadDataExpired(): boolean {

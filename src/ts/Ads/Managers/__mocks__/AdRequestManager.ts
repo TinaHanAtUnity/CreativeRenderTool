@@ -9,6 +9,7 @@ export type AdRequestManagerMock = Base & {
     requestReload: jest.Mock;
     request: jest.Mock;
     isPreloadDataExpired: jest.Mock<boolean>;
+    hasPreloadFailed: jest.Mock<boolean>;
 };
 
 export const AdRequestManager = jest.fn(() => {
@@ -19,6 +20,7 @@ export const AdRequestManager = jest.fn(() => {
         loadCampaign: jest.fn().mockImplementation(() => Promise.resolve()),
         requestReload: jest.fn().mockImplementation(() => Promise.resolve()),
         request: jest.fn().mockImplementation(() => Promise.resolve()),
-        isPreloadDataExpired: jest.fn().mockReturnValue(false)
+        isPreloadDataExpired: jest.fn().mockReturnValue(false),
+        hasPreloadFailed: jest.fn().mockReturnValue(false),
     };
 });
