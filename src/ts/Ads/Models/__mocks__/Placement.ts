@@ -17,13 +17,16 @@ export type PlacementMock = Base & {
     setPlacementStateChanged: Mock;
     getPreviousState: Mock<PlacementState>;
     setCurrentTrackingUrls: Mock;
+    isInvalidationPending: Mock<boolean>;
+    setInvalidationPending: Mock;
 };
 
 export const Placement = jest.fn((id: string = 'video', state: PlacementState = PlacementState.READY, campaign: Campaign | undefined = undefined) => {
     const classState = {
         placementStateChanged: false,
         state: state,
-        perviousState: state
+        perviousState: state,
+        invalidationPending: false
     };
     return <PlacementMock>{
         allowSkip: jest.fn().mockReturnValue(false),
@@ -39,6 +42,8 @@ export const Placement = jest.fn((id: string = 'video', state: PlacementState = 
         getPlacementStateChanged: jest.fn().mockImplementation(() => classState.placementStateChanged),
         setPlacementStateChanged: jest.fn().mockImplementation((x) => classState.placementStateChanged = x),
         getPreviousState: jest.fn().mockImplementation((x) => classState.perviousState),
-        setCurrentTrackingUrls: jest.fn()
+        setCurrentTrackingUrls: jest.fn(),
+        setInvalidationPending: jest.fn().mockImplementation((x) => classState.invalidationPending = x),
+        isInvalidationPending: jest.fn().mockImplementation((x) => classState.invalidationPending),
     };
 });
