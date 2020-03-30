@@ -1,3 +1,8 @@
+# Pending
+
+* Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
+* [Auction V6] Add Test Mode Endpoint Support [#14079](https://github.com/Applifier/unity-ads-webview/pull/14079)
+
 # Mon Mar 30 21:57:00 UTC 2020
 
 * [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
