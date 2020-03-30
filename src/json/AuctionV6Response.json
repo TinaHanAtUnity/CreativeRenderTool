@@ -105,6 +105,10 @@
                     }
                 }
             }
+        },
+        "emptyTracking": {
+            "mediaId": "5be40c5f602f4510ec583881",
+            "tracking": {}
         }
     },
     "trackingTemplates": [
