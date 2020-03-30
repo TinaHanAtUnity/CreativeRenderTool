@@ -8,6 +8,7 @@ const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 export enum MediationExperimentType {
     NofillImmediately = 'nfi',
     CacheModeAllowed = 'cma2',
+    AuctionV6 = 'av6',
     AuctionXHR = 'xhr',
     LoadV5 = 'lv5',
     None = 'none'
