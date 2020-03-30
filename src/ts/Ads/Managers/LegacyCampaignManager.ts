@@ -895,7 +895,7 @@ export class LegacyCampaignManager extends CampaignManager {
         const testMode = this._coreConfig.getTestMode();
 
         if (this._auctionProtocol === AuctionProtocol.V6 && testMode) {
-            return this.constructBaseUrl(CampaignManager.AuctionV6BaseUrl + '/test');
+            return this.constructBaseUrl(CampaignManager.AuctionV6TestBaseUrl);
         }
 
         if (testMode) {
