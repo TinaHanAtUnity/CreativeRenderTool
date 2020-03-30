@@ -29,9 +29,9 @@ export class AuctionResponseParser {
         const events = tracking.events || {};
 
         Object.keys(events).forEach(((eventKey: string) => {
-            const eventTracking = events[eventKey];
+            const eventTracking = events[eventKey] || {};
             const params = {
-                ...(eventTracking.params || {}),
+                ...eventTracking.params,
                 ...globalParams
             };
             eventTracking.urlIndices.forEach((index) => {
