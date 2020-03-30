@@ -111,6 +111,14 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
                 expect(adRequestManager.requestReload).toBeCalledTimes(1);
                 expect(adRequestManager.requestReload).toBeCalledWith(['video_5', 'video_6']);
             });
+
+            it('should set invalidation pending for placements', () => {
+                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+
+                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+            });
         });
 
         describe('refresh after start: on close', () => {
@@ -140,6 +148,14 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             it('should make reload request', () => {
                 expect(adRequestManager.requestReload).toBeCalledTimes(1);
                 expect(adRequestManager.requestReload).toBeCalledWith(['video_5', 'video_6']);
+            });
+
+            it('should set invalidation pending for placements', () => {
+                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+
+                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -171,6 +187,14 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
                 expect(adRequestManager.requestReload).toBeCalledTimes(1);
                 expect(adRequestManager.requestReload).toBeCalledWith(['video_5', 'video_6']);
             });
+
+            it('should set invalidation pending for placements', () => {
+                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+
+                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+            });
         });
 
         describe('trigger on no fill', () => {
@@ -194,6 +218,11 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             it('should reset tracking urls', () => {
                 expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
                 expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
+            });
+
+            it('should reset invalidation pending', () => {
+                expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
             });
         });
 
@@ -220,6 +249,11 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             it('should reset tracking urls', () => {
                 expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
                 expect(placement.setCurrentTrackingUrls).toBeCalledWith({});
+            });
+
+            it('should reset invalidation pending', () => {
+                expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
             });
         });
 
