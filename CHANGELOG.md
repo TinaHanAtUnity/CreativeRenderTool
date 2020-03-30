@@ -1,3 +1,7 @@
+# Pending
+
+* [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+
 # Fri Mar 27 23:32:15 UTC 2020
 
 * [Auction V6] Add Disabled ABTest [#14070](https://github.com/Applifier/unity-ads-webview/pull/14070)
