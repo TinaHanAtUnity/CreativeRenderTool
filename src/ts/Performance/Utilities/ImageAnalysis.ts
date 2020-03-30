@@ -3,18 +3,18 @@
 //
 
 import { Asset } from 'Ads/Models/Assets/Asset';
-import { ICoreApi } from 'Core/ICore';
 import { Swatch } from 'Performance/Utilities/Swatch';
 import { PQueue } from 'Performance/Utilities/PQueue';
 import { Box } from 'Performance/Utilities/Box';
+import { CacheApi } from 'Core/Native/Cache';
 
 const PALETTE_COLOR_COUNT = 16;
 
 export class ImageAnalysis {
 
-    public static analyseImage(core: ICoreApi, asset: Asset): Promise<Swatch[]> {
+    public static analyseImage(cache: CacheApi, asset: Asset): Promise<Swatch[]> {
         return new Promise<Swatch[]>(resolve => {
-            ImageAnalysis.getImagePixelData(core, asset).then((rgbaData: Uint8ClampedArray) => {
+            ImageAnalysis.getImagePixelData(cache, asset).then((rgbaData: Uint8ClampedArray) => {
                 const swatches = ImageAnalysis.quantize(rgbaData, PALETTE_COLOR_COUNT);
                 resolve(swatches);
             });
@@ -97,7 +97,7 @@ export class ImageAnalysis {
         return histogram;
     }
 
-    public static getImagePixelData(core: ICoreApi, asset: Asset): Promise<Uint8ClampedArray> {
+    public static getImagePixelData(cache: CacheApi, asset: Asset): Promise<Uint8ClampedArray> {
         return new Promise((resolve, reject) => {
             const img = new Image();
             const canvas = document.createElement('canvas');
@@ -120,21 +120,21 @@ export class ImageAnalysis {
                 reject('image_load_failed');
             });
 
-            ImageAnalysis.getImageSrc(core, asset).then((src: string) => {
+            ImageAnalysis.getImageSrc(cache, asset).then((src: string) => {
                 img.crossOrigin = 'Anonymous';
                 img.src = src;
             });
         });
     }
 
-    public static getImageSrc(core: ICoreApi, asset: Asset): Promise<string> {
+    public static getImageSrc(cache: CacheApi, asset: Asset): Promise<string> {
         return new Promise((resolve) => {
             const fileId = asset.getFileId();
             const originalUrl = asset.getOriginalUrl();
             const imageExt = originalUrl.split('.').pop();
 
             if (fileId) {
-                core.Cache.getFileContent(fileId, 'Base64').then((res: string) => {
+                cache.getFileContent(fileId, 'Base64').then((res: string) => {
                     resolve(`data:image/${imageExt};base64,${res}`);
                 }).catch(() => {
                     resolve(originalUrl);

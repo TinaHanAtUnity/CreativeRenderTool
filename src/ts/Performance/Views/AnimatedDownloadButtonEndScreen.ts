@@ -91,7 +91,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             }
 
             if (image) {
-                ImageAnalysis.analyseImage(this._core, image).then(swatches => {
+                ImageAnalysis.analyseImage(this._core.Cache, image).then(swatches => {
                     if (!swatches || !swatches.length) {
                         SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
                         return;
