@@ -367,6 +367,7 @@ export class Ads implements IAds {
     }
 
     private configureRefreshManager(): void {
+        // AdRequestManager will be set only if Load V5 is enabled.
         if (this.AdRequestManager) {
             this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager);
             return;
