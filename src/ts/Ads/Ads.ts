@@ -25,6 +25,7 @@ import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
@@ -84,7 +85,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR, AuctionV6Test, LoadV5 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -98,6 +99,9 @@ import { XHRequest } from 'Core/Utilities/XHRequest';
 import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
+import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
 
 export class Ads implements IAds {
 
@@ -130,6 +134,7 @@ export class Ads implements IAds {
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
     private _nofillImmediately: boolean = false;
+    private _forceLoadV5: boolean = false;
     private _mediationName: string;
     private _core: ICore;
     private _automatedExperimentManager: AutomatedExperimentManager;
@@ -139,6 +144,7 @@ export class Ads implements IAds {
     public AR: AR;
     public Analytics: Analytics;
     public Store: IStore;
+    public AdRequestManager: AdRequestManager;
 
     constructor(config: unknown, core: ICore) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
@@ -151,7 +157,7 @@ export class Ads implements IAds {
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
             AdsProperties: new AdsPropertiesApi(core.NativeBridge),
-            Listener: new ListenerApi(core.NativeBridge),
+            Listener: CustomFeatures.pauseEventsSupported(core.ClientInfo.getGameId()) ? new PausableListenerApi(core.NativeBridge) : new ListenerApi(core.NativeBridge),
             Placement: new PlacementApi(core.NativeBridge),
             VideoPlayer: new VideoPlayerApi(core.NativeBridge),
             WebPlayer: new WebPlayerApi(core.NativeBridge),
@@ -188,26 +194,26 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        this.setupLoadApiEnabled();
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-            'wel': `${this._webViewEnabledLoad}`
-        });
-
-        let promise = Promise.resolve();
-
-        this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
-        if (this._nofillImmediately) {
-            promise = this.setupMediationTrackingManager().then(() => {
-                this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
-                return this._core.Api.Sdk.initComplete();
-            });
-        }
-
-        return promise.then(() => {
+        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             Diagnostics.setAbGroup(this._core.Config.getAbGroup());
             return this.setupTestEnvironment();
+        }).then(() => {
+            this.setupLoadApiEnabled();
+            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
+
+            let promise = Promise.resolve();
+
+            this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
+            if (this._nofillImmediately) {
+                promise = this.setupMediationTrackingManager().then(() => {
+                    this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
+                    return this._core.Api.Sdk.initComplete();
+                });
+            }
+            return promise;
         }).then(() => {
             measurements.measure('setup_environment');
             return this.Analytics.initialize();
@@ -285,7 +291,7 @@ export class Ads implements IAds {
                 }
             });
 
-            RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
+            RequestManager.configureAuctionProtocol(this._core.Config.getTestMode(), AuctionV6Test.isValid(this._core.Config.getAbGroup()));
 
             this.configureCampaignManager();
             this.configureAutomatedExperimentManager();
@@ -354,6 +360,14 @@ export class Ads implements IAds {
     }
 
     private configureCampaignManager() {
+        if (this._loadApiEnabled && this._webViewEnabledLoad) {
+            if (this.isLoadV5Enabled()) {
+                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
+                this.CampaignManager = this.AdRequestManager;
+                return;
+            }
+        }
+
         this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
     }
 
@@ -364,6 +378,12 @@ export class Ads implements IAds {
     }
 
     private configureRefreshManager(): void {
+        // AdRequestManager will be set only if Load V5 is enabled.
+        if (this.AdRequestManager) {
+            this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager);
+            return;
+        }
+
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             const abGroup = this._core.Config.getAbGroup();
             const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
@@ -399,7 +419,7 @@ export class Ads implements IAds {
                 if (mediation && mediation.getName() && performance && performance.now) {
 
                     let experimentType = MediationExperimentType.None;
-                    if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                    if (CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (this._nofillImmediately) {
@@ -410,6 +430,10 @@ export class Ads implements IAds {
                         } else {
                             SDKMetrics.reportMetricEvent(MiscellaneousMetric.XHRNotAvailable);
                         }
+                    } else if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
+                        experimentType = MediationExperimentType.LoadV5;
+                    } else if (AuctionV6Test.isValid(this._core.Config.getAbGroup())) {
+                        experimentType = MediationExperimentType.AuctionV6;
                     }
 
                     this._mediationName = mediation.getName()!;
@@ -518,6 +542,14 @@ export class Ads implements IAds {
             return;
         }
 
+        // AdRequestManager is only if Load V5 is enabled.
+        // isInvalidationPending is valid only when Load V5 is in use.
+        if (this.AdRequestManager && placement.isInvalidationPending()) {
+            this.showError(true, placementId, 'Invalidation pending for a placement');
+            SDKMetrics.reportMetricEvent(ErrorMetric.PlacementInvalidationPending);
+            return;
+        }
+
         SdkStats.sendShowEvent(placementId);
 
         if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
@@ -557,6 +589,10 @@ export class Ads implements IAds {
     private showAd(placement: Placement, campaign: Campaign, options: unknown) {
 
         this._showing = true;
+
+        if (this.Api.Listener instanceof PausableListenerApi) {
+            this.Api.Listener.pauseEvents();
+        }
 
         if (this.Config.getCacheMode() !== CacheMode.DISABLED) {
             this.AssetManager.stopCaching();
@@ -628,6 +664,10 @@ export class Ads implements IAds {
             this._currentAdUnit.show().then(() => {
                 if (this._loadApiEnabled && this._webViewEnabledLoad) {
                     SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledShow);
+                }
+
+                if (this.MediationLoadTrackingManager) {
+                    this.MediationLoadTrackingManager.reportAdShown(CampaignAssetInfo.isCached(campaign));
                 }
             });
         });
@@ -748,6 +788,10 @@ export class Ads implements IAds {
         if (TestEnvironment.get('debugJsConsole')) {
             MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
         }
+
+        if (TestEnvironment.get('forceLoadV5')) {
+            this._forceLoadV5 = true;
+        }
     }
 
     private logChinaMetrics() {
@@ -794,9 +838,17 @@ export class Ads implements IAds {
         const isFanateeExtermaxGameForLoad = CustomFeatures.isFanateeExtermaxGameForLoad(this._core.ClientInfo.getGameId());
         const isOriginalLoad = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
         const isLoadV4 = LoadRefreshV4.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
+        const loadV5 = this.isLoadV5Enabled();
 
-        if (isOriginalLoad || isLoadV4 || isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad) {
+        if (isOriginalLoad || isLoadV4 || isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad || loadV5) {
             this._webViewEnabledLoad = true;
         }
+    }
+
+    private isLoadV5Enabled(): boolean {
+        const loadV5Test = LoadV5.isValid(this._core.Config.getAbGroup());
+        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+
+        return (loadV5Test && loadV5Game) || this._forceLoadV5;
     }
 }

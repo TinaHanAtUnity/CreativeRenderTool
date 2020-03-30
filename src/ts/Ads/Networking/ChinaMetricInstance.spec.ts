@@ -2,7 +2,7 @@ import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/Requ
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 
-import { ChinaMetricInstance } from 'Ads/Networking/ChinaMetricInstance';
+import { ChinaMetricInstance } from 'Ads/Networking/MetricInstance';
 import { AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 
@@ -28,22 +28,6 @@ import { Platform } from 'Core/Constants/Platform';
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
         clientInfo.getTestMode.mockReturnValue(false);
         metricInstance = new ChinaMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
-    });
-
-    describe('reportMetricEvent with Chinese network operator', () => {
-        beforeEach(() => {
-            metricInstance.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
-            metricInstance.sendBatchedEvents();
-        });
-
-        it('should fire with china endpoint', () => {
-            expect(requestManager.post).toBeCalledWith(
-                'https://sdk-diagnostics.prd.mz.internal.unity.cn/v1/metrics',
-                expect.anything(),
-                expect.anything(),
-                expect.anything()
-            );
-        });
     });
 
     describe('When test mode is enabled', () => {

@@ -10,4 +10,5 @@ while IFS= read -r release
 do
     git checkout staging/$release
     git push origin staging/$release
+    sleep 5
 done <"$releases"

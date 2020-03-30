@@ -28,7 +28,8 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
-import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { ICoreApi } from 'Core/ICore';
+import { StorageType } from 'Core/Native/Storage';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -56,6 +57,7 @@ export abstract class CampaignManager {
     public static setBaseUrl(baseUrl: string): void {
         CampaignManager.BaseUrl = baseUrl + '/v4/games';
         CampaignManager.AuctionV5BaseUrl = baseUrl + '/v5/games';
+        CampaignManager.TestModeUrl = baseUrl + '/v4/test/games';
     }
 
     protected static CampaignResponse: string | undefined;
@@ -64,11 +66,15 @@ export abstract class CampaignManager {
 
     protected static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     protected static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    protected static AuctionV6BaseUrl: string = 'https://auction.unityads.unity3d.com/v6/games';
     protected static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
+    protected static AuctionV6TestBaseUrl: string = 'https://auction.unityads.unity3d.com/v6/test/games';
 
     protected static CampaignId: string | undefined;
     protected static SessionId: string | undefined;
     protected static Country: string | undefined;
+
+    private _previousPlacementId: string | undefined;
 
     public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
     public readonly onNoFill = new Observable1<string>();
@@ -78,11 +84,16 @@ export abstract class CampaignManager {
 
     public abstract request(nofillRetry?: boolean): Promise<INativeResponse | void>;
     public abstract loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined>;
-    public abstract setPreviousPlacementId(id: string | undefined): void;
-    public abstract getPreviousPlacementId(): string | undefined;
-    public abstract getFullyCachedCampaigns(): Promise<string[]>;
 
-    public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown): Promise<INativeResponse> {
+    public setPreviousPlacementId(id: string | undefined) {
+        this._previousPlacementId = id;
+    }
+
+    public getPreviousPlacementId(): string | undefined {
+        return this._previousPlacementId;
+    }
+
+    public static onlyRequest(request: RequestManager, requestUrl: string, requestBody: unknown, retries: number = 2): Promise<INativeResponse> {
         const body = JSON.stringify(requestBody);
 
         return Promise.resolve().then((): Promise<INativeResponse> => {
@@ -96,7 +107,7 @@ export abstract class CampaignManager {
             }
             const headers: [string, string][] = [];
             return request.post(requestUrl, body, headers, {
-                retries: 2,
+                retries: retries,
                 retryDelay: 10000,
                 followRedirects: false,
                 retryWithConnectionEvents: false
@@ -185,7 +196,7 @@ export abstract class CampaignManager {
     }
 
     // todo: refactor requestedPlacement to something more sensible
-    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, sdkDetectionInfo?: SdkDetectionInfo, requestedPlacement?: Placement): Promise<unknown> {
+    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
         const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         const placementRequest: { [key: string]: unknown } = {};
 
@@ -201,10 +212,6 @@ export abstract class CampaignManager {
             legalFramework: privacy.getLegalFramework(),
             agreedOverAgeLimit: userPrivacyManager.getAgeGateChoice()
         };
-
-        if (sdkDetectionInfo != null) {
-            body.isMadeWithUnity = sdkDetectionInfo.isMadeWithUnity();
-        }
 
         if (previousPlacementId) {
             body.previousPlacementId = previousPlacementId;
@@ -324,6 +331,30 @@ export abstract class CampaignManager {
                 measurement.measure('body_generation');
                 return body;
             });
+        });
+    }
+
+    public static getVersionCode(platform: Platform, core: ICoreApi, clientInfo: ClientInfo): Promise<number | undefined> {
+        if (platform === Platform.ANDROID) {
+            return core.DeviceInfo.Android!.getPackageInfo(clientInfo.getApplicationName()).then(packageInfo => {
+                if (packageInfo.versionCode) {
+                    return packageInfo.versionCode;
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
+    }
+
+    public static getFullyCachedCampaigns(core: ICoreApi): Promise<string[]> {
+        return core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
         });
     }
 }

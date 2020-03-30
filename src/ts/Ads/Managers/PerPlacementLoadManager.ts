@@ -97,7 +97,7 @@ export class PerPlacementLoadManager extends RefreshManager {
     }
 
     // count is the number of times load was called for a placementId before we could process it
-    private loadPlacement(placementId: string, count: number) {
+    protected loadPlacement(placementId: string, count: number) {
 
         LoadCalledCounter.report({
             gameId: this._clientInfo.getGameId(),
@@ -150,7 +150,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         return false;
     }
 
-    private invalidateExpiredCampaigns() {
+    protected invalidateExpiredCampaigns() {
         for (const placementId of this._adsConfig.getPlacementIds()) {
             const placement = this._adsConfig.getPlacement(placementId);
 

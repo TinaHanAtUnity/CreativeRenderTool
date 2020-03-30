@@ -602,9 +602,30 @@
     "platforms": "all"
   },
   {
-    "key": "isMadeWithUnity",
+    "key": "preload",
     "type": "boolean",
-    "description": "isMadeWithUnity flag",
+    "description": "Preload Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "load",
+    "type": "boolean",
+    "description": "Load Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadPlacements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadData",
+    "type": "object",
+    "description": "Preload Data for all placements received in configuration",
     "provider": "SDK",
     "platforms": "all"
   }

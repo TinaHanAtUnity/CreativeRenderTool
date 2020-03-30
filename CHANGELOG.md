@@ -1,3 +1,81 @@
+# Pending
+
+* Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
+* Replace OMIDPartner macro in VastURITag unwrapping for IAS [#14075](https://github.com/Applifier/unity-ads-webview/pull/14075)
+* [Auction V6] Add Test Mode Endpoint Support [#14079](https://github.com/Applifier/unity-ads-webview/pull/14079)
+* [Auction V6] Add Mediation Experiment Type [#14106](https://github.com/Applifier/unity-ads-webview/pull/14106)
+* [Load V5] Metadata flag to force Load V5 to be enabled [#13920](https://github.com/Applifier/unity-ads-webview/pull/13920)
+* [Load V5] Move loadCampaign logic from AdRequestManager to PerPlacementLoadManagerV5 [#14073](https://github.com/Applifier/unity-ads-webview/pull/14073)
+* [Load V5] Invalidation pending state for a placement [#14077](https://github.com/Applifier/unity-ads-webview/pull/14077)
+* [Load V5] Add comment about AdRequestManager [#14078](https://github.com/Applifier/unity-ads-webview/pull/14078)
+
+# Mon Mar 30 21:57:00 UTC 2020
+
+* [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+* Add Initial Optimized Campaign Support [#12639](https://github.com/Applifier/unity-ads-webview/pull/12639)
+
+# Fri Mar 27 23:32:15 UTC 2020
+
+* [Auction V6] Add Disabled ABTest [#14070](https://github.com/Applifier/unity-ads-webview/pull/14070)
+* [Auction V6] Add Auction Response Parser [#14033](https://github.com/Applifier/unity-ads-webview/pull/14033)
+* [Auction V6] Use Auction Parser in LegacyCampaignManager [#14034](https://github.com/Applifier/unity-ads-webview/pull/14034)
+* [Auction V6] Add Metric Tracking For Failure Cases [#14035](https://github.com/Applifier/unity-ads-webview/pull/14035)
+* [Load V5] Add Disabled ABTest for Selected Games [#13890](https://github.com/Applifier/unity-ads-webview/pull/13890)
+* [Load V5] Add Support for PerPlacementLoadManagerV5 [#13889](https://github.com/Applifier/unity-ads-webview/pull/13889)
+* [Load V5] Use reload campaign if ongoing load was canceled [#14068](https://github.com/Applifier/unity-ads-webview/pull/14068)
+* [Load V5] Set Retry to 0 for Requests [#14038](https://github.com/Applifier/unity-ads-webview/pull/14038)
+* [Load V5] Mocks for PerPlacementLoadManagerV5 tests [#14039](https://github.com/Applifier/unity-ads-webview/pull/14039)
+* [Load V5] Increment Ad Ordinal [#14036](https://github.com/Applifier/unity-ads-webview/pull/14036)
+* [Load V5] Parameters Test for Load V5 [#13990](https://github.com/Applifier/unity-ads-webview/pull/13990)
+* [Load V5] Configure test environment as fast as possible [#14069](https://github.com/Applifier/unity-ads-webview/pull/14069)
+* Open Measurement - Add Timeout on Admob start metric [#14040](https://github.com/Applifier/unity-ads-webview/pull/14040)
+* Update AndroidDeviceInfo DTO [#14001](https://github.com/Applifier/unity-ads-webview/pull/14001)
+
+# Thu Mar 26 23:11:54 UTC 2020
+
+* [Auction V6] Add Mocks [#14032](https://github.com/Applifier/unity-ads-webview/pull/14032)
+* [Load V5] Ad Request Manager [#13881](https://github.com/Applifier/unity-ads-webview/pull/13881)
+* Add whitelist for Apple PMP creative [#13954](https://github.com/Applifier/unity-ads-webview/pull/13954)
+* Open Measurement - Clean up non-necessary metrics [#13982](https://github.com/Applifier/unity-ads-webview/pull/13982)
+* Improve Color Utility [#13996](https://github.com/Applifier/unity-ads-webview/pull/13996)
+* Open Measurement - Add Metrics for Admob OM Start and Loaded [#13998](https://github.com/Applifier/unity-ads-webview/pull/13998)
+* Sample SDKMetrics at 50% [#14031](https://github.com/Applifier/unity-ads-webview/pull/14031)
+* Remove SDKDetectionInfo From Request Body [#14027](https://github.com/Applifier/unity-ads-webview/pull/14027)
+* Add CacheMode Allowed Reverse ABTest for Whitelisted Games [#13992](https://github.com/Applifier/unity-ads-webview/pull/13992)
+* Remove Sending "Negative Value" Metrics to SDKMetrics [#14037](https://github.com/Applifier/unity-ads-webview/pull/14037)
+
+# Wed Mar 25 21:40:32 UTC 2020
+
+* [Auction V6] Add Skeleton Implementation [#13884](https://github.com/Applifier/unity-ads-webview/pull/13884)
+* Add NullMetricInstance and Sample SDKMetrics at 25% [#13956](https://github.com/Applifier/unity-ads-webview/pull/13956)
+* Sample Metrics at 100% Temporarily [#13985](https://github.com/Applifier/unity-ads-webview/pull/13985)
+* Add Reverse AB Test Functionality [#13988](https://github.com/Applifier/unity-ads-webview/pull/13988)
+* Add reportAdShown to Mediation Load Tracking [#13989](https://github.com/Applifier/unity-ads-webview/pull/13989)
+* Update Node version to 12 for Travis [#13993](https://github.com/Applifier/unity-ads-webview/pull/13993)
+
+# Sat Mar 21 00:29:50 UTC 2020
+
+* Use RequestError instead of Error in XHRequest [#13921](https://github.com/Applifier/unity-ads-webview/pull/13921)
+* Disable XHR Request ABTest [#13919](https://github.com/Applifier/unity-ads-webview/pull/13919)
+* Browser tester: checkbox to use staging [#13882](https://github.com/Applifier/unity-ads-webview/pull/13882)
+* Open Measurement - Move stopped check strictly to vast [#13949](https://github.com/Applifier/unity-ads-webview/pull/13949)
+* Improving our metrics for auction request [#13948](https://github.com/Applifier/unity-ads-webview/pull/13948)
+
+# Fri Mar 20 16:55:42 UTC 2020
+
+* Conclude Mediation CacheMode Allowed Experiment [#13892](https://github.com/Applifier/unity-ads-webview/pull/13892)
+* [Load V5] Move common methods to Campaign Manager [#13885](https://github.com/Applifier/unity-ads-webview/pull/13885)
+* Add Error Reason Tag to Failed Auction Requests [#13883](https://github.com/Applifier/unity-ads-webview/pull/13883)
+* Duplicate Impression Event in SDKMetrics when sent to PTS [#13918](https://github.com/Applifier/unity-ads-webview/pull/13918)
+
+# Thu Mar 19 20:30:38 UTC 2020
+
+* Open Measurement - Move Loaded Event Prior to Start [#13880](https://github.com/Applifier/unity-ads-webview/pull/13880)
+* Add PausableListenerAPI for ABT-1125 [#13627](https://github.com/Applifier/unity-ads-webview/pull/13627)
+* Clear Event Queue Properly in PausableListenerAPI [#13887](https://github.com/Applifier/unity-ads-webview/pull/13887)
+* Developer age gate, part 1 [#13619](https://github.com/Applifier/unity-ads-webview/pull/13619)
+* [Auction V6] Cleanup AuctionProtocol Use [#13852](https://github.com/Applifier/unity-ads-webview/pull/13852)
+
 # Tue Mar 17 20:26:08 UTC 2020
 
 * Add isMadeWithUnity To New MWU Kafka Topic [#13768](https://github.com/Applifier/unity-ads-webview/pull/13768)

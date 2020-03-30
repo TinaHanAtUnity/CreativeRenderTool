@@ -1,0 +1,27 @@
+{
+    "auctionId": "d301fd4c-4a9e-48e4-82aa-ad8b07977ca6",
+    "correlationId": "crdI5dC67WKlqhsI1RrICm",
+    "media": {
+    },
+    "placements": {
+    },
+    "statusCode": 0,
+    "tracking": {
+    },
+    "preloadData": {
+        "video": {
+            "campaignAvailable": true,
+            "ttlInSeconds": 3600,
+            "dataIndex": "0"
+        },
+        "rewardedVideo": {
+            "campaignAvailable": true,
+            "ttlInSeconds": 3600,
+            "dataIndex": "1"
+        }
+    },
+    "encryptedPreloadData": {
+        "0": "test-data-preload-1",
+        "1": "test-data-preload-2"
+    }
+}

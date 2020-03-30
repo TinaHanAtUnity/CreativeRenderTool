@@ -206,7 +206,7 @@ export class SdkStats {
 
         const eventTimestamp: number = Date.now();
 
-        return Promise.all([SdkStats._campaignManager.getFullyCachedCampaigns(),
+        return Promise.all([CampaignManager.getFullyCachedCampaigns(this._core),
             SdkStats.getAssetSize(campaign),
             SdkStats._metaDataManager.fetch(MediationMetaData)]).then(([cachedCampaigns, assetSize, mediationMetaData]: [string[], number, MediationMetaData | undefined]) => {
             const userInfo: IUserInfo = {

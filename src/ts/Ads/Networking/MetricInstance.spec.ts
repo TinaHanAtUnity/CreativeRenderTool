@@ -1,9 +1,10 @@
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
-import { IProgrammaticTrackingData, MetricInstance } from 'Ads/Networking/MetricInstance';
+import { IProgrammaticTrackingData, MetricInstance, createMetricInstance, NullMetricInstance, ChinaMetricInstance } from 'Ads/Networking/MetricInstance';
 import { AdmobMetric, TimingEvent, InitializationMetric, MediationMetric, BannerMetric } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 [
     Platform.IOS,
@@ -27,6 +28,29 @@ import { Platform } from 'Core/Constants/Platform';
         deviceInfo.getOsVersion.mockReturnValue(osVersion);
         clientInfo.getSdkVersionName.mockReturnValue(sdkVersion);
         metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+    });
+
+    describe('createMetricInstance', () => {
+        it('should create a NullMetricInstance', () => {
+            CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => false);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(false);
+            const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            expect(localInstance).toBeInstanceOf(NullMetricInstance);
+        });
+
+        it('should create a MetricInstance', () => {
+            CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => true);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(false);
+            const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            expect(localInstance).toBeInstanceOf(MetricInstance);
+        });
+
+        it('should create a ChinaMetricInstance', () => {
+            CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => true);
+            deviceInfo.isChineseNetworkOperator.mockReturnValue(true);
+            const localInstance = createMetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            expect(localInstance).toBeInstanceOf(ChinaMetricInstance);
+        });
     });
 
     describe('createAdsSdkTag', () => {
@@ -210,24 +234,6 @@ import { Platform } from 'Core/Constants/Platform';
                     }
                 ]
             }
-        }, {
-            metric: InitializationMetric.WebviewInitialization,
-            value: -1,
-            path: '/metrics',
-            expected: {
-                metrics: [
-                    {
-                        name: 'timing_value_negative',
-                        value: 1,
-                        tags: [
-                            `ads_sdk2_sdv:${sdkVersion}`,
-                            'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:${Platform[platform]}`,
-                            'ads_sdk2_mevt:webview_init' // Intentional to track which timing metrics are negative
-                        ]
-                    }
-                ]
-            }
         }];
         tests.forEach((t) => {
 
@@ -300,15 +306,10 @@ import { Platform } from 'Core/Constants/Platform';
             });
         });
 
-        it('should fire to metric endpoint with negative timing events', () => {
+        it('should fire not to metric endpoint with negative timing events', () => {
             metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, -200);
             return metricInstance.sendBatchedEvents().then(() => {
-                expect(requestManager.post).toBeCalledWith(
-                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
-                    expect.anything(),
-                    [['Content-Type', 'application/json']],
-                    expect.anything()
-                );
+                expect(requestManager.post).not.toBeCalled();
             });
         });
 
@@ -590,6 +591,28 @@ import { Platform } from 'Core/Constants/Platform';
         it('should call the staging endpoint', () => {
             expect(requestManager.post).toBeCalledWith(
                 'https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics',
+                expect.anything(),
+                expect.anything(),
+                expect.anything()
+            );
+        });
+    });
+
+    describe('whet base url overridden', () => {
+        beforeEach(() => {
+            MetricInstance.setBaseUrl('https://localhost');
+            metricInstance = new MetricInstance(platform, requestManager, clientInfo, deviceInfo, country);
+            metricInstance.reportMetricEvent(AdmobMetric.AdmobUsedStreamedVideo);
+            metricInstance.sendBatchedEvents();
+        });
+
+        afterEach(() => {
+            MetricInstance.setBaseUrl(undefined);
+        });
+
+        it('should call the provided endpoint', () => {
+            expect(requestManager.post).toBeCalledWith(
+                'https://localhost/v1/metrics',
                 expect.anything(),
                 expect.anything(),
                 expect.anything()
