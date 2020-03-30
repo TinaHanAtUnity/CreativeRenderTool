@@ -26,7 +26,7 @@ if (canvas.Image.prototype.addEventListener === undefined) {
 const createElement = document.createElement;
 document.createElement = function(tagName, options){
     if (tagName === 'canvas') {
-        return canvas.createCanvas(100, 100);
+        return canvas.createCanvas(0, 0);
     }
     return createElement.apply(document, arguments);
 };
