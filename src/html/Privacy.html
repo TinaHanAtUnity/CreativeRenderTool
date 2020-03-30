@@ -1,10 +1,10 @@
-<div class="safe-area-content">
-    <div class="view-container">
-        <div class="header">
-            <div class="close-button">
-                <span class="icon-close"></span>
-            </div>
+<div class="view-container">
+    <div class="header">
+        <div class="close-button">
+            <span class="icon-close"></span>
         </div>
+    </div>
+    <div class="scroll-area-container">
         <div class="title-container">
             <div class="privacy-logo">
                 <span class="icon-gdpr"></span>
@@ -22,46 +22,46 @@
                 </div>
             </div>
         </div>
-        <div class="page-container">
-            <div class="tool-container">
-                <div class="report-ad-container">
-                    <div class="heading"><span>Report advertisement</span></div>
-                    <div class="text">
-                        <p>
-                            Are you facing issues with your current advertisement? You can report this ad to Unity and let us
-                            know. Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.
-                        </p>
-                    </div>
-                    <ul class="radio-group-container">
-                        <% for (var k = 0; k < data.reportReasons.length; k++) { %>
-                        <div class="radio-item-container">
-                            <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
-                            <label for="<%= data.reportKeys[k] %>">
-                                <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
-                        </div>
-                        <% } %>
-                    </ul>
-                    <div class="text-small">
-                        <p>
-                            Disclaimer: Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.
-                        </p>
-                    </div>
-                    <div class="report-container">
-                        <div class="report-button">Report</div>
-                        <span class="report-confirmed-text text"></span>
-                    </div>
-                </div>
-                <div class="build-info-container">
-                    <div class="heading"><span><%= data.t("privacy-settings-build-info") %></span></div>
-                    <p></p>
-                    <% for (var k in data.buildInformation) { %>
-                    <p class="build-information-item text">
-                        <span class="build-information-key"><%= k %>:</span>
-                        <span class="build-information-value"><%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+        <div class="tool-container">
+            <div class="report-ad-container">
+                <div class="heading"><span>Report advertisement</span></div>
+                <div class="text">
+                    <p>
+                        Are you facing issues with your current advertisement? You can report this ad to Unity and let us
+                        know. Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.
                     </p>
+                </div>
+                <ul class="radio-group-container">
+                    <% for (var k = 0; k < data.reportReasons.length; k++) { %>
+                    <div class="radio-item-container">
+                        <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
+                        <label for="<%= data.reportKeys[k] %>">
+                            <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
+                    </div>
                     <% } %>
+                </ul>
+                <div class="text-small">
+                    <p>
+                        Disclaimer: Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.
+                    </p>
+                </div>
+                <div class="report-container">
+                    <div class="report-button">Report</div>
+                    <span class="report-confirmed-text text"></span>
                 </div>
             </div>
+            <div class="build-info-container">
+                <div class="heading"><span><%= data.t("privacy-settings-build-info") %></span></div>
+                <p></p>
+                <% for (var k in data.buildInformation) { %>
+                <p class="build-information-item text">
+                    <span class="build-information-key"><%= k %>:</span>
+                    <span class="build-information-value"><%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+                </p>
+                <% } %>
+            </div>
+        </div>
+        <div class="privacy-content-container">
             <% if(data.isCoppaCompliant) { %>
             <div class="coppa">
                 <p>
@@ -139,9 +139,7 @@
                     <%= data.t("privacy-dialog-text-li-p1") %>
                 </p>
                 <p>
-                <span class="highlight">
                     <%= data.t("privacy-dialog-text-li-p2") %>
-                </span>
                 </p>
 
                 <p>
@@ -167,7 +165,6 @@
                 <p>
                     <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
                 </p>
-
 
                 <% if(data.isCCPA) { %>
                 <h2>
@@ -219,10 +216,10 @@
                     <span class="data-deletion-link page-link"><%= data.t("privacy-dialog-text-li-p7-2-ccpa") %></span><%= data.t("privacy-dialog-text-li-p7-3-ccpa") %>
                     <span class="data-deletion-note"><%= data.t("privacy-dialog-text-li-p7-data-request-info") %></span>
                     <span id="data-deletion-container"><%= data.t("privacy-dialog-text-li-p7-are-you-sure") %><span id="data-deletion-confirm" class="page-link"><%= data.t("privacy-dialog-text-li-p7-yes") %></span>
-                    / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
+                / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
                     <span id="data-deletion-request-container">
-                        <%= data.t("privacy-dialog-text-li-p7-data-deletion-text-ccpa") %>
-                    </span>
+                    <%= data.t("privacy-dialog-text-li-p7-data-deletion-text-ccpa") %>
+                </span>
                 </p>
                 <% } else { %>
                 <h2>
@@ -232,10 +229,10 @@
                     <%= data.t("privacy-dialog-text-li-p7-1") %>
                     <span class="data-deletion-link page-link"><%= data.t("privacy-dialog-text-li-p7-2") %></span><%= data.t("privacy-dialog-text-li-p7-3") %>
                     <span id="data-deletion-container"><%= data.t("privacy-dialog-text-li-p7-are-you-sure") %><span id="data-deletion-confirm" class="page-link"><%= data.t("privacy-dialog-text-li-p7-yes") %></span>
-                    / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
+                / <span class="data-deletion-reject page-link"><%= data.t("privacy-dialog-text-li-p7-no") %></span></span>
                     <span id="data-deletion-request-container">
-                        <%= data.t("privacy-dialog-text-li-p7-data-deletion-text") %>
-                    </span>
+                    <%= data.t("privacy-dialog-text-li-p7-data-deletion-text") %>
+                </span>
                 </p>
                 <% } %>
                 <div class="data-request-container"></div>

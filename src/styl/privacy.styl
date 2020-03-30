@@ -22,35 +22,35 @@
     font-size: $privacy-settings-h2-font-size;
   }
 
-  .safe-area-content {
+  .view-container {
     position: absolute;
-    top: 0;
+    top: 2 * $default-size;
     right: 0;
     bottom: 0;
     left: 0;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-  }
-
-  .view-container {
-    position: relative;
-    overflow: auto;
-    padding-bottom: 1rem;
-    min-height: 50%;
-    max-height: 90%;
-    width: 100%;
-    border-top-left-radius: .5 * $default-size;
-    border-top-right-radius: .5 * $default-size;
+    overflow: hidden;
+    height: calc(100% - 2 * $default-size);
+    border-top-left-radius: $default-size;
+    border-top-right-radius: $default-size;
     background: $privacy-settings-background-color;
 
     // enable momentum scrolling on iOS
     -webkit-overflow-scrolling: touch;
-
   }
 
-  .page-container {
-    padding: $default-size;
+  .scroll-area-container {
+    position: relative;
+    // min and max values are needed to enable scrolling on legacy iOS and Android devices
+    overflow: auto;
+    min-height: 0;
+    max-height: 100%;
+  }
+
+  .privacy-content-container {
+    position: relative;
+    padding: $default-size $default-size 3 * $default-size $default-size;
   }
 
   a, .page-link {
@@ -61,14 +61,15 @@
   }
 
   .header {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 9999;
+    border-top-left-radius: $default-size;
+    border-top-right-radius: $default-size;
     background: $privacy-settings-header-background-color;
     text-align: left;
 
     .close-button {
-      padding: .5 * $default-size .5 * $default-size .25 * $default-size .5 * $default-size;
+      padding: .5 * $default-size .5 * $default-size .25 * $default-size .75 * $default-size;
       font-size: $default-size;
     }
   }
@@ -89,8 +90,8 @@
     }
 
     .unityads-logo {
-      padding-bottom: $default-size;
-      font-size: $default-size;
+      padding-bottom: .5 * $default-size;
+      font-size: 1.25 * $default-size;
 
       &:after {
         content: "\e00b";
@@ -100,18 +101,17 @@
 
     .tool-button-container {
       display: flex;
-      padding: .25 * $default-size;
+      padding: .5 * $default-size;
       font-size: .65 * $default-size;
       justify-content: space-between;
     }
   }
 
   .tool-container {
-    border-radius: .5 * $default-size;
-    background: $black;
+    background: $privacy-settings-header-background-color;
 
     .report-ad-container {
-      padding: .5 * $default-size;
+      padding: $default-size;
 
       .report-button {
         $privacy-blue-button-default();
@@ -188,9 +188,8 @@
 body {
   &.landscape #privacy {
     .view-container {
+      top: $default-size;
       left: 22%;
-      min-height: 85%;
-      max-height: 90%;
       width: 56%;
     }
   }
@@ -198,14 +197,9 @@ body {
 
 $iphone-x-paddings() {
   #privacy {
-    .safe-area-content {
-      top: constant(safe-area-inset-top);
-      top: env(safe-area-inset-top); // @stylint ignore
-    }
-
     .view-container {
-      padding-bottom: constant(safe-area-inset-bottom);
-      padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+      top: calc(2rem + constant(safe-area-inset-top));
+      top: calc(2rem + env(safe-area-inset-top)); // @stylint ignore
     }
   }
 }
