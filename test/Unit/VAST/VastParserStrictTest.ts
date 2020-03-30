@@ -118,12 +118,12 @@ describe('VastParserStrict', () => {
         });
 
         context('for IAS', () => {
-            it('should replace adsafeprotected urls with vastpixel3 and include correct header for IAS', () => {
+            it('should replace adsafeprotected urls with vastpixel3, OMIDP macro and include correct header for IAS', () => {
                 const wrappedVAST = WrappedVastIAS;
                 sinon.stub(request, 'get').resolves();
 
                 const headers: [string, string][] = [['X-Device-Type', 'unity'], ['User-Agent', navigator.userAgent]];
-                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot';
+                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot;omid_p=Unity3d/1.2.10';
 
                 TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
                 sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
@@ -134,7 +134,7 @@ describe('VastParserStrict', () => {
                 sinon.stub(request, 'get').resolves();
 
                 const headers: [string, string][] = [['X-Device-Type', 'unity'], ['User-Agent', navigator.userAgent]];
-                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?bundleId=booyah&scoot=doot';
+                const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?bundleId=booyah&scoot=doot;omid_p=Unity3d/1.2.10';
 
                 TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah');
                 sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
