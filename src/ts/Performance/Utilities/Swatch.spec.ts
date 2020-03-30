@@ -1,5 +1,5 @@
-import {Swatch} from 'Performance/Utilities/Swatch';
-import {Color} from 'Core/Utilities/Color';
+import { Swatch } from 'Performance/Utilities/Swatch';
+import { Color } from 'Core/Utilities/Color';
 
 describe('SwatchTest', () => {
     describe('Swatch', () => {
