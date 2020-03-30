@@ -1,7 +1,6 @@
 import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { Image } from 'Ads/Models/Assets/Image';
-import { assert } from 'chai';
 import { Core } from 'Core/__mocks__/Core';
 import { ICore } from 'Core/ICore';
 import { Session } from 'Ads/Models/Session';
@@ -29,7 +28,13 @@ describe('ImageAnalysisTest', () => {
                             if (!swatches || !swatches.length) {
                                 reject('No swatches returned');
                             }
-                            assert.deepEqual(swatches[0].color, value.expectedColor);
+                            // Because of the canvas implementation, which relies on the native implementation of the current platform,
+                            // It's possible to have an error down to the 1/256, caused by different software implementation or GPU drivers, etc
+                            // For that reason, we check if the output color is really close to the expected color.
+                            const ex = value.expectedColor;
+                            const c = swatches[0].color;
+                            const colorDiff = Math.abs(ex.r - c.r) + Math.abs(ex.g - c.g) + Math.abs(ex.b - c.b);
+                            expect(colorDiff).toBeLessThanOrEqual(3);
                             resolve();
                         });
                     });
