@@ -166,13 +166,14 @@ export class UserPrivacyManager {
         }
 
         const userSummary = CachedUserSummary.get();
+        const { ads, external, gameExp } = this._userPrivacy.getPermissions();
 
         return new PrivacyConfig(PrivacySDKFlow,
             {
-                ads: this._userPrivacy.getPermissions().ads,
-                external: this._userPrivacy.getPermissions().external,
-                gameExp: this._userPrivacy.getPermissions().gameExp,
-                agreedOverAgeLimit: agreedOverAgeLimit,
+                ads,
+                external,
+                gameExp,
+                agreedOverAgeLimit,
                 agreementMethod: ''
             },
             {

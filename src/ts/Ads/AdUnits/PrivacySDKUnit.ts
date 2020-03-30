@@ -211,11 +211,9 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        this.setConsent({
-                ads: privacySettings.user.ads,
-                external: privacySettings.user.external,
-                gameExp: privacySettings.user.gameExp
-            },
+        const { ads, external, gameExp } = privacySettings.user;
+
+        this.setConsent({ ads, external, gameExp },
             action,
             GDPREventSource.USER);
 
