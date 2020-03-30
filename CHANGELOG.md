@@ -1,6 +1,7 @@
 # Pending
 
 * [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+* Add Initial Optimized Campaign Support [#12639](https://github.com/Applifier/unity-ads-webview/pull/12639)
 
 # Fri Mar 27 23:32:15 UTC 2020
 
