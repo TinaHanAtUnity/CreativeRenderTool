@@ -110,6 +110,7 @@ class SatisfiesMatcher {
             it('should have correct request', () => {
                 expect(request.post).toHaveBeenCalledTimes(1);
                 expect(request.post).toHaveBeenLastCalledWith(expect.anything(), new SatisfiesMatcher({
+                    isLoadEnabled: true,
                     preload: true,
                     load: false,
                     preloadPlacements: {
@@ -275,6 +276,11 @@ class SatisfiesMatcher {
                 expect(loadedCampaign2).toBeDefined();
             });
 
+            it('should isLoadEnabled flag be set to true', () => {
+                expect(loadedCampaign1!.campaign.isLoadEnabled()).toEqual(true);
+                expect(loadedCampaign2!.campaign.isLoadEnabled()).toEqual(true);
+            });
+
             it('should have correct in loadedCampaign1', () => {
                 expect(loadedCampaign1!.campaign.getId()).toEqual('5be40c5f602f4510ec583881');
             });
@@ -301,6 +307,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(3);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    isLoadEnabled: true,
                     preload: false,
                     load: true,
                     preloadPlacements: {},
@@ -789,8 +796,15 @@ class SatisfiesMatcher {
                 expect(campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca7');
             });
 
+            it('should isLoadEnabled flag be set to true', () => {
+                const campaign: Campaign = <Campaign>onCampaign.mock.calls[0][1];
+
+                expect(campaign.isLoadEnabled()).toEqual(true);
+            });
+
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenNthCalledWith(4, expect.anything(), new SatisfiesMatcher({
+                    isLoadEnabled: true,
                     preload: true,
                     load: true,
                     preloadPlacements: {
