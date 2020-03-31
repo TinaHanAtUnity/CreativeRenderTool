@@ -30,7 +30,7 @@ export class AuctionResponseParser {
 
         Object.keys(events).forEach(((eventKey: string) => {
             const eventTracking = events[eventKey] || {};
-            const tempParams = {
+            const tempParams: { [x: string]: string } = {
                 ...eventTracking.params,
                 ...globalParams
             };
