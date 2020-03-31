@@ -2,6 +2,7 @@
 
 * Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
 * Replace OMIDPartner macro in VastURITag unwrapping for IAS [#14075](https://github.com/Applifier/unity-ads-webview/pull/14075)
+* Force LKGs to Update Locally for Revert Script [#14134](https://github.com/Applifier/unity-ads-webview/pull/14134)
 * [Auction V6] Add Test Mode Endpoint Support [#14079](https://github.com/Applifier/unity-ads-webview/pull/14079)
 * [Auction V6] Add Mediation Experiment Type [#14106](https://github.com/Applifier/unity-ads-webview/pull/14106)
 * [Load V5] Metadata flag to force Load V5 to be enabled [#13920](https://github.com/Applifier/unity-ads-webview/pull/13920)
