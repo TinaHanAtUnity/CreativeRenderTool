@@ -54,6 +54,7 @@ EOF
     curl -X POST -H 'Content-type: application/json' --data "$slackjson" https://hooks.slack.com/services/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
 
     git checkout master
+    # ./tools/fire_deploy_json.sh
     echo "Make sure to monitor Slack in case anyone requests that the deployment should not happen at this time!"
 else
     echo "Probably a good idea. Those tests looked sketchy anyways."
