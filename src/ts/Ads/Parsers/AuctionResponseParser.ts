@@ -44,7 +44,7 @@ export class AuctionResponseParser {
                 if (index >= 0 && index < trackingTemplates.length) {
                     const tempTrackingUrls: string[] = trackingUrls[eventKey] || [];
                     const urlToTemplate = trackingTemplates[index];
-                    tempTrackingUrls.push(MacroUtil.replaceMacro(`${urlToTemplate}`, params));
+                    tempTrackingUrls.push(MacroUtil.replaceMacro(urlToTemplate, params));
                     trackingUrls[eventKey] = tempTrackingUrls;
                 } else {
                     SDKMetrics.reportMetricEvent(AuctionV6.TrackingIndicesOutOfBounds);
