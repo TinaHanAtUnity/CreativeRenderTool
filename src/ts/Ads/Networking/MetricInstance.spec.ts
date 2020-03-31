@@ -234,24 +234,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
                     }
                 ]
             }
-        }, {
-            metric: InitializationMetric.WebviewInitialization,
-            value: -1,
-            path: '/metrics',
-            expected: {
-                metrics: [
-                    {
-                        name: 'timing_value_negative',
-                        value: 1,
-                        tags: [
-                            `ads_sdk2_sdv:${sdkVersion}`,
-                            'ads_sdk2_iso:us',
-                            `ads_sdk2_plt:${Platform[platform]}`,
-                            'ads_sdk2_mevt:webview_init' // Intentional to track which timing metrics are negative
-                        ]
-                    }
-                ]
-            }
         }];
         tests.forEach((t) => {
 
@@ -324,15 +306,10 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
             });
         });
 
-        it('should fire to metric endpoint with negative timing events', () => {
+        it('should fire not to metric endpoint with negative timing events', () => {
             metricInstance.reportTimingEvent(InitializationMetric.WebviewInitialization, -200);
             return metricInstance.sendBatchedEvents().then(() => {
-                expect(requestManager.post).toBeCalledWith(
-                    'https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics',
-                    expect.anything(),
-                    [['Content-Type', 'application/json']],
-                    expect.anything()
-                );
+                expect(requestManager.post).not.toBeCalled();
             });
         });
 

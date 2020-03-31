@@ -60,6 +60,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { IARApi } from 'AR/AR';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -174,6 +175,7 @@ describe('CampaignRefreshManager', () => {
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
+        const aem = new AutomatedExperimentManager();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -195,7 +197,7 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        const performance = new Performance(ar, coreModule, adsModule);
+        const performance = new Performance(ar, coreModule, aem, adsModule);
         const contentTypeHandlerMap = performance.getContentTypeHandlerMap();
         for (const contentType in contentTypeHandlerMap) {
             if (contentTypeHandlerMap.hasOwnProperty(contentType)) {

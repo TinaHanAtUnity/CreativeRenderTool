@@ -39,7 +39,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-class SpecVerifier {
+export class SpecVerifier {
     private _platform: Platform;
     private _spec: IEventSpec;
     private _queryParams: string[];

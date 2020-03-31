@@ -85,7 +85,7 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(TEST_BUILD_DIR)/inde
 
 # Built-in targets
 
-.PHONY: all static build-browser build-dev build-release webpack-build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
+.PHONY: all static build-browser build-dev build-release webpack-build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code send-status
 .PHONY: $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
@@ -400,3 +400,15 @@ endif
 
 qr-code:
 	segno "http://$(IP_ADDRESS):8000/build/dev/config.json"
+
+send-status:
+ifeq ($(TRAVIS_PULL_REQUEST), false)
+	echo 'Skipping status update'
+else
+	$(eval SIZE := $(shell cat build/release/index.html | wc -c | awk '{ byte = int($$1 / 1024); print byte " KB" }'))
+	$(eval GZIPSIZE := $(shell gzip -c build/release/index.html | wc -c | awk '{ byte = int($$1 / 1024); print byte " KB" }'))
+	echo "{\"state\":\"success\",\"target_url\":\"\",\"description\": \"Original: ${SIZE}, GZip: ${GZIPSIZE}\",\"context\": \"Size\"}"
+	-curl -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
+		-d "{\"state\":\"success\",\"target_url\":\"\",\"description\": \"Original: ${SIZE}, GZip: ${GZIPSIZE}\",\"context\": \"Size\"}" \
+		"https://api.github.com/repos/${TRAVIS_REPO_SLUG}/statuses/${TRAVIS_PULL_REQUEST_SHA}"
+endif

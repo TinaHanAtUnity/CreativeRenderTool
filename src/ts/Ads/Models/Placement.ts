@@ -58,6 +58,8 @@ export interface IPlacement {
     position: string | undefined;
     auctionType: PlacementAuctionType;
     bannerRefreshRate: number | undefined;
+
+    invalidationPending: boolean;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -83,7 +85,8 @@ export class Placement extends Model<IPlacement> {
             refreshDelay: ['number', 'undefined'],
             position: ['string', 'undefined'],
             auctionType: ['string'],
-            bannerRefreshRate: ['number', 'undefined']
+            bannerRefreshRate: ['number', 'undefined'],
+            invalidationPending: ['boolean']
         });
 
         this.set('id', data.id);
@@ -117,6 +120,8 @@ export class Placement extends Model<IPlacement> {
         if (data.banner) {
             this.set('bannerRefreshRate', data.banner.refreshRate);
         }
+
+        this.set('invalidationPending', false);
     }
 
     public getId(): string {
@@ -229,6 +234,14 @@ export class Placement extends Model<IPlacement> {
             }
         }
         return false;
+    }
+
+    public isInvalidationPending(): boolean {
+        return this.get('invalidationPending');
+    }
+
+    public setInvalidationPending(value: boolean) {
+        this.set('invalidationPending', value);
     }
 
     public getDTO(): { [key: string]: unknown } {

@@ -4,6 +4,11 @@ import { CacheMode } from 'Core/Models/CoreConfiguration';
 
 export class AdsConfigurationParser {
     private static _isBrowserBuild: boolean = false;
+    private static _hasArPlacement: boolean = false;
+
+    public static setTestHasArPlacement(hasArPlacement: boolean) {
+        this._hasArPlacement = hasArPlacement;
+    }
 
     public static setIsBrowserBuild(isBrowserBuild: boolean): void {
         this._isBrowserBuild = isBrowserBuild;
@@ -43,6 +48,7 @@ export class AdsConfigurationParser {
 
         // Browser Build Testing Requires CacheMode to be Disabled
         const cacheMode = this._isBrowserBuild ? CacheMode.DISABLED : this.parseCacheMode(configJson);
+        hasArPlacement = this._hasArPlacement ? true : hasArPlacement;
 
         const configurationParams: IAdsConfiguration = {
             cacheMode: cacheMode,

@@ -63,6 +63,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         if (this._tintColor) {
             this.renderColorTheme();
         }
+        this.renderColorTheme();
     }
 
     private applyDarkMode() {
@@ -120,7 +121,9 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             }
 
             if (image) {
-                ImageAnalysis.analyseImage(this._core, image).then(swatches => {
+                ImageAnalysis.getImageSrc(this._core.Cache, image)
+                    .then(ImageAnalysis.analyseImage)
+                    .then(swatches => {
                     if (!swatches || !swatches.length) {
                         SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
                         return;

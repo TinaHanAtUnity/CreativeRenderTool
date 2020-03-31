@@ -33,10 +33,14 @@ export interface IRawAuctionV5Response {
     encryptedPreloadData?: { [key: string]: string };
 }
 
-interface IPlacementTrackingV6 {
+interface IEventTrackingV6 {
     urlIndices: number[];
-    params: { [key: string]: string };
-    events?: { [key: string]: number[] };
+    params?: { [key: string]: string };
+}
+
+export interface IPlacementTrackingV6 {
+    params?: { [key: string]: string };
+    events?: { [key: string]: IEventTrackingV6 };
 }
 
 export interface IRawAuctionV6Response {
@@ -45,7 +49,7 @@ export interface IRawAuctionV6Response {
     statusCode?: number;
     placements: { [key: string]: { mediaId: string; tracking: IPlacementTrackingV6 } };
     media: { [key: string]: IAuctionResponse };
-    trackingTemplates: { [key: string]: string[] };
+    trackingTemplates: string[];
 }
 
 export interface IAuctionResponse {

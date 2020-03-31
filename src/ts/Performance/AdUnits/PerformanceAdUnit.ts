@@ -93,6 +93,10 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         this._thirdPartyEventManager.sendTrackingEvents(this._performanceCampaign, event, 'performance');
     }
 
+    public getCampaign(): PerformanceCampaign  {
+        return this._performanceCampaign;
+    }
+
     protected unsetReferences() {
         super.unsetReferences();
         delete this._endScreen;
