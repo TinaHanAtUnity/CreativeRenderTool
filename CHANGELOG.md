@@ -1,13 +1,26 @@
 # Pending
 
+* [Auction V6] Enable AB Test on Group 18 [#14080](https://github.com/Applifier/unity-ads-webview/pull/14080)
+* [Auction V6] Fix Templatizing Parameters [#14135](https://github.com/Applifier/unity-ads-webview/pull/14135)
+* Disable fire_deploy_json.sh During LKG Updates [#14136](https://github.com/Applifier/unity-ads-webview/pull/14136)
+
+# Tue Mar 31 18:29:12 UTC 2020
+
 * Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
 * Replace OMIDPartner macro in VastURITag unwrapping for IAS [#14075](https://github.com/Applifier/unity-ads-webview/pull/14075)
+* Force LKGs to Update Locally for Revert Script [#14134](https://github.com/Applifier/unity-ads-webview/pull/14134)
 * [Auction V6] Add Test Mode Endpoint Support [#14079](https://github.com/Applifier/unity-ads-webview/pull/14079)
 * [Auction V6] Add Mediation Experiment Type [#14106](https://github.com/Applifier/unity-ads-webview/pull/14106)
 * [Load V5] Metadata flag to force Load V5 to be enabled [#13920](https://github.com/Applifier/unity-ads-webview/pull/13920)
 * [Load V5] Move loadCampaign logic from AdRequestManager to PerPlacementLoadManagerV5 [#14073](https://github.com/Applifier/unity-ads-webview/pull/14073)
 * [Load V5] Invalidation pending state for a placement [#14077](https://github.com/Applifier/unity-ads-webview/pull/14077)
 * [Load V5] Add comment about AdRequestManager [#14078](https://github.com/Applifier/unity-ads-webview/pull/14078)
+* [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+
+# Reverted to LKGs (Mon Mar 30 21:57:00 UTC 2020) - Tue Mar 31 15:44:19 UTC 2020
+
+* Reverted [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+* Reverted Add Initial Optimized Campaign Support [#12639](https://github.com/Applifier/unity-ads-webview/pull/12639)
 
 # Mon Mar 30 21:57:00 UTC 2020
 
