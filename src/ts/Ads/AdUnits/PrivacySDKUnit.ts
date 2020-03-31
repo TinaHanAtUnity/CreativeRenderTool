@@ -195,11 +195,11 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
 
-            case 'allSeen':
+            case 'allOfSeen':
                 action = GDPREventAction.CONSENT_AGREE; // this is correct, naming is just different in privacy UI
                 break;
 
-            case 'noneSeen':
+            case 'noneOfSeen':
                 action = GDPREventAction.CONSENT_DISAGREE;
                 break;
 
