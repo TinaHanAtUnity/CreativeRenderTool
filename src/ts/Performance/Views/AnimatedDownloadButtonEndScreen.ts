@@ -38,6 +38,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         if (ctaButton !== null) {
             ctaButton.style.backgroundColor = this._bgColor;
         }
+        this.renderColorTheme();
     }
 
     public show(): void {
@@ -91,7 +92,9 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             }
 
             if (image) {
-                ImageAnalysis.analyseImage(this._core.Cache, image).then(swatches => {
+                ImageAnalysis.getImageSrc(this._core.Cache, image)
+                    .then(ImageAnalysis.analyseImage)
+                    .then(swatches => {
                     if (!swatches || !swatches.length) {
                         SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
                         return;

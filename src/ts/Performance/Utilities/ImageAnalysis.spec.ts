@@ -22,9 +22,8 @@ describe('ImageAnalysisTest', () => {
                 }];
 
                 const analyseImage = (value: {imageUrl: string; expectedColor: Color}) => {
-                    const image = new Image(value.imageUrl, new Session(''));
                     return new Promise((resolve, reject) => {
-                        ImageAnalysis.analyseImage(core.Api.Cache, image).then(swatches => {
+                        ImageAnalysis.analyseImage(value.imageUrl).then(swatches => {
                             if (!swatches || !swatches.length) {
                                 reject('No swatches returned');
                             }

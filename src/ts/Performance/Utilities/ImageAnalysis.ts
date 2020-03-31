@@ -12,9 +12,9 @@ const PALETTE_COLOR_COUNT = 16;
 
 export class ImageAnalysis {
 
-    public static analyseImage(cache: CacheApi, asset: Asset): Promise<Swatch[]> {
+    public static analyseImage(imageUrl: string): Promise<Swatch[]> {
         return new Promise<Swatch[]>(resolve => {
-            ImageAnalysis.getImagePixelData(cache, asset).then((rgbaData: Uint8ClampedArray) => {
+            ImageAnalysis.getImagePixelData(imageUrl).then((rgbaData: Uint8ClampedArray) => {
                 const swatches = ImageAnalysis.quantize(rgbaData, PALETTE_COLOR_COUNT);
                 resolve(swatches);
             });
@@ -97,7 +97,7 @@ export class ImageAnalysis {
         return histogram;
     }
 
-    public static getImagePixelData(cache: CacheApi, asset: Asset): Promise<Uint8ClampedArray> {
+    public static getImagePixelData(imageUrl: string): Promise<Uint8ClampedArray> {
         return new Promise((resolve, reject) => {
             const img = new Image();
             const canvas = document.createElement('canvas');
@@ -120,10 +120,8 @@ export class ImageAnalysis {
                 reject('image_load_failed');
             });
 
-            ImageAnalysis.getImageSrc(cache, asset).then((src: string) => {
-                img.crossOrigin = 'Anonymous';
-                img.src = src;
-            });
+            img.crossOrigin = 'Anonymous';
+            img.src = imageUrl;
         });
     }
 
