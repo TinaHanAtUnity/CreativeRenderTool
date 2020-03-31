@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar 31 18:29:12 UTC 2020
 
 * Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
 * Replace OMIDPartner macro in VastURITag unwrapping for IAS [#14075](https://github.com/Applifier/unity-ads-webview/pull/14075)
