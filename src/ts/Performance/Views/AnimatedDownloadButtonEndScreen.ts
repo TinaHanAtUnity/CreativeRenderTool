@@ -38,7 +38,6 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         if (ctaButton !== null) {
             ctaButton.style.backgroundColor = this._bgColor;
         }
-        this.renderColorTheme();
     }
 
     public show(): void {
