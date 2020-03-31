@@ -16,22 +16,22 @@
   font-size: $privacy-settings-font-size;
 
   h2 {
-    margin-top: 1.5rem;
-    margin-bottom: .5rem;
+    margin-top: 1.5 * $default-size;
+    margin-bottom: .5 * $default-size;
     font-weight: $privacy-settings-h2-font-weight;
     font-size: $privacy-settings-h2-font-size;
   }
 
   .view-container {
     position: absolute;
-    top: 2 * $default-size;
+    top: 2rem;
     right: 0;
     bottom: 0;
     left: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    height: calc(100% - 2 * $default-size);
+    height: calc(100% - 2rem);
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $privacy-settings-background-color;
@@ -188,9 +188,10 @@
 body {
   &.landscape #privacy {
     .view-container {
-      top: $default-size;
+      top: 1rem;
       left: 22%;
       width: 56%;
+      height: calc(100% - 1rem);
     }
   }
 }
@@ -200,6 +201,9 @@ $iphone-x-paddings() {
     .view-container {
       top: calc(2rem + constant(safe-area-inset-top));
       top: calc(2rem + env(safe-area-inset-top)); // @stylint ignore
+
+      height: calc(100% - 2rem - constant(safe-area-inset-top));
+      height: calc(100% - 2rem - env(safe-area-inset-top)); // @stylint ignore
     }
   }
 }
