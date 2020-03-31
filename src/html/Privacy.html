@@ -85,24 +85,26 @@
                         From your interaction with this app, here is an example of the information we use to predict which
                         other apps might interest you:
                     </p>
-                    <p>
-                        <span id="phone-type"><%= data.t("privacy-using") %></span>
-                    </p>
-                    <p>
-                        <span id="country"><%= data.t("privacy-located-in") %></span>
-                    </p>
+                    <div class="mini-disclosure-container">
+                        <p>
+                            <span id="phone-type"><%= data.t("privacy-using") %></span>
+                        </p>
+                        <p>
+                            <span id="country"><%= data.t("privacy-located-in") %></span>
+                        </p>
 
-                    <p>
-                        <span id="game-plays-this-week"><%= data.t("privacy-used-this-app") %></span>
-                    </p>
+                        <p>
+                            <span id="game-plays-this-week"><%= data.t("privacy-used-this-app") %></span>
+                        </p>
 
-                    <p>
-                        <span id="ads-seen-in-game"><%= data.t("privacy-seen-ads") %></span>
-                    </p>
+                        <p>
+                            <span id="ads-seen-in-game"><%= data.t("privacy-seen-ads") %></span>
+                        </p>
 
-                    <p>
-                        <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
-                    </p>
+                        <p>
+                            <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
+                        </p>
+                    </div>
                     <p>
                         Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for
                         a full description of our data practices. You can opt-out of Unity Ads’ personalized
@@ -150,21 +152,26 @@
                 <p>
                     <%= data.t("privacy-dialog-text-li-p4") %>
                 </p>
-                <p>
-                    <span id="phone-type"><%= data.t("privacy-using") %></span>
-                </p>
-                <p>
-                    <span id="country"><%= data.t("privacy-located-in") %></span>
-                </p>
-                <p>
-                    <span id="game-plays-this-week"><%= data.t("privacy-used-this-app") %></span>
-                </p>
-                <p>
-                    <span id="ads-seen-in-game"><%= data.t("privacy-seen-ads") %></span>
-                </p>
-                <p>
-                    <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
-                </p>
+                <div class="mini-disclosure-container">
+                    <p>
+                        <span id="phone-type"><%= data.t("privacy-using") %></span>
+                    </p>
+                    <p>
+                        <span id="country"><%= data.t("privacy-located-in") %></span>
+                    </p>
+
+                    <p>
+                        <span id="game-plays-this-week"><%= data.t("privacy-used-this-app") %></span>
+                    </p>
+
+                    <p>
+                        <span id="ads-seen-in-game"><%= data.t("privacy-seen-ads") %></span>
+                    </p>
+
+                    <p>
+                        <span id="games-installed-from-ads"><%= data.t("privacy-installed-based-on") %></span>
+                    </p>
+                </div>
 
                 <% if(data.isCCPA) { %>
                 <h2>
