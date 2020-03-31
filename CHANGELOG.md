@@ -1,3 +1,9 @@
+# Pending
+
+* [Auction V6] Enable AB Test on Group 18 [#14080](https://github.com/Applifier/unity-ads-webview/pull/14080)
+* [Auction V6] Fix Templatizing Parameters [#14135](https://github.com/Applifier/unity-ads-webview/pull/14135)
+* Disable fire_deploy_json.sh During LKG Updates [#14136](https://github.com/Applifier/unity-ads-webview/pull/14136)
+
 # Tue Mar 31 18:29:12 UTC 2020
 
 * Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
