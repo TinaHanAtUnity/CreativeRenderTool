@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar 31 20:51:59 UTC 2020
 
 * [Auction V6] Enable AB Test on Group 18 [#14080](https://github.com/Applifier/unity-ads-webview/pull/14080)
 * [Auction V6] Fix Templatizing Parameters [#14135](https://github.com/Applifier/unity-ads-webview/pull/14135)
