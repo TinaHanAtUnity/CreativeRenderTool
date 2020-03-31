@@ -477,7 +477,7 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
-        if (campaign instanceof PerformanceCampaign) {
+        if (!(campaign instanceof PerformanceCampaign)) {
             SDKMetrics.reportMetricEvent(AUIMetric.IgnoringNonPerformanceCampaign);
             return Promise.resolve();
         }

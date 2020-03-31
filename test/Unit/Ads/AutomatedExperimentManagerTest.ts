@@ -380,6 +380,18 @@ describe('AutomatedExperimentManagerTests', () => {
         });
     });
 
+    it('AutomatedExperimentManager ignores non performance campaigns', () => {
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+        .returns(true);
+
+        aem.initialize(core, campaignSource);
+        aem.registerExperiments([FooExperiment]);
+        return aem.onNewCampaign(TestFixtures.getXPromoCampaign())
+            .then(() => {
+                assert.isTrue(metricStub.calledOnceWith(AUIMetric.IgnoringNonPerformanceCampaign));
+        });
+    });
+
     it(`Experiment defaults cleanly if initialize is not called`, () => {
         const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
             .withArgs(AUIMetric.FailedToFetchAutomatedExperiements)
