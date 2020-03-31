@@ -1,3 +1,8 @@
+# Reverted to LKGs (Mon Mar 30 21:57:00 UTC 2020) - Tue Mar 31 15:44:19 UTC 2020
+
+* Reverted [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+* Reverted Add Initial Optimized Campaign Support [#12639](https://github.com/Applifier/unity-ads-webview/pull/12639)
+
 # Pending
 
 * Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
