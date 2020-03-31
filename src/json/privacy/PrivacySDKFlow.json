@@ -669,20 +669,8 @@
             },
             "actions": [
               {
-                "property": "user.gameExp",
-                "value": false
-              },
-              {
-                "property": "user.ads",
-                "value": false
-              },
-              {
-                "property": "user.external",
-                "value": false
-              },
-              {
                 "property": "user.agreementMethod",
-                "value": "noneSeen"
+                "value": "noneOfSeen"
               }
             ]
           },
@@ -705,7 +693,7 @@
               },
               {
                 "property": "user.agreementMethod",
-                "value": "allSeen"
+                "value": "allOfSeen"
               }
             ],
             "isSubmit": true,
