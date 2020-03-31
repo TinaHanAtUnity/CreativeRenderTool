@@ -124,8 +124,11 @@ export enum AUIMetric {
     FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
+    IgnoringNonPerformanceCampaign = 'ignoring_non_performance_campaign',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
+    OptimizationResponseApplied = 'campaign_optimization_response_applied',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
+    RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiement_name'
 }
 

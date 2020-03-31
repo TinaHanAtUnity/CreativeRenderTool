@@ -1,7 +1,6 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
@@ -147,11 +146,9 @@ export class AutomatedExperimentManager {
 
         if (this.isCampaignTargetForExperiment(campaign)) {
 
-            for (const experimentName in this._campaign.Experiments) {
-                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
-                    this._campaign.Experiments[experiment.getName()].Active = true;
-                    return this._campaign.Experiments[experiment.getName()].Actions;
-                }
+            if (this._campaign.Experiments.hasOwnProperty(experiment.getName())) {
+                this._campaign.Experiments[experiment.getName()].Active = true;
+                return this._campaign.Experiments[experiment.getName()].Actions;
             }
 
             SDKMetrics.reportMetricEvent(AUIMetric.UnknownExperimentName);
@@ -480,6 +477,11 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
+        if (campaign instanceof PerformanceCampaign) {
+            SDKMetrics.reportMetricEvent(AUIMetric.IgnoringNonPerformanceCampaign);
+            return Promise.resolve();
+        }
+
         // This is to limit to 1 optmization call per Game Session.
         if (this._campaignSource !== undefined) {
             this._campaignSource.unsubscribe(this._onCampaignListener);
@@ -491,6 +493,8 @@ export class AutomatedExperimentManager {
         this._declaredExperiments.forEach(experiment => {
             this._campaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
         });
+
+        SDKMetrics.reportMetricEvent(AUIMetric.RequestingCampaignOptimization);
 
         // Fire and forget... No one resolves it/blocks on it explicitely
         return Promise.all([this._staticFeaturesPromise, this.collectDeviceContextualFeatures(), this.collectAdSpecificFeatures(campaign)])
@@ -538,6 +542,8 @@ export class AutomatedExperimentManager {
                     optmzdExperiment.MetaData = experiment.metadata;
                 }
             });
+
+            SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseApplied);
 
             return Promise.resolve();
 
