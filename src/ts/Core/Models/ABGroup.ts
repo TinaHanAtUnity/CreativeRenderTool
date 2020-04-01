@@ -84,9 +84,9 @@ export const PrivacySDKTest = new ABTest(16);
 export const DiagnosticsRampDown = new ABTest(15);
 export const AuctionXHR = new DisabledABTest();
 export const AuctionV6Test = new ABTest(18);
+export const LoadV5 = new ABTest(19);
 
 // Disabled AB Tests
-export const LoadV5 = new DisabledABTest();
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
