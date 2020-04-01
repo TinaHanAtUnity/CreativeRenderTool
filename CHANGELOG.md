@@ -1,3 +1,7 @@
+# Pending
+
+* Privacy SDK metrics callback [#14041](https://github.com/Applifier/unity-ads-webview/pull/14041)
+
 # Tue Mar 31 20:51:59 UTC 2020
 
 * [Auction V6] Enable AB Test on Group 18 [#14080](https://github.com/Applifier/unity-ads-webview/pull/14080)
