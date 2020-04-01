@@ -16,8 +16,8 @@
             "mediaId": "5be40c5f602f4510ec583881",
             "tracking": {
                 "params": {
-                    "{{data}}": "premiumDataBlob",
-                    "{{placement}}": "premiumAuction"
+                    "data": "premiumDataBlob",
+                    "placement": "premiumAuction"
                 },
                 "events": {
                     "start": {
@@ -26,8 +26,8 @@
                             1
                         ],
                         "params": {
-                            "{{eventType}}": "start",
-                            "{{secretParam}}": "scott"
+                            "eventType": "start",
+                            "secretParam": "scott"
                         }
                     },
                     "complete": {
@@ -35,7 +35,7 @@
                             0
                         ],
                         "params": {
-                            "{{eventType}}": "complete"
+                            "eventType": "complete"
                         }
                     }
                 }
@@ -45,8 +45,8 @@
             "mediaId": "5be40c5f602f4510ec583881",
             "tracking": {
                 "params": {
-                    "{{data}}": "videoZoneDataBlob",
-                    "{{placement}}": "video"
+                    "data": "videoZoneDataBlob",
+                    "placement": "video"
                 },
                 "events": {
                     "impression": {
@@ -61,8 +61,8 @@
             "mediaId": "5be40c5f602f4510ec583881",
             "tracking": {
                 "params": {
-                    "{{data}}": "rewardedVideoZoneDataBlob",
-                    "{{placement}}": "rewardedVideoZone"
+                    "data": "rewardedVideoZoneDataBlob",
+                    "placement": "rewardedVideoZone"
                 },
                 "events": {
                     "unsupportedEvent": {
@@ -70,7 +70,7 @@
                             1
                         ],
                         "params": {
-                            "{{secretParam}}": "fifthQuartile"
+                            "secretParam": "fifthQuartile"
                         }
                     }
                 }
@@ -80,8 +80,8 @@
             "mediaId": "5be40c5f602f4510ec583881",
             "tracking": {
                 "params": {
-                    "{{data}}": "outOfBoundsData",
-                    "{{placement}}": "oobPlacement"
+                    "data": "outOfBoundsData",
+                    "placement": "oobPlacement"
                 },
                 "events": {
                     "start": {
@@ -91,8 +91,8 @@
                             2
                         ],
                         "params": {
-                            "{{eventType}}": "start",
-                            "{{secretParam}}": "scott"
+                            "eventType": "start",
+                            "secretParam": "scott"
                         }
                     },
                     "complete": {
@@ -100,11 +100,15 @@
                             0
                         ],
                         "params": {
-                            "{{eventType}}": "complete"
+                            "eventType": "complete"
                         }
                     }
                 }
             }
+        },
+        "emptyTracking": {
+            "mediaId": "5be40c5f602f4510ec583881",
+            "tracking": {}
         }
     },
     "trackingTemplates": [

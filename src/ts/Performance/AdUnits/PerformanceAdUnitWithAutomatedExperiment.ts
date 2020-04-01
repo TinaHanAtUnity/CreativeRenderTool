@@ -15,12 +15,12 @@ export class PerformanceAdUnitWithAutomatedExperiment extends PerformanceAdUnit 
     }
 
     public show(): Promise<void> {
-        this._automatedExperimentManager.sendAction(ButtonAnimationsExperiment, this.getCampaign() ? this.getCampaign().getSession().getId() : undefined);
+        this._automatedExperimentManager.startCampaign(this.getCampaign());
         return super.show();
     }
 
     public hide(): Promise<void> {
-        this._automatedExperimentManager.endExperiment();
+        this._automatedExperimentManager.endCampaign(this.getCampaign());
         return super.hide();
     }
 }

@@ -39,8 +39,8 @@ interface IEventTrackingV6 {
 }
 
 export interface IPlacementTrackingV6 {
-    params: { [key: string]: string };
-    events: { [key: string]: IEventTrackingV6 };
+    params?: { [key: string]: string };
+    events?: { [key: string]: IEventTrackingV6 };
 }
 
 export interface IRawAuctionV6Response {

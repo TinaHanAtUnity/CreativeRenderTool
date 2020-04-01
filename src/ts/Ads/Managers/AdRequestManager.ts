@@ -80,7 +80,6 @@ export class AdRequestManager extends CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
-    private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _currentSession: Session | null;
 
@@ -155,7 +154,7 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
             ]);
         }).then(([requestUrl, requestBody]) => CampaignManager.onlyRequest(this._request, requestUrl, this.makePreloadBody(<ILoadV5BodyExtra>requestBody), 0)).then((response) => {
             if (response) {
@@ -243,7 +242,7 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId))
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId))
             ]);
         }).then(([requestUrl, requestBody]) => CampaignManager.onlyRequest(this._request, requestUrl, this.makeLoadBody(<ILoadV5BodyExtra>requestBody, placementId), 0)).then((response) => {
             // if load request has been canceled by reload request, we start it again or we use result from reload request
@@ -305,7 +304,7 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
             ]);
         }).then(([requestUrl, requestBody]) => CampaignManager.onlyRequest(this._request, requestUrl, this.makeReloadBody(<ILoadV5BodyExtra>requestBody, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId))), 0)).then((response) => {
             if (response) {
@@ -331,18 +330,7 @@ export class AdRequestManager extends CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
-        // If by some reason at the time of load request we don't have preload data
-        // we would trigger preload requests and load requests after.
-        // It would make sense to use reload request here, however it would require some refactoring,
-        // which will be done later.
-        if (this.hasPreloadFailed()) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadCampaignWithPreloadData);
-            return this.requestPreload().then(() => {
-                return this.requestLoad(placement.getId());
-            });
-        } else {
-            return this.requestLoad(placement.getId());
-        }
+        return this.requestLoad(placement.getId());
     }
 
     public isPreloadDataExpired(): boolean {
@@ -464,6 +452,7 @@ export class AdRequestManager extends CampaignManager {
             return parser.parse(auctionResponse, this._currentSession).then((campaign) => {
                 if (campaign) {
                     campaign.setMediaId(auctionResponse.getMediaId());
+                    campaign.setIsLoadEnabled(true);
 
                     return this._assetManager.setup(campaign).then(() => {
                         if (trackingUrls) {

@@ -58,10 +58,34 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         return this._adRequestManager.requestPreload();
     }
 
+    protected loadPlacement(placementId: string, count: number) {
+        // If by some reason at the time of load request we don't have preload data
+        // we would trigger preload requests and load requests after.
+        // It would make sense to use reload request here, however it would require some refactoring,
+        // which will be done later.
+        if (this._adRequestManager.hasPreloadFailed()) {
+            SDKMetrics.reportMetricEvent(LoadV5.LoadCampaignWithPreloadData);
+            return this._adRequestManager.requestPreload().then(() => {
+                super.loadPlacement(placementId, count);
+            }).catch((err) => {
+                // If preload request failed, therefore we cannot make load request.
+                // Therefore we should report no fill, so that we do not cause any timeout.
+                this.setPlacementState(placementId, PlacementState.WAITING);
+                this.setPlacementState(placementId, PlacementState.NO_FILL);
+            });
+        } else {
+            return super.loadPlacement(placementId, count);
+        }
+    }
+
     private invalidateStart(placementId: string) {
-        this._adRequestManager.requestReload(this._adsConfig.getPlacementIds()
+        const placements = this._adsConfig.getPlacementIds()
             .filter((x) => x !== placementId)
-            .filter((x) => this.isPlacementActive(x)));
+            .filter((x) => this.isPlacementActive(x));
+
+        placements.forEach(placement => this._adsConfig.getPlacement(placement).setInvalidationPending(true));
+
+        this._adRequestManager.requestReload(placements);
     }
 
     private isPlacementActive(placement: string) {
@@ -104,6 +128,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         if (placement) {
             placement.setCurrentCampaign(campaign);
             placement.setCurrentTrackingUrls(trackingUrls);
+            placement.setInvalidationPending(false);
         }
     }
 
@@ -114,6 +139,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
             SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
             placement.setCurrentCampaign(undefined);
             placement.setCurrentTrackingUrls(undefined);
+            placement.setInvalidationPending(false);
             this.setPlacementState(placementId, PlacementState.NO_FILL);
         }
     }

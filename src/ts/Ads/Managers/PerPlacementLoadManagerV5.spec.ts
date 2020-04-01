@@ -11,6 +11,7 @@ import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Campaign, CampaignMock } from 'Ads/Models/__mocks__/Campaign';
 import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/AbstractAdUnit';
+import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
 
 [Platform.IOS, Platform.ANDROID].forEach((platform) => {
     describe(`PerPlacementLoadManagerV5(${Platform[platform]})`, () => {
@@ -110,6 +111,14 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
                 expect(adRequestManager.requestReload).toBeCalledTimes(1);
                 expect(adRequestManager.requestReload).toBeCalledWith(['video_5', 'video_6']);
             });
+
+            it('should set invalidation pending for placements', () => {
+                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+
+                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+            });
         });
 
         describe('refresh after start: on close', () => {
@@ -139,6 +148,14 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
             it('should make reload request', () => {
                 expect(adRequestManager.requestReload).toBeCalledTimes(1);
                 expect(adRequestManager.requestReload).toBeCalledWith(['video_5', 'video_6']);
+            });
+
+            it('should set invalidation pending for placements', () => {
+                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+
+                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -170,6 +187,14 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
                 expect(adRequestManager.requestReload).toBeCalledTimes(1);
                 expect(adRequestManager.requestReload).toBeCalledWith(['video_5', 'video_6']);
             });
+
+            it('should set invalidation pending for placements', () => {
+                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+
+                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
+                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+            });
         });
 
         describe('trigger on no fill', () => {
@@ -194,9 +219,14 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
                 expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
                 expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
             });
+
+            it('should reset invalidation pending', () => {
+                expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+            });
         });
 
-        describe('trigger on cmaapign', () => {
+        describe('trigger on campaign', () => {
             let placement: PlacementMock;
             let campaign: CampaignMock;
 
@@ -219,6 +249,122 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
             it('should reset tracking urls', () => {
                 expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
                 expect(placement.setCurrentTrackingUrls).toBeCalledWith({});
+            });
+
+            it('should reset invalidation pending', () => {
+                expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+            });
+        });
+
+        describe('load placement', () => {
+            let placement: PlacementMock;
+            let campaign: CampaignMock;
+
+            beforeEach(async () => {
+                placement = Placement();
+                campaign = Campaign();
+
+                placement.setState(PlacementState.NOT_AVAILABLE);
+
+                adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                adRequestManager.hasPreloadFailed.mockReturnValue(false);
+                adRequestManager.loadCampaign.mockResolvedValue({
+                    campaign: campaign,
+                    trackingUrls: {}
+                });
+
+                (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video': 1 });
+            });
+
+            it('should call loadCampaign', () => {
+                expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
+                expect(adRequestManager.loadCampaign).toBeCalledWith(placement);
+            });
+
+            it('should not call requestPreload', () => {
+                expect(adRequestManager.requestPreload).toBeCalledTimes(0);
+            });
+
+            it('should set state to no fill', () => {
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(2);
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'NOT_AVAILABLE', 'WAITING');
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'WAITING', 'READY');
+            });
+        });
+
+        describe('load placement when no preload data', () => {
+            let placement: PlacementMock;
+            let campaign: CampaignMock;
+
+            beforeEach(async () => {
+                placement = Placement();
+                campaign = Campaign();
+
+                placement.setState(PlacementState.NOT_AVAILABLE);
+
+                adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                adRequestManager.hasPreloadFailed.mockReturnValue(true);
+                adRequestManager.loadCampaign.mockResolvedValue({
+                    campaign: campaign,
+                    trackingUrls: {}
+                });
+
+                (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video': 1 });
+            });
+
+            it('should call loadCampaign', () => {
+                expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
+                expect(adRequestManager.loadCampaign).toBeCalledWith(placement);
+            });
+
+            it('should not call requestPreload', () => {
+                expect(adRequestManager.requestPreload).toBeCalledTimes(1);
+            });
+
+            it('should set state to no fill', () => {
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(2);
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'NOT_AVAILABLE', 'WAITING');
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'WAITING', 'READY');
+            });
+        });
+
+        describe('load placement when no preload data and preload fails', () => {
+            let placement: PlacementMock;
+            let campaign: CampaignMock;
+
+            beforeEach(async () => {
+                placement = Placement();
+                campaign = Campaign();
+
+                placement.setState(PlacementState.NOT_AVAILABLE);
+
+                adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                adRequestManager.hasPreloadFailed.mockReturnValue(true);
+                adRequestManager.requestPreload.mockRejectedValue(new Error());
+                adRequestManager.loadCampaign.mockResolvedValue({
+                    campaign: campaign,
+                    trackingUrls: {}
+                });
+
+                (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video': 1 });
+            });
+
+            it('should call loadCampaign', () => {
+                expect(adRequestManager.loadCampaign).toBeCalledTimes(0);
+            });
+
+            it('should not call requestPreload', () => {
+                expect(adRequestManager.requestPreload).toBeCalledTimes(1);
+            });
+
+            it('should set state to no fill', () => {
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(2);
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'NOT_AVAILABLE', 'WAITING');
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'WAITING', 'NO_FILL');
             });
         });
     });

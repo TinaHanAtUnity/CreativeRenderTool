@@ -141,6 +141,12 @@ export class CustomFeatures {
                this.existsInList(etermaxGames, gameId);
     }
 
+    public static isLoadV5Game(gameId: string): boolean {
+        const gameIds = ['1783252', '1781853', '1781854'];
+
+        return this.existsInList(gameIds, gameId);
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;

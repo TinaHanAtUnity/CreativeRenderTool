@@ -853,7 +853,14 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private getBaseUrl(): string {
-        if (this._coreConfig.getTestMode()) {
+
+        const testMode = this._coreConfig.getTestMode();
+
+        if (this._auctionProtocol === AuctionProtocol.V6 && testMode) {
+            return this.constructBaseUrl(CampaignManager.AuctionV6TestBaseUrl);
+        }
+
+        if (testMode) {
             return this.constructBaseUrl(CampaignManager.TestModeUrl);
         }
 

@@ -16,6 +16,7 @@ describe('AuctionResponseParser', () => {
             'video': Placement('video'),
             'rewardedVideoZone': Placement('rewardedVideoZone'),
             'outOfBoundsStartPlacement': Placement('outOfBoundsStartPlacement'),
+            'emptyTracking': Placement('outOfBoundsStartPlacement'),
             'mraid': Placement('mraid')
         };
     });
@@ -54,7 +55,7 @@ describe('AuctionResponseParser', () => {
             });
 
             it('should contain the correct amount of AuctionPlacements', () => {
-                expect(parsedAuctionResponse.auctionResponses[0].getPlacements().length).toEqual(4);
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements().length).toEqual(5);
             });
 
             it('should contain the correct placementIds', () => {
@@ -62,6 +63,7 @@ describe('AuctionResponseParser', () => {
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[1].getPlacementId()).toEqual('video');
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[2].getPlacementId()).toEqual('rewardedVideoZone');
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[3].getPlacementId()).toEqual('outOfBoundsStartPlacement');
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[4].getPlacementId()).toEqual('emptyTracking');
             });
 
             it('should contain the correct trackingUrls for premium', () => {
@@ -105,6 +107,11 @@ describe('AuctionResponseParser', () => {
                     ]
                 };
                 expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[3].getTrackingUrls()).toStrictEqual(expectedTrackingUrls);
+            });
+
+            it('should contain the correct trackingUrls for emptyTracking with two out of bounds entries', () => {
+                const expectedTrackingUrls = {};
+                expect(parsedAuctionResponse.auctionResponses[0].getPlacements()[4].getTrackingUrls()).toStrictEqual(expectedTrackingUrls);
             });
         });
     });
