@@ -1,6 +1,7 @@
 # Pending
 
 * [Load V5] Handling no fill case better for preload and load [#14222](https://github.com/Applifier/unity-ads-webview/pull/14222)
+* [Load V5] Improve handling when parsing campaign [#14223](https://github.com/Applifier/unity-ads-webview/pull/14223)
 
 # Thu Apr  2 00:43:15 UTC 2020
 
