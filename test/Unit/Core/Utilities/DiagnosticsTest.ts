@@ -26,6 +26,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
+            Diagnostics.disabled = false;
         });
 
         afterEach(() => {

@@ -547,6 +547,7 @@ describe('UserPrivacyManagerTest', () => {
             getRequestStub = <sinon.SinonStub>request.get;
             getRequestStub.resolves({response: '{"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}'});
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
+            Diagnostics.disabled = false;
             logErrorStub = sinon.stub(core.Sdk, 'logError');
 
             (<sinon.SinonStub>clientInfo.getGameId).returns(gameId);
