@@ -1,18 +1,8 @@
 import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
-import { Image } from 'Ads/Models/Assets/Image';
-import { Core } from 'Core/__mocks__/Core';
-import { ICore } from 'Core/ICore';
-import { Session } from 'Ads/Models/Session';
 
 describe('ImageAnalysisTest', () => {
-    let core: ICore;
-
     describe('ImageAnalysis', () => {
-        beforeEach(() => {
-            core = new Core();
-        });
-
         describe('analyseImage', () => {
             // @ts-ignore
             it('should return the dominant color of the asset', () => {
