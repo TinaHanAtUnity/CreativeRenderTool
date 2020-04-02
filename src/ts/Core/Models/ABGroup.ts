@@ -86,7 +86,6 @@ export const AuctionV6Test = new ABTest(18);
 export const LoadV5 = new ABTest(19);
 
 // Disabled AB Tests
-export const DiagnosticsRampDown = new DisabledABTest();
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
