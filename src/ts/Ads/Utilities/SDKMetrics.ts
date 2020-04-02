@@ -170,6 +170,7 @@ export enum LoadV5 {
     LoadRequestFailed = 'v5_load_request_failed',
     LoadRequestWasCanceled = 'v5_load_request_was_canceled',
     LoadRequestCurrentSessionMissing = 'v5_load_request_current_session_missing',
+    LoadRequestFill = 'v5_load_request_fill',
     ReloadRequestOngoing = 'v5_reload_request_ongoing',
     ReloadRequestFailed = 'v5_reload_request_failed',
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
