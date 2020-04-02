@@ -178,7 +178,8 @@ export enum LoadV5 {
     LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data',
     RefreshManagerPreloadDataExpired = 'v5_refresh_manager_preload_data_expired',
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
-    RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate'
+    RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
+    Show = 'v5_show'
 }
 
 export enum AuctionV6 {
