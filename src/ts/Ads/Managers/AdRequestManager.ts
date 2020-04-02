@@ -399,7 +399,7 @@ export class AdRequestManager extends CampaignManager {
     }
 
     private parsePreloadData(response: IRawAuctionV5Response): IPlacementIdMap<IParsedPlacementPreloadData> | null {
-        if (!response.preloadData || !response.encryptedPreloadData) {
+        if (!response.preloadData) {
             return null;
         }
 
@@ -411,7 +411,7 @@ export class AdRequestManager extends CampaignManager {
                 preloadData[placementPreloadData] = {
                     ttlInSeconds: value.ttlInSeconds,
                     campaignAvailable: value.campaignAvailable,
-                    data: response.encryptedPreloadData[value.dataIndex]
+                    data: response.encryptedPreloadData ? response.encryptedPreloadData[value.dataIndex] || '' : ''
                 };
             }
         }
@@ -436,6 +436,11 @@ export class AdRequestManager extends CampaignManager {
                     trackingUrls = response.tracking[trackingId];
                 }
             }
+        }
+
+        // This is no fill case, just return undefined
+        if (!mediaId && !trackingUrls) {
+            return Promise.resolve(undefined);
         }
 
         if (this._currentSession === null) {
