@@ -1,6 +1,7 @@
 # Pending
 
 * Revert "[Load V5] Enable AB test" [#14217](https://github.com/Applifier/unity-ads-webview/pull/14217)
+* [Auction V6] Fix Bug with Banners [#14224](https://github.com/Applifier/unity-ads-webview/pull/14224)
 
 # Wed Apr  1 18:59:16 UTC 2020
 
