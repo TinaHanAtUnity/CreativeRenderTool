@@ -202,4 +202,11 @@ export class CustomFeatures {
                gameId === '1543461' || // richardh, test app (Google Play Store)
                gameId === '80222';   // Pocketgems, Episode (Google Play Store)
     }
+
+    public static shouldVideoOverlayRemainVisible(gameId: string): boolean {
+        return gameId === '1046481' ||
+               gameId === '1050871' ||
+               gameId === '1048767' ||
+               gameId === '1060862';
+    }
 }
