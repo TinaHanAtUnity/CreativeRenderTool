@@ -20,7 +20,7 @@ export class Swatch {
 
     public population: number;
 
-    constructor(color: number[], population: number) {
+    constructor(color: [number, number, number], population: number) {
         this.color = new Color(color[0], color[1], color[2]);
         this.population = population;
     }
