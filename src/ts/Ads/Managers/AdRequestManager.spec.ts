@@ -257,9 +257,8 @@ class SatisfiesMatcher {
                 loadedCampaign2 = await adRequestManager.requestLoad('rewardedVideo');
             });
 
-            it('should load both campaigns', () => {
-                expect(loadedCampaign1).toBeDefined();
-                expect(loadedCampaign2).toBeDefined();
+            it('should send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
             });
 
             it('should not increase request count in game session counter', () => {
@@ -450,6 +449,10 @@ class SatisfiesMatcher {
 
             it('should not load campaign', () => {
                 expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should not send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill);
             });
 
             it('should not trigger error metric', () => {

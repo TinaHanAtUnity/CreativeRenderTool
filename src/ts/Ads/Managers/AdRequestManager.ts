@@ -257,6 +257,9 @@ export class AdRequestManager extends CampaignManager {
             return this.parseLoadResponse(response, this._adsConfig.getPlacement(placementId));
         }).then((campaign) => {
             delete this._ongoingLoadRequests[placementId];
+            if (campaign) {
+                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestFill);
+            }
             return campaign;
         }).catch((err) => {
             delete this._ongoingLoadRequests[placementId];
