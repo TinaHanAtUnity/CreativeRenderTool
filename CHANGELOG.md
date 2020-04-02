@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Handling no fill case better for preload and load [#14222](https://github.com/Applifier/unity-ads-webview/pull/14222)
+
 # Thu Apr  2 00:43:15 UTC 2020
 
 * Revert "[Load V5] Enable AB test" [#14217](https://github.com/Applifier/unity-ads-webview/pull/14217)
