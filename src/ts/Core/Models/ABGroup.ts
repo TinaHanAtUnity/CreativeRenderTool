@@ -81,12 +81,12 @@ export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
 export const PrivacySDKTest = new ABTest(16);
-export const DiagnosticsRampDown = new ABTest(15);
 export const AuctionXHR = new DisabledABTest();
 export const AuctionV6Test = new ABTest(18);
 export const LoadV5 = new ABTest(19);
 
 // Disabled AB Tests
+export const DiagnosticsRampDown = new DisabledABTest();
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const HtmlEndcardTest = new DisabledABTest();
