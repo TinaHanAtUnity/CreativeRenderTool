@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Disable test [#14255](https://github.com/Applifier/unity-ads-webview/pull/14255)
 * [Load V5] Send metric when load request has fill [#14227](https://github.com/Applifier/unity-ads-webview/pull/14227)
 * [Load V5] Add show metric [#14254](https://github.com/Applifier/unity-ads-webview/pull/14254)
 
