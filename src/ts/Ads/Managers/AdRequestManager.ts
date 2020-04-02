@@ -532,8 +532,8 @@ export class AdRequestManager extends CampaignManager {
         }
 
         return Promise.all(
-            placementsToLoad.map((x) => this.parseCampaign(json, x, auctionStatusCode).catch(() => {
-                SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestParseCampaignFailed);
+            placementsToLoad.map((x) => this.parseCampaign(json, x, auctionStatusCode).catch((err) => {
+                this.handleError(LoadV5.ReloadRequestParseCampaignFailed, err);
                 return undefined;
             }))
         ).then((loadedCampaigns) => {
