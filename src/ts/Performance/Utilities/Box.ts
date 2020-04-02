@@ -82,7 +82,7 @@ export class Box {
         return this._diffR * this._diffG * this._diffB;
     }
 
-    public avg(): number[] {
+    public avg(): [number, number, number] {
         return [this._avgR, this._avgG, this._avgB];
     }
 
