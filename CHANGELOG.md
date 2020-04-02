@@ -1,5 +1,10 @@
 # Pending
 
+* [Load V5] Send metric when load request has fill [#14227](https://github.com/Applifier/unity-ads-webview/pull/14227)
+* [Load V5] Add show metric [#14254](https://github.com/Applifier/unity-ads-webview/pull/14254)
+
+# Thu Apr  2 18:01:21 UTC 2020
+
 * [Load V5] Enable AB Test, Attempt 2 [#14228](https://github.com/Applifier/unity-ads-webview/pull/14228)
 * [Load V5] Handling no fill case better for preload and load [#14222](https://github.com/Applifier/unity-ads-webview/pull/14222)
 * [Load V5] Improve handling when parsing campaign [#14223](https://github.com/Applifier/unity-ads-webview/pull/14223)
