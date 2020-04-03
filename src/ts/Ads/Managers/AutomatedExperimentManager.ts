@@ -275,7 +275,7 @@ export class AutomatedExperimentManager {
             { l: 'coppaCompliant', c: 'coppa_compliant' },
             { l: 'limitAdTracking', c: 'limit_ad_tracking' },
             { l: 'gdpr_enabled', c: undefined },
-            { l: 'opt_out_Recorded', c: undefined },
+            { l: 'opt_out_recorded', c: undefined },
             { l: 'opt_out_enabled', c: undefined },
 
             //DEMOGRAPHIC
@@ -311,7 +311,7 @@ export class AutomatedExperimentManager {
                     ...res[1],
                     ...res[2],
                     'gdpr_enabled': this._privacySdk.isGDPREnabled(),
-                    'opt_out_Recorded': this._privacySdk.isOptOutRecorded(),
+                    'opt_out_recorded': this._privacySdk.isOptOutRecorded(),
                     'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
                     'platform': Platform[this._nativeBridge.getPlatform()],
                     'stores': this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,

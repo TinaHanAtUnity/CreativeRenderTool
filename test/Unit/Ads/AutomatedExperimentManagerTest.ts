@@ -96,7 +96,7 @@ describe('AutomatedExperimentManagerTests', () => {
         coppa_compliant: false,
         limit_ad_tracking: true,
         gdpr_enabled: false,
-        opt_out_Recorded: false,
+        opt_out_recorded: false,
         opt_out_enabled: false,
         country: 'FI',
         language: 'en_US',
