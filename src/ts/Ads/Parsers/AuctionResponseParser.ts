@@ -30,10 +30,16 @@ export class AuctionResponseParser {
 
         Object.keys(events).forEach(((eventKey: string) => {
             const eventTracking = events[eventKey] || {};
-            const params = {
+            const tempParams: { [x: string]: string } = {
                 ...eventTracking.params,
                 ...globalParams
             };
+            const params: { [x: string]: string } =  {};
+            Object.keys(tempParams).forEach(key =>  {
+                const templateKey = `{{${key}}}`;
+                params[templateKey] = tempParams[key];
+            });
+
             eventTracking.urlIndices.forEach((index) => {
                 if (index >= 0 && index < trackingTemplates.length) {
                     const tempTrackingUrls: string[] = trackingUrls[eventKey] || [];

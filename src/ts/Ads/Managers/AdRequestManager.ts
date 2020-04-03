@@ -257,6 +257,9 @@ export class AdRequestManager extends CampaignManager {
             return this.parseLoadResponse(response, this._adsConfig.getPlacement(placementId));
         }).then((campaign) => {
             delete this._ongoingLoadRequests[placementId];
+            if (campaign) {
+                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestFill);
+            }
             return campaign;
         }).catch((err) => {
             delete this._ongoingLoadRequests[placementId];
@@ -399,7 +402,7 @@ export class AdRequestManager extends CampaignManager {
     }
 
     private parsePreloadData(response: IRawAuctionV5Response): IPlacementIdMap<IParsedPlacementPreloadData> | null {
-        if (!response.preloadData || !response.encryptedPreloadData) {
+        if (!response.preloadData) {
             return null;
         }
 
@@ -411,7 +414,7 @@ export class AdRequestManager extends CampaignManager {
                 preloadData[placementPreloadData] = {
                     ttlInSeconds: value.ttlInSeconds,
                     campaignAvailable: value.campaignAvailable,
-                    data: response.encryptedPreloadData[value.dataIndex]
+                    data: response.encryptedPreloadData ? response.encryptedPreloadData[value.dataIndex] || '' : ''
                 };
             }
         }
@@ -424,18 +427,27 @@ export class AdRequestManager extends CampaignManager {
         let mediaId: string | undefined;
         let trackingUrls: ICampaignTrackingUrls | undefined;
 
-        if (response.placements.hasOwnProperty(placementId)) {
-            if (response.placements[placementId].hasOwnProperty('mediaId')) {
-                mediaId = response.placements[placementId].mediaId;
-            }
+        try {
+            if (response.placements.hasOwnProperty(placementId)) {
+                if (response.placements[placementId].hasOwnProperty('mediaId')) {
+                    mediaId = response.placements[placementId].mediaId;
+                }
 
-            if (response.placements[placementId].hasOwnProperty('trackingId')) {
-                const trackingId: string = response.placements[placementId].trackingId;
+                if (response.placements[placementId].hasOwnProperty('trackingId')) {
+                    const trackingId: string = response.placements[placementId].trackingId;
 
-                if (response.tracking[trackingId]) {
-                    trackingUrls = response.tracking[trackingId];
+                    if (response.tracking[trackingId]) {
+                        trackingUrls = response.tracking[trackingId];
+                    }
                 }
             }
+        } catch (err) {
+            return Promise.reject(new AdRequestManagerError('Failed to get media and tracking url', 'media'));
+        }
+
+        // This is no fill case, just return undefined
+        if (!mediaId && !trackingUrls) {
+            return Promise.resolve(undefined);
         }
 
         if (this._currentSession === null) {
@@ -444,32 +456,49 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (mediaId && trackingUrls) {
-            const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
-            const auctionResponse = new AuctionResponse([auctionPlacement], response.media[mediaId], mediaId, response.correlationId, auctionStatusCode);
+            let auctionPlacement: AuctionPlacement;
+            let auctionResponse: AuctionResponse;
+            let parser: CampaignParser;
 
-            const parser: CampaignParser = this.getCampaignParser(auctionResponse.getContentType());
+            try {
+                auctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
+                auctionResponse = new AuctionResponse([auctionPlacement], response.media[mediaId], mediaId, response.correlationId, auctionStatusCode);
+            } catch (err) {
+                return Promise.reject(new AdRequestManagerError('Failed to prepare AuctionPlacement and AuctionResponse', 'prep'));
+            }
 
-            return parser.parse(auctionResponse, this._currentSession).then((campaign) => {
+            try {
+                parser = this.getCampaignParser(auctionResponse.getContentType());
+            } catch (err) {
+                return Promise.reject(new AdRequestManagerError('Failed to create parser', 'create_parser'));
+            }
+
+            return parser.parse(auctionResponse, this._currentSession).catch((err) => {
+                throw new AdRequestManagerError('Failed to parse', 'campaign_parse');
+            }).then((campaign) => {
                 if (campaign) {
                     campaign.setMediaId(auctionResponse.getMediaId());
                     campaign.setIsLoadEnabled(true);
-
-                    return this._assetManager.setup(campaign).then(() => {
-                        if (trackingUrls) {
-                            return {
-                                campaign: campaign,
-                                trackingUrls: trackingUrls
-                            };
-                        } else {
-                            throw new AdRequestManagerError('No tracking URLs', 'tracking');
-                        }
-                    });
+                    return campaign;
                 } else {
-                    throw new AdRequestManagerError('Failed to read campaign', 'campaign');
+                    throw new AdRequestManagerError('Failed to read campaign', 'no_campaign');
+                }
+            }).then(campaign => {
+                return this._assetManager.setup(campaign).catch((err) => {
+                    throw new AdRequestManagerError('Failed to setup campaign', 'campaign_setup');
+                });
+            }).then((campaign) => {
+                if (trackingUrls) {
+                    return {
+                        campaign: campaign,
+                        trackingUrls: trackingUrls
+                    };
+                } else {
+                    throw new AdRequestManagerError('No tracking URLs', 'tracking');
                 }
             });
         } else {
-            throw new AdRequestManagerError('No media or tracking url', 'media_or_url');
+            return Promise.reject(new AdRequestManagerError('No media or tracking url', 'media_or_url'));
         }
     }
 

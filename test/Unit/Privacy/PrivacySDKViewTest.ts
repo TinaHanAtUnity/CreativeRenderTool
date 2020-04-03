@@ -20,7 +20,8 @@ describe('PrivacySDKViewTest', () => {
             ads: false,
             external: false,
             gameExp: false,
-            agreedOverAgeLimit: false
+            agreedOverAgeLimit: false,
+            agreementMethod: ''
         },
         {
             buildOsVersion: '10.0.3',
@@ -74,13 +75,13 @@ describe('PrivacySDKViewTest', () => {
                     document.body.removeChild(privacyView.container());
                     done();
                 },
-                onPrivacyCompleted: (userSettings: IPrivacySettings): void => {
+                onPrivacyCompleted: (privacySettings: IPrivacySettings): void => {
                     // TODO: Empty
                 },
                 onPrivacyOpenUrl: (url: string): void => {
                     // TODO: Empty
                 },
-                onPrivacyMetric: (data: { [key: string]: unknown }): void => {
+                onPrivacyMetric: (data: string): void => {
                     // TODO: Empty
                 },
                 onPrivacyFetch: (url: string, data: { [key: string]: unknown }): void => {

@@ -127,6 +127,12 @@ export enum AUIMetric {
     IgnoringNonPerformanceCampaign = 'ignoring_non_performance_campaign',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     OptimizationResponseApplied = 'campaign_optimization_response_applied',
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
+    DecisionNotReady = 'decision_not_ready',
+    InvalidEndscreenColorTintSwitches = 'invalid_endscreen_color_tint_switches',
+    InvalidEndscreenColorTintTheme = 'invalid_endscreen_color_tint_theme',
+    EndscreenColorTintError = 'endscreen_color_tint_error',
+    EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiement_name'
@@ -173,6 +179,7 @@ export enum LoadV5 {
     LoadRequestFailed = 'v5_load_request_failed',
     LoadRequestWasCanceled = 'v5_load_request_was_canceled',
     LoadRequestCurrentSessionMissing = 'v5_load_request_current_session_missing',
+    LoadRequestFill = 'v5_load_request_fill',
     ReloadRequestOngoing = 'v5_reload_request_ongoing',
     ReloadRequestFailed = 'v5_reload_request_failed',
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
@@ -181,7 +188,8 @@ export enum LoadV5 {
     LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data',
     RefreshManagerPreloadDataExpired = 'v5_refresh_manager_preload_data_expired',
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
-    RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate'
+    RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
+    Show = 'v5_show'
 }
 
 export enum AuctionV6 {
