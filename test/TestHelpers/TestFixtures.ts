@@ -162,6 +162,9 @@ import { Analytics } from 'Analytics/Analytics';
 import { Store } from 'Store/Store';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { IMonetizationApi } from 'Monetization/IMonetization';
+import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
+import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -1084,6 +1087,13 @@ export class TestFixtures {
         return {
             BannerApi: new BannerApi(nativeBridge),
             BannerListenerApi: new BannerListenerApi(nativeBridge)
+        };
+    }
+
+    public static getMonetizationApi(nativeBridge: NativeBridge): IMonetizationApi {
+        return {
+            Listener: new MonetizationListenerApi(nativeBridge),
+            PlacementContents: new PlacementContentsApi(nativeBridge)
         };
     }
 

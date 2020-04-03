@@ -52,6 +52,7 @@ import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
+import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
 import { MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -137,6 +138,7 @@ export class Ads implements IAds {
     private _automatedExperimentManager: AutomatedExperimentManager;
 
     public BannerModule: BannerModule;
+    public Monetization: Monetization;
     public AR: AR;
     public Analytics: Analytics;
     public Store: IStore;
@@ -243,6 +245,7 @@ export class Ads implements IAds {
             }
 
             this.BannerModule = new BannerModule(this._core, this);
+            this.Monetization = new Monetization(this._core, this);
             this.AR = new AR(this._core);
 
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
@@ -284,6 +287,12 @@ export class Ads implements IAds {
             this.configureAutomatedExperimentManager();
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
+
+            this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
+                if (enabled) {
+                    this.Monetization.initialize();
+                }
+            });
 
         }).then(() => {
             measurements.measure('managers_init');
@@ -599,6 +608,9 @@ export class Ads implements IAds {
             AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
             this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options);
             this.RefreshManager.setCurrentAdUnit(this._currentAdUnit, placement);
+            if (this.Monetization.isInitialized()) {
+                this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
+            }
             this._currentAdUnit.onClose.subscribe(() => {
                 this.onAdUnitClose();
                 SDKMetrics.sendBatchedEvents();
