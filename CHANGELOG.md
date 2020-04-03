@@ -1,3 +1,8 @@
+# Pending
+
+* Add AUI Endcard Dark Mode Support [#13999](https://github.com/Applifier/unity-ads-webview/pull/13999)
+* Add Color Analysis Utilities for Color Experiment [#13997](https://github.com/Applifier/unity-ads-webview/pull/13997)
+
 # Thu Apr  2 21:56:38 UTC 2020
 
 * [Load V5] Disable test [#14255](https://github.com/Applifier/unity-ads-webview/pull/14255)
