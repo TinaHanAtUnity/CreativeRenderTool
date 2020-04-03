@@ -296,12 +296,12 @@ describe('AutomatedExperimentManagerTests', () => {
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
                 user_info: {ab_group: 99, auction_id: '12345'},
+                reward: rewarded,
                 experiments:
                 [
                     {
                         experiment: testCategory + '-' + experimentID,
                         actions: FooExperimentDefaultActions,
-                        reward: rewarded,
                         metadata: 'booh'
                     }
                 ]

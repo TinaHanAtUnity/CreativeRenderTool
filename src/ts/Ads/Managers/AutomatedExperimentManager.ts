@@ -112,7 +112,7 @@ export class AutomatedExperimentManager {
     private _nativeBridge: NativeBridge;
     private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
-    private static readonly BaseUrl = 'https://auiopt.unityads.unity3d.com/';
+    public static readonly BaseUrl = 'https://auiopt.unityads.unity3d.com/';
     //public static readonly BaseUrl = 'http://127.0.0.1:3001';
     public static readonly CreateEndPoint = '/v1/experiment-categorized';
     public static readonly RewardEndPoint = '/v1/reward-categorized';
@@ -240,7 +240,6 @@ export class AutomatedExperimentManager {
             experiments.push({
                 experiment: part.id,
                 actions: part.actions,
-                reward: categorizedExp.Outcome,
                 metadata: part.metadata
             });
         }
@@ -251,6 +250,7 @@ export class AutomatedExperimentManager {
                 auction_id: campaign.getSession().getId(),
                 game_session_id: this._gameSessionID
             },
+            reward: categorizedExp.Outcome,
             experiments: experiments
         };
 
