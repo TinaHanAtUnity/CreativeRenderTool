@@ -77,7 +77,7 @@ export const FakeReverseABTest = new ReverseABTest(16, 17);
 
 // Active AB Tests
 export const MediationCacheModeAllowedTest = new ReverseABTest(5, 6);
-export const TemporaryCacheModeAllowedTest = new ABTest(18, 19);
+export const TemporaryCacheModeAllowedTest = new ABTest(15, 18);
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const LoadExperiment = new ABTest(13);
 export const LoadRefreshV4 = new ABTest(14);
