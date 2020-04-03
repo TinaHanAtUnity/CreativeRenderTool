@@ -1,7 +1,6 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
@@ -147,11 +146,9 @@ export class AutomatedExperimentManager {
 
         if (this.isCampaignTargetForExperiment(campaign)) {
 
-            for (const experimentName in this._campaign.Experiments) {
-                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
-                    this._campaign.Experiments[experiment.getName()].Active = true;
-                    return this._campaign.Experiments[experiment.getName()].Actions;
-                }
+            if (this._campaign.Experiments.hasOwnProperty(experiment.getName())) {
+                this._campaign.Experiments[experiment.getName()].Active = true;
+                return this._campaign.Experiments[experiment.getName()].Actions;
             }
 
             SDKMetrics.reportMetricEvent(AUIMetric.UnknownExperimentName);
@@ -275,7 +272,7 @@ export class AutomatedExperimentManager {
             { l: 'coppaCompliant', c: 'coppa_compliant' },
             { l: 'limitAdTracking', c: 'limit_ad_tracking' },
             { l: 'gdpr_enabled', c: undefined },
-            { l: 'opt_out_Recorded', c: undefined },
+            { l: 'opt_out_recorded', c: undefined },
             { l: 'opt_out_enabled', c: undefined },
 
             //DEMOGRAPHIC
@@ -311,7 +308,7 @@ export class AutomatedExperimentManager {
                     ...res[1],
                     ...res[2],
                     'gdpr_enabled': this._privacySdk.isGDPREnabled(),
-                    'opt_out_Recorded': this._privacySdk.isOptOutRecorded(),
+                    'opt_out_recorded': this._privacySdk.isOptOutRecorded(),
                     'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
                     'platform': Platform[this._nativeBridge.getPlatform()],
                     'stores': this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
@@ -350,7 +347,6 @@ export class AutomatedExperimentManager {
             { l: 'networkMetered', c: 'network_metered' },
             { l: 'screenBrightness', c: 'screen_brightness' },
             { l: 'video_orientation', c: undefined },
-            { l: 'local_day_time', c: undefined },
             { l: 'screenWidth', c: 'screen_width' },
             { l: 'screenHeight', c: 'screen_height' }
         ];
@@ -359,15 +355,13 @@ export class AutomatedExperimentManager {
             this._deviceInfo.getDTO(),
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
-            new Date(Date.now()),
             this._deviceInfo.getFreeSpace()
         ])
             .then((res) => {
                 const rawData: { [key: string]: ContextualFeature } = {
                     ...res[0],
                     'video_orientation': Orientation[res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
-                    'local_day_time': res[3].getHours() + res[3].getMinutes() / 60,
-                    'device_free_space': res[4]
+                    'device_free_space': res[3]
                 };
 
                 // do some enum conversions
@@ -397,6 +391,7 @@ export class AutomatedExperimentManager {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
+        const ts = new Date();
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
         features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
@@ -405,6 +400,9 @@ export class AutomatedExperimentManager {
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;
         features.is_video_cached = CampaignAssetInfo.isCached(campaign);
+        features.is_weekend = ts.getDay() === 0 || ts.getDay() === 6;
+        features.day_of_week = ts.getDay();
+        features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
         // Extract game session counters: Campaign centric
         let ids: string[] = [];
@@ -480,6 +478,11 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
+        if (!(campaign instanceof PerformanceCampaign)) {
+            SDKMetrics.reportMetricEvent(AUIMetric.IgnoringNonPerformanceCampaign);
+            return Promise.resolve();
+        }
+
         // This is to limit to 1 optmization call per Game Session.
         if (this._campaignSource !== undefined) {
             this._campaignSource.unsubscribe(this._onCampaignListener);
@@ -491,6 +494,8 @@ export class AutomatedExperimentManager {
         this._declaredExperiments.forEach(experiment => {
             this._campaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
         });
+
+        SDKMetrics.reportMetricEvent(AUIMetric.RequestingCampaignOptimization);
 
         // Fire and forget... No one resolves it/blocks on it explicitely
         return Promise.all([this._staticFeaturesPromise, this.collectDeviceContextualFeatures(), this.collectAdSpecificFeatures(campaign)])
@@ -538,6 +543,8 @@ export class AutomatedExperimentManager {
                     optmzdExperiment.MetaData = experiment.metadata;
                 }
             });
+
+            SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseApplied);
 
             return Promise.resolve();
 
