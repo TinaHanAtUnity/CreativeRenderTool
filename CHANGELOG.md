@@ -5,6 +5,8 @@
 * Fix Typo in AUI Optimization Payload [#14283](https://github.com/Applifier/unity-ads-webview/pull/14283)
 * Add Day of Week Field in AUI Optimization Payload [#14163](https://github.com/Applifier/unity-ads-webview/pull/14163)
 * Only Make AUI Optimization Request on First Performance Campaign [#14137](https://github.com/Applifier/unity-ads-webview/pull/14137)
+* [Load V5] Reason tag for reload campaign parsing error [#14284](https://github.com/Applifier/unity-ads-webview/pull/14284)
+* [Load V5] Baseline line for show [#14282](https://github.com/Applifier/unity-ads-webview/pull/14282)
 
 # Thu Apr  2 21:56:38 UTC 2020
 
