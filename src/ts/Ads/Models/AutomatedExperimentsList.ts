@@ -14,6 +14,11 @@ import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } 
 //     cacheDisabled: true
 // });
 
+export enum AutomatedExperimentsCategories {
+    PERFAD_ENDCARD = 'webview-perf-ad-endcard',
+    MRAID_AR = 'webview-ar-mraid'
+}
+
 export const ButtonExperimentDeclaration: IExperimentDeclaration = {
   animation: {
       STATIC: 'static',
@@ -39,8 +44,6 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
     cacheDisabled: true
 });
 
-export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
-
 // AR Ads
 
 export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
@@ -65,5 +68,3 @@ export const ArAvailableButtonExperiment = new AutomatedExperiment({
     },
     cacheDisabled: true
 });
-
-export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ArAvailableButtonExperiment];

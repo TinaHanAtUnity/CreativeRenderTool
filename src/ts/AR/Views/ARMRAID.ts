@@ -19,6 +19,7 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { IArUiExperiments } from 'AR/Experiments/ARUIExperiments';
 import { Color } from 'Core/Utilities/Color';
 
@@ -109,7 +110,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this.hideArAvailableButton();
                         this.showARPermissionPanel();
                         this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
-                        this._automatedExperimentManager.rewardExperiments(campaign);
+                        this._automatedExperimentManager.rewardSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
                     }
                 },
                 selector: '.ar-available-button'
@@ -203,8 +204,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         this.showLoadingScreen();
-
-        this._automatedExperimentManager.startCampaign(this._campaign);
     }
 
     public hide() {
@@ -236,7 +235,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.hide();
         this._mraidAdapterContainer.disconnect();
 
-        this._automatedExperimentManager.endCampaign(this._campaign);
+        this._automatedExperimentManager.endSelectedExperiment(this._campaign, AutomatedExperimentsCategories.MRAID_AR);
     }
 
     private showLoadingScreen() {

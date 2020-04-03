@@ -1,7 +1,7 @@
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
 import { IPerformanceAdUnitWithAutomatedExperimentParameters } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperiment';
-
+import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 export class IOSPerformanceAdUnitWithAutomatedExperiment extends IOSPerformanceAdUnit {
 
     private _automatedExperimentManager: AutomatedExperimentManager;
@@ -11,13 +11,8 @@ export class IOSPerformanceAdUnitWithAutomatedExperiment extends IOSPerformanceA
         this._automatedExperimentManager = parameters.automatedExperimentManager;
     }
 
-    public show(): Promise<void> {
-        this._automatedExperimentManager.startCampaign(this.getCampaign());
-        return super.show();
-    }
-
     public hide(): Promise<void> {
-        this._automatedExperimentManager.endCampaign(this.getCampaign());
+        this._automatedExperimentManager.endSelectedExperiment(this.getCampaign(), AutomatedExperimentsCategories.PERFAD_ENDCARD);
 
         return super.hide();
     }

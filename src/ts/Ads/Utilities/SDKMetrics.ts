@@ -117,7 +117,8 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
-    CampaignAlreadyActive = 'campaign_already_active',
+    CampaignCategoryAlreadyActive = 'campaign_category_already_active',
+    CampaignCategoryInactive = 'campaign_category_inactive',
     CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
     FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',
@@ -126,7 +127,7 @@ export enum AUIMetric {
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
-    UnknownExperimentName = 'unknown_experiement_name'
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }
 
 export enum GeneralTimingMetric {

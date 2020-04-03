@@ -1,6 +1,6 @@
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { ArAvailableButtonExperiment } from 'Ads/Models/AutomatedExperimentsList';
-import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
+import { AutomatedExperimentsCategories, ArAvailableButtonExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { Campaign } from 'Ads/Models/Campaign';
 
 export interface IArUiExperiments {
@@ -9,10 +9,19 @@ export interface IArUiExperiments {
 }
 
 export function arAvailableButtonDecision(automatedExperimentManager: AutomatedExperimentManager, campaign: Campaign): IArUiExperiments {
-    const arAvailableButtonCombination = automatedExperimentManager.activateExperiment(campaign, ArAvailableButtonExperiment);
+    let actions: IExperimentActionChoice | undefined;
+
+    const experimentID = automatedExperimentManager.getSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
+    if (experimentID === ArAvailableButtonExperiment.getName()) {
+        actions = automatedExperimentManager.activateSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
+    }
+
+    if (actions === undefined) {
+        actions = ArAvailableButtonExperiment.getDefaultActions();
+    }
 
     return {
-        color: arAvailableButtonCombination.color,
-        skip: arAvailableButtonCombination.skip
+        color: actions.color,
+        skip: actions.skip
     };
 }

@@ -50,17 +50,10 @@ const FooExperimentDefaultActions = {
     action2: FooExperimentDeclaration.action2.choiceA
 };
 
-const FooExperiment = new AutomatedExperiment({
-    name: 'FooExperiment',
-    actions: FooExperimentDeclaration,
-    defaultActions: FooExperimentDefaultActions
-});
-
 describe('AutomatedExperimentManagerTests', () => {
-    const baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
-    const createEndPoint = 'experiment';
-    const rewardEndPoint = 'reward';
-
+    const testCategory = 'TestCategory';
+    const experimentID = 'test-exp';
+    const campaignType = 'PerformanceCampaign'; // must match type of object returned by TestFixtures.getCampaign()
     const sandbox = sinon.createSandbox();
     let backend: Backend;
     let nativeBridge: NativeBridge;
@@ -172,22 +165,28 @@ describe('AutomatedExperimentManagerTests', () => {
         });
     }
 
-    it(`initialize with request ok, no experiments`, () => {
-        const postUrl = baseUrl + createEndPoint;
-
-        const postStub = sandbox.stub(core.RequestManager, 'post')
-            .withArgs(postUrl)
-            .resolves(<INativeResponse>{
-                responseCode: 200,
-                response: ''
-            });
-
-        return aem.onNewCampaign(campaign)
-        .then(() => aem.startCampaign(campaign))
-        .then(() => {
-            assert.isFalse(postStub.called);
+    function genExperimentResponseBody(actions?: any) {
+        if (actions === undefined) {
+            actions = FooExperimentDefaultActions;
+        }
+        return JSON.stringify({
+            categories:
+            {
+                TestCategory:
+                {
+                    experiment_name: experimentID,
+                    parts:
+                    [
+                        {
+                            id: testCategory + '-' + experimentID,
+                            actions: actions,
+                            metadata: 'booh'
+                        }
+                    ]
+                }
+            }
         });
-    });
+    }
 
     [
         {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
@@ -196,31 +195,33 @@ describe('AutomatedExperimentManagerTests', () => {
         {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
-            const postUrl = baseUrl + createEndPoint;
-            const responseText = JSON.stringify({experiments: {FooExperiment: action}});
+            const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
                 .withArgs(postUrl)
                 .resolves(<INativeResponse>{
                     responseCode: 200,
-                    response: responseText
+                    response: genExperimentResponseBody(action)
                 });
 
             aem.initialize(core, campaignSource);
-            aem.registerExperiments([FooExperiment]);
+            aem.registerExperimentCategory(testCategory, campaignType);
 
             return aem.onNewCampaign(campaign)
-                .then(() => aem.startCampaign(campaign))
                 .then(() => {
                     assert.isTrue(postStub.called);
                     assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
-                    assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(action), 'Wrong variant...');
+
+                    assert.equal(aem.getSelectedExperiment(campaign, testCategory), experimentID);
+
+                    const selectedActions = aem.activateSelectedExperiment(campaign, testCategory);
+                    assert.equal(JSON.stringify(selectedActions), JSON.stringify(action), 'Wrong variant...');
             });
         });
     });
 
-    it(`send proper request, receive garbage, use default action`, () => {
-        const postUrl = baseUrl + createEndPoint;
+    it(`send proper request, receive garbage, returns undefined actions`, () => {
+        const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
         const responseText = 'not json';
 
         const postStub = sandbox.stub(core.RequestManager, 'post')
@@ -235,20 +236,20 @@ describe('AutomatedExperimentManagerTests', () => {
             .returns(true);
 
         aem.initialize(core, campaignSource);
-        aem.registerExperiments([FooExperiment]);
+        aem.registerExperimentCategory(testCategory, campaignType);
         return aem.onNewCampaign(campaign)
-        .then(() => aem.startCampaign(campaign))
         .then(() => {
             assert.isTrue(postStub.called);
             assert.isTrue(metricStub.calledOnce);
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-            assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
+            assert.equal(aem.getSelectedExperiment(campaign, testCategory), '');
+            assert.equal(aem.activateSelectedExperiment(campaign, testCategory), undefined);
         });
     });
 
-    it('initialize with request failure, use default action', () => {
-        const postUrl = baseUrl + createEndPoint;
+    it('initialize with request failure, returns undefined actions', () => {
+        const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
         const responseText = JSON.stringify({});
 
         const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
@@ -263,58 +264,62 @@ describe('AutomatedExperimentManagerTests', () => {
             });
 
         aem.initialize(core, campaignSource);
-        aem.registerExperiments([FooExperiment]);
+        aem.registerExperimentCategory(testCategory, campaignType);
         return aem.onNewCampaign(campaign)
-        .then(() => aem.startCampaign(campaign))
         .then(() => {
             assert.isTrue(postStub.called);
             assert.isTrue(metricStub.calledOnce);
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-            assert.equal(JSON.stringify(aem.activateExperiment(campaign, FooExperiment)), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant...');
+            assert.equal(aem.getSelectedExperiment(campaign, testCategory), '');
+            assert.equal(aem.activateSelectedExperiment(campaign, testCategory), undefined);
         });
     });
 
     [0, 1].forEach((rewarded) => {
         it(`experiment, rewarded(${rewarded})`, () => {
             const postStub = sandbox.stub(core.RequestManager, 'post');
-
-            const responseText = JSON.stringify({experiments: {FooExperiment: FooExperimentDefaultActions}});
-
-            postStub.onCall(0).resolves(<INativeResponse>{
+            postStub.onFirstCall().resolves(<INativeResponse>{
                 responseCode: 200,
-                response: responseText
+                response: genExperimentResponseBody()
             });
 
-            const rewardPostUrl = baseUrl + rewardEndPoint;
+            const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: {ab_group: 99, auction_id: '12345'}, experiment: 'FooExperiment', actions: FooExperimentDefaultActions, reward: rewarded, metadata: ''
+                user_info: {ab_group: 99, auction_id: '12345'},
+                experiments:
+                [
+                    {
+                        experiment: testCategory + '-' + experimentID,
+                        actions: FooExperimentDefaultActions,
+                        reward: rewarded,
+                        metadata: 'booh'
+                    }
+                ]
             });
-            const rewardResponseText = JSON.stringify({success: true});
 
-            const postStubReward = postStub.onCall(2).resolves(<INativeResponse>{
+            const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
                 responseCode: 200,
-                response: rewardResponseText
+                response: JSON.stringify({success: true})
             });
 
             aem.initialize(core, campaignSource);
-            aem.registerExperiments([FooExperiment]);
+            aem.registerExperimentCategory(testCategory, campaignType);
             return aem.onNewCampaign(campaign)
-            .then(() => aem.startCampaign(campaign))
-            .then(() => {
-                const variant = aem.activateExperiment(campaign, FooExperiment);
-                assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
+                .then(() => {
+                    assert.equal(aem.getSelectedExperiment(campaign, testCategory), experimentID);
+                    const variant = aem.activateSelectedExperiment(campaign, testCategory);
+                    assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
 
-                if (rewarded) {
-                    aem.rewardExperiments(campaign);
-                }
-
-            }).then(() => {
-                return aem.endCampaign(campaign);
-            }).then(() => {
-                assert(postStub.calledTwice);
-                assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
-            });
+                    if (rewarded) {
+                        return aem.rewardSelectedExperiment(campaign, testCategory);
+                    }
+                }).then(() => {
+                    return aem.endSelectedExperiment(campaign, testCategory);
+                }).then(() => {
+                    assert(postStub.calledTwice);
+                    assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
+                });
         });
     });
 
@@ -374,17 +379,35 @@ describe('AutomatedExperimentManagerTests', () => {
         });
     });
 
-    it(`Experiment defaults cleanly if initialize is not called`, () => {
+    it(`Attempting to activate experiment when nothing has been initialized, generates no errors and returns undefined actions`, () => {
         const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
-            .withArgs(AUIMetric.FailedToFetchAutomatedExperiements)
             .returns(true);
 
-        aem.registerExperiments([FooExperiment]);
-        aem.startCampaign(campaign);
-        const variant = aem.activateExperiment(campaign, FooExperiment);
-        assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
-        assert.isTrue(metricStub.notCalled);
+        aem.registerExperimentCategory(testCategory, campaignType);
+        assert.equal(aem.activateSelectedExperiment(campaign, testCategory), undefined);
 
-        return aem.endCampaign(campaign);
+        assert.isTrue(metricStub.notCalled);
+    });
+
+    it(`Attempting to activate experiment for non-registered category, triggers error reporting and returns undefined actions`, () => {
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .returns(true);
+
+        const postStub = sandbox.stub(core.RequestManager, 'post');
+        postStub.onFirstCall().resolves(<INativeResponse>{
+            responseCode: 200,
+            response: genExperimentResponseBody()
+        });
+
+        aem.initialize(core, campaignSource);
+        aem.registerExperimentCategory(testCategory, campaignType);
+
+        return aem.onNewCampaign(campaign)
+            .then(() => {
+                assert.equal(metricStub.callCount, 0);
+                assert.equal(aem.activateSelectedExperiment(campaign, 'fooBar'), undefined);
+
+                assert.equal(metricStub.callCount, 1);
+            });
     });
 });

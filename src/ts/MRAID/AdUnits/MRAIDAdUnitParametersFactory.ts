@@ -16,8 +16,7 @@ import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { ArAutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList';
-import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { arAvailableButtonDecision } from 'AR/Experiments/ARUIExperiments';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
@@ -42,7 +41,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         this._automatedExperimentManager = automatedExperimentManager;
 
         if (ads.Config.getHasArPlacement()) {
-            this._automatedExperimentManager.registerExperiments(ArAutomatedExperimentsList);
+            this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.MRAID_AR, 'MRAIDCampaign');
         }
 
         this._ar = ar;
