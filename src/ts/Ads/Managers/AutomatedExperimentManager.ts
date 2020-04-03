@@ -112,8 +112,8 @@ export class AutomatedExperimentManager {
     private _nativeBridge: NativeBridge;
     private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
-    //private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/';
-    public static readonly BaseUrl = 'http://127.0.0.1:3001';
+    private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/';
+    //public static readonly BaseUrl = 'http://127.0.0.1:3001';
     public static readonly CreateEndPoint = '/v1/experiment-categorized';
     public static readonly RewardEndPoint = '/v1/reward-categorized';
 
@@ -288,7 +288,7 @@ export class AutomatedExperimentManager {
             { l: 'coppaCompliant', c: 'coppa_compliant' },
             { l: 'limitAdTracking', c: 'limit_ad_tracking' },
             { l: 'gdpr_enabled', c: undefined },
-            { l: 'opt_out_Recorded', c: undefined },
+            { l: 'opt_out_recorded', c: undefined },
             { l: 'opt_out_enabled', c: undefined },
 
             //DEMOGRAPHIC
@@ -324,7 +324,7 @@ export class AutomatedExperimentManager {
                     ...res[1],
                     ...res[2],
                     'gdpr_enabled': this._privacySdk.isGDPREnabled(),
-                    'opt_out_Recorded': this._privacySdk.isOptOutRecorded(),
+                    'opt_out_recorded': this._privacySdk.isOptOutRecorded(),
                     'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
                     'platform': Platform[this._nativeBridge.getPlatform()],
                     'stores': this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
@@ -363,7 +363,6 @@ export class AutomatedExperimentManager {
             { l: 'networkMetered', c: 'network_metered' },
             { l: 'screenBrightness', c: 'screen_brightness' },
             { l: 'video_orientation', c: undefined },
-            { l: 'local_day_time', c: undefined },
             { l: 'screenWidth', c: 'screen_width' },
             { l: 'screenHeight', c: 'screen_height' }
         ];
@@ -372,15 +371,13 @@ export class AutomatedExperimentManager {
             this._deviceInfo.getDTO(),
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
-            new Date(Date.now()),
             this._deviceInfo.getFreeSpace()
         ])
             .then((res) => {
                 const rawData: { [key: string]: ContextualFeature } = {
                     ...res[0],
                     'video_orientation': Orientation[res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
-                    'local_day_time': res[3].getHours() + res[3].getMinutes() / 60,
-                    'device_free_space': res[4]
+                    'device_free_space': res[3]
                 };
 
                 // do some enum conversions
@@ -410,6 +407,7 @@ export class AutomatedExperimentManager {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
+        const ts = new Date();
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
         features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
@@ -418,6 +416,9 @@ export class AutomatedExperimentManager {
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;
         features.is_video_cached = CampaignAssetInfo.isCached(campaign);
+        features.is_weekend = ts.getDay() === 0 || ts.getDay() === 6;
+        features.day_of_week = ts.getDay();
+        features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
         // Extract game session counters: Campaign centric
         let ids: string[] = [];
@@ -505,6 +506,8 @@ export class AutomatedExperimentManager {
             this._campaign.CategorizedExperiments[cat] = new CategorizedExperiment();
         }
 
+        SDKMetrics.reportMetricEvent(AUIMetric.RequestingCampaignOptimization);
+
         // Fire and forget... No one resolves it/blocks on it explicitely
         return Promise.all([this._staticFeaturesPromise, this.collectDeviceContextualFeatures(), this.collectAdSpecificFeatures(campaign)])
             .then((featureMaps) => {
@@ -552,6 +555,8 @@ export class AutomatedExperimentManager {
                 categorizedExp.Experiment = response.categories[category];
                 categorizedExp.Stage = AutomatedExperimentStage.OPTIMIZED;
             });
+
+            SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseApplied);
 
             return Promise.resolve();
 

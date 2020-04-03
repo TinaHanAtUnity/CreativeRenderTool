@@ -21,13 +21,18 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign } from 'Ads/Models/Campaign';
+import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5ReloadResponse = require('json/LoadV5ReloadResponse.json');
 
@@ -252,9 +257,8 @@ class SatisfiesMatcher {
                 loadedCampaign2 = await adRequestManager.requestLoad('rewardedVideo');
             });
 
-            it('should load both campaigns', () => {
-                expect(loadedCampaign1).toBeDefined();
-                expect(loadedCampaign2).toBeDefined();
+            it('should send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
             });
 
             it('should not increase request count in game session counter', () => {
@@ -357,6 +361,162 @@ class SatisfiesMatcher {
                 });
             });
         });
+
+        describe('successful load request with no fill from preload', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse_NoFill),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockReturnValue(Placement());
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should load campaign', () => {
+                expect(loadedCampaign).toBeDefined();
+            });
+
+            it('should have correct in loadedCampaign', () => {
+                expect(loadedCampaign!.campaign.getId()).toEqual('5be40c5f602f4510ec583881');
+            });
+
+            it('should make request with correct body', () => {
+                expect(request.post).toHaveBeenCalledTimes(2);
+                expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    isLoadEnabled: true,
+                    preload: false,
+                    load: true,
+                    preloadPlacements: {},
+                    placements: {
+                        video: {
+                            adTypes: ['VIDEO'],
+                            allowSkip: false,
+                            auctionType: 'cpm'
+                        }
+                    },
+                    preloadData: {
+                        video: {
+                            campaignAvailable: false,
+                            data: ''
+                        }
+                    }
+                }), [], {
+                    followRedirects: false,
+                    retries: 0,
+                    retryDelay: 10000,
+                    retryWithConnectionEvents: false
+                });
+            });
+        });
+
+        describe('successful load request with no fill', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_NoFill),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockReturnValue(Placement());
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should not load campaign', () => {
+                expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should not send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill);
+            });
+
+            it('should not trigger error metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill and no fill from preload', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse_NoFill),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_NoFill),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockReturnValue(Placement());
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should not load campaign', () => {
+                expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should make request with correct body', () => {
+                expect(request.post).toHaveBeenCalledTimes(2);
+                expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    isLoadEnabled: true,
+                    preload: false,
+                    load: true,
+                    preloadPlacements: {},
+                    placements: {
+                        video: {
+                            adTypes: ['VIDEO'],
+                            allowSkip: false,
+                            auctionType: 'cpm'
+                        }
+                    },
+                    preloadData: {
+                        video: {
+                            campaignAvailable: false,
+                            data: ''
+                        }
+                    }
+                }), [], {
+                    followRedirects: false,
+                    retries: 0,
+                    retryDelay: 10000,
+                    retryWithConnectionEvents: false
+                });
+            });
+        });
+
 
         describe('load request when no preload data', () => {
             let loadedCampaign: ILoadedCampaign | undefined;

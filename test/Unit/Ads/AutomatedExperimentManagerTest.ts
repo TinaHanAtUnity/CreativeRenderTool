@@ -89,7 +89,7 @@ describe('AutomatedExperimentManagerTests', () => {
         coppa_compliant: false,
         limit_ad_tracking: true,
         gdpr_enabled: false,
-        opt_out_Recorded: false,
+        opt_out_recorded: false,
         opt_out_enabled: false,
         country: 'FI',
         language: 'en_US',
@@ -135,7 +135,9 @@ describe('AutomatedExperimentManagerTests', () => {
         gsc_campaign_last_start_ts: ['sdfsfs'],
         gsc_target_games: ['2'],
         gsc_target_game_starts: [0],
-        gsc_target_game_views: [0]
+        gsc_target_game_views: [0],
+        day_of_week: 0,
+        is_weekend: true
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
@@ -196,6 +198,9 @@ describe('AutomatedExperimentManagerTests', () => {
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
             const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
+
+            sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .returns(true);
 
             const postStub = sandbox.stub(core.RequestManager, 'post')
                 .withArgs(postUrl)
@@ -278,6 +283,10 @@ describe('AutomatedExperimentManagerTests', () => {
 
     [0, 1].forEach((rewarded) => {
         it(`experiment, rewarded(${rewarded})`, () => {
+
+            sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .returns(true);
+
             const postStub = sandbox.stub(core.RequestManager, 'post');
             postStub.onFirstCall().resolves(<INativeResponse>{
                 responseCode: 200,
@@ -379,6 +388,19 @@ describe('AutomatedExperimentManagerTests', () => {
         });
     });
 
+    it('AutomatedExperimentManager ignores non performance campaigns', () => {
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+        .returns(true);
+
+        aem.initialize(core, campaignSource);
+        aem.registerExperimentCategory(testCategory, campaignType);
+        const otherTypeCampaign = TestFixtures.getXPromoCampaign();
+        return aem.onNewCampaign(otherTypeCampaign)
+            .then(() => {
+                assert.equal(aem.getSelectedExperiment(otherTypeCampaign, testCategory), '');
+            });
+    });
+
     it(`Attempting to activate experiment when nothing has been initialized, generates no errors and returns undefined actions`, () => {
         const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
             .returns(true);
@@ -404,10 +426,9 @@ describe('AutomatedExperimentManagerTests', () => {
 
         return aem.onNewCampaign(campaign)
             .then(() => {
-                assert.equal(metricStub.callCount, 0);
                 assert.equal(aem.activateSelectedExperiment(campaign, 'fooBar'), undefined);
 
-                assert.equal(metricStub.callCount, 1);
+                assert.isTrue(metricStub.calledWith(AUIMetric.UnknownCategoryProvided));
             });
     });
 });

@@ -1,3 +1,35 @@
+# Fri Apr  3 17:32:38 UTC 2020
+
+* [Auction V6] Temporarily Disable Test [#14315](https://github.com/Applifier/unity-ads-webview/pull/14315)
+* Add AUI Endcard Dark Mode Support [#13999](https://github.com/Applifier/unity-ads-webview/pull/13999)
+* Add Color Analysis Utilities for Color Experiment [#13997](https://github.com/Applifier/unity-ads-webview/pull/13997)
+* Fix Typo in AUI Optimization Payload [#14283](https://github.com/Applifier/unity-ads-webview/pull/14283)
+* Add Day of Week Field in AUI Optimization Payload [#14163](https://github.com/Applifier/unity-ads-webview/pull/14163)
+* Only Make AUI Optimization Request on First Performance Campaign [#14137](https://github.com/Applifier/unity-ads-webview/pull/14137)
+* [Load V5] Reason tag for reload campaign parsing error [#14284](https://github.com/Applifier/unity-ads-webview/pull/14284)
+* [Load V5] Baseline line for show [#14282](https://github.com/Applifier/unity-ads-webview/pull/14282)
+
+# Thu Apr  2 21:56:38 UTC 2020
+
+* [Load V5] Disable test [#14255](https://github.com/Applifier/unity-ads-webview/pull/14255)
+* [Load V5] Send metric when load request has fill [#14227](https://github.com/Applifier/unity-ads-webview/pull/14227)
+* [Load V5] Add show metric [#14254](https://github.com/Applifier/unity-ads-webview/pull/14254)
+
+# Thu Apr  2 18:01:21 UTC 2020
+
+* [Load V5] Enable AB Test, Attempt 2 [#14228](https://github.com/Applifier/unity-ads-webview/pull/14228)
+* [Load V5] Handling no fill case better for preload and load [#14222](https://github.com/Applifier/unity-ads-webview/pull/14222)
+* [Load V5] Improve handling when parsing campaign [#14223](https://github.com/Applifier/unity-ads-webview/pull/14223)
+
+# Thu Apr  2 00:43:15 UTC 2020
+
+* Revert "[Load V5] Enable AB test" [#14217](https://github.com/Applifier/unity-ads-webview/pull/14217)
+* [Auction V6] Fix Bug with Banners [#14224](https://github.com/Applifier/unity-ads-webview/pull/14224)
+
+# Wed Apr  1 18:59:16 UTC 2020
+
+* [Load V5] Enable AB test [#14164](https://github.com/Applifier/unity-ads-webview/pull/14164/files)
+
 # Wed Apr  1 15:21:28 UTC 2020
 
 * Privacy SDK metrics callback [#14041](https://github.com/Applifier/unity-ads-webview/pull/14041)

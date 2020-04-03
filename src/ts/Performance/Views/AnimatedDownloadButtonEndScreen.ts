@@ -55,6 +55,10 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         }
     }
 
+    private applyDarkMode() {
+        document.body.classList.add('dark-mode');
+    }
+
     public show(): void {
         super.show();
         window.addEventListener('resize', this.handleResize, false);
