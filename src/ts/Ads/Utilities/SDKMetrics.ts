@@ -125,6 +125,12 @@ export enum AUIMetric {
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
+    AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
+    DecisionNotReady = 'decision_not_ready',
+    InvalidEndscreenColorTintSwitches = 'invalid_endscreen_color_tint_switches',
+    InvalidEndscreenColorTintTheme = 'invalid_endscreen_color_tint_theme',
+    EndscreenColorTintError = 'endscreen_color_tint_error',
+    EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     UnknownExperimentName = 'unknown_experiement_name'
 }
