@@ -1,5 +1,6 @@
 # Pending
 
+* [Auction V6] Temporarily Disable Test [#14315](https://github.com/Applifier/unity-ads-webview/pull/14315)
 * Add AUI Endcard Dark Mode Support [#13999](https://github.com/Applifier/unity-ads-webview/pull/13999)
 * Add Color Analysis Utilities for Color Experiment [#13997](https://github.com/Applifier/unity-ads-webview/pull/13997)
 * Fix Typo in AUI Optimization Payload [#14283](https://github.com/Applifier/unity-ads-webview/pull/14283)
