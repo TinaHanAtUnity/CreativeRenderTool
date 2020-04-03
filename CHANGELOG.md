@@ -4,6 +4,7 @@
 * Add Color Analysis Utilities for Color Experiment [#13997](https://github.com/Applifier/unity-ads-webview/pull/13997)
 * Fix Typo in AUI Optimization Payload [#14283](https://github.com/Applifier/unity-ads-webview/pull/14283)
 * Add Day of Week Field in AUI Optimization Payload [#14163](https://github.com/Applifier/unity-ads-webview/pull/14163)
+* Only Make AUI Optimization Request on First Performance Campaign [#14137](https://github.com/Applifier/unity-ads-webview/pull/14137)
 
 # Thu Apr  2 21:56:38 UTC 2020
 
