@@ -198,6 +198,9 @@ describe('AutomatedExperimentManagerTests', () => {
         {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
+            sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .returns(true);
+
             const postUrl = baseUrl + createEndPoint;
             const responseText = JSON.stringify({experiments: {FooExperiment: action}});
 
@@ -280,6 +283,9 @@ describe('AutomatedExperimentManagerTests', () => {
     [0, 1].forEach((rewarded) => {
         it(`experiment, rewarded(${rewarded})`, () => {
             const postStub = sandbox.stub(core.RequestManager, 'post');
+
+            sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .returns(true);
 
             const responseText = JSON.stringify({experiments: {FooExperiment: FooExperimentDefaultActions}});
 
@@ -373,6 +379,18 @@ describe('AutomatedExperimentManagerTests', () => {
         })
         .then(() => {
             assert(onNewCampaignStub.calledOnce);
+        });
+    });
+
+    it('AutomatedExperimentManager ignores non performance campaigns', () => {
+        const metricStub = sandbox.stub(SDKMetrics, 'reportMetricEvent')
+        .returns(true);
+
+        aem.initialize(core, campaignSource);
+        aem.registerExperiments([FooExperiment]);
+        return aem.onNewCampaign(TestFixtures.getXPromoCampaign())
+            .then(() => {
+                assert.isTrue(metricStub.calledOnceWith(AUIMetric.IgnoringNonPerformanceCampaign));
         });
     });
 
