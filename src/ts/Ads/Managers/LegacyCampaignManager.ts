@@ -757,13 +757,9 @@ export class LegacyCampaignManager extends CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.CampaignParsing, {
-            'cct': response.getContentType()
-        });
         return parser.parse(response, session).catch((error) => {
             if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
-                measurement.measure('vpaid_identified_as_vast');
                 return parser.parse(response, session);
             } else {
                 throw error;
@@ -772,7 +768,6 @@ export class LegacyCampaignManager extends CampaignManager {
             this.reportToCreativeBlockingService(error, parser.creativeID, parser.seatID, parser.campaignID);
             throw error;
         }).then((campaign) => {
-            measurement.measure('parsing_complete');
             const parseDuration = Date.now() - parseTimestamp;
             for (const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);

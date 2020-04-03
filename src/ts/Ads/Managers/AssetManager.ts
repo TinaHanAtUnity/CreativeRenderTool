@@ -87,34 +87,20 @@ export class AssetManager {
             return Promise.resolve(campaign);
         }
 
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.CacheLatency, {
-            'cmd': CacheMode[this._cacheMode],
-            'cct': campaign.getContentType(),
-            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
-        });
-
         return this.selectAssets(campaign).then(([requiredAssets, optionalAssets]) => {
-            measurement.measure('select_assets');
             const requiredChain = this.cache(requiredAssets, campaign, CacheType.REQUIRED).then(() => {
-                measurement.measure('required_assets');
-                return this.validateVideos(requiredAssets, campaign).then(() => {
-                    measurement.measure('validate_videos');
-                });
+                return this.validateVideos(requiredAssets, campaign);
             });
 
             if (this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
-                        measurement.measure('optional_assets');
-                    }).catch(() => {
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
                         // allow optional assets to fail caching when in CacheMode.FORCED
                     });
                     return campaign;
                 });
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
-                    measurement.measure('optional_assets');
-                }).catch(() => {
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
                 });
             }
