@@ -350,7 +350,6 @@ export class AutomatedExperimentManager {
             { l: 'networkMetered', c: 'network_metered' },
             { l: 'screenBrightness', c: 'screen_brightness' },
             { l: 'video_orientation', c: undefined },
-            { l: 'local_day_time', c: undefined },
             { l: 'screenWidth', c: 'screen_width' },
             { l: 'screenHeight', c: 'screen_height' }
         ];
@@ -359,15 +358,13 @@ export class AutomatedExperimentManager {
             this._deviceInfo.getDTO(),
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
-            new Date(Date.now()),
             this._deviceInfo.getFreeSpace()
         ])
             .then((res) => {
                 const rawData: { [key: string]: ContextualFeature } = {
                     ...res[0],
                     'video_orientation': Orientation[res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
-                    'local_day_time': res[3].getHours() + res[3].getMinutes() / 60,
-                    'device_free_space': res[4]
+                    'device_free_space': res[3]
                 };
 
                 // do some enum conversions
@@ -397,6 +394,7 @@ export class AutomatedExperimentManager {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
+        const ts = new Date();
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
         features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
@@ -405,6 +403,9 @@ export class AutomatedExperimentManager {
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;
         features.is_video_cached = CampaignAssetInfo.isCached(campaign);
+        features.is_weekend = ts.getDay() === 0 || ts.getDay() === 6;
+        features.day_of_week = ts.getDay();
+        features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
         // Extract game session counters: Campaign centric
         let ids: string[] = [];
