@@ -96,7 +96,6 @@ import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Manag
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
-import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
@@ -124,7 +123,6 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
-    public NofillImmediatelyManager: NofillImmediatelyManager;
 
     private static _forcedConsentUnit: boolean = false;
 
@@ -133,7 +131,6 @@ export class Ads implements IAds {
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
-    private _nofillImmediately: boolean = false;
     private _forceLoadV5: boolean = false;
     private _mediationName: string;
     private _core: ICore;
@@ -203,17 +200,6 @@ export class Ads implements IAds {
         }).then(() => {
             this.setupLoadApiEnabled();
             measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
-
-            let promise = Promise.resolve();
-
-            this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
-            if (this._nofillImmediately) {
-                promise = this.setupMediationTrackingManager().then(() => {
-                    this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
-                    return this._core.Api.Sdk.initComplete();
-                });
-            }
-            return promise;
         }).then(() => {
             measurements.measure('setup_environment');
             return this.Analytics.initialize();
@@ -313,10 +299,6 @@ export class Ads implements IAds {
             measurements.measure('init_complete_to_native');
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
-            }
-
-            if (this.NofillImmediatelyManager) {
-                this.NofillImmediatelyManager.setInitComplete();
             }
 
             if (this.PrivacyManager.isPrivacySDKTestActive()) {
@@ -422,8 +404,6 @@ export class Ads implements IAds {
                     if (CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
-                    } else if (this._nofillImmediately) {
-                        experimentType = MediationExperimentType.NofillImmediately;
                     } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
                         if (XHRequest.isAvailable()) {
                             experimentType = MediationExperimentType.AuctionXHR;
