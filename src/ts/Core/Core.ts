@@ -128,11 +128,10 @@ export class Core implements ICore {
         if (performance && performance.now) {
             loadTime = performance.now();
         }
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
             'wel': 'undefined'
         });
         return this.Api.Sdk.loadComplete().then((data) => {
-            measurements.measure('webview_load_complete');
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
@@ -168,6 +167,10 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
+            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+                'wel': 'undefined'
+            });
+
             return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             measurements.measure('device_info_collection');
@@ -184,7 +187,9 @@ export class Core implements ICore {
 
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
-            measurements.measure('before_config_request');
+            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
+                'wel': 'undefined'
+            });
             let configPromise: Promise<unknown>;
             if (TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(CreativeUrlConfiguration);
@@ -213,7 +218,6 @@ export class Core implements ICore {
 
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
-            measurements.measure('config_parsed');
             this.Config = coreConfig;
             SDKMetrics.initialize(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
 
@@ -241,8 +245,6 @@ export class Core implements ICore {
         }).then((configJson: unknown) => {
             this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
-
-            measurements.measure('core_ready');
 
             return this.Ads.initialize().then(() => {
                 SDKMetrics.sendBatchedEvents();

@@ -194,7 +194,7 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -215,7 +215,6 @@ export class Ads implements IAds {
             }
             return promise;
         }).then(() => {
-            measurements.measure('setup_environment');
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
@@ -229,15 +228,12 @@ export class Ads implements IAds {
 
             PrivacyDataRequestHelper.init(this._core);
         }).then(() => {
-            measurements.measure('privacy_init');
             return this.setupMediationTrackingManager();
         }).then(() => {
-            measurements.measure('mediation_tracking_init');
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing since it's normal to have undefined developer consent
             });
         }).then(() => {
-            measurements.measure('consent_update');
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
@@ -307,10 +303,8 @@ export class Ads implements IAds {
             });
 
         }).then(() => {
-            measurements.measure('managers_init');
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
-            measurements.measure('init_complete_to_native');
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
@@ -323,13 +317,13 @@ export class Ads implements IAds {
                 CachedUserSummary.fetch(this.PrivacyManager);
             }
 
+            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+
             return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             measurements.measure('request_on_init');
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         }).then(() => {
-            measurements.measure('ads_ready');
-
             if (performance && performance.now) {
                 const webviewInitTime = performance.now();
                 SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, {
