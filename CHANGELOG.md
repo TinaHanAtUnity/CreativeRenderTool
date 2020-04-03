@@ -1,13 +1,56 @@
 # Pending
 
+* Add AUI Endcard Dark Mode Support [#13999](https://github.com/Applifier/unity-ads-webview/pull/13999)
+* Add Color Analysis Utilities for Color Experiment [#13997](https://github.com/Applifier/unity-ads-webview/pull/13997)
+
+# Thu Apr  2 21:56:38 UTC 2020
+
+* [Load V5] Disable test [#14255](https://github.com/Applifier/unity-ads-webview/pull/14255)
+* [Load V5] Send metric when load request has fill [#14227](https://github.com/Applifier/unity-ads-webview/pull/14227)
+* [Load V5] Add show metric [#14254](https://github.com/Applifier/unity-ads-webview/pull/14254)
+
+# Thu Apr  2 18:01:21 UTC 2020
+
+* [Load V5] Enable AB Test, Attempt 2 [#14228](https://github.com/Applifier/unity-ads-webview/pull/14228)
+* [Load V5] Handling no fill case better for preload and load [#14222](https://github.com/Applifier/unity-ads-webview/pull/14222)
+* [Load V5] Improve handling when parsing campaign [#14223](https://github.com/Applifier/unity-ads-webview/pull/14223)
+
+# Thu Apr  2 00:43:15 UTC 2020
+
+* Revert "[Load V5] Enable AB test" [#14217](https://github.com/Applifier/unity-ads-webview/pull/14217)
+* [Auction V6] Fix Bug with Banners [#14224](https://github.com/Applifier/unity-ads-webview/pull/14224)
+
+# Wed Apr  1 18:59:16 UTC 2020
+
+* [Load V5] Enable AB test [#14164](https://github.com/Applifier/unity-ads-webview/pull/14164/files)
+
+# Wed Apr  1 15:21:28 UTC 2020
+
+* Privacy SDK metrics callback [#14041](https://github.com/Applifier/unity-ads-webview/pull/14041)
+
+# Tue Mar 31 20:51:59 UTC 2020
+
+* [Auction V6] Enable AB Test on Group 18 [#14080](https://github.com/Applifier/unity-ads-webview/pull/14080)
+* [Auction V6] Fix Templatizing Parameters [#14135](https://github.com/Applifier/unity-ads-webview/pull/14135)
+* Disable fire_deploy_json.sh During LKG Updates [#14136](https://github.com/Applifier/unity-ads-webview/pull/14136)
+
+# Tue Mar 31 18:29:12 UTC 2020
+
 * Post WebView size to GitHub as commit status [#14072](https://github.com/Applifier/unity-ads-webview/pull/14072)
 * Replace OMIDPartner macro in VastURITag unwrapping for IAS [#14075](https://github.com/Applifier/unity-ads-webview/pull/14075)
+* Force LKGs to Update Locally for Revert Script [#14134](https://github.com/Applifier/unity-ads-webview/pull/14134)
 * [Auction V6] Add Test Mode Endpoint Support [#14079](https://github.com/Applifier/unity-ads-webview/pull/14079)
 * [Auction V6] Add Mediation Experiment Type [#14106](https://github.com/Applifier/unity-ads-webview/pull/14106)
 * [Load V5] Metadata flag to force Load V5 to be enabled [#13920](https://github.com/Applifier/unity-ads-webview/pull/13920)
 * [Load V5] Move loadCampaign logic from AdRequestManager to PerPlacementLoadManagerV5 [#14073](https://github.com/Applifier/unity-ads-webview/pull/14073)
 * [Load V5] Invalidation pending state for a placement [#14077](https://github.com/Applifier/unity-ads-webview/pull/14077)
 * [Load V5] Add comment about AdRequestManager [#14078](https://github.com/Applifier/unity-ads-webview/pull/14078)
+* [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+
+# Reverted to LKGs (Mon Mar 30 21:57:00 UTC 2020) - Tue Mar 31 15:44:19 UTC 2020
+
+* Reverted [Auction V6] Add Support for Empty Tracking [#14076](https://github.com/Applifier/unity-ads-webview/pull/14076)
+* Reverted Add Initial Optimized Campaign Support [#12639](https://github.com/Applifier/unity-ads-webview/pull/12639)
 
 # Mon Mar 30 21:57:00 UTC 2020
 

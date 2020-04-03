@@ -44,6 +44,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     private _showing: boolean;
     private _privacyManager: UserPrivacyManager;
     private _unityPrivacyView: PrivacySDKView;
+    private _privacyMetricsUrl: string;
     private readonly _platform: Platform;
     private readonly _landingPage: ConsentPage;
 
@@ -54,6 +55,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
         this._privacySDK = parameters.privacySDK;
+        this._privacyMetricsUrl = this._privacyManager.getPrivacyMetricsUrl();
 
         this._landingPage = this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
 
@@ -184,24 +186,24 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         }
     }
 
-    public onPrivacyCompleted(userSettings: IPrivacySettings): void {
-        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(userSettings));
+    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
+        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(privacySettings));
 
         let action: GDPREventAction;
-        switch (userSettings.lastInteraction.id) {
-            case 'acceptTracking':
+        switch (privacySettings.user.agreementMethod) {
+            case 'all':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
 
-            case 'allowAll':
+            case 'allOfSeen':
                 action = GDPREventAction.CONSENT_AGREE; // this is correct, naming is just different in privacy UI
                 break;
 
-            case 'disagree':
+            case 'noneOfSeen':
                 action = GDPREventAction.CONSENT_DISAGREE;
                 break;
 
-            case 'saveChoices':
+            case 'userSelected':
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
                 break;
 
@@ -209,11 +211,9 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        this.setConsent({
-                ads: userSettings.user.ads,
-                external: userSettings.user.external,
-                gameExp: userSettings.user.gameExp
-            },
+        const { ads, external, gameExp } = privacySettings.user;
+
+        this.setConsent({ ads, external, gameExp },
             action,
             GDPREventSource.USER);
 
@@ -236,8 +236,11 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._unityPrivacyView.openUrlCallback(url);
     }
 
-    public onPrivacyMetric(data: { [key: string]: unknown }): void {
-        // EMPTY
+    public onPrivacyMetric(data: string): void {
+        this._requestManager.post(this._privacyMetricsUrl, data)
+          .catch(error => {
+              this._core.Sdk.logError(`PRIVACY: sending metrics failed: ${error.message}`);
+          });
     }
 
     public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
