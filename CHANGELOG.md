@@ -1,4 +1,4 @@
-# Pending
+# Fri Apr  3 17:32:38 UTC 2020
 
 * [Auction V6] Temporarily Disable Test [#14315](https://github.com/Applifier/unity-ads-webview/pull/14315)
 * Add AUI Endcard Dark Mode Support [#13999](https://github.com/Applifier/unity-ads-webview/pull/13999)
