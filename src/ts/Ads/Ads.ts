@@ -671,7 +671,7 @@ export class Ads implements IAds {
                 // AdRequestManager is valid only if Load V5 is enabled
                 if (this.AdRequestManager) {
                     SDKMetrics.reportMetricEvent(LoadV5Metrics.Show);
-                } else if (this._webViewEnabledLoad && BaseLineLoadV5.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId())) {
+                } else if (this._loadApiEnabled && BaseLineLoadV5.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId())) {
                     SDKMetrics.reportMetricEvent(LoadV5Metrics.Show);
                 }
 
