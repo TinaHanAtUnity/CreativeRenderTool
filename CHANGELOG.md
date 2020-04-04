@@ -1,4 +1,4 @@
-# Pending
+# Sat Apr  4 00:23:31 UTC 2020
 
 * [Load V5] Bug fix for baseline metric in Load V5 [#14316](https://github.com/Applifier/unity-ads-webview/pull/14316)
 * Add Temporary Cache Allowed AB Test [#14322](https://github.com/Applifier/unity-ads-webview/pull/14322)
