@@ -59,6 +59,11 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     }
 
     protected loadPlacement(placementId: string, count: number) {
+        if (this._adRequestManager.isPreloadDataExpired()) {
+            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
+            this.invalidateActivePlacements();
+        }
+
         // If by some reason at the time of load request we don't have preload data
         // we would trigger preload requests and load requests after.
         // It would make sense to use reload request here, however it would require some refactoring,
@@ -78,24 +83,10 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         }
     }
 
-    private invalidateStart(placementId: string) {
-        const placements = this._adsConfig.getPlacementIds()
-            .filter((x) => x !== placementId)
-            .filter((x) => this.isPlacementActive(x));
-
-        placements.forEach(placement => this._adsConfig.getPlacement(placement).setInvalidationPending(true));
-
-        this._adRequestManager.requestReload(placements);
-    }
-
-    private isPlacementActive(placement: string) {
-        return this._adsConfig.getPlacement(placement).getState() === PlacementState.READY
-            || this._adsConfig.getPlacement(placement).getState() === PlacementState.WAITING;
-    }
-
     protected invalidateExpiredCampaigns(): Promise<void> {
         if (this._adRequestManager.isPreloadDataExpired()) {
             SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
+            return this.invalidateActivePlacements();
         }
 
         for (const placementId of this._adsConfig.getPlacementIds()) {
@@ -118,8 +109,32 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     private attemptStartRefresh(placementId: string): void {
         if (this._shouldRefresh) {
             this._shouldRefresh = false;
-            this.invalidateStart(placementId);
+            this.invalidateActivePlacements(placementId);
         }
+    }
+
+    private invalidateActivePlacements(excludePlacementId?: string): Promise<void> {
+        const placementToReload: string[] = [];
+
+        for (const placementId of this._adsConfig.getPlacementIds()) {
+            if (excludePlacementId && excludePlacementId === placementId) {
+                continue;
+            }
+
+            const placement = this._adsConfig.getPlacement(placementId);
+
+            if (placement && this.isPlacementActive(placement)) {
+                placement.setInvalidationPending(true);
+                placementToReload.push(placement.getId());
+            }
+        }
+
+        return this._adRequestManager.requestReload(placementToReload);
+    }
+
+    private isPlacementActive(placement: Placement) {
+        return placement.getState() === PlacementState.READY
+            || placement.getState() === PlacementState.WAITING;
     }
 
     private onCampaign(placementId: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls | undefined): void {
