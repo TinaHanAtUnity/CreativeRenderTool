@@ -1,6 +1,7 @@
 # Pending
 
 * Remove Nofill Immediately Test [#14317](https://github.com/Applifier/unity-ads-webview/pull/14317)
+* Update the design of Privacy Settings view [#14028](https://github.com/Applifier/unity-ads-webview/pull/14028)
 
 # Mon Apr  6 22:22:37 UTC 2020
 
