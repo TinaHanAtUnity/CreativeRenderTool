@@ -100,6 +100,17 @@
               true
             ]
           }
+        },
+        {
+          "node": null,
+          "condition": {
+            "==": [
+              {
+                "var": "user.agreedOverAgeLimit"
+              },
+              false
+            ]
+          }
         }
       ]
     },
@@ -131,12 +142,7 @@
             "text": "showChoices",
             "variant": "secondary",
             "isSubmit": true,
-            "actions": [
-              {
-                "property": "state.hasAcceptedTracking",
-                "value": false
-              }
-            ]
+            "actions": []
           },
           {
             "id": "acceptTracking",
@@ -159,10 +165,6 @@
               {
                 "property": "user.agreementMethod",
                 "value": "all"
-              },
-              {
-                "property": "state.hasAcceptedTracking",
-                "value": true
               }
             ],
             "isSubmit": true
@@ -171,13 +173,24 @@
       },
       "links": [
         {
+          "node": null,
+          "condition": {
+            "==": [
+              {
+                "var": "user.agreementMethod"
+              },
+              "all"
+            ]
+          }
+        },
+        {
           "node": "customization",
           "condition": {
             "!=": [
               {
-                "var": "state.hasAcceptedTracking"
+                "var": "user.agreementMethod"
               },
-              true
+              "all"
             ]
           }
         }
@@ -779,7 +792,12 @@
           }
         ]
       },
-      "links": [],
+      "links": [
+        {
+          "node": null,
+          "condition": true
+        }
+      ],
       "allowGoBack": true
     }
   }
