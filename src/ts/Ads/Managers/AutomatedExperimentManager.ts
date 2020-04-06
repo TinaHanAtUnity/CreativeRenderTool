@@ -113,9 +113,9 @@ export class AutomatedExperimentManager {
     private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
     public static readonly BaseUrl = 'https://auiopt.unityads.unity3d.com/';
-    //public static readonly BaseUrl = 'http://127.0.0.1:3001';
-    public static readonly CreateEndPoint = '/v1/experiment-categorized';
-    public static readonly RewardEndPoint = '/v1/reward-categorized';
+    //public static readonly BaseUrl = 'http://127.0.0.1:3001'; // just for local debugging convenience
+    public static readonly CreateEndPoint = '/v1/category-experiment';
+    public static readonly RewardEndPoint = '/v1/category-reward';
 
     private _abGroup: number;
     private _gameSessionID: number;
