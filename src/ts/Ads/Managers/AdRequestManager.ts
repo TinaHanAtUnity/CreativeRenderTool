@@ -570,7 +570,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (ttl === undefined) {
-            ttl = 3600;
+            ttl = 7200;
         }
 
         this._preloadDataExpireAt = Date.now() + ttl * 1000;
