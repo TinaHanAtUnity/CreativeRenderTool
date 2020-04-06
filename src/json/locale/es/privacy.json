@@ -69,5 +69,8 @@
 
   "privacy-captcha-description": "Necesitamos verificar que el usuario es humano. Por favor, revisa las 16 imágenes siguientes y selecciona las que no concuerdan con el tema.",
   "privacy-captcha-success-message": "Confirmado",
-  "privacy-captcha-retry-message": "Incorrecto. Por favor, inténtalo otra vez"
+  "privacy-captcha-retry-message": "Incorrecto. Por favor, inténtalo otra vez",
+
+  "privacy-settings-report-ad": "Denunciar anuncio",
+  "privacy-settings-build-info": "Información de la compilación"
 }
