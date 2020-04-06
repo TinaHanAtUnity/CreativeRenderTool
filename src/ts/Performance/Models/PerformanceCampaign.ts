@@ -39,6 +39,7 @@ export interface IRawPerformanceCampaign extends IRawCampaign {
     appDownloadUrl?: string;
     mraidUrl?: string;
     dynamicMarkup?: string;
+    mraidEndScreenUrl?: string;
 }
 
 export interface IPerformanceCampaign extends ICampaign {
@@ -63,6 +64,7 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
+    mraidEndScreenUrl?: string;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -89,7 +91,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
-            appDownloadUrl: ['string', 'undefined']
+            appDownloadUrl: ['string', 'undefined'],
+            mraidEndScreenUrl: ['string', 'undefined']
         }, campaign);
     }
 
@@ -216,6 +219,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('adUnitStyle');
     }
 
+    public getMraidEndScreenUrl() {
+        return this.get('mraidEndScreenUrl');
+    }
+
     public getDTO(): { [key: string]: unknown } {
         let gameIcon: unknown;
         const gameIconObject = this.getGameIcon();
@@ -270,7 +277,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
-            'appDownloadUrl': this.getAppDownloadUrl()
+            'appDownloadUrl': this.getAppDownloadUrl(),
+            'mraidEndScreenUrl': this.getMraidEndScreenUrl()
         };
     }
 }

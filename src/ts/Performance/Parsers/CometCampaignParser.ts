@@ -18,6 +18,7 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { Url } from 'Core/Utilities/Url';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
@@ -115,6 +116,19 @@ export class CometCampaignParser extends CampaignParser {
             }
             return Promise.resolve(mraidCampaign);
         } else {
+            if (json.mraidEndScreenUrl === undefined) {
+                // todo: deployment pending
+                const baseUrl = 'http://modules.unityads.unity3d.com/endscreen/index.html';
+
+                json.mraidEndScreenUrl = Url.addParameters(baseUrl, {
+                    landscapeImage: json.endScreenLandscape,
+                    gameIcon: json.gameIcon,
+                    gameName: json.gameName,
+                    rating: json.rating,
+                    ratingCount: json.ratingCount
+                }, true);
+            }
+
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
                 appStoreId: json.appStoreId,
@@ -132,7 +146,8 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
+                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined,
+                mraidEndScreenUrl: json.mraidEndScreenUrl
             };
 
             if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
