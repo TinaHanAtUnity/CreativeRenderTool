@@ -4,6 +4,7 @@
 * Update the design of Privacy Settings view [#14028](https://github.com/Applifier/unity-ads-webview/pull/14028)
 * [Load V5] Support Preload Data Expiration [#14225](https://github.com/Applifier/unity-ads-webview/pull/14225)
 * [Load V5] Change default TTL for preload data to 7200 [#14353](https://github.com/Applifier/unity-ads-webview/pull/14353)
+* Add dark mode and color matching to automated experiment [#14000](https://github.com/Applifier/unity-ads-webview/pull/14000)
 
 # Mon Apr  6 22:22:37 UTC 2020
 
