@@ -45,7 +45,6 @@ import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
-import { Purchasing } from 'Purchasing/Purchasing';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
@@ -82,7 +81,6 @@ export class Core implements ICore {
     public Config: CoreConfiguration;
 
     public Ads: Ads;
-    public Purchasing: Purchasing;
 
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
@@ -239,7 +237,6 @@ export class Core implements ICore {
 
             return configJson;
         }).then((configJson: unknown) => {
-            this.Purchasing = new Purchasing(this);
             this.Ads = new Ads(configJson, this);
 
             measurements.measure('core_ready');

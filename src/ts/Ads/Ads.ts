@@ -57,7 +57,6 @@ import { MRAID } from 'MRAID/MRAID';
 import { MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
-import { Promo } from 'Promo/Promo';
 import { VAST } from 'VAST/VAST';
 import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -72,7 +71,6 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
@@ -245,16 +243,8 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const promo = new Promo(this._core, this, this._core.Purchasing);
-            const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
-            for (const contentType in promoContentTypeHandlerMap) {
-                if (promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
-                    this.ContentTypeHandlerManager.addHandler(contentType, promoContentTypeHandlerMap[contentType]);
-                }
-            }
-
             this.BannerModule = new BannerModule(this._core, this);
-            this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
+            this.Monetization = new Monetization(this._core, this);
             this.AR = new AR(this._core);
 
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
@@ -296,8 +286,6 @@ export class Ads implements IAds {
             this.configureAutomatedExperimentManager();
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
-
-            promo.initialize();
 
             this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
                 if (enabled) {
@@ -552,12 +540,6 @@ export class Ads implements IAds {
         }
 
         SdkStats.sendShowEvent(placementId);
-
-        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
-            this.showError(false, placementId, 'No creatives found for promo campaign');
-            SDKMetrics.reportMetricEvent(ErrorMetric.PromoWithoutCreatives);
-            return;
-        }
 
         if (campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');

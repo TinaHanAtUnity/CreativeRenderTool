@@ -19,15 +19,7 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
-import { Image } from 'Ads/Models/Assets/Image';
-import { Session } from 'Ads/Models/Session';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 describe('OverlayTest', () => {
