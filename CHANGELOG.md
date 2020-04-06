@@ -1,5 +1,7 @@
 # Pending
 
+* Remove ABGroup 15 from Temporary CacheMode Allowed Test [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
+* [Auction V6] Enable Test on Group 15 [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
 * Remove Nofill Immediately Test [#14317](https://github.com/Applifier/unity-ads-webview/pull/14317)
 * Update the design of Privacy Settings view [#14028](https://github.com/Applifier/unity-ads-webview/pull/14028)
 * [Load V5] Support Preload Data Expiration [#14225](https://github.com/Applifier/unity-ads-webview/pull/14225)
