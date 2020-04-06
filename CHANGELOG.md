@@ -1,6 +1,7 @@
 # Pending
 
 * Remove Promo and Purchasing [#13565](https://github.com/Applifier/unity-ads-webview/pull/13565)
+* Revert "Open Measurement - Add Timeout on Admob start metric" [#14321](https://github.com/Applifier/unity-ads-webview/pull/14321)
 
 # Sat Apr  4 00:23:31 UTC 2020
 
