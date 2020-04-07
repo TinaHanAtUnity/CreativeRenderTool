@@ -14,22 +14,15 @@ class NullTimeMeasurements implements ITimeMeasurements {
     }
 }
 
-interface IStoredTimeMeasurement {
-    duration: number;
-    allTags: { [key: string]: string };
-}
-
 class TimeMeasurements implements ITimeMeasurements {
     private _startTime: number;
     private _tags: { [key: string]: string };
     private _event: TimingEvent;
-    private _storedTimes: IStoredTimeMeasurement[];
 
     constructor(event: TimingEvent, tags: { [key: string]: string }) {
         this._startTime = performance.now();
         this._tags = tags;
         this._event = event;
-        this._storedTimes = [];
     }
 
     public overrideTag(tag: string, value: string): void {
@@ -43,22 +36,7 @@ class TimeMeasurements implements ITimeMeasurements {
             ...this._tags,
             'stg': tag };
 
-        if (SDKMetrics.isMetricInstanceInitialized()) {
-            SDKMetrics.reportTimingEventWithTags(this._event, duration, allTags);
-
-            if (this._storedTimes.length > 0) {
-                this._storedTimes.forEach(storedTime => {
-                    SDKMetrics.reportTimingEventWithTags(this._event, storedTime.duration, storedTime.allTags);
-                });
-                this._storedTimes = [];
-            }
-
-        } else {
-            this._storedTimes.push({
-                duration,
-                allTags
-            });
-        }
+        SDKMetrics.reportTimingEventWithTags(this._event, duration, allTags);
 
         this._startTime = time;
     }
