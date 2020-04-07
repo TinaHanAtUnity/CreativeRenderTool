@@ -1,3 +1,7 @@
+# Pending
+
+* Privacy release 1.2.0 [#14412](https://github.com/Applifier/unity-ads-webview/pull/14412)
+
 # Tue Apr  7 00:13:49 UTC 2020
 
 * Remove ABGroup 15 from Temporary CacheMode Allowed Test [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
