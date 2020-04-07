@@ -28,11 +28,6 @@ export class CampaignAssetInfo {
             if ((resourceUrl && resourceUrl.isCached()) || campaign.getResource()) {
                 return true;
             }
-        } else if (campaign instanceof AdMobCampaign) {
-            const video = campaign.getVideo();
-            if (video && video.getVideo() && video.getVideo().isCached()) {
-                return true;
-            }
         }
 
         return false;

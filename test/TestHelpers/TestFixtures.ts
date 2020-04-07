@@ -192,7 +192,6 @@ export class TestFixtures {
         return {
             ... this.getCampaignBaseParams(session, 'fakeCampaignId', undefined),
             dynamicMarkup: 'foo',
-            video: null,
             useWebViewUserAgentForTracking: false,
             isOMEnabled: false,
             omVendors: [],
