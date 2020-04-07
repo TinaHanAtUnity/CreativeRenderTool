@@ -384,10 +384,8 @@ export class Ads implements IAds {
                     let experimentType = MediationExperimentType.None;
                     const whitelistedCMATest = CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup());
                     const temporaryCMATest = TemporaryCacheModeAllowedTest.isValid(this._core.Config.getAbGroup());
-                    if (whitelistedCMATest || temporaryCMATest) {
-                        this.Config.set('cacheMode', CacheMode.ALLOWED);
-                        experimentType = MediationExperimentType.CacheModeAllowed;
-                    } else if (CacheModeDisabledTest.isValid(this._core.Config.getAbGroup())) {
+
+                    if (CacheModeDisabledTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.DISABLED);
                         experimentType = MediationExperimentType.CacheModeDisabled;
                     } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
@@ -400,6 +398,9 @@ export class Ads implements IAds {
                         experimentType = MediationExperimentType.LoadV5;
                     } else if (AuctionV6Test.isValid(this._core.Config.getAbGroup())) {
                         experimentType = MediationExperimentType.AuctionV6;
+                    } else if (whitelistedCMATest || temporaryCMATest) {
+                        this.Config.set('cacheMode', CacheMode.ALLOWED);
+                        experimentType = MediationExperimentType.CacheModeAllowed;
                     }
 
                     this._mediationName = mediation.getName()!;
