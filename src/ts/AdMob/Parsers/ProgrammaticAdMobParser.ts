@@ -1,6 +1,6 @@
 import { AdMobCampaign, IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { ICore } from 'Core/ICore';
@@ -13,7 +13,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         super(core.NativeBridge.getPlatform());
     }
 
-    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(response: AuctionResponse, session: Session): Promise<AdMobCampaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const isOpenMeasurementEnabled = response.isAdmobOMEnabled();
