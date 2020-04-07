@@ -329,6 +329,7 @@ describe('AutomatedExperimentManagerTests', () => {
     it('AutomatedExperimentManager notified of performance campaigns', () => {
         sandbox.stub(SDKMetrics, 'reportMetricEventWithTags')
             .returns(true);
+        sinon.stub(SDKMetrics, 'reportTimingEventWithTags');
 
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 

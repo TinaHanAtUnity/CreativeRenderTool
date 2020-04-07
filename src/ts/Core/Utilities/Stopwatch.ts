@@ -1,73 +1,74 @@
 import { TimingEvent, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-export interface ITimeMeasurements {
-    measure(tag: string): void;
-    overrideTag(tag: string, value: string): void;
+export interface IStopwatch {
+    start(): void;
+    stop(): void;
+    reset(): void;
+    stopAndSend(event: TimingEvent, tags: { [key: string]: string }): void;
+    send(event: TimingEvent, tags: { [key: string]: string }): void;
 }
 
-class NullTimeMeasurements implements ITimeMeasurements {
-    public measure(tag: string): void {
+class NullStopwatch implements IStopwatch {
+    public start(): void {
         // noop
     }
-    public overrideTag(tag: string, value: string): void {
+    public stop(): void {
+        // noop
+    }
+    public stopAndSend(): void {
+        // noop
+    }
+    public reset(): void {
+        // noop
+    }
+    public send(): void {
         // noop
     }
 }
 
-interface IStoredTimeMeasurement {
-    duration: number;
-    allTags: { [key: string]: string };
-}
-
-class TimeMeasurements implements ITimeMeasurements {
+class Stopwatch implements IStopwatch {
+    private _totalTime: number;
     private _startTime: number;
-    private _tags: { [key: string]: string };
-    private _event: TimingEvent;
-    private _storedTimes: IStoredTimeMeasurement[];
+    private _started: boolean;
 
-    constructor(event: TimingEvent, tags: { [key: string]: string }) {
-        this._startTime = performance.now();
-        this._tags = tags;
-        this._event = event;
-        this._storedTimes = [];
+    constructor() {
+        this.reset();
     }
 
-    public overrideTag(tag: string, value: string): void {
-        this._tags[tag] = value;
-    }
-
-    public measure(tag: string): void {
-        const time = performance.now();
-        const duration = time - this._startTime;
-        const allTags = {
-            ...this._tags,
-            'stg': tag };
-
-        if (SDKMetrics.isMetricInstanceInitialized()) {
-            SDKMetrics.reportTimingEventWithTags(this._event, duration, allTags);
-
-            if (this._storedTimes.length > 0) {
-                this._storedTimes.forEach(storedTime => {
-                    SDKMetrics.reportTimingEventWithTags(this._event, storedTime.duration, storedTime.allTags);
-                });
-                this._storedTimes = [];
-            }
-
-        } else {
-            this._storedTimes.push({
-                duration,
-                allTags
-            });
+    public start(): void {
+        if (!this._started) {
+            this._startTime = performance.now();
+            this._started = true;
         }
+    }
+    public stop(): void {
+        if (this._started) {
+            this._totalTime += performance.now() - this._startTime;
+            this._started = false;
+        }
+    }
+    public stopAndSend(event: TimingEvent, tags: { [key: string]: string }): void {
+        this.stop();
+        this.send(event, tags);
+    }
 
-        this._startTime = time;
+    public reset(): void {
+        this._startTime = 0;
+        this._totalTime = 0;
+        this._started = false;
+    }
+
+    public send(event: TimingEvent, tags: { [key: string]: string }): void {
+        if (SDKMetrics.isMetricInstanceInitialized()) {
+            SDKMetrics.reportTimingEventWithTags(event, this._totalTime, tags);
+        }
     }
 }
 
-export function createMeasurementsInstance(event: TimingEvent, tags: { [key: string]: string } = {}): ITimeMeasurements {
+export function createStopwatch(): IStopwatch {
     if (performance && performance.now) {
-        return new TimeMeasurements(event, tags);
+        return new Stopwatch();
     }
 
-    return new NullTimeMeasurements();
+    return new NullStopwatch();
 }

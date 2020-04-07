@@ -39,7 +39,7 @@ import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlockin
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
+import { IStopwatch, createStopwatch } from 'Core/Utilities/Stopwatch';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -99,7 +99,7 @@ export class LegacyCampaignManager extends CampaignManager {
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         const requestStartTime = this.getTime();
-        let measurement: ITimeMeasurements;
+        let measurement: IStopwatch;
         this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
@@ -140,10 +140,7 @@ export class LegacyCampaignManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry)
             ]);
         }).then(([requestUrl, requestBody]) => {
-            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
-                'wel': 'false',
-                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
-            });
+            measurement = createStopwatch();
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
             if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
@@ -181,7 +178,11 @@ export class LegacyCampaignManager extends CampaignManager {
                 'wel': 'false',
                 'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
             });
-            measurement.measure('auction_response');
+            measurement.stopAndSend(GeneralTimingMetric.AuctionRequest, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+                'stg': 'auction_response'
+            });
             const cachingTime = this.getTime();
             if (this._mediationLoadTracking && performance && performance.now) {
                 this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
@@ -482,7 +483,6 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -597,7 +597,6 @@ export class LegacyCampaignManager extends CampaignManager {
         this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
-        measurement.measure('parse_response');
         for (const mediaId in campaigns) {
             if (campaigns.hasOwnProperty(mediaId)) {
                 let auctionResponse: AuctionResponse;

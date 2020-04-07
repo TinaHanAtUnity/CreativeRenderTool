@@ -26,7 +26,7 @@ import { GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { ICoreApi } from 'Core/ICore';
 import { StorageType } from 'Core/Native/Storage';
 
@@ -115,7 +115,6 @@ export abstract class CampaignManager {
     }
 
     public static createRequestUrl(baseUrl: string, platform: Platform, clientInfo: ClientInfo, deviceInfo: DeviceInfo, coreConfig: CoreConfiguration, lastAuctionId?: string, nofillRetry?: boolean): Promise<string> {
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         let url: string = baseUrl;
 
         const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(platform, deviceInfo);
@@ -189,14 +188,12 @@ export abstract class CampaignManager {
                 connectionType: connectionType,
                 networkType: networkType
             });
-            measurement.measure('url_generation');
             return url;
         });
     }
 
     // todo: refactor requestedPlacement to something more sensible
     public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         const placementRequest: { [key: string]: unknown } = {};
 
         const body: { [key: string]: unknown } = {
@@ -325,8 +322,6 @@ export abstract class CampaignManager {
                 if (developerId) {
                     body.developerId = developerId;
                 }
-
-                measurement.measure('body_generation');
                 return body;
             });
         });

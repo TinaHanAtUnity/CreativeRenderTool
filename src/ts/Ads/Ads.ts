@@ -92,7 +92,7 @@ import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
 import { CachedUserSummary } from 'Privacy/CachedUserSummary';
-import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
@@ -189,14 +189,13 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        const measurements = createStopwatch();
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
             this.setupLoadApiEnabled();
-            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -286,11 +285,16 @@ export class Ads implements IAds {
                 CachedUserSummary.fetch(this.PrivacyManager);
             }
 
-            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+            measurements.reset();
+            measurements.start();
 
             return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
-            measurements.measure('request_on_init');
+            measurements.stopAndSend(
+                InitializationMetric.WebviewInitializationPhases, {
+                'wel': `${this._webViewEnabledLoad}`,
+                'stg': 'request_on_init'
+            });
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         }).then(() => {
             if (performance && performance.now) {
