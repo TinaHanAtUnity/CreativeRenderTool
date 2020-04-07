@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR, AuctionV6Test, LoadV5, BaseLineLoadV5, TemporaryCacheModeAllowedTest } from 'Core/Models/ABGroup';
+import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR, AuctionV6Test, LoadV5, BaseLineLoadV5, TemporaryCacheModeAllowedTest, CacheModeDisabledTest } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -386,6 +386,9 @@ export class Ads implements IAds {
                     const temporaryCMATest = TemporaryCacheModeAllowedTest.isValid(this._core.Config.getAbGroup());
                     if (whitelistedCMATest || temporaryCMATest) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
+                        experimentType = MediationExperimentType.CacheModeAllowed;
+                    } else if (CacheModeDisabledTest.isValid(this._core.Config.getAbGroup())) {
+                        this.Config.set('cacheMode', CacheMode.DISABLED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
                         if (XHRequest.isAvailable()) {
