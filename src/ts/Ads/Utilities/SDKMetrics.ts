@@ -14,6 +14,7 @@ export enum ErrorMetric {
 }
 
 export enum AdmobMetric {
+    AdmobVideoElementMissing = 'admob_video_element_missing',
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
