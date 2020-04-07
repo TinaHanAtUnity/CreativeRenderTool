@@ -39,13 +39,10 @@ import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlockin
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 
@@ -218,9 +215,6 @@ export class LegacyCampaignManager extends CampaignManager {
             }
             throw new WebViewError('Empty campaign response', 'CampaignRequestError');
         }).then(() => {
-            if (!PurchasingUtilities.isCatalogAvailable() && PurchasingUtilities.configurationIncludesPromoPlacement()) {
-                PurchasingUtilities.refreshCatalog();
-            }
             this._requesting = false;
         }).catch((error) => {
             this._requesting = false;
@@ -420,22 +414,6 @@ export class LegacyCampaignManager extends CampaignManager {
                             if (error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if (error === CacheStatus.FAILED) {
-                                if (auctionResponse.getContentType() === PromoCampaignParser.ContentType) {
-                                    const placementIds = fill[mediaId].map(placement => placement.getPlacementId()).join();
-                                    PromoErrorService.report(this._request, {
-                                        auctionID: session ? session.getId() : undefined,
-                                        corrID: auctionResponse.getCorrelationId(),
-                                        country: this._coreConfig.getCountry(),
-                                        projectID: this._coreConfig.getUnityProjectId(),
-                                        gameID: this._clientInfo.getGameId(),
-                                        placementID: placementIds,
-                                        productID: undefined,
-                                        platform: this._platform,
-                                        gamerToken: this._coreConfig.getToken(),
-                                        errorCode: 104,
-                                        errorMessage: 'Unable to retrieve and cache asset'
-                                    });
-                                }
                                 return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if (error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
@@ -757,13 +735,9 @@ export class LegacyCampaignManager extends CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.CampaignParsing, {
-            'cct': response.getContentType()
-        });
         return parser.parse(response, session).catch((error) => {
             if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
-                measurement.measure('vpaid_identified_as_vast');
                 return parser.parse(response, session);
             } else {
                 throw error;
@@ -772,7 +746,6 @@ export class LegacyCampaignManager extends CampaignManager {
             this.reportToCreativeBlockingService(error, parser.creativeID, parser.seatID, parser.campaignID);
             throw error;
         }).then((campaign) => {
-            measurement.measure('parsing_complete');
             const parseDuration = Date.now() - parseTimestamp;
             for (const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);
@@ -869,22 +842,6 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: AuctionPlacement[], session?: Session): Promise<void> {
-        if (contentType === PromoCampaignParser.ContentType) {
-            const placementIds = placements.map(placement => placement.getPlacementId()).join();
-            PromoErrorService.report(this._request, {
-                auctionID: session ? session.getId() : undefined,
-                corrID: undefined,
-                country: this._coreConfig.getCountry(),
-                projectID: this._coreConfig.getUnityProjectId(),
-                gameID: this._clientInfo.getGameId(),
-                placementID: placementIds,
-                productID: undefined,
-                platform: this._platform,
-                gamerToken: this._coreConfig.getToken(),
-                errorCode: 103,
-                errorMessage: campaignError.errorMessage
-            });
-        }
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
         return this.handlePlacementError(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);

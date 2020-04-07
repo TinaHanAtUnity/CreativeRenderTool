@@ -77,6 +77,71 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
                 expect(placements.video_1.setCurrentCampaign).toBeCalledTimes(1);
                 expect(placements.video_1.setCurrentCampaign).toBeCalledWith(undefined);
             });
+
+            ['video_2', 'video_3', 'video_4', 'video_5', 'video_6'].forEach(placement => {
+                it(`should not set campaign to undefined ${placement}`, () => {
+                    expect(placements[placement].setCurrentCampaign).not.toBeCalled();
+                });
+            });
+        });
+
+        describe('refresh expired placements when preload expired', () => {
+            const expectedReloadPlacements = ['video_1', 'video_4', 'video_6'];
+
+            let placements: {[key: string]: PlacementMock};
+
+            beforeEach(() => {
+                const expiredCampaign = Campaign();
+                expiredCampaign.isExpired.mockReturnValue(true);
+
+                const readyCampaign = Campaign();
+
+                placements = {
+                    'video_1': Placement('video_1', PlacementState.READY, expiredCampaign),
+                    'video_2': Placement('video_2', PlacementState.NOT_AVAILABLE, expiredCampaign),
+                    'video_3': Placement('video_3', PlacementState.NO_FILL, readyCampaign),
+                    'video_4': Placement('video_4', PlacementState.WAITING, expiredCampaign),
+                    'video_5': Placement('video_5', PlacementState.DISABLED, expiredCampaign),
+                    'video_6': Placement('video_6', PlacementState.READY, readyCampaign)
+                };
+
+                adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3', 'video_4', 'video_5', 'video_6']);
+                adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
+
+                adRequestManager.isPreloadDataExpired.mockReturnValue(true);
+
+                return refreshManager.refresh();
+            });
+
+            it('should call requestReload', () => {
+                expect(adRequestManager.requestReload).toBeCalledTimes(1);
+                expect(adRequestManager.requestReload).toBeCalledWith(expectedReloadPlacements);
+            });
+
+            expectedReloadPlacements.forEach(placement => {
+                it(`should set invalidation state for ${placement}`, () => {
+                    expect(placements[placement].setInvalidationPending).toBeCalledTimes(1);
+                    expect(placements[placement].setInvalidationPending).toBeCalledWith(true);
+                });
+            });
+
+            expectedReloadPlacements.forEach(placement => {
+                it(`should not set campaign to undefined in ${placement}`, () => {
+                    expect(placements.video_1.setCurrentCampaign).not.toBeCalled();
+                });
+            });
+
+            expectedReloadPlacements.forEach(placement => {
+                it(`should not send update ${placement}`, () => {
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).not.toBeCalled();
+                });
+            });
+
+            ['video_2', 'video_3', 'video_5'].forEach(placement => {
+                it(`should not set invalidation state for ${placement}`, () => {
+                    expect(placements[placement].setInvalidationPending).not.toBeCalled();
+                });
+            });
         });
 
         describe('refresh after start: with timeout', () => {
@@ -284,7 +349,7 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             });
 
             it('should not call requestPreload', () => {
-                expect(adRequestManager.requestPreload).toBeCalledTimes(0);
+                expect(adRequestManager.requestPreload).not.toBeCalled();
             });
 
             it('should set state to no fill', () => {
@@ -354,7 +419,7 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             });
 
             it('should call loadCampaign', () => {
-                expect(adRequestManager.loadCampaign).toBeCalledTimes(0);
+                expect(adRequestManager.loadCampaign).not.toBeCalled();
             });
 
             it('should not call requestPreload', () => {
@@ -365,6 +430,65 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(2);
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'NOT_AVAILABLE', 'WAITING');
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'WAITING', 'NO_FILL');
+            });
+        });
+
+        describe('load placement with expired data', () => {
+            let placements: {[key: string]: PlacementMock};
+            let campaign: CampaignMock;
+
+            beforeEach(async () => {
+                campaign = Campaign();
+
+                placements = {
+                    'video_1': Placement('video_1', PlacementState.READY, campaign),
+                    'video_2': Placement('video_2', PlacementState.NOT_AVAILABLE),
+                    'video_3': Placement('video_3', PlacementState.NO_FILL),
+                    'video_4': Placement('video_4', PlacementState.DISABLED),
+                    'video_5': Placement('video_5', PlacementState.WAITING),
+                    'video_6': Placement('video_6', PlacementState.READY)
+                };
+
+                adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3', 'video_4', 'video_5', 'video_6']);
+                adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
+
+                adRequestManager.isPreloadDataExpired.mockReturnValue(true);
+                adRequestManager.hasPreloadFailed.mockReturnValue(false);
+                adRequestManager.loadCampaign.mockResolvedValue({
+                    campaign: campaign,
+                    trackingUrls: {}
+                });
+
+                (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_2': 1 });
+            });
+
+            it('should call loadCampaign', () => {
+                expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
+                expect(adRequestManager.loadCampaign).toBeCalledWith(placements['video_2']);
+            });
+
+            it('should call requestReload', () => {
+                expect(adRequestManager.requestReload).toBeCalledTimes(1);
+                expect(adRequestManager.requestReload).toBeCalledWith(['video_1', 'video_5', 'video_6']);
+            });
+
+            ['video_1', 'video_5', 'video_6'].forEach(placement => {
+                it(`should set invalidation state for ${placement}`, () => {
+                    expect(placements[placement].setInvalidationPending).toBeCalledTimes(1);
+                    expect(placements[placement].setInvalidationPending).toBeCalledWith(true)
+                });
+            });
+
+            ['video_2', 'video_3', 'video_4'].forEach(placement => {
+                it(`should not set invalidation state for ${placement}`, () => {
+                    expect(placements[placement].setInvalidationPending).not.toBeCalled();
+                });
+            });
+
+            it('should update state loaded placement', () => {
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(2);
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_2', 'NOT_AVAILABLE', 'WAITING');
+                expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_2', 'WAITING', 'READY');
             });
         });
     });

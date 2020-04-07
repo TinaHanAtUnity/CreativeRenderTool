@@ -106,7 +106,7 @@ class ExperimentCategory {
 
 export class AutomatedExperimentManager {
 
-    private static _forcedARMRAID: boolean
+    private static _forcedARMRAID: boolean;
 
     private _requestManager: RequestManager;
     private _deviceInfo: DeviceInfo;
@@ -494,7 +494,7 @@ export class AutomatedExperimentManager {
             // This sucks but couldn't find a way dynamicaly do it. JS limitation as far as I could tell.
             if ((exp.CampaignType === 'PerformanceCampaign' && campaign instanceof PerformanceCampaign) ||
                 (exp.CampaignType === 'MRAIDCampaign_AR' && campaign instanceof MRAIDCampaign && ARUtil.isARCreative(campaign)) ||
-                AutomatedExperimentManager._forcedARMRAID ) {
+                AutomatedExperimentManager._forcedARMRAID) {
                 categories.push(exp.Category);
             }
         });

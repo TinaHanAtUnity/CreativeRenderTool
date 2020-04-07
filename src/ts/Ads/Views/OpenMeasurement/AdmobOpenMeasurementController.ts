@@ -160,16 +160,10 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public start(duration: number) {
-
-        // timeout used to experiment how race condition can be massaged
-        // until admob creatives are fixed
-        setTimeout(() => {
-            if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
-                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMStartFirst);
-                this._omMetricFirstCheck = true;
-            }
-        }, 50);
-
+        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMStartFirst);
+            this._omMetricFirstCheck = true;
+        }
         super.start(duration);
     }
 

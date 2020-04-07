@@ -1,3 +1,30 @@
+# Tue Apr  7 13:39:01 UTC 2020
+
+* Privacy release 1.2.0 [#14412](https://github.com/Applifier/unity-ads-webview/pull/14412)
+
+# Tue Apr  7 00:13:49 UTC 2020
+
+* Remove ABGroup 15 from Temporary CacheMode Allowed Test [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
+* Cleanup unused metrics from latency optimization [#14314](https://github.com/Applifier/unity-ads-webview/pull/14314)
+* [Auction V6] Enable Test on Group 15 [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
+* Remove Nofill Immediately Test [#14317](https://github.com/Applifier/unity-ads-webview/pull/14317)
+* Update the design of Privacy Settings view [#14028](https://github.com/Applifier/unity-ads-webview/pull/14028)
+* [Load V5] Support Preload Data Expiration [#14225](https://github.com/Applifier/unity-ads-webview/pull/14225)
+* [Load V5] Change default TTL for preload data to 7200 [#14353](https://github.com/Applifier/unity-ads-webview/pull/14353)
+* Add dark mode and color matching to automated experiment [#14000](https://github.com/Applifier/unity-ads-webview/pull/14000)
+
+# Mon Apr  6 22:22:37 UTC 2020
+
+* Remove Promo and Purchasing [#13565](https://github.com/Applifier/unity-ads-webview/pull/13565)
+* Revert "Open Measurement - Add Timeout on Admob start metric" [#14321](https://github.com/Applifier/unity-ads-webview/pull/14321)
+
+# Sat Apr  4 00:23:31 UTC 2020
+
+* [Load V5] Bug fix for baseline metric in Load V5 [#14316](https://github.com/Applifier/unity-ads-webview/pull/14316)
+* Add Temporary Cache Allowed AB Test [#14322](https://github.com/Applifier/unity-ads-webview/pull/14322)
+* Change Temporary CacheMode AB Test Groups [#14323](https://github.com/Applifier/unity-ads-webview/pull/14323)
+* Remove DiagnosticsRampDown AB test [#14256](https://github.com/Applifier/unity-ads-webview/pull/14256)
+
 # Fri Apr  3 17:32:38 UTC 2020
 
 * [Auction V6] Temporarily Disable Test [#14315](https://github.com/Applifier/unity-ads-webview/pull/14315)

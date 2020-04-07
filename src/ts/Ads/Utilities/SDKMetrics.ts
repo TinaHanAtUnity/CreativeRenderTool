@@ -7,7 +7,6 @@ export enum ErrorMetric {
     VastClickWithoutImpressionError = 'vast_click_without_impression',
     AdUnitAlreadyShowing = 'ad_unit_already_showing',
     PlacementWithIdDoesNotExist = 'placement_with_id_does_not_exist',
-    PromoWithoutCreatives = 'promo_without_creatives',
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
@@ -141,8 +140,6 @@ export enum AUIMetric {
 
 export enum GeneralTimingMetric {
     AuctionRequest = 'auction_request',
-    CampaignParsing = 'campaign_parsing',
-    CacheLatency = 'cache_latency',
     AuctionHealthGood = 'auction_health_good',
     AuctionHealthBad = 'auction_health_bad',
     AuctionHealthGoodXHR = 'auction_health_good_xhr',

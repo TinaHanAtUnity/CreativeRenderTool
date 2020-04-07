@@ -5,7 +5,6 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
@@ -29,14 +28,6 @@ export class CampaignAssetInfo {
             if ((resourceUrl && resourceUrl.isCached()) || campaign.getResource()) {
                 return true;
             }
-        } else if (campaign instanceof PromoCampaign) {
-            const resourceList = campaign.getRequiredAssets();
-            for (const resource of resourceList) {
-                if (resource.isCached()) {
-                    return false;
-                }
-            }
-            return true;
         } else if (campaign instanceof AdMobCampaign) {
             const video = campaign.getVideo();
             if (video && video.getVideo() && video.getVideo().isCached()) {
