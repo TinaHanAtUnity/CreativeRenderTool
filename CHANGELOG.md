@@ -1,6 +1,7 @@
 # Pending
 
 * Proposal: Reduce Admob Campaign Parsing Time [#14438](https://github.com/Applifier/unity-ads-webview/pull/14438)
+* Add customer feature to disable UI fade on click [#14286](https://github.com/Applifier/unity-ads-webview/pull/14286)
 
 # Tue Apr  7 13:39:01 UTC 2020
 
