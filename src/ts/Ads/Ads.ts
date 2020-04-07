@@ -389,7 +389,7 @@ export class Ads implements IAds {
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     } else if (CacheModeDisabledTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.DISABLED);
-                        experimentType = MediationExperimentType.CacheModeAllowed;
+                        experimentType = MediationExperimentType.CacheModeDisabled;
                     } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
                         if (XHRequest.isAvailable()) {
                             experimentType = MediationExperimentType.AuctionXHR;
