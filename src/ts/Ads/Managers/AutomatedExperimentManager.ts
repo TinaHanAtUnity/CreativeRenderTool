@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
+import { IExperimentActionChoice, AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -21,6 +21,7 @@ import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
 import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 
 interface IAutomatedExperimentResponse {
     categories: { [expCat: string]: IAggregateExperiment };
@@ -104,6 +105,9 @@ class ExperimentCategory {
 //  6. endSelectedExperiment()                  // Once the experiment is over (success or not) (this sends negative outcome back to AUI/Optm)
 
 export class AutomatedExperimentManager {
+
+    private static _forcedARMRAID: boolean
+
     private _requestManager: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _privacySdk: PrivacySDK;
@@ -114,8 +118,8 @@ export class AutomatedExperimentManager {
 
     public static readonly BaseUrl = 'https://auiopt.unityads.unity3d.com/';
     //public static readonly BaseUrl = 'http://127.0.0.1:3001'; // just for local debugging convenience
-    public static readonly CreateEndPoint = '/v1/category-experiment';
-    public static readonly RewardEndPoint = '/v1/category-reward';
+    public static readonly CreateEndPoint = '/v1/category/experiment';
+    public static readonly RewardEndPoint = '/v1/category/reward';
 
     private _abGroup: number;
     private _gameSessionID: number;
@@ -123,6 +127,10 @@ export class AutomatedExperimentManager {
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
+
+    public static setForcedARMRAID(value: boolean) {
+        this._forcedARMRAID = value;
+    }
 
     public static isAutomationAvailable(adsConfig: AdsConfiguration, config: CoreConfiguration) {
         return !MabDisabledABTest.isValid(config.getAbGroup()) || adsConfig.getHasArPlacement();
@@ -485,7 +493,8 @@ export class AutomatedExperimentManager {
         this._experimentCategories.forEach((exp) => {
             // This sucks but couldn't find a way dynamicaly do it. JS limitation as far as I could tell.
             if ((exp.CampaignType === 'PerformanceCampaign' && campaign instanceof PerformanceCampaign) ||
-                (exp.CampaignType === 'MRAIDCampaign' && campaign instanceof MRAIDCampaign)) {
+                (exp.CampaignType === 'MRAIDCampaign_AR' && campaign instanceof MRAIDCampaign && ARUtil.isARCreative(campaign)) ||
+                AutomatedExperimentManager._forcedARMRAID ) {
                 categories.push(exp.Category);
             }
         });

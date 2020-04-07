@@ -30,6 +30,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     public static setForcedARMRAID(value: boolean) {
         MRAIDAdUnitParametersFactory._forcedARMRAID = value;
+        AutomatedExperimentManager.setForcedARMRAID(value);
     }
 
     private _ar: IARApi;
@@ -41,7 +42,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         this._automatedExperimentManager = automatedExperimentManager;
 
         if (ads.Config.getHasArPlacement()) {
-            this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.MRAID_AR, 'MRAIDCampaign');
+            this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.MRAID_AR, 'MRAIDCampaign_AR');
         }
 
         this._ar = ar;
