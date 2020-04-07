@@ -398,7 +398,7 @@ export class Ads implements IAds {
                         experimentType = MediationExperimentType.LoadV5;
                     } else if (AuctionV6Test.isValid(this._core.Config.getAbGroup())) {
                         experimentType = MediationExperimentType.AuctionV6;
-                    } if (whitelistedCMATest || temporaryCMATest) {
+                    } else if (whitelistedCMATest || temporaryCMATest) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
                     }
