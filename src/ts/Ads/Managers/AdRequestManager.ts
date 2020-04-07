@@ -53,6 +53,8 @@ class AdRequestManagerError extends Error {
 }
 
 export class AdRequestManager extends CampaignManager {
+    protected static LoadV5BaseUrl: string = 'https://auction-load.unityads.unity3d.com/v5/games';
+
     private _preloadData: IPlacementIdMap<IParsedPlacementPreloadData> | null;
     private _preloadDataExpireAt: number;
 
@@ -346,7 +348,7 @@ export class AdRequestManager extends CampaignManager {
 
     private getBaseUrl(): string {
         return [
-            CampaignManager.AuctionV5BaseUrl,
+            AdRequestManager.LoadV5BaseUrl,
             this._clientInfo.getGameId(),
             'requests'
         ].join('/');
