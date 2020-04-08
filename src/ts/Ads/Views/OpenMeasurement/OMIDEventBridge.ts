@@ -53,7 +53,7 @@ export class OMIDEventBridge {
         this._campaign = campaign;
 
         this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
-        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey, <string>msg.data.uuid);
+        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey, <string>msg.data.uuid, <string>msg.data.iframeId);
 
         this._registeredFuncs = {
             'omidVideo': []
@@ -144,7 +144,10 @@ export class OMIDEventBridge {
         }
     }
 
-    public onEventRegistered(eventName: string, vendorKey: string, uuid: string) {
+    public onEventRegistered(eventName: string, vendorKey: string, uuid: string, iframeId: string) {
+        if (iframeId !== this._iframe3p.id) {
+            return;
+        }
         const eventDatas = this._eventHistory[eventName];
 
         if (!this._registeredFuncs[eventName]) {

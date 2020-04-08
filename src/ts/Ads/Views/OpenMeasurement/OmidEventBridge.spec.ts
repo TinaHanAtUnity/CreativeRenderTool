@@ -33,7 +33,7 @@ describe('OmidEventBridge', () => {
 
     describe('when triggering admob impression event', () => {
         it('should send postmessage event', () => {
-            omidEventBridge.onEventRegistered('omidImpression', 'test', '1');
+            omidEventBridge.onEventRegistered('omidImpression', 'test', '1', '002dd2438861479d9c91c1b45d8d3b68');
             omidEventBridge.triggerVideoEvent('omidImpression');
 
             // tslint:disable-next-line
