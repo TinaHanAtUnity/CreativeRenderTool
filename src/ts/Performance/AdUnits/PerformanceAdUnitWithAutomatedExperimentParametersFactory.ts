@@ -16,7 +16,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     constructor(core: ICore, aem: AutomatedExperimentManager) {
         super(core, core.Ads);
         this._automatedExperimentManager = aem;
-        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFAD_ENDCARD, 'PerformanceCampaign');
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFORMANCE_ENDCARD, 'PerformanceCampaign');
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -33,12 +33,12 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        const experimentID = this._automatedExperimentManager.getSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFAD_ENDCARD);
+        const experimentID = this._automatedExperimentManager.getSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
         let endScreenCombination: IExperimentActionChoice | undefined;
 
         if (AnimatedDownloadButtonEndScreen.experimentSupported(experimentID)) {
-            endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFAD_ENDCARD);
+            endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
         }
         const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 

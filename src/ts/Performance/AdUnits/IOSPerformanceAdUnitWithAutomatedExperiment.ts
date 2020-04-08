@@ -12,7 +12,7 @@ export class IOSPerformanceAdUnitWithAutomatedExperiment extends IOSPerformanceA
     }
 
     public hide(): Promise<void> {
-        this._automatedExperimentManager.endSelectedExperiment(this.getCampaign(), AutomatedExperimentsCategories.PERFAD_ENDCARD);
+        this._automatedExperimentManager.endSelectedExperiment(this.getCampaign(), AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
         return super.hide();
     }

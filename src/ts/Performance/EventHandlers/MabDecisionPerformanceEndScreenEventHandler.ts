@@ -16,6 +16,6 @@ export class MabDecisionPerformanceEndScreenEventHandler extends PerformanceEndS
 
     public onEndScreenDownload(parameters: IStoreHandlerDownloadParameters): void {
         super.onEndScreenDownload(parameters);
-        this._automatedExperimentManager.rewardSelectedExperiment(this._adUnit.getCampaign(), AutomatedExperimentsCategories.PERFAD_ENDCARD);
+        this._automatedExperimentManager.rewardSelectedExperiment(this._adUnit.getCampaign(), AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
     }
 }
