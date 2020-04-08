@@ -1,3 +1,12 @@
+# Tue Apr  7 23:21:53 UTC 2020
+
+* Reduce Admob Campaign Parsing Time [#14438](https://github.com/Applifier/unity-ads-webview/pull/14438)
+* Add customer feature to disable UI fade on click [#14286](https://github.com/Applifier/unity-ads-webview/pull/14286)
+* Remove Group 5 from CacheModeAllowed Test [#14465](https://github.com/Applifier/unity-ads-webview/pull/14465)
+* Add CacheMode Disabled Test on Group 5 [#14466](https://github.com/Applifier/unity-ads-webview/pull/14466)
+* Reorganize Mediation Experiments to Accomodate ReverseABTest [#14467](https://github.com/Applifier/unity-ads-webview/pull/14467)
+* [Load V5] Change Auction Endpoints [#14464](https://github.com/Applifier/unity-ads-webview/pull/14464)
+
 # Tue Apr  7 13:39:01 UTC 2020
 
 * Privacy release 1.2.0 [#14412](https://github.com/Applifier/unity-ads-webview/pull/14412)
