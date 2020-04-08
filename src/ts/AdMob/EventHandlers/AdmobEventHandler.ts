@@ -11,7 +11,6 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -23,6 +22,7 @@ import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -143,7 +143,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     public onTrackingEvent(event: TrackingEvent, data?: string) {
         this._adUnit.sendTrackingEvent(event);
         if (event === TrackingEvent.ERROR) {
-            SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
+            if (data && data.startsWith('Missing Video Error')) {
+                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobVideoElementMissing);
+                this._adUnit.hide();
+            }
         } else if (event === TrackingEvent.STALLED) {
             Diagnostics.trigger('admob_ad_video_stalled', {
                 data: data
