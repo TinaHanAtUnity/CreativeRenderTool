@@ -67,10 +67,10 @@
                     }, '*');
                 };
 
-                this.onPrivacyCompleted = function(userSettings) {
+                this.onPrivacyCompleted = function(data) {
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
-                        data: JSON.parse(userSettings)
+                        data: JSON.parse(data)
                     }, '*');
                 };
 
@@ -94,7 +94,7 @@
                         url: url,
                         data: JSON.parse(data)
                     }, '*');
-                }
+                };
             };
 
             window.privacyAdapter = new AdsPrivacyAdapter();

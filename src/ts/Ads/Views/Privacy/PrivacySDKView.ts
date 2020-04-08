@@ -6,7 +6,7 @@ import { ICoreApi } from 'Core/ICore';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacySettings, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -114,8 +114,8 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         });
     }
 
-    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
-        this._handlers.forEach(handler => handler.onPrivacyCompleted(privacySettings));
+    public onPrivacyCompleted(params: IPrivacyCompletedParams): void {
+        this._handlers.forEach(handler => handler.onPrivacyCompleted(params));
     }
 
     public completeCallback(): void {

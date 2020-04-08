@@ -18,7 +18,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
@@ -169,11 +169,19 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         }
     }
 
-    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
-        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(privacySettings));
+    public onPrivacyCompleted(params: IPrivacyCompletedParams): void {
+        const { user, error } = params;
+
+        if (error) {
+            this._core.Sdk.logError(`Privacy error: ${error}`);
+            this.closePrivacy();
+            return;
+        }
+
+        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(user));
 
         let action: GDPREventAction;
-        switch (privacySettings.user.agreementMethod) {
+        switch (user.agreementMethod) {
             case 'all':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
@@ -194,7 +202,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        const { ads, external, gameExp, agreedOverAgeLimit } = privacySettings.user;
+        const { ads, external, gameExp, agreedOverAgeLimit } = user;
         const permissions: IPrivacyPermissions = { ads, external, gameExp };
 
         this.setConsent(permissions, action, GDPREventSource.USER);
@@ -213,7 +221,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
 
             this._privacyManager.setUsersAgeGateChoice(ageGateChoice, AgeGateSource.USER);
 
-            if (ageGateChoice === AgeGateChoice.NO || (privacySettings.env.privacyMethod && privacySettings.env.privacyMethod === PrivacyMethod.UNITY_CONSENT)) {
+            if (ageGateChoice === AgeGateChoice.NO || (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT)) {
                 this.setConsent(permissions, action, GDPREventSource.USER);
             }
         } else {

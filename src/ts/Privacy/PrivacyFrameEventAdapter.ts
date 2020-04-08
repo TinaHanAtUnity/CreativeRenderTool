@@ -1,7 +1,7 @@
 import { ICoreApi } from 'Core/ICore';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams } from 'Privacy/IPrivacySettings';
 
-export enum IFrameEvents {
+enum IFrameEvents {
     PRIVACY_READY = 'onPrivacyReady',
     PRIVACY_COMPLETED = 'onPrivacyCompleted',
     PRIVACY_OPENURL = 'onPrivacyOpenUrl',
@@ -15,7 +15,7 @@ export interface IPrivacyFrameEventAdapter {
 }
 
 export interface IPrivacyFrameHandler {
-    onPrivacyCompleted(privacySettings: IPrivacySettings): void;
+    onPrivacyCompleted(params: IPrivacyCompletedParams): void;
     onPrivacyReady(): void;
     onPrivacyOpenUrl(url: string): void;
     onPrivacyMetric(data: string): void;
@@ -37,8 +37,8 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
         this._iFrameHandlers = {};
-        this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IPrivacySettings>msg.data);
-        this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = (msg) => this.onPrivacyReady();
+        this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IPrivacyCompletedParams>msg.data);
+        this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = () => this.onPrivacyReady();
         this._iFrameHandlers[IFrameEvents.PRIVACY_OPENURL] = (msg) => this.onPrivacyOpenUrl(<string>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_METRIC] = (msg) => this.onPrivacyMetric(<string>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_FETCH] = (msg) => this.onPrivacyFetch(<string>msg.url, <{ [key: string]: unknown }>msg.data);
@@ -69,8 +69,8 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         }
     }
 
-    private onPrivacyCompleted(privacySettings: IPrivacySettings): void {
-        this._handler.onPrivacyCompleted(privacySettings);
+    private onPrivacyCompleted(params: IPrivacyCompletedParams): void {
+        this._handler.onPrivacyCompleted(params);
     }
 
     private onPrivacyReady(): void {

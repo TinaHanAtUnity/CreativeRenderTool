@@ -1,6 +1,6 @@
-export interface IPrivacySettings {
+export interface IPrivacyCompletedParams {
     user: IUserPrivacySettings;
-    env: { [key: string]: unknown };
+    error?: string;
 }
 
 export interface IUserPrivacySettings {
