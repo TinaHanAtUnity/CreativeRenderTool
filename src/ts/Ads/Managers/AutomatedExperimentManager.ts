@@ -51,11 +51,11 @@ enum AutomatedExperimentStage {
     ENDED
 }
 
-// A categorized experiment is an experiment that is associated to a 'Experiment Category'
-// An experiment category can, on the AUI/Optmz service side, be compose of many 'categorized experiments'
-// When the AUI/Optmz is queried for for an categrozied experiment, will will choose a random experiment
+// A categorized experiment is an experiment that is associated to an 'Experiment Category'
+// An experiment category can, on the AUI/Optmz service side, be composed of many 'categorized experiments'
+// When the AUI/Optmz is queried for an categorized experiment, it will choose a random experiment
 // for the available experiments of that category.
-// This allows the AUI/Optmz service to A/B select experiments per category.
+// This allows the AUI/Optmz service to select optimized experiments per category.
 class CategorizedExperiment {
     constructor() {
         this.Outcome = 0;
