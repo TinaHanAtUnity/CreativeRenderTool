@@ -431,4 +431,8 @@ describe('AutomatedExperimentManagerTests', () => {
                 assert.isTrue(metricStub.calledWith(AUIMetric.UnknownCategoryProvided));
             });
     });
+
+    it(`AUI/Optmz endpoint targets Production env`, () => {
+        assert.equal(AutomatedExperimentManager.BaseUrl, AutomatedExperimentManager.BaseUrlProduction);
+    });
 });
