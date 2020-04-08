@@ -2,9 +2,6 @@
 ##
 # Removes local release and staging branches.
 
-# Exits script when a commmand fails
-set -e
-
 git checkout master
 
 webviewdir=$(git rev-parse --show-toplevel)
