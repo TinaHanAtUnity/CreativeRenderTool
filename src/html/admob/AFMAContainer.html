@@ -79,10 +79,10 @@
 
                 var videoEl = document.querySelector('video');
                 if (videoEl === null) {
-                    var error = 'videoEl for admob is not found';
+                    var errorMessage = 'Missing Video Error: No video element contained in document';
                     self.postMessage('tracking', {
                         event: 'error',
-                        data: JSON.stringify(error)
+                        data: errorMessage
                     });
                     return;
                 }
