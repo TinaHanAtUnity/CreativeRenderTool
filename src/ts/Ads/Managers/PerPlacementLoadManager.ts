@@ -3,7 +3,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -92,12 +91,8 @@ export class PerPlacementLoadManager extends RefreshManager {
         // todo: implement method or remove from parent class
     }
 
-    public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
-        // todo: implement method or remove from parent class
-    }
-
     // count is the number of times load was called for a placementId before we could process it
-    private loadPlacement(placementId: string, count: number) {
+    protected loadPlacement(placementId: string, count: number) {
 
         LoadCalledCounter.report({
             gameId: this._clientInfo.getGameId(),
@@ -150,7 +145,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         return false;
     }
 
-    private invalidateExpiredCampaigns() {
+    protected invalidateExpiredCampaigns() {
         for (const placementId of this._adsConfig.getPlacementIds()) {
             const placement = this._adsConfig.getPlacement(placementId);
 

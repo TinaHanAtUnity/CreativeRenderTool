@@ -7,6 +7,7 @@ import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
 import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -228,6 +229,10 @@ export class Activity extends AdUnitContainer {
                 this._currentActivityFinished = true;
                 this._handlers.forEach(handler => handler.onContainerDestroy());
             }
+        }
+
+        if (this._ads.Listener instanceof PausableListenerApi) {
+            this._ads.Listener.resumeEvents();
         }
     }
 

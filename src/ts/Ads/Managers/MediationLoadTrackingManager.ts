@@ -6,9 +6,11 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export enum MediationExperimentType {
-    NofillImmediately = 'nfi',
-    CacheModeAllowed = 'cma',
+    CacheModeAllowed = 'cma2',
+    CacheModeDisabled = 'cmd',
+    AuctionV6 = 'av6',
     AuctionXHR = 'xhr',
+    LoadV5 = 'lv5',
     None = 'none'
 }
 
@@ -70,14 +72,45 @@ export class MediationLoadTrackingManager {
         });
     }
 
-    public reportAuctionRequest(latency: number, requestSuccessful: boolean) {
-        SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, {
+    public reportAuctionRequestStarted() {
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AuctionRequestStarted, {
+            'med': this._mediationName,
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+            'exp': this._experimentType
+        });
+        SDKMetrics.sendBatchedEvents();
+    }
+
+    public reportAdShown(adPlayedFromStream: boolean) {
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AdShow, {
+            'med': this._mediationName,
+            'wel': `${this._webviewEnabledLoad}`,
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+            'exp': this._experimentType,
+            'str': `${adPlayedFromStream}`
+        });
+        SDKMetrics.sendBatchedEvents();
+    }
+
+    public reportAuctionRequest(latency: number, requestSuccessful: boolean, reason?: string) {
+        let tags: { [key: string]: string } = {
             'med': this._mediationName,
             'wel': `${this._webviewEnabledLoad}`,
             'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
             'res': `${requestSuccessful}`,
             'exp': this._experimentType
-        });
+        };
+
+        if (reason) {
+            tags = {
+                ...tags,
+                'rsn': reason
+            };
+        }
+
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.AuctionRequest, latency, tags);
+        SDKMetrics.sendBatchedEvents();
     }
 
     public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {

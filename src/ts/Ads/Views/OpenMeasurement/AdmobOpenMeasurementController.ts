@@ -1,4 +1,4 @@
-import { OpenMeasurement, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AdMobSessionInterfaceEventBridge } from 'Ads/Views/OpenMeasurement/AdMobSessionInterfaceEventBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
@@ -34,6 +34,8 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+
+    private _omMetricFirstCheck: boolean = false;
 
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder, thirdPartyEventManager: ThirdPartyEventManager) {
         super(placement, omAdViewBuilder);
@@ -88,7 +90,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         });
         this._campaign.setOMVendors(omVendors);
         this._thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.OM_VENDORS, omVendors.join('|'));
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMInjected);
     }
 
     public setupOMInstance(om: OpenMeasurement<AdMobCampaign>, resource: IVerificationScriptResource) {
@@ -150,6 +151,22 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
+    public loaded(vastProperties: IVastProperties) {
+        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMLoadedFirst);
+            this._omMetricFirstCheck = true;
+        }
+        super.loaded(vastProperties);
+    }
+
+    public start(duration: number) {
+        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
+            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMStartFirst);
+            this._omMetricFirstCheck = true;
+        }
+        super.start(duration);
+    }
+
     public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
@@ -205,7 +222,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     }
 
     public sessionStart(sessionEvent: ISessionEvent) {
-
         this._omInstances.forEach((om) => {
             // Need a deep assignment to avoid duplication for events
             const event = JSON.parse(JSON.stringify(sessionEvent));
@@ -220,7 +236,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
                 });
             }
         });
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStart);
     }
 
     /**
@@ -228,7 +243,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
      */
     public sessionFinish() {
         super.sessionFinish();
-        SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionFinish);
         this._omSessionInterfaceBridge.sendSessionFinish();
     }
 }

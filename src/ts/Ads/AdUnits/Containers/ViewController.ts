@@ -15,6 +15,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Double } from 'Core/Utilities/Double';
 import { IObserver0, IObserver2 } from 'Core/Utilities/IObserver';
+import { PausableListenerApi } from 'Ads/Native/PausableListener';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -202,6 +203,9 @@ export class ViewController extends AdUnitContainer {
 
     private onViewDidDisappear(): void {
         this._handlers.forEach(handler => handler.onContainerDestroy());
+        if (this._ads.Listener instanceof PausableListenerApi) {
+            this._ads.Listener.resumeEvents();
+        }
     }
 
     private onMemoryWarning(): void {

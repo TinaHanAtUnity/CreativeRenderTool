@@ -1,20 +1,25 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { Observable3 } from 'Core/Utilities/Observable';
+import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
+import { MabDisabledABTest } from 'Core/Models/ABGroup';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 interface IAutomatedExperimentResponse {
     experiments: { [key: string]: IExperimentActionChoice };
@@ -27,18 +32,20 @@ interface IParsedExperiment {
     metadata: string;
 }
 
-export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[];
+export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number } | number[] | string[];
 
-class StateItem {
-    constructor(experiment: AutomatedExperiment, actions: IExperimentActionChoice) {
+class OptimizedAutomatedExperiment {
+    constructor(experiment: AutomatedExperiment) {
         this._experiment = experiment;
-        this.Actions = actions;
+        this.Actions = experiment.getDefaultActions();
+        this.Active = false;
+        this.Outcome = 0;
     }
 
     private _experiment: AutomatedExperiment;
     public Actions: IExperimentActionChoice;
-    public SendReward = false;
-    public SendAction = false;
+    public Active: boolean;
+    public Outcome: number;
     public MetaData: string;
 
     public getExperiment(): AutomatedExperiment {
@@ -46,228 +53,193 @@ class StateItem {
     }
 }
 
-class UserInfo {
-    public ABGroup: number;
-    public AuctionID: string | undefined;
-    public GameSessionID: number;
+enum AutomatedExperimentStage {
+    AWAITING_OPTIMIZATION,
+    RUNNING,
+    OUTCOME_PUBLISHED,
+    ENDED
 }
 
-export class CachableAutomatedExperimentData {
-    constructor(actions: IExperimentActionChoice, metadata: string) {
-        this.Actions = actions;
-        this.Metadata = metadata;
+class OptimizedCampaign {
+    constructor() {
+        this.Stage = AutomatedExperimentStage.AWAITING_OPTIMIZATION;
+        this.Experiments = {};
+        this.Id = '';
     }
 
-    public Actions: IExperimentActionChoice;
-    public Metadata: string;
-}
-
-enum AutomatedExperimentStage {
-    WaitingToStart,
-    Running,
-    ResultReported,
-    Done
+    public Id: string;
+    public Stage: AutomatedExperimentStage;
+    public Experiments: { [experimentId: string]: OptimizedAutomatedExperiment };
 }
 
 export class AutomatedExperimentManager {
-    private readonly _deviceInfo: DeviceInfo;
-    private readonly _clientInfo: ClientInfo;
-    private readonly _coreConfig: CoreConfiguration;
-    private readonly _privacySDK: PrivacySDK;
-    private readonly _nativeBridge: NativeBridge;
-    private readonly _requestManager: RequestManager;
-    private readonly _storageApi: StorageApi;
-
-    private readonly _state: { [key: string]: StateItem };
-    private _experimentStage: AutomatedExperimentStage;
-    private _userInfo: UserInfo;
-    private _gameSessionId: number;
+    private _requestManager: RequestManager;
+    private _deviceInfo: DeviceInfo;
+    private _privacySdk: PrivacySDK;
+    private _clientInfo: ClientInfo;
+    private _coreConfig: CoreConfiguration;
+    private _nativeBridge: NativeBridge;
+    private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
     private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
     private static readonly _createEndPoint = 'experiment';
     private static readonly _rewardEndPoint = 'reward';
-    private static readonly _settingsPrefix = 'AUI_OPT_EXPERIMENT';
 
-    constructor(core: ICore) {
+    private _abGroup: number;
+    private _gameSessionID: number;
+    private _declaredExperiments: AutomatedExperiment[];
+    private _campaign: OptimizedCampaign;
+    private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
+    private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
+
+    public static isAutomationAvailable(adsConfig: AdsConfiguration, config: CoreConfiguration) {
+        return !MabDisabledABTest.isValid(config.getAbGroup()) || adsConfig.getHasArPlacement();
+    }
+
+    constructor() {
+        this._declaredExperiments = [];
+    }
+
+    public initialize(core: ICore, campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
+        this._requestManager = core.RequestManager;
         this._deviceInfo = core.DeviceInfo;
+        this._privacySdk = core.Ads.PrivacySDK;
         this._clientInfo = core.ClientInfo;
         this._coreConfig = core.Config;
-        this._privacySDK = core.Ads.PrivacySDK;
         this._nativeBridge = core.NativeBridge;
-        this._requestManager = core.RequestManager;
-        this._storageApi = core.Api.Storage;
-        this._gameSessionId = core.Ads.SessionManager.getGameSessionId();
-        this._state = {};
-        this._experimentStage = AutomatedExperimentStage.WaitingToStart;
-        this._userInfo = new UserInfo();
+        this._abGroup = core.Config.getAbGroup();
+        this._gameSessionID = core.Ads.SessionManager.getGameSessionId();
+        this._campaignSource = campaignSource;
+        this._onCampaignListener = (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => this.onNewCampaign(campaign);
+        this._campaignSource.subscribe(this._onCampaignListener);
+        this._staticFeaturesPromise = this.collectStaticContextualFeatures();
     }
 
-    public initialize(experiments: AutomatedExperiment[]): Promise<void> {
-        const storedExperimentsPromise = experiments
-            .filter(experiment => !experiment.isCacheDisabled())
-            .map(experiment => this.getStoredExperimentData(experiment)
-                .then((storedExperimentData) => ({ experiment, data : storedExperimentData }))
-                .catch(() => ({experiment, data: null}))
-            );
-
-        experiments.forEach(experiment => {
-            this._state[experiment.getName()] = new StateItem(experiment, experiment.getDefaultActions());
-        });
-
-        this._userInfo.ABGroup = this._coreConfig.getAbGroup();
-        this._userInfo.GameSessionID = this._gameSessionId;
-
-        return this.collectStaticContextualFeatures().then(features => {
-              return Promise.all(storedExperimentsPromise).then(storedExperiments => {
-                storedExperiments
-                    .filter(storedExperiment => storedExperiment.data !== null)
-                    .forEach((storedExperiment) => {
-                        const stateItem = this._state[storedExperiment.experiment.getName()];
-                        if (stateItem) {
-                            stateItem.Actions = storedExperiment.data!.Actions;
-                            stateItem.MetaData = storedExperiment.data!.Metadata;
-                        }
-                    });
-
-                const experimentsToRequest = [
-                    ...storedExperiments
-                        .filter(storedExperiment => storedExperiment.data === null)
-                        .map(storedExperiment => storedExperiment.experiment),
-                    ...experiments.filter(experiment => experiment.isCacheDisabled())
-                ];
-
-                if (experimentsToRequest.length > 0) {
-                    const body = this.createRequestBody(experimentsToRequest, features);
-                    const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
-
-                    return this._requestManager.post(url, body)
-                        .then((response) => this.parseExperimentsResponse(response))
-                        .then((parsedExperiments) => Promise.all([this.storeExperiments(parsedExperiments), this.loadExperiments(parsedExperiments)]).then(() => Promise.resolve()))
-                        .catch((err) => {
-                            Diagnostics.trigger('failed_to_fetch_automated_experiments', err);
-                        });
-                }
-            });
-        });
+    public registerExperiments(experiments: AutomatedExperiment[]) {
+        this._declaredExperiments = this._declaredExperiments.concat(experiments);
     }
 
-    public beginExperiment() {
-        for (const stateKey in this._state) {
-            if (this._state.hasOwnProperty(stateKey)) {
-                this._state[stateKey].SendAction = false;
-                this._state[stateKey].SendReward = false;
+    public isCampaignTargetForExperiment(campaign: Campaign) {
+        return this._campaign !== undefined && this._campaign.Id === campaign.getId();
+    }
+
+    public startCampaign(campaign: Campaign) {
+        if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Stage === AutomatedExperimentStage.RUNNING) {
+                SDKMetrics.reportMetricEvent(AUIMetric.CampaignAlreadyActive);
+                return;
             }
-        }
 
-        this._experimentStage = AutomatedExperimentStage.Running;
-    }
-
-    public endExperiment(): Promise<void> {
-        if (this._experimentStage === AutomatedExperimentStage.Done) {
-            return Promise.resolve();
-        } else if (this._experimentStage === AutomatedExperimentStage.WaitingToStart) {
-            return Promise.reject('Experiment session not started.');
-        }
-
-        return this.reportExperiments(AutomatedExperimentStage.Done);
-    }
-
-    private reportExperiments(nextStage: AutomatedExperimentStage): Promise<void> {
-        const stage = this._experimentStage;
-        this._experimentStage = nextStage;
-
-        if (stage === AutomatedExperimentStage.Running) {
-            const promises: Promise<INativeResponse>[] = [];
-            for (const stateKey in this._state) {
-                if (this._state.hasOwnProperty(stateKey)) {
-                    promises.push(this.submitExperimentOutcome(this._state[stateKey], AutomatedExperimentManager._rewardEndPoint));
+            for (const experimentName in this._campaign.Experiments.keys) {
+                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+                    this._campaign.Experiments[experimentName].Active = false;
+                    this._campaign.Experiments[experimentName].Outcome = 0;
                 }
             }
 
-            this._experimentStage = nextStage;
-            return Promise.all(promises).then((ignored) => Promise.resolve());
-        } else {
-            this._experimentStage = nextStage;
-            return Promise.resolve();
+            this._campaign.Stage = AutomatedExperimentStage.RUNNING;
         }
     }
 
-    public sendAction(experiment: AutomatedExperiment, sessionId: string | undefined) {
-        if (this._experimentStage !== AutomatedExperimentStage.Running) {
-            return;
+    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): IExperimentActionChoice {
+
+        if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Experiments.hasOwnProperty(experiment.getName())) {
+                this._campaign.Experiments[experiment.getName()].Active = true;
+                return this._campaign.Experiments[experiment.getName()].Actions;
+            }
+
+            SDKMetrics.reportMetricEvent(AUIMetric.UnknownExperimentName);
         }
 
-        const stateItem = this._state[experiment.getName()];
-        if (stateItem) {
-            stateItem.SendAction = true;
-            this._userInfo.AuctionID = sessionId; // happens to also be the auction ID. Horrible but that all I could find so far.
-        }
+        return experiment.getDefaultActions();
     }
 
-    public sendReward() {
-        if (this._experimentStage !== AutomatedExperimentStage.Running) {
-            return;
+    public endCampaign(campaign: Campaign): Promise<void> {
+
+        if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+
+                this._campaign.Stage = AutomatedExperimentStage.ENDED;
+
+                return Promise.resolve();
+
+            } else if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
+                return Promise.reject('Experiment session not started.');
+            }
+
+            return this.publishCampaignOutcomes(campaign, AutomatedExperimentStage.ENDED);
         }
 
-        for (const state in this._state) {
-            if (this._state.hasOwnProperty(state)) {
-                if (this._state[state].SendAction) {
-                    this._state[state].SendReward = true;
+        return Promise.resolve();
+    }
+
+    private publishCampaignOutcomes(campaign: Campaign, nextStage: AutomatedExperimentStage): Promise<void> {
+
+        this._campaign.Stage = nextStage;
+
+        const promises: Promise<INativeResponse>[] = [];
+        for (const experimentName in this._campaign.Experiments) {
+
+            if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+
+                const optmzdExperiment = this._campaign.Experiments[experimentName];
+                if (optmzdExperiment.Active) {
+                    optmzdExperiment.Active = false;
+                    promises.push(this.postExperimentOutcome(campaign, optmzdExperiment, AutomatedExperimentManager._rewardEndPoint));
                 }
             }
         }
 
-        this.reportExperiments(AutomatedExperimentStage.ResultReported);
+        return Promise.all(promises)
+            .catch((e) => {
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToPublishOutcome);
+                return Promise.reject(e);
+            })
+            .finally(() => { this._campaign = new OptimizedCampaign(); })
+            .then((res) => { return Promise.resolve(); });
     }
 
-    public getExperimentAction(experiment: AutomatedExperiment): IExperimentActionChoice|undefined {
-        const stateItem = this._state[experiment.getName()];
-        if (!stateItem) {
-            return undefined;
-        }
+    public rewardExperiments(campaign: Campaign) {
 
-        return stateItem.Actions;
+        if (this.isCampaignTargetForExperiment(campaign)) {
+
+            if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
+                return;
+            }
+
+            for (const experimentName in this._campaign.Experiments) {
+                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
+
+                    if (this._campaign.Experiments[experimentName].Active) {
+                        this._campaign.Experiments[experimentName].Outcome = 1;
+                    }
+                }
+            }
+
+            this.publishCampaignOutcomes(campaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
+        }
     }
 
-    private submitExperimentOutcome(item: StateItem, apiEndPoint: string): Promise<INativeResponse> {
-        let rewardVal = 0;
-        if (item.SendReward) {
-            rewardVal = 1;
-        }
-
+    private postExperimentOutcome(campaign: Campaign, optmzExperiment: OptimizedAutomatedExperiment, apiEndPoint: string): Promise<INativeResponse> {
         const outcome = {
             user_info: {
-                ab_group: this._userInfo.ABGroup,
-                auction_id: this._userInfo.AuctionID,
-                game_session_id: this._userInfo.GameSessionID
+                ab_group: this._abGroup,
+                auction_id: campaign.getSession().getId(),
+                game_session_id: this._gameSessionID
             },
-            experiment: item.getExperiment().getName(),
-            actions: item.Actions,
-            reward: rewardVal,
-            metadata: item.MetaData
+            experiment: optmzExperiment.getExperiment().getName(),
+            actions: optmzExperiment.Actions,
+            reward: optmzExperiment.Outcome,
+            metadata: optmzExperiment.MetaData
         };
 
         const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
         const body = JSON.stringify(outcome);
         return this._requestManager.post(url, body);
-    }
-
-    private loadExperiments(experiments: IParsedExperiment[]): Promise<void> {
-        experiments.forEach(experiment => {
-            const stateItem = this._state[experiment.name];
-            if (stateItem) {
-                stateItem.Actions = experiment.actions;
-                stateItem.MetaData = experiment.metadata;
-            }
-        });
-        return Promise.resolve();
-    }
-
-    private storeExperiments(experiments: IParsedExperiment[]): Promise<void> {
-        experiments.forEach(experiment => {
-            this.storeExperimentData(experiment.name, new CachableAutomatedExperimentData(experiment.actions, experiment.metadata));
-        });
-        return Promise.resolve();
     }
 
     private parseExperimentsResponse(response: INativeResponse): IParsedExperiment[] {
@@ -282,7 +254,7 @@ export class AutomatedExperimentManager {
                     metadata: (json.metadata === null || json.metadata === undefined ? '' : json.metadata[experiment])
                 }));
             } catch (e) {
-                Diagnostics.trigger('failed_to_parse_automated_experiments', e);
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToParseExperimentResponse);
                 return [];
             }
         } else {
@@ -290,17 +262,17 @@ export class AutomatedExperimentManager {
         }
     }
 
-    private collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }>  {
+    private collectStaticContextualFeatures(): Promise<{ [key: string]: ContextualFeature }> {
         const filter = [
             //GAMES, CAMPAIGN, THE AD
-            { l: 'bundleId', c: 'bundle_id'},
+            { l: 'bundleId', c: 'bundle_id' },
             { l: 'gameId', c: 'game_id' },
 
             //PRIVACY & OPT-OUTS
             { l: 'coppaCompliant', c: 'coppa_compliant' },
             { l: 'limitAdTracking', c: 'limit_ad_tracking' },
             { l: 'gdpr_enabled', c: undefined },
-            { l: 'opt_out_Recorded', c: undefined },
+            { l: 'opt_out_recorded', c: undefined },
             { l: 'opt_out_enabled', c: undefined },
 
             //DEMOGRAPHIC
@@ -309,136 +281,189 @@ export class AutomatedExperimentManager {
             { l: 'timeZone', c: 'time_zone' },
 
             //DEVICE -- STATIC
-            { l: 'platform',  c: undefined },
+            { l: 'platform', c: undefined },
             { l: 'osVersion', c: 'os_version' },
             { l: 'deviceModel', c: 'device_model' },
             { l: 'deviceMake', c: 'device_make' },
-            { l: 'screenWidth', c: 'screen_width' },
-            { l: 'screenHeight', c: 'screen_height' },
             { l: 'screenDensity', c: 'screen_density' },
-            { l: 'simulator',  c: undefined },
+            { l: 'simulator', c: undefined },
             { l: 'stores', c: undefined },
 
             //DEVICE -- BEHAVIOUR
-            { l: 'rooted',  c: undefined },
-            { l: 'connectionType', c: 'connection_type' },
-            { l: 'device_free_space', c: undefined },
-            { l: 'headset', c: undefined },
-            { l: 'deviceVolume', c: 'device_volume' },
+            { l: 'rooted', c: undefined },
             { l: 'max_volume', c: undefined },
-            { l: 'freeMemory', c: 'free_memory' },
             { l: 'totalMemory', c: 'total_memory' },
             { l: 'total_internal_space', c: undefined },
-            { l: 'free_external_space', c: undefined },
-            { l: 'total_external_space', c: undefined },
+            { l: 'totalSpaceExternal', c: 'total_external_space' }
+        ];
+
+        return Promise.all([
+            this._deviceInfo.getDTO(),
+            this._clientInfo.getDTO(),
+            this._coreConfig.getDTO()
+        ])
+            .then((res) => {
+                const rawData: { [key: string]: ContextualFeature } = {
+                    ...res[0],
+                    ...res[1],
+                    ...res[2],
+                    'gdpr_enabled': this._privacySdk.isGDPREnabled(),
+                    'opt_out_recorded': this._privacySdk.isOptOutRecorded(),
+                    'opt_out_enabled': this._privacySdk.isOptOutEnabled(),
+                    'platform': Platform[this._nativeBridge.getPlatform()],
+                    'stores': this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
+                    'simulator': this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
+                    'total_internal_space': this._deviceInfo.getTotalSpace(),
+                    'max_volume': this._deviceInfo.get('maxVolume')
+                };
+
+                const features: { [key: string]: ContextualFeature } = {};
+                filter.forEach(item => {
+                    if (rawData[item.l] !== undefined) {
+                        const name = (item.c !== undefined) ? item.c : item.l;
+                        features[name] = rawData[item.l];
+                    }
+                });
+
+                return features;
+            }).catch(err => {
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToCollectStaticFeatures);
+                return {};
+            });
+    }
+
+    private async collectDeviceContextualFeatures(): Promise<{ [key: string]: ContextualFeature }> {
+        const filter = [
+            { l: 'connectionType', c: 'connection_type' },
+            { l: 'headset', c: undefined },
+            { l: 'deviceVolume', c: 'device_volume' },
+            { l: 'freeMemory', c: 'free_memory' },
+            { l: 'device_free_space', c: undefined },
+            { l: 'freeSpaceExternal', c: 'free_external_space' },
             { l: 'batteryLevel', c: 'battery_level' },
             { l: 'batteryStatus', c: 'battery_status' },
-            { l: 'usb_connected', c: undefined },
-            { l: 'ringer_mode', c: undefined },
-            { l: 'network_metered', c: undefined },
+            { l: 'usbConnected', c: 'usb_connected' },
+            { l: 'ringerMode', c: 'ringer_mode' },
+            { l: 'networkMetered', c: 'network_metered' },
             { l: 'screenBrightness', c: 'screen_brightness' },
-
-            // NOT REALLY STATIC, BUT CONCIDERED SO FOR NOW
-            { l: 'local_day_time', c: undefined }
+            { l: 'video_orientation', c: undefined },
+            { l: 'screenWidth', c: 'screen_width' },
+            { l: 'screenHeight', c: 'screen_height' }
         ];
 
         return Promise.all([
-            this._deviceInfo.fetch(),
             this._deviceInfo.getDTO(),
-            this._deviceInfo.getFreeSpace(),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getFreeSpaceExternal() : Promise.resolve<number | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getTotalSpaceExternal() : Promise.resolve<number | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getNetworkMetered() : Promise.resolve<boolean | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getRingerMode() : Promise.resolve<number | undefined>(undefined),
-            this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.isUSBConnected() : Promise.resolve<boolean | undefined>(undefined),
-            new Date(Date.now())
-        ]).then((res) => {
-            const rawData: { [key: string]: ContextualFeature } = {
-               ...res[1],
-               ...this._clientInfo.getDTO(),
-               ...this._coreConfig.getDTO(),
-               'gdpr_enabled': this._privacySDK.isGDPREnabled(),
-               'opt_out_Recorded': this._privacySDK.isOptOutRecorded(),
-               'opt_out_enabled': this._privacySDK.isOptOutEnabled(),
-               'platform': Platform[this._nativeBridge.getPlatform()],
-               'stores':  this._deviceInfo.getStores() !== undefined ? this._deviceInfo.getStores().split(',') : undefined,
-               'simulator': this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
-               'total_internal_space': this._deviceInfo.getTotalSpace(),
-               'device_free_space': res[2],
-               'free_external_space': res[3],
-               'total_external_space': res[4],
-               'network_metered' : res[5],
-               'ringer_mode': res[6] !== undefined ? RingerMode[<RingerMode>res[6]] : undefined,
-               'usb_connected' : res[7],
-               'max_volume': this._deviceInfo.get('maxVolume'),
-               'local_day_time': res[8].getHours() + res[8].getMinutes() / 60
-            };
-
-            // do some enum conversions
-            if (rawData.hasOwnProperty('batteryStatus')) {
-                rawData.batteryStatus = BatteryStatus[<BatteryStatus>rawData.batteryStatus];
-            }
-
-            const features: { [key: string]: ContextualFeature } = {};
-            filter.forEach(item => {
-               if (rawData[item.l] !== undefined) {
-                   const name = (item.c !== undefined) ? item.c : item.l;
-                   features[ name ] = rawData[item.l] ;
-               }
-            });
-
-            return features;
-        });
-    }
-
-    // not used at the moment. but will be soon: when we do an inference / ad display.
-    // incomplete implementation
-    private collectAdRelatedFeatures(deviceInfo: DeviceInfo): Promise<{ [key: string]: ContextualFeature }>  {
-        const filter = [
-            // CAMPAIGN, THE AD
-            'campaignId', 'targetGameId', 'rating', 'ratingCount', 'gameSessionCounters', 'cached',
-
-            // MISC
-            'videoOrientation'
-        ];
-
-        const undefinedValue = new Promise(() => undefined);
-        return Promise.all([
-            deviceInfo.getScreenWidth(),
-            deviceInfo.getScreenHeight()
-        ]).then((res) => {
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._deviceInfo.getFreeSpace()
+        ])
+            .then((res) => {
                 const rawData: { [key: string]: ContextualFeature } = {
-                    'videoOrientation': Orientation[  res[0] >= res[1] ? Orientation.LANDSCAPE : Orientation.PORTRAIT]
-            };
+                    ...res[0],
+                    'video_orientation': Orientation[res[1] >= res[2] ? Orientation.LANDSCAPE : Orientation.PORTRAIT],
+                    'device_free_space': res[3]
+                };
 
-            const features: { [key: string]: ContextualFeature } = {};
-            filter.forEach(name => {
-               if (rawData[name] !== undefined) {
-                   features[name] = rawData[name];
-               }
+                // do some enum conversions
+                if (rawData.hasOwnProperty('batteryStatus')) {
+                    rawData.batteryStatus = BatteryStatus[<BatteryStatus>rawData.batteryStatus];
+                }
+                if (rawData.hasOwnProperty('ringerMode')) {
+                    rawData.ringerMode = RingerMode[<RingerMode>rawData.ringerMode];
+                }
+
+                const features: { [key: string]: ContextualFeature } = {};
+                filter.forEach(item => {
+                    if (rawData[item.l] !== undefined) {
+                        const name = (item.c !== undefined) ? item.c : item.l;
+                        features[name] = rawData[item.l];
+                    }
+                });
+
+                return features;
+            }).catch(err => {
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToCollectDeviceFeatures);
+                return {};
             });
-
-            return features;
-        });
     }
 
-    private createRequestBody(experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature}): string {
+    private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
+        const features: { [key: string]: ContextualFeature } = {};
+        const gameSessionCounters = GameSessionCounters.getCurrentCounters();
+
+        const ts = new Date();
+        features.campaign_id = campaign.getId();
+        features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
+        features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
+        features.rating_count = campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
+        features.gsc_ad_requests = gameSessionCounters.adRequests;
+        features.gsc_views = gameSessionCounters.views;
+        features.gsc_starts = gameSessionCounters.starts;
+        features.is_video_cached = CampaignAssetInfo.isCached(campaign);
+        features.is_weekend = ts.getDay() === 0 || ts.getDay() === 6;
+        features.day_of_week = ts.getDay();
+        features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
+
+        // Extract game session counters: Campaign centric
+        let ids: string[] = [];
+        let starts: number[] = [];
+        let views: number[] = [];
+        let startsTS: string[] = [];
+        for (const campaignID in gameSessionCounters.startsPerCampaign) {
+            if (gameSessionCounters.startsPerCampaign.hasOwnProperty(campaignID)) {
+                ids = ids.concat(campaignID);
+                starts = starts.concat(gameSessionCounters.startsPerCampaign[campaignID]);
+                views = views.concat(gameSessionCounters.viewsPerCampaign[campaignID] !== undefined ? gameSessionCounters.viewsPerCampaign[campaignID] : 0);
+                startsTS = startsTS.concat(gameSessionCounters.latestCampaignsStarts[campaignID] !== undefined ? gameSessionCounters.latestCampaignsStarts[campaignID] : '');
+            }
+        }
+        if (ids.length > 0) {
+            features.gsc_campaigns = ids;
+            features.gsc_campaign_starts = starts;
+            features.gsc_campaign_views = views;
+            features.gsc_campaign_last_start_ts = startsTS;
+        }
+
+        // Extract game session counters: targetted game centric
+        ids = [];
+        starts = [];
+        views = [];
+        for (const targetId in gameSessionCounters.startsPerTarget) {
+            if (gameSessionCounters.startsPerTarget.hasOwnProperty(targetId)) {
+                ids = ids.concat(targetId);
+                starts = starts.concat(gameSessionCounters.startsPerTarget[targetId]);
+                views = views.concat(gameSessionCounters.viewsPerTarget[targetId] !== undefined ? gameSessionCounters.viewsPerTarget[targetId] : 0);
+            }
+        }
+
+        if (ids.length > 0) {
+            features.gsc_target_games = ids;
+            features.gsc_target_game_starts = starts;
+            features.gsc_target_game_views = views;
+        }
+
+        return features;
+    }
+
+    private createRequestBody(campaign: Campaign, experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature }): string {
         return JSON.stringify({
             user_info: {
-                ab_group: this._userInfo.ABGroup,
-                game_session_id: this._userInfo.GameSessionID
-                // auction_id: Left out on purpose, as experiments are used accross multiple actions at the moment
+                ab_group: this._abGroup,
+                game_session_id: this._gameSessionID,
+                auction_id: campaign.getSession().getId()
             },
-            experiments: experiments.map(e => { return {
-                name: e.getName(),
-                actions: this.getExperimentSpace(e.getActions())
-            }; }),
+            experiments: experiments.map(e => {
+                return {
+                    name: e.getName(),
+                    actions: this.getExperimentSpace(e.getActions())
+                };
+            }),
             contextual_features: contextualFeatures
         });
     }
 
     private getExperimentSpace(experimentComponentsDictionary: IExperimentDeclaration): IExperimentActionsPossibleValues {
-        const experimentSpace: {[actionName: string]: string[]} = {};
+        const experimentSpace: { [actionName: string]: string[] } = {};
         for (const [actionName, variants] of Object.entries(experimentComponentsDictionary)) {
             experimentSpace[actionName] = Object.values(variants);
         }
@@ -446,12 +471,85 @@ export class AutomatedExperimentManager {
         return experimentSpace;
     }
 
-    private getStoredExperimentData(e: AutomatedExperiment): Promise<CachableAutomatedExperimentData> {
-        return this._storageApi.get<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + e.getName());
+    // Only public so that testing can access it. :/
+    public onNewCampaign(campaign: Campaign): Promise<void> {
+
+        if (this._declaredExperiments.length === 0) {
+            return Promise.resolve();
+        }
+
+        if (!(campaign instanceof PerformanceCampaign)) {
+            SDKMetrics.reportMetricEvent(AUIMetric.IgnoringNonPerformanceCampaign);
+            return Promise.resolve();
+        }
+
+        // This is to limit to 1 optmization call per Game Session.
+        if (this._campaignSource !== undefined) {
+            this._campaignSource.unsubscribe(this._onCampaignListener);
+        }
+
+        this._campaign = new OptimizedCampaign();
+        this._campaign.Id = campaign.getId();
+
+        this._declaredExperiments.forEach(experiment => {
+            this._campaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
+        });
+
+        SDKMetrics.reportMetricEvent(AUIMetric.RequestingCampaignOptimization);
+
+        // Fire and forget... No one resolves it/blocks on it explicitely
+        return Promise.all([this._staticFeaturesPromise, this.collectDeviceContextualFeatures(), this.collectAdSpecificFeatures(campaign)])
+            .then((featureMaps) => {
+                const features: { [key: string]: ContextualFeature } = {};
+                for (const i in featureMaps) {
+                    if (featureMaps.hasOwnProperty(i)) {
+                        for (const name in featureMaps[i]) {
+                            if (!features.hasOwnProperty(name)) {
+                                features[name] = featureMaps[i][name];
+                            }
+                        }
+                    }
+                }
+                return features;
+            }).then((features) => {
+                const body = this.createRequestBody(campaign, this._declaredExperiments, features);
+                const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
+
+                return this._requestManager.post(url, body)
+                    .then((response) => this.parseExperimentsResponse(response))
+                    .then((parsedExperiments) => this.loadCampaignExperiments(campaign, parsedExperiments))
+                    .then(() => Promise.resolve())
+                    .catch((err) => {
+                        SDKMetrics.reportMetricEvent(AUIMetric.FailedToFetchAutomatedExperiements);
+                    });
+            }).catch(() => {
+                SDKMetrics.reportMetricEvent(AUIMetric.CampaignInitializationError);
+            });
     }
 
-    private storeExperimentData(experimentName: string, data: CachableAutomatedExperimentData) {
-        this._storageApi.set<CachableAutomatedExperimentData>(StorageType.PRIVATE, AutomatedExperimentManager._settingsPrefix + '_' + experimentName, data);
-        this._storageApi.write(StorageType.PRIVATE);
+    private loadCampaignExperiments(campaign: Campaign, experiments: IParsedExperiment[]): Promise<void> {
+
+        if (this._campaign.Id === campaign.getId()) {
+
+            if (this._campaign.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+                SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseIgnored);
+                return Promise.resolve();
+            }
+
+            experiments.forEach(experiment => {
+                const optmzdExperiment = this._campaign.Experiments[experiment.name];
+                if (optmzdExperiment) {
+                    optmzdExperiment.Actions = experiment.actions;
+                    optmzdExperiment.MetaData = experiment.metadata;
+                }
+            });
+
+            SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseApplied);
+
+            return Promise.resolve();
+
+        } else {
+            return Promise.reject('unknown_campaign_cant_load_experiments');
+        }
     }
 }

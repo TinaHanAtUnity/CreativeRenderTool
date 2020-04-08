@@ -8,6 +8,7 @@ import { Url } from 'Core/Utilities/Url';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -72,6 +73,10 @@ export class ThirdPartyEventManager {
         const urls = campaign.getTrackingUrlsForEvent(event);
         const sessionId = campaign.getSession().getId();
         const events = [];
+
+        if (event === TrackingEvent.IMPRESSION && CustomFeatures.sampleAtGivenPercent(50)) {
+            SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
+        }
 
         for (const url of urls) {
             events.push(this.sendWithGet(`${adDescription} ${event}`, sessionId, url, useWebViewUserAgentForTracking, headers));

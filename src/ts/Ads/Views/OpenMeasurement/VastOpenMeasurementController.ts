@@ -1,12 +1,13 @@
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { Placement } from 'Ads/Models/Placement';
-import { OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
+import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { AccessMode,  ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P, IVastProperties } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastOpenMeasurementController extends OpenMeasurementController {
     private _clientInfo: ClientInfo;
@@ -39,6 +40,17 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
         });
     }
 
+    /**
+     * Video-only event. The player has loaded and buffered the creative’s
+     * media and assets either fully or to the extent that it is ready
+     * to play the media. Corresponds to the VAST  loaded  event.
+     */
+    public loaded(vastProperties: IVastProperties) {
+        if (this.getState() === OMState.STOPPED) {
+            super.loaded(vastProperties);
+        }
+    }
+
     public sessionStart() {
         const contextData: IContext = this.buildSessionContext();
         const date = Date.now();
@@ -55,8 +67,17 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             if (verification.getVerificationParameters()) {
                 event.data.verificationParameters = verification.getVerificationParameters();
             }
-            event.data.vendorkey = verification.getVerificationVendor();
+
+            const vendorKey = verification.getVerificationVendor();
+
+            event.data.vendorkey = vendorKey;
+
+            if (CustomFeatures.isIASVendor(vendorKey)) {
+                contextData.adSessionType = AdSessionType.NATIVE;  // TODO: Adjust. IAS expects native to run properly
+            }
+
             event.data.context = contextData;
+
             om.sessionStart(event);
         });
 
@@ -67,7 +88,7 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
             environment: 'app',                                   // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.NATIVE,                  // Needed to be native for IAS for some reason
+            adSessionType: AdSessionType.HTML,
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
