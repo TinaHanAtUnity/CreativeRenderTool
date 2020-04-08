@@ -33,7 +33,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        const experimentID = this._automatedExperimentManager.getSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
+        const experimentID = this._automatedExperimentManager.getSelectedExperimentName(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
         let endScreenCombination: IExperimentActionChoice | undefined;
 

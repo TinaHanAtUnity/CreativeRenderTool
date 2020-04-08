@@ -217,7 +217,7 @@ describe('AutomatedExperimentManagerTests', () => {
                     assert.isTrue(postStub.called);
                     assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-                    assert.equal(aem.getSelectedExperiment(campaign, testCategory), experimentID);
+                    assert.equal(aem.getSelectedExperimentName(campaign, testCategory), experimentID);
 
                     const selectedActions = aem.activateSelectedExperiment(campaign, testCategory);
                     assert.equal(JSON.stringify(selectedActions), JSON.stringify(action), 'Wrong variant...');
@@ -248,7 +248,7 @@ describe('AutomatedExperimentManagerTests', () => {
             assert.isTrue(metricStub.calledOnce);
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-            assert.equal(aem.getSelectedExperiment(campaign, testCategory), '');
+            assert.equal(aem.getSelectedExperimentName(campaign, testCategory), '');
             assert.equal(aem.activateSelectedExperiment(campaign, testCategory), undefined);
         });
     });
@@ -276,7 +276,7 @@ describe('AutomatedExperimentManagerTests', () => {
             assert.isTrue(metricStub.calledOnce);
             assert.isTrue(ValidateFeaturesInRequestBody(postStub.firstCall.args[1]));
 
-            assert.equal(aem.getSelectedExperiment(campaign, testCategory), '');
+            assert.equal(aem.getSelectedExperimentName(campaign, testCategory), '');
             assert.equal(aem.activateSelectedExperiment(campaign, testCategory), undefined);
         });
     });
@@ -316,7 +316,7 @@ describe('AutomatedExperimentManagerTests', () => {
             aem.registerExperimentCategory(testCategory, campaignType);
             return aem.onNewCampaign(campaign)
                 .then(() => {
-                    assert.equal(aem.getSelectedExperiment(campaign, testCategory), experimentID);
+                    assert.equal(aem.getSelectedExperimentName(campaign, testCategory), experimentID);
                     const variant = aem.activateSelectedExperiment(campaign, testCategory);
                     assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
 
@@ -397,7 +397,7 @@ describe('AutomatedExperimentManagerTests', () => {
         const otherTypeCampaign = TestFixtures.getXPromoCampaign();
         return aem.onNewCampaign(otherTypeCampaign)
             .then(() => {
-                assert.equal(aem.getSelectedExperiment(otherTypeCampaign, testCategory), '');
+                assert.equal(aem.getSelectedExperimentName(otherTypeCampaign, testCategory), '');
             });
     });
 

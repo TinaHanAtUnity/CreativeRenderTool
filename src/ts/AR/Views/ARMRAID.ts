@@ -20,7 +20,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
-import { IArUiExperiments } from 'AR/Experiments/ARUIExperiments';
+import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { Color } from 'Core/Utilities/Color';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -56,13 +56,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
     private _arAndroidEnumsReceivedObserver: IObserver1<unknown>;
-    private _arUiExperiments: IArUiExperiments;
+    private _arUiExperiments: IExperimentActionChoice;
     private _automatedExperimentManager: AutomatedExperimentManager;
 
     private _hasCameraPermission = false;
     private _viewable: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUiExperiments: IArUiExperiments) {
+    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUiExperiments: IExperimentActionChoice) {
         super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, !!hidePrivacy, gameSessionId);
 
         this._ar = ar;

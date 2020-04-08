@@ -3,15 +3,10 @@ import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { AutomatedExperimentsCategories, ArAvailableButtonExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { Campaign } from 'Ads/Models/Campaign';
 
-export interface IArUiExperiments {
-    color: string;
-    skip: string;
-}
-
-export function arAvailableButtonDecision(automatedExperimentManager: AutomatedExperimentManager, campaign: Campaign): IArUiExperiments {
+export function arAvailableButtonDecision(automatedExperimentManager: AutomatedExperimentManager, campaign: Campaign): IExperimentActionChoice {
     let actions: IExperimentActionChoice | undefined;
 
-    const experimentID = automatedExperimentManager.getSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
+    const experimentID = automatedExperimentManager.getSelectedExperimentName(campaign, AutomatedExperimentsCategories.MRAID_AR);
     if (experimentID === ArAvailableButtonExperiment.getName()) {
         actions = automatedExperimentManager.activateSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
     }
@@ -20,8 +15,5 @@ export function arAvailableButtonDecision(automatedExperimentManager: AutomatedE
         actions = ArAvailableButtonExperiment.getDefaultActions();
     }
 
-    return {
-        color: actions.color,
-        skip: actions.skip
-    };
+    return actions;
 }
