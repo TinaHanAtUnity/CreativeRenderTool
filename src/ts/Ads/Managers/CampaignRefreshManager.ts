@@ -18,14 +18,10 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities, ProductState } from 'Promo/Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { TimeUtils } from 'Ads/Utilities/TimeUtils';
-import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
 
 export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
@@ -106,13 +102,6 @@ export class CampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
         this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
-    }
-
-    public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
-        eventHandler.onClose.subscribe(() => {
-            this._needsRefill = true;
-            this.refresh();
-        });
     }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -198,51 +187,8 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls | undefined) {
-        if (PurchasingUtilities.isInitialized()) {
-            PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
-        }
         this._parsingErrorCount = 0;
-        if (campaign instanceof PromoCampaign) {
-            this.handlePromoCampaign(placementId, campaign, trackingUrls);
-        } else {
-            this.setPlacementReady(placementId, campaign, trackingUrls);
-        }
-    }
-
-    private handlePromoCampaign(placementId: string, campaign: PromoCampaign, trackingUrls: ICampaignTrackingUrls | undefined) {
-        const productId = campaign.getIapProductId();
-        const state = PurchasingUtilities.getProductState(productId);
-        switch (state) {
-            case ProductState.EXISTS_IN_CATALOG:
-                this.setPlacementReady(placementId, campaign, trackingUrls);
-                break;
-            case ProductState.MISSING_PRODUCT_IN_CATALOG:
-                PromoErrorService.report(this._request, {
-                    auctionID: campaign.getSession().getId(),
-                    corrID: campaign.getCorrelationId(),
-                    country: this._coreConfig.getCountry(),
-                    projectID: this._coreConfig.getUnityProjectId(),
-                    gameID: this._clientInfo.getGameId(),
-                    placementID: placementId,
-                    productID: productId,
-                    platform: this._platform,
-                    gamerToken: this._coreConfig.getToken(),
-                    errorCode: 102,
-                    errorMessage: 'placement missing productId'
-                });
-                this._core.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productId} available in purchasing catalog`);
-                this.onDisable(placementId);
-                break;
-            case ProductState.WAITING_FOR_CATALOG:
-                // Set the tracking urls on the placement to be used later once the placement is ready
-                const placement = this._adsConfig.getPlacement(placementId);
-                if (placement) {
-                    placement.setCurrentTrackingUrls(trackingUrls);
-                }
-                this.setPlacementState(placementId, PlacementState.WAITING);
-                break;
-            default:
-        }
+        this.setPlacementReady(placementId, campaign, trackingUrls);
     }
 
     private setPlacementReady(placementId: string, campaign: Campaign, trackingUrls: { [eventName: string]: string[] } | undefined) {

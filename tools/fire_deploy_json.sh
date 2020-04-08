@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Script is currently unused and unsupported. Its function was to alert SRE of Webview Deployments.
+
 command -v kt >/dev/null 2>&1 || { echo >&2 "kafka-tools (kt) is required to run this script. Install it from https://github.com/fgeller/kt#installation"; exit 1; }
 
 REMOTEURL="kafka1.prd.log.corp.unity3d.com:9092"

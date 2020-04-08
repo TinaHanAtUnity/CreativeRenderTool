@@ -6,7 +6,6 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { AdMobView } from 'AdMob/Views/AdMobView';
-import { OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
 import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';

@@ -15,6 +15,11 @@ import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } 
 // });
 
 export const ButtonExperimentDeclaration: IExperimentDeclaration = {
+  scheme: {
+      DARK: 'dark',
+      LIGHT: 'light',
+      COLORMATCHING: 'color_matching'
+  },
   animation: {
       STATIC: 'static',
       HEARTBEATING: 'heartbeating',
@@ -30,11 +35,12 @@ export const ButtonExperimentDeclaration: IExperimentDeclaration = {
 };
 
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
-    name: 'wbvw-endcard-v1',
+    name: 'wbvw-endcard-v2',
     actions: ButtonExperimentDeclaration,
     defaultActions: {
-        color: ButtonExperimentDeclaration.color.BLUE,
-        animation: ButtonExperimentDeclaration.animation.STATIC
+        scheme: ButtonExperimentDeclaration.scheme.LIGHT,
+        animation: ButtonExperimentDeclaration.animation.BOUNCING,
+        color: ButtonExperimentDeclaration.color.BLUE
     },
     cacheDisabled: true
 });

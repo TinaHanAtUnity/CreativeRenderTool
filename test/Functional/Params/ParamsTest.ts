@@ -37,8 +37,9 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-class SpecVerifier {
+export class SpecVerifier {
     private _platform: Platform;
     private _spec: IEventSpec;
     private _queryParams: string[];
@@ -177,14 +178,21 @@ describe('Event parameters should match specifications', () => {
     describe('with ad request', () => {
         let coreConfig: CoreConfiguration;
         let adsConfig: AdsConfiguration;
+        let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
+            sandbox = sinon.createSandbox();
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
+
+            sandbox.stub(SDKMetrics, 'reportMetricEventWithTags');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
         });
 
         it('on Android', () => {
-            const sandbox = sinon.createSandbox();
             const platform = Platform.ANDROID;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -222,7 +230,6 @@ describe('Event parameters should match specifications', () => {
         });
 
         it('on iOS', () => {
-            const sandbox = sinon.createSandbox();
             const platform = Platform.IOS;
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);

@@ -10,6 +10,6 @@ export const AssetManager = jest.fn(() => {
     return <AssetManagerMock>{
         enableCaching: jest.fn(),
         checkFreeSpace: jest.fn(),
-        setup: jest.fn().mockImplementation(() => Promise.resolve())
+        setup: jest.fn().mockImplementation((campaign) => Promise.resolve(campaign))
     };
 });

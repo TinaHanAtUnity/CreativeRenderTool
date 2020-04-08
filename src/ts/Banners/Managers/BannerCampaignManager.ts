@@ -98,10 +98,13 @@ export class BannerCampaignManager {
             .then((response) => {
                 const nativeResponse = request.getNativeResponse();
                 if (nativeResponse) {
-                    if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
-                        return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
+                    switch (RequestManager.getAuctionProtocol()) {
+                        case AuctionProtocol.V4:
+                            return this.parseBannerCampaign(nativeResponse, placement);
+                        case AuctionProtocol.V5:
+                        default:
+                            return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
-                    return this.parseBannerCampaign(nativeResponse, placement);
                 }
                 throw new Error('Empty campaign response');
             })

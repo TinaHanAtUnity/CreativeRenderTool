@@ -546,13 +546,6 @@
     "platforms": "all"
   },
   {
-    "key": "isPromoCatalogAvailable",
-    "type": "boolean",
-    "description": "Flag describing if the developer has a set up a catalog for their IAP Promo Placement",
-    "provider": "SDK",
-    "platforms": "all"
-  },
-  {
     "key": "isLoadEnabled",
     "type": "boolean",
     "description": "Flag describing if the campaign was loaded using Load API or from Precached Initialization",
@@ -602,9 +595,30 @@
     "platforms": "all"
   },
   {
-    "key": "isMadeWithUnity",
+    "key": "preload",
     "type": "boolean",
-    "description": "isMadeWithUnity flag",
+    "description": "Preload Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "load",
+    "type": "boolean",
+    "description": "Load Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadPlacements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadData",
+    "type": "object",
+    "description": "Preload Data for all placements received in configuration",
     "provider": "SDK",
     "platforms": "all"
   }

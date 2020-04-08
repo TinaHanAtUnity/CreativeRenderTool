@@ -1,6 +1,5 @@
 import {
     AnalyticsProtocol,
-    IAnalyticsMonetizationExtras,
     IAnalyticsObject,
     IAnalyticsCommonObjectV1
 } from 'Analytics/AnalyticsProtocol';
@@ -15,7 +14,6 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 import { Promises } from 'Core/Utilities/Promises';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
@@ -43,22 +41,6 @@ export class AnalyticsManager implements IAnalyticsManager {
     private _adsAnalyticsSessionId: string;
     private _latestAppStartTime: number;
 
-    public static getPurchasingFailureReason(reason: string): PurchasingFailureReason {
-        switch (reason) {
-            case 'NOT_SUPPORTED':
-                return PurchasingFailureReason.ProductUnavailable;
-            case 'ITEM_UNAVAILABLE':
-                return PurchasingFailureReason.ProductUnavailable;
-            case 'USER_CANCELLED':
-                return PurchasingFailureReason.UserCancelled;
-            case 'NETWORK_ERROR':
-            case 'SERVER_ERROR':
-            case 'UNKNOWN_ERROR':
-            default:
-                return PurchasingFailureReason.Unknown;
-        }
-    }
-
     constructor(core: ICore, analytics: IAnalyticsApi, privacySDK: PrivacySDK, analyticsStorage: AnalyticsStorage) {
         this._platform = core.NativeBridge.getPlatform();
         this._analytics = analytics;
@@ -70,9 +52,6 @@ export class AnalyticsManager implements IAnalyticsManager {
         this._privacySDK = privacySDK;
         this._storage = analyticsStorage;
 
-        this._analytics.Analytics.addExtras({
-            'unity_monetization_extras': JSON.stringify(this.buildMonetizationExtras())
-        });
         this._adsAnalyticsSessionId = JaegerUtilities.uuidv4();
     }
 
@@ -205,12 +184,5 @@ export class AnalyticsManager implements IAnalyticsManager {
         const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
         return Promises.voidResult(this._request.post(this._endpoint, data));
-    }
-
-    private buildMonetizationExtras(): IAnalyticsMonetizationExtras {
-        return {
-            gamer_token: this._configuration.getToken(),
-            game_id: this._clientInfo.getGameId()
-        };
     }
 }

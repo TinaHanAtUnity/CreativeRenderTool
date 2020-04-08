@@ -11,6 +11,10 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { ICoreApi } from 'Core/ICore';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
+import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -139,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
         const loadModeElement = <HTMLInputElement>window.parent.document.getElementById('loadMode');
         const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
+        const useStagingElement = <HTMLInputElement>window.parent.document.getElementById('useStaging');
         const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
         const loadButtonDefault = <HTMLButtonElement>window.parent.document.getElementById('loadDefault');
         const loadButtonIncentivize = <HTMLButtonElement>window.parent.document.getElementById('loadIncentivize');
@@ -153,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.localStorage.setItem('testMode', testModeElement.checked.toString());
             window.localStorage.setItem('loadMode', loadModeElement.checked.toString());
             window.localStorage.setItem('autoSkip', autoSkipElement.checked.toString());
+            window.localStorage.setItem('useStaging', useStagingElement.checked.toString());
 
             abGroupElement.disabled = true;
             campaignIdElement.disabled = true;
@@ -160,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             platformElement.disabled = true;
             gameIdElement.disabled = true;
             testModeElement.disabled = true;
+            useStagingElement.disabled = true;
             loadButtonDefault.disabled = !loadModeElement.checked;
             loadButtonIncentivize.disabled = !loadModeElement.checked;
             loadModeElement.disabled = true;
@@ -226,6 +233,15 @@ document.addEventListener('DOMContentLoaded', () => {
             PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
             PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
 
+            if (useStagingElement.checked) {
+                ProgrammaticOperativeEventManager.setTestBaseUrl('https://auction.staging.unityads.unity3d.com');
+                CampaignManager.setBaseUrl('https://auction.staging.unityads.unity3d.com');
+                AuctionRequest.setBaseUrl('https://auction.staging.unityads.unity3d.com');
+                ConfigManager.setTestBaseUrl('https://ads-game-configuration.staging.unityads.unity3d.com');
+                MetricInstance.setBaseUrl('https://sdk-diagnostics.stg.mz.internal.unity3d.com');
+                HttpKafka.setTestBaseUrl('https://httpkafka.staging.unityads.unity3d.com/v1/events');
+            }
+
             switch (platformElement.value) {
                 case 'android':
                     UnityAds.setBackend(new Backend(Platform.ANDROID));
@@ -273,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             testModeElement.checked = window.localStorage.getItem('testMode') === null ? testModeElement.checked : window.localStorage.getItem('testMode') === 'true';
             loadModeElement.checked = window.localStorage.getItem('loadMode') === null ? loadModeElement.checked : window.localStorage.getItem('loadMode') === 'true';
             autoSkipElement.checked = window.localStorage.getItem('autoSkip') === null ? autoSkipElement.checked : window.localStorage.getItem('autoSkip') === 'true';
+            useStagingElement.checked = window.localStorage.getItem('useStaging') === null ? useStagingElement.checked : window.localStorage.getItem('useStaging') === 'true';
 
             initializeButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();

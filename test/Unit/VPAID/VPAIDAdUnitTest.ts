@@ -31,7 +31,6 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 
@@ -43,7 +42,6 @@ describe('VPAIDAdUnit', () => {
     let ads: IAdsApi;
     let store: IStoreApi;
     let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let webPlayerContainer: WebPlayerContainer;
     let parameters: IVPAIDAdUnitParameters;
     let adUnit: VPAIDAdUnit;
@@ -56,7 +54,6 @@ describe('VPAIDAdUnit', () => {
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
         ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         (<sinon.SinonStub>webPlayerContainer.setSettings).returns(Promise.resolve());

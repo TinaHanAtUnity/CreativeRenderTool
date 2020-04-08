@@ -4,14 +4,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
-
-export interface IAnalyticsMonetizationExtras {
-    gamer_token: string;
-    game_id: string;
-}
 
 export interface IAnalyticsObject<T> {
     type: string;

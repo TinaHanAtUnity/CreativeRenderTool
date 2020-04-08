@@ -28,8 +28,8 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
         this._isConnected = false;
     }
 
-    public onPrivacyCompleted(userSettings: IPrivacySettings): void {
-        this._handler.onPrivacyCompleted(userSettings);
+    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
+        this._handler.onPrivacyCompleted(privacySettings);
     }
 
     public onPrivacyReady(): void {
@@ -40,7 +40,7 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
         this._handler.onPrivacyOpenUrl(url);
     }
 
-    public onPrivacyMetric(data: { [key: string]: unknown }): void {
+    public onPrivacyMetric(data: string): void {
         this._handler.onPrivacyMetric(data);
     }
 

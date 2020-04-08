@@ -24,6 +24,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -135,6 +136,7 @@ describe('MraidAdUnit', () => {
         );
 
         sendWithGetStub = sandbox.stub(thirdPartyEventMnager, 'sendWithGet').returns(Promise.resolve());
+        sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
         mraidAdUnit = new MRAIDAdUnit(mraidAdUnitParameters);
     });

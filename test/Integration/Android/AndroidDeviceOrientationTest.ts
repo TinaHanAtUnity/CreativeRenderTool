@@ -16,7 +16,6 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { MRAIDView } from 'MRAID/Views/MRAIDView';
-import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 class TestListener implements IUnityAdsListener {
 
