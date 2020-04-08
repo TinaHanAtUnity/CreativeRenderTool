@@ -100,7 +100,7 @@ class ExperimentCategory {
 //  1. initialize()                             // Done by Ads
 //  2. registerExperimentCategory()             // for each category of interest
 //  3. (optional) getSelectedExperiment()       // gets the name of the experiment choosen by AUi/Optmz
-//  4. activeSelectedExperiment()               // Signals that experiment is underway -> awayting aan outcome
+//  4. activeSelectedExperiment()               // Signals that experiment is underway -> awaiting an outcome
 //  5. (Optional) rewardSelectedExperiment()    // when experiment result is found to be positive (this sends positive outcome back to AUI/Optm)
 //  6. endSelectedExperiment()                  // Once the experiment is over (success or not) (this sends negative outcome back to AUI/Optmz if no reward was sent)
 
