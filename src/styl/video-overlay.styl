@@ -534,5 +534,24 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
       width: 80%;
       height: 100%;
     }
+
+    @keyframes xyz {
+      0% {
+        transform: translateY(20deg);  
+      }
+
+      100% {
+        transform: translateY(-20deg);
+      }
+      
+    }
+    
+    svg {
+      width: 3em;
+      height: auto;
+      transform: rotate(-90deg);
+      animation: xyz 2s infinite;
+    }
+
   }
 }
