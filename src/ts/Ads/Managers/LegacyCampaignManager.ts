@@ -19,7 +19,7 @@ import { AuctionResponseParser, IParsedAuctionResponse } from 'Ads/Parsers/Aucti
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { GeneralTimingMetric, LoadMetric, MiscellaneousMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { GeneralTimingMetric, LoadMetric, MiscellaneousMetric, SDKMetrics, ChinaAucionEndpoint } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -76,6 +76,7 @@ export class LegacyCampaignManager extends CampaignManager {
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
+    private _useChinaAuctionEndpoint: boolean | undefined = false;
 
     constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         super();
@@ -98,6 +99,7 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
+        this._useChinaAuctionEndpoint = this._coreConfig.getCountry() === 'CN';
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -149,6 +151,10 @@ export class LegacyCampaignManager extends CampaignManager {
             });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
+            }
+
             if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
                 return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
                     return {
@@ -184,6 +190,11 @@ export class LegacyCampaignManager extends CampaignManager {
                 'wel': 'false',
                 'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
             });
+
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
+            }
+
             measurement.measure('auction_response');
             const cachingTime = this.getTime();
             if (this._mediationLoadTracking && performance && performance.now) {
@@ -274,6 +285,10 @@ export class LegacyCampaignManager extends CampaignManager {
             const body = JSON.stringify(requestBody);
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
 
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
+            }
+
             return Promise.resolve().then(() => {
                 return this._request.post(requestUrl, body, [], {
                     retries: 0,
@@ -308,6 +323,10 @@ export class LegacyCampaignManager extends CampaignManager {
                 cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
+                }
+
+                if (this._useChinaAuctionEndpoint) {
+                    SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
                 }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, this._deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
@@ -914,6 +933,9 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private constructBaseUrl(baseUri: string): string {
+        if (this._useChinaAuctionEndpoint) {
+            baseUri = baseUri.replace(/(.*unity3d)(\.com)(.*)/, '$1.cn$3');
+        }
         return [
             baseUri,
             this._clientInfo.getGameId(),

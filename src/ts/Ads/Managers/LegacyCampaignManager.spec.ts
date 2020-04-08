@@ -140,5 +140,42 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
                 expect(Object.keys(filledPlacements).length).toEqual(3);
             });
         });
+
+        describe('Should request with China auction endpoint ', () => {
+            let campaignManagerCN: LegacyCampaignManager;
+
+            beforeEach(() => {
+                coreConfig.getCountry = jest.fn().mockImplementation(() => 'CN');
+                campaignManagerCN = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, undefined);
+                return campaignManagerCN.request();
+            });
+
+            it('should change the endpoint to .cn', () => {
+
+                expect(requestManager.post).toHaveBeenCalledWith(
+                    `https://auction.unityads.unity3d.cn/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`,
+                    expect.anything(),
+                    expect.anything(),
+                    expect.anything()
+                );
+            });
+        });
+
+        describe('Should not request with China auction endpoint ', () => {
+
+            beforeEach(() => {
+                return campaignManager.request();
+            });
+
+            it('Endpoint should remain .com', () => {
+
+                expect(requestManager.post).toHaveBeenCalledWith(
+                    `https://auction.unityads.unity3d.com/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`,
+                    expect.anything(),
+                    expect.anything(),
+                    expect.anything()
+                );
+            });
+        });
     });
 });
