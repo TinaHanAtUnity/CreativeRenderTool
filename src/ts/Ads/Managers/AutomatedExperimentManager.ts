@@ -28,7 +28,7 @@ interface IAutomatedExperimentResponse {
 }
 
 // For a given category, AUI/Optmz service can return multiple experiments that answer the request.
-// These experiments always share the same "outcomes" and are internal the to AutomatedManager.
+// These experiments always share the same "outcomes" and are internal to the AutomatedManager.
 // What gets exposed is the aggregated `actions` of these experiments.
 interface IAggregateExperiment {
     experiment_name: string;
