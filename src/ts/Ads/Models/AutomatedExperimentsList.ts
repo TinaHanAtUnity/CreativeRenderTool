@@ -15,7 +15,7 @@ import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } 
 // });
 
 export enum AutomatedExperimentsCategories {
-    PERFAD_ENDCARD = 'webview-perf-ad-endcard',
+    PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
     MRAID_AR = 'webview-ar-mraid'
 }
 
