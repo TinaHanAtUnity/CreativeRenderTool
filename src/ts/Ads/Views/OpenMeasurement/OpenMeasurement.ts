@@ -196,10 +196,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         super.render();
 
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY });
-
         this._omIframe.id += this._omAdSessionId;
-        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ IFRAME_ID_ }}': this._omIframe.id });
+        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY, '{{ IFRAME_ID_ }}': this._omIframe.id });
         this._omIframe.style.position = 'absolute';
         this._omIframe.style.top = '0';
         this._omIframe.style.left = '0';

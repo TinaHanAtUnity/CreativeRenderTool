@@ -26,8 +26,9 @@ describe('omid3p', () => {
                 data: {
                     eventName: 'omidImpression',
                     uuid: '1',
-                    vendorKey: ''
-                }, 
+                    vendorKey: '',
+                    iframeId: '{{ IFRAME_ID_ }}'
+                },
                 event: 'onEventRegistered',
                 type: 'omid'
             }, '*');
@@ -43,7 +44,7 @@ describe('omid3p', () => {
         it ('should postmessage to typescript with omid event', () => {
             window.omid3p.postback('onEventProcessed', { eventType: 'loadError' });
             expect(window.postMessage).toBeCalledWith({
-                type: 'omid', 
+                type: 'omid',
                 event: 'onEventProcessed',
                 data: {
                     eventType: 'loadError'
