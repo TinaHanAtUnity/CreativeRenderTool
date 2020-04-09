@@ -145,6 +145,7 @@ export class OMIDEventBridge {
     }
 
     public onEventRegistered(eventName: string, vendorKey: string, uuid: string, iframeId: string) {
+        //Prevents uuids from other iframe multi-registered on the event bridge
         if (iframeId !== this._iframe3p.id) {
             return;
         }
