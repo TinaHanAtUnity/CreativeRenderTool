@@ -7,8 +7,7 @@ import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyMana
 import { Core } from 'Core/Core';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { PrivacyMethod } from 'Privacy/Privacy';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
-
+import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
 
@@ -84,7 +83,7 @@ describe('PrivacySDKViewTest', () => {
                 onPrivacyMetric: (data: string): void => {
                     // TODO: Empty
                 },
-                onPrivacyFetch: (url: string, data: { [key: string]: unknown }): void => {
+                onPrivacyFetchUrl: (data: IPrivacyFetchUrlParams): void => {
                     // TODO: Empty
                 },
                 onPrivacyViewError: (event: string | Event) => {

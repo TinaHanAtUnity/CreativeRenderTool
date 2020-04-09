@@ -1,5 +1,5 @@
 import { IPrivacyFrameEventAdapter, IPrivacyFrameHandler } from 'Privacy/PrivacyFrameEventAdapter';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
     private _eventAdapter: IPrivacyFrameEventAdapter;
@@ -44,7 +44,7 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
         this._handler.onPrivacyMetric(data);
     }
 
-    public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
-        this._handler.onPrivacyFetch(url, data);
+    public onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void {
+        this._handler.onPrivacyFetchUrl(data);
     }
 }

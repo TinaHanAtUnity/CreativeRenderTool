@@ -10,3 +10,8 @@ export interface IUserPrivacySettings {
     agreedOverAgeLimit: boolean;
     agreementMethod: string;
 }
+
+export interface IPrivacyFetchUrlParams {
+    url: string;
+    property: string;
+}

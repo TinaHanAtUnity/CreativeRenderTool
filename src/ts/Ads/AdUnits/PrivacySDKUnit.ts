@@ -18,7 +18,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
@@ -246,9 +246,10 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
           });
     }
 
-    public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
+    public onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void {
+        const { url, property } = data;
         this._requestManager.get(url).then((response) => {
-            this._unityPrivacyView.fetchCallback(response.response);
+            this._unityPrivacyView.fetchUrlCallback(response.response, property);
         });
     }
 
