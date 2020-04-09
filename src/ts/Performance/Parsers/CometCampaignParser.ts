@@ -147,7 +147,8 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined,
-                mraidEndScreenUrl: json.mraidEndScreenUrl
+                endScreenUrl: json.endScreenUrl,
+                endScreen: json.endScreenUrl ? new HTML(this.validateAndEncodeUrl(json.endScreenUrl, session), session, json.creativeId) : undefined
             };
 
             if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {

@@ -3,6 +3,7 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign, ICampaign, IRawCampaign } from 'Ads/Models/Campaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
+import { HTML } from 'Ads/Models/Assets/HTML';
 
 export enum StoreName {
     APPLE,
@@ -39,7 +40,7 @@ export interface IRawPerformanceCampaign extends IRawCampaign {
     appDownloadUrl?: string;
     mraidUrl?: string;
     dynamicMarkup?: string;
-    mraidEndScreenUrl?: string;
+    endScreenUrl?: string;
 }
 
 export interface IPerformanceCampaign extends ICampaign {
@@ -64,7 +65,8 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
-    mraidEndScreenUrl?: string;
+    endScreenUrl?: string;
+    endScreen?: HTML;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -92,7 +94,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
-            mraidEndScreenUrl: ['string', 'undefined']
+            endScreenUrl: ['string', 'undefined'],
+            endScreen: ['object', 'undefined']
         }, campaign);
     }
 
@@ -181,7 +184,14 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getRequiredAssets() {
-        return [];
+        const assets: Asset[] = [];
+
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            assets.push(endScreen);
+        }
+
+        return assets;
     }
 
     public getOptionalAssets() {
@@ -219,8 +229,12 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('adUnitStyle');
     }
 
-    public getMraidEndScreenUrl() {
-        return this.get('mraidEndScreenUrl');
+    public getEndScreenUrl() {
+        return this.get('endScreenUrl');
+    }
+
+    public getEndScreen(): HTML | undefined {
+        return this.get('endScreen');
     }
 
     public getDTO(): { [key: string]: unknown } {
@@ -278,7 +292,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
             'appDownloadUrl': this.getAppDownloadUrl(),
-            'mraidEndScreenUrl': this.getMraidEndScreenUrl()
+            'endScreenUrl': this.getEndScreenUrl(),
+            'endScreen': this.getEndScreen()
         };
     }
 }
