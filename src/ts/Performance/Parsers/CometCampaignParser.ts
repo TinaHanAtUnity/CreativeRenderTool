@@ -116,18 +116,10 @@ export class CometCampaignParser extends CampaignParser {
             }
             return Promise.resolve(mraidCampaign);
         } else {
-            if (json.mraidEndScreenUrl === undefined) {
-                // todo: deployment pending
-                const baseUrl = 'http://modules.unityads.unity3d.com/endscreen/index.html';
-
-                json.mraidEndScreenUrl = Url.addParameters(baseUrl, {
-                    landscapeImage: json.endScreenLandscape,
-                    gameIcon: json.gameIcon,
-                    gameName: json.gameName,
-                    rating: json.rating,
-                    ratingCount: json.ratingCount
-                }, true);
-            }
+            // For testing purposes
+            // if (json.endScreenUrl === undefined) {
+            //     json.endScreenUrl = 'http://endscreen.unityads.unity3d.com/index.html';
+            // }
 
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
