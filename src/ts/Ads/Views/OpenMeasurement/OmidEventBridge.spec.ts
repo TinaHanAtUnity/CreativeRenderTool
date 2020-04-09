@@ -9,14 +9,7 @@ describe('OmidEventBridge', () => {
     let handler: IOMIDEventHandler;
 
     let omInstance: OpenMeasurementMockVast;
-
-    const iframe: HTMLIFrameElement = document.createElement('iframe');
-    Object.defineProperty(iframe, 'contentWindow', {
-        value: {
-            postMessage: jest.fn()
-        }
-    });
-    Object.defineProperty(iframe, 'id', {value: 'iframeId'});
+    let iframe: HTMLIFrameElement;
 
     beforeEach(() => {
         handler = {
@@ -28,6 +21,14 @@ describe('OmidEventBridge', () => {
 
         omInstance = new OpenMeasurementVast();
         jest.spyOn(Date, 'now').mockImplementation(() => 1000);
+
+        iframe = document.createElement('iframe');
+        Object.defineProperty(iframe, 'contentWindow', {
+            value: {
+                postMessage: jest.fn()
+            }
+        });
+        Object.defineProperty(iframe, 'id', {value: 'iframeId'});
 
         omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign);
     });
