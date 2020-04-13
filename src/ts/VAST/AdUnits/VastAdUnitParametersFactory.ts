@@ -34,10 +34,10 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             overlay: overlay
         };
 
-        if (baseParams.campaign.hasHtmlEndscreen()) {
-            vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
-        } else if (baseParams.campaign.hasStaticEndscreen()) {
+        if (baseParams.campaign.hasStaticEndscreen()) {
             vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams);
+        } else if (baseParams.campaign.hasHtmlEndscreen()) {
+            vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();

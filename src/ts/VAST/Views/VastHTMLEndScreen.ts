@@ -102,24 +102,12 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
                 this.shouldOverrideUrlLoading(url, method);
             });
         }
-        let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
-        if (this._platform === Platform.ANDROID) {
-            webPlayerSettings = {
-                setJavaScriptCanOpenWindowsAutomatically: [true]
-            };
-        } else {
-            webPlayerSettings = {
-                javaScriptCanOpenWindowsAutomatically: true,
-                scalesPagesToFit: true,
-                scrollEnabled: true
-            };
-        }
         return this._adUnitContainer.reconfigure(ViewConfiguration.WEB_PLAYER)
             .then(() => {
                 this._adUnitContainer.reorient(false, this._adUnitContainer.getLockedOrientation());
             })
             .then(() => {
-                this._webPlayerContainer.setSettings(webPlayerSettings, {}).then(() => {
+                this.setWebPlayerSettings().then(() => {
                     const promises = [
                         this._deviceInfo.getScreenWidth(),
                         this._deviceInfo.getScreenHeight()
@@ -146,6 +134,22 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
                 'uri': url
             });
         }
+    }
+
+    private setWebPlayerSettings(): Promise<void> {
+        let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
+        if (this._platform === Platform.ANDROID) {
+            webPlayerSettings = {
+                setJavaScriptCanOpenWindowsAutomatically: [true]
+            };
+        } else {
+            webPlayerSettings = {
+                javaScriptCanOpenWindowsAutomatically: true,
+                scalesPagesToFit: true,
+                scrollEnabled: true
+            };
+        }
+        return this._webPlayerContainer.setSettings(webPlayerSettings, {});
     }
 
     private setWebplayerEventSettings(): Promise<void> {
