@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Remove duplicate and unused metrics [#14532](https://github.com/Applifier/unity-ads-webview/pull/14532)
+
 # Thu Apr  9 18:08:35 UTC 2020
 
 * [Load V5] Enable Load V5 ab test, round 3 [#14354](https://github.com/Applifier/unity-ads-webview/pull/14354)
