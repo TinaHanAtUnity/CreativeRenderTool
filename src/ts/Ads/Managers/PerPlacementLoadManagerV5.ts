@@ -60,7 +60,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     protected loadPlacement(placementId: string, count: number) {
         if (this._adRequestManager.isPreloadDataExpired()) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
             this.invalidateActivePlacements();
         }
 
@@ -69,7 +68,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         // It would make sense to use reload request here, however it would require some refactoring,
         // which will be done later.
         if (this._adRequestManager.hasPreloadFailed()) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadCampaignWithPreloadData);
             return this._adRequestManager.requestPreload().then(() => {
                 super.loadPlacement(placementId, count);
             }).catch((err) => {
@@ -85,7 +83,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     protected invalidateExpiredCampaigns(): Promise<void> {
         if (this._adRequestManager.isPreloadDataExpired()) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
             return this.invalidateActivePlacements();
         }
 
