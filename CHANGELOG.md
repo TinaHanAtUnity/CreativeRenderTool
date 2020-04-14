@@ -1,4 +1,4 @@
-# Pending
+# Tue Apr 14 00:36:19 UTC 2020
 
 * [Load V5] Remove duplicate and unused metrics [#14532](https://github.com/Applifier/unity-ads-webview/pull/14532)
 * [Auction V6] Switch ABGroup from 18 to 6 [#14536](https://github.com/Applifier/unity-ads-webview/pull/14536)
