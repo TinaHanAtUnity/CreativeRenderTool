@@ -57,7 +57,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { IARApi } from 'AR/AR';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {

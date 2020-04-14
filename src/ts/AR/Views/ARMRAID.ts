@@ -18,9 +18,9 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
-import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
+import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MABOptimization/Models/AutomatedExperimentsList';
+import { IExperimentActionChoice } from 'MABOptimization/Models/AutomatedExperiment';
 import { Color } from 'Core/Utilities/Color';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {

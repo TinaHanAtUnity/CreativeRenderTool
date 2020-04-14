@@ -7,9 +7,9 @@ import { IAds } from 'Ads/IAds';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { IARApi } from 'AR/AR';
-import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
-import { PerformanceAdUnitWithAutomatedExperimentFactory } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperimentFactory';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'MABOptimization/Performance/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
+import { PerformanceAdUnitWithAutomatedExperimentFactory } from 'MABOptimization/Performance/PerformanceAdUnitWithAutomatedExperimentFactory';
+import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
 import { MabDisabledABTest } from 'Core/Models/ABGroup';
 
 export class Performance extends AbstractParserModule {

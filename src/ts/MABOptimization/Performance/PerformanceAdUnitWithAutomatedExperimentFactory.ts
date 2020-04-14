@@ -10,9 +10,9 @@ import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitF
 import {
     IPerformanceAdUnitWithAutomatedExperimentParameters,
     PerformanceAdUnitWithAutomatedExperiment
-} from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperiment';
-import { IOSPerformanceAdUnitWithAutomatedExperiment } from 'Performance/AdUnits/IOSPerformanceAdUnitWithAutomatedExperiment';
-import { MabDecisionPerformanceEndScreenEventHandler } from 'Performance/EventHandlers/MabDecisionPerformanceEndScreenEventHandler';
+} from 'MABOptimization/Performance/PerformanceAdUnitWithAutomatedExperiment';
+import { IOSPerformanceAdUnitWithAutomatedExperiment } from 'MABOptimization/Performance/IOSPerformanceAdUnitWithAutomatedExperiment';
+import { MabDecisionPerformanceEndScreenEventHandler } from 'MABOptimization/Performance/MabDecisionPerformanceEndScreenEventHandler';
 
 export class PerformanceAdUnitWithAutomatedExperimentFactory extends PerformanceAdUnitFactory {
 

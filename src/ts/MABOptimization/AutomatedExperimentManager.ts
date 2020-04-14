@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IExperimentActionChoice, AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { IExperimentActionChoice, AutomatedExperiment } from 'MABOptimization/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';

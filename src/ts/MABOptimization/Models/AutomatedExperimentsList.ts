@@ -1,4 +1,4 @@
-import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
+import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } from 'MABOptimization/Models/AutomatedExperiment';
 
 // List experiments to run here and add them to the list
 // Examples:

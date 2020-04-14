@@ -16,7 +16,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { ButtonExperimentDeclaration } from 'Ads/Models/AutomatedExperimentsList';
+import { ButtonExperimentDeclaration } from 'MABOptimization/Models/AutomatedExperimentsList';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('EndScreenTest', () => {

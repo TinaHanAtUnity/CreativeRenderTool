@@ -15,8 +15,8 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
+import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MABOptimization/Models/AutomatedExperimentsList';
 import { arAvailableButtonDecision } from 'AR/Experiments/ARUIExperiments';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
