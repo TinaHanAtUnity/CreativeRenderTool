@@ -52,6 +52,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
+    protected _swipeUpButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
@@ -120,6 +121,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.gdpr-button'
+            },
+            {
+                event: 'swipeup',
+                listener: (event: Event) => this.onSwipeUpEvent(event),
+                selector: '.swipe-up-zone'
             }
         ];
 
@@ -213,7 +219,9 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
 
         const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
         if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
-            this.showCallButton();
+            //this is for traditional install button sliding in from the right
+            // this.showCallButton();
+            this.showSwipeUpButton(); //this is for swipe up 'button'
             return;
         }
     }
@@ -321,6 +329,14 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this.triggerOnOverlayDownload();
     }
 
+    private onSwipeUpEvent (event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.resetFadeTimer();
+        this._handlers.forEach(handler => handler.onOverlayCallButton());
+        this.triggerOnOverlayDownload();
+    }
+
     private triggerOnOverlayDownload(): void {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             const campaign = this._campaign;
@@ -366,6 +382,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement> this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement> this._container.querySelector('.call-button');
+        this._swipeUpButtonElement = <HTMLElement> this._container.querySelector('.swipe-up-button');
         this._timerElement = <HTMLElement> this._container.querySelector('.timer');
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
@@ -374,7 +391,8 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
             if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-                this.showCallButton();
+                // this.showCallButton();  //this is for traditional install button sliding from the right
+                this.showSwipeUpButton(); //this is for swipe up 'button'
             }
         }
     }
@@ -391,6 +409,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement.classList.add('show-go-text');
     }
 
+    protected showSwipeUpButton() {
+        this._swipeUpButtonElement.classList.add('show-swipe-up-button');
+    }
+
     private fadeIn() {
         if (!this._container) {
             return;
@@ -401,9 +423,14 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             return;
         }
+        //this is for traditional install button sliding from the right
+        // setTimeout(() => {
+        //     this.showCallButton();
+        // }, 500);
 
+        //this is for swipe up 'button'
         setTimeout(() => {
-            this.showCallButton();
+            this.showSwipeUpButton();
         }, 500);
     }
 

@@ -521,7 +521,6 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
 
 
   .swipe-up-zone-container {
-    background: pink;
     position: absolute;
     display: flex;
     width: 100%;
@@ -530,7 +529,6 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
     justify-content: center;
 
     .swipe-up-zone {
-      background: red;
       width: 80%;
       height: 100%;
       display: flex;
@@ -539,9 +537,17 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
     }
 
     .swipe-up-button {
+      font-size: 0.9em;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding-bottom: 0.5em;
+      transform: translateY(130%);
+      transition: transform .5s ease-in;
+    }
+
+    .show-swipe-up-button {
+      transform: translateY(0%);  
     }
 
     .swipe-up-download-text {
@@ -550,55 +556,59 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
     }
 
     @keyframes arrow-jump {
-      0%, 100% { 
+      0%, 80% { 
         transform: translateY(0.3em);
       }
 
-      15%, 85% {
+      20%, 50% {
         transform: translateY(-0.5em);
       }
     }
       
     @keyframes color-change {
-      0%, 100% { 
+      0%, 80% { 
         fill: $white;
       }
 
-      15%, 85% {
+      20%, 50% {
         fill: transparent;
       }
     }
 
     @keyframes background-color-change {
-      0%, 100% { 
+      0%, 80% { 
         fill: transparent;
       }
 
-      15%, 85% {
+      20%, 50% {
         fill: $white;
       }
     }
 
     svg {
+      filter: drop-shadow(1px 1px 3px $black);
       width: 1.5em;
       height: auto;
-      animation: arrow-jump 2s infinite;
+      animation: arrow-jump 1.4s infinite;
       animation-timing-function: ease-in-out;
+      animation-delay: 4.5s;
       border-radius: 75px;
+      transform: translateY(0.3em);
     }
 
     .up-arrow-background {
       fill: transparent;  
-      animation: background-color-change 2s infinite;
+      animation: background-color-change 1.4s infinite;
       animation-timing-function: ease-in-out;
+      animation-delay: 4.5s;
     }
 
     .up-arrow {
       fill: $white;
-      animation: color-change 2s infinite;
+      animation: color-change 1.4s infinite;
       animation-timing-function: ease-in-out;
+      animation-delay: 4.5s;
     }
-
 
   }
 }
