@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IExperimentActionChoice, AutomatedExperiment } from 'MabExperimentation/Models/AutomatedExperiment';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -22,76 +22,16 @@ import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { ARUtil } from 'AR/Utilities/ARUtil';
-
-interface IAutomatedExperimentResponse {
-    categories: { [expCat: string]: IAggregateExperiment };
-}
-
-// For a given category, AUI/Optmz service can return multiple experiments that answer the request.
-// These experiments always share the same "outcomes" and are internal to the AutomatedManager.
-// What gets exposed is the aggregated `actions` of these experiments.
-interface IAggregateExperiment {
-    experiment_name: string;
-    parts: IAggregateExperimentPart[];
-}
-
-interface IAggregateExperimentPart {
-    id: string;
-    actions: IExperimentActionChoice;
-    metadata: string;
-}
+import { IAutomatedExperimentResponse } from 'MabExperimentation/Models/AutomatedExperimentResponse';
+import { OptimizedCampaign } from 'MabExperimentation/Models/OptimizedCampaign';
+import { CategorizedExperimentStage, CategorizedExperiment } from 'MabExperimentation/Models/CategorizedExperiment';
 
 export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number } | number[] | string[];
 
-enum AutomatedExperimentStage {
-    AWAITING_OPTIMIZATION,
-    OPTIMIZED,
-    RUNNING,
-    OUTCOME_PUBLISHED,
-    ENDED
-}
-
-// A categorized experiment is an experiment that is associated to an 'Experiment Category'
-// An experiment category can, on the AUI/Optmz service side, be composed of many 'categorized experiments'
-// When the AUI/Optmz is queried for an categorized experiment, it will choose a random experiment
-// for the available experiments of that category.
-// This allows the AUI/Optmz service to select optimized experiments per category.
-class CategorizedExperiment {
-    constructor() {
-        this.Outcome = 0;
-        this.Stage = AutomatedExperimentStage.AWAITING_OPTIMIZATION;
-    }
-
-    public Stage: AutomatedExperimentStage;
-    public Experiment: IAggregateExperiment;
-    public Outcome: number;
-
-    public aggregatedActions(): IExperimentActionChoice {
-
-        const actions: IExperimentActionChoice = {};
-
-        for (const part of this.Experiment.parts) {
-
-            Object.keys(part.actions).forEach((act) => {
-                actions[act] = part.actions[act];
-            });
-        }
-
-        return actions;
-    }
-}
-
-class OptimizedCampaign {
-    constructor() {
-        this.CategorizedExperiments = {};
-        this.Id = '';
-    }
-
-    public Id: string;
-    public CategorizedExperiments: { [Category: string]: CategorizedExperiment };
-}
-
-class ExperimentCategory {
+// What: Defines a filter that states for a given Campaign Type (MRAID, Performance, etc) a Category of experiments that are supported.
+// Why: Since the AEM listens automaticaly on new compaigns it needs a way to be told for a given campaign type if should it make an optimzation
+//      request. If so, what Experiment Catagory(ies) to ask for, as a campaign type can span multiple categories (say `Performance Ad EndCards` vs `Performance Ad Video`).
+class AutomatedExperimentFilter {
     public Category: string;
     public CampaignType: string;
 }
@@ -99,7 +39,7 @@ class ExperimentCategory {
 // How to usage, call in order:
 //  1. initialize()                             // Done by Ads
 //  2. registerExperimentCategory()             // for each category of interest
-//  3. (optional) getSelectedExperimentName()       // gets the name of the experiment choosen by AUi/Optmz
+//  3. (optional) getSelectedExperimentName()   // gets the name of the experiment choosen by AUi/Optmz
 //  4. activeSelectedExperiment()               // Signals that experiment is underway -> awaiting an outcome
 //  5. (Optional) rewardSelectedExperiment()    // when experiment result is found to be positive (this sends positive outcome back to AUI/Optmz)
 //  6. endSelectedExperiment()                  // Once the experiment is over (success or not) (this sends negative outcome back to AUI/Optmz if no reward was sent)
@@ -126,7 +66,7 @@ export class AutomatedExperimentManager {
 
     private _abGroup: number;
     private _gameSessionID: number;
-    private _experimentCategories: ExperimentCategory[];
+    private _experimentFilters: AutomatedExperimentFilter[];
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
@@ -140,7 +80,7 @@ export class AutomatedExperimentManager {
     }
 
     constructor() {
-        this._experimentCategories = [];
+        this._experimentFilters = [];
     }
 
     public initialize(core: ICore, campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
@@ -160,11 +100,11 @@ export class AutomatedExperimentManager {
 
     public registerExperimentCategory(category: string, campaignType: string) {
 
-        const newCatExp = new ExperimentCategory();
-        newCatExp.CampaignType = campaignType;
-        newCatExp.Category = category;
+        const filter = new AutomatedExperimentFilter();
+        filter.CampaignType = campaignType;
+        filter.Category = category;
 
-        this._experimentCategories = this._experimentCategories.concat(newCatExp);
+        this._experimentFilters = this._experimentFilters.concat(filter);
     }
 
     public getSelectedExperimentName(campaign: Campaign, category: string): string {
@@ -175,8 +115,8 @@ export class AutomatedExperimentManager {
 
         const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-        if (categorizedExp.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION ||
-            categorizedExp.Stage === AutomatedExperimentStage.ENDED) {
+        if (categorizedExp.Stage === CategorizedExperimentStage.AWAITING_OPTIMIZATION ||
+            categorizedExp.Stage === CategorizedExperimentStage.ENDED) {
             return '';
         }
 
@@ -191,14 +131,14 @@ export class AutomatedExperimentManager {
 
         const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-        if (categorizedExp.Stage === AutomatedExperimentStage.RUNNING) {
+        if (categorizedExp.Stage === CategorizedExperimentStage.RUNNING) {
             SDKMetrics.reportMetricEvent(AUIMetric.CampaignCategoryAlreadyActive);
             return undefined;
-        } else if (categorizedExp.Stage !== AutomatedExperimentStage.OPTIMIZED) {
+        } else if (categorizedExp.Stage !== CategorizedExperimentStage.OPTIMIZED) {
             return undefined;
         }
 
-        categorizedExp.Stage = AutomatedExperimentStage.RUNNING;
+        categorizedExp.Stage = CategorizedExperimentStage.RUNNING;
         categorizedExp.Outcome = 0;
 
         return categorizedExp.aggregatedActions();
@@ -213,11 +153,11 @@ export class AutomatedExperimentManager {
         try {
             const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-            if (categorizedExp.Stage !== AutomatedExperimentStage.RUNNING) {
+            if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
                 return Promise.resolve();
             }
 
-            return this.publishCampaignOutcomes(campaign, categorizedExp, AutomatedExperimentStage.ENDED);
+            return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
         }
         finally {
             this._campaign = new OptimizedCampaign();
@@ -233,16 +173,16 @@ export class AutomatedExperimentManager {
 
         const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-        if (categorizedExp.Stage !== AutomatedExperimentStage.RUNNING) {
+        if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
             return Promise.resolve();
         }
 
         categorizedExp.Outcome = 1;
 
-        return this.publishCampaignOutcomes(campaign, categorizedExp, AutomatedExperimentStage.OUTCOME_PUBLISHED);
+        return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.OUTCOME_PUBLISHED);
     }
 
-    private publishCampaignOutcomes(campaign: Campaign, categorizedExp: CategorizedExperiment, nextStage: AutomatedExperimentStage): Promise<void> {
+    private publishCampaignOutcomes(campaign: Campaign, categorizedExp: CategorizedExperiment, nextStage: CategorizedExperimentStage): Promise<void> {
 
         categorizedExp.Stage = nextStage;
 
@@ -487,13 +427,13 @@ export class AutomatedExperimentManager {
     // Only public so that testing can access it. :/
     public onNewCampaign(campaign: Campaign): Promise<void> {
 
-        if (Object.keys(this._experimentCategories).length === 0) {
+        if (Object.keys(this._experimentFilters).length === 0) {
             return Promise.resolve();
         }
 
         // Gather relevant categories from campaign type
         const categories: string[] = [];
-        this._experimentCategories.forEach((exp) => {
+        this._experimentFilters.forEach((exp) => {
             // This sucks but couldn't find a way dynamicaly do it. JS limitation as far as I could tell.
             if ((exp.CampaignType === 'PerformanceCampaign' && campaign instanceof PerformanceCampaign) ||
                 (exp.CampaignType === 'MRAIDCampaign_AR' && campaign instanceof MRAIDCampaign && ARUtil.isARCreative(campaign)) ||
@@ -558,14 +498,14 @@ export class AutomatedExperimentManager {
 
                 const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-                if (categorizedExp.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+                if (categorizedExp.Stage !== CategorizedExperimentStage.AWAITING_OPTIMIZATION) {
                     SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseIgnored);
                     this._campaign = new OptimizedCampaign();
                     return;
                 }
 
                 categorizedExp.Experiment = response.categories[category];
-                categorizedExp.Stage = AutomatedExperimentStage.OPTIMIZED;
+                categorizedExp.Stage = CategorizedExperimentStage.OPTIMIZED;
             });
 
             SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseApplied);
