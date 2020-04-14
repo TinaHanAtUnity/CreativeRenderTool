@@ -1,6 +1,6 @@
-import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
-import { IExperimentActionChoice } from 'MABOptimization/Models/AutomatedExperiment';
-import { AutomatedExperimentsCategories, ArAvailableButtonExperiment } from 'MABOptimization/Models/AutomatedExperimentsList';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { AutomatedExperimentsCategories, ArAvailableButtonExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { Campaign } from 'Ads/Models/Campaign';
 
 export function arAvailableButtonDecision(automatedExperimentManager: AutomatedExperimentManager, campaign: Campaign): IExperimentActionChoice {

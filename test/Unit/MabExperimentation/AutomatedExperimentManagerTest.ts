@@ -6,7 +6,7 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { AutomatedExperimentManager, ContextualFeature } from 'MABOptimization/AutomatedExperimentManager';
+import { AutomatedExperimentManager, ContextualFeature } from 'MabExperimentation/AutomatedExperimentManager';
 import { AuctionProtocol, INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CacheManager } from 'Core/Managers/CacheManager';

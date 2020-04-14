@@ -1,5 +1,5 @@
-import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'MABOptimization/Models/AutomatedExperimentsList';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export interface IPerformanceAdUnitWithAutomatedExperimentParameters extends IPerformanceAdUnitParameters {

@@ -1,7 +1,7 @@
-import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
-import { IPerformanceAdUnitWithAutomatedExperimentParameters } from 'MABOptimization/Performance/PerformanceAdUnitWithAutomatedExperiment';
-import { AutomatedExperimentsCategories } from 'MABOptimization/Models/AutomatedExperimentsList';
+import { IPerformanceAdUnitWithAutomatedExperimentParameters } from 'MabExperimentation/Performance/PerformanceAdUnitWithAutomatedExperiment';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 export class IOSPerformanceAdUnitWithAutomatedExperiment extends IOSPerformanceAdUnit {
 
     private _automatedExperimentManager: AutomatedExperimentManager;

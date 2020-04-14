@@ -6,7 +6,7 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
-import { AutomatedExperimentManager } from 'MABOptimization/AutomatedExperimentManager';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 export class MRAID extends AbstractParserModule {
 
