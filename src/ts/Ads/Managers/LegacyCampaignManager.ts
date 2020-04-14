@@ -48,6 +48,7 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -99,7 +100,7 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
-        this._useChinaAuctionEndpoint = this._coreConfig.getCountry() === 'CN';
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(1) && coreConfig.getCountry() === 'CN');
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -934,7 +935,7 @@ export class LegacyCampaignManager extends CampaignManager {
 
     private constructBaseUrl(baseUri: string): string {
         if (this._useChinaAuctionEndpoint) {
-            baseUri = baseUri.replace(/(.*unity3d)(\.com)(.*)/, '$1.cn$3');
+            baseUri = baseUri.replace(/(.*auction\.unityads\.)(unity3d\.com)(.*)/, '$1unity.cn$3');
         }
         return [
             baseUri,

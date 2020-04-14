@@ -21,6 +21,7 @@ import { ICore } from 'Core/ICore';
 import { AuctionProtocol, RequestManager as RealRequestManager } from 'Core/Managers/RequestManager';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 // TODO: Update once json importing is fixed for .spec.ts
 const AuctionV6Response = require('json/AuctionV6Response.json');
@@ -141,23 +142,39 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
             });
         });
 
-        describe('Should request with China auction endpoint ', () => {
-            let campaignManagerCN: LegacyCampaignManager;
+        describe('Should request with China auction endpoint based on sample percentage', () => {
 
-            beforeEach(() => {
-                coreConfig.getCountry = jest.fn().mockImplementation(() => 'CN');
-                campaignManagerCN = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, undefined);
-                return campaignManagerCN.request();
-            });
-
-            it('should change the endpoint to .cn', () => {
-
-                expect(requestManager.post).toHaveBeenCalledWith(
-                    `https://auction.unityads.unity3d.cn/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`,
-                    expect.anything(),
-                    expect.anything(),
-                    expect.anything()
-                );
+            const tests: {
+                sampledPercentage: boolean;
+                expectedUrl: string;
+            }[] = [
+                {
+                    sampledPercentage: true,
+                    expectedUrl: `https://auction.unityads.unity.cn/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`
+                },
+                {
+                    sampledPercentage: false,
+                    expectedUrl: `https://auction.unityads.unity3d.com/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`
+                }
+            ];
+            tests.forEach((t) => {
+                describe(`when sampleAtGivenPercent returns ${t.sampledPercentage}`, () => {
+                    let campaignManagerCN: LegacyCampaignManager;
+                    beforeEach(() => {
+                        CustomFeatures.sampleAtGivenPercent = jest.fn().mockImplementation(() => t.sampledPercentage);
+                        coreConfig.getCountry = jest.fn().mockImplementation(() => 'CN');
+                        campaignManagerCN = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, requestManager, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, undefined);
+                        return campaignManagerCN.request();
+                    });
+                    it('should change endpoint accordingly', () => {
+                        expect(requestManager.post).toHaveBeenCalledWith(
+                            t.expectedUrl,
+                            expect.anything(),
+                            expect.anything(),
+                            expect.anything()
+                        );
+                    });
+                });
             });
         });
 

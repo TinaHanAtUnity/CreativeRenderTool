@@ -27,6 +27,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { SDKMetrics, ChinaAucionEndpoint } from 'Ads/Utilities/SDKMetrics';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -212,7 +213,7 @@ export class AuctionRequest {
         this._privacy = RequestPrivacyFactory.create(params.privacySDK, this._deviceInfo.getLimitAdTracking());
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
-        this._useChinaAuctionEndpoint = this._coreConfig.getCountry() === 'CN';
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(1) && params.coreConfig.getCountry() === 'CN');
         this.assignBaseUrl();
     }
 
@@ -319,7 +320,7 @@ export class AuctionRequest {
         let url = this.getBaseURL();
 
         if (this._useChinaAuctionEndpoint) {
-            url = url.replace(/(.*unity3d)(\.com)(.*)/, '$1.cn$3');
+            url = url.replace(/(.*auction\.unityads\.)(unity3d\.com)(.*)/, '$1unity.cn$3');
         }
 
         url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo));
