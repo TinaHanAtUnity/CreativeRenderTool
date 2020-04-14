@@ -5,6 +5,7 @@
 * [Load V5] Expand Load V5 to new AB group [#14535](https://github.com/Applifier/unity-ads-webview/pull/14535)
 * Conclude Original Load and Load V4 Experiment [#14562](https://github.com/Applifier/unity-ads-webview/pull/14562)
 * Add Deploy Label to Deployment PRs [#14566](https://github.com/Applifier/unity-ads-webview/pull/14566)
+* [Auction V6] Increase Traffic to Group 13 [#14594](https://github.com/Applifier/unity-ads-webview/pull/14594)
 
 # Tue Apr 14 00:36:19 UTC 2020
 
