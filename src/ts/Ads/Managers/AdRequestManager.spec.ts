@@ -822,6 +822,10 @@ class SatisfiesMatcher {
                 expect(loadedCampaign1).toBeUndefined();
                 expect(loadedCampaign2).toBeUndefined();
             });
+
+            it('should send metric when reload rescheduled', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.objectContaining({'rsn': 'rescheduled_failed_preload'}));
+            });
         });
 
         describe('load request while reload ongoing', () => {
