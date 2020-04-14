@@ -182,8 +182,6 @@ export class AdRequestManager extends CampaignManager {
 
         // schedule load request after preload
         if (this._ongoingPreloadRequest !== null) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWhilePreloadOngoing);
-
             let promiseResolve: () => void;
             const promise = new Promise((resolve) => { promiseResolve = resolve; }).then(() =>
                 this.requestLoad(placementId)
@@ -196,8 +194,6 @@ export class AdRequestManager extends CampaignManager {
 
         // schedule load request after reload
         if (this._ongoingReloadRequest !== null) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWhileReloadOngoing);
-
             let promiseResolve: () => void;
             const promise = new Promise((resolve) => { promiseResolve = resolve; }).then(() =>
                 this.requestLoad(placementId)
@@ -215,17 +211,14 @@ export class AdRequestManager extends CampaignManager {
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestNoPreloadData);
                 throw new AdRequestManagerError('Preload data does not exists', 'no_preload');
             }
 
             if (this.isPreloadDataExpired()) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestPreloadDataExpired);
                 throw new AdRequestManagerError('Preload data expired', 'expired');
             }
 
             if (this._currentSession === null) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestCurrentSessionIsNotSet);
                 throw new AdRequestManagerError('Session is not set', 'no_session');
             }
 
@@ -272,7 +265,6 @@ export class AdRequestManager extends CampaignManager {
 
     public requestReload(placementsToLoad: string[]) {
         if (this._ongoingReloadRequest !== null) {
-            SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestOngoing);
             return Promise.resolve();
         }
 
@@ -453,7 +445,6 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (this._currentSession === null) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestCurrentSessionMissing);
             throw new AdRequestManagerError('Session is not set', 'no_session');
         }
 

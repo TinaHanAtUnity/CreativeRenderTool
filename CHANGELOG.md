@@ -1,3 +1,21 @@
+# Tue Apr 14 00:36:19 UTC 2020
+
+* [Load V5] Remove duplicate and unused metrics [#14532](https://github.com/Applifier/unity-ads-webview/pull/14532)
+* [Auction V6] Switch ABGroup from 18 to 6 [#14536](https://github.com/Applifier/unity-ads-webview/pull/14536)
+* Apply shouldVideoOverlayRemainVisible on click customer feature to all mobilityware games [#14534](https://github.com/Applifier/unity-ads-webview/pull/14534)
+
+# Thu Apr  9 18:08:35 UTC 2020
+
+* [Load V5] Enable Load V5 ab test, round 3 [#14354](https://github.com/Applifier/unity-ads-webview/pull/14354)
+
+# Thu Apr  9 01:40:19 UTC 2020
+
+* Cleanup Deployment Scripts [#14471](https://github.com/Applifier/unity-ads-webview/pull/14471)
+* Change AdmobEventHandler Data to Always be a String [#14472](https://github.com/Applifier/unity-ads-webview/pull/14472)
+* Add Local Branches Removal Script [#14470](https://github.com/Applifier/unity-ads-webview/pull/14470)
+* Close Admob Ad Unit When Video Element is Not Found [#14469](https://github.com/Applifier/unity-ads-webview/pull/14469)
+* Revert Add CacheMode Disabled Test on Group 5 [#14475](https://github.com/Applifier/unity-ads-webview/pull/14475)
+
 # Tue Apr  7 23:21:53 UTC 2020
 
 * Reduce Admob Campaign Parsing Time [#14438](https://github.com/Applifier/unity-ads-webview/pull/14438)

@@ -197,9 +197,6 @@ export class CustomFeatures {
     }
 
     public static shouldVideoOverlayRemainVisible(gameId: string): boolean {
-        return gameId === '1046481' ||
-               gameId === '1050871' ||
-               gameId === '1048767' ||
-               gameId === '1060862';
+        return this.existsInList(MobilityWareGamesJson, gameId);
     }
 }
