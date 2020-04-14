@@ -2,6 +2,7 @@
 
 * [Load V5] Remove duplicate and unused metrics [#14532](https://github.com/Applifier/unity-ads-webview/pull/14532)
 * [Auction V6] Switch ABGroup from 18 to 6 [#14536](https://github.com/Applifier/unity-ads-webview/pull/14536)
+* Apply shouldVideoOverlayRemainVisible on click customer feature to all mobilityware games [#14534](https://github.com/Applifier/unity-ads-webview/pull/14534)
 
 # Thu Apr  9 18:08:35 UTC 2020
 
