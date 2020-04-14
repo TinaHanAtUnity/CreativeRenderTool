@@ -211,7 +211,7 @@ export class AdRequestManager extends CampaignManager {
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
-                throw new AdRequestManagerError('Preload data does not exists', 'no_preload');
+                throw new AdRequestManagerError('Preload data is missing due to failure to receive it', 'failed_preload');
             }
 
             if (this.isPreloadDataExpired()) {
