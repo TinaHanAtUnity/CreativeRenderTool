@@ -81,7 +81,7 @@ export const TemporaryCacheModeAllowedTest = new ABTest(15);
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const PrivacySDKTest = new ABTest(16);
 export const AuctionXHR = new DisabledABTest();
-export const AuctionV6Test = new ABTest(6);
+export const AuctionV6Test = new ABTest(6, 13);
 export const LoadV5 = new ABTest(18, 19);
 export const BaseLineLoadV5 = new ABTest(18, 19);
 
