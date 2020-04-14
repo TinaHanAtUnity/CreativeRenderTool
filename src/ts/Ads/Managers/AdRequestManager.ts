@@ -175,7 +175,7 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
-    public requestLoad(placementId: string): Promise<ILoadedCampaign | undefined> {
+    public requestLoad(placementId: string, rescheduled: boolean = false): Promise<ILoadedCampaign | undefined> {
         // setting that placementId is being loaded,
         // this is used to track load cancellation due to reload request
         this._ongoingLoadRequests[placementId] = true;
@@ -184,7 +184,7 @@ export class AdRequestManager extends CampaignManager {
         if (this._ongoingPreloadRequest !== null) {
             let promiseResolve: () => void;
             const promise = new Promise((resolve) => { promiseResolve = resolve; }).then(() =>
-                this.requestLoad(placementId)
+                this.requestLoad(placementId, true)
             );
 
             this._ongoingPreloadRequest = this._ongoingPreloadRequest.then(() => { promiseResolve(); });
@@ -196,7 +196,7 @@ export class AdRequestManager extends CampaignManager {
         if (this._ongoingReloadRequest !== null) {
             let promiseResolve: () => void;
             const promise = new Promise((resolve) => { promiseResolve = resolve; }).then(() =>
-                this.requestLoad(placementId)
+                this.requestLoad(placementId, true)
             );
 
             this._ongoingReloadRequest = this._ongoingReloadRequest.then(() => { promiseResolve(); });
@@ -211,6 +211,9 @@ export class AdRequestManager extends CampaignManager {
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
+                if (rescheduled) {
+                    throw new AdRequestManagerError('Preload data is missing due to failure to receive it after load request was rescheduled', 'rescheduled_failed_preload');
+                }
                 throw new AdRequestManagerError('Preload data is missing due to failure to receive it', 'failed_preload');
             }
 
