@@ -533,25 +533,72 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
       background: red;
       width: 80%;
       height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
     }
 
-    @keyframes xyz {
-      0% {
-        transform: translateY(20deg);  
+    .swipe-up-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .swipe-up-download-text {
+      text-shadow: 2px 2px 3px $black;
+      font-size: 0.85em;
+    }
+
+    @keyframes arrow-jump {
+      0%, 100% { 
+        transform: translateY(0.3em);
       }
 
-      100% {
-        transform: translateY(-20deg);
+      15%, 85% {
+        transform: translateY(-0.5em);
       }
+    }
       
+    @keyframes color-change {
+      0%, 100% { 
+        fill: $white;
+      }
+
+      15%, 85% {
+        fill: transparent;
+      }
     }
-    
+
+    @keyframes background-color-change {
+      0%, 100% { 
+        fill: transparent;
+      }
+
+      15%, 85% {
+        fill: $white;
+      }
+    }
+
     svg {
-      width: 3em;
+      width: 1.5em;
       height: auto;
-      transform: rotate(-90deg);
-      animation: xyz 2s infinite;
+      animation: arrow-jump 2s infinite;
+      animation-timing-function: ease-in-out;
+      border-radius: 75px;
     }
+
+    .up-arrow-background {
+      fill: transparent;  
+      animation: background-color-change 2s infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    .up-arrow {
+      fill: $white;
+      animation: color-change 2s infinite;
+      animation-timing-function: ease-in-out;
+    }
+
 
   }
 }
