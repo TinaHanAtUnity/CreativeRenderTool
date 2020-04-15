@@ -1,3 +1,7 @@
+# Pending
+
+* Expand Temporary Cachemode Allowed Test to Group 14 and 15 [#14598](https://github.com/Applifier/unity-ads-webview/pull/14598)
+
 # Wed Apr 15 01:24:42 UTC 2020
 
 * [Load V5] Send metric when preload failed while rescheduling load request [#14564](https://github.com/Applifier/unity-ads-webview/pull/14564)
