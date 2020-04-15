@@ -388,8 +388,6 @@ export class Ads implements IAds {
                         }
                     } else if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
                         experimentType = MediationExperimentType.LoadV5;
-                    } else if (AuctionV6Test.isValid(this._core.Config.getAbGroup())) {
-                        experimentType = MediationExperimentType.AuctionV6;
                     } else if (whitelistedCMATest || temporaryCMATest) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
                         experimentType = MediationExperimentType.CacheModeAllowed;
