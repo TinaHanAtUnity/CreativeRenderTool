@@ -18,22 +18,46 @@
         {
           "node": "ageSelect",
           "condition": {
-            ">": [
+            "and": [
               {
-                "var": "env.ageGateLimit"
+                ">": [
+                  {
+                    "var": "env.ageGateLimit"
+                  },
+                  0
+                ]
               },
-              0
+              {
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "missing"
+                ]
+              }
             ]
           }
         },
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "or": [
               {
-                "var": "env.ageGateLimit"
+                "==": [
+                  {
+                    "var": "env.ageGateLimit"
+                  },
+                  0
+                ]
               },
-              0
+              {
+                "!=": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "missing"
+                ]
+              }
             ]
           }
         }
@@ -69,8 +93,8 @@
             "variant": "secondary",
             "actions": [
               {
-                "property": "user.agreedOverAgeLimit",
-                "value": false
+                "property": "user.ageGateChoice",
+                "value": "no"
               }
             ]
           },
@@ -82,8 +106,8 @@
             "variant": "primary",
             "actions": [
               {
-                "property": "user.agreedOverAgeLimit",
-                "value": true
+                "property": "user.ageGateChoice",
+                "value": "yes"
               }
             ]
           }
@@ -95,9 +119,9 @@
           "condition": {
             "==": [
               {
-                "var": "user.agreedOverAgeLimit"
+                "var": "user.ageGateChoice"
               },
-              true
+              "yes"
             ]
           }
         },
@@ -106,9 +130,9 @@
           "condition": {
             "==": [
               {
-                "var": "user.agreedOverAgeLimit"
+                "var": "user.ageGateChoice"
               },
-              false
+              "no"
             ]
           }
         }
