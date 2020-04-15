@@ -1,4 +1,4 @@
-# Pending
+# Wed Apr 15 23:25:45 UTC 2020
 
 * [Load V5] Cleanup unused condition block for tracking URLs [#14626](https://github.com/Applifier/unity-ads-webview/pull/14626)
 * [Auction V6] Remove Mediation Experiment Type [#14599](https://github.com/Applifier/unity-ads-webview/pull/14599)
