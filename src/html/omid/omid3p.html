@@ -10,6 +10,7 @@
                     SESSION_ERROR = 'sessionError',
                     SESSION_REGISTERED = 'sessionRegistered';
                     var DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
+                    var IFRAME_ID = '{{ IFRAME_ID_ }}';
                     var sessionObservers = [];
                     var sessionStartData = {};
                     var sessionStartCalled = false;
@@ -30,7 +31,7 @@
                             sessionObservers[i](eventData);
                         }
                     }
-        
+
                     /**
                      * Callback to communicate back to TS layer of changed state
                      * @param {string} event to send to the server
@@ -81,7 +82,7 @@
                             sessionStartData = event.data;
                         }
                     }
-        
+
                     /**
                      * Strips 'omid' from string to be passed to vendor
                      * @param {string} event to send to the vendor
@@ -109,7 +110,7 @@
                                 break;
                         }
                     }
-        
+
                     /**
                      * LifeCycle Event Listener
                      */
@@ -133,12 +134,12 @@
 
                         /**
                          * SESSION EVENTS:
-                         */ 
+                         */
                         handleSessionEvents(event);
                     });
-        
+
                     /*
-                    * Tells verification script omid3p is supported 
+                    * Tells verification script omid3p is supported
                     */
                     this.isSupported = function() {
                         return true;
@@ -173,7 +174,8 @@
                         postMessageCallback('onEventRegistered', {
                             eventName: adjustEventTypeString(type),
                             vendorKey: scriptVendor,
-                            uuid: '' + uuid
+                            uuid: '' + uuid,
+                            iframeId: IFRAME_ID
                         });
                     }
 
@@ -191,13 +193,13 @@
                         postMessageCallback(event, data);
                     }
                 }
-        
+
                 /**
                  * Generic Vast verification scripts attach to this:
                  */
                 window.omid3p = new OmidVerification();
                 Object.freeze(window.omid3p);
-                
+
                 /**
                  * Used for IAB test:
                  * window.OmidVerificationClient = {'omid3p': OmidVerification};
