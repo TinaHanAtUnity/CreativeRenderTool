@@ -145,11 +145,8 @@ class SatisfiesMatcher {
                     adRequests: 1,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
@@ -194,11 +191,8 @@ class SatisfiesMatcher {
                     adRequests: 1,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
@@ -266,11 +260,8 @@ class SatisfiesMatcher {
                     adRequests: 1,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
@@ -937,11 +928,8 @@ class SatisfiesMatcher {
                     adRequests: 2,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
