@@ -1,5 +1,6 @@
 # Pending
 
+* [Tech Debt] Disable SessionDiagnostics from Firing to Kafka [14313](https://github.com/Applifier/unity-ads-webview/pull/14313)
 * [Tech Debt] Disable Diagnostics from Firing to Kafka [14287](https://github.com/Applifier/unity-ads-webview/pull/14287)
 * OM: Fix duplicate postMessage events happens when several OM instances exist [#14474](https://github.com/Applifier/unity-ads-webview/pull/14474)
 
