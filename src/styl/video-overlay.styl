@@ -557,31 +557,31 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
     }
 
     @keyframes arrow-jump {
-      0%, 80% { 
+      0%, 60%, 70%, 80%, 90%, 100% { 
         transform: translateY(0em);
       }
 
-      20%, 50% {
+      10%, 20%, 30%, 40%, 50% {
         transform: translateY(-0.8em);
       }
     }
       
     @keyframes color-change {
-      0%, 80% { 
+      0%, 60%, 70%, 80%, 90%, 100% { 
         fill: $white;
       }
 
-      20%, 50% {
+      10%, 20%, 30%, 40%, 50% {
         fill: transparent;
       }
     }
 
     @keyframes background-color-change {
-      0%, 80% { 
+      0%, 60%, 70%, 80%, 90%, 100% { 
         fill: transparent;
       }
 
-      20%, 50% {
+      10%, 20%, 30%, 40%, 50% {
         fill: $white;
       }
     }
@@ -590,23 +590,22 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
       filter: drop-shadow(1px 1px 3px $black);
       width: 1.5em;
       height: auto;
-      animation: arrow-jump 1.4s infinite;
+      animation: arrow-jump 3s infinite;
       animation-timing-function: ease-in-out;
       animation-delay: 5.5s;
       border-radius: 75px;
-      // transform: translateY(0.3em);
     }
 
     .up-arrow-background {
       fill: transparent;  
-      animation: background-color-change 1.4s infinite;
+      animation: background-color-change 3s infinite;
       animation-timing-function: ease-in-out;
       animation-delay: 5.5s;
     }
 
     .up-arrow {
       fill: $white;
-      animation: color-change 1.4s infinite;
+      animation: color-change 3s infinite;
       animation-timing-function: ease-in-out;
       animation-delay: 5.5s;
     }
