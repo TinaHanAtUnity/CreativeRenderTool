@@ -362,6 +362,37 @@ class SatisfiesMatcher {
             });
         });
 
+        describe('successful load request and caching fails', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                assetManager.setup.mockRejectedValue(new Error());
+
+                adsConfig.getPlacement.mockReturnValue(Placement());
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should have a fill', () => {
+                expect(loadedCampaign).toBeDefined();
+            });
+        });
+
         describe('successful load request with no fill from preload', () => {
             let loadedCampaign: ILoadedCampaign | undefined;
 
@@ -516,7 +547,6 @@ class SatisfiesMatcher {
                 });
             });
         });
-
 
         describe('load request when no preload data', () => {
             let loadedCampaign: ILoadedCampaign | undefined;
