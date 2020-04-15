@@ -1,3 +1,7 @@
+# Pending
+
+* China auction endpoint switch for 1% of traffic [#14567](https://github.com/Applifier/unity-ads-webview/pull/14567)
+
 # Wed Apr 15 23:25:45 UTC 2020
 
 * [Load V5] Cleanup unused condition block for tracking URLs [#14626](https://github.com/Applifier/unity-ads-webview/pull/14626)
