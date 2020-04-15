@@ -96,6 +96,17 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return this.get('defaultBannerPlacement');
     }
 
+    public getPlacementsForAdunit(adUnitId: string): string[] {
+        const placementIds: string[] = [];
+        const placements = this.getPlacements();
+
+        Object.keys(placements)
+              .map((placementId) => placements[placementId])
+              .filter(placement => placement.hasAdUnitId() && placement.getAdUnitId() === adUnitId)
+              .map((placement) => placementIds.push(placement.getId()));
+        return placementIds;
+    }
+
     public getHidePrivacy(): boolean | undefined {
         return this.get('hidePrivacy');
     }
