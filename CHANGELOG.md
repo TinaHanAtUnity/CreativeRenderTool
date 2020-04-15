@@ -1,4 +1,4 @@
-# Pending
+# Wed Apr 15 01:24:42 UTC 2020
 
 * [Load V5] Send metric when preload failed while rescheduling load request [#14564](https://github.com/Applifier/unity-ads-webview/pull/14564)
 * [Load V5] Rename error message and error tag to correct one [#14563](https://github.com/Applifier/unity-ads-webview/pull/14563)
