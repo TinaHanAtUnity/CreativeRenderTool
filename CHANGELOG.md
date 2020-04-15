@@ -1,6 +1,63 @@
-# Pending
+# Wed Apr 15 02:32:42 UTC 2020
+
+* Expand Temporary Cachemode Allowed Test to Group 14 and 15 [#14598](https://github.com/Applifier/unity-ads-webview/pull/14598)
+
+# Wed Apr 15 01:24:42 UTC 2020
+
+* [Load V5] Send metric when preload failed while rescheduling load request [#14564](https://github.com/Applifier/unity-ads-webview/pull/14564)
+* [Load V5] Rename error message and error tag to correct one [#14563](https://github.com/Applifier/unity-ads-webview/pull/14563)
+* [Load V5] Expand Load V5 to new AB group [#14535](https://github.com/Applifier/unity-ads-webview/pull/14535)
+* Conclude Original Load and Load V4 Experiment [#14562](https://github.com/Applifier/unity-ads-webview/pull/14562)
+* Add Deploy Label to Deployment PRs [#14566](https://github.com/Applifier/unity-ads-webview/pull/14566)
+* [Auction V6] Increase Traffic to Group 13 [#14594](https://github.com/Applifier/unity-ads-webview/pull/14594)
+* [Auction V6] Change Group 13 to Group 10 [#14597](https://github.com/Applifier/unity-ads-webview/pull/14597)
+
+# Tue Apr 14 00:36:19 UTC 2020
+
+* [Load V5] Remove duplicate and unused metrics [#14532](https://github.com/Applifier/unity-ads-webview/pull/14532)
+* [Auction V6] Switch ABGroup from 18 to 6 [#14536](https://github.com/Applifier/unity-ads-webview/pull/14536)
+* Apply shouldVideoOverlayRemainVisible on click customer feature to all mobilityware games [#14534](https://github.com/Applifier/unity-ads-webview/pull/14534)
+
+# Thu Apr  9 18:08:35 UTC 2020
+
+* [Load V5] Enable Load V5 ab test, round 3 [#14354](https://github.com/Applifier/unity-ads-webview/pull/14354)
+
+# Thu Apr  9 01:40:19 UTC 2020
+
+* Cleanup Deployment Scripts [#14471](https://github.com/Applifier/unity-ads-webview/pull/14471)
+* Change AdmobEventHandler Data to Always be a String [#14472](https://github.com/Applifier/unity-ads-webview/pull/14472)
+* Add Local Branches Removal Script [#14470](https://github.com/Applifier/unity-ads-webview/pull/14470)
+* Close Admob Ad Unit When Video Element is Not Found [#14469](https://github.com/Applifier/unity-ads-webview/pull/14469)
+* Revert Add CacheMode Disabled Test on Group 5 [#14475](https://github.com/Applifier/unity-ads-webview/pull/14475)
+
+# Tue Apr  7 23:21:53 UTC 2020
+
+* Reduce Admob Campaign Parsing Time [#14438](https://github.com/Applifier/unity-ads-webview/pull/14438)
+* Add customer feature to disable UI fade on click [#14286](https://github.com/Applifier/unity-ads-webview/pull/14286)
+* Remove Group 5 from CacheModeAllowed Test [#14465](https://github.com/Applifier/unity-ads-webview/pull/14465)
+* Add CacheMode Disabled Test on Group 5 [#14466](https://github.com/Applifier/unity-ads-webview/pull/14466)
+* Reorganize Mediation Experiments to Accomodate ReverseABTest [#14467](https://github.com/Applifier/unity-ads-webview/pull/14467)
+* [Load V5] Change Auction Endpoints [#14464](https://github.com/Applifier/unity-ads-webview/pull/14464)
+
+# Tue Apr  7 13:39:01 UTC 2020
+
+* Privacy release 1.2.0 [#14412](https://github.com/Applifier/unity-ads-webview/pull/14412)
+
+# Tue Apr  7 00:13:49 UTC 2020
+
+* Remove ABGroup 15 from Temporary CacheMode Allowed Test [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
+* Cleanup unused metrics from latency optimization [#14314](https://github.com/Applifier/unity-ads-webview/pull/14314)
+* [Auction V6] Enable Test on Group 15 [#14382](https://github.com/Applifier/unity-ads-webview/pull/14382)
+* Remove Nofill Immediately Test [#14317](https://github.com/Applifier/unity-ads-webview/pull/14317)
+* Update the design of Privacy Settings view [#14028](https://github.com/Applifier/unity-ads-webview/pull/14028)
+* [Load V5] Support Preload Data Expiration [#14225](https://github.com/Applifier/unity-ads-webview/pull/14225)
+* [Load V5] Change default TTL for preload data to 7200 [#14353](https://github.com/Applifier/unity-ads-webview/pull/14353)
+* Add dark mode and color matching to automated experiment [#14000](https://github.com/Applifier/unity-ads-webview/pull/14000)
+
+# Mon Apr  6 22:22:37 UTC 2020
 
 * Remove Promo and Purchasing [#13565](https://github.com/Applifier/unity-ads-webview/pull/13565)
+* Revert "Open Measurement - Add Timeout on Admob start metric" [#14321](https://github.com/Applifier/unity-ads-webview/pull/14321)
 
 # Sat Apr  4 00:23:31 UTC 2020
 

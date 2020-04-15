@@ -30,6 +30,14 @@ And check that it's correctly set with:
 
 ### Staging
 
+#### Staging/00.delete_local_branches.sh
+
+Removes references to local branches if they exist.
+
+This script should be ran if:
+- You intend on creating new staging branches
+- You are merging on top of Staged Deployments
+
 #### Staging/create_staging_branches.sh
 
 Run this script if staging branches do not yet exist locally. Be sure local staging branches are deleted before continuing to avoid merge conflict issues.

@@ -9,13 +9,6 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 
 export class CustomFeatures {
 
-    public static isNofillImmediatelyGame(gameId: string): boolean {
-        return gameId === '1781853' ||
-               gameId === '1781854' ||
-               gameId === '3152568' ||
-               gameId === '3152569';
-    }
-
     public static isNoGzipGame(gameId: string): boolean {
         return gameId === '1475968' ||
                gameId === '1708468' ||
@@ -201,5 +194,9 @@ export class CustomFeatures {
         return gameId === '1543460' || // richardh, test app (Apple App Store)
                gameId === '1543461' || // richardh, test app (Google Play Store)
                gameId === '80222';   // Pocketgems, Episode (Google Play Store)
+    }
+
+    public static shouldVideoOverlayRemainVisible(gameId: string): boolean {
+        return this.existsInList(MobilityWareGamesJson, gameId);
     }
 }

@@ -71,5 +71,8 @@
 
   "privacy-captcha-description": "We need to verify that the user is human. Please review the following 16 images and select the one that does not fit the theme.",
   "privacy-captcha-success-message": "Confirmed",
-  "privacy-captcha-retry-message": "Incorrect. Please try again."
+  "privacy-captcha-retry-message": "Incorrect. Please try again.",
+
+  "privacy-settings-report-ad": "Report ad",
+  "privacy-settings-build-info": "Build info"
 }
