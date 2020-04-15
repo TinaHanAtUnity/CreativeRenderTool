@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Cleanup unused condition block for tracking URLs [14626](https://github.com/Applifier/unity-ads-webview/pull/14626)
 * [Auction V6] Remove Mediation Experiment Type [14599](https://github.com/Applifier/unity-ads-webview/pull/14599)
 * [Tech Debt] Disable SessionDiagnostics from Firing to Kafka [14313](https://github.com/Applifier/unity-ads-webview/pull/14313)
 * [Tech Debt] Disable Diagnostics from Firing to Kafka [14287](https://github.com/Applifier/unity-ads-webview/pull/14287)
