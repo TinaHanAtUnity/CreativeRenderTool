@@ -14,6 +14,7 @@ export enum ErrorMetric {
 }
 
 export enum AdmobMetric {
+    AdmobVideoElementMissing = 'admob_video_element_missing',
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
@@ -167,24 +168,15 @@ export enum LoadV5 {
     PreloadRequestParsingResponse = 'v5_preload_request_parsing_response',
     PreloadRequestStarted = 'v5_preload_request_started',
     PreloadRequestAlreadyActive = 'v5_preload_request_already_active',
-    LoadRequestNoPreloadData = 'v5_load_request_no_preload_data',
-    LoadRequestPreloadDataExpired = 'v5_load_request_preload_data_expired',
-    LoadRequestWhilePreloadOngoing = 'v5_load_request_while_preload_ongoing',
-    LoadRequestWhileReloadOngoing = 'v5_load_request_while_reload_ongoing',
-    LoadRequestCurrentSessionIsNotSet = 'v5_load_request_current_session_is_not_set',
     LoadRequestStarted = 'v5_load_request_started',
     LoadRequestParsingResponse = 'v5_load_request_parsing_response',
     LoadRequestFailed = 'v5_load_request_failed',
     LoadRequestWasCanceled = 'v5_load_request_was_canceled',
-    LoadRequestCurrentSessionMissing = 'v5_load_request_current_session_missing',
     LoadRequestFill = 'v5_load_request_fill',
-    ReloadRequestOngoing = 'v5_reload_request_ongoing',
     ReloadRequestFailed = 'v5_reload_request_failed',
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
     ReloadRequestStarted = 'v5_reload_request_started',
     ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
-    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data',
-    RefreshManagerPreloadDataExpired = 'v5_refresh_manager_preload_data_expired',
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
     RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
     Show = 'v5_show'
@@ -201,9 +193,14 @@ export enum AuctionV6 {
     FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
 }
 
+export enum ChinaAucionEndpoint {
+    AuctionRequest = 'china_user_auction_request',
+    AuctionResponse = 'china_user_auction_response'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
 
 export class SDKMetrics {
 
