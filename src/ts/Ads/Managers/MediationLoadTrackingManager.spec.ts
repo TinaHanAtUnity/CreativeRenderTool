@@ -244,14 +244,14 @@ describe('MediationLoadTrackingManager', () => {
     });
 
     [false, true].forEach(flag => {
-        describe(`should create the str with the ${flag} flag`, () => {
+        describe(`should create the str with the ${!flag} flag`, () => {
             beforeEach(() => {
                 medLoadTrackingManager.reportAdShown(flag);
             });
 
             it('should report metric event with tags', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${flag}` }));
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${!flag}` }));
             });
         });
     });
